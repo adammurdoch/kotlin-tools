@@ -1,1 +1,2 @@
 includeBuild("plugins")
+includeBuild("test")

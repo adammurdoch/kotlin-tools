@@ -8,7 +8,7 @@ A collection of Gradle plugins for building applications using Kotlin.
   - Adds `nativeMain` and `nativeTest` source sets that are shared by these targets. You can add shared Kotlin/Native code
     to these source sets.
 
-See ../test for some samples.
+See [`../test`](../test/README.md) for some samples.
 
 ### TODO
 

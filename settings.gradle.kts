@@ -1,2 +1,2 @@
 includeBuild("plugins")
-includeBuild("test")
+includeBuild("test-apps")

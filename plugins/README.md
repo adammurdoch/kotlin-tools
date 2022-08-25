@@ -1,6 +1,6 @@
 # Gradle Plugins
 
-A collection of Gradle plugins for building applications from Kotlin.
+A collection of Gradle plugins for building applications using Kotlin.
 
 - `net.rubygrapefruit.native-cli-app`
   - Builds a command-line application implemented in Kotlin/Native
@@ -13,3 +13,4 @@ See ../test for some samples.
 ### TODO
 
 - Add a settings plugin that add the maven repo and plugin dependencies to the root project.
+- Add some kind `assembleDebug` task to build a single dev target.

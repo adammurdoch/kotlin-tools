@@ -7,6 +7,10 @@ repositories {
     mavenCentral()
 }
 
+dependencies {
+    implementation(versions.kotlinJvmPlugin)
+}
+
 gradlePlugin {
     plugins {
         create("native-cli-app") {

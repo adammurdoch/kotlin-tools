@@ -3,6 +3,8 @@ plugins {
     alias(versions.plugins.kotlinJvmPlugin)
 }
 
+group="net.rubygrapefruit.plugins"
+
 repositories {
     mavenCentral()
 }

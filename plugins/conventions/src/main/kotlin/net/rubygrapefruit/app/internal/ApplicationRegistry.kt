@@ -19,6 +19,7 @@ internal abstract class ApplicationRegistry(private val project: Project) {
             t.imageDirectory.set(app.distribution.flatMap { d -> d.imageDirectory })
             t.launcherFile.set(app.distribution.flatMap { d -> d.launcherFile })
             t.launcherBaseName.set(project.name)
+            t.libraries.from(app.distribution.get().libraries)
         }
     }
 }

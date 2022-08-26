@@ -5,6 +5,8 @@ import net.rubygrapefruit.app.internal.DefaultCliApplication
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.mpp.Executable
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 open class NativeCliApplicationPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -58,6 +60,17 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
                     it.dependsOn(nativeTest)
                 }
             }
+
+            val nativeTargetName = if (System.getProperty("os.name").contains("linux", true)) {
+                "linuxX64"
+            } else {
+                "macosX64"
+            }
+
+            val extension = extensions.getByType(KotlinMultiplatformExtension::class.java)
+            val nativeTarget = extension.targets.getByName(nativeTargetName) as KotlinNativeTarget
+            val executable = nativeTarget.binaries.withType(Executable::class.java).first()
+            app.distribution.get().launcherFile.set(layout.file(executable.linkTaskProvider.map { it.binary.outputFile }))
         }
     }
 }

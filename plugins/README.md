@@ -18,6 +18,12 @@ Builds a command-line application implemented in Kotlin/JVM
 - Adds `appliction { }` block
   - `application.mainClass`
 
+## Common application settings
+
+- Adds `appliction { }` block
+  - `application.imageDirectory`
+- Adds a `dist` task to create a distribution image ready for installation
+
 See [`../test-apps`](../test-apps/) for some samples.
 
 ### TODO

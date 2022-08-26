@@ -1,13 +1,15 @@
 package net.rubygrapefruit.app.plugins
 
+import net.rubygrapefruit.app.CliApplication
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
-open class NativeCLIApplicationPlugin : Plugin<Project> {
+open class NativeCliApplicationPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
+            extensions.create("application", CliApplication::class.java)
 
             repositories.mavenCentral()
 

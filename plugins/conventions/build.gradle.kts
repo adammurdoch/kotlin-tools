@@ -17,7 +17,11 @@ gradlePlugin {
     plugins {
         create("native-cli-app") {
             id = "net.rubygrapefruit.native-cli-app"
-            implementationClass = "net.rubygrapefruit.app.plugins.NativeCLIApplicationPlugin"
+            implementationClass = "net.rubygrapefruit.app.plugins.NativeCliApplicationPlugin"
+        }
+        create("jvm-cli-app") {
+            id = "net.rubygrapefruit.jvm-cli-app"
+            implementationClass = "net.rubygrapefruit.app.plugins.JvmCliApplicationPlugin"
         }
     }
 }

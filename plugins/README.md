@@ -7,6 +7,8 @@ A collection of Gradle plugins for building applications using Kotlin.
   - Adds macOS and Linux targets.
   - Adds `nativeMain` and `nativeTest` source sets that are shared by these targets. You can add shared Kotlin/Native code
     to these source sets.
+- `net.rubygrapefruit.jvm-cli-app`
+  - Builds a command-line application implemented in Kotlin/JVM
 
 See [`../test-apps`](../test-apps/) for some samples.
 
@@ -14,3 +16,4 @@ See [`../test-apps`](../test-apps/) for some samples.
 
 - Add a settings plugin that add the maven repo and plugin dependencies to the root project.
 - Add some kind `assembleDebug` task to build a single dev target.
+- Add functional tests for plugins.

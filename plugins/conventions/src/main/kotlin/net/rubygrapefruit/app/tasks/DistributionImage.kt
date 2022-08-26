@@ -12,6 +12,7 @@ import java.nio.file.FileVisitor
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.attribute.BasicFileAttributes
+import java.nio.file.attribute.PosixFilePermission
 
 /**
  * Creates an image of the application distribution.
@@ -40,7 +41,9 @@ abstract class DistributionImage : DefaultTask() {
             println("No launcher defined for this distribution")
         } else {
             println("  launcher: $launcherFile")
-            Files.copy(launcherFile, imageDirectory.resolve(launcherBaseName.get()))
+            val target = imageDirectory.resolve(launcherBaseName.get())
+            Files.copy(launcherFile, target)
+            Files.setPosixFilePermissions(target, setOf(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE))
         }
         if (!libraries.isEmpty) {
             val libsDir = imageDirectory.resolve("libs")

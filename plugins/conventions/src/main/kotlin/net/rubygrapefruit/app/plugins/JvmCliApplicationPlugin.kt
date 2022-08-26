@@ -1,6 +1,7 @@
 package net.rubygrapefruit.app.plugins
 
-import net.rubygrapefruit.app.JvmCliApplication
+import net.rubygrapefruit.app.internal.ApplicationRegistry
+import net.rubygrapefruit.app.internal.DefaultJvmCliApplication
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -8,9 +9,11 @@ class JvmCliApplicationPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             plugins.apply("org.jetbrains.kotlin.jvm")
-            extensions.create("application", JvmCliApplication::class.java)
+            plugins.apply(ApplicationBasePlugin::class.java)
 
-            repositories.mavenCentral()
+            val app = extensions.create("application", DefaultJvmCliApplication::class.java)
+            app.setup()
+            extensions.getByType(ApplicationRegistry::class.java).register(app)
         }
     }
 }

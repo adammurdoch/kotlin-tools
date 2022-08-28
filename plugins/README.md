@@ -36,16 +36,19 @@ See [`../test-apps`](../test-apps/) for some samples.
 
 ### TODO
 
-- Set JDK to 11
-- Generate module file
+- Set JDK to 11.
+- Use toolchain's `jlink` command.
+- Generate module file.
+- Use correct architecture for macOS native binary and embedded JVM
 - Add a settings plugin that add the maven repo and plugin dependencies to the root project.
 - Add some kind `assembleDebug` task to build a single dev target.
 - Add functional tests for plugins.
   - Customisation
 - Generate windows launcher script for JVM applications.
 - Gradle issues:
+  - Fix running `gradlew test-apps:x` (needs leading `:` and error message does not mention this) 
   - Fix `task.flatMap { it.someOutputDir.file("some-file") }` -> does not carry task dependencies
-  - Cannot discard property value from Kotlin (set(null) is ambiguous)
+  - Awkward to discard property value from Kotlin (set(null) is ambiguous)
   - Some kind of managed type `Property<T>` or `Provider<T>` that allows deferred configuration (eg `Property<Distribution>`)
   - Create a property of managed type (eg `val dist: Distribution`)
-  - Some way to get dependencies as locations or file names (ie without the build dependencies, to generate a manifest, etc)
+  - Some way to get `FileCollection` elements as locations or file names (ie without the build dependencies, to generate a manifest, etc)

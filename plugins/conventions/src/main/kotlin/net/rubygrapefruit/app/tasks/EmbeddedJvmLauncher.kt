@@ -18,13 +18,7 @@ abstract class EmbeddedJvmLauncher : DefaultTask() {
     abstract val imageDirectory: DirectoryProperty
 
     @get:Input
-    abstract val launcherName: Property<String>
-
-    @get:Input
     abstract val module: Property<String>
-
-    @get:Input
-    abstract val mainClass: Property<String>
 
     @get:InputFiles
     abstract val modulePath: ConfigurableFileCollection
@@ -35,26 +29,22 @@ abstract class EmbeddedJvmLauncher : DefaultTask() {
     @TaskAction
     fun generate() {
         val module = module.get()
-        val launcherName = launcherName.get()
-        val mainClass = mainClass.get()
         val imageDirectory = imageDirectory.get().asFile.toPath()
         imageDirectory.makeEmpty()
         imageDirectory.deleteIfExists()
 
         exec.exec {
             // TODO - use jlink from toolchain
-            // TODO - strip the image
             it.commandLine(
                 "jlink",
-                "--verbose",
+                "--no-header-files",
+                "--no-man-pages",
                 "--output",
                 imageDirectory.toAbsolutePath(),
                 "--module-path",
                 modulePath.asPath,
                 "--add-modules",
-                module,
-                "--launcher",
-                "$launcherName=$module/$mainClass"
+                module
             )
         }
     }

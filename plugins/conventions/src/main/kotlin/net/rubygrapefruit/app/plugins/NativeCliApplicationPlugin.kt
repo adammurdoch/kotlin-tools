@@ -69,9 +69,7 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
             val extension = extensions.getByType(KotlinMultiplatformExtension::class.java)
             val nativeTarget = extension.targets.getByName(nativeTargetName) as KotlinNativeTarget
             val executable = nativeTarget.binaries.withType(Executable::class.java).first()
-            applications.applyLauncherTo(app.distribution) { dist ->
-                dist.launcherFile.set(layout.file(executable.linkTaskProvider.map { it.binary.outputFile }))
-            }
+            app.distribution.launcherFile.set(layout.file(executable.linkTaskProvider.map { it.binary.outputFile }))
         }
     }
 }

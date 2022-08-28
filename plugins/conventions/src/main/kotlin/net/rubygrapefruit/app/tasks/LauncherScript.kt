@@ -5,6 +5,7 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
@@ -21,11 +22,19 @@ abstract class LauncherScript : DefaultTask() {
     @get:Input
     abstract val modulePath: ListProperty<String>
 
+    @get:Input
+    @get:Optional
+    abstract val javaCommand: Property<String>
+
     @TaskAction
     fun generate() {
         val scriptFile = scriptFile.get().asFile
+
+        val javaCommand = if (javaCommand.isPresent) "\$BASE_DIR/${javaCommand.get()}" else "java"
+        val modulePath = if (modulePath.get().isNotEmpty()) "--module-path \"${modulePath.get().joinToString(":") { "\$BASE_DIR/libs/$it" }}\"" else ""
+
         scriptFile.writeText(
-            """#!/bin/sh
+            """#!/bin/bash
 
 SOURCE=${'$'}{BASH_SOURCE[0]}
 while [ -L "${'$'}SOURCE" ]; do
@@ -35,7 +44,7 @@ while [ -L "${'$'}SOURCE" ]; do
 done
 BASE_DIR=${'$'}( cd -P "${'$'}( dirname "${'$'}SOURCE" )" >/dev/null 2>&1 && pwd )
 
-java --module-path ${modulePath.get().joinToString(":") { "\$BASE_DIR/libs/$it" }} --module ${module.get()}/${mainClass.get()} "$*"
+$javaCommand $modulePath --module ${module.get()}/${mainClass.get()} "$*"
 """
         )
     }

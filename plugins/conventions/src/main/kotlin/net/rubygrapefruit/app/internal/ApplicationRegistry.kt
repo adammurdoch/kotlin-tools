@@ -1,7 +1,6 @@
 package net.rubygrapefruit.app.internal
 
 import net.rubygrapefruit.app.CliApplication
-import net.rubygrapefruit.app.Distribution
 import net.rubygrapefruit.app.JvmCliApplication
 import net.rubygrapefruit.app.tasks.DistributionImage
 import org.gradle.api.Project
@@ -22,10 +21,9 @@ internal abstract class ApplicationRegistry(private val project: Project) {
         val distTask = project.tasks.register("dist", DistributionImage::class.java) { t ->
             t.imageDirectory.set(app.distribution.imageDirectory)
             t.launcherFile.set(app.distribution.launcherFile)
-            t.launcherDirectory.set(app.distribution.launcherDirectory)
-            t.launcherFilePath.set(app.distribution.launcherFilePath)
             t.launcherName.set(app.appName)
             t.libraries.from(app.distribution.libraries)
+            t.content.from(app.distribution.content)
         }
 
         app.distribution.launcherOutputFile.set(distTask.flatMap { t -> t.imageDirectory.map { it.file(t.launcherName.get()) } })
@@ -34,13 +32,6 @@ internal abstract class ApplicationRegistry(private val project: Project) {
             builder(project, app)
         }
         whenAppSet.clear()
-    }
-
-    fun applyLauncherTo(distribution: Distribution, builder: Project.(Distribution) -> Unit) {
-        distribution.launcherFile.set(project.provider { null })
-        distribution.launcherDirectory.set(project.provider { null })
-        distribution.launcherFilePath.set(project.provider { null })
-        builder(project, distribution)
     }
 
     fun withApp(builder: Project.(CliApplication) -> Unit) {

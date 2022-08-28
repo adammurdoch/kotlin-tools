@@ -21,6 +21,9 @@ class JvmCliApplicationPlugin : Plugin<Project> {
             val jarTask = tasks.named("jar", Jar::class.java)
             val runtimeClasspath = configurations.getByName("runtimeClasspath")
 
+            app.outputModulePath.from(jarTask.map { it.archiveFile })
+            app.outputModulePath.from(runtimeClasspath)
+
             val launcherTask = tasks.register("launcherScript", LauncherScript::class.java) {
                 it.scriptFile.set(layout.buildDirectory.file("app/launcher.sh"))
                 it.module.set(app.module)
@@ -30,11 +33,8 @@ class JvmCliApplicationPlugin : Plugin<Project> {
                 it.modulePath.addAll(libNames)
             }
 
-            applications.applyLauncherTo(app.distribution) { dist ->
-                dist.libraries.from(jarTask.map { it.archiveFile })
-                dist.libraries.from(runtimeClasspath)
-                dist.launcherFile.set(launcherTask.flatMap { it.scriptFile })
-            }
+            app.distribution.launcherFile.set(launcherTask.flatMap { it.scriptFile })
+            app.distribution.libraries.from(app.outputModulePath)
         }
     }
 }

@@ -19,19 +19,13 @@ abstract class DistributionImage : DefaultTask() {
     abstract val imageDirectory: DirectoryProperty
 
     @get:InputFile
-    @get:Optional
     abstract val launcherFile: RegularFileProperty
-
-    @get:InputDirectory
-    @get:Optional
-    abstract val launcherDirectory: DirectoryProperty
-
-    @get:Input
-    @get:Optional
-    abstract val launcherFilePath: Property<String>
 
     @get:InputFiles
     abstract val libraries: ConfigurableFileCollection
+
+    @get:InputFiles
+    abstract val content: ConfigurableFileCollection
 
     @get:Input
     abstract val launcherName: Property<String>
@@ -41,27 +35,25 @@ abstract class DistributionImage : DefaultTask() {
         val imageDirectory = imageDirectory.get().asFile.toPath()
         imageDirectory.makeEmpty()
 
-        val launcherFile = launcherFile.orNull?.asFile?.toPath()
-        val launcherDir = launcherDirectory.orNull?.asFile?.toPath()
-        if (launcherFile == null && launcherDir == null) {
-            throw IllegalArgumentException("No launcher file or launcher directory specified.")
-        } else if (launcherFile != null && launcherDir != null) {
-            throw IllegalArgumentException("Both launcher file or launcher directory specified.")
-        } else if (launcherFile != null) {
-            println("  launcher file: $launcherFile")
-            val target = imageDirectory.resolve(launcherName.get())
-            Files.copy(launcherFile, target)
-            Files.setPosixFilePermissions(target, setOf(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE))
-        } else {
-            println("  launcher dir: $launcherDir using ${launcherFilePath.get()}")
-            copyDir(launcherDir!!, imageDirectory)
-        }
+        val launcherFile = launcherFile.get().asFile.toPath()
+        println("  launcher file: $launcherFile")
+        val target = imageDirectory.resolve(launcherName.get())
+        Files.copy(launcherFile, target)
+        Files.setPosixFilePermissions(target, setOf(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE))
+
         if (!libraries.isEmpty) {
             val libsDir = imageDirectory.resolve("libs")
             Files.createDirectories(libsDir)
             for (library in libraries) {
                 println("  library: $library")
                 Files.copy(library.toPath(), imageDirectory.resolve("libs/${library.name}"))
+            }
+        }
+        for (file in content) {
+            if (file.isDirectory) {
+                copyDir(file.toPath(), imageDirectory)
+            } else {
+                Files.copy(file.toPath(), target)
             }
         }
     }

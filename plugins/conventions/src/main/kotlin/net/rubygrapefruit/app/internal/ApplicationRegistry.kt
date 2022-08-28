@@ -5,7 +5,7 @@ import net.rubygrapefruit.app.JvmCliApplication
 import net.rubygrapefruit.app.tasks.DistributionImage
 import org.gradle.api.Project
 
-internal abstract class ApplicationRegistry(private val project: Project) {
+abstract class ApplicationRegistry(private val project: Project) {
     private var main: CliApplication? = null
     private val whenAppSet = mutableListOf<Project.(CliApplication) -> Unit>()
 

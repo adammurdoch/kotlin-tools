@@ -4,6 +4,8 @@ import net.rubygrapefruit.app.internal.makeEmpty
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
@@ -15,6 +17,15 @@ abstract class EmbeddedJvmLauncher : DefaultTask() {
     @get:OutputDirectory
     abstract val imageDirectory: DirectoryProperty
 
+    @get:Input
+    abstract val launcherName: Property<String>
+
+    @get:Input
+    abstract val module: Property<String>
+
+    @get:Input
+    abstract val mainClass: Property<String>
+
     @get:InputFiles
     abstract val modulePath: ConfigurableFileCollection
 
@@ -23,18 +34,15 @@ abstract class EmbeddedJvmLauncher : DefaultTask() {
 
     @TaskAction
     fun generate() {
-        val module = "someModule"
-        val launcherName = "thing"
-        val mainClasName = "sample.MainKt"
+        val module = module.get()
+        val launcherName = launcherName.get()
+        val mainClass = mainClass.get()
         val imageDirectory = imageDirectory.get().asFile.toPath()
         imageDirectory.makeEmpty()
         imageDirectory.deleteIfExists()
 
         exec.exec {
             // TODO - use jlink from toolchain
-            // TODO - configurable module name
-            // TODO - pass in launcher name
-            // TODO - pass in main class
             // TODO - strip the image
             it.commandLine(
                 "jlink",
@@ -46,7 +54,7 @@ abstract class EmbeddedJvmLauncher : DefaultTask() {
                 "--add-modules",
                 module,
                 "--launcher",
-                "$launcherName=$module/$mainClasName"
+                "$launcherName=$module/$mainClass"
             )
         }
     }

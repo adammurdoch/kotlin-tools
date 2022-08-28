@@ -1,8 +1,9 @@
 package net.rubygrapefruit.app
 
-import javax.inject.Inject
+import org.gradle.api.provider.Property
 
 interface CliApplication {
-    @get:Inject
     val distribution: Distribution
+
+    val appName: Property<String>
 }

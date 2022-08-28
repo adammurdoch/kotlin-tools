@@ -15,8 +15,8 @@ class JvmCliApplicationPlugin : Plugin<Project> {
             plugins.apply(ApplicationBasePlugin::class.java)
 
             val app = extensions.create("application", DefaultJvmCliApplication::class.java)
-            app.setup()
             applications.register(app)
+            app.module.set(app.appName)
 
             val jarTask = tasks.named("jar", Jar::class.java)
             val runtimeClasspath = configurations.getByName("runtimeClasspath")

@@ -15,16 +15,17 @@ internal abstract class ApplicationRegistry(private val project: Project) {
         }
         main = app
 
+        app.appName.set(project.name)
         app.distribution.imageDirectory.set(project.layout.buildDirectory.dir("dist-image"))
 
         val distTask = project.tasks.register("dist", DistributionImage::class.java) { t ->
             t.imageDirectory.set(app.distribution.imageDirectory)
             t.launcherFile.set(app.distribution.launcherFile)
-            t.launcherBaseName.set(project.name)
+            t.launcherName.set(app.appName)
             t.libraries.from(app.distribution.libraries)
         }
 
-        app.distribution.launcherOutputFile.set(distTask.flatMap { t -> t.imageDirectory.map { it.file(t.launcherBaseName.get()) } })
+        app.distribution.launcherOutputFile.set(distTask.flatMap { t -> t.imageDirectory.map { it.file(t.launcherName.get()) } })
 
         for (builder in whenAppSet) {
             builder(project, app)

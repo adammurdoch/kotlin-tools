@@ -15,7 +15,6 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
             plugins.apply(ApplicationBasePlugin::class.java)
 
             val app = extensions.create("application", DefaultCliApplication::class.java)
-            app.setup()
             applications.register(app)
 
             with(extensions.getByType(KotlinMultiplatformExtension::class.java)) {

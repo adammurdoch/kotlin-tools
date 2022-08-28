@@ -12,9 +12,12 @@ open class EmbeddedJvmLauncherPlugin : Plugin<Project> {
             applications.withJvmApp { app ->
                 val embeddedJvmTask = tasks.register("embeddedJvm", EmbeddedJvmLauncher::class.java) { t ->
                     t.imageDirectory.set(layout.buildDirectory.dir("embedded-jvm"))
+                    t.launcherName.set(app.appName)
+                    t.module.set(app.module)
+                    t.mainClass.set(app.mainClass)
                     t.modulePath.from(app.distribution.libraries)
                 }
-                app.distribution.launcherFile.set(embeddedJvmTask.flatMap { t -> t.imageDirectory.map { it.file("thing") } })
+                app.distribution.launcherFile.set(embeddedJvmTask.flatMap { t -> t.imageDirectory.map { it.file("bin/${t.launcherName.get()}") } })
             }
         }
     }

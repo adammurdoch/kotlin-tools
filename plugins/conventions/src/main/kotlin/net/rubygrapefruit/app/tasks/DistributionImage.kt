@@ -25,7 +25,7 @@ abstract class DistributionImage : DefaultTask() {
     abstract val libraries: ConfigurableFileCollection
 
     @get:Input
-    abstract val launcherBaseName: Property<String>
+    abstract val launcherName: Property<String>
 
     @TaskAction
     fun install() {
@@ -37,7 +37,7 @@ abstract class DistributionImage : DefaultTask() {
             println("No launcher defined for this distribution")
         } else {
             println("  launcher: $launcherFile")
-            val target = imageDirectory.resolve(launcherBaseName.get())
+            val target = imageDirectory.resolve(launcherName.get())
             Files.copy(launcherFile, target)
             Files.setPosixFilePermissions(target, setOf(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE))
         }

@@ -13,18 +13,29 @@ abstract class LauncherScript : DefaultTask() {
     abstract val scriptFile: RegularFileProperty
 
     @get:Input
+    abstract val module: Property<String>
+
+    @get:Input
     abstract val mainClass: Property<String>
 
     @get:Input
-    abstract val classPath: ListProperty<String>
+    abstract val modulePath: ListProperty<String>
 
     @TaskAction
     fun generate() {
         val scriptFile = scriptFile.get().asFile
         scriptFile.writeText(
             """#!/bin/sh
-BASE_DIR=`dirname "$0"`
-java -cp ${classPath.get().joinToString(":") { "\$BASE_DIR/libs/$it" }} ${mainClass.get()} "$*"
+
+SOURCE=${'$'}{BASH_SOURCE[0]}
+while [ -L "${'$'}SOURCE" ]; do
+    DIR=${'$'}( cd -P "${'$'}( dirname "${'$'}SOURCE" )" >/dev/null 2>&1 && pwd )
+    SOURCE=${'$'}(readlink "${'$'}SOURCE")
+    [[ ${'$'}SOURCE != /* ]] && SOURCE=${'$'}DIR/${'$'}SOURCE
+done
+BASE_DIR=${'$'}( cd -P "${'$'}( dirname "${'$'}SOURCE" )" >/dev/null 2>&1 && pwd )
+
+java --module-path ${modulePath.get().joinToString(":") { "\$BASE_DIR/libs/$it" }} --module ${module.get()}/${mainClass.get()} "$*"
 """
         )
     }

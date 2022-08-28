@@ -10,4 +10,6 @@ interface Distribution {
     val launcherFile: RegularFileProperty
 
     val libraries: ConfigurableFileCollection
+
+    val launcherOutputFile: RegularFileProperty
 }

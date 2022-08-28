@@ -1,11 +1,13 @@
 package net.rubygrapefruit.app.internal
 
 import net.rubygrapefruit.app.CliApplication
+import net.rubygrapefruit.app.JvmCliApplication
 import net.rubygrapefruit.app.tasks.DistributionImage
 import org.gradle.api.Project
 
 internal abstract class ApplicationRegistry(private val project: Project) {
     private var main: CliApplication? = null
+    private val whenAppSet = mutableListOf<Project.(CliApplication) -> Unit>()
 
     fun register(app: CliApplication) {
         if (main != null) {
@@ -13,13 +15,37 @@ internal abstract class ApplicationRegistry(private val project: Project) {
         }
         main = app
 
-        app.distribution.get().imageDirectory.set(project.layout.buildDirectory.dir("dist-image"))
+        app.distribution.imageDirectory.set(project.layout.buildDirectory.dir("dist-image"))
 
-        project.tasks.register("dist", DistributionImage::class.java) { t ->
-            t.imageDirectory.set(app.distribution.flatMap { d -> d.imageDirectory })
-            t.launcherFile.set(app.distribution.flatMap { d -> d.launcherFile })
+        val distTask = project.tasks.register("dist", DistributionImage::class.java) { t ->
+            t.imageDirectory.set(app.distribution.imageDirectory)
+            t.launcherFile.set(app.distribution.launcherFile)
             t.launcherBaseName.set(project.name)
-            t.libraries.from(app.distribution.get().libraries)
+            t.libraries.from(app.distribution.libraries)
+        }
+
+        app.distribution.launcherOutputFile.set(distTask.flatMap { t -> t.imageDirectory.map { it.file(t.launcherBaseName.get()) } })
+
+        for (builder in whenAppSet) {
+            builder(project, app)
+        }
+        whenAppSet.clear()
+    }
+
+    fun withApp(builder: Project.(CliApplication) -> Unit) {
+        val main = this.main
+        if (main != null) {
+            builder(project, main)
+        } else {
+            whenAppSet.add(builder)
+        }
+    }
+
+    fun withJvmApp(builder: Project.(JvmCliApplication) -> Unit) {
+        withApp { app ->
+            if (app is JvmCliApplication) {
+                builder(project, app)
+            }
         }
     }
 }

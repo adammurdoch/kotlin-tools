@@ -1,7 +1,7 @@
 package net.rubygrapefruit.app.plugins
 
-import net.rubygrapefruit.app.internal.ApplicationRegistry
 import net.rubygrapefruit.app.internal.DefaultCliApplication
+import net.rubygrapefruit.app.internal.applications
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -16,7 +16,7 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
 
             val app = extensions.create("application", DefaultCliApplication::class.java)
             app.setup()
-            extensions.getByType(ApplicationRegistry::class.java).register(app)
+            applications.register(app)
 
             with(extensions.getByType(KotlinMultiplatformExtension::class.java)) {
                 macosX64 {
@@ -70,7 +70,7 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
             val extension = extensions.getByType(KotlinMultiplatformExtension::class.java)
             val nativeTarget = extension.targets.getByName(nativeTargetName) as KotlinNativeTarget
             val executable = nativeTarget.binaries.withType(Executable::class.java).first()
-            app.distribution.get().launcherFile.set(layout.file(executable.linkTaskProvider.map { it.binary.outputFile }))
+            app.distribution.launcherFile.set(layout.file(executable.linkTaskProvider.map { it.binary.outputFile }))
         }
     }
 }

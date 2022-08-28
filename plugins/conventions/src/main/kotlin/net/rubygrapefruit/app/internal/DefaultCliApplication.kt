@@ -9,7 +9,11 @@ internal abstract class DefaultCliApplication : CliApplication {
     @get:Inject
     abstract val factory: ObjectFactory
 
+    override val distribution: Distribution by lazy {
+        factory.newInstance(Distribution::class.java)
+    }
+
     fun setup() {
-        distribution.set(factory.newInstance(Distribution::class.java))
+//        distribution.set(factory.newInstance(Distribution::class.java))
     }
 }

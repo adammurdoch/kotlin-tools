@@ -1,5 +1,6 @@
 package net.rubygrapefruit.app.tasks
 
+import net.rubygrapefruit.app.internal.copyDir
 import net.rubygrapefruit.app.internal.makeEmpty
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
@@ -21,6 +22,14 @@ abstract class DistributionImage : DefaultTask() {
     @get:Optional
     abstract val launcherFile: RegularFileProperty
 
+    @get:InputDirectory
+    @get:Optional
+    abstract val launcherDirectory: DirectoryProperty
+
+    @get:Input
+    @get:Optional
+    abstract val launcherFilePath: Property<String>
+
     @get:InputFiles
     abstract val libraries: ConfigurableFileCollection
 
@@ -33,13 +42,19 @@ abstract class DistributionImage : DefaultTask() {
         imageDirectory.makeEmpty()
 
         val launcherFile = launcherFile.orNull?.asFile?.toPath()
-        if (launcherFile == null) {
-            println("No launcher defined for this distribution")
-        } else {
-            println("  launcher: $launcherFile")
+        val launcherDir = launcherDirectory.orNull?.asFile?.toPath()
+        if (launcherFile == null && launcherDir == null) {
+            throw IllegalArgumentException("No launcher file or launcher directory specified.")
+        } else if (launcherFile != null && launcherDir != null) {
+            throw IllegalArgumentException("Both launcher file or launcher directory specified.")
+        } else if (launcherFile != null) {
+            println("  launcher file: $launcherFile")
             val target = imageDirectory.resolve(launcherName.get())
             Files.copy(launcherFile, target)
             Files.setPosixFilePermissions(target, setOf(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE))
+        } else {
+            println("  launcher dir: $launcherDir using ${launcherFilePath.get()}")
+            copyDir(launcherDir!!, imageDirectory)
         }
         if (!libraries.isEmpty) {
             val libsDir = imageDirectory.resolve("libs")

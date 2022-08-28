@@ -1,6 +1,7 @@
 package net.rubygrapefruit.app.plugins
 
 import net.rubygrapefruit.app.internal.applications
+import net.rubygrapefruit.app.tasks.DistributionImage
 import net.rubygrapefruit.app.tasks.EmbeddedJvmLauncher
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -17,7 +18,13 @@ open class EmbeddedJvmLauncherPlugin : Plugin<Project> {
                     t.mainClass.set(app.mainClass)
                     t.modulePath.from(app.distribution.libraries)
                 }
-                app.distribution.launcherFile.set(embeddedJvmTask.flatMap { t -> t.imageDirectory.map { it.file("bin/${t.launcherName.get()}") } })
+                applications.applyLauncherTo(app.distribution) { dist ->
+                    dist.launcherDirectory.set(embeddedJvmTask.flatMap { t -> t.imageDirectory })
+                    dist.launcherFilePath.set(embeddedJvmTask.map { t -> "bin/${t.launcherName.get()}" })
+                }
+                tasks.named("dist", DistributionImage::class.java) {
+                    it.libraries.setFrom()
+                }
             }
         }
     }

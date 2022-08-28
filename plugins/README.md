@@ -45,6 +45,7 @@ See [`../test-apps`](../test-apps/) for some samples.
 - Generate windows launcher script for JVM applications.
 - Gradle issues:
   - Fix `task.flatMap { it.someOutputDir.file("some-file") }` -> does not carry task dependencies
+  - Cannot discard property value from Kotlin (set(null) is ambiguous)
   - Some kind of managed type `Property<T>` or `Provider<T>` that allows deferred configuration (eg `Property<Distribution>`)
   - Create a property of managed type (eg `val dist: Distribution`)
   - Some way to get dependencies as locations or file names (ie without the build dependencies, to generate a manifest, etc)

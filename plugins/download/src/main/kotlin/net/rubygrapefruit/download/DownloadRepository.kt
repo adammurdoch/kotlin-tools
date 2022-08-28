@@ -24,33 +24,71 @@ class DownloadRepository(val silent: Boolean = false) {
     /**
      * Downloads and installs the given Zip
      */
-    fun install(uri: URI, name: String): Path {
+    fun install(uri: URI, name: String, onInstall: (Path) -> Unit = {}): Path {
         Files.createDirectories(downloadsDir)
         val dir = downloadsDir.resolve(name)
         if (Files.exists(dir)) {
             return dir
         } else {
-            val tmpFile = downloadsDir.resolve("${name}.zip-tmp")
+            val format = when {
+                uri.path.endsWith(Zip.extension, true) -> Zip
+                uri.path.endsWith(TarGz.extension, true) -> TarGz
+                else -> throw RuntimeException("Don't know how to install $uri")
+            }
+
+            val tmpFile = downloadsDir.resolve("${name}.download.${format.extension}")
             val tmpDir = downloadsDir.resolve("${name}.expanded-tmp")
+            Files.createDirectories(tmpDir)
             if (!silent) {
                 println("Downloading $uri")
             }
-            uri.toURL().openConnection().getInputStream().use {
-                Files.copy(it, tmpFile, StandardCopyOption.REPLACE_EXISTING)
+            try {
+                uri.toURL().openConnection().getInputStream().use {
+                    Files.copy(it, tmpFile, StandardCopyOption.REPLACE_EXISTING)
+                }
+                format.unpack(tmpFile, tmpDir)
+                Files.move(tmpDir, dir, StandardCopyOption.ATOMIC_MOVE)
+                onInstall(dir)
+            } finally {
+                Files.deleteIfExists(tmpFile)
             }
-            if (!exec("unzip", "-q", tmpFile.toString(), "-d", tmpDir.toString())) {
-                throw RuntimeException("Could not unzip $tmpFile")
-            }
-            Files.move(tmpDir, dir, StandardCopyOption.ATOMIC_MOVE)
             return dir
         }
     }
 
-    private fun exec(vararg commandLine: String): Boolean {
-        val builder = ProcessBuilder(commandLine.toList())
-        builder.inheritIO()
-        val process = builder.start()
-        val exitValue = process.waitFor()
-        return exitValue == 0
+    private sealed interface Format {
+        val extension: String
+
+        fun unpack(file: Path, dir: Path)
     }
+
+    private object Zip : Format {
+        override val extension: String
+            get() = "zip"
+
+        override fun unpack(file: Path, dir: Path) {
+            if (!exec("unzip", "-q", file.toString(), "-d", dir.toString())) {
+                throw RuntimeException("Could not unzip $file")
+            }
+        }
+    }
+
+    private object TarGz : Format {
+        override val extension: String
+            get() = "tar.gz"
+
+        override fun unpack(file: Path, dir: Path) {
+            if (!exec("tar", "--extract", "-f", file.toString(), "--directory", dir.toString())) {
+                throw RuntimeException("Could not untar $file")
+            }
+        }
+    }
+}
+
+private fun exec(vararg commandLine: String): Boolean {
+    val builder = ProcessBuilder(commandLine.toList())
+    builder.inheritIO()
+    val process = builder.start()
+    val exitValue = process.waitFor()
+    return exitValue == 0
 }

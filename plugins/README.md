@@ -45,10 +45,11 @@ See [`../test-apps`](../test-apps/) for some samples.
 
 ### TODO
 
+- Fix native image for linux
 - Set JDK to 11.
 - Use toolchain's `jlink` command.
 - Generate module file.
-- Use correct architecture for macOS native binary and embedded JVM
+- Use correct architecture for macOS native binary, embedded JVM and GraalVM native binary output.
 - Add a settings plugin that add the maven repo and plugin dependencies to the root project.
 - Add some kind `assembleDebug` task to build a single dev target.
 - Add jvm library convention plugin and use for `downloads` project.
@@ -56,8 +57,9 @@ See [`../test-apps`](../test-apps/) for some samples.
 - Add functional tests for plugins.
   - Customisation
 - Generate windows launcher script for JVM applications.
+- Refactor `DownloadRepository` to use Gradle exec service when used in a plugin.
 - Gradle issues:
-  - Fix import of `test-apps` 
+  - Fix import of `test-apps` - does not seem to be included
   - Use version catalog
   - Fix running `gradlew test-apps:x` (needs leading `:` and error message does not mention this) 
   - Fix `task.flatMap { it.someOutputDir.file("some-file") }` -> does not carry task dependencies

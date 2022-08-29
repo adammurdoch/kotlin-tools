@@ -16,8 +16,8 @@ dependencies {
 gradlePlugin {
     plugins {
         create("settings") {
-            id = "net.rubygrapefruit.kotlin-apps"
-            implementationClass = "net.rubygrapefruit.app.plugins.KotlinAppsPlugin"
+            id = "net.rubygrapefruit.kotlin-base"
+            implementationClass = "net.rubygrapefruit.app.plugins.KotlinBasePlugin"
         }
         create("native-cli-app") {
             id = "net.rubygrapefruit.native-cli-app"

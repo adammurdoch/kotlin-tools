@@ -61,6 +61,7 @@ See [`../test-apps`](../test-apps/) for some samples.
 - Gradle issues:
   - Fix import of `test-apps` - does not seem to be included
   - Use version catalog
+  - "Included build 'x' does not exist" does not give any content, eg where is it defined?
   - Fix running `gradlew test-apps:x` (needs leading `:` and error message does not mention this) 
   - Fix `task.flatMap { it.someOutputDir.file("some-file") }` -> does not carry task dependencies
   - Awkward to discard property value from Kotlin (set(null) is ambiguous)

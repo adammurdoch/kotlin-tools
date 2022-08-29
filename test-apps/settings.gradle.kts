@@ -1,8 +1,9 @@
 pluginManagement {
-    includeBuild("../plugins")
+    includeBuild("../base-plugins")
+    includeBuild("../launcher-plugins")
 }
 plugins {
-    id("net.rubygrapefruit.kotlin-apps")
+    id("net.rubygrapefruit.kotlin-base")
 }
 
 for (f in rootDir.listFiles()) {

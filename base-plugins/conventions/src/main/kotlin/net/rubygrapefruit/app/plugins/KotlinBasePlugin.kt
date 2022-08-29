@@ -4,7 +4,7 @@ import net.rubygrapefruit.app.internal.settingsPluginApplied
 import org.gradle.api.Plugin
 import org.gradle.api.initialization.Settings
 
-class KotlinAppsPlugin: Plugin<Settings> {
+class KotlinBasePlugin: Plugin<Settings> {
     override fun apply(target: Settings) {
         with(target) {
             target.gradle.rootProject { project ->

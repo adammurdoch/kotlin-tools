@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":conventions"))
+    implementation("net.rubygrapefruit.plugins:conventions:1.0")
     implementation(project(":download"))
 }
 

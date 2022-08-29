@@ -11,6 +11,6 @@ internal fun Project.settingsPluginApplied() {
 
 internal fun Project.checkSettingsPluginApplied() {
     if (rootProject.extensions.findByName("__settings_plugin_applied__") == null) {
-        throw IllegalStateException("Plugin 'net.rubygrapefruit.kotlin-apps' must be applied to the settings of this build.")
+        throw IllegalStateException("Plugin 'net.rubygrapefruit.kotlin-base' must be applied to the settings of this build.")
     }
 }

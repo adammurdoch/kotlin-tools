@@ -7,4 +7,5 @@ plugins {
 }
 
 include("download")
+include("native-launcher")
 include("launcher-plugins")

@@ -73,3 +73,4 @@ See [`../test-apps`](../test-apps/) for some samples.
   - Some way to get `FileCollection` elements as locations or file names (ie without the build dependencies, to generate a manifest, etc.)
   - No way to have a generated output directory (eg a task that uses `DownloadRepository` to locate the output)
   - Improve error message when settings plugin is applied to project, and vice versa
+  - Some way to apply concurrent limits across all builds (eg to work around `commonizeNativeDistribution` concurrency issue)

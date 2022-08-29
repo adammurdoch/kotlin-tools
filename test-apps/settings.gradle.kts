@@ -4,6 +4,7 @@ pluginManagement {
 }
 plugins {
     id("net.rubygrapefruit.kotlin-base")
+    id("net.rubygrapefruit.included-build")
 }
 
 for (f in rootDir.listFiles()) {

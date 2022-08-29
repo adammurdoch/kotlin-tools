@@ -19,6 +19,10 @@ gradlePlugin {
             id = "net.rubygrapefruit.kotlin-base"
             implementationClass = "net.rubygrapefruit.app.plugins.KotlinBasePlugin"
         }
+        create("included-builds") {
+            id = "net.rubygrapefruit.included-build"
+            implementationClass = "net.rubygrapefruit.app.plugins.IncludedBuildLifecyclePlugin"
+        }
         create("native-cli-app") {
             id = "net.rubygrapefruit.native-cli-app"
             implementationClass = "net.rubygrapefruit.app.plugins.NativeCliApplicationPlugin"

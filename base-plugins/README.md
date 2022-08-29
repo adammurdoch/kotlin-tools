@@ -61,7 +61,9 @@ See [`../test-apps`](../test-apps/) for some samples.
 - Gradle issues:
   - Fix import of `test-apps` - does not seem to be included
   - Use version catalog
-  - "Included build 'x' does not exist" does not give any content, eg where is it defined?
+  - "Included build 'x' does not exist" does not give any content, e.g. where is it defined?
+  - Add some way to get a dependency on all tasks with a given name in a build
+  - Add some way to get a dependency on task with given path in a build, where the task may not exist
   - Fix running `gradlew test-apps:x` (needs leading `:` and error message does not mention this) 
   - Fix `task.flatMap { it.someOutputDir.file("some-file") }` -> does not carry task dependencies
   - Awkward to discard property value from Kotlin (set(null) is ambiguous)
@@ -70,3 +72,4 @@ See [`../test-apps`](../test-apps/) for some samples.
   - Create a property of managed type (eg `val dist: Distribution`)
   - Some way to get `FileCollection` elements as locations or file names (ie without the build dependencies, to generate a manifest, etc.)
   - No way to have a generated output directory (eg a task that uses `DownloadRepository` to locate the output)
+  - Improve error message when settings plugin is applied to project, and vice versa

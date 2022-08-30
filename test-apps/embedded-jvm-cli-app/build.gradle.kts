@@ -1,6 +1,6 @@
 plugins {
-    id("net.rubygrapefruit.jvm-cli-app")
-    id("net.rubygrapefruit.embedded-jvm")
+    id("net.rubygrapefruit.jvm.cli-app")
+    id("net.rubygrapefruit.jvm.embedded-jvm")
 }
 
 application {

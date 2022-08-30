@@ -2,11 +2,14 @@
 
 A collection of Gradle plugins for building applications using Kotlin.
 
+These plugins all target Kotlin 1.7.10 and a minimum of Java 11 (for Kotlin/JVM apps). The plugins require
+Gradle 7.5.1 or later.
+
 ## `net.rubygrapefruit.kotlin-apps`
 
 A settings plugin that must be applied to the settings of any build that uses these plugins.
 
-## `net.rubygrapefruit.native-cli-app`
+## `net.rubygrapefruit.native.cli-app`
 
 Builds a command-line application implemented in Kotlin/Native
 
@@ -15,37 +18,42 @@ Builds a command-line application implemented in Kotlin/Native
   to these source sets.
 - Adds `appliction { }` block
 
-## `net.rubygrapefruit.jvm-cli-app`
+## `net.rubygrapefruit.jvm.cli-app`
 
 Builds a command-line application implemented in Kotlin/JVM. Expects that the application uses the JVM module system.
 
 - Adds `application { }` block
-  - `application.module`
-  - `application.mainClass`
+  - `application.module` - defaults to the application name
+  - `application.mainClass` - must be specified.
 - Generates a launcher script in the distribution. This script requires that a compatible JVM can be found on the machine's `$PATH`. 
 
-## `net.rubygrapefruit.embedded-jvm`
+## `net.rubygrapefruit.jvm.embedded-jvm`
 
-Can be applied with `net.rubygrapefruit.jvm-cli-app` to include a copy of the JVM in the application distribution,
+Can be applied with `net.rubygrapefruit.jvm.cli-app` to include a copy of the JVM in the application distribution,
 instead of using a launcher script. Uses `jlink` to create the JVM image.
 
-## `net.rubygrapefruit.native-binary`
+## `net.rubygrapefruit.jvm.native-binary`
 
-Can be applied with `net.rubygrapefruit.jvm-cli-app` to create a native binary to use in the application distribution,
+Can be applied with `net.rubygrapefruit.jvm.cli-app` to create a native binary to use in the application distribution,
 instead of using a launcher script. Uses `graalvm` to create the native binary.
+
+## `net.rubygrapefruit.plugin`
+
+A convention plugin for implementing Gradle plugins using Kotlin.
 
 ## Common application settings
 
 - Adds `application { }` block
-  - `application.appName`
-  - `application.imageDirectory`
-- Adds a `dist` task to create a distribution image ready for installation. By default, this is created in `build/dist-image`
+  - `application.appName` - the base name for the application, used for various default file names.
+  - `application.imageDirectory` - the directory to create the distribution image in.
+- Adds a `dist` task to create a distribution image containing the app ready for installation. By default, this is created in `build/dist-image`
 
 See [`../test-apps`](../test-apps/) for some samples.
 
 ### TODO
 
-- Fix native image for linux
+- Fix native image for linux and windows
+- Infer the main class for a JVM app.
 - Set JDK to 11.
 - Use toolchain's `jlink` command.
 - Generate module file.

@@ -36,7 +36,6 @@ abstract class DistributionImage : DefaultTask() {
         imageDirectory.makeEmpty()
 
         val launcherFile = launcherFile.get().asFile.toPath()
-        println("  launcher file: $launcherFile")
         val target = imageDirectory.resolve(launcherName.get())
         Files.copy(launcherFile, target)
         Files.setPosixFilePermissions(target, setOf(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE))
@@ -45,7 +44,6 @@ abstract class DistributionImage : DefaultTask() {
             val libsDir = imageDirectory.resolve("libs")
             Files.createDirectories(libsDir)
             for (library in libraries) {
-                println("  library: $library")
                 Files.copy(library.toPath(), imageDirectory.resolve("libs/${library.name}"))
             }
         }

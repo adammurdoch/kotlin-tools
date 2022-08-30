@@ -1,3 +1,3 @@
 plugins {
-    id("net.rubygrapefruit.native-cli-app")
+    id("net.rubygrapefruit.native.cli-app")
 }

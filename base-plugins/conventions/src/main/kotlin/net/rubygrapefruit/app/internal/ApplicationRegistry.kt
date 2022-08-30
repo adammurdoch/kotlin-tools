@@ -11,7 +11,7 @@ abstract class ApplicationRegistry(private val project: Project) {
     private var mainDistTask: TaskProvider<DistributionImage>? = null
     private val whenAppSet = mutableListOf<Project.(CliApplication) -> Unit>()
 
-    fun <T : CliApplication> register(app: T) {
+    fun register(app: CliApplication) {
         if (main != null) {
             throw UnsupportedOperationException("Support for multiple applications in the same project is not implemented.")
         }
@@ -19,14 +19,13 @@ abstract class ApplicationRegistry(private val project: Project) {
 
         app.appName.convention(project.name)
         app.distribution.imageDirectory.convention(project.layout.buildDirectory.dir("dist-image"))
+        app.distribution.launcherFilePath.convention(app.appName)
 
         val distTask = project.tasks.register("dist", DistributionImage::class.java) { t ->
             t.imageDirectory.set(app.distribution.imageDirectory)
-            t.launcherFile.set(app.distribution.launcherFile)
-            t.launcherName.set(app.appName)
-            t.content.from(app.distribution.content)
+            t.includeFile(app.distribution.launcherFilePath, app.distribution.launcherFile)
         }
-        app.distribution.launcherOutputFile.set(distTask.flatMap { t -> t.imageDirectory.map { it.file(t.launcherName.get()) } })
+        app.distribution.launcherOutputFile.set(distTask.flatMap { t -> t.imageDirectory.map { it.file(app.distribution.launcherFilePath.get()) } })
         mainDistTask = distTask
 
         for (builder in whenAppSet) {
@@ -35,8 +34,10 @@ abstract class ApplicationRegistry(private val project: Project) {
         whenAppSet.clear()
     }
 
-    fun applyToDistribution(builder: Project.(TaskProvider<DistributionImage>) -> Unit) {
-        builder(project, mainDistTask!!)
+    fun applyToDistribution(builder: Project.(DistributionImage) -> Unit) {
+        mainDistTask!!.configure {
+            builder(project, it)
+        }
     }
 
     private fun withApp(builder: Project.(CliApplication) -> Unit) {

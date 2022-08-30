@@ -21,10 +21,8 @@ open class EmbeddedJvmLauncherPlugin : Plugin<Project> {
                 app.distribution.javaLauncherPath.set("$jvmDir/bin/java")
                 app.distribution.modulePath.setFrom()
 
-                applications.applyToDistribution { p ->
-                    p.configure { t ->
-                        t.includeDir(jvmDir, embeddedJvmTask.flatMap { e -> e.imageDirectory })
-                    }
+                applications.applyToDistribution { t ->
+                    t.includeDir(jvmDir, embeddedJvmTask.flatMap { e -> e.imageDirectory })
                 }
 
                 tasks.named("launcherScript", LauncherScript::class.java) {

@@ -8,6 +8,9 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import java.nio.file.Files
+import java.nio.file.attribute.PosixFilePermission
+import kotlin.io.path.writeText
 
 abstract class LauncherScript : DefaultTask() {
     @get:OutputFile
@@ -31,8 +34,6 @@ abstract class LauncherScript : DefaultTask() {
 
     @TaskAction
     fun generate() {
-        val scriptFile = scriptFile.get().asFile
-
         val javaCommand = if (javaLauncherPath.isPresent) "\$BASE_DIR/${javaLauncherPath.get()}" else "java"
         val libsDirPath = libsDirPath.get()
         val modulePath = modulePath.get()
@@ -42,6 +43,7 @@ abstract class LauncherScript : DefaultTask() {
             ""
         }
 
+        val scriptFile = scriptFile.get().asFile.toPath()
         scriptFile.writeText(
             """#!/bin/bash
 
@@ -55,6 +57,18 @@ BASE_DIR=${'$'}( cd -P "${'$'}( dirname "${'$'}SOURCE" )" >/dev/null 2>&1 && pwd
 
 $javaCommand $modulePathArg --module ${module.get()}/${mainClass.get()} "$*"
 """
+        )
+        Files.setPosixFilePermissions(
+            scriptFile,
+            setOf(
+                PosixFilePermission.OWNER_WRITE,
+                PosixFilePermission.OWNER_READ,
+                PosixFilePermission.OWNER_EXECUTE,
+                PosixFilePermission.GROUP_READ,
+                PosixFilePermission.GROUP_EXECUTE,
+                PosixFilePermission.OTHERS_READ,
+                PosixFilePermission.OTHERS_EXECUTE
+            )
         )
     }
 }

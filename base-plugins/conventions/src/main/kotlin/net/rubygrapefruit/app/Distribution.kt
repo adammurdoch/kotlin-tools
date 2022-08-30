@@ -1,8 +1,8 @@
 package net.rubygrapefruit.app
 
-import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Property
 
 interface Distribution {
     val imageDirectory: DirectoryProperty
@@ -12,10 +12,7 @@ interface Distribution {
      */
     val launcherFile: RegularFileProperty
 
-    /**
-     * Additional files and directories to copy into the root of the distribution image.
-     */
-    val content: ConfigurableFileCollection
+    val launcherFilePath: Property<String>
 
     /**
      * The launcher file in the distribution image. You can use this to use the launcher from other tasks, eg a `run` task.

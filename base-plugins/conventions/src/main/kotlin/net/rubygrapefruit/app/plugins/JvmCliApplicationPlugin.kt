@@ -36,10 +36,8 @@ class JvmCliApplicationPlugin : Plugin<Project> {
                 it.modulePath.addAll(libNames)
             }
 
-            applications.applyToDistribution { p ->
-                p.configure { t ->
-                    t.includeFilesInDir(libsDirPath, app.distribution.modulePath)
-                }
+            applications.applyToDistribution { t ->
+                t.includeFilesInDir(libsDirPath, app.distribution.modulePath)
             }
 
             app.distribution.launcherFile.set(launcherTask.flatMap { it.scriptFile })

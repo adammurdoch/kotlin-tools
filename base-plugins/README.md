@@ -70,6 +70,7 @@ See [`../test-apps`](../test-apps/) for some samples.
 - Use toolchain's `jlink` command.
 - Generate module file.
 - Use correct architecture for macOS native binary, embedded JVM and GraalVM native binary output.
+  - Bundle native launcher for each platform in the plugins.
 - Add a settings plugin that add the maven repo and plugin dependencies to the root project.
 - Add some kind `assembleDebug` task to build a single dev target.
 - Add jvm library convention plugin and use for `downloads` project.
@@ -82,6 +83,7 @@ See [`../test-apps`](../test-apps/) for some samples.
   - Fix import of `test-apps` - does not seem to be included
   - Use version catalog
   - "Included build 'x' does not exist" does not give any content, e.g. where is it defined?
+  - Get the jlink tool for a toolchain
   - Add some way to get a dependency on all tasks with a given name in a build
   - Add some way to get a dependency on task with given path in a build, where the task may not exist
   - Fix running `gradlew test-apps:x` (needs leading `:` and error message does not mention this) 

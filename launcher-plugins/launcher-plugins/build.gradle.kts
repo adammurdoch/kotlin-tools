@@ -4,8 +4,19 @@ plugins {
 
 group = "net.rubygrapefruit.plugins"
 
+val nativeBinaries = configurations.create("nativeBinaries") {
+    attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named("native-binary"))
+    isCanBeResolved = true
+    isCanBeConsumed = false
+}
+
 dependencies {
     implementation(project(":download"))
+    add(nativeBinaries.name, project(":native-launcher"))
+}
+
+tasks.processResources {
+    from(nativeBinaries)
 }
 
 gradlePlugin {

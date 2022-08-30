@@ -5,11 +5,10 @@ import net.rubygrapefruit.app.internal.makeEmpty
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.*
 import org.gradle.api.provider.ListProperty
-import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import java.nio.file.Files
-import java.nio.file.attribute.PosixFilePermission
+import java.nio.file.StandardCopyOption
 
 /**
  * Creates an image of the application distribution.
@@ -18,15 +17,6 @@ abstract class DistributionImage : DefaultTask() {
     @get:OutputDirectory
     abstract val imageDirectory: DirectoryProperty
 
-    @get:InputFile
-    abstract val launcherFile: RegularFileProperty
-
-    @get:InputFiles
-    abstract val content: ConfigurableFileCollection
-
-    @get:Input
-    abstract val launcherName: Property<String>
-
     @get:Nested
     abstract val contributions: ListProperty<Contribution>
 
@@ -34,11 +24,6 @@ abstract class DistributionImage : DefaultTask() {
     fun install() {
         val imageDirectory = imageDirectory.get().asFile.toPath()
         imageDirectory.makeEmpty()
-
-        val launcherFile = launcherFile.get().asFile.toPath()
-        val target = imageDirectory.resolve(launcherName.get())
-        Files.copy(launcherFile, target)
-        Files.setPosixFilePermissions(target, setOf(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE))
 
         for (contribution in contributions.get()) {
             when (contribution) {
@@ -67,18 +52,14 @@ abstract class DistributionImage : DefaultTask() {
                     }
                 }
 
-                is FileContribution -> TODO()
-            }
-        }
-        for (file in content) {
-            try {
-                if (file.isDirectory) {
-                    copyDir(file.toPath(), imageDirectory)
-                } else {
-                    Files.copy(file.toPath(), imageDirectory.resolve(file.name))
+                is FileContribution -> {
+                    val sourceFile = contribution.file.orNull
+                    if (sourceFile != null) {
+                        val targetFile = imageDirectory.resolve(contribution.filePath.get())
+                        Files.createDirectories(targetFile.parent)
+                        Files.copy(sourceFile.asFile.toPath(), targetFile, StandardCopyOption.COPY_ATTRIBUTES)
+                    }
                 }
-            } catch (e: Exception) {
-                throw RuntimeException("Could not copy $file into the distribution image directory.", e)
             }
         }
     }
@@ -97,11 +78,25 @@ abstract class DistributionImage : DefaultTask() {
         contributions.add(DirectoryContribution(dirPath, dir))
     }
 
+    /**
+     * Includes the given file in the image. The file provider can be undefined.
+     */
+    fun includeFile(filePath: String, file: Provider<RegularFile>) {
+        contributions.add(FileContribution(project.provider { filePath }, file))
+    }
+
+    /**
+     * Includes the given file in the image. The file provider can be undefined.
+     */
+    fun includeFile(filePath: Provider<String>, file: Provider<RegularFile>) {
+        contributions.add(FileContribution(filePath, file))
+    }
+
     sealed class Contribution
 
     class FileContribution(
         @get:Input
-        val filePath: String,
+        val filePath: Provider<String>,
         @get:InputFile
         val file: Provider<RegularFile>
     ) : Contribution()

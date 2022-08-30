@@ -1,10 +1,5 @@
 plugins {
-    id("java-library")
-    id("org.jetbrains.kotlin.jvm")
+    id("net.rubygrapefruit.jvm.lib")
 }
 
 group = "net.rubygrapefruit.libs"
-
-repositories {
-    mavenCentral()
-}

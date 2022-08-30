@@ -48,10 +48,14 @@ abstract class DistributionImage : DefaultTask() {
             }
         }
         for (file in content) {
-            if (file.isDirectory) {
-                copyDir(file.toPath(), imageDirectory)
-            } else {
-                Files.copy(file.toPath(), target)
+            try {
+                if (file.isDirectory) {
+                    copyDir(file.toPath(), imageDirectory)
+                } else {
+                    Files.copy(file.toPath(), imageDirectory.resolve(file.name))
+                }
+            } catch (e: Exception) {
+                throw RuntimeException("Could not copy $file into the distribution image directory.", e)
             }
         }
     }

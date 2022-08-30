@@ -16,7 +16,7 @@ Builds a command-line application implemented in Kotlin/Native
 - Adds macOS and Linux targets.
 - Adds `nativeMain` and `nativeTest` source sets that are shared by these targets. You can add shared Kotlin/Native code
   to these source sets.
-- Adds `appliction { }` block
+- Adds `application { }` block.
 
 ## `net.rubygrapefruit.jvm.cli-app`
 
@@ -37,6 +37,13 @@ instead of using a launcher script. Uses `jlink` to create the JVM image.
 Can be applied with `net.rubygrapefruit.jvm.cli-app` to create a native binary to use in the application distribution,
 instead of using a launcher script. Uses `graalvm` to create the native binary.
 
+## `net.rubygrapefruit.jvm.ui-app`
+
+Builds a desktop UI application implemented in Kotlin/JVM and that presents a Swing or JavaFX UI. Expects that the application uses the JVM module system.
+
+- Creates a macOS application bundle.
+- Adds `application { }` block.
+
 ## `net.rubygrapefruit.plugin`
 
 A convention plugin for implementing Gradle plugins using Kotlin.
@@ -52,6 +59,11 @@ See [`../test-apps`](../test-apps/) for some samples.
 
 ### TODO
 
+- Move embedded JVM down to `jvm` in the image
+- Move launcher config to resources directory in app bundle
+- Split base plugin out of jvm cli plugin to share with jvm ui plugin
+- Configurable bundle id, app display name
+- Don't include launcher script in app bundle?
 - Fix native image for linux and windows
 - Infer the main class for a JVM app.
 - Set JDK to 11.

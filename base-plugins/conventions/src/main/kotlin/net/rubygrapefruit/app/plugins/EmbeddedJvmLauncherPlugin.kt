@@ -16,11 +16,19 @@ open class EmbeddedJvmLauncherPlugin : Plugin<Project> {
                     t.module.set(app.module)
                     t.modulePath.from(app.outputModulePath)
                 }
-                app.distribution.content.from(embeddedJvmTask.flatMap { t -> t.imageDirectory })
-                app.distribution.libraries.setFrom()
+
+                val jvmDir = "jvm"
+                app.distribution.javaLauncherPath.set("$jvmDir/bin/java")
+                app.distribution.modulePath.setFrom()
+
+                applications.applyToDistribution { p ->
+                    p.configure { t ->
+                        t.includeDir(jvmDir, embeddedJvmTask.flatMap { e -> e.imageDirectory })
+                    }
+                }
 
                 tasks.named("launcherScript", LauncherScript::class.java) {
-                    it.javaCommand.set("bin/java")
+                    it.javaLauncherPath.set(app.distribution.javaLauncherPath)
                     it.modulePath.empty()
                 }
             }

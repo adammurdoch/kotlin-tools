@@ -4,12 +4,14 @@ import net.rubygrapefruit.app.CliApplication
 import net.rubygrapefruit.app.JvmCliApplication
 import net.rubygrapefruit.app.tasks.DistributionImage
 import org.gradle.api.Project
+import org.gradle.api.tasks.TaskProvider
 
 abstract class ApplicationRegistry(private val project: Project) {
     private var main: CliApplication? = null
+    private var mainDistTask: TaskProvider<DistributionImage>? = null
     private val whenAppSet = mutableListOf<Project.(CliApplication) -> Unit>()
 
-    fun register(app: CliApplication) {
+    fun <T : CliApplication> register(app: T) {
         if (main != null) {
             throw UnsupportedOperationException("Support for multiple applications in the same project is not implemented.")
         }
@@ -22,11 +24,10 @@ abstract class ApplicationRegistry(private val project: Project) {
             t.imageDirectory.set(app.distribution.imageDirectory)
             t.launcherFile.set(app.distribution.launcherFile)
             t.launcherName.set(app.appName)
-            t.libraries.from(app.distribution.libraries)
             t.content.from(app.distribution.content)
         }
-
         app.distribution.launcherOutputFile.set(distTask.flatMap { t -> t.imageDirectory.map { it.file(t.launcherName.get()) } })
+        mainDistTask = distTask
 
         for (builder in whenAppSet) {
             builder(project, app)
@@ -34,7 +35,11 @@ abstract class ApplicationRegistry(private val project: Project) {
         whenAppSet.clear()
     }
 
-    fun withApp(builder: Project.(CliApplication) -> Unit) {
+    fun applyToDistribution(builder: Project.(TaskProvider<DistributionImage>) -> Unit) {
+        builder(project, mainDistTask!!)
+    }
+
+    private fun withApp(builder: Project.(CliApplication) -> Unit) {
         val main = this.main
         if (main != null) {
             builder(project, main)

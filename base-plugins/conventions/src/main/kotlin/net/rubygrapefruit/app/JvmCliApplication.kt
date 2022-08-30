@@ -4,6 +4,11 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Property
 
 interface JvmCliApplication : CliApplication {
+    override val distribution: JvmDistribution
+
+    /**
+     * The name of the module for this application.
+     */
     val module: Property<String>
 
     val mainClass: Property<String>

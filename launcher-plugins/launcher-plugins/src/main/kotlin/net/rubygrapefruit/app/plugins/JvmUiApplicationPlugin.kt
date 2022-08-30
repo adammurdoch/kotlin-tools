@@ -26,7 +26,7 @@ class JvmUiApplicationPlugin : Plugin<Project> {
             val configTask = tasks.register("launcherConf", LauncherConf::class.java) {
                 it.configFile.set(layout.buildDirectory.file("app/launcher.conf"))
                 it.applicationDisplayName.set(capitalizedAppName)
-                it.javaCommand.set("bin/java")
+                it.javaCommand.set(app.distribution.javaLauncherPath)
                 it.module.set(app.module)
                 it.mainClass.set(app.mainClass)
             }

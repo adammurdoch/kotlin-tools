@@ -23,15 +23,24 @@ abstract class LauncherScript : DefaultTask() {
     abstract val modulePath: ListProperty<String>
 
     @get:Input
+    abstract val libsDirPath: Property<String>
+
+    @get:Input
     @get:Optional
-    abstract val javaCommand: Property<String>
+    abstract val javaLauncherPath: Property<String>
 
     @TaskAction
     fun generate() {
         val scriptFile = scriptFile.get().asFile
 
-        val javaCommand = if (javaCommand.isPresent) "\$BASE_DIR/${javaCommand.get()}" else "java"
-        val modulePath = if (modulePath.get().isNotEmpty()) "--module-path \"${modulePath.get().joinToString(":") { "\$BASE_DIR/libs/$it" }}\"" else ""
+        val javaCommand = if (javaLauncherPath.isPresent) "\$BASE_DIR/${javaLauncherPath.get()}" else "java"
+        val libsDirPath = libsDirPath.get()
+        val modulePath = modulePath.get()
+        val modulePathArg = if (modulePath.isNotEmpty()) {
+            "--module-path \"${modulePath.joinToString(":") { "\$BASE_DIR/$libsDirPath/$it" }}\""
+        } else {
+            ""
+        }
 
         scriptFile.writeText(
             """#!/bin/bash
@@ -44,7 +53,7 @@ while [ -L "${'$'}SOURCE" ]; do
 done
 BASE_DIR=${'$'}( cd -P "${'$'}( dirname "${'$'}SOURCE" )" >/dev/null 2>&1 && pwd )
 
-$javaCommand $modulePath --module ${module.get()}/${mainClass.get()} "$*"
+$javaCommand $modulePathArg --module ${module.get()}/${mainClass.get()} "$*"
 """
         )
     }

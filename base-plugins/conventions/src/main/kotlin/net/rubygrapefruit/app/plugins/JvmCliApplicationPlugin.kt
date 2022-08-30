@@ -24,17 +24,26 @@ class JvmCliApplicationPlugin : Plugin<Project> {
             app.outputModulePath.from(jarTask.map { it.archiveFile })
             app.outputModulePath.from(runtimeClasspath)
 
+            val libsDirPath = "lib"
+
             val launcherTask = tasks.register("launcherScript", LauncherScript::class.java) {
                 it.scriptFile.set(layout.buildDirectory.file("app/launcher.sh"))
                 it.module.set(app.module)
                 it.mainClass.set(app.mainClass)
+                it.libsDirPath.set(libsDirPath)
                 it.modulePath.add(jarTask.flatMap { it.archiveFileName })
                 val libNames = runtimeClasspath.elements.map { it.map { f -> f.asFile.name } }
                 it.modulePath.addAll(libNames)
             }
 
+            applications.applyToDistribution { p ->
+                p.configure { t ->
+                    t.includeFilesInDir(libsDirPath, app.distribution.modulePath)
+                }
+            }
+
             app.distribution.launcherFile.set(launcherTask.flatMap { it.scriptFile })
-            app.distribution.libraries.from(app.outputModulePath)
+            app.distribution.modulePath.from(app.outputModulePath)
         }
     }
 }

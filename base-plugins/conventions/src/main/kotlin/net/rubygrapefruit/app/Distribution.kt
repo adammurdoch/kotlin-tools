@@ -18,11 +18,6 @@ interface Distribution {
     val content: ConfigurableFileCollection
 
     /**
-     * The libraries to copy into the distribution image.
-     */
-    val libraries: ConfigurableFileCollection
-
-    /**
      * The launcher file in the distribution image. You can use this to use the launcher from other tasks, eg a `run` task.
      */
     val launcherOutputFile: RegularFileProperty

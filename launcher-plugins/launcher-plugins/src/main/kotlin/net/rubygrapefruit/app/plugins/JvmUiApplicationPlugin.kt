@@ -38,6 +38,8 @@ class JvmUiApplicationPlugin : Plugin<Project> {
             app.distribution.launcherFile.set(launcherTask.flatMap { it.outputFile })
 
             applications.applyToDistribution { t ->
+                t.imageDirectory.set(layout.buildDirectory.dir(capitalizedAppName.map { "$it.app" }))
+                t.rootDirPath.set("Contents")
                 t.includeFile("Info.plist", infoPlistTask.flatMap { it.plistFile })
                 t.includeFile("Resources/launcher.conf", configTask.flatMap { it.configFile })
             }

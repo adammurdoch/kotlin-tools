@@ -5,6 +5,7 @@ import net.rubygrapefruit.app.internal.makeEmpty
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.*
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import java.nio.file.Files
@@ -17,6 +18,9 @@ abstract class DistributionImage : DefaultTask() {
     @get:OutputDirectory
     abstract val imageDirectory: DirectoryProperty
 
+    @get:Input
+    abstract val rootDirPath: Property<String>
+
     @get:Nested
     abstract val contributions: ListProperty<Contribution>
 
@@ -25,12 +29,14 @@ abstract class DistributionImage : DefaultTask() {
         val imageDirectory = imageDirectory.get().asFile.toPath()
         imageDirectory.makeEmpty()
 
+        val rootDirectory = imageDirectory.resolve(rootDirPath.get())
+
         for (contribution in contributions.get()) {
             when (contribution) {
                 is FilesContribution -> {
                     val sourceFiles = contribution.files.get()
                     if (sourceFiles.isNotEmpty()) {
-                        val targetDir = imageDirectory.resolve(contribution.dirPath)
+                        val targetDir = rootDirectory.resolve(contribution.dirPath)
                         Files.createDirectories(targetDir)
                         for (sourceFile in sourceFiles) {
                             val file = sourceFile.asFile
@@ -46,7 +52,7 @@ abstract class DistributionImage : DefaultTask() {
                 is DirectoryContribution -> {
                     val sourceDir = contribution.dir.orNull
                     if (sourceDir != null) {
-                        val targetDir = imageDirectory.resolve(contribution.dirPath)
+                        val targetDir = rootDirectory.resolve(contribution.dirPath)
                         Files.createDirectories(targetDir)
                         copyDir(sourceDir.asFile.toPath(), targetDir)
                     }
@@ -55,7 +61,7 @@ abstract class DistributionImage : DefaultTask() {
                 is FileContribution -> {
                     val sourceFile = contribution.file.orNull
                     if (sourceFile != null) {
-                        val targetFile = imageDirectory.resolve(contribution.filePath.get())
+                        val targetFile = rootDirectory.resolve(contribution.filePath.get())
                         Files.createDirectories(targetFile.parent)
                         Files.copy(sourceFile.asFile.toPath(), targetFile, StandardCopyOption.COPY_ATTRIBUTES)
                     }

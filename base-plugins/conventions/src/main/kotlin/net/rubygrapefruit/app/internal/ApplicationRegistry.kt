@@ -23,6 +23,7 @@ abstract class ApplicationRegistry(private val project: Project) {
 
         val distTask = project.tasks.register("dist", DistributionImage::class.java) { t ->
             t.imageDirectory.set(app.distribution.imageDirectory)
+            t.rootDirPath.set(".")
             t.includeFile(app.distribution.launcherFilePath, app.distribution.launcherFile)
         }
         app.distribution.launcherOutputFile.set(distTask.flatMap { t -> t.imageDirectory.map { it.file(app.distribution.launcherFilePath.get()) } })

@@ -16,16 +16,16 @@ Builds a command-line application implemented in Kotlin/Native
 - Adds macOS and Linux targets.
 - Adds `nativeMain` and `nativeTest` source sets that are shared by these targets. You can add shared Kotlin/Native code
   to these source sets.
-- Adds `application { }` block.
+- Adds `application { }` block, see below for the available settings.
 
 ## `net.rubygrapefruit.jvm.cli-app`
 
-Builds a command-line application implemented in Kotlin/JVM. Expects that the application uses the JVM module system.
+Builds a command-line application implemented in Kotlin/JVM.
+Expects that the application uses the JVM module system.
 
-- Adds `application { }` block
-  - `application.module` - defaults to the application name
-  - `application.mainClass` - must be specified.
-- Generates a launcher script in the distribution. This script requires that a compatible JVM can be found on the machine's `$PATH`. 
+- The distribution contains the jars for the application and a launcher script. 
+  This script requires that a compatible JVM can be found on the machine's `$PATH`. 
+- Adds `application { }` block, see below for the available settings.
 
 ## `net.rubygrapefruit.jvm.embedded-jvm`
 
@@ -39,23 +39,33 @@ instead of using a launcher script. Uses `graalvm` to create the native binary.
 
 ## `net.rubygrapefruit.jvm.ui-app`
 
-Builds a desktop UI application implemented in Kotlin/JVM and that presents a Swing or JavaFX UI. Expects that the application uses the JVM module system.
+Builds a desktop UI application implemented in Kotlin/JVM and that presents a Swing or JavaFX UI.
+Expects that the application uses the JVM module system.
 
 - Creates a debug (unsigned) macOS application bundle and a release (signed and notarized) application bundle
 - Provides an application icon
 - Use `dist` task to build the debug application bundle and `releaseDist` to build the release application bundle
-- Adds `application { }` block.
+- Adds `application { }` block, see below for the available settings.
 
 ## `net.rubygrapefruit.plugin`
 
 A convention plugin for implementing Gradle plugins using Kotlin.
+
+- Adds dependencies and repository definitions so that a fixed version of Kotlin available (currently 1.7.10).
 
 ## Common application settings
 
 - Adds `application { }` block
   - `application.appName` - the base name for the application, used for various default file names.
   - `application.imageDirectory` - the directory to create the distribution image in.
-- Adds a `dist` task to create a distribution image containing the app ready for installation. By default, this is created in `build/dist-image`
+- Adds a `dist` task to create a distribution image containing the app ready for installation.
+  By default, this is created in `build/dist-image`
+
+## Common JVM application settings
+
+- Adds `application { }` block
+  - `application.module` - defaults to the application name
+  - `application.mainClass` - must be specified.
 
 See [`../test-apps`](../test-apps/) for some samples.
 

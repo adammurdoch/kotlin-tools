@@ -79,6 +79,9 @@ See [`../test-apps`](../test-apps/) for some samples.
   - Customisation
 - Generate windows launcher script for JVM applications.
 - Refactor `DownloadRepository` to use Gradle exec service when used in a plugin.
+- `codesign -s "cert-name" bundle`
+- `/usr/bin/ditto -c -k --keepParent bundle zipfile`
+- `xcrun notarytool submit ...`
 - Gradle issues:
   - Fix import of `test-apps` - does not seem to be included
   - Use version catalog

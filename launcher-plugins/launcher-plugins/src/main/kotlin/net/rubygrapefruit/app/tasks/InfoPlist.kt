@@ -21,10 +21,14 @@ abstract class InfoPlist : DefaultTask() {
     @get:Input
     abstract val bundleName: Property<String>
 
+    @get:Input
+    abstract val iconName: Property<String>
+
     @TaskAction
     fun generate() {
         val infoPlist = plistFile.get().asFile.toPath()
-        infoPlist.writeText("""
+        infoPlist.writeText(
+            """
             <?xml version="1.0" encoding="UTF-8"?>
             <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
             <plist version="1.0">
@@ -37,8 +41,11 @@ abstract class InfoPlist : DefaultTask() {
                     <string>APPL</string>
                     <key>CFBundleExecutable</key>
                     <string>${executableName.get()}</string>
+                    <key>CFBundleIconFile</key>
+                    <string>${iconName.get()}</string>
                 </dict>
             </plist>            
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 }

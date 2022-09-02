@@ -1,7 +1,8 @@
 package net.rubygrapefruit.app
 
-import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.file.RegularFile
+import org.gradle.api.provider.Provider
 
-interface NativeCliApplication: CliApplication {
-    val outputBinary: RegularFileProperty
+interface NativeCliApplication : Application {
+    val outputBinary: Provider<RegularFile>
 }

@@ -18,17 +18,18 @@ fun main() {
         val configFilePath = "$bundlePath/Contents/Resources/launcher.conf"
         val lines = readConfigFile(configFilePath)
         val appDisplayName = lines[0]
+        val icon = lines[1]
 
-        val javaLauncher = lines[1]
+        val javaLauncher = lines[2]
         val launcher = "$bundlePath/Contents/$javaLauncher"
 
-        val mainClass = lines[2]
+        val mainClass = lines[3]
 
         println("Launcher: $launcher")
         println("App display name: $appDisplayName")
         println("Main class: $mainClass")
 
-        val args = listOf(launcher, "-Xdock:name=$appDisplayName", "--module", mainClass)
+        val args = listOf(launcher, "-Xdock:name=$appDisplayName", "-Xdock:icon=$bundlePath/Contents/Resources/$icon", "-Dapple.laf.useScreenMenuBar=true", "--module", mainClass)
         execv(args.first(), (args.map { it.cstr.ptr } + listOf(null)).toCValues())
         failed("Could not launch app")
     }

@@ -24,12 +24,16 @@ abstract class LauncherConf : DefaultTask() {
     @get:Input
     abstract val javaCommand: Property<String>
 
+    @get:Input
+    abstract val iconName: Property<String>
+
     @TaskAction
     fun generate() {
         val configFile = configFile.get().asFile
         configFile.writeText(
             """
             ${applicationDisplayName.get()}
+            ${iconName.get()}
             ${javaCommand.get()}
             ${module.get()}/${mainClass.get()}
         """.trimIndent()

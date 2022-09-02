@@ -1,17 +1,16 @@
 package net.rubygrapefruit.app.internal
 
-import net.rubygrapefruit.app.CliApplication
-import net.rubygrapefruit.app.JvmCliApplication
+import net.rubygrapefruit.app.Application
 import net.rubygrapefruit.app.tasks.DistributionImage
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 
 abstract class ApplicationRegistry(private val project: Project) {
-    private var main: CliApplication? = null
+    private var main: Application? = null
     private var mainDistTask: TaskProvider<DistributionImage>? = null
-    private val whenAppSet = mutableListOf<Project.(CliApplication) -> Unit>()
+    private val whenAppSet = mutableListOf<Project.(Application) -> Unit>()
 
-    fun register(app: CliApplication) {
+    fun register(app: Application) {
         if (main != null) {
             throw UnsupportedOperationException("Support for multiple applications in the same project is not implemented.")
         }
@@ -41,7 +40,7 @@ abstract class ApplicationRegistry(private val project: Project) {
         }
     }
 
-    private fun withApp(builder: Project.(CliApplication) -> Unit) {
+    fun applyToApp(builder: Project.(Application) -> Unit) {
         val main = this.main
         if (main != null) {
             builder(project, main)
@@ -50,9 +49,9 @@ abstract class ApplicationRegistry(private val project: Project) {
         }
     }
 
-    fun withJvmApp(builder: Project.(JvmCliApplication) -> Unit) {
-        withApp { app ->
-            if (app is JvmCliApplication) {
+    inline fun <reified T : Application> withApp(crossinline builder: Project.(T) -> Unit) {
+        applyToApp { app ->
+            if (app is T) {
                 builder(project, app)
             }
         }

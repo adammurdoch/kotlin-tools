@@ -12,6 +12,9 @@ interface Distribution {
      */
     val launcherFile: RegularFileProperty
 
+    /**
+     * The location in the distribution image to copy the launcher file to.
+     */
     val launcherFilePath: Property<String>
 
     /**

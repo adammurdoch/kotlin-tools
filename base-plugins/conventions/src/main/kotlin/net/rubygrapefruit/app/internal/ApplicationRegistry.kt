@@ -10,22 +10,23 @@ abstract class ApplicationRegistry(private val project: Project) {
     private var mainDistTask: TaskProvider<DistributionImage>? = null
     private val whenAppSet = mutableListOf<Project.(Application) -> Unit>()
 
-    fun register(app: Application) {
+    fun register(app: Application, dist: DefaultDistribution) {
         if (main != null) {
             throw UnsupportedOperationException("Support for multiple applications in the same project is not implemented.")
         }
         main = app
 
         app.appName.convention(project.name)
-        app.distribution.imageDirectory.convention(project.layout.buildDirectory.dir("dist-image"))
-        app.distribution.launcherFilePath.convention(app.appName)
+        dist.imageDirectory.convention(project.layout.buildDirectory.dir("dist-image"))
+        dist.launcherFilePath.convention(app.appName)
 
         val distTask = project.tasks.register("dist", DistributionImage::class.java) { t ->
-            t.imageDirectory.set(app.distribution.imageDirectory)
+            t.imageDirectory.set(dist.imageDirectory)
             t.rootDirPath.set(".")
-            t.includeFile(app.distribution.launcherFilePath, app.distribution.launcherFile)
+            t.includeFile(dist.launcherFilePath, dist.launcherFile)
         }
-        app.distribution.launcherOutputFile.set(distTask.flatMap { t -> t.imageDirectory.map { it.file(app.distribution.launcherFilePath.get()) } })
+        dist.imageOutputDirectory.set(distTask.flatMap { t -> t.imageDirectory })
+        dist.launcherOutputFile.set(distTask.flatMap { t -> t.imageDirectory.map { it.file(app.distribution.launcherFilePath.get()) } })
         mainDistTask = distTask
 
         for (builder in whenAppSet) {

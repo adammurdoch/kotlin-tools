@@ -2,10 +2,7 @@ package net.rubygrapefruit.app.plugins
 
 import net.rubygrapefruit.app.internal.DefaultJvmUiApplication
 import net.rubygrapefruit.app.internal.applications
-import net.rubygrapefruit.app.tasks.AppIcon
-import net.rubygrapefruit.app.tasks.InfoPlist
-import net.rubygrapefruit.app.tasks.LauncherConf
-import net.rubygrapefruit.app.tasks.NativeUiLauncher
+import net.rubygrapefruit.app.tasks.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -49,16 +46,23 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                 app.distribution.launcherFile.set(launcherTask.flatMap { it.outputFile })
 
                 applications.applyToDistribution { t ->
-                    t.imageDirectory.set(layout.buildDirectory.dir(capitalizedAppName.map { "$it.app" }))
+                    t.imageDirectory.set(layout.buildDirectory.dir(capitalizedAppName.map { "debug/$it.app" }))
                     t.rootDirPath.set("Contents")
                     t.includeFile("Info.plist", infoPlistTask.flatMap { it.plistFile })
                     t.includeFile("Resources/launcher.conf", configTask.flatMap { it.configFile })
                     t.includeFile(iconName.map { "Resources/$it" }, iconTask.flatMap { it.outputIcon })
                 }
+
+                tasks.register("releaseDist", ReleaseDistribution::class.java) { t ->
+                    t.imageDirectory.set(layout.buildDirectory.dir(capitalizedAppName.map { "release/$it.app" }))
+                    t.unsignedImage.set(app.distribution.imageOutputDirectory)
+                    t.signingIdentity.set(app.signingIdentity)
+                    t.notarizationProfileName.set(app.notarizationProfileName)
+                }
             }
 
             val app = extensions.create("application", DefaultJvmUiApplication::class.java)
-            applications.register(app)
+            applications.register(app, app.distribution)
         }
     }
 }

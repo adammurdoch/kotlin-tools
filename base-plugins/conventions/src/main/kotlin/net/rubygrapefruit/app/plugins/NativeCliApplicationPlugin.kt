@@ -72,7 +72,7 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
             }
 
             val app = extensions.create("application", DefaultNativeCliApplication::class.java)
-            applications.register(app)
+            applications.register(app, app.distribution)
         }
     }
 }

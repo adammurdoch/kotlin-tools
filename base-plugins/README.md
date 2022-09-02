@@ -41,7 +41,9 @@ instead of using a launcher script. Uses `graalvm` to create the native binary.
 
 Builds a desktop UI application implemented in Kotlin/JVM and that presents a Swing or JavaFX UI. Expects that the application uses the JVM module system.
 
-- Creates a macOS application bundle.
+- Creates a debug (unsigned) macOS application bundle and a release (signed and notarized) application bundle
+- Provides an application icon
+- Use `dist` task to build the debug application bundle and `releaseDist` to build the release application bundle
 - Adds `application { }` block.
 
 ## `net.rubygrapefruit.plugin`

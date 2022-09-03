@@ -80,12 +80,13 @@ See [`../test-apps`](../test-apps/) for some samples.
 - Infer the main class for a JVM app.
 - Set JDK to 11.
 - Use toolchain's `jlink` command.
-- Generate module file.
+- Generate module-info with requires.
 - Use correct architecture for macOS native binary, embedded JVM and GraalVM native binary output.
   - Bundle native launcher for each platform in the plugins.
 - Add a settings plugin that add the maven repo and plugin dependencies to the root project.
 - Add some kind `assembleDebug` task to build a single dev target.
 - Add jvm library convention plugin and use for `downloads` project.
+  - Generate module-info with requires.
 - Add plugin convention plugin and use for plugins projects.
 - Add functional tests for plugins.
   - Customisation

@@ -55,7 +55,7 @@ while [ -L "${'$'}SOURCE" ]; do
 done
 BASE_DIR=${'$'}( cd -P "${'$'}( dirname "${'$'}SOURCE" )" >/dev/null 2>&1 && pwd )
 
-$javaCommand $modulePathArg --module ${module.get()}/${mainClass.get()} "$*"
+$javaCommand $modulePathArg --module ${module.get()}/${mainClass.get()} "$@"
 """
         )
         Files.setPosixFilePermissions(

@@ -1,4 +1,4 @@
-package sample.app
+package sample
 
 fun main(args: Array<String>) {
     println("Test application")

@@ -9,14 +9,24 @@ Gradle 7.5.1 or later.
 
 A settings plugin that must be applied to the settings of any build that uses these plugins.
 
+## `net.rubygrapefruit.native.lib`
+
+Builds a library implemented in Kotlin/Native.
+
+- Adds macOS and Linux targets.
+
 ## `net.rubygrapefruit.native.cli-app`
 
-Builds a command-line application implemented in Kotlin/Native
+Builds a command-line application implemented in Kotlin/Native.
 
 - Adds macOS and Linux targets.
 - Adds `nativeMain` and `nativeTest` source sets that are shared by these targets. You can add shared Kotlin/Native code
   to these source sets.
 - Adds `application { }` block, see below for the available settings.
+
+## `net.rubygrapefruit.jvm.lib`
+
+Builds a library implemented in Kotlin/JVM.
 
 ## `net.rubygrapefruit.jvm.cli-app`
 
@@ -71,11 +81,8 @@ See [`../test-apps`](../test-apps/) for some samples.
 
 ### TODO
 
-- Move embedded JVM down to `jvm` in the image
-- Move launcher config to resources directory in app bundle
 - Split base plugin out of jvm cli plugin to share with jvm ui plugin
 - Configurable bundle id, app display name
-- Don't include launcher script in app bundle?
 - Fix native image for linux and windows
 - Infer the main class for a JVM app.
 - Set JDK to 11.
@@ -85,9 +92,6 @@ See [`../test-apps`](../test-apps/) for some samples.
   - Bundle native launcher for each platform in the plugins.
 - Add a settings plugin that add the maven repo and plugin dependencies to the root project.
 - Add some kind `assembleDebug` task to build a single dev target.
-- Add jvm library convention plugin and use for `downloads` project.
-  - Generate module-info with requires.
-- Add plugin convention plugin and use for plugins projects.
 - Add functional tests for plugins.
   - Customisation
 - Generate windows launcher script for JVM applications.

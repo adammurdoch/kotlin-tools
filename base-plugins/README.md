@@ -19,7 +19,7 @@ Builds a library implemented in Kotlin/Native.
 
 Builds a command-line application implemented in Kotlin/Native.
 
-- Adds macOS and Linux targets.
+- Adds macOS, Linux and Windows targets.
 - Adds `nativeMain` and `nativeTest` source sets that are shared by these targets. You can add shared Kotlin/Native code
   to these source sets.
 - Adds `application { }` block, see below for the available settings.

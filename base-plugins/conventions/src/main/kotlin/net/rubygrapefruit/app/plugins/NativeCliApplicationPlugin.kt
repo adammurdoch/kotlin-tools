@@ -7,6 +7,7 @@ import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.Executable
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import java.io.ByteArrayOutputStream
 
 open class NativeCliApplicationPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -28,6 +29,12 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
                         }
                     }
                     linuxX64 {
+                        binaries {
+                            executable {
+                            }
+                        }
+                    }
+                    mingwX64 {
                         binaries {
                             executable {
                             }
@@ -59,8 +66,19 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
 
                 val nativeTargetName = if (System.getProperty("os.name").contains("linux", true)) {
                     "linuxX64"
+                } else if (System.getProperty("os.name").contains("windows", true)) {
+                    "mingwX64"
                 } else {
-                    "macosX64"
+                    val output = ByteArrayOutputStream()
+                    exec {
+                        it.commandLine("sysctl", "-n", "machdep.cpu.brand_string")
+                        it.standardOutput = output
+                    }
+                    if (output.toString().contains("Apple M1")) {
+                        "macosArm64"
+                    } else {
+                        "macosX64"
+                    }
                 }
 
                 val extension = extensions.getByType(KotlinMultiplatformExtension::class.java)

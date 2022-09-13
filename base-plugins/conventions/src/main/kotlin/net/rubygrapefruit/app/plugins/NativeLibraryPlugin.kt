@@ -17,17 +17,18 @@ class NativeLibraryPlugin : Plugin<Project> {
                 macosX64()
                 macosArm64()
                 linuxX64()
-                val nativeMain = sourceSets.create("nativeMain") {
+                mingwX64()
+                val unixMain = sourceSets.create("unixMain") {
                     it.dependsOn(sourceSets.getByName("commonMain"))
                 }
                 sourceSets.getByName("macosX64Main") {
-                    it.dependsOn(nativeMain)
+                    it.dependsOn(unixMain)
                 }
                 sourceSets.getByName("macosArm64Main") {
-                    it.dependsOn(nativeMain)
+                    it.dependsOn(unixMain)
                 }
                 sourceSets.getByName("linuxX64Main") {
-                    it.dependsOn(nativeMain)
+                    it.dependsOn(unixMain)
                 }
             }
         }

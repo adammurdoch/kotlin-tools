@@ -1,7 +1,6 @@
 package net.rubygrapefruit.app.plugins
 
-import net.rubygrapefruit.app.internal.DefaultNativeCliApplication
-import net.rubygrapefruit.app.internal.applications
+import net.rubygrapefruit.app.internal.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -40,44 +39,36 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
                             }
                         }
                     }
-                    val nativeMain = sourceSets.create("nativeMain") {
+                    val unixMain = sourceSets.create("unixMain") {
                         it.dependsOn(sourceSets.getByName("commonMain"))
                     }
+                    val macOsMain = sourceSets.create("macosMain") {
+                        it.dependsOn(unixMain)
+                    }
                     sourceSets.getByName("macosX64Main") {
-                        it.dependsOn(nativeMain)
+                        it.dependsOn(macOsMain)
                     }
                     sourceSets.getByName("macosArm64Main") {
-                        it.dependsOn(nativeMain)
+                        it.dependsOn(macOsMain)
                     }
                     sourceSets.getByName("linuxX64Main") {
-                        it.dependsOn(nativeMain)
+                        it.dependsOn(unixMain)
                     }
-                    val nativeTest = sourceSets.create("nativeTest") {
-                        it.dependsOn(sourceSets.getByName("nativeMain"))
+                    val unixTest = sourceSets.create("unixTest") {
+                        it.dependsOn(unixMain)
                         it.dependsOn(sourceSets.getByName("commonTest"))
                     }
+                    val macOsTest = sourceSets.create("macosTest") {
+                        it.dependsOn(unixTest)
+                    }
                     sourceSets.getByName("macosX64Test") {
-                        it.dependsOn(nativeTest)
+                        it.dependsOn(macOsTest)
                     }
-                    sourceSets.getByName("linuxX64Main") {
-                        it.dependsOn(nativeTest)
+                    sourceSets.getByName("macosArm64Test") {
+                        it.dependsOn(macOsTest)
                     }
-                }
-
-                val nativeTargetName = if (System.getProperty("os.name").contains("linux", true)) {
-                    "linuxX64"
-                } else if (System.getProperty("os.name").contains("windows", true)) {
-                    "mingwX64"
-                } else {
-                    val output = ByteArrayOutputStream()
-                    exec {
-                        it.commandLine("sysctl", "-n", "machdep.cpu.brand_string")
-                        it.standardOutput = output
-                    }
-                    if (output.toString().contains("Apple M1")) {
-                        "macosArm64"
-                    } else {
-                        "macosX64"
+                    sourceSets.getByName("linuxX64Test") {
+                        it.dependsOn(unixTest)
                     }
                 }
 
@@ -86,11 +77,33 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
                 val executable = nativeTarget.binaries.withType(Executable::class.java).first()
                 val binaryFile = layout.file(executable.linkTaskProvider.map { it.binary.outputFile })
                 app.outputBinary.set(binaryFile)
+                app.distribution.launcherFilePath.set(app.appName.map { if (currentOs() == Windows) "$it.exe" else it })
                 app.distribution.launcherFile.set(binaryFile)
             }
 
             val app = extensions.create("application", DefaultNativeCliApplication::class.java)
             applications.register(app, app.distribution)
+        }
+    }
+}
+
+
+private val nativeTargetName by lazy {
+    val os = currentOs()
+    if (os == Linux) {
+        "linuxX64"
+    } else if (os == Windows) {
+        "mingwX64"
+    } else {
+        val output = ByteArrayOutputStream()
+        val builder = ProcessBuilder("sysctl", "-n", "machdep.cpu.brand_string")
+        val process = builder.start()
+        process.inputStream.copyTo(output)
+        process.errorStream.copyTo(System.err)
+        if (output.toString().contains("Apple M1")) {
+            "macosArm64"
+        } else {
+            "macosX64"
         }
     }
 }

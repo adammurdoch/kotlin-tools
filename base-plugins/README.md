@@ -13,15 +13,16 @@ A settings plugin that must be applied to the settings of any build that uses th
 
 Builds a library implemented in Kotlin/Native.
 
-- Adds macOS and Linux targets.
+- Adds Linux and Windows x64 targets and macOS x64 and arm64 targets.
+- Adds `unixMain` and `unixTest` source sets for Kotlin code that is shared by macOS and Linux targets.
 
 ## `net.rubygrapefruit.native.cli-app`
 
 Builds a command-line application implemented in Kotlin/Native.
 
-- Adds macOS, Linux and Windows targets.
-- Adds `nativeMain` and `nativeTest` source sets that are shared by these targets. You can add shared Kotlin/Native code
-  to these source sets.
+- Adds Linux and Windows x64 targets and macOS x64 and arm64 targets.
+- Adds `unixMain` and `unixTest` source sets for Kotlin code that is shared by macOS and Linux targets.
+- Adds `macosMain` and `macosTest` source set for Kotlin code that is shared by macOS targets.
 - Adds `application { }` block, see below for the available settings.
 
 ## `net.rubygrapefruit.jvm.lib`
@@ -81,12 +82,14 @@ See [`../test-apps`](../test-apps/) for some samples.
 
 ### TODO
 
-- Split base plugin out of jvm cli plugin to share with jvm ui plugin
-- Configurable bundle id, app display name
+- Don't include windows launcher script for embedded JVM and native exe JVM apps
+- Remove `nativeMain` source set, or perhaps rename it `posixMain` 
 - Fix native image for linux and windows
-- Infer the main class for a JVM app.
 - Set JDK to 11.
 - Use toolchain's `jlink` command.
+- Split base plugin out of jvm cli plugin to share with jvm ui plugin
+- Configurable bundle id, app display name
+- Infer the main class for a JVM app.
 - Generate module-info with requires.
 - Use correct architecture for macOS native binary, embedded JVM and GraalVM native binary output.
   - Bundle native launcher for each platform in the plugins.
@@ -94,7 +97,6 @@ See [`../test-apps`](../test-apps/) for some samples.
 - Add some kind `assembleDebug` task to build a single dev target.
 - Add functional tests for plugins.
   - Customisation
-- Generate windows launcher script for JVM applications.
 - Refactor `DownloadRepository` to use Gradle exec service when used in a plugin.
 - Gradle issues:
   - Fix import of `test-apps` - does not seem to be included

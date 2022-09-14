@@ -83,12 +83,13 @@ See [`../test-apps`](../test-apps/) for some samples.
 ### TODO
 
 - Don't include windows launcher script for embedded JVM and native exe JVM apps
-- Remove `nativeMain` source set, or perhaps rename it `posixMain` 
 - Fix native image for linux and windows
 - Set JDK to 11.
 - Use toolchain's `jlink` command.
+- Native app plugin creates distributions for all targets
 - Split base plugin out of jvm cli plugin to share with jvm ui plugin
-- Configurable bundle id, app display name
+- Native macOS bundle plugin
+- Configurable bundle id, app display name, app version
 - Infer the main class for a JVM app.
 - Generate module-info with requires.
 - Use correct architecture for macOS native binary, embedded JVM and GraalVM native binary output.

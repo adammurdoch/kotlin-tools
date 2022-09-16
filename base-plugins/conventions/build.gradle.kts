@@ -27,6 +27,10 @@ gradlePlugin {
             id = "net.rubygrapefruit.gradle-plugin"
             implementationClass = "net.rubygrapefruit.app.plugins.GradlePluginPlugin"
         }
+        create("mpp-lib") {
+            id = "net.rubygrapefruit.mpp.lib"
+            implementationClass = "net.rubygrapefruit.app.plugins.MppLibraryPlugin"
+        }
         create("native-lib") {
             id = "net.rubygrapefruit.native.lib"
             implementationClass = "net.rubygrapefruit.app.plugins.NativeLibraryPlugin"

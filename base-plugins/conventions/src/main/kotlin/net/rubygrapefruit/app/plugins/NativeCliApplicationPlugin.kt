@@ -39,8 +39,9 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
                             }
                         }
                     }
+                    val commonMain = sourceSets.getByName("commonMain")
                     val unixMain = sourceSets.create("unixMain") {
-                        it.dependsOn(sourceSets.getByName("commonMain"))
+                        it.dependsOn(commonMain)
                     }
                     val macOsMain = sourceSets.create("macosMain") {
                         it.dependsOn(unixMain)

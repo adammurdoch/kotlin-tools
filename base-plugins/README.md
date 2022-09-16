@@ -14,7 +14,8 @@ A settings plugin that must be applied to the settings of any build that uses th
 Builds a library implemented in Kotlin/Native.
 
 - Adds Linux and Windows x64 targets and macOS x64 and arm64 targets.
-- Adds `unixMain` and `unixTest` source sets for Kotlin code that is shared by macOS and Linux targets.
+- Adds `unixMain` source sets for Kotlin code that is shared by macOS and Linux targets.
+- Adds `macosMain` source set for Kotlin code that is shared by macOS targets.
 
 ## `net.rubygrapefruit.native.cli-app`
 
@@ -24,6 +25,14 @@ Builds a command-line application implemented in Kotlin/Native.
 - Adds `unixMain` and `unixTest` source sets for Kotlin code that is shared by macOS and Linux targets.
 - Adds `macosMain` and `macosTest` source set for Kotlin code that is shared by macOS targets.
 - Adds `application { }` block, see below for the available settings.
+
+## `net.rubygrapefruit.mpp.lib`
+
+Builds a library implemented in Kotlin implemented for the JVM and native
+
+- Add JVM target.
+- Adds Linux and Windows x64 targets and macOS x64 and arm64 targets.
+- Adds `nativeMain` source set for Kotlin code that is shared by native targets.
 
 ## `net.rubygrapefruit.jvm.lib`
 
@@ -55,7 +64,8 @@ Expects that the application uses the JVM module system.
 
 - Creates a debug (unsigned) macOS application bundle and a release (signed and notarized) application bundle
 - Provides an application icon
-- Use `dist` task to build the debug application bundle and `releaseDist` to build the release application bundle
+- Use `dist` task to build the debug application bundle
+- Use `releaseDist` to build the release application bundle
 - Adds `application { }` block, see below for the available settings.
 
 ## `net.rubygrapefruit.plugin`
@@ -84,8 +94,9 @@ See [`../test-apps`](../test-apps/) for some samples.
 
 - Don't include windows launcher script for embedded JVM and native exe JVM apps
 - Fix native image for linux and windows
-- Set JDK to 11.
+- Set JDK to 11, and correct architecture
 - Use toolchain's `jlink` command.
+- Use `jlink` from arm64 toolchain on m1 macOS
 - Native app plugin creates distributions for all targets
 - Split base plugin out of jvm cli plugin to share with jvm ui plugin
 - Native macOS bundle plugin

@@ -1,4 +1,4 @@
-ARGS="a1 a2"
+ARGS="1 + 2"
 
 echo "== jvm-cli-app =="
 time ./test-apps/jvm-cli-app/build/dist-image/jvm-cli-app $ARGS

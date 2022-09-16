@@ -1,5 +1,7 @@
 package net.rubygrapefruit.app.tasks
 
+import net.rubygrapefruit.app.internal.Linux
+import net.rubygrapefruit.app.internal.currentOs
 import net.rubygrapefruit.download.DownloadRepository
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
@@ -32,7 +34,11 @@ abstract class NativeBinary : DefaultTask() {
     @TaskAction
     fun install() {
         val repository = DownloadRepository()
-        val uri = URI("https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-22.2.0/graalvm-ce-java11-darwin-amd64-22.2.0.tar.gz")
+        val uri = if (currentOs() is Linux) {
+            URI("https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-22.2.0/graalvm-ce-java11-linux-amd64-22.2.0.tar.gz")
+        } else {
+            URI("https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-22.2.0/graalvm-ce-java11-darwin-amd64-22.2.0.tar.gz")
+        }
         val dir = repository.install(uri, "graalvm-amd64-22.2") { dir ->
             val tool = dir.resolve("graalvm-ce-java11-22.2.0/Contents/Home/bin/gu")
             processOperations.exec { spec ->

@@ -112,7 +112,8 @@ See [`../test-apps`](../test-apps/) for some samples.
 - Native app plugin creates distributions for all targets
 - Native macOS bundle plugin
 - Configurable bundle id, app display name, app version
-- Infer the main class for a JVM app.
+- Infer the main class for a JVM app
+- Don't add a dist task when there is no source for the current target
 - Module-info
   - Infer requires from classpath
   - Infer exports from compiled classes

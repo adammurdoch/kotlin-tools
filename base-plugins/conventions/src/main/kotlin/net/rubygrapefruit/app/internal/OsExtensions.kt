@@ -1,15 +1,15 @@
 package net.rubygrapefruit.app.internal
 
-internal sealed class Os
+sealed class Os
 
-internal object Windows: Os()
+object Windows: Os()
 
-internal object Linux: Os()
+object Linux: Os()
 
-internal object MacOs: Os()
+object MacOs: Os()
 
 
-internal fun currentOs(): Os {
+fun currentOs(): Os {
     return if (System.getProperty("os.name").contains("linux", true)) {
         Linux
     } else if (System.getProperty("os.name").contains("windows", true)) {

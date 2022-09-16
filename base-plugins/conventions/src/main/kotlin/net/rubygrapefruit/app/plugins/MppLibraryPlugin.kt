@@ -1,15 +1,21 @@
 package net.rubygrapefruit.app.plugins
 
+import net.rubygrapefruit.app.JvmLibrary
+import net.rubygrapefruit.app.internal.JvmModuleRegistry
 import net.rubygrapefruit.app.internal.checkSettingsPluginApplied
+import net.rubygrapefruit.app.internal.toModuleName
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.jvm.tasks.Jar
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 class MppLibraryPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            plugins.apply("org.jetbrains.kotlin.multiplatform")
             checkSettingsPluginApplied()
+
+            plugins.apply("org.jetbrains.kotlin.multiplatform")
+            plugins.apply(JvmConventionsPlugin::class.java)
 
             repositories.mavenCentral()
 
@@ -42,6 +48,14 @@ class MppLibraryPlugin : Plugin<Project> {
                 sourceSets.getByName("mingwX64Main") {
                     it.dependsOn(nativeMain)
                 }
+            }
+
+            val lib = extensions.create("library", JvmLibrary::class.java)
+            lib.module.name.convention(toModuleName(project.name))
+
+            val moduleInfoCp = extensions.getByType(JvmModuleRegistry::class.java).moduleInfoClasspathEntryFor(lib.module)
+            tasks.named("jvmJar", Jar::class.java) {
+                it.from(moduleInfoCp)
             }
         }
     }

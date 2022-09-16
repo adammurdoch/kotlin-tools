@@ -4,6 +4,6 @@ plugins {
 
 application {
     appName.set("app")
-    module.set("sample.app")
+    module.name.set("sample.app")
     mainClass.set("sample.app.MainKt")
 }

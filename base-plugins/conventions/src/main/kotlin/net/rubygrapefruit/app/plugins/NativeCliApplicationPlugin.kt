@@ -13,6 +13,7 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
         with(target) {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
             plugins.apply(ApplicationBasePlugin::class.java)
+
             applications.withApp<DefaultNativeCliApplication> { app ->
                 with(extensions.getByType(KotlinMultiplatformExtension::class.java)) {
                     macosX64 {

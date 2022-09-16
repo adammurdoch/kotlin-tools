@@ -30,7 +30,7 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                     it.applicationDisplayName.set(capitalizedAppName)
                     it.iconName.set(iconName)
                     it.javaCommand.set(app.distribution.javaLauncherPath)
-                    it.module.set(app.module)
+                    it.module.set(app.module.name)
                     it.mainClass.set(app.mainClass)
                 }
                 val launcherTask = tasks.register("nativeLauncher", NativeUiLauncher::class.java) {

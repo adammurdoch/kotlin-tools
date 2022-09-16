@@ -9,6 +9,7 @@ class ApplicationBasePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             checkSettingsPluginApplied()
+
             repositories.mavenCentral()
 
             target.extensions.create("applications", ApplicationRegistry::class.java)

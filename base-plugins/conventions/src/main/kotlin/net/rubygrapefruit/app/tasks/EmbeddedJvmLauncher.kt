@@ -26,6 +26,9 @@ abstract class EmbeddedJvmLauncher : DefaultTask() {
     @get:Inject
     abstract val exec: ExecFactory
 
+    @get:Input
+    abstract val jlinkPath: Property<String>
+
     @TaskAction
     fun generate() {
         val module = module.get()
@@ -34,9 +37,8 @@ abstract class EmbeddedJvmLauncher : DefaultTask() {
         imageDirectory.deleteIfExists()
 
         exec.exec {
-            // TODO - use jlink from toolchain
             it.commandLine(
-                "jlink",
+                jlinkPath.get(),
                 "--no-header-files",
                 "--no-man-pages",
                 "--output",

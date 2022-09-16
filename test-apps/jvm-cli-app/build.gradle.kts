@@ -3,6 +3,10 @@ plugins {
 }
 
 application {
-    module.set("sample")
     mainClass.set("sample.MainKt")
+    module.requires.add("sample.parser")
+}
+
+dependencies {
+    implementation(project(":mpp-lib"))
 }

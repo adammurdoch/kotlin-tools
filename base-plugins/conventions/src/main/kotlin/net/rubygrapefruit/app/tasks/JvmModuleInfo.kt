@@ -4,6 +4,7 @@ import net.rubygrapefruit.app.tasks.internal.module.BytecodeWriter
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
@@ -14,6 +15,15 @@ abstract class JvmModuleInfo : DefaultTask() {
 
     @get:Input
     abstract val module: Property<String>
+
+    @get:Input
+    abstract val exports: SetProperty<String>
+
+    @get:Input
+    abstract val requires: SetProperty<String>
+
+    @get:Input
+    abstract val requiresTransitive: SetProperty<String>
 
     @get:Input
     abstract val generate: Property<Boolean>
@@ -29,7 +39,7 @@ abstract class JvmModuleInfo : DefaultTask() {
 
         val outputFile = outputDirectory.resolve("module-info.class")
         BytecodeWriter().writeTo(outputFile) {
-            module(module.get())
+            module(module.get(), exports.get().sorted(), requires.get().sorted(), requiresTransitive.get().sorted())
         }
     }
 }

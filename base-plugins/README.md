@@ -33,10 +33,15 @@ Builds a library implemented in Kotlin implemented for the JVM and native
 - Add JVM target.
 - Adds Linux and Windows x64 targets and macOS x64 and arm64 targets.
 - Adds `nativeMain` source set for Kotlin code that is shared by native targets.
+- Adds `library { }` block, see below for the available settings.
+- Generates a `module-info` for the JVM target.
 
 ## `net.rubygrapefruit.jvm.lib`
 
 Builds a library implemented in Kotlin/JVM.
+
+- Adds `library { }` block, see below for the available settings.
+- Generates a `module-info`.
 
 ## `net.rubygrapefruit.jvm.cli-app`
 
@@ -46,6 +51,7 @@ Expects that the application uses the JVM module system.
 - The distribution contains the jars for the application and a launcher script. 
   This script requires that a compatible JVM can be found on the machine's `$PATH`. 
 - Adds `application { }` block, see below for the available settings.
+- Generates a `module-info`.
 
 ## `net.rubygrapefruit.jvm.embedded-jvm`
 
@@ -74,7 +80,7 @@ A convention plugin for implementing Gradle plugins using Kotlin.
 
 - Adds dependencies and repository definitions so that a fixed version of Kotlin available (currently 1.7.10).
 
-## Common application settings
+## Common application settings for all targets
 
 - Adds `application { }` block
   - `application.appName` - the base name for the application, used for various default file names.
@@ -82,11 +88,18 @@ A convention plugin for implementing Gradle plugins using Kotlin.
 - Adds a `dist` task to create a distribution image containing the app ready for installation.
   By default, this is created in `build/dist-image`
 
-## Common JVM application settings
+## Common application settings for JVM targets
 
 - Adds `application { }` block
-  - `application.module` - defaults to the application name
+  - `application.module.name` - defaults to the application name
   - `application.mainClass` - must be specified.
+
+## Common JVM library settings
+
+- Adds `library { }` block
+  - `library.module.name` - defaults to the project name 
+  - `library.module.exports` 
+  - `library.module.requires` 
 
 See [`../test-apps`](../test-apps/) for some samples.
 
@@ -94,18 +107,18 @@ See [`../test-apps`](../test-apps/) for some samples.
 
 - Don't include windows launcher script for embedded JVM and native exe JVM apps
 - Fix native image for linux and windows
-- Set JDK to 11, and correct architecture
-- Use toolchain's `jlink` command.
+- Set JDK to correct architecture somehow?
 - Use `jlink` from arm64 toolchain on m1 macOS
 - Native app plugin creates distributions for all targets
-- Split base plugin out of jvm cli plugin to share with jvm ui plugin
 - Native macOS bundle plugin
 - Configurable bundle id, app display name, app version
 - Infer the main class for a JVM app.
-- Generate module-info with requires.
+- Module-info
+  - Infer requires from classpath
+  - Infer exports from compiled classes
+  - Figure out how to apply to Kotlin compilation
 - Use correct architecture for macOS native binary, embedded JVM and GraalVM native binary output.
   - Bundle native launcher for each platform in the plugins.
-- Add a settings plugin that add the maven repo and plugin dependencies to the root project.
 - Add some kind `assembleDebug` task to build a single dev target.
 - Add functional tests for plugins.
   - Customisation

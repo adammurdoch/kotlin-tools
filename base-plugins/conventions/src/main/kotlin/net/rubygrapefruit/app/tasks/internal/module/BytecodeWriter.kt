@@ -18,7 +18,7 @@ internal class BytecodeWriter {
     }
 
     interface Builder {
-        fun module(name: String)
+        fun module(name: String, exports: List<String>, requires: List<String>, requiresTransitive: List<String>)
     }
 
     private enum class AccessFlag(val value: Int) {
@@ -50,7 +50,14 @@ internal class BytecodeWriter {
         }
     }
 
-    private sealed class Attribute() {
+    private class PackageInfoEntry(index: Int, val name: StringEntry) : ConstantPoolEntry(index) {
+        override fun BuilderImpl.writeTo() {
+            u1(20u)
+            u2(name.index.toUInt())
+        }
+    }
+
+    private sealed class Attribute {
         abstract fun BuilderImpl.writeTo()
     }
 
@@ -59,7 +66,9 @@ internal class BytecodeWriter {
         val moduleInfo: ModuleInfoEntry,
         val javaBaseModuleInfo: ModuleInfoEntry,
         val javaVersion: StringEntry,
-        val modules: List<ModuleInfoEntry>
+        val requires: List<ModuleInfoEntry>,
+        val requiresTransitive: List<ModuleInfoEntry>,
+        val exports: List<PackageInfoEntry>
     ) : Attribute() {
         override fun BuilderImpl.writeTo() {
             u2(attributeName.index.toUInt())
@@ -70,17 +79,27 @@ internal class BytecodeWriter {
                 // module version
                 u2(0u)
                 // requires count
-                u2(modules.size.toUInt() + 1u)
+                u2((requires.size + requiresTransitive.size + 1).toUInt())
                 u2(javaBaseModuleInfo.index.toUInt())
                 u2(0x8000u)
                 u2(javaVersion.index.toUInt())
-                for (module in modules) {
+                for (module in requires) {
                     u2(module.index.toUInt())
                     u2(0x8000u)
                     u2(0u)
                 }
+                for (module in requiresTransitive) {
+                    u2(module.index.toUInt())
+                    u2(0x8020u)
+                    u2(0u)
+                }
                 // exports count
-                u2(0u)
+                u2(exports.size.toUInt())
+                for (export in exports) {
+                    u2(export.index.toUInt())
+                    u2(0x8000u)
+                    u2(0u)
+                }
                 // opens count
                 u2(0u)
                 // uses count
@@ -93,33 +112,77 @@ internal class BytecodeWriter {
         }
     }
 
+    private class ConstantPool {
+        val entries = mutableListOf<ConstantPoolEntry>()
+
+        fun string(text: String): StringEntry {
+            val entry = StringEntry(entries.size + 1, text)
+            entries.add(entry)
+            return entry
+        }
+
+        fun classInfo(name: StringEntry): ClassInfoEntry {
+            val entry = ClassInfoEntry(entries.size + 1, name)
+            entries.add(entry)
+            return entry
+        }
+
+        fun classInfo(name: String): ClassInfoEntry {
+            return classInfo(string(name))
+        }
+
+        fun moduleInfo(name: StringEntry): ModuleInfoEntry {
+            val entry = ModuleInfoEntry(entries.size + 1, name)
+            entries.add(entry)
+            return entry
+        }
+
+        fun moduleInfo(name: String): ModuleInfoEntry {
+            return moduleInfo(string(name))
+        }
+
+        fun packageInfo(name: StringEntry): PackageInfoEntry {
+            val entry = PackageInfoEntry(entries.size + 1, name)
+            entries.add(entry)
+            return entry
+        }
+
+        fun packageInfo(name: String): PackageInfoEntry {
+            return packageInfo(string(name))
+        }
+
+        fun BuilderImpl.writeTo() {
+            val entries = entries
+            u2(entries.size.toUInt() + 1u)
+            for (entry in entries) {
+                entry.apply { writeTo() }
+            }
+        }
+    }
+
     private class BuilderImpl(
         stream: OutputStream
     ) : Builder {
         private val output = DataOutputStream(stream)
 
-        override fun module(name: String) {
+        override fun module(name: String, exports: List<String>, requires: List<String>, requiresTransitive: List<String>) {
             u4(0xCAFEBABEu)
-            // version
+            // bytecode version
             u2(0u)
             u2(55u)
 
             // constant pool
-            val className = StringEntry(1, "module-info")
-            val classInfo = ClassInfoEntry(2, className)
-            val moduleAttributeName = StringEntry(3, "Module")
-            val moduleName = StringEntry(4, name)
-            val moduleInfo = ModuleInfoEntry(5, moduleName)
-            val javaBaseName = StringEntry(6, "java.base")
-            val javaBaseModuleInfo = ModuleInfoEntry(7, javaBaseName)
-            val javaVersion = StringEntry(8, System.getProperty("java.version"))
-            val kotlinName = StringEntry(9, "kotlin.stdlib")
-            val kotlinModuleInfo = ModuleInfoEntry(10, kotlinName)
-            val entries = listOf(className, classInfo, moduleAttributeName, moduleName, moduleInfo, javaBaseName, javaBaseModuleInfo, javaVersion, kotlinName, kotlinModuleInfo).sortedBy { it.index }
-            u2(entries.size.toUInt() + 1u)
-            for (entry in entries) {
-                entry.apply { writeTo() }
-            }
+            val constantPool = ConstantPool()
+            val classInfo = constantPool.classInfo("module-info")
+            val moduleAttributeName = constantPool.string("Module")
+            val moduleInfo = constantPool.moduleInfo(name)
+            val javaBaseModuleInfo = constantPool.moduleInfo("java.base")
+            val javaVersion = constantPool.string(System.getProperty("java.version"))
+            val kotlinModuleInfo = constantPool.moduleInfo("kotlin.stdlib")
+            val requiresModuleInfo = requires.map { constantPool.moduleInfo(it) }
+            val requiresTransitiveModuleInfo = requiresTransitive.map { constantPool.moduleInfo(it) }
+            val exportsPackageInfo = exports.map { constantPool.packageInfo(it.replace('.', '/')) }
+            constantPool.apply { writeTo() }
 
             accessFlags(AccessFlag.Module)
 
@@ -133,17 +196,21 @@ internal class BytecodeWriter {
             u2(0u)
 
             // attributes
-            val module = ModuleAttribute(moduleAttributeName, moduleInfo, javaBaseModuleInfo, javaVersion, listOf(kotlinModuleInfo))
+            val module = ModuleAttribute(
+                moduleAttributeName,
+                moduleInfo,
+                javaBaseModuleInfo,
+                javaVersion,
+                listOf(kotlinModuleInfo) + requiresModuleInfo,
+                requiresTransitiveModuleInfo,
+                exportsPackageInfo
+            )
             val attributes = listOf(module)
             u2(attributes.size.toUInt())
             for (attribute in attributes) {
                 attribute.apply { writeTo() }
             }
         }
-
-        val UInt.display: String get() = "Ox${toString(16).padStart(8, '0')} (${toString()})"
-
-        val UByte.display: String get() = "Ox${toString(16).padStart(2, '0')} (${toString()})"
 
         fun writing(builder: BuilderImpl.() -> Unit): ByteArray {
             val stream = ByteArrayOutputStream()

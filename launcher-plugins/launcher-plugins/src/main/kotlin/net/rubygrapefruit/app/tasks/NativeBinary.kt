@@ -40,7 +40,11 @@ abstract class NativeBinary : DefaultTask() {
             URI("https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-22.2.0/graalvm-ce-java11-darwin-amd64-22.2.0.tar.gz")
         }
         val dir = repository.install(uri, "graalvm-amd64-22.2") { dir ->
-            val tool = dir.resolve("graalvm-ce-java11-22.2.0/Contents/Home/bin/gu")
+            val tool = if (currentOs() is Linux) {
+                dir.resolve("graalvm-ce-java11-22.2.0/bin/gu")
+            } else {
+                dir.resolve("graalvm-ce-java11-22.2.0/Contents/Home/bin/gu")
+            }
             processOperations.exec { spec ->
                 spec.commandLine(tool, "install", "native-image")
             }

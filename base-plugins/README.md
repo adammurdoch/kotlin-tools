@@ -99,7 +99,8 @@ A convention plugin for implementing Gradle plugins using Kotlin.
 - Adds `library { }` block
   - `library.module.name` - defaults to the project name 
   - `library.module.exports` 
-  - `library.module.requires` 
+  - `library.module.requires` - calculated from the compile (implementation) dependencies 
+  - `library.module.requiresTransitive` - calculated from the API dependencies
 
 See [`../test-apps`](../test-apps/) for some samples.
 
@@ -117,9 +118,9 @@ See [`../test-apps`](../test-apps/) for some samples.
 - Configurable bundle id, app display name, app version
 - Infer the main class for a JVM app
 - Module-info
-  - Infer requires from classpath
-  - Infer exports from compiled classes
-  - Figure out how to apply to Kotlin compilation
+  - Default module name to top-most package
+  - Only export packages that contain public non-internal types
+  - Figure out how to enforce for Kotlin JVM compilation
   - Use an artifact transform to extract the module info for dependencies
 - Use correct architecture for macOS native binary, embedded JVM and GraalVM native binary output.
   - Bundle native launcher for each platform in the plugins.

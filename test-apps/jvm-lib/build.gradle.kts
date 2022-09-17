@@ -3,5 +3,5 @@ plugins {
 }
 
 library {
-    module.exports.add("sample.system")
+    module.name.set("sample.system")
 }

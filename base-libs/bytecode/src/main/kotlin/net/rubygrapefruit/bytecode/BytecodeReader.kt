@@ -3,6 +3,9 @@ package net.rubygrapefruit.bytecode
 import java.io.InputStream
 
 class BytecodeReader {
+    /**
+     * Reads class file to the given file.
+     */
     fun readFrom(stream: InputStream, visitor: Visitor) {
         val decoder = StreamBackedDecoder(stream)
         decoder.doRead(visitor)

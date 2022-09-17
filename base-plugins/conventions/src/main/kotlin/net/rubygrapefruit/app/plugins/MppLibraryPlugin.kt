@@ -8,7 +8,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
 class MppLibraryPlugin : Plugin<Project> {
@@ -54,14 +53,18 @@ class MppLibraryPlugin : Plugin<Project> {
             lib.module.name.convention(toModuleName(project.name))
 
             val extension = extensions.getByType(KotlinMultiplatformExtension::class.java)
-            val target = extension.targets.getByName("jvm") as KotlinJvmTarget
-            println("-> api elements config: ${target.apiElementsConfigurationName}")
-            println("-> compilation API config: ${target.compilations.first().apiConfigurationName}")
-            println("-> compilation impl config: ${target.compilations.first().implementationConfigurationName}")
-            println("-> compilation comp dep files: ${target.compilations.first().compileDependencyFiles}")
-            println("-> compilation runtime dep files: ${target.compilations.first().runtimeDependencyFiles}")
+            val jvmTarget = extension.targets.getByName("jvm") as KotlinJvmTarget
 
-            val moduleInfoCp = extensions.getByType(JvmModuleRegistry::class.java).moduleInfoClasspathEntryFor(lib.module, target.compilations.first().compileDependencyFiles)
+            val apiConfig = configurations.getByName(jvmTarget.apiElementsConfigurationName)
+
+            val apiClasspath = configurations.create("apiClasspath")
+            apiClasspath.extendsFrom(apiConfig)
+
+            val compilation = jvmTarget.compilations.first()
+
+            val classesDir = compilation.compileKotlinTaskProvider.flatMap { it.destinationDirectory }
+
+            val moduleInfoCp = extensions.getByType(JvmModuleRegistry::class.java).moduleInfoClasspathEntryFor(lib.module, files(classesDir), apiClasspath, compilation.compileDependencyFiles)
             tasks.named("jvmJar", Jar::class.java) {
                 it.from(moduleInfoCp)
             }

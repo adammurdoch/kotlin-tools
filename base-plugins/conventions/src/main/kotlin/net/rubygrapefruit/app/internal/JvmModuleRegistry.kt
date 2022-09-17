@@ -1,6 +1,7 @@
 package net.rubygrapefruit.app.internal
 
 import net.rubygrapefruit.app.JvmModule
+import net.rubygrapefruit.app.tasks.InferExportedPackages
 import net.rubygrapefruit.app.tasks.InferRequiredModules
 import net.rubygrapefruit.app.tasks.JvmModuleInfo
 import org.gradle.api.Project
@@ -11,12 +12,28 @@ import org.gradle.api.provider.Provider
 abstract class JvmModuleRegistry(
     private val project: Project
 ) {
-    fun moduleInfoClasspathEntryFor(module: JvmModule, classPath: FileCollection): Provider<Directory> {
+    fun moduleInfoClasspathEntryFor(module: JvmModule, classesDirs: FileCollection?, apiClassPath: FileCollection?, compileClasspath: FileCollection): Provider<Directory> {
+        if (apiClassPath != null) {
+            val requiresTransitive = project.tasks.register("requiredTransitiveModules", InferRequiredModules::class.java) {
+                it.classPath.from(apiClassPath)
+                it.outputFile.set(project.layout.buildDirectory.file("jvm/required-transitive-modules.txt"))
+            }
+            module.requiresTransitive.convention(requiresTransitive.map { it.outputFile.get().asFile.readLines() })
+        }
+
         val requires = project.tasks.register("requiredModules", InferRequiredModules::class.java) {
-            it.classPath.from(classPath)
+            it.classPath.from(compileClasspath)
             it.outputFile.set(project.layout.buildDirectory.file("jvm/required-modules.txt"))
         }
         module.requires.convention(requires.map { it.outputFile.get().asFile.readLines() })
+
+        if (classesDirs != null) {
+            val exports = project.tasks.register("exportedPackages", InferExportedPackages::class.java) {
+                it.classesDirs.from(classesDirs)
+                it.outputFile.set(project.layout.buildDirectory.file("jvm/exported-packages.txt"))
+            }
+            module.exports.convention(exports.map { it.outputFile.get().asFile.readLines() })
+        }
 
         val moduleTask = project.tasks.register("moduleInfo", JvmModuleInfo::class.java) {
             it.outputDirectory.set(project.layout.buildDirectory.dir("jvm/jvm-module"))

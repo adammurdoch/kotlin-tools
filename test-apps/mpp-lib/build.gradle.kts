@@ -3,6 +3,5 @@ plugins {
 }
 
 library {
-    module.name.set("sample.parser")
-    module.exports.add("sample.calc")
+    module.name.set("sample.calc")
 }

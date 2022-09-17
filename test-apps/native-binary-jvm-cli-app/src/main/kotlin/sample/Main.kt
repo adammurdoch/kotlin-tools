@@ -1,6 +1,8 @@
 package sample
 
+import sample.system.reportSystemInfo
+
 fun main(args: Array<String>) {
-    println("Test application")
+    reportSystemInfo()
     println("Arguments: ${args.joinToString(", ")}")
 }

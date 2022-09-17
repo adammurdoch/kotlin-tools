@@ -12,6 +12,6 @@ fun main(args: Array<String>) {
             println("Expression: ${result.expression}")
             println("Result: ${result.expression.evaluate()}")
         }
-        is Failure -> println("Expected ${result.expected}, found: ${result.remaining.take(30)}")
+        is Failure -> println(result.message)
     }
 }

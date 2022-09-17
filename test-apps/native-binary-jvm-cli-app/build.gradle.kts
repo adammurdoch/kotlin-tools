@@ -5,4 +5,10 @@ plugins {
 
 application {
     mainClass.set("sample.MainKt")
+
+    module.requires.add("jvmLib")
+}
+
+dependencies {
+    implementation(project(":jvm-lib"))
 }

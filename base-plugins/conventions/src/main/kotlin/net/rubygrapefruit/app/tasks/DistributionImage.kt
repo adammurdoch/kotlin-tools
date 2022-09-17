@@ -103,14 +103,14 @@ abstract class DistributionImage : DefaultTask() {
     class FileContribution(
         @get:Input
         val filePath: Provider<String>,
-        @get:InputFile
+        @get:InputFile @get:Optional
         val file: Provider<RegularFile>
     ) : Contribution()
 
     class DirectoryContribution(
         @get:Input
         val dirPath: String,
-        @get:InputDirectory
+        @get:InputDirectory @get:Optional
         val dir: Provider<Directory>
     ) : Contribution()
 

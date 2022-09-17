@@ -7,6 +7,7 @@ kotlin {
         named("commonMain") {
             dependencies {
                 implementation(project(":mpp-lib"))
+                implementation(project(":native-lib"))
             }
         }
     }

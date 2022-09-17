@@ -105,15 +105,17 @@ See [`../test-apps`](../test-apps/) for some samples.
 
 ### TODO
 
+- Native-launcher: build both macOS binaries, do not build on non-macOS machine
 - Don't include windows launcher script for embedded JVM and native exe JVM apps
-- Fix native image for linux and windows
+- Fix native image for windows
+- Don't add a dist task when there is no source for the current target (eg native-launcher on linux)
+- Download service: don't keep the install dir when install action fails
 - Set JDK to correct architecture somehow?
 - Use `jlink` from arm64 toolchain on m1 macOS
 - Native app plugin creates distributions for all targets
 - Native macOS bundle plugin
 - Configurable bundle id, app display name, app version
 - Infer the main class for a JVM app
-- Don't add a dist task when there is no source for the current target
 - Module-info
   - Infer requires from classpath
   - Infer exports from compiled classes

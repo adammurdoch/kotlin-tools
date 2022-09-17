@@ -1,3 +1,3 @@
 plugins {
-    id("net.rubygrapefruit.mpp.lib")
+    id("net.rubygrapefruit.native.lib")
 }

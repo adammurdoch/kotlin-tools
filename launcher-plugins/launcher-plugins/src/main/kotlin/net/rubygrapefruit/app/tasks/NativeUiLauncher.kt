@@ -1,5 +1,6 @@
 package net.rubygrapefruit.app.tasks
 
+import net.rubygrapefruit.app.internal.currentOs
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.OutputFile
@@ -14,7 +15,7 @@ abstract class NativeUiLauncher : DefaultTask() {
 
     @TaskAction
     fun extract() {
-        val resource = javaClass.classLoader.getResource("native-launcher.kexe")
+        val resource = javaClass.classLoader.getResource("${currentOs.machine.kotlinTarget}/native-launcher.kexe")
         val outputFile = outputFile.get().asFile.toPath()
         Files.copy(resource.openStream(), outputFile, StandardCopyOption.REPLACE_EXISTING)
         Files.setPosixFilePermissions(

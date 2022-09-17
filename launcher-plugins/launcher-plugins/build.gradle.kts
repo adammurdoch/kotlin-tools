@@ -1,22 +1,33 @@
+import net.rubygrapefruit.app.NativeMachine
+
 plugins {
     id("net.rubygrapefruit.gradle-plugin")
 }
 
 group = "net.rubygrapefruit.plugins"
 
-val nativeBinaries = configurations.create("nativeBinaries") {
-    attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named("native-binary"))
-    isCanBeResolved = true
-    isCanBeConsumed = false
+val nativeBinaries = listOf(NativeMachine.MacOSX64, NativeMachine.MacOSArm64).map { machine ->
+    val nativeBinaries = configurations.create("nativeBinaries${machine.name}") {
+        attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named("native-binary-${machine.kotlinTarget}"))
+        isCanBeResolved = true
+        isCanBeConsumed = false
+    }
+    dependencies {
+        add(nativeBinaries.name, project(":native-launcher"))
+    }
+    Pair(machine, nativeBinaries)
 }
 
 dependencies {
     implementation(project(":download"))
-    add(nativeBinaries.name, project(":native-launcher"))
 }
 
 tasks.processResources {
-    from(nativeBinaries)
+    for (entry in nativeBinaries) {
+        from(entry.second) {
+            into(entry.first.kotlinTarget)
+        }
+    }
 }
 
 gradlePlugin {

@@ -34,12 +34,12 @@ abstract class NativeBinary : DefaultTask() {
     @TaskAction
     fun install() {
         val repository = DownloadRepository()
-        val uri = if (currentOs() is Linux) {
+        val uri = if (currentOs is Linux) {
             URI("https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-22.2.0/graalvm-ce-java11-linux-amd64-22.2.0.tar.gz")
         } else {
             URI("https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-22.2.0/graalvm-ce-java11-darwin-amd64-22.2.0.tar.gz")
         }
-        val binDirName = if (currentOs() is Linux) {
+        val binDirName = if (currentOs is Linux) {
             "graalvm-ce-java11-22.2.0/bin"
         } else {
             "graalvm-ce-java11-22.2.0/Contents/Home/bin"

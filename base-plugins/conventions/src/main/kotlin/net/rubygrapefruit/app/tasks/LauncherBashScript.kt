@@ -34,7 +34,7 @@ BASE_DIR=${'$'}( cd -P "${'$'}( dirname "${'$'}SOURCE" )" >/dev/null 2>&1 && pwd
 $javaCommand $modulePathArg --module ${module.get()}/${mainClass.get()} "$@"
 """
         )
-        if (currentOs() != Windows) {
+        if (currentOs != Windows) {
             Files.setPosixFilePermissions(
                 scriptFile,
                 setOf(

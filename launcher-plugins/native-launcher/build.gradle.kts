@@ -1,11 +1,17 @@
+import net.rubygrapefruit.app.NativeMachine
+
 plugins {
     id("net.rubygrapefruit.native.cli-app")
 }
 
-val nativeBinary = application.outputBinary
-configurations.create("outgoingNativeBinary") {
-    attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named("native-binary"))
-    isCanBeResolved = false
-    isCanBeConsumed = true
-    outgoing.artifact(nativeBinary)
+for (machine in listOf(NativeMachine.MacOSX64, NativeMachine.MacOSArm64)) {
+    configurations.create("outgoingNativeBinary${machine.name}") {
+        attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named("native-binary-${machine.kotlinTarget}"))
+        isCanBeResolved = false
+        isCanBeConsumed = true
+        val binary = application.outputBinary(machine)
+        if (binary.isPresent) {
+            outgoing.artifact(binary)
+        }
+    }
 }

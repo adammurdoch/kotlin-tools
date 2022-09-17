@@ -120,6 +120,7 @@ See [`../test-apps`](../test-apps/) for some samples.
   - Infer requires from classpath
   - Infer exports from compiled classes
   - Figure out how to apply to Kotlin compilation
+  - Use an artifact transform to extract the module info for dependencies
 - Use correct architecture for macOS native binary, embedded JVM and GraalVM native binary output.
   - Bundle native launcher for each platform in the plugins.
 - Add some kind `assembleDebug` task to build a single dev target.

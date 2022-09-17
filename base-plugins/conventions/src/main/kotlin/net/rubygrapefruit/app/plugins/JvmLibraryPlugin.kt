@@ -22,7 +22,9 @@ class JvmLibraryPlugin : Plugin<Project> {
             val lib = extensions.create("library", JvmLibrary::class.java)
             lib.module.name.convention(toModuleName(project.name))
 
-            val moduleInfoCp = extensions.getByType(JvmModuleRegistry::class.java).moduleInfoClasspathEntryFor(lib.module)
+            val runtimeClasspath = configurations.getByName("runtimeClasspath")
+
+            val moduleInfoCp = extensions.getByType(JvmModuleRegistry::class.java).moduleInfoClasspathEntryFor(lib.module, runtimeClasspath)
             val sourceSet = extensions.getByType(SourceSetContainer::class.java).getByName("main")
             sourceSet.output.dir(moduleInfoCp)
         }

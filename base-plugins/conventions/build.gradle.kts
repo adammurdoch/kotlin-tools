@@ -11,6 +11,7 @@ repositories {
 
 dependencies {
     api("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10")
+    implementation("net.rubygrapefruit.libs:bytecode:1.0")
 }
 
 gradlePlugin {

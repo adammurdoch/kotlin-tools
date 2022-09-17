@@ -8,6 +8,8 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
 class MppLibraryPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -20,9 +22,7 @@ class MppLibraryPlugin : Plugin<Project> {
             repositories.mavenCentral()
 
             with(extensions.getByType(KotlinMultiplatformExtension::class.java)) {
-                jvm {
-                    withJava()
-                }
+                jvm()
                 macosX64()
                 macosArm64()
                 linuxX64()
@@ -53,7 +53,15 @@ class MppLibraryPlugin : Plugin<Project> {
             val lib = extensions.create("library", JvmLibrary::class.java)
             lib.module.name.convention(toModuleName(project.name))
 
-            val moduleInfoCp = extensions.getByType(JvmModuleRegistry::class.java).moduleInfoClasspathEntryFor(lib.module)
+            val extension = extensions.getByType(KotlinMultiplatformExtension::class.java)
+            val target = extension.targets.getByName("jvm") as KotlinJvmTarget
+            println("-> api elements config: ${target.apiElementsConfigurationName}")
+            println("-> compilation API config: ${target.compilations.first().apiConfigurationName}")
+            println("-> compilation impl config: ${target.compilations.first().implementationConfigurationName}")
+            println("-> compilation comp dep files: ${target.compilations.first().compileDependencyFiles}")
+            println("-> compilation runtime dep files: ${target.compilations.first().runtimeDependencyFiles}")
+
+            val moduleInfoCp = extensions.getByType(JvmModuleRegistry::class.java).moduleInfoClasspathEntryFor(lib.module, target.compilations.first().compileDependencyFiles)
             tasks.named("jvmJar", Jar::class.java) {
                 it.from(moduleInfoCp)
             }

@@ -7,8 +7,6 @@ application {
     mainClass.set("sample.app.MainKt")
 
     module.name.set("sample.app")
-    module.requires.add("sample.parser")
-    module.requires.add("jvmLib")
 }
 
 dependencies {

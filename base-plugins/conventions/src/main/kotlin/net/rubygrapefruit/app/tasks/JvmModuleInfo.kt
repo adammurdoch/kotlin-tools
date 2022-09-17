@@ -1,6 +1,6 @@
 package net.rubygrapefruit.app.tasks
 
-import net.rubygrapefruit.app.tasks.internal.module.BytecodeWriter
+import net.rubygrapefruit.bytecode.BytecodeWriter
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
@@ -36,6 +36,12 @@ abstract class JvmModuleInfo : DefaultTask() {
         if (!generate.get()) {
             return
         }
+
+        println("-> generate module-info.class")
+        println("-> name: ${module.get()}")
+        println("-> exports: ${exports.get()}")
+        println("-> requires: ${requires.get()}")
+        println("-> requires transitive: ${requiresTransitive.get()}")
 
         val outputFile = outputDirectory.resolve("module-info.class")
         BytecodeWriter().writeTo(outputFile) {

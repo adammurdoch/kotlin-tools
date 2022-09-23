@@ -3,6 +3,30 @@ package net.rubygrapefruit.file
 import kotlinx.cinterop.*
 import platform.posix.*
 
+internal actual fun stat(file: FileSystemElement): FileSystemElementMetadata {
+    return memScoped {
+        val statBuf = alloc<stat>()
+        if (lstat(file.path, statBuf.ptr) != 0) {
+            if (errno == ENOENT) {
+                return MissingEntryMetadata
+            }
+            if (errno == EACCES) {
+                UnreadableEntryMetadata
+            } else {
+                throw NativeException("Could not stat file '$file'.")
+            }
+        } else if (statBuf.st_mode.convert<Int>() and S_IFDIR == S_IFDIR) {
+            DirectoryMetadata
+        } else if (statBuf.st_mode.convert<Int>() and S_IFLNK == S_IFLNK) {
+            SymlinkMetadata
+        } else if (statBuf.st_mode.convert<Int>() and S_IFLNK == S_IFREG) {
+            RegularFileMetadata(statBuf.st_size.convert())
+        } else {
+            OtherMetadata
+        }
+    }
+}
+
 internal actual fun getUserHomeDir(): Directory {
     return memScoped {
         val uid = getuid()

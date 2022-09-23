@@ -18,6 +18,11 @@ expect sealed class FileSystemElement {
      * Returns the absolute path of this element.
      */
     val absolutePath: String
+
+    /**
+     * Get a snapshot of the current metadata of the file.
+     */
+    fun metadata(): FileSystemElementMetadata
 }
 
 /**
@@ -52,12 +57,12 @@ expect class Directory : FileSystemElement {
     fun createDirectories()
 
     /**
-     * Locates a file with the given name in this directory.
+     * Locates a file relative to this directory.
      */
     fun file(name: String): RegularFile
 
     /**
-     * Locates a directory with the given name in this directory.
+     * Locates a directory relative to this directory.
      */
     fun dir(name: String): Directory
 

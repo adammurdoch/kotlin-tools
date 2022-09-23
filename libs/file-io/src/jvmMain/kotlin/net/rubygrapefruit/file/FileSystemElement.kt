@@ -1,7 +1,9 @@
 package net.rubygrapefruit.file
 
+import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.attribute.BasicFileAttributeView
 import kotlin.io.path.name
 import kotlin.io.path.pathString
 
@@ -29,6 +31,29 @@ actual sealed class FileSystemElement(protected val path: Path) {
 
     actual val absolutePath: String
         get() = path.pathString
+
+    /**
+     * Returns this element as a JVM `Path`.
+     */
+    fun toPath(): Path = path
+
+    /**
+     * Returns this element as a JVM `File`.
+     */
+    fun toFile(): File = path.toFile()
+
+    /**
+     * Get a snapshot of the current metadata of the file.
+     */
+    actual fun metadata(): FileSystemElementMetadata {
+        val attributes = Files.getFileAttributeView(path, BasicFileAttributeView::class.java).readAttributes()
+        return when {
+            attributes.isRegularFile -> RegularFileMetadata(attributes.size().toULong())
+            attributes.isDirectory -> DirectoryMetadata
+            attributes.isSymbolicLink -> SymlinkMetadata
+            else -> OtherMetadata
+        }
+    }
 }
 
 actual class RegularFile internal constructor(path: Path) : FileSystemElement(path) {

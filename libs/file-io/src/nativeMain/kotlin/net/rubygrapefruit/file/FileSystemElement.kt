@@ -23,6 +23,10 @@ actual sealed class FileSystemElement(internal val path: String) {
     override fun toString(): String {
         return path
     }
+
+    actual fun metadata(): FileSystemElementMetadata {
+        return stat(this)
+    }
 }
 
 actual class RegularFile internal constructor(path: String) : FileSystemElement(path) {
@@ -41,11 +45,11 @@ actual class Directory internal constructor(path: String) : FileSystemElement(pa
     }
 
     actual fun file(name: String): RegularFile {
-        return RegularFile("$path/$name")
+        return RegularFile(resolve(name))
     }
 
     actual fun dir(name: String): Directory {
-        return Directory("$path/$name")
+        return Directory(resolve(name))
     }
 
     actual fun createTemporaryDirectory(): Directory {
@@ -55,7 +59,25 @@ actual class Directory internal constructor(path: String) : FileSystemElement(pa
     actual fun createDirectories() {
         createDir(this)
     }
+
+    private fun resolve(name: String): String {
+        if (name.startsWith("/")) {
+            return name
+        } else if (name == ".") {
+            return path
+        } else if (name.startsWith("./")) {
+            return resolve(name.substring(2))
+        } else if (name == "..") {
+            return parent!!.absolutePath
+        } else if (name.startsWith("../")) {
+            return parent!!.resolve(name.substring(3))
+        } else {
+            return "$path/$name"
+        }
+    }
 }
+
+internal expect fun stat(file: FileSystemElement): FileSystemElementMetadata
 
 internal expect fun getUserHomeDir(): Directory
 

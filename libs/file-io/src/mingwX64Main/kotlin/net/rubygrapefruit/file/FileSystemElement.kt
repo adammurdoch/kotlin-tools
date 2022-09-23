@@ -1,21 +1,25 @@
 package net.rubygrapefruit.file
 
-actual fun getUserHomeDir(): Directory {
+internal actual fun stat(file: FileSystemElement): FileSystemElementMetadata {
     TODO()
 }
 
-actual fun getCurrentDir(): Directory {
+internal actual fun getUserHomeDir(): Directory {
     TODO()
 }
 
-actual fun createTempDir(baseDir: Directory): Directory {
+internal actual fun getCurrentDir(): Directory {
     TODO()
 }
 
-actual fun createDir(dir: Directory) {
+internal actual fun createTempDir(baseDir: Directory): Directory {
     TODO()
 }
 
-actual fun writeToFile(file: RegularFile, text: String) {
+internal actual fun createDir(dir: Directory) {
+    TODO()
+}
+
+internal actual fun writeToFile(file: RegularFile, text: String) {
     TODO()
 }

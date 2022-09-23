@@ -7,5 +7,6 @@ plugins {
 
 includeBuild("base-libs")
 includeBuild("base-plugins")
+includeBuild("libs")
 includeBuild("launcher-plugins")
 includeBuild("test-apps")

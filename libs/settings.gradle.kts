@@ -6,5 +6,6 @@ plugins {
     id("net.rubygrapefruit.included-build")
 }
 
-include("native-launcher")
-include("launcher-plugins")
+include("download")
+include("file-io")
+include("file-fixtures")

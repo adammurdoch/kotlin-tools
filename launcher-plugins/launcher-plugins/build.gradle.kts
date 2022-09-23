@@ -19,7 +19,7 @@ val nativeBinaries = listOf(NativeMachine.MacOSX64, NativeMachine.MacOSArm64).ma
 }
 
 dependencies {
-    implementation(project(":download"))
+    implementation("net.rubygrapefruit.libs:download:1.0")
 }
 
 tasks.processResources {

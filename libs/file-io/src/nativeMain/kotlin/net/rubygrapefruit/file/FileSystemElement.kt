@@ -35,6 +35,9 @@ actual class Directory internal constructor(path: String) : FileSystemElement(pa
     actual companion object {
         actual val current: Directory
             get() = getCurrentDir()
+
+        actual val userHome: Directory
+            get() = getUserHomeDir()
     }
 
     actual fun file(name: String): RegularFile {
@@ -53,6 +56,8 @@ actual class Directory internal constructor(path: String) : FileSystemElement(pa
         createDir(this)
     }
 }
+
+internal expect fun getUserHomeDir(): Directory
 
 internal expect fun getCurrentDir(): Directory
 

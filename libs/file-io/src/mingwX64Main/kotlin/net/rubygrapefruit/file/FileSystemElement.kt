@@ -1,5 +1,9 @@
 package net.rubygrapefruit.file
 
+actual fun getUserHomeDir(): Directory {
+    TODO()
+}
+
 actual fun getCurrentDir(): Directory {
     TODO()
 }

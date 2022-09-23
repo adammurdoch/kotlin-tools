@@ -1,6 +1,5 @@
 package net.rubygrapefruit.file
 
-import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.name
@@ -44,7 +43,10 @@ actual class RegularFile internal constructor(path: Path) : FileSystemElement(pa
 actual class Directory internal constructor(path: Path) : FileSystemElement(path) {
     actual companion object {
         actual val current: Directory
-            get() = Directory(File(".").toPath().toAbsolutePath().normalize())
+            get() = Directory(Path.of(".").toAbsolutePath().normalize())
+
+        actual val userHome: Directory
+            get() = Directory(Path.of(System.getProperty("user.home")).toAbsolutePath().normalize())
     }
 
     actual fun file(name: String): RegularFile {

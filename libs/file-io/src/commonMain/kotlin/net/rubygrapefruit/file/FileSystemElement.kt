@@ -1,5 +1,8 @@
 package net.rubygrapefruit.file
 
+/**
+ * Some element in the file system.
+ */
 expect sealed class FileSystemElement {
     /**
      * Returns the parent of this element, or null if this element is the root of the file system
@@ -17,6 +20,9 @@ expect sealed class FileSystemElement {
     val absolutePath: String
 }
 
+/**
+ * A regular file in the file system.
+ */
 expect class RegularFile : FileSystemElement {
     /**
      * Writes the given text to the file, using UTF-8 encoding.
@@ -24,12 +30,20 @@ expect class RegularFile : FileSystemElement {
     fun writeText(text: String)
 }
 
+/**
+ * A directory in the file system.
+ */
 expect class Directory : FileSystemElement {
     companion object {
         /**
-         * Locates the current directory of this process.
+         * The current directory of this process.
          */
         val current: Directory
+
+        /**
+         * The user's home directory.
+         */
+        val userHome: Directory
     }
 
     /**

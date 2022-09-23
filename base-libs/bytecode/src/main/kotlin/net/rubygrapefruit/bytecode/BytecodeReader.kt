@@ -16,7 +16,7 @@ class BytecodeReader {
         if (header != 0xCAFEBABEu) {
             throw IllegalArgumentException("Unexpected magic number: $header")
         }
-        val minor = u2()
+        u2() // minor version
         val major = u2()
         if (major > 62u) {
             throw IllegalArgumentException("Unrecognized major version: $major")

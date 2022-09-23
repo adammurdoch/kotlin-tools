@@ -3,6 +3,17 @@ package net.rubygrapefruit.file
 import kotlinx.cinterop.*
 import platform.posix.*
 
+internal actual fun getUserHomeDir(): Directory {
+    return memScoped {
+        val uid = getuid()
+        val pwd = getpwuid(uid)
+        if (pwd == null) {
+            throw NativeException("Could not get user home directory.")
+        }
+        Directory(pwd.pointed.pw_dir!!.toKString())
+    }
+}
+
 internal actual fun getCurrentDir(): Directory {
     return memScoped {
         val length = MAXPATHLEN

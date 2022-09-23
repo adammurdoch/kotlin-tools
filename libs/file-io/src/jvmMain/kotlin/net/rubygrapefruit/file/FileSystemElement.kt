@@ -42,10 +42,11 @@ actual sealed class FileSystemElement(protected val path: Path) {
      */
     fun toFile(): File = path.toFile()
 
-    /**
-     * Get a snapshot of the current metadata of the file.
-     */
     actual fun metadata(): FileSystemElementMetadata {
+        return metadata(path)
+    }
+
+    protected fun metadata(path: Path): FileSystemElementMetadata {
         val attributes = Files.getFileAttributeView(path, BasicFileAttributeView::class.java).readAttributes()
         return when {
             attributes.isRegularFile -> RegularFileMetadata(attributes.size().toULong())
@@ -53,6 +54,10 @@ actual sealed class FileSystemElement(protected val path: Path) {
             attributes.isSymbolicLink -> SymlinkMetadata
             else -> OtherMetadata
         }
+    }
+
+    actual fun resolve(): FileResolveResult {
+        return ResolveResultImpl(path, metadata())
     }
 }
 
@@ -88,5 +93,23 @@ actual class Directory internal constructor(path: Path) : FileSystemElement(path
 
     actual fun createDirectories() {
         Files.createDirectories(path)
+    }
+
+    actual fun resolve(name: String): FileResolveResult {
+        val path = path.resolve(name)
+        return ResolveResultImpl(path, metadata(path))
+    }
+}
+
+internal class ResolveResultImpl(private val path: Path, override val metadata: FileSystemElementMetadata) : AbstractFileResolveResult() {
+    override val absolutePath: String
+        get() = path.pathString
+
+    override fun asRegularFile(): RegularFile {
+        return RegularFile(path)
+    }
+
+    override fun asDirectory(): Directory {
+        return Directory(path)
     }
 }

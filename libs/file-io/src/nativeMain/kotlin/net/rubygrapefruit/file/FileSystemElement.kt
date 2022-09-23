@@ -25,7 +25,11 @@ actual sealed class FileSystemElement(internal val path: String) {
     }
 
     actual fun metadata(): FileSystemElementMetadata {
-        return stat(this)
+        return stat(path)
+    }
+
+    actual fun resolve(): FileResolveResult {
+        return ResolveResultImpl(path, metadata())
     }
 }
 
@@ -45,11 +49,11 @@ actual class Directory internal constructor(path: String) : FileSystemElement(pa
     }
 
     actual fun file(name: String): RegularFile {
-        return RegularFile(resolve(name))
+        return RegularFile(resolveName(name))
     }
 
     actual fun dir(name: String): Directory {
-        return Directory(resolve(name))
+        return Directory(resolveName(name))
     }
 
     actual fun createTemporaryDirectory(): Directory {
@@ -60,24 +64,39 @@ actual class Directory internal constructor(path: String) : FileSystemElement(pa
         createDir(this)
     }
 
-    private fun resolve(name: String): String {
+    actual fun resolve(name: String): FileResolveResult {
+        val path = resolveName(name)
+        return ResolveResultImpl(path, stat(path))
+    }
+
+    private fun resolveName(name: String): String {
         if (name.startsWith("/")) {
             return name
         } else if (name == ".") {
             return path
         } else if (name.startsWith("./")) {
-            return resolve(name.substring(2))
+            return resolveName(name.substring(2))
         } else if (name == "..") {
             return parent!!.absolutePath
         } else if (name.startsWith("../")) {
-            return parent!!.resolve(name.substring(3))
+            return parent!!.resolveName(name.substring(3))
         } else {
             return "$path/$name"
         }
     }
 }
 
-internal expect fun stat(file: FileSystemElement): FileSystemElementMetadata
+private class ResolveResultImpl(override val absolutePath: String, override val metadata: FileSystemElementMetadata) : AbstractFileResolveResult() {
+    override fun asRegularFile(): RegularFile {
+        return RegularFile(absolutePath)
+    }
+
+    override fun asDirectory(): Directory {
+        return Directory(absolutePath)
+    }
+}
+
+internal expect fun stat(file: String): FileSystemElementMetadata
 
 internal expect fun getUserHomeDir(): Directory
 

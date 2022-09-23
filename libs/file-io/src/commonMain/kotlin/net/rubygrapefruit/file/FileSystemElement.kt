@@ -20,9 +20,14 @@ expect sealed class FileSystemElement {
     val absolutePath: String
 
     /**
-     * Get a snapshot of the current metadata of the file.
+     * Returns a snapshot of the current metadata of the file.
      */
     fun metadata(): FileSystemElementMetadata
+
+    /**
+     * Returns this element as a resolve result, which contains the path of this element and a snapshot of its metadata.
+     */
+    fun resolve(): FileResolveResult
 }
 
 /**
@@ -52,19 +57,24 @@ expect class Directory : FileSystemElement {
     }
 
     /**
-     * Creates this directory and its ancestors if they do not exist.
-     */
-    fun createDirectories()
-
-    /**
-     * Locates a file relative to this directory.
+     * Resolves a file relative to this directory. Note: does not check whether the file exists or is a regular file.
      */
     fun file(name: String): RegularFile
 
     /**
-     * Locates a directory relative to this directory.
+     * Resolves a directory relative to this directory. Note: does not check whether the file exists or is a directory.
      */
     fun dir(name: String): Directory
+
+    /**
+     * Resolves a name relative to this directory and queries the element's type and basic metadata.
+     */
+    fun resolve(name: String): FileResolveResult
+
+    /**
+     * Creates this directory and its ancestors if they do not exist.
+     */
+    fun createDirectories()
 
     /**
      * Creates a new temporary directory in this directory.

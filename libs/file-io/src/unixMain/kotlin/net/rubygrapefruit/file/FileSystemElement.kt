@@ -3,10 +3,10 @@ package net.rubygrapefruit.file
 import kotlinx.cinterop.*
 import platform.posix.*
 
-internal actual fun stat(file: FileSystemElement): FileSystemElementMetadata {
+internal actual fun stat(file: String): FileSystemElementMetadata {
     return memScoped {
         val statBuf = alloc<stat>()
-        if (lstat(file.path, statBuf.ptr) != 0) {
+        if (lstat(file, statBuf.ptr) != 0) {
             if (errno == ENOENT) {
                 return MissingEntryMetadata
             }

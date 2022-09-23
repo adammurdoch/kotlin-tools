@@ -1,6 +1,6 @@
 package net.rubygrapefruit.file
 
-internal actual fun stat(file: FileSystemElement): FileSystemElementMetadata {
+internal actual fun stat(file: String): FileSystemElementMetadata {
     TODO()
 }
 

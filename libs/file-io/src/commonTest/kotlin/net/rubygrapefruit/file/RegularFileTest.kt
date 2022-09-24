@@ -11,15 +11,28 @@ class RegularFileTest {
 
     @Test
     fun `can write text to a file to create it`() {
-        val file = fixture.testDir.file("file")
+        listOf("1234", "日本語").forEachIndexed { index, text ->
+            val file = fixture.testDir.file("file-$index")
 
-        assertEquals(MissingEntryMetadata, file.metadata())
+            assertEquals(MissingEntryMetadata, file.metadata())
 
+            file.writeText(text)
+
+            val metadata = file.metadata()
+            assertIs<RegularFileMetadata>(metadata)
+            assertEquals(text.encodeToByteArray().size.toULong(), metadata.size)
+
+            assertEquals(text, file.readText())
+        }
+    }
+
+    @Test
+    fun `can write to file with unicode name`() {
+        val file = fixture.testDir.file("日本語")
         file.writeText("1234")
 
-        val metadata = file.metadata()
-        assertIs<RegularFileMetadata>(metadata)
-        assertEquals(4u, metadata.size)
+        assertIs<RegularFileMetadata>(file.metadata())
+        assertEquals("1234", file.readText())
     }
 
     @Test

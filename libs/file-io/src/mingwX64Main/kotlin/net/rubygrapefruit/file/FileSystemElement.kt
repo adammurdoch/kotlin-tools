@@ -23,3 +23,7 @@ internal actual fun createDir(dir: Directory) {
 internal actual fun writeToFile(file: RegularFile, text: String) {
     TODO()
 }
+
+internal actual fun readFromFile(file: RegularFile): String {
+    TODO()
+}

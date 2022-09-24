@@ -37,6 +37,10 @@ actual class RegularFile internal constructor(path: String) : FileSystemElement(
     actual fun writeText(text: String) {
         writeToFile(this, text)
     }
+
+    actual fun readText(): String {
+        return readFromFile(this)
+    }
 }
 
 actual class Directory internal constructor(path: String) : FileSystemElement(path) {
@@ -114,3 +118,5 @@ internal expect fun createTempDir(baseDir: Directory): Directory
 internal expect fun createDir(dir: Directory)
 
 internal expect fun writeToFile(file: RegularFile, text: String)
+
+internal expect fun readFromFile(file: RegularFile): String

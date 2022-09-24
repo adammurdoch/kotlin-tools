@@ -5,4 +5,5 @@ A Kotlin multi-platform library for accessing the file system.
 ## TODO 
 
 - Add context exceptions to all operations
-- Test unicode
+- Test failure modes for reading text
+- Test unicode directory name

@@ -97,3 +97,27 @@ internal actual fun writeToFile(file: RegularFile, text: String) {
     }
 }
 
+internal actual fun readFromFile(file: RegularFile): String {
+    return memScoped {
+        val des = open(file.path, O_RDONLY)
+        if (des < 0) {
+            throw NativeException("Could not open $file")
+        }
+        try {
+            val statBuf = alloc<stat>()
+            if (stat(file.absolutePath, statBuf.ptr) != 0) {
+                throw NativeException("Could not stat $file")
+            }
+            val fileSize = statBuf.st_size
+            val buffer = ByteArray(fileSize.convert())
+            val nread = read(des, buffer.refTo(0), fileSize.convert())
+            if (nread < 0) {
+                throw NativeException("Could not read from $file")
+            }
+            buffer.decodeToString(0, nread.convert())
+        } finally {
+            close(des)
+        }
+    }
+}
+

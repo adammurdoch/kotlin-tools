@@ -38,6 +38,11 @@ expect class RegularFile : FileSystemElement {
      * Writes the given text to the file, using UTF-8 encoding.
      */
     fun writeText(text: String)
+
+    /**
+     * Reads text from the file, using UTF-8 encoding.
+     */
+    fun readText(): String
 }
 
 /**

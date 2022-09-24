@@ -74,6 +74,10 @@ actual class RegularFile internal constructor(path: Path) : FileSystemElement(pa
             throw writeToFile(this, e)
         }
     }
+
+    actual fun readText(): String {
+        return Files.readString(path, Charsets.UTF_8)
+    }
 }
 
 actual class Directory internal constructor(path: Path) : FileSystemElement(path) {

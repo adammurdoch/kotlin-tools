@@ -1,13 +1,32 @@
 package net.rubygrapefruit.file
 
 import net.rubygrapefruit.file.fixtures.FilesFixture
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertIs
-import kotlin.test.fail
+import kotlin.test.*
 
 class DirectoryTest {
     private val fixture = FilesFixture()
+
+    @Test
+    fun `can query home and current directories`() {
+        assertNotNull(Directory.current)
+        assertNotNull(Directory.userHome)
+    }
+
+    @Test
+    fun `can create temporary directory`() {
+        val dir = fixture.dir("parent")
+        val d1 = dir.createTemporaryDirectory()
+        val d2 = dir.createTemporaryDirectory()
+
+        assertEquals(dir.absolutePath, d1.parent?.absolutePath)
+        assertEquals(DirectoryMetadata, d1.metadata())
+
+        assertEquals(dir.absolutePath, d2.parent?.absolutePath)
+        assertEquals(DirectoryMetadata, d2.metadata())
+
+        assertNotEquals(d1, d2)
+        assertNotEquals(d1.name, d2.name)
+    }
 
     @Test
     fun `can create directory`() {
@@ -73,10 +92,32 @@ class DirectoryTest {
             dir.createDirectories()
             fail()
         } catch (e: FileSystemException) {
-            assertEquals("Could not create directory ${dir.parent} as it already exists but is not a directory.", e.message)
+            assertEquals("Could not create directory $file as it already exists but is not a directory.", e.message)
         }
 
         assertIs<RegularFileMetadata>(file.metadata())
+        assertEquals(MissingEntryMetadata, dir.metadata())
+    }
+
+    @Test
+    fun `cannot create directory whose ancestor exists as a file`() {
+        val file = fixture.file("dir")
+        val parent = fixture.testDir.dir("dir/dir2")
+        val dir = parent.dir("dir3")
+
+        assertIs<RegularFileMetadata>(file.metadata())
+        assertEquals(MissingEntryMetadata, parent.metadata())
+        assertEquals(MissingEntryMetadata, dir.metadata())
+
+        try {
+            dir.createDirectories()
+            fail()
+        } catch (e: FileSystemException) {
+            assertEquals("Could not create directory $file as it already exists but is not a directory.", e.message)
+        }
+
+        assertIs<RegularFileMetadata>(file.metadata())
+        assertEquals(MissingEntryMetadata, parent.metadata())
         assertEquals(MissingEntryMetadata, dir.metadata())
     }
 }

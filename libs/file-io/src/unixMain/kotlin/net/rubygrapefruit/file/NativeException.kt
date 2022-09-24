@@ -4,10 +4,9 @@ import kotlinx.cinterop.toKString
 import platform.posix.errno
 import platform.posix.strerror
 
-class NativeException(message: String) : FileSystemException(format(message))
+class NativeException(message: String, code: Int = errno) : FileSystemException(format(message, code))
 
-private fun format(message: String): String {
+private fun format(message: String, code: Int): String {
     require(message.endsWith('.'))
-    val code = errno
     return "$message errno: $code, ${strerror(code)?.toKString()}"
 }

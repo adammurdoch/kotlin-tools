@@ -68,7 +68,11 @@ actual sealed class FileSystemElement(protected val path: Path) {
 
 actual class RegularFile internal constructor(path: Path) : FileSystemElement(path) {
     actual fun writeText(text: String) {
-        Files.writeString(path, text, Charsets.UTF_8)
+        try {
+            Files.writeString(path, text, Charsets.UTF_8)
+        } catch (e: IOException) {
+            throw writeToFile(this, e)
+        }
     }
 }
 
@@ -97,21 +101,21 @@ actual class Directory internal constructor(path: Path) : FileSystemElement(path
         try {
             Files.createDirectories(path)
         } catch (e: FileAlreadyExistsException) {
-            throw FileSystemException("Could not create directory $path as it already exists but is not a directory.", e)
+            throw directoryExistsAndIsNotADir(path.pathString, e)
         } catch (e: IOException) {
             var p = parent
             while (p != null) {
                 when (p.metadata()) {
                     // Found a directory - should have been able to create dir so rethrow original failure
-                    DirectoryMetadata -> throw e
+                    DirectoryMetadata -> throw createDirectory(path.pathString, e)
                     // Keep looking
                     MissingEntryMetadata -> p = p.parent
                     // Found something else - fail
-                    else -> throw FileSystemException("Could not create directory $p as it already exists but is not a directory.", e)
+                    else -> throw directoryExistsAndIsNotADir(p.absolutePath, e)
                 }
             }
             // Nothing in the hierarchy exists, which is unexpected, so rethrow original failure
-            throw e
+            throw createDirectory(path.pathString, e)
         }
     }
 

@@ -67,7 +67,7 @@ internal actual fun createDir(dir: Directory) {
             if (errno != EEXIST) {
                 throw NativeException("Could not create directory $dir.")
             } else if (stat(dir.path) != DirectoryMetadata) {
-                throw FileSystemException("Could not create directory $dir as it already exists but is not a directory.")
+                throw directoryExistsAndIsNotADir(dir.path)
             }
         }
     }
@@ -77,11 +77,19 @@ internal actual fun writeToFile(file: RegularFile, text: String) {
     memScoped {
         val des = fopen(file.path, "w")
         if (des == null) {
-            throw NativeException("Could not create file $file.")
+            if (errno == EISDIR) {
+                throw fileExistsAndIsNotAFile(file.path)
+            }
+            val errnoValue = errno
+            throw writeToFile(file, null) { message, _ -> NativeException(message, errnoValue) }
         }
         try {
             if (fputs(text, des) == EOF) {
-                throw NativeException("Could not write to file $file.")
+                if (errno == ENOTDIR) {
+                    throw fileExistsAndIsNotAFile(file.path)
+                }
+                val errnoValue = errno
+                throw writeToFile(file, null) { message, _ -> NativeException(message, errnoValue) }
             }
         } finally {
             fclose(des)

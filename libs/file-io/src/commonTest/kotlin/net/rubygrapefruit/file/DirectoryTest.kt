@@ -7,12 +7,6 @@ class DirectoryTest {
     private val fixture = FilesFixture()
 
     @Test
-    fun `can query home and current directories`() {
-        assertNotNull(Directory.current)
-        assertNotNull(Directory.userHome)
-    }
-
-    @Test
     fun `can create temporary directory`() {
         val dir = fixture.dir("parent")
         val d1 = dir.createTemporaryDirectory()

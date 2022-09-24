@@ -44,14 +44,6 @@ actual class RegularFile internal constructor(path: String) : FileSystemElement(
 }
 
 actual class Directory internal constructor(path: String) : FileSystemElement(path) {
-    actual companion object {
-        actual val current: Directory
-            get() = getCurrentDir()
-
-        actual val userHome: Directory
-            get() = getUserHomeDir()
-    }
-
     actual fun file(name: String): RegularFile {
         return RegularFile(resolveName(name))
     }

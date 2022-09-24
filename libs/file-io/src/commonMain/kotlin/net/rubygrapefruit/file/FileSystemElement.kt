@@ -49,18 +49,6 @@ expect class RegularFile : FileSystemElement {
  * A directory in the file system.
  */
 expect class Directory : FileSystemElement {
-    companion object {
-        /**
-         * The current directory of this process.
-         */
-        val current: Directory
-
-        /**
-         * The user's home directory.
-         */
-        val userHome: Directory
-    }
-
     /**
      * Resolves a file relative to this directory. Note: does not check whether the file exists or is a regular file.
      */

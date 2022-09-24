@@ -1,11 +1,12 @@
 package net.rubygrapefruit.file.fixtures
 
 import net.rubygrapefruit.file.Directory
+import net.rubygrapefruit.file.FileSystem
 import net.rubygrapefruit.file.RegularFile
 
 class FilesFixture {
     val testDir by lazy {
-        val baseDir = Directory.current.dir("build/test files")
+        val baseDir = FileSystem.currentDirectory.dir("build/test files")
         baseDir.createDirectories()
         baseDir.createTemporaryDirectory()
     }

@@ -3,7 +3,93 @@ package net.rubygrapefruit.file
 import kotlinx.cinterop.*
 import platform.posix.*
 
-internal actual fun stat(file: String): FileSystemElementMetadata {
+internal sealed class UnixFileSystemElement(path: String) : PathFileSystemElement(path) {
+    override val parent: Directory?
+        get() {
+            return if (path == "/") {
+                null
+            } else {
+                UnixDirectory(path.substringBeforeLast("/"))
+            }
+        }
+
+    override fun metadata(): FileSystemElementMetadata {
+        return stat(path)
+    }
+
+    override fun resolve(): FileResolveResult {
+        return ResolveResultImpl(path, metadata())
+    }
+
+}
+
+internal class UnixRegularFile(path: String) : UnixFileSystemElement(path), RegularFile {
+    override fun writeText(text: String) {
+        writeToFile(this, text)
+    }
+
+    override fun readText(): String {
+        return readFromFile(this)
+    }
+}
+
+internal class UnixDirectory(path: String) : UnixFileSystemElement(path), Directory {
+    override fun file(name: String): RegularFile {
+        return UnixRegularFile(resolveName(name))
+    }
+
+    override fun dir(name: String): Directory {
+        return UnixDirectory(resolveName(name))
+    }
+
+    override fun createTemporaryDirectory(): Directory {
+        return createTempDir(this)
+    }
+
+    override fun createDirectories() {
+        val parent = parent
+        if (parent != null) {
+            if (parent.metadata() != DirectoryMetadata) {
+                // Error handling will deal with parent being a file, etc
+                parent.createDirectories()
+            }
+        }
+        createDir(this)
+    }
+
+    override fun resolve(name: String): FileResolveResult {
+        val path = resolveName(name)
+        return ResolveResultImpl(path, stat(path))
+    }
+
+    private fun resolveName(name: String): String {
+        if (name.startsWith("/")) {
+            return name
+        } else if (name == ".") {
+            return path
+        } else if (name.startsWith("./")) {
+            return resolveName(name.substring(2))
+        } else if (name == "..") {
+            return parent!!.absolutePath
+        } else if (name.startsWith("../")) {
+            return (parent as UnixDirectory).resolveName(name.substring(3))
+        } else {
+            return "$path/$name"
+        }
+    }
+}
+
+private class ResolveResultImpl(override val absolutePath: String, override val metadata: FileSystemElementMetadata) : AbstractFileResolveResult() {
+    override fun asRegularFile(): RegularFile {
+        return UnixRegularFile(absolutePath)
+    }
+
+    override fun asDirectory(): Directory {
+        return UnixDirectory(absolutePath)
+    }
+}
+
+internal fun stat(file: String): FileSystemElementMetadata {
     return memScoped {
         val statBuf = alloc<stat>()
         if (lstat(file, statBuf.ptr) != 0) {
@@ -27,18 +113,18 @@ internal actual fun stat(file: String): FileSystemElementMetadata {
     }
 }
 
-internal actual fun getUserHomeDir(): Directory {
+internal fun getUserHomeDir(): UnixDirectory {
     return memScoped {
         val uid = getuid()
         val pwd = getpwuid(uid)
         if (pwd == null) {
             throw NativeException("Could not get user home directory.")
         }
-        NativeDirectory(pwd.pointed.pw_dir!!.toKString())
+        UnixDirectory(pwd.pointed.pw_dir!!.toKString())
     }
 }
 
-internal actual fun getCurrentDir(): Directory {
+internal fun getCurrentDir(): UnixDirectory {
     return memScoped {
         val length = MAXPATHLEN
         val buffer = allocArray<ByteVar>(length)
@@ -46,21 +132,21 @@ internal actual fun getCurrentDir(): Directory {
         if (path == null) {
             throw NativeException("Could not get current directory.")
         }
-        NativeDirectory(buffer.toKString())
+        UnixDirectory(buffer.toKString())
     }
 }
 
-internal actual fun createTempDir(baseDir: NativeDirectory): Directory {
+internal fun createTempDir(baseDir: UnixDirectory): Directory {
     return memScoped {
         val pathCopy = baseDir.dir("dir-XXXXXX").absolutePath.cstr.ptr
         if (mkdtemp(pathCopy) == null) {
             throw NativeException("Could not create temporary directory in ${baseDir}.")
         }
-        NativeDirectory(pathCopy.toKString())
+        UnixDirectory(pathCopy.toKString())
     }
 }
 
-internal actual fun createDir(dir: NativeDirectory) {
+internal fun createDir(dir: UnixDirectory) {
     memScoped {
         val result = mkdir(dir.path, S_IRWXU)
         if (result != 0) {
@@ -73,7 +159,7 @@ internal actual fun createDir(dir: NativeDirectory) {
     }
 }
 
-internal actual fun writeToFile(file: NativeRegularFile, text: String) {
+internal fun writeToFile(file: UnixRegularFile, text: String) {
     memScoped {
         val des = fopen(file.path, "w")
         if (des == null) {
@@ -97,7 +183,7 @@ internal actual fun writeToFile(file: NativeRegularFile, text: String) {
     }
 }
 
-internal actual fun readFromFile(file: NativeRegularFile): String {
+internal fun readFromFile(file: UnixRegularFile): String {
     return memScoped {
         val des = open(file.path, O_RDONLY)
         if (des < 0) {

@@ -1,6 +1,8 @@
 package net.rubygrapefruit.file
 
 import java.io.File
+import java.io.IOException
+import java.nio.file.FileAlreadyExistsException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.attribute.BasicFileAttributeView
@@ -20,7 +22,7 @@ actual sealed class FileSystemElement(protected val path: Path) {
         get() {
             val parent = path.parent
             return if (parent != null) {
-                Directory(path)
+                Directory(parent)
             } else {
                 null
             }
@@ -47,6 +49,9 @@ actual sealed class FileSystemElement(protected val path: Path) {
     }
 
     protected fun metadata(path: Path): FileSystemElementMetadata {
+        if (!Files.exists(path)) {
+            return MissingEntryMetadata
+        }
         val attributes = Files.getFileAttributeView(path, BasicFileAttributeView::class.java).readAttributes()
         return when {
             attributes.isRegularFile -> RegularFileMetadata(attributes.size().toULong())
@@ -62,9 +67,6 @@ actual sealed class FileSystemElement(protected val path: Path) {
 }
 
 actual class RegularFile internal constructor(path: Path) : FileSystemElement(path) {
-    /**
-     * Writes the given text to the file, using UTF-8 encoding.
-     */
     actual fun writeText(text: String) {
         Files.writeString(path, text, Charsets.UTF_8)
     }
@@ -92,7 +94,25 @@ actual class Directory internal constructor(path: Path) : FileSystemElement(path
     }
 
     actual fun createDirectories() {
-        Files.createDirectories(path)
+        try {
+            Files.createDirectories(path)
+        } catch (e: FileAlreadyExistsException) {
+            throw FileSystemException("Could not create directory $path as it already exists but is not a directory.", e)
+        } catch (e: IOException) {
+            var p = parent
+            while (p != null) {
+                when (p.metadata()) {
+                    // Found a directory - should have been able to create dir so rethrow original failure
+                    DirectoryMetadata -> throw e
+                    // Keep looking
+                    MissingEntryMetadata -> p = p.parent
+                    // Found something else - fail
+                    else -> throw FileSystemException("Could not create directory $p as it already exists but is not a directory.", e)
+                }
+            }
+            // Nothing in the hierarchy exists, which is unexpected, so rethrow original failure
+            throw e
+        }
     }
 
     actual fun resolve(name: String): FileResolveResult {

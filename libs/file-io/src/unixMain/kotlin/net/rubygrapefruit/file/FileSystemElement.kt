@@ -7,7 +7,7 @@ internal actual fun stat(file: String): FileSystemElementMetadata {
     return memScoped {
         val statBuf = alloc<stat>()
         if (lstat(file, statBuf.ptr) != 0) {
-            if (errno == ENOENT) {
+            if (errno == ENOENT || errno == ENOTDIR) {
                 return MissingEntryMetadata
             }
             if (errno == EACCES) {
@@ -62,9 +62,12 @@ internal actual fun createTempDir(baseDir: Directory): Directory {
 
 internal actual fun createDir(dir: Directory) {
     memScoped {
-        if (mkdir(dir.path, S_IRWXU) != 0) {
+        val result = mkdir(dir.path, S_IRWXU)
+        if (result != 0) {
             if (errno != EEXIST) {
                 throw NativeException("Could not create directory $dir.")
+            } else if (stat(dir.path) != DirectoryMetadata) {
+                throw FileSystemException("Could not create directory $dir as it already exists but is not a directory.")
             }
         }
     }

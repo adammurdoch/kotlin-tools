@@ -61,6 +61,13 @@ actual class Directory internal constructor(path: String) : FileSystemElement(pa
     }
 
     actual fun createDirectories() {
+        val parent = parent
+        if (parent != null) {
+            if (parent.metadata() != DirectoryMetadata) {
+                // Error handling will deal with parent being a file, etc
+                parent.createDirectories()
+            }
+        }
         createDir(this)
     }
 

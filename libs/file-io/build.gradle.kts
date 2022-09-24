@@ -3,3 +3,14 @@ plugins {
 }
 
 group = "net.rubygrapefruit.libs"
+
+kotlin {
+    sourceSets {
+        named("commonTest") {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation(project(":file-fixtures"))
+            }
+        }
+    }
+}

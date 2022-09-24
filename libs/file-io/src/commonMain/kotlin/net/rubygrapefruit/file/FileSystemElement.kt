@@ -1,9 +1,9 @@
 package net.rubygrapefruit.file
 
 /**
- * Some element in the file system.
+ * A reference to an element in the file system.
  */
-expect sealed class FileSystemElement {
+expect sealed interface FileSystemElement {
     /**
      * Returns the parent of this element, or null if this element is the root of the file system
      */
@@ -33,7 +33,7 @@ expect sealed class FileSystemElement {
 /**
  * A regular file in the file system.
  */
-expect class RegularFile : FileSystemElement {
+interface RegularFile : FileSystemElement {
     /**
      * Writes the given text to the file, using UTF-8 encoding.
      */
@@ -48,7 +48,7 @@ expect class RegularFile : FileSystemElement {
 /**
  * A directory in the file system.
  */
-expect class Directory : FileSystemElement {
+interface Directory : FileSystemElement {
     /**
      * Resolves a file relative to this directory. Note: does not check whether the file exists or is a regular file.
      */

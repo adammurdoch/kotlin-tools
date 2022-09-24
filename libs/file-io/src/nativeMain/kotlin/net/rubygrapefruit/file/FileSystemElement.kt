@@ -1,62 +1,74 @@
 package net.rubygrapefruit.file
 
-actual sealed class FileSystemElement(internal val path: String) {
+actual sealed interface FileSystemElement {
+    actual val parent: Directory?
+
+    actual val name: String
+
+    actual val absolutePath: String
+
+    actual fun metadata(): FileSystemElementMetadata
+
+    actual fun resolve(): FileResolveResult
+}
+
+internal sealed class PathFileSystemElement(internal val path: String) : FileSystemElement {
     init {
         require(path.startsWith("/"))
     }
 
-    actual val parent: Directory?
+    override val parent: Directory?
         get() {
             return if (path == "/") {
                 null
             } else {
-                Directory(path.substringBeforeLast("/"))
+                NativeDirectory(path.substringBeforeLast("/"))
             }
         }
 
-    actual val name: String
+    override val name: String
         get() = path.substringAfterLast("/")
 
-    actual val absolutePath: String
+    override val absolutePath: String
         get() = path
 
     override fun toString(): String {
         return path
     }
 
-    actual fun metadata(): FileSystemElementMetadata {
+    override fun metadata(): FileSystemElementMetadata {
         return stat(path)
     }
 
-    actual fun resolve(): FileResolveResult {
+    override fun resolve(): FileResolveResult {
         return ResolveResultImpl(path, metadata())
     }
 }
 
-actual class RegularFile internal constructor(path: String) : FileSystemElement(path) {
-    actual fun writeText(text: String) {
+internal class NativeRegularFile internal constructor(path: String) : PathFileSystemElement(path), RegularFile {
+    override fun writeText(text: String) {
         writeToFile(this, text)
     }
 
-    actual fun readText(): String {
+    override fun readText(): String {
         return readFromFile(this)
     }
 }
 
-actual class Directory internal constructor(path: String) : FileSystemElement(path) {
-    actual fun file(name: String): RegularFile {
-        return RegularFile(resolveName(name))
+internal class NativeDirectory internal constructor(path: String) : PathFileSystemElement(path), Directory {
+    override fun file(name: String): RegularFile {
+        return NativeRegularFile(resolveName(name))
     }
 
-    actual fun dir(name: String): Directory {
-        return Directory(resolveName(name))
+    override fun dir(name: String): Directory {
+        return NativeDirectory(resolveName(name))
     }
 
-    actual fun createTemporaryDirectory(): Directory {
+    override fun createTemporaryDirectory(): Directory {
         return createTempDir(this)
     }
 
-    actual fun createDirectories() {
+    override fun createDirectories() {
         val parent = parent
         if (parent != null) {
             if (parent.metadata() != DirectoryMetadata) {
@@ -67,7 +79,7 @@ actual class Directory internal constructor(path: String) : FileSystemElement(pa
         createDir(this)
     }
 
-    actual fun resolve(name: String): FileResolveResult {
+    override fun resolve(name: String): FileResolveResult {
         val path = resolveName(name)
         return ResolveResultImpl(path, stat(path))
     }
@@ -82,7 +94,7 @@ actual class Directory internal constructor(path: String) : FileSystemElement(pa
         } else if (name == "..") {
             return parent!!.absolutePath
         } else if (name.startsWith("../")) {
-            return parent!!.resolveName(name.substring(3))
+            return (parent as NativeDirectory).resolveName(name.substring(3))
         } else {
             return "$path/$name"
         }
@@ -91,11 +103,11 @@ actual class Directory internal constructor(path: String) : FileSystemElement(pa
 
 private class ResolveResultImpl(override val absolutePath: String, override val metadata: FileSystemElementMetadata) : AbstractFileResolveResult() {
     override fun asRegularFile(): RegularFile {
-        return RegularFile(absolutePath)
+        return NativeRegularFile(absolutePath)
     }
 
     override fun asDirectory(): Directory {
-        return Directory(absolutePath)
+        return NativeDirectory(absolutePath)
     }
 }
 
@@ -105,10 +117,10 @@ internal expect fun getUserHomeDir(): Directory
 
 internal expect fun getCurrentDir(): Directory
 
-internal expect fun createTempDir(baseDir: Directory): Directory
+internal expect fun createTempDir(baseDir: NativeDirectory): Directory
 
-internal expect fun createDir(dir: Directory)
+internal expect fun createDir(dir: NativeDirectory)
 
-internal expect fun writeToFile(file: RegularFile, text: String)
+internal expect fun writeToFile(file: NativeRegularFile, text: String)
 
-internal expect fun readFromFile(file: RegularFile): String
+internal expect fun readFromFile(file: NativeRegularFile): String

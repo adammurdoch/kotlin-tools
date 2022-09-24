@@ -12,18 +12,18 @@ internal actual fun getCurrentDir(): Directory {
     TODO()
 }
 
-internal actual fun createTempDir(baseDir: Directory): Directory {
+internal actual fun createTempDir(baseDir: NativeDirectory): Directory {
     TODO()
 }
 
-internal actual fun createDir(dir: Directory) {
+internal actual fun createDir(dir: NativeDirectory) {
     TODO()
 }
 
-internal actual fun writeToFile(file: RegularFile, text: String) {
+internal actual fun writeToFile(file: NativeRegularFile, text: String) {
     TODO()
 }
 
-internal actual fun readFromFile(file: RegularFile): String {
+internal actual fun readFromFile(file: NativeRegularFile): String {
     TODO()
 }

@@ -9,7 +9,29 @@ import java.nio.file.attribute.BasicFileAttributeView
 import kotlin.io.path.name
 import kotlin.io.path.pathString
 
-actual sealed class FileSystemElement(protected val path: Path) {
+actual sealed interface FileSystemElement {
+    /**
+     * Returns this element as a JVM `Path`.
+     */
+    fun toPath(): Path
+
+    /**
+     * Returns this element as a JVM `File`.
+     */
+    fun toFile(): File
+
+    actual val parent: Directory?
+
+    actual val name: String
+
+    actual val absolutePath: String
+
+    actual fun metadata(): FileSystemElementMetadata
+
+    actual fun resolve(): FileResolveResult
+}
+
+internal sealed class JvmFileSystemElement(protected val path: Path) : FileSystemElement {
     init {
         require(path.isAbsolute)
     }
@@ -18,33 +40,30 @@ actual sealed class FileSystemElement(protected val path: Path) {
         return path.pathString
     }
 
-    actual val parent: Directory?
+    override val parent: Directory?
         get() {
             val parent = path.parent
             return if (parent != null) {
-                Directory(parent)
+                JvmDirectory(parent)
             } else {
                 null
             }
         }
 
-    actual val name: String
+    override val name: String
         get() = path.name
 
-    actual val absolutePath: String
+    override val absolutePath: String
         get() = path.pathString
 
-    /**
-     * Returns this element as a JVM `Path`.
-     */
-    fun toPath(): Path = path
+    override fun toPath(): Path = path
 
     /**
      * Returns this element as a JVM `File`.
      */
-    fun toFile(): File = path.toFile()
+    override fun toFile(): File = path.toFile()
 
-    actual fun metadata(): FileSystemElementMetadata {
+    override fun metadata(): FileSystemElementMetadata {
         return metadata(path)
     }
 
@@ -61,13 +80,13 @@ actual sealed class FileSystemElement(protected val path: Path) {
         }
     }
 
-    actual fun resolve(): FileResolveResult {
+    override fun resolve(): FileResolveResult {
         return ResolveResultImpl(path, metadata())
     }
 }
 
-actual class RegularFile internal constructor(path: Path) : FileSystemElement(path) {
-    actual fun writeText(text: String) {
+internal class JvmRegularFile internal constructor(path: Path) : JvmFileSystemElement(path), RegularFile {
+    override fun writeText(text: String) {
         try {
             Files.writeString(path, text, Charsets.UTF_8)
         } catch (e: IOException) {
@@ -75,25 +94,25 @@ actual class RegularFile internal constructor(path: Path) : FileSystemElement(pa
         }
     }
 
-    actual fun readText(): String {
+    override fun readText(): String {
         return Files.readString(path, Charsets.UTF_8)
     }
 }
 
-actual class Directory internal constructor(path: Path) : FileSystemElement(path) {
-    actual fun file(name: String): RegularFile {
-        return RegularFile(path.resolve(name))
+internal class JvmDirectory internal constructor(path: Path) : JvmFileSystemElement(path), Directory {
+    override fun file(name: String): RegularFile {
+        return JvmRegularFile(path.resolve(name))
     }
 
-    actual fun dir(name: String): Directory {
-        return Directory(path.resolve(name))
+    override fun dir(name: String): Directory {
+        return JvmDirectory(path.resolve(name))
     }
 
-    actual fun createTemporaryDirectory(): Directory {
-        return Directory(Files.createTempDirectory(this.path, "dir"))
+    override fun createTemporaryDirectory(): Directory {
+        return JvmDirectory(Files.createTempDirectory(this.path, "dir"))
     }
 
-    actual fun createDirectories() {
+    override fun createDirectories() {
         try {
             Files.createDirectories(path)
         } catch (e: FileAlreadyExistsException) {
@@ -115,7 +134,7 @@ actual class Directory internal constructor(path: Path) : FileSystemElement(path
         }
     }
 
-    actual fun resolve(name: String): FileResolveResult {
+    override fun resolve(name: String): FileResolveResult {
         val path = path.resolve(name)
         return ResolveResultImpl(path, metadata(path))
     }
@@ -126,10 +145,10 @@ internal class ResolveResultImpl(private val path: Path, override val metadata: 
         get() = path.pathString
 
     override fun asRegularFile(): RegularFile {
-        return RegularFile(path)
+        return JvmRegularFile(path)
     }
 
     override fun asDirectory(): Directory {
-        return Directory(path)
+        return JvmDirectory(path)
     }
 }

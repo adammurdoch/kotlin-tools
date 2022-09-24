@@ -34,7 +34,7 @@ internal actual fun getUserHomeDir(): Directory {
         if (pwd == null) {
             throw NativeException("Could not get user home directory.")
         }
-        Directory(pwd.pointed.pw_dir!!.toKString())
+        NativeDirectory(pwd.pointed.pw_dir!!.toKString())
     }
 }
 
@@ -46,21 +46,21 @@ internal actual fun getCurrentDir(): Directory {
         if (path == null) {
             throw NativeException("Could not get current directory.")
         }
-        Directory(buffer.toKString())
+        NativeDirectory(buffer.toKString())
     }
 }
 
-internal actual fun createTempDir(baseDir: Directory): Directory {
+internal actual fun createTempDir(baseDir: NativeDirectory): Directory {
     return memScoped {
-        val pathCopy = baseDir.dir("dir-XXXXXX").path.cstr.ptr
+        val pathCopy = baseDir.dir("dir-XXXXXX").absolutePath.cstr.ptr
         if (mkdtemp(pathCopy) == null) {
             throw NativeException("Could not create temporary directory in ${baseDir}.")
         }
-        Directory(pathCopy.toKString())
+        NativeDirectory(pathCopy.toKString())
     }
 }
 
-internal actual fun createDir(dir: Directory) {
+internal actual fun createDir(dir: NativeDirectory) {
     memScoped {
         val result = mkdir(dir.path, S_IRWXU)
         if (result != 0) {
@@ -73,7 +73,7 @@ internal actual fun createDir(dir: Directory) {
     }
 }
 
-internal actual fun writeToFile(file: RegularFile, text: String) {
+internal actual fun writeToFile(file: NativeRegularFile, text: String) {
     memScoped {
         val des = fopen(file.path, "w")
         if (des == null) {
@@ -97,7 +97,7 @@ internal actual fun writeToFile(file: RegularFile, text: String) {
     }
 }
 
-internal actual fun readFromFile(file: RegularFile): String {
+internal actual fun readFromFile(file: NativeRegularFile): String {
     return memScoped {
         val des = open(file.path, O_RDONLY)
         if (des < 0) {

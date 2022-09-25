@@ -14,15 +14,15 @@ class RegularFileTest {
         listOf("1234", "日本語").forEachIndexed { index, text ->
             val file = fixture.testDir.file("file-$index")
 
-            assertEquals(MissingEntryMetadata, file.metadata())
+            assertIs<MissingEntry<*>>(file.metadata())
 
             file.writeText(text)
 
-            val metadata = file.metadata()
+            val metadata = file.metadata().get()
             assertIs<RegularFileMetadata>(metadata)
             assertEquals(text.encodeToByteArray().size.toULong(), metadata.size)
 
-            assertEquals(text, file.readText())
+            assertEquals(text, file.readText().get())
         }
     }
 
@@ -31,8 +31,8 @@ class RegularFileTest {
         val file = fixture.testDir.file("日本語")
         file.writeText("1234")
 
-        assertIs<RegularFileMetadata>(file.metadata())
-        assertEquals("1234", file.readText())
+        assertIs<RegularFileMetadata>(file.metadata().get())
+        assertEquals("1234", file.readText().get())
     }
 
     @Test
@@ -40,11 +40,11 @@ class RegularFileTest {
         val file = fixture.testDir.file("file")
         file.writeText("1234")
 
-        assertIs<RegularFileMetadata>(file.metadata())
+        assertIs<RegularFileMetadata>(file.metadata().get())
 
         file.writeText("12345678")
 
-        val metadata = file.metadata()
+        val metadata = file.metadata().get()
         assertIs<RegularFileMetadata>(metadata)
         assertEquals(8u, metadata.size)
     }

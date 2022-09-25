@@ -1,5 +1,9 @@
 package net.rubygrapefruit.file
 
+internal fun missingElement(path: String, cause: Throwable? = null) = FileSystemException("File $path does not exist.", cause)
+
+internal fun unreadableElement(path: String, cause: Throwable? = null) = FileSystemException("File $path is not readable.", cause)
+
 internal fun directoryExistsAndIsNotADir(path: String, cause: Throwable? = null) = FileSystemException("Could not create directory $path as it already exists but is not a directory.", cause)
 
 internal fun createDirectory(path: String, cause: Throwable? = null) = FileSystemException("Could not create directory $path.", cause)
@@ -14,30 +18,31 @@ internal fun parentDirectoryIsNotADir(path: String, ancestor: String, cause: Thr
  * Tries to infer why a file could not be written to.
  */
 internal fun writeToFile(file: RegularFile, cause: Throwable? = null, factory: (String, Throwable?) -> FileSystemException = { message, cause -> FileSystemException(message, cause) }): FileSystemException {
-    when (file.metadata()) {
-        is RegularFileMetadata -> return factory("Could not write to ${file.absolutePath}", cause)
-        MissingEntryMetadata -> {
-            var lastMissing: Directory? = null
-            var p = file.parent
-            while (p != null) {
-                when (p.metadata()) {
-                    MissingEntryMetadata -> lastMissing = p
-                    DirectoryMetadata -> {
-                        if (lastMissing != null) {
-                            return parentDirectoryDoesNotExist(file.absolutePath, lastMissing.absolutePath, cause)
-                        } else {
-                            return factory("Could not write to ${file.absolutePath}", cause)
-                        }
-                    }
-
-                    else -> return parentDirectoryIsNotADir(file.absolutePath, p.absolutePath, cause)
-                }
-                p = p.parent
-            }
-            return factory("Could not write to ${file.absolutePath}", cause)
-        }
-
-        else -> return fileExistsAndIsNotAFile(file.absolutePath, cause)
+    val fileMetadata = file.metadata()
+    if (fileMetadata is Success && fileMetadata.get() is RegularFileMetadata) {
+        return factory("Could not write to ${file.absolutePath}", cause)
     }
-
+    if (fileMetadata is MissingEntry) {
+        var lastMissing: Directory? = null
+        var p = file.parent
+        while (p != null) {
+            val parentMetadata = p.metadata()
+            if (parentMetadata is MissingEntry) {
+                lastMissing = p
+            } else if (parentMetadata is Success) {
+                if (parentMetadata.get() is DirectoryMetadata) {
+                    if (lastMissing != null) {
+                        return parentDirectoryDoesNotExist(file.absolutePath, lastMissing.absolutePath, cause)
+                    } else {
+                        break
+                    }
+                } else {
+                    return parentDirectoryIsNotADir(file.absolutePath, p.absolutePath, cause)
+                }
+            }
+            p = p.parent
+        }
+        return factory("Could not write to ${file.absolutePath}", cause)
+    }
+    return fileExistsAndIsNotAFile(file.absolutePath, cause)
 }

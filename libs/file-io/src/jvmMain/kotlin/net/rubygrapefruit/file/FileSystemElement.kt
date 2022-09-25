@@ -25,9 +25,9 @@ actual sealed interface FileSystemElement {
 
     actual val absolutePath: String
 
-    actual fun metadata(): ElementMetadata
+    actual fun metadata(): Result<ElementMetadata>
 
-    actual fun resolve(): ElementResolveResult
+    actual fun snapshot(): Result<ElementSnapshot>
 }
 
 internal sealed class JvmFileSystemElement(protected val path: Path) : FileSystemElement {
@@ -62,18 +62,18 @@ internal sealed class JvmFileSystemElement(protected val path: Path) : FileSyste
      */
     override fun toFile(): File = path.toFile()
 
-    override fun metadata(): ElementMetadata {
+    override fun metadata(): Result<ElementMetadata> {
         return metadata(path)
     }
 
-    protected fun metadata(path: Path): ElementMetadata {
+    protected fun metadata(path: Path): Result<ElementMetadata> {
         if (!Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
-            return MissingEntryMetadata
+            return MissingEntry(absolutePath)
         }
-        return metadataOfExistingFile(path)
+        return Success(metadataOfExistingFile(path))
     }
 
-    protected fun metadataOfExistingFile(path: Path): ExistingElementMetadata {
+    protected fun metadataOfExistingFile(path: Path): ElementMetadata {
         val attributes = Files.getFileAttributeView(path, BasicFileAttributeView::class.java, LinkOption.NOFOLLOW_LINKS).readAttributes()
         return when {
             attributes.isRegularFile -> RegularFileMetadata(attributes.size().toULong())
@@ -83,8 +83,8 @@ internal sealed class JvmFileSystemElement(protected val path: Path) : FileSyste
         }
     }
 
-    override fun resolve(): ElementResolveResult {
-        return ResolveResultImpl(path, metadata())
+    override fun snapshot(): Result<ElementSnapshot> {
+        return metadata().map { SnapshotImpl(path, it) }
     }
 }
 
@@ -97,8 +97,8 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
         }
     }
 
-    override fun readText(): String {
-        return Files.readString(path, Charsets.UTF_8)
+    override fun readText(): Result<String> {
+        return Success(Files.readString(path, Charsets.UTF_8))
     }
 }
 
@@ -127,43 +127,48 @@ internal class JvmDirectory(path: Path) : JvmFileSystemElement(path), Directory 
         } catch (e: IOException) {
             var p = parent
             while (p != null) {
-                when (p.metadata()) {
-                    // Found a directory - should have been able to create dir so rethrow original failure
-                    DirectoryMetadata -> throw createDirectory(path.pathString, e)
+                val metadata = p.metadata()
+                if (metadata is MissingEntry) {
                     // Keep looking
-                    MissingEntryMetadata -> p = p.parent
-                    // Found something else - fail
-                    else -> throw directoryExistsAndIsNotADir(p.absolutePath, e)
+                    p = p.parent
+                    continue
                 }
+                if (metadata is Success && metadata.get() is DirectoryMetadata) {
+                    // Found a directory - should have been able to create dir so rethrow original failure
+                    throw createDirectory(path.pathString, e)
+                }
+                // Found something else - fail
+                throw directoryExistsAndIsNotADir(p.absolutePath, e)
             }
             // Nothing in the hierarchy exists, which is unexpected, so rethrow original failure
             throw createDirectory(path.pathString, e)
         }
     }
 
-    override fun resolve(name: String): ElementResolveResult {
+    override fun resolve(name: String): FileSystemElement {
         val path = path.resolve(name)
-        return ResolveResultImpl(path, metadata(path))
+        return JvmRegularFile(path)
     }
 
-    override fun listEntries(): DirectoryEntries {
+    override fun listEntries(): Result<List<DirectoryEntry>> {
         val stream = try {
             Files.list(path)
         } catch (e: NoSuchFileException) {
-            return MissingDirectoryEntries
+            return MissingEntry(path.pathString, e)
         }
         val entries = stream.map { DirectoryEntryImpl(it, metadataOfExistingFile(it).type) }.toList()
-        return ExistingDirectoryEntries(entries)
+        return Success(entries)
     }
 }
 
 internal class JvmSymlink(path: Path) : JvmFileSystemElement(path), SymLink {
-    override fun readSymLink(): String {
-        return Files.readSymbolicLink(path).pathString
+    override fun readSymLink(): Result<String> {
+        return Success(Files.readSymbolicLink(path).pathString)
     }
 
     override fun writeSymLink(target: String) {
-        if (metadata() is SymlinkMetadata) {
+        val metadata = metadata()
+        if (metadata is Success && metadata.get() is SymlinkMetadata) {
             Files.delete(this.path)
         }
         Files.createSymbolicLink(this.path, Path.of(target))
@@ -175,7 +180,7 @@ private class DirectoryEntryImpl(private val path: Path, override val type: Elem
         get() = path.name
 }
 
-private class ResolveResultImpl(private val path: Path, override val metadata: ElementMetadata) : AbstractElementResolveResult() {
+private class SnapshotImpl(private val path: Path, override val metadata: ElementMetadata) : AbstractElementSnapshot() {
     override val absolutePath: String
         get() = path.pathString
 

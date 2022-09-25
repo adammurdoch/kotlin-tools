@@ -13,12 +13,12 @@ internal sealed class UnixFileSystemElement(path: String) : PathFileSystemElemen
             }
         }
 
-    override fun metadata(): ElementMetadata {
+    override fun metadata(): Result<ElementMetadata> {
         return stat(path)
     }
 
-    override fun resolve(): ElementResolveResult {
-        return ResolveResultImpl(path, metadata())
+    override fun snapshot(): Result<ElementSnapshot> {
+        return metadata().map { SnapshotImpl(path, it) }
     }
 
     protected fun MemScope.fileSize(): Long {
@@ -56,7 +56,7 @@ internal class UnixRegularFile(path: String) : UnixFileSystemElement(path), Regu
         }
     }
 
-    override fun readText(): String {
+    override fun readText(): Result<String> {
         return memScoped {
             val des = open(path, O_RDONLY)
             if (des < 0) {
@@ -69,7 +69,7 @@ internal class UnixRegularFile(path: String) : UnixFileSystemElement(path), Regu
                 if (nread < 0) {
                     throw NativeException("Could not read from $path.")
                 }
-                buffer.decodeToString(0, nread.convert())
+                Success(buffer.decodeToString(0, nread.convert()))
             } finally {
                 close(des)
             }
@@ -97,7 +97,8 @@ internal class UnixDirectory(path: String) : UnixFileSystemElement(path), Direct
     override fun createDirectories() {
         val parent = parent
         if (parent != null) {
-            if (parent.metadata() != DirectoryMetadata) {
+            val metadata = parent.metadata()
+            if (metadata !is Success || metadata.get() != DirectoryMetadata) {
                 // Error handling will deal with parent being a file, etc
                 parent.createDirectories()
             }
@@ -105,19 +106,19 @@ internal class UnixDirectory(path: String) : UnixFileSystemElement(path), Direct
         createDir(this)
     }
 
-    override fun resolve(name: String): ElementResolveResult {
+    override fun resolve(name: String): FileSystemElement {
         val path = resolveName(name)
-        return ResolveResultImpl(path, stat(path))
+        return UnixRegularFile(path)
     }
 
-    override fun listEntries(): DirectoryEntries {
+    override fun listEntries(): Result<List<DirectoryEntry>> {
         val dirPointer = opendir(path)
         if (dirPointer == null) {
             if (errno == ENOENT) {
-                return MissingDirectoryEntries
+                return MissingEntry(path)
             }
             if (errno == EPERM || errno == EACCES) {
-                return UnreadableDirectoryEntries
+                return UnreadableEntry(path)
             }
             throw NativeException("Could not list directory '$path'.")
         }
@@ -144,7 +145,7 @@ internal class UnixDirectory(path: String) : UnixFileSystemElement(path), Direct
                     }
                 }
             }
-            return ExistingDirectoryEntries(entries)
+            return Success(entries)
         } finally {
             closedir(dirPointer)
         }
@@ -168,7 +169,7 @@ internal class UnixDirectory(path: String) : UnixFileSystemElement(path), Direct
 }
 
 internal class UnixSymLink(path: String) : UnixFileSystemElement(path), SymLink {
-    override fun readSymLink(): String {
+    override fun readSymLink(): Result<String> {
         memScoped {
             val size = fileSize()
             val buffer = ByteArray(size.convert())
@@ -176,12 +177,13 @@ internal class UnixSymLink(path: String) : UnixFileSystemElement(path), SymLink 
             if (nread < 0) {
                 throw NativeException("Could not read symlink $path.")
             }
-            return buffer.decodeToString(0, nread.convert())
+            return Success(buffer.decodeToString(0, nread.convert()))
         }
     }
 
     override fun writeSymLink(target: String) {
-        if (stat(path) is SymlinkMetadata) {
+        val stat = stat(path)
+        if (stat is Success && stat.get() is SymlinkMetadata) {
             if (remove(path) < 0) {
                 throw NativeException("Could not delete symlink $path.")
             }
@@ -195,7 +197,7 @@ internal class UnixSymLink(path: String) : UnixFileSystemElement(path), SymLink 
 private class DirectoryEntryImpl(override val name: String, override val type: ElementType) : DirectoryEntry {
 }
 
-private class ResolveResultImpl(override val absolutePath: String, override val metadata: ElementMetadata) : AbstractElementResolveResult() {
+private class SnapshotImpl(override val absolutePath: String, override val metadata: ElementMetadata) : AbstractElementSnapshot() {
     override fun asRegularFile(): RegularFile {
         return UnixRegularFile(absolutePath)
     }
@@ -205,26 +207,26 @@ private class ResolveResultImpl(override val absolutePath: String, override val 
     }
 }
 
-internal fun stat(file: String): ElementMetadata {
+internal fun stat(file: String): Result<ElementMetadata> {
     return memScoped {
         val statBuf = alloc<stat>()
         if (lstat(file, statBuf.ptr) != 0) {
             if (errno == ENOENT || errno == ENOTDIR) {
-                return MissingEntryMetadata
+                return MissingEntry(file)
             }
             if (errno == EACCES) {
-                UnreadableEntryMetadata
+                return UnreadableEntry(file)
             } else {
                 throw NativeException("Could not stat file '$file'.")
             }
         } else if (statBuf.st_mode.convert<Int>() and S_IFDIR == S_IFDIR) {
-            DirectoryMetadata
+            Success(DirectoryMetadata)
         } else if (statBuf.st_mode.convert<Int>() and S_IFLNK == S_IFLNK) {
-            SymlinkMetadata
+            Success(SymlinkMetadata)
         } else if (statBuf.st_mode.convert<Int>() and S_IFLNK == S_IFREG) {
-            RegularFileMetadata(statBuf.st_size.convert())
+            Success(RegularFileMetadata(statBuf.st_size.convert()))
         } else {
-            OtherMetadata
+            Success(OtherMetadata)
         }
     }
 }
@@ -268,7 +270,9 @@ internal fun createDir(dir: UnixDirectory) {
         if (result != 0) {
             if (errno != EEXIST) {
                 throw NativeException("Could not create directory $dir.")
-            } else if (stat(dir.path) != DirectoryMetadata) {
+            }
+            val stat = stat(dir.path)
+            if (stat !is Success || stat.get() != DirectoryMetadata) {
                 throw directoryExistsAndIsNotADir(dir.path)
             }
         }

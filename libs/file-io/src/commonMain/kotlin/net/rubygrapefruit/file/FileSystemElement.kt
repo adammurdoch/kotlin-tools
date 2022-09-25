@@ -22,12 +22,12 @@ expect sealed interface FileSystemElement {
     /**
      * Returns a snapshot of the current metadata of the file. Does not follow symlinks.
      */
-    fun metadata(): ElementMetadata
+    fun metadata(): Result<ElementMetadata>
 
     /**
      * Returns this element as a resolve result, which contains the path of this element and a snapshot of its metadata. Does not follow symlinks.
      */
-    fun resolve(): ElementResolveResult
+    fun snapshot(): Result<ElementSnapshot>
 }
 
 /**
@@ -37,12 +37,13 @@ interface RegularFile : FileSystemElement {
     /**
      * Writes the given text to the file, using UTF-8 encoding.
      */
+    @Throws(FileSystemException::class)
     fun writeText(text: String)
 
     /**
      * Reads text from the file, using UTF-8 encoding.
      */
-    fun readText(): String
+    fun readText(): Result<String>
 }
 
 /**
@@ -65,37 +66,40 @@ interface Directory : FileSystemElement {
     fun symLink(name: String): SymLink
 
     /**
-     * Resolves a name relative to this directory and queries the element's type and basic metadata.
+     * Resolves a name relative to this directory. Note: does not determine the type.
      */
-    fun resolve(name: String): ElementResolveResult
+    fun resolve(name: String): FileSystemElement
 
     /**
      * Creates this directory and its ancestors if they do not exist.
      */
+    @Throws(FileSystemException::class)
     fun createDirectories()
 
     /**
      * Creates a new temporary directory in this directory.
      */
+    @Throws(FileSystemException::class)
     fun createTemporaryDirectory(): Directory
 
     /**
      * Returns a snapshot of the entries in this directory. Does not follow symlinks in the entries.
      */
-    fun listEntries(): DirectoryEntries
+    fun listEntries(): Result<List<DirectoryEntry>>
 }
 
 /**
  * A symlink in the file system.
  */
-interface SymLink: FileSystemElement {
+interface SymLink : FileSystemElement {
     /**
      * Reads the symlink target.
      */
-    fun readSymLink(): String
+    fun readSymLink(): Result<String>
 
     /**
      * Creates a symlink or updates its target.
      */
+    @Throws(FileSystemException::class)
     fun writeSymLink(target: String)
 }

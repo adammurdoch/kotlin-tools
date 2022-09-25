@@ -13,10 +13,10 @@ class DirectoryTest {
         val d2 = dir.createTemporaryDirectory()
 
         assertEquals(dir.absolutePath, d1.parent?.absolutePath)
-        assertEquals(DirectoryMetadata, d1.metadata())
+        assertEquals(DirectoryMetadata, d1.metadata().get())
 
         assertEquals(dir.absolutePath, d2.parent?.absolutePath)
-        assertEquals(DirectoryMetadata, d2.metadata())
+        assertEquals(DirectoryMetadata, d2.metadata().get())
 
         assertNotEquals(d1, d2)
         assertNotEquals(d1.name, d2.name)
@@ -27,20 +27,20 @@ class DirectoryTest {
         val parent = fixture.dir("parent")
         val dir = parent.dir("dir")
 
-        assertEquals(MissingEntryMetadata, dir.metadata())
+        assertIs<MissingEntry<*>>(dir.metadata())
         val entries1 = parent.listEntries()
-        assertIs<ExistingDirectoryEntries>(entries1)
-        assertTrue(entries1.entries.isEmpty())
+        assertIs<Success<*>>(entries1)
+        assertTrue(entries1.get().isEmpty())
 
         dir.createDirectories()
 
-        assertEquals(DirectoryMetadata, dir.metadata())
+        assertEquals(DirectoryMetadata, dir.metadata().get())
         val entries2 = dir.listEntries()
-        assertIs<ExistingDirectoryEntries>(entries2)
-        assertTrue(entries2.entries.isEmpty())
+        assertIs<Success<*>>(entries2)
+        assertTrue(entries2.get().isEmpty())
         val entries3 = parent.listEntries()
-        assertIs<ExistingDirectoryEntries>(entries3)
-        assertEquals(listOf("dir"), entries3.entries.map { it.name })
+        assertIs<Success<*>>(entries3)
+        assertEquals(listOf("dir"), entries3.get().map { it.name })
     }
 
     @Test
@@ -53,12 +53,12 @@ class DirectoryTest {
         }
 
         val entries1 = empty.listEntries()
-        assertIs<ExistingDirectoryEntries>(entries1)
-        assertTrue(entries1.entries.isEmpty())
+        assertIs<Success<*>>(entries1)
+        assertTrue(entries1.get().isEmpty())
 
         val entries2 = dir.listEntries()
-        assertIs<ExistingDirectoryEntries>(entries2)
-        val sorted = entries2.entries.sortedBy { it.name }
+        assertIs<Success<*>>(entries2)
+        val sorted = entries2.get().sortedBy { it.name }
         assertEquals(listOf("dir1", "file1", "link1"), sorted.map { it.name })
         assertEquals(listOf(ElementType.Directory, ElementType.RegularFile, ElementType.SymLink), sorted.map { it.type })
     }
@@ -68,7 +68,7 @@ class DirectoryTest {
         val dir = fixture.testDir.dir("dir1")
 
         val entries = dir.listEntries()
-        assertIs<MissingDirectoryEntries>(entries)
+        assertIs<MissingEntry<*>>(entries)
     }
 
     @Test
@@ -77,7 +77,7 @@ class DirectoryTest {
         val dir = parent.dir("dir1")
 
         val entries = dir.listEntries()
-        assertIs<MissingDirectoryEntries>(entries)
+        assertIs<MissingEntry<*>>(entries)
     }
 
     @Test
@@ -86,31 +86,31 @@ class DirectoryTest {
         val dir = ancestor.dir("dir1/dir2")
 
         val entries = dir.listEntries()
-        assertIs<MissingDirectoryEntries>(entries)
+        assertIs<MissingEntry<*>>(entries)
     }
 
     @Test
     fun `can create intermediate directories`() {
         val dir = fixture.testDir.dir("dir1/dir2/dir3")
 
-        assertEquals(MissingEntryMetadata, dir.metadata())
-        assertEquals(MissingEntryMetadata, dir.parent?.metadata())
+        assertIs<MissingEntry<*>>(dir.metadata())
+        assertIs<MissingEntry<*>>(dir.parent?.metadata())
 
         dir.createDirectories()
 
-        assertEquals(DirectoryMetadata, dir.metadata())
-        assertEquals(DirectoryMetadata, dir.parent?.metadata())
+        assertEquals(DirectoryMetadata, dir.metadata().get())
+        assertEquals(DirectoryMetadata, dir.parent?.metadata()?.get())
     }
 
     @Test
     fun `can create directory that already exists`() {
         val dir = fixture.testDir.dir("dir")
         dir.createDirectories()
-        assertEquals(DirectoryMetadata, dir.metadata())
+        assertEquals(DirectoryMetadata, dir.metadata().get())
 
         dir.createDirectories()
 
-        assertEquals(DirectoryMetadata, dir.metadata())
+        assertEquals(DirectoryMetadata, dir.metadata().get())
     }
 
     @Test
@@ -118,7 +118,7 @@ class DirectoryTest {
         fixture.file("dir")
         val dir = fixture.testDir.dir("dir")
 
-        assertIs<RegularFileMetadata>(dir.metadata())
+        assertIs<RegularFileMetadata>(dir.metadata().get())
 
         try {
             dir.createDirectories()
@@ -127,7 +127,7 @@ class DirectoryTest {
             assertEquals("Could not create directory $dir as it already exists but is not a directory.", e.message)
         }
 
-        assertIs<RegularFileMetadata>(dir.metadata())
+        assertIs<RegularFileMetadata>(dir.metadata().get())
     }
 
     @Test
@@ -135,8 +135,8 @@ class DirectoryTest {
         val file = fixture.file("dir")
         val dir = fixture.testDir.dir("dir/dir2")
 
-        assertIs<RegularFileMetadata>(file.metadata())
-        assertEquals(MissingEntryMetadata, dir.metadata())
+        assertIs<RegularFileMetadata>(file.metadata().get())
+        assertIs<MissingEntry<*>>(dir.metadata())
 
         try {
             dir.createDirectories()
@@ -145,8 +145,8 @@ class DirectoryTest {
             assertEquals("Could not create directory $file as it already exists but is not a directory.", e.message)
         }
 
-        assertIs<RegularFileMetadata>(file.metadata())
-        assertEquals(MissingEntryMetadata, dir.metadata())
+        assertIs<RegularFileMetadata>(file.metadata().get())
+        assertIs<MissingEntry<*>>(dir.metadata())
     }
 
     @Test
@@ -155,9 +155,9 @@ class DirectoryTest {
         val parent = fixture.testDir.dir("dir/dir2")
         val dir = parent.dir("dir3")
 
-        assertIs<RegularFileMetadata>(file.metadata())
-        assertEquals(MissingEntryMetadata, parent.metadata())
-        assertEquals(MissingEntryMetadata, dir.metadata())
+        assertIs<RegularFileMetadata>(file.metadata().get())
+        assertIs<MissingEntry<*>>(parent.metadata())
+        assertIs<MissingEntry<*>>(dir.metadata())
 
         try {
             dir.createDirectories()
@@ -166,8 +166,8 @@ class DirectoryTest {
             assertEquals("Could not create directory $file as it already exists but is not a directory.", e.message)
         }
 
-        assertIs<RegularFileMetadata>(file.metadata())
-        assertEquals(MissingEntryMetadata, parent.metadata())
-        assertEquals(MissingEntryMetadata, dir.metadata())
+        assertIs<RegularFileMetadata>(file.metadata().get())
+        assertIs<MissingEntry<*>>(parent.metadata())
+        assertIs<MissingEntry<*>>(dir.metadata())
     }
 }

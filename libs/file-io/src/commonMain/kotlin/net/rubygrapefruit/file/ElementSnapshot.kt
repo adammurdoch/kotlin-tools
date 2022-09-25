@@ -3,7 +3,7 @@ package net.rubygrapefruit.file
 /**
  * An immutable snapshot of a file system element's path, type and basic metadata.
  */
-interface ElementResolveResult {
+interface ElementSnapshot {
     /**
      * Returns the element's metadata.
      */

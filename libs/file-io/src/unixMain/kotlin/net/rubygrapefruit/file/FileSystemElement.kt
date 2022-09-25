@@ -98,7 +98,7 @@ internal class UnixDirectory(path: String) : UnixFileSystemElement(path), Direct
         val parent = parent
         if (parent != null) {
             val metadata = parent.metadata()
-            if (metadata !is Success || metadata.get() != DirectoryMetadata) {
+            if (!metadata.directory) {
                 // Error handling will deal with parent being a file, etc
                 parent.createDirectories()
             }
@@ -173,11 +173,15 @@ internal class UnixSymLink(path: String) : UnixFileSystemElement(path), SymLink 
         memScoped {
             val size = fileSize()
             val buffer = ByteArray(size.convert())
-            val nread = readlink(path, buffer.refTo(0), size.convert())
-            if (nread < 0) {
-                throw NativeException("Could not read symlink $path.")
+            val count = readlink(path, buffer.refTo(0), size.convert())
+            if (count < 0) {
+                if (errno == EACCES) {
+                    return UnreadableEntry(path)
+                } else {
+                    throw NativeException("Could not read symlink '$path'.")
+                }
             }
-            return Success(buffer.decodeToString(0, nread.convert()))
+            return Success(buffer.decodeToString(0, count.convert()))
         }
     }
 
@@ -204,6 +208,10 @@ private class SnapshotImpl(override val absolutePath: String, override val metad
 
     override fun asDirectory(): Directory {
         return UnixDirectory(absolutePath)
+    }
+
+    override fun asSymLink(): SymLink {
+        return UnixSymLink(absolutePath)
     }
 }
 
@@ -272,7 +280,7 @@ internal fun createDir(dir: UnixDirectory) {
                 throw NativeException("Could not create directory $dir.")
             }
             val stat = stat(dir.path)
-            if (stat !is Success || stat.get() != DirectoryMetadata) {
+            if (!stat.directory) {
                 throw directoryExistsAndIsNotADir(dir.path)
             }
         }

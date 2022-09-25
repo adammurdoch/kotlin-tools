@@ -15,7 +15,16 @@ internal abstract class AbstractElementSnapshot : ElementSnapshot {
         return asDirectory()
     }
 
+    final override fun toSymLink(): SymLink {
+        if (metadata !is SymlinkMetadata) {
+            throw IllegalStateException("$absolutePath is not a symlink.")
+        }
+        return asSymLink()
+    }
+
     abstract fun asDirectory(): Directory
 
     abstract fun asRegularFile(): RegularFile
+
+    abstract fun asSymLink(): SymLink
 }

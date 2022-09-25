@@ -23,4 +23,9 @@ interface ElementSnapshot {
      * View the element as a directory.
      */
     fun toDir(): Directory
+
+    /**
+     * View the element as a symlink.
+     */
+    fun toSymLink(): SymLink
 }

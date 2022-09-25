@@ -13,10 +13,10 @@ class DirectoryTest {
         val d2 = dir.createTemporaryDirectory()
 
         assertEquals(dir.absolutePath, d1.parent?.absolutePath)
-        assertEquals(DirectoryMetadata, d1.metadata().get())
+        assertTrue(d1.metadata().directory)
 
         assertEquals(dir.absolutePath, d2.parent?.absolutePath)
-        assertEquals(DirectoryMetadata, d2.metadata().get())
+        assertTrue(d2.metadata().directory)
 
         assertNotEquals(d1, d2)
         assertNotEquals(d1.name, d2.name)

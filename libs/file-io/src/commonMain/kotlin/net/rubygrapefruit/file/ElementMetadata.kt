@@ -26,3 +26,12 @@ data class RegularFileMetadata(val size: ULong) : ElementMetadata() {
     override val type: ElementType
         get() = ElementType.RegularFile
 }
+
+val Result<ElementMetadata>.missing: Boolean
+    get() = this is MissingEntry
+
+val Result<ElementMetadata>.directory: Boolean
+    get() = getOrNull() is DirectoryMetadata
+
+val Result<ElementMetadata>.regularFile: Boolean
+    get() = getOrNull() is RegularFileMetadata

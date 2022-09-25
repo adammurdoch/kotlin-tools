@@ -133,7 +133,7 @@ internal class JvmDirectory(path: Path) : JvmFileSystemElement(path), Directory 
                     p = p.parent
                     continue
                 }
-                if (metadata is Success && metadata.get() is DirectoryMetadata) {
+                if (metadata.directory) {
                     // Found a directory - should have been able to create dir so rethrow original failure
                     throw createDirectory(path.pathString, e)
                 }
@@ -190,5 +190,9 @@ private class SnapshotImpl(private val path: Path, override val metadata: Elemen
 
     override fun asDirectory(): Directory {
         return JvmDirectory(path)
+    }
+
+    override fun asSymLink(): SymLink {
+        return JvmSymlink(path)
     }
 }

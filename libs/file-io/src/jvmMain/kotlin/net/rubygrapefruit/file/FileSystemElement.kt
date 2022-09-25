@@ -26,9 +26,9 @@ actual sealed interface FileSystemElement {
 
     actual val absolutePath: String
 
-    actual fun metadata(): FileSystemElementMetadata
+    actual fun metadata(): ElementMetadata
 
-    actual fun resolve(): FileResolveResult
+    actual fun resolve(): ElementResolveResult
 }
 
 internal sealed class JvmFileSystemElement(protected val path: Path) : FileSystemElement {
@@ -63,14 +63,18 @@ internal sealed class JvmFileSystemElement(protected val path: Path) : FileSyste
      */
     override fun toFile(): File = path.toFile()
 
-    override fun metadata(): FileSystemElementMetadata {
+    override fun metadata(): ElementMetadata {
         return metadata(path)
     }
 
-    protected fun metadata(path: Path): FileSystemElementMetadata {
+    protected fun metadata(path: Path): ElementMetadata {
         if (!Files.exists(path)) {
             return MissingEntryMetadata
         }
+        return metadataOfExistingFile(path)
+    }
+
+    protected fun metadataOfExistingFile(path: Path): ElementMetadata {
         val attributes = Files.getFileAttributeView(path, BasicFileAttributeView::class.java).readAttributes()
         return when {
             attributes.isRegularFile -> RegularFileMetadata(attributes.size().toULong())
@@ -80,7 +84,7 @@ internal sealed class JvmFileSystemElement(protected val path: Path) : FileSyste
         }
     }
 
-    override fun resolve(): FileResolveResult {
+    override fun resolve(): ElementResolveResult {
         return ResolveResultImpl(path, metadata())
     }
 }
@@ -134,13 +138,26 @@ internal class JvmDirectory internal constructor(path: Path) : JvmFileSystemElem
         }
     }
 
-    override fun resolve(name: String): FileResolveResult {
+    override fun resolve(name: String): ElementResolveResult {
         val path = path.resolve(name)
         return ResolveResultImpl(path, metadata(path))
     }
+
+    override fun listEntries(): List<DirectoryEntry> {
+        val result = mutableListOf<DirectoryEntry>()
+        Files.list(path).forEach {
+            result.add(DirectoryEntryImpl(it, metadataOfExistingFile(it).type!!))
+        }
+        return result
+    }
 }
 
-internal class ResolveResultImpl(private val path: Path, override val metadata: FileSystemElementMetadata) : AbstractFileResolveResult() {
+internal class DirectoryEntryImpl(private val path: Path, override val type: ElementType) : DirectoryEntry {
+    override val name: String
+        get() = path.name
+}
+
+internal class ResolveResultImpl(private val path: Path, override val metadata: ElementMetadata) : AbstractElementResolveResult() {
     override val absolutePath: String
         get() = path.pathString
 

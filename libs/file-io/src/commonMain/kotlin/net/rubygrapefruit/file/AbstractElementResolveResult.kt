@@ -1,6 +1,6 @@
 package net.rubygrapefruit.file
 
-internal abstract class AbstractFileResolveResult : FileResolveResult {
+internal abstract class AbstractElementResolveResult : ElementResolveResult {
     final override fun toFile(): RegularFile {
         if (metadata !is RegularFileMetadata) {
             throw IllegalStateException("$absolutePath is not a regular file.")

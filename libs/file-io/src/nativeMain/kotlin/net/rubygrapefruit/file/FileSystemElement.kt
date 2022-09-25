@@ -7,9 +7,9 @@ actual sealed interface FileSystemElement {
 
     actual val absolutePath: String
 
-    actual fun metadata(): FileSystemElementMetadata
+    actual fun metadata(): ElementMetadata
 
-    actual fun resolve(): FileResolveResult
+    actual fun resolve(): ElementResolveResult
 }
 
 internal abstract class PathFileSystemElement(internal val path: String) : FileSystemElement {

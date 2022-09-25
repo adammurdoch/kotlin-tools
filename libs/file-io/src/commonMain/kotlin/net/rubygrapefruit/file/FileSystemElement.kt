@@ -22,12 +22,12 @@ expect sealed interface FileSystemElement {
     /**
      * Returns a snapshot of the current metadata of the file.
      */
-    fun metadata(): FileSystemElementMetadata
+    fun metadata(): ElementMetadata
 
     /**
      * Returns this element as a resolve result, which contains the path of this element and a snapshot of its metadata.
      */
-    fun resolve(): FileResolveResult
+    fun resolve(): ElementResolveResult
 }
 
 /**
@@ -62,7 +62,7 @@ interface Directory : FileSystemElement {
     /**
      * Resolves a name relative to this directory and queries the element's type and basic metadata.
      */
-    fun resolve(name: String): FileResolveResult
+    fun resolve(name: String): ElementResolveResult
 
     /**
      * Creates this directory and its ancestors if they do not exist.
@@ -73,4 +73,9 @@ interface Directory : FileSystemElement {
      * Creates a new temporary directory in this directory.
      */
     fun createTemporaryDirectory(): Directory
+
+    /**
+     * Returns a snapshot of the entries in this directory.
+     */
+    fun listEntries(): List<DirectoryEntry>
 }

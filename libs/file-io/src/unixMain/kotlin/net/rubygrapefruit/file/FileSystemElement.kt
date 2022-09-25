@@ -13,11 +13,11 @@ internal sealed class UnixFileSystemElement(path: String) : PathFileSystemElemen
             }
         }
 
-    override fun metadata(): FileSystemElementMetadata {
+    override fun metadata(): ElementMetadata {
         return stat(path)
     }
 
-    override fun resolve(): FileResolveResult {
+    override fun resolve(): ElementResolveResult {
         return ResolveResultImpl(path, metadata())
     }
 
@@ -57,9 +57,43 @@ internal class UnixDirectory(path: String) : UnixFileSystemElement(path), Direct
         createDir(this)
     }
 
-    override fun resolve(name: String): FileResolveResult {
+    override fun resolve(name: String): ElementResolveResult {
         val path = resolveName(name)
         return ResolveResultImpl(path, stat(path))
+    }
+
+    override fun listEntries(): List<DirectoryEntry> {
+        val dirPointer = opendir(path)
+        if (dirPointer == null) {
+            throw NativeException("Could not list directory '$path'.")
+        }
+        try {
+            val entries = mutableListOf<DirectoryEntry>()
+            memScoped {
+                while (true) {
+                    val entryPointer = readdir(dirPointer)
+                    if (entryPointer == null) {
+                        break
+                    }
+                    val name = entryPointer.pointed.d_name.toKString()
+                    if (name == "." || name == "..") {
+                        continue
+                    }
+                    if (entryPointer.pointed.d_type.convert<Int>() == DT_DIR) {
+                        entries.add(DirectoryEntryImpl(name, ElementType.Directory))
+                    } else if (entryPointer.pointed.d_type.convert<Int>() == DT_LNK) {
+                        entries.add(DirectoryEntryImpl(name, ElementType.SymLink))
+                    } else if (entryPointer.pointed.d_type.convert<Int>() == DT_REG) {
+                        entries.add(DirectoryEntryImpl(name, ElementType.RegularFile))
+                    } else {
+                        entries.add(DirectoryEntryImpl(name, ElementType.Other))
+                    }
+                }
+            }
+            return entries
+        } finally {
+            closedir(dirPointer)
+        }
     }
 
     private fun resolveName(name: String): String {
@@ -79,7 +113,10 @@ internal class UnixDirectory(path: String) : UnixFileSystemElement(path), Direct
     }
 }
 
-private class ResolveResultImpl(override val absolutePath: String, override val metadata: FileSystemElementMetadata) : AbstractFileResolveResult() {
+private class DirectoryEntryImpl(override val name: String, override val type: ElementType) : DirectoryEntry {
+}
+
+private class ResolveResultImpl(override val absolutePath: String, override val metadata: ElementMetadata) : AbstractElementResolveResult() {
     override fun asRegularFile(): RegularFile {
         return UnixRegularFile(absolutePath)
     }
@@ -89,7 +126,7 @@ private class ResolveResultImpl(override val absolutePath: String, override val 
     }
 }
 
-internal fun stat(file: String): FileSystemElementMetadata {
+internal fun stat(file: String): ElementMetadata {
     return memScoped {
         val statBuf = alloc<stat>()
         if (lstat(file, statBuf.ptr) != 0) {

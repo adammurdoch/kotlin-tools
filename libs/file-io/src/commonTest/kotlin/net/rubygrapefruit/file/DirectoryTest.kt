@@ -24,13 +24,31 @@ class DirectoryTest {
 
     @Test
     fun `can create directory`() {
-        val dir = fixture.testDir.dir("dir")
+        val parent = fixture.dir("parent")
+        val dir = parent.dir("dir")
 
         assertEquals(MissingEntryMetadata, dir.metadata())
+        assertTrue(parent.listEntries().isEmpty())
 
         dir.createDirectories()
 
         assertEquals(DirectoryMetadata, dir.metadata())
+        assertTrue(dir.listEntries().isEmpty())
+        assertEquals(listOf("dir"), parent.listEntries().map { it.name })
+    }
+
+    @Test
+    fun `can list contents of directory`() {
+        val empty = fixture.dir("empty")
+        val dir = fixture.dir("dir") {
+            file("file1")
+            dir("dir1")
+        }
+
+        assertTrue(empty.listEntries().isEmpty())
+
+        assertEquals(listOf("file1", "dir1"), dir.listEntries().map { it.name })
+        assertEquals(listOf(ElementType.RegularFile, ElementType.Directory), dir.listEntries().map { it.type })
     }
 
     @Test

@@ -3,11 +3,11 @@ package net.rubygrapefruit.file
 /**
  * An immutable snapshot of a file system element's path, type and basic metadata.
  */
-interface FileResolveResult {
+interface ElementResolveResult {
     /**
      * Returns the element's metadata.
      */
-    val metadata: FileSystemElementMetadata
+    val metadata: ElementMetadata
 
     /**
      * Returns the element's path.

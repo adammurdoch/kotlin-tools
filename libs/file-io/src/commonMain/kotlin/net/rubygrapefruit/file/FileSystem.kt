@@ -1,5 +1,8 @@
 package net.rubygrapefruit.file
 
+/**
+ * An entry point into the local file system.
+ */
 expect class FileSystem {
     companion object {
         /**
@@ -8,7 +11,7 @@ expect class FileSystem {
         val currentDirectory: Directory
 
         /**
-         * The user's home directory.
+         * The current user's home directory.
          */
         val userHomeDirectory: Directory
     }

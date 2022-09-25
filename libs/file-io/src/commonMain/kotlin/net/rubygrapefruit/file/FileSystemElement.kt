@@ -77,5 +77,5 @@ interface Directory : FileSystemElement {
     /**
      * Returns a snapshot of the entries in this directory.
      */
-    fun listEntries(): List<DirectoryEntry>
+    fun listEntries(): DirectoryEntries
 }

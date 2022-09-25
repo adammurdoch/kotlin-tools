@@ -28,13 +28,19 @@ class DirectoryTest {
         val dir = parent.dir("dir")
 
         assertEquals(MissingEntryMetadata, dir.metadata())
-        assertTrue(parent.listEntries().isEmpty())
+        val entries1 = parent.listEntries()
+        assertIs<ExistingDirectoryEntries>(entries1)
+        assertTrue(entries1.entries.isEmpty())
 
         dir.createDirectories()
 
         assertEquals(DirectoryMetadata, dir.metadata())
-        assertTrue(dir.listEntries().isEmpty())
-        assertEquals(listOf("dir"), parent.listEntries().map { it.name })
+        val entries2 = dir.listEntries()
+        assertIs<ExistingDirectoryEntries>(entries2)
+        assertTrue(entries2.entries.isEmpty())
+        val entries3 = parent.listEntries()
+        assertIs<ExistingDirectoryEntries>(entries3)
+        assertEquals(listOf("dir"), entries3.entries.map { it.name })
     }
 
     @Test
@@ -45,10 +51,14 @@ class DirectoryTest {
             dir("dir1")
         }
 
-        assertTrue(empty.listEntries().isEmpty())
+        val entries1 = empty.listEntries()
+        assertIs<ExistingDirectoryEntries>(entries1)
+        assertTrue(entries1.entries.isEmpty())
 
-        assertEquals(listOf("file1", "dir1"), dir.listEntries().map { it.name })
-        assertEquals(listOf(ElementType.RegularFile, ElementType.Directory), dir.listEntries().map { it.type })
+        val entries2 = dir.listEntries()
+        assertIs<ExistingDirectoryEntries>(entries2)
+        assertEquals(listOf("file1", "dir1"), entries2.entries.map { it.name })
+        assertEquals(listOf(ElementType.RegularFile, ElementType.Directory), entries2.entries.map { it.type })
     }
 
     @Test

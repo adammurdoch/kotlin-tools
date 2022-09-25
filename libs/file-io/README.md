@@ -9,3 +9,4 @@ A Kotlin multi-platform library for accessing the file system.
 - Test failure modes for listing directory contents
 - Test unicode directory names
 - Test name resolution
+- Test case insensitive lookup

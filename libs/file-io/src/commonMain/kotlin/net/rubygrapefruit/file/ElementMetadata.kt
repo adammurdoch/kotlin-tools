@@ -1,35 +1,34 @@
 package net.rubygrapefruit.file
 
-sealed class ElementMetadata {
-    abstract val type: ElementType?
+/**
+ * An immutable snapshot of some basic metadata about a file system element.
+ */
+sealed class ElementMetadata
+
+object MissingEntryMetadata : ElementMetadata()
+
+object UnreadableEntryMetadata : ElementMetadata()
+
+sealed class ExistingElementMetadata : ElementMetadata() {
+    abstract val type: ElementType
 }
 
-object MissingEntryMetadata : ElementMetadata() {
-    override val type: ElementType?
-        get() = null
-}
-
-object UnreadableEntryMetadata : ElementMetadata() {
-    override val type: ElementType?
-        get() = null
-}
-
-object DirectoryMetadata : ElementMetadata() {
+object DirectoryMetadata : ExistingElementMetadata() {
     override val type: ElementType
         get() = ElementType.Directory
 }
 
-object SymlinkMetadata : ElementMetadata() {
+object SymlinkMetadata : ExistingElementMetadata() {
     override val type: ElementType
         get() = ElementType.SymLink
 }
 
-object OtherMetadata : ElementMetadata() {
+object OtherMetadata : ExistingElementMetadata() {
     override val type: ElementType
         get() = ElementType.Other
 }
 
-data class RegularFileMetadata(val size: ULong) : ElementMetadata() {
+data class RegularFileMetadata(val size: ULong) : ExistingElementMetadata() {
     override val type: ElementType
         get() = ElementType.RegularFile
 }

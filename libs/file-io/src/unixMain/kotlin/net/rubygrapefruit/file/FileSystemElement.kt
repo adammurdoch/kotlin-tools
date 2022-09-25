@@ -62,9 +62,12 @@ internal class UnixDirectory(path: String) : UnixFileSystemElement(path), Direct
         return ResolveResultImpl(path, stat(path))
     }
 
-    override fun listEntries(): List<DirectoryEntry> {
+    override fun listEntries(): DirectoryEntries {
         val dirPointer = opendir(path)
         if (dirPointer == null) {
+            if (errno == EPERM || errno == EACCES) {
+                return UnreadableDirectoryEntries
+            }
             throw NativeException("Could not list directory '$path'.")
         }
         try {
@@ -90,7 +93,7 @@ internal class UnixDirectory(path: String) : UnixFileSystemElement(path), Direct
                     }
                 }
             }
-            return entries
+            return ExistingDirectoryEntries(entries)
         } finally {
             closedir(dirPointer)
         }

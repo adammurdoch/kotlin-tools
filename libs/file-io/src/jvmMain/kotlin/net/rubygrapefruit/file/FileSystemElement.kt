@@ -74,7 +74,7 @@ internal sealed class JvmFileSystemElement(protected val path: Path) : FileSyste
         return metadataOfExistingFile(path)
     }
 
-    protected fun metadataOfExistingFile(path: Path): ElementMetadata {
+    protected fun metadataOfExistingFile(path: Path): ExistingElementMetadata {
         val attributes = Files.getFileAttributeView(path, BasicFileAttributeView::class.java).readAttributes()
         return when {
             attributes.isRegularFile -> RegularFileMetadata(attributes.size().toULong())
@@ -143,12 +143,12 @@ internal class JvmDirectory internal constructor(path: Path) : JvmFileSystemElem
         return ResolveResultImpl(path, metadata(path))
     }
 
-    override fun listEntries(): List<DirectoryEntry> {
+    override fun listEntries(): DirectoryEntries {
         val result = mutableListOf<DirectoryEntry>()
         Files.list(path).forEach {
-            result.add(DirectoryEntryImpl(it, metadataOfExistingFile(it).type!!))
+            result.add(DirectoryEntryImpl(it, metadataOfExistingFile(it).type))
         }
-        return result
+        return ExistingDirectoryEntries(result)
     }
 }
 

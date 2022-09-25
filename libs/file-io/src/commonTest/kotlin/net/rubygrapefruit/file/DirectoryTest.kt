@@ -49,6 +49,7 @@ class DirectoryTest {
         val dir = fixture.dir("dir") {
             file("file1")
             dir("dir1")
+            symLink("link1", "nothing")
         }
 
         val entries1 = empty.listEntries()
@@ -57,8 +58,35 @@ class DirectoryTest {
 
         val entries2 = dir.listEntries()
         assertIs<ExistingDirectoryEntries>(entries2)
-        assertEquals(listOf("file1", "dir1"), entries2.entries.map { it.name })
-        assertEquals(listOf(ElementType.RegularFile, ElementType.Directory), entries2.entries.map { it.type })
+        val sorted = entries2.entries.sortedBy { it.name }
+        assertEquals(listOf("dir1", "file1", "link1"), sorted.map { it.name })
+        assertEquals(listOf(ElementType.Directory, ElementType.RegularFile, ElementType.SymLink), sorted.map { it.type })
+    }
+
+    @Test
+    fun `cannot list contents of a directory that does not exist`() {
+        val dir = fixture.testDir.dir("dir1")
+
+        val entries = dir.listEntries()
+        assertIs<MissingDirectoryEntries>(entries)
+    }
+
+    @Test
+    fun `cannot list contents of a directory whose parent does not exist`() {
+        val parent = fixture.testDir.dir("dir")
+        val dir = parent.dir("dir1")
+
+        val entries = dir.listEntries()
+        assertIs<MissingDirectoryEntries>(entries)
+    }
+
+    @Test
+    fun `cannot list contents of a directory whose ancestor does not exist`() {
+        val ancestor = fixture.testDir.dir("dir")
+        val dir = ancestor.dir("dir1/dir2")
+
+        val entries = dir.listEntries()
+        assertIs<MissingDirectoryEntries>(entries)
     }
 
     @Test

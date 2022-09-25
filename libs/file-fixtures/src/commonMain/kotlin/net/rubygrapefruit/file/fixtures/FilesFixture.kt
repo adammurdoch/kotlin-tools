@@ -43,5 +43,9 @@ class FilesFixture {
             subdir.createDirectories()
             builder(DirFixture(subdir))
         }
+
+        fun symLink(name: String, path: String) {
+            dir.symLink(name).writeSymLink(path)
+        }
     }
 }

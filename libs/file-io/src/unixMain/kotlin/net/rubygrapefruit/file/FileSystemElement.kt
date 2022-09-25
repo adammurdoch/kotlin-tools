@@ -21,15 +21,59 @@ internal sealed class UnixFileSystemElement(path: String) : PathFileSystemElemen
         return ResolveResultImpl(path, metadata())
     }
 
+    protected fun MemScope.fileSize(): Long {
+        val statBuf = alloc<stat>()
+        if (lstat(path, statBuf.ptr) != 0) {
+            throw NativeException("Could not stat $path.")
+        }
+        return statBuf.st_size
+    }
+
 }
 
 internal class UnixRegularFile(path: String) : UnixFileSystemElement(path), RegularFile {
     override fun writeText(text: String) {
-        writeToFile(this, text)
+        memScoped {
+            val des = fopen(path, "w")
+            if (des == null) {
+                if (errno == EISDIR) {
+                    throw fileExistsAndIsNotAFile(path)
+                }
+                val errnoValue = errno
+                throw writeToFile(this@UnixRegularFile, null) { message, _ -> NativeException(message, errnoValue) }
+            }
+            try {
+                if (fputs(text, des) == EOF) {
+                    if (errno == ENOTDIR) {
+                        throw fileExistsAndIsNotAFile(path)
+                    }
+                    val errnoValue = errno
+                    throw writeToFile(this@UnixRegularFile, null) { message, _ -> NativeException(message, errnoValue) }
+                }
+            } finally {
+                fclose(des)
+            }
+        }
     }
 
     override fun readText(): String {
-        return readFromFile(this)
+        return memScoped {
+            val des = open(path, O_RDONLY)
+            if (des < 0) {
+                throw NativeException("Could not open $path.")
+            }
+            try {
+                val fileSize = fileSize()
+                val buffer = ByteArray(fileSize.convert())
+                val nread = read(des, buffer.refTo(0), fileSize.convert())
+                if (nread < 0) {
+                    throw NativeException("Could not read from $path.")
+                }
+                buffer.decodeToString(0, nread.convert())
+            } finally {
+                close(des)
+            }
+        }
     }
 }
 
@@ -40,6 +84,10 @@ internal class UnixDirectory(path: String) : UnixFileSystemElement(path), Direct
 
     override fun dir(name: String): Directory {
         return UnixDirectory(resolveName(name))
+    }
+
+    override fun symLink(name: String): SymLink {
+        return UnixSymLink(resolveName(name))
     }
 
     override fun createTemporaryDirectory(): Directory {
@@ -65,6 +113,9 @@ internal class UnixDirectory(path: String) : UnixFileSystemElement(path), Direct
     override fun listEntries(): DirectoryEntries {
         val dirPointer = opendir(path)
         if (dirPointer == null) {
+            if (errno == ENOENT) {
+                return MissingDirectoryEntries
+            }
             if (errno == EPERM || errno == EACCES) {
                 return UnreadableDirectoryEntries
             }
@@ -112,6 +163,31 @@ internal class UnixDirectory(path: String) : UnixFileSystemElement(path), Direct
             return (parent as UnixDirectory).resolveName(name.substring(3))
         } else {
             return "$path/$name"
+        }
+    }
+}
+
+internal class UnixSymLink(path: String) : UnixFileSystemElement(path), SymLink {
+    override fun readSymLink(): String {
+        memScoped {
+            val size = fileSize()
+            val buffer = ByteArray(size.convert())
+            val nread = readlink(path, buffer.refTo(0), size.convert())
+            if (nread < 0) {
+                throw NativeException("Could not read symlink $path.")
+            }
+            return buffer.decodeToString(0, nread.convert())
+        }
+    }
+
+    override fun writeSymLink(target: String) {
+        if (stat(path) is SymlinkMetadata) {
+            if (remove(path) < 0) {
+                throw NativeException("Could not delete symlink $path.")
+            }
+        }
+        if (symlink(target, path) < 0) {
+            throw NativeException("Could not create symlink $path.")
         }
     }
 }
@@ -198,52 +274,3 @@ internal fun createDir(dir: UnixDirectory) {
         }
     }
 }
-
-internal fun writeToFile(file: UnixRegularFile, text: String) {
-    memScoped {
-        val des = fopen(file.path, "w")
-        if (des == null) {
-            if (errno == EISDIR) {
-                throw fileExistsAndIsNotAFile(file.path)
-            }
-            val errnoValue = errno
-            throw writeToFile(file, null) { message, _ -> NativeException(message, errnoValue) }
-        }
-        try {
-            if (fputs(text, des) == EOF) {
-                if (errno == ENOTDIR) {
-                    throw fileExistsAndIsNotAFile(file.path)
-                }
-                val errnoValue = errno
-                throw writeToFile(file, null) { message, _ -> NativeException(message, errnoValue) }
-            }
-        } finally {
-            fclose(des)
-        }
-    }
-}
-
-internal fun readFromFile(file: UnixRegularFile): String {
-    return memScoped {
-        val des = open(file.path, O_RDONLY)
-        if (des < 0) {
-            throw NativeException("Could not open $file")
-        }
-        try {
-            val statBuf = alloc<stat>()
-            if (stat(file.absolutePath, statBuf.ptr) != 0) {
-                throw NativeException("Could not stat $file")
-            }
-            val fileSize = statBuf.st_size
-            val buffer = ByteArray(fileSize.convert())
-            val nread = read(des, buffer.refTo(0), fileSize.convert())
-            if (nread < 0) {
-                throw NativeException("Could not read from $file")
-            }
-            buffer.decodeToString(0, nread.convert())
-        } finally {
-            close(des)
-        }
-    }
-}
-

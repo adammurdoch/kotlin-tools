@@ -2,12 +2,11 @@ package net.rubygrapefruit.file
 
 import java.io.File
 import java.io.IOException
-import java.nio.file.FileAlreadyExistsException
-import java.nio.file.Files
-import java.nio.file.Path
+import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributeView
 import kotlin.io.path.name
 import kotlin.io.path.pathString
+import kotlin.streams.toList
 
 actual sealed interface FileSystemElement {
     /**
@@ -68,14 +67,14 @@ internal sealed class JvmFileSystemElement(protected val path: Path) : FileSyste
     }
 
     protected fun metadata(path: Path): ElementMetadata {
-        if (!Files.exists(path)) {
+        if (!Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
             return MissingEntryMetadata
         }
         return metadataOfExistingFile(path)
     }
 
     protected fun metadataOfExistingFile(path: Path): ExistingElementMetadata {
-        val attributes = Files.getFileAttributeView(path, BasicFileAttributeView::class.java).readAttributes()
+        val attributes = Files.getFileAttributeView(path, BasicFileAttributeView::class.java, LinkOption.NOFOLLOW_LINKS).readAttributes()
         return when {
             attributes.isRegularFile -> RegularFileMetadata(attributes.size().toULong())
             attributes.isDirectory -> DirectoryMetadata
@@ -89,7 +88,7 @@ internal sealed class JvmFileSystemElement(protected val path: Path) : FileSyste
     }
 }
 
-internal class JvmRegularFile internal constructor(path: Path) : JvmFileSystemElement(path), RegularFile {
+internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularFile {
     override fun writeText(text: String) {
         try {
             Files.writeString(path, text, Charsets.UTF_8)
@@ -103,13 +102,17 @@ internal class JvmRegularFile internal constructor(path: Path) : JvmFileSystemEl
     }
 }
 
-internal class JvmDirectory internal constructor(path: Path) : JvmFileSystemElement(path), Directory {
+internal class JvmDirectory(path: Path) : JvmFileSystemElement(path), Directory {
     override fun file(name: String): RegularFile {
         return JvmRegularFile(path.resolve(name))
     }
 
     override fun dir(name: String): Directory {
         return JvmDirectory(path.resolve(name))
+    }
+
+    override fun symLink(name: String): SymLink {
+        return JvmSymlink(path.resolve(name))
     }
 
     override fun createTemporaryDirectory(): Directory {
@@ -144,20 +147,35 @@ internal class JvmDirectory internal constructor(path: Path) : JvmFileSystemElem
     }
 
     override fun listEntries(): DirectoryEntries {
-        val result = mutableListOf<DirectoryEntry>()
-        Files.list(path).forEach {
-            result.add(DirectoryEntryImpl(it, metadataOfExistingFile(it).type))
+        val stream = try {
+            Files.list(path)
+        } catch (e: NoSuchFileException) {
+            return MissingDirectoryEntries
         }
-        return ExistingDirectoryEntries(result)
+        val entries = stream.map { DirectoryEntryImpl(it, metadataOfExistingFile(it).type) }.toList()
+        return ExistingDirectoryEntries(entries)
     }
 }
 
-internal class DirectoryEntryImpl(private val path: Path, override val type: ElementType) : DirectoryEntry {
+internal class JvmSymlink(path: Path) : JvmFileSystemElement(path), SymLink {
+    override fun readSymLink(): String {
+        return Files.readSymbolicLink(path).pathString
+    }
+
+    override fun writeSymLink(target: String) {
+        if (metadata() is SymlinkMetadata) {
+            Files.delete(this.path)
+        }
+        Files.createSymbolicLink(this.path, Path.of(target))
+    }
+}
+
+private class DirectoryEntryImpl(private val path: Path, override val type: ElementType) : DirectoryEntry {
     override val name: String
         get() = path.name
 }
 
-internal class ResolveResultImpl(private val path: Path, override val metadata: ElementMetadata) : AbstractElementResolveResult() {
+private class ResolveResultImpl(private val path: Path, override val metadata: ElementMetadata) : AbstractElementResolveResult() {
     override val absolutePath: String
         get() = path.pathString
 

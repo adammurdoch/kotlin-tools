@@ -20,12 +20,12 @@ expect sealed interface FileSystemElement {
     val absolutePath: String
 
     /**
-     * Returns a snapshot of the current metadata of the file.
+     * Returns a snapshot of the current metadata of the file. Does not follow symlinks.
      */
     fun metadata(): ElementMetadata
 
     /**
-     * Returns this element as a resolve result, which contains the path of this element and a snapshot of its metadata.
+     * Returns this element as a resolve result, which contains the path of this element and a snapshot of its metadata. Does not follow symlinks.
      */
     fun resolve(): ElementResolveResult
 }
@@ -60,6 +60,11 @@ interface Directory : FileSystemElement {
     fun dir(name: String): Directory
 
     /**
+     * Resolves a symlink relative to this directory. Note: does not check whether the file exists or is a symlink.
+     */
+    fun symLink(name: String): SymLink
+
+    /**
      * Resolves a name relative to this directory and queries the element's type and basic metadata.
      */
     fun resolve(name: String): ElementResolveResult
@@ -75,7 +80,22 @@ interface Directory : FileSystemElement {
     fun createTemporaryDirectory(): Directory
 
     /**
-     * Returns a snapshot of the entries in this directory.
+     * Returns a snapshot of the entries in this directory. Does not follow symlinks in the entries.
      */
     fun listEntries(): DirectoryEntries
+}
+
+/**
+ * A symlink in the file system.
+ */
+interface SymLink: FileSystemElement {
+    /**
+     * Reads the symlink target.
+     */
+    fun readSymLink(): String
+
+    /**
+     * Creates a symlink or updates its target.
+     */
+    fun writeSymLink(target: String)
 }

@@ -4,6 +4,8 @@ import java.io.File
 import java.io.IOException
 import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributeView
+import java.nio.file.attribute.PosixFileAttributeView
+import java.nio.file.attribute.PosixFilePermission
 import kotlin.io.path.name
 import kotlin.io.path.pathString
 import kotlin.streams.toList
@@ -28,6 +30,10 @@ actual sealed interface FileSystemElement {
     actual fun metadata(): Result<ElementMetadata>
 
     actual fun snapshot(): Result<ElementSnapshot>
+
+    actual fun posixPermissions(): Result<PosixPermissions>
+
+    actual fun setPermissions(permissions: PosixPermissions)
 }
 
 internal sealed class JvmFileSystemElement(protected val path: Path) : FileSystemElement {
@@ -57,16 +63,9 @@ internal sealed class JvmFileSystemElement(protected val path: Path) : FileSyste
 
     override fun toPath(): Path = path
 
-    /**
-     * Returns this element as a JVM `File`.
-     */
     override fun toFile(): File = path.toFile()
 
     override fun metadata(): Result<ElementMetadata> {
-        return metadata(path)
-    }
-
-    protected fun metadata(path: Path): Result<ElementMetadata> {
         if (!Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
             return MissingEntry(absolutePath)
         }
@@ -85,6 +84,15 @@ internal sealed class JvmFileSystemElement(protected val path: Path) : FileSyste
 
     override fun snapshot(): Result<ElementSnapshot> {
         return metadata().map { SnapshotImpl(path, it) }
+    }
+
+    override fun posixPermissions(): Result<PosixPermissions> {
+        val attributes = Files.getFileAttributeView(path, PosixFileAttributeView::class.java, LinkOption.NOFOLLOW_LINKS).readAttributes()
+        return Success(attributes.permissions().permissions())
+    }
+
+    override fun setPermissions(permissions: PosixPermissions) {
+        Files.getFileAttributeView(path, PosixFileAttributeView::class.java, LinkOption.NOFOLLOW_LINKS).setPermissions(permissions.permSet())
     }
 }
 

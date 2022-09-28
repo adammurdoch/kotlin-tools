@@ -113,4 +113,20 @@ class RegularFileTest {
             assertEquals("Could not write to $file as $ancestor exists but is not a directory.", e.message)
         }
     }
+
+    @Test
+    fun `can set and query permissions`() {
+        val file = fixture.file("file")
+        val originalPerms = file.posixPermissions()
+        assertIs<Success<*>>(originalPerms)
+
+        try {
+            file.setPermissions(PosixPermissions.readOnly)
+            val perms = file.posixPermissions()
+            assertIs<Success<*>>(perms)
+            assertEquals(PosixPermissions.readOnly, perms.get())
+        } finally {
+            file.setPermissions(originalPerms.get())
+        }
+    }
 }

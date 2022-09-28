@@ -25,9 +25,20 @@ expect sealed interface FileSystemElement {
     fun metadata(): Result<ElementMetadata>
 
     /**
-     * Returns this element as a resolve result, which contains the path of this element and a snapshot of its metadata. Does not follow symlinks.
+     * Returns a snapshot of the element, which contains the path of this element and a snapshot of its metadata. Does not follow symlinks.
      */
     fun snapshot(): Result<ElementSnapshot>
+
+    /**
+     * Returns a snapshot of the current permissions. Does not follow symlinks.
+     */
+    fun posixPermissions(): Result<PosixPermissions>
+
+    /**
+     * Sets the permissions of this element.
+     */
+    @Throws(FileSystemException::class)
+    fun setPermissions(permissions: PosixPermissions)
 }
 
 /**

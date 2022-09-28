@@ -3,6 +3,7 @@ package net.rubygrapefruit.file.fixtures
 import net.rubygrapefruit.file.Directory
 import net.rubygrapefruit.file.FileSystem
 import net.rubygrapefruit.file.RegularFile
+import net.rubygrapefruit.file.SymLink
 
 class FilesFixture {
     val testDir by lazy {
@@ -23,6 +24,12 @@ class FilesFixture {
         val file = testDir.file(name)
         file.writeText("test")
         return file
+    }
+
+    fun symlink(name: String, target: String): SymLink {
+        val symLink = testDir.symLink(name)
+        symLink.writeSymLink(target)
+        return symLink
     }
 
     fun dir(name: String, builder: DirFixture.() -> Unit = {}): Directory {

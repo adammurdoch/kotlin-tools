@@ -10,6 +10,10 @@ actual sealed interface FileSystemElement {
     actual fun metadata(): Result<ElementMetadata>
 
     actual fun snapshot(): Result<ElementSnapshot>
+
+    actual fun posixPermissions(): Result<PosixPermissions>
+
+    actual fun setPermissions(permissions: PosixPermissions)
 }
 
 internal abstract class PathFileSystemElement(internal val path: String) : FileSystemElement {

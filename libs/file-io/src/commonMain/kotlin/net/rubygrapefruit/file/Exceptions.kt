@@ -17,7 +17,7 @@ internal fun parentDirectoryIsNotADir(path: String, ancestor: String, cause: Thr
 /**
  * Tries to infer why a file could not be written to.
  */
-internal fun writeToFile(file: RegularFile, cause: Throwable? = null, factory: (String, Throwable?) -> FileSystemException = { message, cause -> FileSystemException(message, cause) }): FileSystemException {
+internal fun writeToFile(file: RegularFile, cause: Throwable? = null, factory: (String, Throwable?) -> FileSystemException = { m, c -> FileSystemException(m, c) }): FileSystemException {
     val fileMetadata = file.metadata()
     if (fileMetadata.regularFile) {
         return factory("Could not write to ${file.absolutePath}", cause)

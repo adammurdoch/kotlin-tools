@@ -21,6 +21,22 @@ internal sealed class UnixFileSystemElement(path: String) : PathFileSystemElemen
         return metadata().map { SnapshotImpl(path, it) }
     }
 
+    override fun posixPermissions(): Result<PosixPermissions> {
+        return memScoped {
+            val statBuf = alloc<stat>()
+            if (lstat(path, statBuf.ptr) != 0) {
+                throw NativeException("Could not stat $path.")
+            }
+            Success(PosixPermissions((statBuf.st_mode.convert<UInt>() and (S_IRWXU or S_IRWXG or S_IRWXO).convert())))
+        }
+    }
+
+    override fun setPermissions(permissions: PosixPermissions) {
+        if (chmod(path, permissions.mode.convert()) != 0) {
+            throw NativeException("Could not set permissions on $path.")
+        }
+    }
+
     protected fun MemScope.fileSize(): Long {
         val statBuf = alloc<stat>()
         if (lstat(path, statBuf.ptr) != 0) {
@@ -215,6 +231,7 @@ private class SnapshotImpl(override val absolutePath: String, override val metad
     }
 }
 
+@OptIn(UnsafeNumber::class)
 internal fun stat(file: String): Result<ElementMetadata> {
     return memScoped {
         val statBuf = alloc<stat>()
@@ -227,11 +244,13 @@ internal fun stat(file: String): Result<ElementMetadata> {
             } else {
                 throw NativeException("Could not stat file '$file'.")
             }
-        } else if (statBuf.st_mode.convert<Int>() and S_IFDIR == S_IFDIR) {
+        }
+        val mode = statBuf.st_mode.convert<Int>()
+        if (mode and S_IFDIR == S_IFDIR) {
             Success(DirectoryMetadata)
-        } else if (statBuf.st_mode.convert<Int>() and S_IFLNK == S_IFLNK) {
+        } else if (mode and S_IFLNK == S_IFLNK) {
             Success(SymlinkMetadata)
-        } else if (statBuf.st_mode.convert<Int>() and S_IFLNK == S_IFREG) {
+        } else if (mode and S_IFREG == S_IFREG) {
             Success(RegularFileMetadata(statBuf.st_size.convert()))
         } else {
             Success(OtherMetadata)
@@ -272,6 +291,7 @@ internal fun createTempDir(baseDir: UnixDirectory): Directory {
     }
 }
 
+@OptIn(UnsafeNumber::class)
 internal fun createDir(dir: UnixDirectory) {
     memScoped {
         val result = mkdir(dir.path, S_IRWXU)

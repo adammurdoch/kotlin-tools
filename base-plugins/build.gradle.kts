@@ -4,7 +4,7 @@ plugins {
 
 for (task in listOf("clean", "assemble", "check", "build")) {
     project.tasks.register(task) {
-        dependsOn(subprojects.map { it.tasks.findByName(task) }.filterNotNull())
+        dependsOn(subprojects.mapNotNull { it.tasks.findByName(task) })
     }
 }
 

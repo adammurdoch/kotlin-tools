@@ -16,7 +16,7 @@ actual sealed interface FileSystemElement {
     actual fun setPermissions(permissions: PosixPermissions)
 }
 
-internal abstract class PathFileSystemElement(internal val path: String) : FileSystemElement {
+internal abstract class PathFileSystemElement(internal val path: String) : AbstractFileSystemElement() {
     init {
         require(path.startsWith("/"))
     }
@@ -26,8 +26,4 @@ internal abstract class PathFileSystemElement(internal val path: String) : FileS
 
     override val absolutePath: String
         get() = path
-
-    override fun toString(): String {
-        return path
-    }
 }

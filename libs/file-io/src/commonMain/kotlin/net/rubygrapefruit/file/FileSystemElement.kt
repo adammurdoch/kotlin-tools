@@ -97,6 +97,11 @@ interface Directory : FileSystemElement {
      * Returns a snapshot of the entries in this directory. Does not follow symlinks in the entries.
      */
     fun listEntries(): Result<List<DirectoryEntry>>
+
+    /**
+     * Visits the contents of this directory tree. Visits a directory before its entries.
+     */
+    fun visitTopDown(visitor: (DirectoryEntry) -> Unit)
 }
 
 /**

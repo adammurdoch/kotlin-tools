@@ -1,13 +1,22 @@
 package net.rubygrapefruit.file
 
 import net.rubygrapefruit.file.fixtures.FilesFixture
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertIs
-import kotlin.test.fail
+import kotlin.test.*
 
 class RegularFileTest {
     private val fixture = FilesFixture()
+
+    @AfterTest
+    fun cleanup() {
+        fixture.testDir.visitTopDown {
+            // Try to reset the test file permissions
+            if (it.type == ElementType.Directory) {
+                it.toDir().setPermissions(PosixPermissions.directory)
+            } else {
+                it.toElement().setPermissions(PosixPermissions.regularFile)
+            }
+        }
+    }
 
     @Test
     fun `can write text to a file to create it`() {
@@ -120,13 +129,8 @@ class RegularFileTest {
         val originalPerms = file.posixPermissions()
         assertIs<Success<*>>(originalPerms)
 
-        try {
-            file.setPermissions(PosixPermissions.readOnly)
-            val perms = file.posixPermissions()
-            assertIs<Success<*>>(perms)
-            assertEquals(PosixPermissions.readOnly, perms.get())
-        } finally {
-            file.setPermissions(originalPerms.get())
-        }
+        file.setPermissions(PosixPermissions.readOnly)
+        val perms = file.posixPermissions()
+        assertEquals(PosixPermissions.readOnly, perms.get())
     }
 }

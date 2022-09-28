@@ -5,7 +5,6 @@ import java.io.IOException
 import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributeView
 import java.nio.file.attribute.PosixFileAttributeView
-import java.nio.file.attribute.PosixFilePermission
 import kotlin.io.path.name
 import kotlin.io.path.pathString
 import kotlin.streams.toList
@@ -36,13 +35,9 @@ actual sealed interface FileSystemElement {
     actual fun setPermissions(permissions: PosixPermissions)
 }
 
-internal sealed class JvmFileSystemElement(protected val path: Path) : FileSystemElement {
+internal open class JvmFileSystemElement(protected val path: Path) : AbstractFileSystemElement() {
     init {
         require(path.isAbsolute)
-    }
-
-    override fun toString(): String {
-        return path.pathString
     }
 
     override val parent: Directory?
@@ -167,6 +162,10 @@ internal class JvmDirectory(path: Path) : JvmFileSystemElement(path), Directory 
         val entries = stream.map { DirectoryEntryImpl(it, metadataOfExistingFile(it).type) }.toList()
         return Success(entries)
     }
+
+    override fun visitTopDown(visitor: (DirectoryEntry) -> Unit) {
+        visitTopDown(this, visitor)
+    }
 }
 
 internal class JvmSymlink(path: Path) : JvmFileSystemElement(path), SymLink {
@@ -186,6 +185,14 @@ internal class JvmSymlink(path: Path) : JvmFileSystemElement(path), SymLink {
 private class DirectoryEntryImpl(private val path: Path, override val type: ElementType) : DirectoryEntry {
     override val name: String
         get() = path.name
+
+    override fun toDir(): Directory {
+        return JvmDirectory(path)
+    }
+
+    override fun toElement(): FileSystemElement {
+        return JvmFileSystemElement(path)
+    }
 }
 
 private class SnapshotImpl(private val path: Path, override val metadata: ElementMetadata) : AbstractElementSnapshot() {

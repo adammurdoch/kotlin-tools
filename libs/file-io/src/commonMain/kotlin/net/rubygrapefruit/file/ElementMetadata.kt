@@ -27,11 +27,20 @@ data class RegularFileMetadata(val size: ULong) : ElementMetadata() {
         get() = ElementType.RegularFile
 }
 
+/**
+ * Is the element missing?
+ */
 val Result<ElementMetadata>.missing: Boolean
     get() = this is MissingEntry
 
+/**
+ * Is the element a directory?
+ */
 val Result<ElementMetadata>.directory: Boolean
     get() = getOrNull() is DirectoryMetadata
 
+/**
+ * Is the element a regular file?
+ */
 val Result<ElementMetadata>.regularFile: Boolean
     get() = getOrNull() is RegularFileMetadata

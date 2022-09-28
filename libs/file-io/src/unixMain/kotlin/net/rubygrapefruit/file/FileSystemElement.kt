@@ -3,7 +3,7 @@ package net.rubygrapefruit.file
 import kotlinx.cinterop.*
 import platform.posix.*
 
-internal sealed class UnixFileSystemElement(path: String) : PathFileSystemElement(path) {
+internal open class UnixFileSystemElement(path: String) : PathFileSystemElement(path) {
     override val parent: Directory?
         get() {
             return if (path == "/") {
@@ -151,13 +151,13 @@ internal class UnixDirectory(path: String) : UnixFileSystemElement(path), Direct
                         continue
                     }
                     if (entryPointer.pointed.d_type.convert<Int>() == DT_DIR) {
-                        entries.add(DirectoryEntryImpl(name, ElementType.Directory))
+                        entries.add(DirectoryEntryImpl(path, name, ElementType.Directory))
                     } else if (entryPointer.pointed.d_type.convert<Int>() == DT_LNK) {
-                        entries.add(DirectoryEntryImpl(name, ElementType.SymLink))
+                        entries.add(DirectoryEntryImpl(path, name, ElementType.SymLink))
                     } else if (entryPointer.pointed.d_type.convert<Int>() == DT_REG) {
-                        entries.add(DirectoryEntryImpl(name, ElementType.RegularFile))
+                        entries.add(DirectoryEntryImpl(path, name, ElementType.RegularFile))
                     } else {
-                        entries.add(DirectoryEntryImpl(name, ElementType.Other))
+                        entries.add(DirectoryEntryImpl(path, name, ElementType.Other))
                     }
                 }
             }
@@ -165,6 +165,10 @@ internal class UnixDirectory(path: String) : UnixFileSystemElement(path), Direct
         } finally {
             closedir(dirPointer)
         }
+    }
+
+    override fun visitTopDown(visitor: (DirectoryEntry) -> Unit) {
+        visitTopDown(this, visitor)
     }
 
     private fun resolveName(name: String): String {
@@ -214,7 +218,14 @@ internal class UnixSymLink(path: String) : UnixFileSystemElement(path), SymLink 
     }
 }
 
-private class DirectoryEntryImpl(override val name: String, override val type: ElementType) : DirectoryEntry {
+private class DirectoryEntryImpl(private val parentPath: String, override val name: String, override val type: ElementType) : DirectoryEntry {
+    override fun toDir(): Directory {
+        return UnixDirectory("$parentPath/$name")
+    }
+
+    override fun toElement(): FileSystemElement {
+        return UnixFileSystemElement("$parentPath/$name")
+    }
 }
 
 private class SnapshotImpl(override val absolutePath: String, override val metadata: ElementMetadata) : AbstractElementSnapshot() {

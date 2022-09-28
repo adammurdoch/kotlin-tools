@@ -13,4 +13,14 @@ interface DirectoryEntry {
      * The type of the entry.
      */
     val type: ElementType
+
+    /**
+     * View the entry as a `Directory`.
+     */
+    fun toDir(): Directory
+
+    /**
+     * View the entry as a `FileSystemElement`.
+     */
+    fun toElement(): FileSystemElement
 }

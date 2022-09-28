@@ -20,6 +20,18 @@ value class PosixPermissions internal constructor(internal val mode: UInt) {
          */
         val readOnly: PosixPermissions
             get() = PosixPermissions(ownerRead or groupRead or othersRead)
+
+        /**
+         * Read-write-execute by user and read-execute by group and others.
+         */
+        val directory: PosixPermissions
+            get() = PosixPermissions(ownerRead or ownerWrite or ownerExecute or groupRead or groupExecute or othersRead or othersExecute)
+
+        /**
+         * Read-write by user and read by group and others.
+         */
+        val regularFile: PosixPermissions
+            get() = PosixPermissions(ownerRead or ownerWrite or groupRead or othersRead)
     }
 
     override fun toString(): String {

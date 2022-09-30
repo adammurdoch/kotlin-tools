@@ -1,11 +1,8 @@
 package net.rubygrapefruit.file
 
-import net.rubygrapefruit.file.fixtures.FilesFixture
 import kotlin.test.*
 
-class DirectoryTest {
-    private val fixture = FilesFixture()
-
+class DirectoryTest : AbstractFileSystemElementTest() {
     @Test
     fun `can create temporary directory`() {
         val dir = fixture.dir("parent")
@@ -169,5 +166,15 @@ class DirectoryTest {
         assertIs<RegularFileMetadata>(file.metadata().get())
         assertIs<MissingEntry<*>>(parent.metadata())
         assertIs<MissingEntry<*>>(dir.metadata())
+    }
+
+    @Test
+    fun `can set and query directory posix permissions`() {
+        val dir = fixture.dir("dir")
+        assertNotEquals(PosixPermissions.readOnlyDirectory, dir.posixPermissions().get())
+
+        dir.setPermissions(PosixPermissions.readOnlyDirectory)
+        val perms = dir.posixPermissions()
+        assertEquals(PosixPermissions.readOnlyDirectory, perms.get())
     }
 }

@@ -32,9 +32,13 @@ internal open class UnixFileSystemElement(path: String) : PathFileSystemElement(
     }
 
     override fun setPermissions(permissions: PosixPermissions) {
-        if (chmod(path, permissions.mode.convert()) != 0) {
+        if (lchmod(path, permissions.mode.convert()) != 0) {
             throw NativeException("Could not set permissions on $path.")
         }
+    }
+
+    override fun supports(capability: FileSystemCapability): Boolean {
+        return true
     }
 
     protected fun MemScope.fileSize(): Long {
@@ -44,7 +48,6 @@ internal open class UnixFileSystemElement(path: String) : PathFileSystemElement(
         }
         return statBuf.st_size
     }
-
 }
 
 internal class UnixRegularFile(path: String) : UnixFileSystemElement(path), RegularFile {

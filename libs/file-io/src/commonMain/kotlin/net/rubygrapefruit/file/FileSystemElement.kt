@@ -35,10 +35,15 @@ expect sealed interface FileSystemElement {
     fun posixPermissions(): Result<PosixPermissions>
 
     /**
-     * Sets the permissions of this element.
+     * Sets the permissions of this element. Note that when this element is a symlink, the permissions of the symlink itself are changed.
      */
     @Throws(FileSystemException::class)
     fun setPermissions(permissions: PosixPermissions)
+
+    /**
+     * Does this file system element have the specified capability?
+     */
+    fun supports(capability: FileSystemCapability): Boolean
 }
 
 /**
@@ -101,7 +106,7 @@ interface Directory : FileSystemElement {
     /**
      * Visits the contents of this directory tree. Visits a directory before its entries.
      */
-    fun visitTopDown(visitor: (DirectoryEntry) -> Unit)
+    fun visitTopDown(visitor: DirectoryEntry.() -> Unit)
 }
 
 /**

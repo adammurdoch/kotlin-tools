@@ -33,6 +33,8 @@ actual sealed interface FileSystemElement {
     actual fun posixPermissions(): Result<PosixPermissions>
 
     actual fun setPermissions(permissions: PosixPermissions)
+
+    actual fun supports(capability: FileSystemCapability): Boolean
 }
 
 internal open class JvmFileSystemElement(protected val path: Path) : AbstractFileSystemElement() {
@@ -88,6 +90,12 @@ internal open class JvmFileSystemElement(protected val path: Path) : AbstractFil
 
     override fun setPermissions(permissions: PosixPermissions) {
         Files.getFileAttributeView(path, PosixFileAttributeView::class.java, LinkOption.NOFOLLOW_LINKS).setPermissions(permissions.permSet())
+    }
+
+    override fun supports(capability: FileSystemCapability): Boolean {
+        return when (capability) {
+            FileSystemCapability.SetSymLinkPosixPermissions -> false
+        }
     }
 }
 

@@ -1,13 +1,11 @@
 package net.rubygrapefruit.file
 
-import net.rubygrapefruit.file.fixtures.FilesFixture
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.test.assertNotEquals
 
-class SymLinkTest {
-    private val fixture = FilesFixture()
-
+class SymLinkTest : AbstractFileSystemElementTest() {
     @Test
     fun `can create a symlink`() {
         val link = fixture.testDir.symLink("link")
@@ -41,5 +39,26 @@ class SymLinkTest {
         link.writeSymLink(file.name)
 
         assertEquals("1234", fixture.testDir.file("link").readText().get())
+    }
+
+    @Test
+    fun `can set and query symlink posix permissions`() {
+        if (!fixture.testDir.supports(FileSystemCapability.SetSymLinkPosixPermissions)) {
+            return
+        }
+
+        val file = fixture.file("file")
+        val symLink = fixture.symlink("link", file.name)
+
+        assertNotEquals(PosixPermissions.readOnlyFile, symLink.posixPermissions().get())
+        assertNotEquals(PosixPermissions.readWriteFile, symLink.posixPermissions().get())
+
+        file.setPermissions(PosixPermissions.readOnlyFile)
+
+        assertNotEquals(file.posixPermissions().get(), symLink.posixPermissions().get())
+
+        symLink.setPermissions(PosixPermissions.readWriteFile)
+
+        assertEquals(PosixPermissions.readWriteFile, symLink.posixPermissions().get())
     }
 }

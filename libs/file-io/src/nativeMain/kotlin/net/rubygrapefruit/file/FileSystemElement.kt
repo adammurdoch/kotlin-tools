@@ -14,6 +14,8 @@ actual sealed interface FileSystemElement {
     actual fun posixPermissions(): Result<PosixPermissions>
 
     actual fun setPermissions(permissions: PosixPermissions)
+
+    actual fun supports(capability: FileSystemCapability): Boolean
 }
 
 internal abstract class PathFileSystemElement(internal val path: String) : AbstractFileSystemElement() {

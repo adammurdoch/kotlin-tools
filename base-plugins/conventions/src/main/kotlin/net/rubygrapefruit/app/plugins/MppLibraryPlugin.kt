@@ -21,6 +21,7 @@ class MppLibraryPlugin : Plugin<Project> {
             repositories.mavenCentral()
 
             with(extensions.getByType(KotlinMultiplatformExtension::class.java)) {
+                jvmToolchain(11)
                 jvm()
                 macosX64()
                 macosArm64()

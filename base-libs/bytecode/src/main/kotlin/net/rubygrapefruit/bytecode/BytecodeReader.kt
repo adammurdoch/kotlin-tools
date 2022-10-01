@@ -28,7 +28,7 @@ class BytecodeReader {
         constantPool.run { readFrom() }
 
         val access = u2()
-        val module = AccessFlag.Module.value.and(access) != 0u
+        val module = AccessFlag.Module.containedIn(access)
         val thisClass = constantPool.classInfo(u2())
         val superClassIndex = u2()
         val superClass = if (superClassIndex == 0u) null else constantPool.classInfo(superClassIndex)
@@ -44,7 +44,12 @@ class BytecodeReader {
         }
 
         if (!module) {
-            visitor.type(TypeInfo(thisClass.typeName, superClass?.typeName, interfaces))
+            when {
+                AccessFlag.Interface.containedIn(access) -> visitor.type(InterfaceInfo(thisClass.typeName, superClass?.typeName, interfaces))
+                AccessFlag.Annotation.containedIn(access) -> visitor.type(AnnotationInfo(thisClass.typeName, superClass?.typeName, interfaces))
+                AccessFlag.Enum.containedIn(access) -> visitor.type(EnumInfo(thisClass.typeName, superClass?.typeName, interfaces))
+                else -> visitor.type(ClassInfo(thisClass.typeName, superClass?.typeName, interfaces))
+            }
         }
 
         val fieldCount = u2()

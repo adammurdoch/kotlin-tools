@@ -94,10 +94,25 @@ internal class ConstantPool {
                     val nameAndType = u2()
                     MethodRefEntry(index, classIndex, nameAndType)
                 }
+                11 -> {
+                    val classIndex = u2()
+                    val nameAndType = u2()
+                    InterfaceMethodRefEntry(index, classIndex, nameAndType)
+                }
                 12 -> {
                     val nameIndex = u2()
                     val descriptorIndex = u2()
                     NameAndTypeEntry(index, nameIndex, descriptorIndex)
+                }
+                15 -> {
+                    val referenceType = u1()
+                    val referenceIndex = u2()
+                    MethodHandleInfo(index, referenceType, referenceIndex)
+                }
+                18 -> {
+                    val bootstrapMethodIndex = u2()
+                    val nameAndTypeIndex = u2()
+                    InvokeDynamicInfo(index, bootstrapMethodIndex, nameAndTypeIndex)
                 }
                 19 -> {
                     val nameIndex = u2()

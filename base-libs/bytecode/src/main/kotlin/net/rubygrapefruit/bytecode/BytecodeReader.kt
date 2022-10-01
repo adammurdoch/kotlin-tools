@@ -25,29 +25,45 @@ class BytecodeReader {
         constantPool.run { readFrom() }
 
         val access = u2()
-        if (AccessFlag.Module.value.and(access) == 0u) {
-            throw IllegalArgumentException("Not a module file")
-        }
-        u2() // this class
+        val module = AccessFlag.Module.value.and(access) != 0u
+        val thisClass = constantPool.classInfo(u2())
         u2() // super class
 
+        if (!module) {
+            visitor.type(thisClass.name.replace("/", "."))
+        }
+
         val interfaces = u2()
-        if (interfaces != 0u) {
+        for (i in 1..interfaces.toInt()) {
+            u2()
+        }
+        if (module && interfaces != 0u) {
             throw IllegalArgumentException("Expected zero interfaces, found $interfaces")
         }
 
         val fields = u2()
-        if (fields != 0u) {
+        for (i in 1..fields.toInt()) {
+            u2() // access
+            u2() // name index
+            u2() // descriptor index
+            skipAttributes()
+        }
+        if (module && fields != 0u) {
             throw IllegalArgumentException("Expected zero fields, found $fields")
         }
 
         val methods = u2()
-        if (methods != 0u) {
+        for (i in 1..methods.toInt()) {
+            u2() // access
+            u2() // name index
+            u2() // descriptor index
+            skipAttributes()
+        }
+        if (module && methods != 0u) {
             throw IllegalArgumentException("Expected zero methods, found $methods")
         }
 
         val attributes = u2()
-
         for (i in 1..attributes.toInt()) {
             val nameIndex = u2()
             val length = u4()
@@ -64,7 +80,18 @@ class BytecodeReader {
         }
     }
 
+    private fun Decoder.skipAttributes() {
+        val attributes = u2()
+        for (i in 1..attributes.toInt()) {
+            val nameIndex = u2()
+            val length = u4()
+            skip(length.toInt())
+        }
+    }
+
     interface Visitor {
-        fun module(name: String)
+        fun module(name: String) {}
+
+        fun type(name: String) {}
     }
 }

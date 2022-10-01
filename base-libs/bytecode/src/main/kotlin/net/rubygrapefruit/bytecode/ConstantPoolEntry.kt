@@ -58,11 +58,35 @@ internal class MethodRefEntry(index: Int, private val classIndex: UInt, private 
     }
 }
 
+internal class InterfaceMethodRefEntry(index: Int, private val classIndex: UInt, private val nameAndTypeIndex: UInt) : ConstantPoolEntry(index) {
+    override fun Encoder.writeTo() {
+        u1(11u)
+        u2(classIndex)
+        u2(nameAndTypeIndex)
+    }
+}
+
 internal class NameAndTypeEntry(index: Int, private val nameIndex: UInt, private val descriptorIndex: UInt) : ConstantPoolEntry(index) {
     override fun Encoder.writeTo() {
         u1(12u)
         u2(nameIndex)
         u2(descriptorIndex)
+    }
+}
+
+internal class InvokeDynamicInfo(index: Int, private val bootstrapMethodIndex: UInt, private val nameAndTypeIndex: UInt) : ConstantPoolEntry(index) {
+    override fun Encoder.writeTo() {
+        u1(18u)
+        u2(bootstrapMethodIndex)
+        u2(nameAndTypeIndex)
+    }
+}
+
+internal class MethodHandleInfo(index: Int, private val referenceType: UByte, private val referenceIndex: UInt) : ConstantPoolEntry(index) {
+    override fun Encoder.writeTo() {
+        u1(15u)
+        u1(referenceType)
+        u2(referenceIndex)
     }
 }
 

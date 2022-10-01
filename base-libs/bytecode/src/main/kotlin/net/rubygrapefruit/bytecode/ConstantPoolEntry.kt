@@ -4,6 +4,11 @@ internal sealed class ConstantPoolEntry(val index: Int) {
     abstract fun Encoder.writeTo()
 }
 
+internal class UnusableEntry(index: Int) : ConstantPoolEntry(index) {
+    override fun Encoder.writeTo() {
+    }
+}
+
 internal class StringEntry(index: Int, val string: String) : ConstantPoolEntry(index) {
     override fun toString(): String {
         return "CONSTANT_Utf8_info($index: $string)"
@@ -22,8 +27,19 @@ internal class IntegerEntry(index: Int, val value: Int) : ConstantPoolEntry(inde
     }
 }
 
+internal class LongEntry(index: Int, val highValue: UInt, val lowValue: UInt) : ConstantPoolEntry(index) {
+    override fun Encoder.writeTo() {
+        u1(5u)
+        u4(highValue)
+        u4(lowValue)
+    }
+}
+
 internal class ClassInfoEntry(index: Int, private val nameIndex: UInt, private val owner: ConstantPool) : ConstantPoolEntry(index) {
     val name by lazy { owner.string(nameIndex).string }
+
+    val typeName: String
+        get() = name.replace("/", ".")
 
     override fun toString(): String {
         return "CONSTANT_Class_info($index: name=$nameIndex)"
@@ -70,6 +86,13 @@ internal class NameAndTypeEntry(index: Int, private val nameIndex: UInt, private
     override fun Encoder.writeTo() {
         u1(12u)
         u2(nameIndex)
+        u2(descriptorIndex)
+    }
+}
+
+internal class MethodTypeInfo(index: Int, private val descriptorIndex: UInt) : ConstantPoolEntry(index) {
+    override fun Encoder.writeTo() {
+        u1(16u)
         u2(descriptorIndex)
     }
 }

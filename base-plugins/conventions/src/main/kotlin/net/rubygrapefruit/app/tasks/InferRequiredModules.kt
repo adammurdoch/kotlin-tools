@@ -1,6 +1,8 @@
 package net.rubygrapefruit.app.tasks
 
 import net.rubygrapefruit.bytecode.BytecodeReader
+import net.rubygrapefruit.bytecode.ClassFileVisitor
+import net.rubygrapefruit.bytecode.ModuleInfo
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
@@ -25,9 +27,9 @@ abstract class InferRequiredModules : DefaultTask() {
                 JarFile(file, true, ZipFile.OPEN_READ, Runtime.version()).use { jar ->
                     val moduleInfoEntry = jar.getJarEntry("module-info.class")
                     if (moduleInfoEntry != null) {
-                        parser.readFrom(jar.getInputStream(moduleInfoEntry), object : BytecodeReader.Visitor {
-                            override fun module(name: String) {
-                                writer.write(name)
+                        parser.readFrom(jar.getInputStream(moduleInfoEntry), object : ClassFileVisitor {
+                            override fun module(info: ModuleInfo) {
+                                writer.write(info.name)
                                 writer.write("\n")
                             }
                         })

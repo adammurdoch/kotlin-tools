@@ -1,6 +1,8 @@
 package net.rubygrapefruit.bytecode
 
 interface Decoder {
+    val offset: Long
+
     fun u1(): UByte
 
     fun u2(): UInt

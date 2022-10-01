@@ -65,7 +65,10 @@ internal class ConstantPool {
 
     fun Decoder.readFrom() {
         val count = u2().toInt() - 1
-        for (index in 1..count) {
+        var remaining = count
+        var index = 1
+        while (remaining > 0) {
+            val startPos = offset
             val tag = u1().toInt()
             val entry = when (tag) {
                 1 -> {
@@ -75,6 +78,11 @@ internal class ConstantPool {
                 3 -> {
                     val value = i4()
                     IntegerEntry(index, value)
+                }
+                5 -> {
+                    val highValue = u4()
+                    val lowValue = u4()
+                    LongEntry(index, highValue, lowValue)
                 }
                 7 -> {
                     val nameIndex = u2()
@@ -109,6 +117,10 @@ internal class ConstantPool {
                     val referenceIndex = u2()
                     MethodHandleInfo(index, referenceType, referenceIndex)
                 }
+                16 -> {
+                    val descriptorIndex = u2()
+                    MethodTypeInfo(index, descriptorIndex)
+                }
                 18 -> {
                     val bootstrapMethodIndex = u2()
                     val nameAndTypeIndex = u2()
@@ -123,10 +135,17 @@ internal class ConstantPool {
                     PackageInfoEntry(index, nameIndex, this@ConstantPool)
                 }
                 else -> {
-                    throw IllegalArgumentException("Unrecognized constant pool tag: $tag")
+                    throw IllegalArgumentException("Unrecognized constant pool tag $tag for index $index at offset $startPos (0x${startPos.toString(16)})")
                 }
             }
+            remaining--
+            index++
             entries.add(entry)
+            if (entry is LongEntry) {
+                remaining--
+                index++
+                entries.add(UnusableEntry(index))
+            }
         }
     }
 }

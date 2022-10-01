@@ -2,16 +2,19 @@ package net.rubygrapefruit.bytecode
 
 import java.io.InputStream
 
+/**
+ * Reads the contents of a class file.
+ */
 class BytecodeReader {
     /**
-     * Reads class file to the given file.
+     * Reads class file from the given stream.
      */
-    fun readFrom(stream: InputStream, visitor: Visitor) {
+    fun readFrom(stream: InputStream, visitor: ClassFileVisitor) {
         val decoder = StreamBackedDecoder(stream)
         decoder.doRead(visitor)
     }
 
-    private fun Decoder.doRead(visitor: Visitor) {
+    private fun Decoder.doRead(visitor: ClassFileVisitor) {
         val header = u4()
         if (header != 0xCAFEBABEu) {
             throw IllegalArgumentException("Unexpected magic number: $header")
@@ -27,40 +30,43 @@ class BytecodeReader {
         val access = u2()
         val module = AccessFlag.Module.value.and(access) != 0u
         val thisClass = constantPool.classInfo(u2())
-        u2() // super class
+        val superClassIndex = u2()
+        val superClass = if (superClassIndex == 0u) null else constantPool.classInfo(superClassIndex)
+
+        val interfaceCount = u2()
+        val interfaces = mutableListOf<String>()
+        for (i in 1..interfaceCount.toInt()) {
+            val nameIndex = u2()
+            interfaces.add(constantPool.classInfo(nameIndex).typeName)
+        }
+        if (module && interfaceCount != 0u) {
+            throw IllegalArgumentException("Expected zero interfaces, found $interfaceCount")
+        }
 
         if (!module) {
-            visitor.type(thisClass.name.replace("/", "."))
+            visitor.type(TypeInfo(thisClass.typeName, superClass?.typeName, interfaces))
         }
 
-        val interfaces = u2()
-        for (i in 1..interfaces.toInt()) {
-            u2()
-        }
-        if (module && interfaces != 0u) {
-            throw IllegalArgumentException("Expected zero interfaces, found $interfaces")
-        }
-
-        val fields = u2()
-        for (i in 1..fields.toInt()) {
+        val fieldCount = u2()
+        for (i in 1..fieldCount.toInt()) {
             u2() // access
             u2() // name index
             u2() // descriptor index
             skipAttributes()
         }
-        if (module && fields != 0u) {
-            throw IllegalArgumentException("Expected zero fields, found $fields")
+        if (module && fieldCount != 0u) {
+            throw IllegalArgumentException("Expected zero fields, found $fieldCount")
         }
 
-        val methods = u2()
-        for (i in 1..methods.toInt()) {
+        val methodCount = u2()
+        for (i in 1..methodCount.toInt()) {
             u2() // access
             u2() // name index
             u2() // descriptor index
             skipAttributes()
         }
-        if (module && methods != 0u) {
-            throw IllegalArgumentException("Expected zero methods, found $methods")
+        if (module && methodCount != 0u) {
+            throw IllegalArgumentException("Expected zero methods, found $methodCount")
         }
 
         val attributes = u2()
@@ -71,7 +77,7 @@ class BytecodeReader {
             if (attributeName == "Module") {
                 val moduleNameIndex = u2()
                 val moduleName = constantPool.moduleInfo(moduleNameIndex).name
-                visitor.module(moduleName)
+                visitor.module(ModuleInfo(moduleName))
                 skip(length.toInt() - 2)
                 break
             } else {
@@ -89,9 +95,4 @@ class BytecodeReader {
         }
     }
 
-    interface Visitor {
-        fun module(name: String) {}
-
-        fun type(name: String) {}
-    }
 }

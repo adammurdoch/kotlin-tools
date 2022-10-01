@@ -37,6 +37,10 @@ internal class StreamBackedEncoder(
         output.writeInt(value.toInt())
     }
 
+    override fun i4(value: Int) {
+        output.writeInt(value)
+    }
+
     fun flush() {
         output.flush()
     }

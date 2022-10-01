@@ -7,6 +7,8 @@ internal interface Encoder {
 
     fun u4(value: UInt)
 
+    fun i4(value: Int)
+
     fun string(string: String)
 
     fun bytes(bytes: ByteArray)

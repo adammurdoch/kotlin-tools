@@ -7,6 +7,8 @@ interface Decoder {
 
     fun u4(): UInt
 
+    fun i4(): Int
+
     fun string(): String
 
     fun skip(count: Int)

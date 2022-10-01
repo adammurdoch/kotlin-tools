@@ -72,22 +72,41 @@ internal class ConstantPool {
                     val text = string()
                     StringEntry(index, text)
                 }
-
+                3 -> {
+                    val value = i4()
+                    IntegerEntry(index, value)
+                }
                 7 -> {
                     val nameIndex = u2()
                     ClassInfoEntry(index, nameIndex, this@ConstantPool)
                 }
-
+                8 -> {
+                    val textEntry = u2()
+                    StringInfoEntry(index, textEntry)
+                }
+                9 -> {
+                    val classIndex = u2()
+                    val nameAndType = u2()
+                    FieldRefEntry(index, classIndex, nameAndType)
+                }
+                10 -> {
+                    val classIndex = u2()
+                    val nameAndType = u2()
+                    MethodRefEntry(index, classIndex, nameAndType)
+                }
+                12 -> {
+                    val nameIndex = u2()
+                    val descriptorIndex = u2()
+                    NameAndTypeEntry(index, nameIndex, descriptorIndex)
+                }
                 19 -> {
                     val nameIndex = u2()
                     ModuleInfoEntry(index, nameIndex, this@ConstantPool)
                 }
-
                 20 -> {
                     val nameIndex = u2()
                     PackageInfoEntry(index, nameIndex, this@ConstantPool)
                 }
-
                 else -> {
                     throw IllegalArgumentException("Unrecognized constant pool tag: $tag")
                 }

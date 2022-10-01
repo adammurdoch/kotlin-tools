@@ -20,6 +20,10 @@ internal class StreamBackedDecoder(
         return input.readInt().toUInt()
     }
 
+    override fun i4(): Int {
+        return input.readInt()
+    }
+
     override fun string(): String {
         return input.readUTF()
     }

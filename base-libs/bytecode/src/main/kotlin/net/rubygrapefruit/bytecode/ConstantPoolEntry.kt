@@ -15,6 +15,13 @@ internal class StringEntry(index: Int, val string: String) : ConstantPoolEntry(i
     }
 }
 
+internal class IntegerEntry(index: Int, val value: Int) : ConstantPoolEntry(index) {
+    override fun Encoder.writeTo() {
+        u1(3u)
+        i4(value)
+    }
+}
+
 internal class ClassInfoEntry(index: Int, private val nameIndex: UInt, private val owner: ConstantPool) : ConstantPoolEntry(index) {
     val name by lazy { owner.string(nameIndex).string }
 
@@ -25,6 +32,37 @@ internal class ClassInfoEntry(index: Int, private val nameIndex: UInt, private v
     override fun Encoder.writeTo() {
         u1(7u)
         u2(nameIndex)
+    }
+}
+
+internal class StringInfoEntry(index: Int, private val textIndex: UInt) : ConstantPoolEntry(index) {
+    override fun Encoder.writeTo() {
+        u1(8u)
+        u2(textIndex)
+    }
+}
+
+internal class FieldRefEntry(index: Int, private val classIndex: UInt, private val nameAndTypeIndex: UInt) : ConstantPoolEntry(index) {
+    override fun Encoder.writeTo() {
+        u1(9u)
+        u2(classIndex)
+        u2(nameAndTypeIndex)
+    }
+}
+
+internal class MethodRefEntry(index: Int, private val classIndex: UInt, private val nameAndTypeIndex: UInt) : ConstantPoolEntry(index) {
+    override fun Encoder.writeTo() {
+        u1(10u)
+        u2(classIndex)
+        u2(nameAndTypeIndex)
+    }
+}
+
+internal class NameAndTypeEntry(index: Int, private val nameIndex: UInt, private val descriptorIndex: UInt) : ConstantPoolEntry(index) {
+    override fun Encoder.writeTo() {
+        u1(12u)
+        u2(nameIndex)
+        u2(descriptorIndex)
     }
 }
 

@@ -9,8 +9,10 @@ repositories {
     mavenCentral()
 }
 
+val targetKotlinVersion = "1.7.20"
+
 dependencies {
-    api("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10")
+    api("org.jetbrains.kotlin:kotlin-gradle-plugin:${targetKotlinVersion}")
     implementation("net.rubygrapefruit.libs:bytecode:1.0")
 }
 
@@ -54,3 +56,13 @@ gradlePlugin {
         }
     }
 }
+
+val outFile = layout.buildDirectory.file("app/resources/kotlin-version.txt")
+val generateResource = tasks.register("generate-version-resource") {
+    outputs.file(outFile)
+    doLast {
+        outFile.get().asFile.writeText(targetKotlinVersion)
+    }
+}
+
+sourceSets.getByName("main").output.dir(generateResource.map { outFile.get().asFile.parentFile })

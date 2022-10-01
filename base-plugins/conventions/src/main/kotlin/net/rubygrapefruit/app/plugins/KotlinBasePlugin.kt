@@ -1,17 +1,19 @@
 package net.rubygrapefruit.app.plugins
 
 import net.rubygrapefruit.app.internal.settingsPluginApplied
+import net.rubygrapefruit.app.internal.targetKotlinVersion
 import org.gradle.api.Plugin
 import org.gradle.api.initialization.Settings
 import java.util.concurrent.locks.ReentrantLock
 
-class KotlinBasePlugin: Plugin<Settings> {
+class KotlinBasePlugin : Plugin<Settings> {
     override fun apply(target: Settings) {
         with(target) {
             target.gradle.rootProject { project ->
                 with(project) {
+
                     buildscript.repositories.mavenCentral()
-                    buildscript.dependencies.add("classpath", "org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10")
+                    buildscript.dependencies.add("classpath", "org.jetbrains.kotlin:kotlin-gradle-plugin:$targetKotlinVersion")
 
                     // Need this to resolve native tooling
                     repositories.mavenCentral()

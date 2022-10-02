@@ -21,7 +21,7 @@ class BytecodeReader {
         }
         u2() // minor version
         val major = u2()
-        if (major > 62u) {
+        if (major > 63u) { // Java 19
             throw IllegalArgumentException("Unrecognized major version: $major")
         }
         val constantPool = ConstantPool()
@@ -45,11 +45,11 @@ class BytecodeReader {
 
         val typeVisitor = if (!module) {
             val info = when {
-                AccessFlag.Annotation.containedIn(access) -> AnnotationInfo(thisClass.typeName, superClass?.typeName, interfaces)
-                AccessFlag.Enum.containedIn(access) -> EnumInfo(thisClass.typeName, superClass?.typeName, interfaces)
+                AccessFlag.Annotation.containedIn(access) -> AnnotationInfo(thisClass.typeName, superClass?.typeName, interfaces, access)
+                AccessFlag.Enum.containedIn(access) -> EnumInfo(thisClass.typeName, superClass?.typeName, interfaces, access)
                 // Annotations are also marked as interfaces
-                AccessFlag.Interface.containedIn(access) -> InterfaceInfo(thisClass.typeName, superClass?.typeName, interfaces)
-                else -> ClassInfo(thisClass.typeName, superClass?.typeName, interfaces)
+                AccessFlag.Interface.containedIn(access) -> InterfaceInfo(thisClass.typeName, superClass?.typeName, interfaces, access)
+                else -> ClassInfo(thisClass.typeName, superClass?.typeName, interfaces, access)
             }
             visitor.type(info) ?: NoOpTypeVisitor
         } else {
@@ -58,12 +58,12 @@ class BytecodeReader {
 
         val fieldCount = u2()
         for (i in 1..fieldCount.toInt()) {
-            u2() // access
+            val fieldFlags = u2()
             val nameIndex = u2()
             val descriptorIndex = u2()
             skipAttributes()
             val fieldType = MethodDescriptor.decodeFieldDescriptor(constantPool.string(descriptorIndex).string)
-            typeVisitor.field(FieldInfo(constantPool.string(nameIndex).string, fieldType))
+            typeVisitor.field(FieldInfo(constantPool.string(nameIndex).string, fieldType, fieldFlags))
         }
         if (module && fieldCount != 0u) {
             throw IllegalArgumentException("Expected zero fields, found $fieldCount")
@@ -71,12 +71,12 @@ class BytecodeReader {
 
         val methodCount = u2()
         for (i in 1..methodCount.toInt()) {
-            u2() // access
+            val methodFlags = u2() // access
             val nameIndex = u2()
             val descriptorIndex = u2()
             skipAttributes()
             val descriptor = MethodDescriptor.decode(constantPool.string(descriptorIndex).string)
-            typeVisitor.method(MethodInfo(constantPool.string(nameIndex).string, descriptor.parameters, descriptor.returnType))
+            typeVisitor.method(MethodInfo(constantPool.string(nameIndex).string, descriptor.parameters, descriptor.returnType, methodFlags))
         }
         if (module && methodCount != 0u) {
             throw IllegalArgumentException("Expected zero methods, found $methodCount")

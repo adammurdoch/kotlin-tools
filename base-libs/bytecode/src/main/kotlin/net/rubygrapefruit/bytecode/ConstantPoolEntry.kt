@@ -1,6 +1,9 @@
 package net.rubygrapefruit.bytecode
 
 internal sealed class ConstantPoolEntry(val index: Int) {
+    open val consumesTwoSlots
+        get() = false
+
     abstract fun Encoder.writeTo()
 }
 
@@ -27,9 +30,23 @@ internal class IntegerEntry(index: Int, val value: Int) : ConstantPoolEntry(inde
     }
 }
 
-internal class LongEntry(index: Int, val highValue: UInt, val lowValue: UInt) : ConstantPoolEntry(index) {
+internal class LongEntry(index: Int, private val highValue: UInt, private val lowValue: UInt) : ConstantPoolEntry(index) {
+    override val consumesTwoSlots: Boolean
+        get() = true
+
     override fun Encoder.writeTo() {
         u1(5u)
+        u4(highValue)
+        u4(lowValue)
+    }
+}
+
+internal class DoubleEntry(index: Int, private val highValue: UInt, private val lowValue: UInt) : ConstantPoolEntry(index) {
+    override val consumesTwoSlots: Boolean
+        get() = true
+
+    override fun Encoder.writeTo() {
+        u1(6u)
         u4(highValue)
         u4(lowValue)
     }

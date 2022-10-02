@@ -43,21 +43,27 @@ class BytecodeReader {
             throw IllegalArgumentException("Expected zero interfaces, found $interfaceCount")
         }
 
-        if (!module) {
-            when {
-                AccessFlag.Interface.containedIn(access) -> visitor.type(InterfaceInfo(thisClass.typeName, superClass?.typeName, interfaces))
-                AccessFlag.Annotation.containedIn(access) -> visitor.type(AnnotationInfo(thisClass.typeName, superClass?.typeName, interfaces))
-                AccessFlag.Enum.containedIn(access) -> visitor.type(EnumInfo(thisClass.typeName, superClass?.typeName, interfaces))
-                else -> visitor.type(ClassInfo(thisClass.typeName, superClass?.typeName, interfaces))
+        val typeVisitor = if (!module) {
+            val info = when {
+                AccessFlag.Annotation.containedIn(access) -> AnnotationInfo(thisClass.typeName, superClass?.typeName, interfaces)
+                AccessFlag.Enum.containedIn(access) -> EnumInfo(thisClass.typeName, superClass?.typeName, interfaces)
+                // Annotations are also marked as interfaces
+                AccessFlag.Interface.containedIn(access) -> InterfaceInfo(thisClass.typeName, superClass?.typeName, interfaces)
+                else -> ClassInfo(thisClass.typeName, superClass?.typeName, interfaces)
             }
+            visitor.type(info) ?: NoOpTypeVisitor
+        } else {
+            NoOpTypeVisitor
         }
 
         val fieldCount = u2()
         for (i in 1..fieldCount.toInt()) {
             u2() // access
-            u2() // name index
-            u2() // descriptor index
+            val nameIndex = u2()
+            val descriptorIndex = u2()
             skipAttributes()
+            val fieldType = MethodDescriptor.decodeFieldDescriptor(constantPool.string(descriptorIndex).string)
+            typeVisitor.field(FieldInfo(constantPool.string(nameIndex).string, fieldType))
         }
         if (module && fieldCount != 0u) {
             throw IllegalArgumentException("Expected zero fields, found $fieldCount")
@@ -66,9 +72,11 @@ class BytecodeReader {
         val methodCount = u2()
         for (i in 1..methodCount.toInt()) {
             u2() // access
-            u2() // name index
-            u2() // descriptor index
+            val nameIndex = u2()
+            val descriptorIndex = u2()
             skipAttributes()
+            val descriptor = MethodDescriptor.decode(constantPool.string(descriptorIndex).string)
+            typeVisitor.method(MethodInfo(constantPool.string(nameIndex).string, descriptor.parameters, descriptor.returnType))
         }
         if (module && methodCount != 0u) {
             throw IllegalArgumentException("Expected zero methods, found $methodCount")
@@ -94,10 +102,9 @@ class BytecodeReader {
     private fun Decoder.skipAttributes() {
         val attributes = u2()
         for (i in 1..attributes.toInt()) {
-            val nameIndex = u2()
+            u2() // name index
             val length = u4()
             skip(length.toInt())
         }
     }
-
 }

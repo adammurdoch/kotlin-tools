@@ -84,6 +84,11 @@ internal class ConstantPool {
                     val lowValue = u4()
                     LongEntry(index, highValue, lowValue)
                 }
+                6 -> {
+                    val highValue = u4()
+                    val lowValue = u4()
+                    DoubleEntry(index, highValue, lowValue)
+                }
                 7 -> {
                     val nameIndex = u2()
                     ClassInfoEntry(index, nameIndex, this@ConstantPool)
@@ -141,7 +146,7 @@ internal class ConstantPool {
             remaining--
             index++
             entries.add(entry)
-            if (entry is LongEntry) {
+            if (entry.consumesTwoSlots) {
                 remaining--
                 index++
                 entries.add(UnusableEntry(index))

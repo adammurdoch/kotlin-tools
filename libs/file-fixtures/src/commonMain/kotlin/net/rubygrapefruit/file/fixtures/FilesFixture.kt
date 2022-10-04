@@ -40,9 +40,9 @@ class FilesFixture {
     }
 
     class DirFixture(val dir: Directory) {
-        fun file(name: String) {
+        fun file(name: String, text: String = "test") {
             val file = dir.file(name)
-            file.writeText("test")
+            file.writeText(text)
         }
 
         fun dir(name: String, builder: DirFixture.() -> Unit = {}) {

@@ -43,4 +43,11 @@ value class PosixPermissions internal constructor(internal val mode: UInt) {
     override fun toString(): String {
         return mode.toString(8).padStart(3, '0')
     }
+
+    /**
+     * Returns a copy of this permission set with group and other permissions removed.
+     */
+    fun userOnly(): PosixPermissions {
+        return PosixPermissions(mode and (ownerRead or ownerWrite or ownerExecute))
+    }
 }

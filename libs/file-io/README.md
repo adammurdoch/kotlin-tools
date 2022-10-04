@@ -13,6 +13,7 @@ The entry point is `FileSystem`
 ## TODO 
 
 - Add context exceptions to all operations
+- Test delete files, directories and symlinks
 - Test set/get permissions on symlinks and directories
 - Test visiting tree top down
 - Test failure modes for reading text

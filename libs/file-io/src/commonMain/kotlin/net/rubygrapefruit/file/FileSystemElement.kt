@@ -51,6 +51,11 @@ expect sealed interface FileSystemElement {
  */
 interface RegularFile : FileSystemElement {
     /**
+     * Deletes this file, if it exists.
+     */
+    fun delete()
+
+    /**
      * Writes the given text to the file, using UTF-8 encoding.
      */
     @Throws(FileSystemException::class)
@@ -85,6 +90,11 @@ interface Directory : FileSystemElement {
      * Resolves a name relative to this directory. Note: does not determine the type.
      */
     fun resolve(name: String): FileSystemElement
+
+    /**
+     * Deletes this directory and all of its entries recursively, if the directory exists.
+     */
+    fun deleteRecursively()
 
     /**
      * Creates this directory and its ancestors if they do not exist.

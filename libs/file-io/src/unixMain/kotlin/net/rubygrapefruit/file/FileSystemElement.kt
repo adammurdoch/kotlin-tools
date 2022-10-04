@@ -51,6 +51,12 @@ internal open class UnixFileSystemElement(path: String) : PathFileSystemElement(
 }
 
 internal class UnixRegularFile(path: String) : UnixFileSystemElement(path), RegularFile {
+    override fun delete() {
+        if (remove(path) != 0) {
+            throw NativeException("Could not delete $path.")
+        }
+    }
+
     override fun writeText(text: String) {
         memScoped {
             val des = fopen(path, "w")
@@ -107,6 +113,12 @@ internal class UnixDirectory(path: String) : UnixFileSystemElement(path), Direct
 
     override fun symLink(name: String): SymLink {
         return UnixSymLink(resolveName(name))
+    }
+
+    override fun deleteRecursively() {
+        if (remove(path) != 0) {
+            throw NativeException("Could not delete $path.")
+        }
     }
 
     override fun createTemporaryDirectory(): Directory {

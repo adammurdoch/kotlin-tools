@@ -100,6 +100,10 @@ internal open class JvmFileSystemElement(protected val path: Path) : AbstractFil
 }
 
 internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularFile {
+    override fun delete() {
+        Files.deleteIfExists(path)
+    }
+
     override fun writeText(text: String) {
         try {
             Files.writeString(path, text, Charsets.UTF_8)
@@ -124,6 +128,10 @@ internal class JvmDirectory(path: Path) : JvmFileSystemElement(path), Directory 
 
     override fun symLink(name: String): SymLink {
         return JvmSymlink(path.resolve(name))
+    }
+
+    override fun deleteRecursively() {
+        path.toFile().deleteRecursively()
     }
 
     override fun createTemporaryDirectory(): Directory {

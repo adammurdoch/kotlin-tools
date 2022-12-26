@@ -1,6 +1,6 @@
 # Gradle Plugins
 
-A collection of Gradle plugins for building applications using Kotlin.
+A collection of Gradle plugins for building applications and libraries using Kotlin.
 
 These plugins all target Kotlin 1.7.20 and a minimum of Java 11 (for Kotlin/JVM apps). The plugins require
 Gradle 7.5.1 or later.
@@ -11,7 +11,7 @@ A settings plugin that must be applied to the settings of any build that uses th
 
 ## `net.rubygrapefruit.native.lib`
 
-Builds a library implemented in Kotlin/Native.
+Builds a library implemented in Kotlin/Native that targets native desktop platforms.
 
 - Adds Linux and Windows x64 targets and macOS x64 and arm64 targets.
 - Adds `unixMain` source sets for Kotlin code that is shared by macOS and Linux targets.
@@ -19,7 +19,7 @@ Builds a library implemented in Kotlin/Native.
 
 ## `net.rubygrapefruit.native.cli-app`
 
-Builds a command-line application implemented in Kotlin/Native.
+Builds a command-line application implemented in Kotlin/Native that targets native desktop platforms.
 
 - Adds Linux and Windows x64 targets and macOS x64 and arm64 targets.
 - Adds `unixMain` and `unixTest` source sets for Kotlin code that is shared by macOS and Linux targets.
@@ -28,7 +28,7 @@ Builds a command-line application implemented in Kotlin/Native.
 
 ## `net.rubygrapefruit.mpp.lib`
 
-Builds a library implemented in Kotlin implemented for the JVM and native
+Builds a library implemented in Kotlin multiplatform that targets the JVM and native desktop platforms.
 
 - Add JVM target.
 - Adds Linux and Windows x64 targets and macOS x64 and arm64 targets.
@@ -76,7 +76,7 @@ Expects that the application uses the JVM module system.
 
 ## `net.rubygrapefruit.plugin`
 
-A convention plugin for implementing Gradle plugins using Kotlin.
+A convention plugin for implementing Gradle plugins in Kotlin/JVM.
 
 - Adds dependencies and repository definitions so that a fixed version of Kotlin available (currently 1.7.20).
 

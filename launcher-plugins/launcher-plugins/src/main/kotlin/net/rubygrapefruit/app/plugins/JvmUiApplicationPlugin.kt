@@ -50,7 +50,9 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                     t.rootDirPath.set("Contents")
                     t.includeFile("Info.plist", infoPlistTask.flatMap { it.plistFile })
                     t.includeFile("Resources/launcher.conf", configTask.flatMap { it.configFile })
-                    t.includeFile(iconName.map { "Resources/$it" }, iconTask.flatMap { it.outputIcon })
+                    t.includeFile(
+                        iconName.map { "Resources/$it" },
+                        iconTask.flatMap { if (it.sourceIcon.get().asFile.exists()) it.outputIcon else null })
                 }
 
                 tasks.register("releaseDist", ReleaseDistribution::class.java) { t ->

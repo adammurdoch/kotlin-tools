@@ -91,15 +91,15 @@ A convention plugin for implementing Gradle plugins in Kotlin/JVM.
 ## Common application settings for JVM targets
 
 - Adds `application { }` block
-  - `application.module.name` - defaults to the application name
   - `application.mainClass` - must be specified.
+  - `application.module.name` - defaults to the application name
 
 ## Common JVM library settings
 
 - Adds `library { }` block
   - `library.module.name` - defaults to the project name 
   - `library.module.exports` 
-  - `library.module.requires` - calculated from the compile (implementation) dependencies 
+  - `library.module.requires` - calculated from compile (implementation) dependencies 
   - `library.module.requiresTransitive` - calculated from the API dependencies
 
 See [`../test-apps`](../test-apps/) for some samples.

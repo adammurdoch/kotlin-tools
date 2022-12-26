@@ -1,26 +1,14 @@
 ARGS="1 + 2"
 
-echo ""
-echo "== jvm-cli-app =="
-time ./test-apps/jvm-cli-app/build/dist-image/jvm-cli-app $ARGS
-du -sh ./test-apps/jvm-cli-app/build/dist-image
+function run_app() {
+  echo ""
+  echo "== $1 =="
+  du -sh ./test-apps/$1/build/dist-image
+  time ./test-apps/$1/build/dist-image/$1 $ARGS
+}
 
-echo ""
-echo "== customised =="
-time ./test-apps/customised/build/dist-image/app $ARGS
-du -sh ./test-apps/customised/build/dist-image
-
-echo ""
-echo "== embedded-jvm-cli-app"
-time ./test-apps/embedded-jvm-cli-app/build/dist-image/embedded-jvm-cli-app $ARGS
-du -sh ./test-apps/embedded-jvm-cli-app/build/dist-image
-
-echo ""
-echo "== native-binary-jvm-cli-app"
-time ./test-apps/native-binary-jvm-cli-app/build/dist-image/native-binary-jvm-cli-app $ARGS
-du -sh ./test-apps/native-binary-jvm-cli-app/build/dist-image
-
-echo ""
-echo "== native-cli-app"
-time ./test-apps/native-cli-app/build/dist-image/native-cli-app $ARGS
-du -sh ./test-apps/native-cli-app/build/dist-image
+run_app jvm-cli-app
+run_app jvm-cli-app-embedded
+run_app jvm-cli-app-customized
+run_app jvm-cli-app-native-binary
+run_app native-cli-app

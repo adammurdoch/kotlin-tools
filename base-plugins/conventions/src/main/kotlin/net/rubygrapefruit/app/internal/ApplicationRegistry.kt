@@ -6,15 +6,16 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 
 abstract class ApplicationRegistry(private val project: Project) {
-    private var main: Application? = null
+    private var main: MutableApplication? = null
     private var mainDistTask: TaskProvider<DistributionImage>? = null
     private val whenAppSet = mutableListOf<Project.(Application) -> Unit>()
 
-    fun register(app: Application, dist: DefaultDistribution) {
+    fun register(app: MutableApplication) {
         if (main != null) {
             throw UnsupportedOperationException("Support for multiple applications in the same project is not implemented.")
         }
         main = app
+        val dist = app.distribution
 
         app.appName.convention(project.name)
         dist.imageDirectory.convention(project.layout.buildDirectory.dir("dist-image"))

@@ -40,5 +40,9 @@ gradlePlugin {
             id = "net.rubygrapefruit.jvm.ui-app"
             implementationClass = "net.rubygrapefruit.app.plugins.JvmUiApplicationPlugin"
         }
+        create("native-ui-app") {
+            id = "net.rubygrapefruit.native.ui-app"
+            implementationClass = "net.rubygrapefruit.app.plugins.NativeUiApplicationPlugin"
+        }
     }
 }

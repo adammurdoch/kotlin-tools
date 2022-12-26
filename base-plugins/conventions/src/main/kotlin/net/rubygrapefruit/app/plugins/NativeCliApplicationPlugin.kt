@@ -1,7 +1,7 @@
 package net.rubygrapefruit.app.plugins
 
 import net.rubygrapefruit.app.NativeMachine
-import net.rubygrapefruit.app.internal.DefaultNativeCliApplication
+import net.rubygrapefruit.app.internal.DefaultNativeApplication
 import net.rubygrapefruit.app.internal.applications
 import net.rubygrapefruit.app.internal.currentOs
 import org.gradle.api.Plugin
@@ -16,7 +16,7 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
             plugins.apply(ApplicationBasePlugin::class.java)
 
-            applications.withApp<DefaultNativeCliApplication> { app ->
+            applications.withApp<DefaultNativeApplication> { app ->
                 with(extensions.getByType(KotlinMultiplatformExtension::class.java)) {
                     macosX64 {
                         binaries {
@@ -89,8 +89,8 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
                 app.distribution.launcherFile.set(app.outputBinary)
             }
 
-            val app = extensions.create("application", DefaultNativeCliApplication::class.java)
-            applications.register(app, app.distribution)
+            val app = extensions.create("application", DefaultNativeApplication::class.java)
+            applications.register(app)
         }
     }
 }

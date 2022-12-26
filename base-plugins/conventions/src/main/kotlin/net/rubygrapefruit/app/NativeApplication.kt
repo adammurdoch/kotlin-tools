@@ -3,7 +3,7 @@ package net.rubygrapefruit.app
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
 
-interface NativeCliApplication : Application {
+interface NativeApplication : Application {
     /**
      * The output binary for the host machine.
      */

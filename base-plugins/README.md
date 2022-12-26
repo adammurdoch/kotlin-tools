@@ -26,6 +26,10 @@ Builds a command-line application implemented in Kotlin/Native that targets nati
 - Adds `macosMain` and `macosTest` source set for Kotlin code that is shared by macOS targets.
 - Adds `application { }` block, see below for the available settings.
 
+## `net.rubygrapefruit.native.ui-app`
+
+Builds a UI application implemented in Kotlin/Native that targets native desktop platforms.
+
 ## `net.rubygrapefruit.mpp.lib`
 
 Builds a library implemented in Kotlin multiplatform that targets the JVM and native desktop platforms.
@@ -69,7 +73,7 @@ Builds a desktop UI application implemented in Kotlin/JVM and that presents a Sw
 Expects that the application uses the JVM module system.
 
 - Creates a debug (unsigned) macOS application bundle and a release (signed and notarized) application bundle
-- Provides an application icon
+- Provides an application icon, default location is `src/main/Icon1024.png`
 - Use `dist` task to build the debug application bundle
 - Use `releaseDist` to build the release application bundle
 - Adds `application { }` block, see below for the available settings.
@@ -84,7 +88,7 @@ A convention plugin for implementing Gradle plugins in Kotlin/JVM.
 
 - Adds `application { }` block
   - `application.appName` - the base name for the application, used for various default file names.
-  - `application.imageDirectory` - the directory to create the distribution image in.
+  - `application.distribution.imageDirectory` - the directory to create the distribution image in.
 - Adds a `dist` task to create a distribution image containing the app ready for installation.
   By default, this is created in `build/dist-image`
 

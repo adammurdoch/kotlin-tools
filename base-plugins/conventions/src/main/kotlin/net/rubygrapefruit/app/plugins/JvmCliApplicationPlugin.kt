@@ -40,7 +40,7 @@ class JvmCliApplicationPlugin : Plugin<Project> {
             }
 
             val app = extensions.create("application", DefaultJvmApplication::class.java)
-            applications.register(app, app.distribution)
+            applications.register(app)
         }
     }
 }

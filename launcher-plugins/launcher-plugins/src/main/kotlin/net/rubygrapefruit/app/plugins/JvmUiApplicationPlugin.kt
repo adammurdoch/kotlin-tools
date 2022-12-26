@@ -64,7 +64,7 @@ class JvmUiApplicationPlugin : Plugin<Project> {
             }
 
             val app = extensions.create("application", DefaultJvmUiApplication::class.java)
-            applications.register(app, app.distribution)
+            applications.register(app)
         }
     }
 }

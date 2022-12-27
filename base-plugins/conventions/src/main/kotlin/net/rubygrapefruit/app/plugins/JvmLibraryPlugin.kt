@@ -1,25 +1,24 @@
 package net.rubygrapefruit.app.plugins
 
 import net.rubygrapefruit.app.JvmLibrary
+import net.rubygrapefruit.app.internal.ComponentTargets
 import net.rubygrapefruit.app.internal.JvmModuleRegistry
-import net.rubygrapefruit.app.internal.checkSettingsPluginApplied
+import net.rubygrapefruit.app.internal.libraries
 import net.rubygrapefruit.app.internal.toModuleName
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSetContainer
-import org.gradle.api.tasks.compile.JavaCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 class JvmLibraryPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            checkSettingsPluginApplied()
-
             plugins.apply("java-library")
             plugins.apply("org.jetbrains.kotlin.jvm")
+            plugins.apply(LibraryBasePlugin::class.java)
             plugins.apply(JvmConventionsPlugin::class.java)
 
-            repositories.mavenCentral()
+            libraries.registerLibrary(ComponentTargets(true, emptySet()))
 
             val lib = extensions.create("library", JvmLibrary::class.java)
             lib.module.name.convention(toModuleName(project.name))

@@ -1,8 +1,10 @@
 package net.rubygrapefruit.app.plugins
 
 import net.rubygrapefruit.app.JvmLibrary
+import net.rubygrapefruit.app.NativeMachine
+import net.rubygrapefruit.app.internal.ComponentTargets
 import net.rubygrapefruit.app.internal.JvmModuleRegistry
-import net.rubygrapefruit.app.internal.checkSettingsPluginApplied
+import net.rubygrapefruit.app.internal.libraries
 import net.rubygrapefruit.app.internal.toModuleName
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -13,42 +15,11 @@ import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 class MppLibraryPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            checkSettingsPluginApplied()
-
             plugins.apply("org.jetbrains.kotlin.multiplatform")
+            plugins.apply(LibraryBasePlugin::class.java)
             plugins.apply(JvmConventionsPlugin::class.java)
 
-            repositories.mavenCentral()
-
-            with(extensions.getByType(KotlinMultiplatformExtension::class.java)) {
-                jvmToolchain(11)
-                jvm()
-                macosX64()
-                macosArm64()
-                linuxX64()
-                mingwX64()
-                val nativeMain = sourceSets.create("nativeMain") {
-                    it.dependsOn(sourceSets.getByName("commonMain"))
-                }
-                val unixMain = sourceSets.create("unixMain") {
-                    it.dependsOn(nativeMain)
-                }
-                val macosMain = sourceSets.create("macosMain") {
-                    it.dependsOn(unixMain)
-                }
-                sourceSets.getByName("macosX64Main") {
-                    it.dependsOn(macosMain)
-                }
-                sourceSets.getByName("macosArm64Main") {
-                    it.dependsOn(macosMain)
-                }
-                sourceSets.getByName("linuxX64Main") {
-                    it.dependsOn(unixMain)
-                }
-                sourceSets.getByName("mingwX64Main") {
-                    it.dependsOn(nativeMain)
-                }
-            }
+            libraries.registerLibrary(ComponentTargets(true, setOf(NativeMachine.LinuxX64, NativeMachine.MacOSX64, NativeMachine.MacOSArm64, NativeMachine.WindowsX64)))
 
             val lib = extensions.create("library", JvmLibrary::class.java)
             lib.module.name.convention(toModuleName(project.name))

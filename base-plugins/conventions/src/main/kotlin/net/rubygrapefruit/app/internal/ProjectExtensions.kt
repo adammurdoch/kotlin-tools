@@ -5,6 +5,9 @@ import org.gradle.api.Project
 val Project.applications
     get() = extensions.getByType(ApplicationRegistry::class.java)
 
+val Project.libraries
+    get() = extensions.getByType(LibraryRegistry::class.java)
+
 internal fun Project.settingsPluginApplied() {
     extensions.add("__settings_plugin_applied__", "true")
 }

@@ -5,7 +5,7 @@ import net.rubygrapefruit.app.tasks.DistributionImage
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 
-abstract class ApplicationRegistry(private val project: Project) {
+open class ApplicationRegistry(private val project: Project) {
     private var main: MutableApplication? = null
     private var mainDistTask: TaskProvider<DistributionImage>? = null
     private val whenAppSet = mutableListOf<Project.(Application) -> Unit>()

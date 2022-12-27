@@ -1,9 +1,7 @@
 package net.rubygrapefruit.app.plugins
 
 import net.rubygrapefruit.app.NativeMachine
-import net.rubygrapefruit.app.internal.DefaultNativeApplication
-import net.rubygrapefruit.app.internal.applications
-import net.rubygrapefruit.app.internal.currentOs
+import net.rubygrapefruit.app.internal.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -16,6 +14,17 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
             plugins.apply(ApplicationBasePlugin::class.java)
 
+            multiplatformComponents.registerSourceSets(
+                ComponentTargets(
+                    false,
+                    setOf(
+                        NativeMachine.LinuxX64,
+                        NativeMachine.MacOSX64,
+                        NativeMachine.MacOSArm64,
+                        NativeMachine.WindowsX64
+                    )
+                )
+            )
             applications.withApp<DefaultNativeApplication> { app ->
                 with(extensions.getByType(KotlinMultiplatformExtension::class.java)) {
                     macosX64 {
@@ -41,38 +50,6 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
                             executable {
                             }
                         }
-                    }
-                    val commonMain = sourceSets.getByName("commonMain")
-                    val unixMain = sourceSets.create("unixMain") {
-                        it.dependsOn(commonMain)
-                    }
-                    val macOsMain = sourceSets.create("macosMain") {
-                        it.dependsOn(unixMain)
-                    }
-                    sourceSets.getByName("macosX64Main") {
-                        it.dependsOn(macOsMain)
-                    }
-                    sourceSets.getByName("macosArm64Main") {
-                        it.dependsOn(macOsMain)
-                    }
-                    sourceSets.getByName("linuxX64Main") {
-                        it.dependsOn(unixMain)
-                    }
-                    val unixTest = sourceSets.create("unixTest") {
-                        it.dependsOn(unixMain)
-                        it.dependsOn(sourceSets.getByName("commonTest"))
-                    }
-                    val macOsTest = sourceSets.create("macosTest") {
-                        it.dependsOn(unixTest)
-                    }
-                    sourceSets.getByName("macosX64Test") {
-                        it.dependsOn(macOsTest)
-                    }
-                    sourceSets.getByName("macosArm64Test") {
-                        it.dependsOn(macOsTest)
-                    }
-                    sourceSets.getByName("linuxX64Test") {
-                        it.dependsOn(unixTest)
                     }
                 }
 

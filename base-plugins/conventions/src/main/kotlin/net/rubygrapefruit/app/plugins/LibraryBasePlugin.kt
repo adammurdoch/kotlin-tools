@@ -1,6 +1,6 @@
 package net.rubygrapefruit.app.plugins
 
-import net.rubygrapefruit.app.internal.LibraryRegistry
+import net.rubygrapefruit.app.internal.MultiPlatformComponentRegistry
 import net.rubygrapefruit.app.internal.checkSettingsPluginApplied
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -12,7 +12,7 @@ class LibraryBasePlugin : Plugin<Project> {
 
             repositories.mavenCentral()
 
-            target.extensions.create("libraries", LibraryRegistry::class.java)
+            target.extensions.create("multiplatformComponents", MultiPlatformComponentRegistry::class.java)
         }
     }
 }

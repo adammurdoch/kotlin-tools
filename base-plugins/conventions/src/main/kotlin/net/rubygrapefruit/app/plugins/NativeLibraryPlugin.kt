@@ -2,7 +2,7 @@ package net.rubygrapefruit.app.plugins
 
 import net.rubygrapefruit.app.NativeMachine
 import net.rubygrapefruit.app.internal.ComponentTargets
-import net.rubygrapefruit.app.internal.libraries
+import net.rubygrapefruit.app.internal.multiplatformComponents
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -12,7 +12,7 @@ class NativeLibraryPlugin : Plugin<Project> {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
             plugins.apply(LibraryBasePlugin::class.java)
 
-            libraries.registerLibrary(ComponentTargets(false, setOf(NativeMachine.LinuxX64, NativeMachine.MacOSX64, NativeMachine.MacOSArm64, NativeMachine.WindowsX64)))
+            multiplatformComponents.registerSourceSets(ComponentTargets(false, setOf(NativeMachine.LinuxX64, NativeMachine.MacOSX64, NativeMachine.MacOSArm64, NativeMachine.WindowsX64)))
         }
     }
 }

@@ -5,10 +5,10 @@ import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 
-open class LibraryRegistry(private val project: Project) {
+open class MultiPlatformComponentRegistry(private val project: Project) {
     private var hasLibrary = false
 
-    fun registerLibrary(targets: ComponentTargets) {
+    fun registerSourceSets(targets: ComponentTargets) {
         if (hasLibrary) {
             throw UnsupportedOperationException("Support for multiple libraries in the same project is not implemented.")
         }
@@ -22,39 +22,58 @@ open class LibraryRegistry(private val project: Project) {
                 jvm()
             }
             val nativeSourceSets = mutableListOf<KotlinSourceSet>()
+            val nativeTestSourceSets = mutableListOf<KotlinSourceSet>()
             val unixSourceSets = mutableListOf<KotlinSourceSet>()
+            val unixTestSourceSets = mutableListOf<KotlinSourceSet>()
             val macosSourceSets = mutableListOf<KotlinSourceSet>()
+            val macosTestSourceSets = mutableListOf<KotlinSourceSet>()
 
             if (targets.nativeTargets.contains(NativeMachine.MacOSX64)) {
                 macosX64()
                 macosSourceSets.add(sourceSets.getByName("macosX64Main"))
+                macosTestSourceSets.add(sourceSets.getByName("macosX64Test"))
             }
             if (targets.nativeTargets.contains(NativeMachine.MacOSArm64)) {
                 macosArm64()
                 macosSourceSets.add(sourceSets.getByName("macosArm64Main"))
+                macosTestSourceSets.add(sourceSets.getByName("macosArm64Test"))
             }
             if (targets.nativeTargets.contains(NativeMachine.LinuxX64)) {
                 linuxX64()
                 unixSourceSets.add(sourceSets.getByName("linuxX64Main"))
+                unixTestSourceSets.add(sourceSets.getByName("linuxX64Test"))
             }
             if (targets.nativeTargets.contains(NativeMachine.WindowsX64)) {
                 mingwX64()
                 nativeSourceSets.add(sourceSets.getByName("mingwX64Main"))
+                nativeTestSourceSets.add(sourceSets.getByName("mingwX64Test"))
             }
-            unixSourceSets.addAll(macosSourceSets)
-            nativeSourceSets.addAll(unixSourceSets)
             val nativeMain = sourceSets.create("nativeMain") {
                 it.dependsOn(sourceSets.getByName("commonMain"))
             }
             for (sourceSet in nativeSourceSets) {
                 sourceSet.dependsOn(nativeMain)
             }
-            if (unixSourceSets.isNotEmpty()) {
+            val nativeTest = sourceSets.create("nativeTest") {
+                it.dependsOn(nativeMain)
+                it.dependsOn(sourceSets.getByName("commonTest"))
+            }
+            for (sourceSet in nativeTestSourceSets) {
+                sourceSet.dependsOn(nativeTest)
+            }
+            if (unixSourceSets.isNotEmpty() || macosSourceSets.isNotEmpty()) {
                 val unixMain = sourceSets.create("unixMain") {
                     it.dependsOn(nativeMain)
                 }
                 for (sourceSet in unixSourceSets) {
                     sourceSet.dependsOn(unixMain)
+                }
+                val unixTest = sourceSets.create("unixTest") {
+                    it.dependsOn(unixMain)
+                    it.dependsOn(nativeTest)
+                }
+                for (sourceSet in unixTestSourceSets) {
+                    sourceSet.dependsOn(unixTest)
                 }
                 if (macosSourceSets.isNotEmpty()) {
                     val macosMain = sourceSets.create("macosMain") {
@@ -62,6 +81,13 @@ open class LibraryRegistry(private val project: Project) {
                     }
                     for (sourceSet in macosSourceSets) {
                         sourceSet.dependsOn(macosMain)
+                    }
+                    val macosTest = sourceSets.create("macosTest") {
+                        it.dependsOn(macosMain)
+                        it.dependsOn(unixTest)
+                    }
+                    for (sourceSet in macosTestSourceSets) {
+                        sourceSet.dependsOn(macosTest)
                     }
                 }
             }

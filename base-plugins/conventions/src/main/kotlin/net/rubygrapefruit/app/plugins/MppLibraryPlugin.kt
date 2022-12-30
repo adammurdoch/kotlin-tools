@@ -19,7 +19,7 @@ class MppLibraryPlugin : Plugin<Project> {
             plugins.apply(LibraryBasePlugin::class.java)
             plugins.apply(JvmConventionsPlugin::class.java)
 
-            multiplatformComponents.registerSourceSets(ComponentTargets(true, setOf(NativeMachine.LinuxX64, NativeMachine.MacOSX64, NativeMachine.MacOSArm64, NativeMachine.WindowsX64)))
+            multiplatformComponents.registerSourceSets(ComponentTargets(true, setOf(NativeMachine.LinuxX64, NativeMachine.MacOSX64, NativeMachine.MacOSArm64, NativeMachine.WindowsX64), false))
 
             val lib = extensions.create("library", JvmLibrary::class.java)
             lib.module.name.convention(toModuleName(project.name))

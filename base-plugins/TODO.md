@@ -23,6 +23,8 @@
 - Add functional tests for plugins.
     - Customisation
 - Refactor `DownloadRepository` to use Gradle exec service when used in a plugin.
+- Kotlin issues:
+    - Duplicate symbol error linking native test executable for mpp library when all test source sets defined 
 - Gradle issues:
     - Fix import of `test-apps` - does not seem to be included
     - Use version catalog

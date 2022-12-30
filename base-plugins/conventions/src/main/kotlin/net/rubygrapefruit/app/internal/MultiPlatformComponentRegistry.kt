@@ -6,13 +6,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 
 open class MultiPlatformComponentRegistry(private val project: Project) {
-    private var hasLibrary = false
-
     fun registerSourceSets(targets: ComponentTargets) {
-        if (hasLibrary) {
-            throw UnsupportedOperationException("Support for multiple libraries in the same project is not implemented.")
-        }
-        hasLibrary = true
         if (targets.nativeTargets.isEmpty()) {
             return
         }
@@ -54,12 +48,20 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
             for (sourceSet in nativeSourceSets) {
                 sourceSet.dependsOn(nativeMain)
             }
-            val nativeTest = sourceSets.create("nativeTest") {
-                it.dependsOn(nativeMain)
-                it.dependsOn(sourceSets.getByName("commonTest"))
+
+            // Some hacks to avoid duplicate symbol problem
+
+            val commonTest = sourceSets.getByName("commonTest")
+            val nativeTest by lazy {
+                sourceSets.create("nativeTest") {
+                    it.dependsOn(nativeMain)
+                    it.dependsOn(commonTest)
+                }
             }
-            for (sourceSet in nativeTestSourceSets) {
-                sourceSet.dependsOn(nativeTest)
+            if (targets.testSourceSets) {
+                for (sourceSet in nativeTestSourceSets) {
+                    sourceSet.dependsOn(nativeTest)
+                }
             }
             if (unixSourceSets.isNotEmpty() || macosSourceSets.isNotEmpty()) {
                 val unixMain = sourceSets.create("unixMain") {
@@ -68,12 +70,16 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
                 for (sourceSet in unixSourceSets) {
                     sourceSet.dependsOn(unixMain)
                 }
-                val unixTest = sourceSets.create("unixTest") {
-                    it.dependsOn(unixMain)
-                    it.dependsOn(nativeTest)
+                val unixTest by lazy {
+                    sourceSets.create("unixTest") {
+                        it.dependsOn(unixMain)
+                        it.dependsOn(nativeTest)
+                    }
                 }
-                for (sourceSet in unixTestSourceSets) {
-                    sourceSet.dependsOn(unixTest)
+                if (targets.testSourceSets) {
+                    for (sourceSet in unixTestSourceSets) {
+                        sourceSet.dependsOn(unixTest)
+                    }
                 }
                 if (macosSourceSets.isNotEmpty()) {
                     val macosMain = sourceSets.create("macosMain") {
@@ -82,12 +88,14 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
                     for (sourceSet in macosSourceSets) {
                         sourceSet.dependsOn(macosMain)
                     }
-                    val macosTest = sourceSets.create("macosTest") {
-                        it.dependsOn(macosMain)
-                        it.dependsOn(unixTest)
-                    }
-                    for (sourceSet in macosTestSourceSets) {
-                        sourceSet.dependsOn(macosTest)
+                    if (targets.testSourceSets) {
+                        val macosTest = sourceSets.create("macosTest") {
+                            it.dependsOn(macosMain)
+                            it.dependsOn(unixTest)
+                        }
+                        for (sourceSet in macosTestSourceSets) {
+                            sourceSet.dependsOn(macosTest)
+                        }
                     }
                 }
             }

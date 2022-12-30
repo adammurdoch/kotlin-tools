@@ -25,7 +25,7 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
                     )
                 )
             )
-            applications.withApp<DefaultNativeApplication> { app ->
+            applications.withApp<DefaultNativeCliApplication> { app ->
                 with(extensions.getByType(KotlinMultiplatformExtension::class.java)) {
                     macosX64 {
                         binaries {
@@ -66,7 +66,7 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
                 app.distribution.launcherFile.set(app.outputBinary)
             }
 
-            val app = extensions.create("application", DefaultNativeApplication::class.java)
+            val app = extensions.create("application", DefaultNativeCliApplication::class.java)
             applications.register(app)
         }
     }

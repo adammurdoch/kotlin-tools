@@ -1,6 +1,6 @@
 package net.rubygrapefruit.app.plugins
 
-import net.rubygrapefruit.app.internal.DefaultJvmApplication
+import net.rubygrapefruit.app.internal.DefaultJvmCliApplication
 import net.rubygrapefruit.app.internal.applications
 import net.rubygrapefruit.app.tasks.LauncherBashScript
 import net.rubygrapefruit.app.tasks.LauncherBatScript
@@ -11,7 +11,7 @@ class JvmCliApplicationPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             plugins.apply(JvmApplicationBasePlugin::class.java)
-            applications.withApp<DefaultJvmApplication> { app ->
+            applications.withApp<DefaultJvmCliApplication> { app ->
                 val libsDirPath = "lib"
 
                 val launcherTask = tasks.register("launcherScript", LauncherBashScript::class.java) {
@@ -39,7 +39,7 @@ class JvmCliApplicationPlugin : Plugin<Project> {
                 app.distribution.launcherFile.set(launcherTask.flatMap { it.scriptFile })
             }
 
-            val app = extensions.create("application", DefaultJvmApplication::class.java)
+            val app = extensions.create("application", DefaultJvmCliApplication::class.java)
             applications.register(app)
         }
     }

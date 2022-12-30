@@ -1,9 +1,6 @@
 package net.rubygrapefruit.app.plugins
 
-import net.rubygrapefruit.app.internal.DefaultJvmApplication
-import net.rubygrapefruit.app.internal.JvmModuleRegistry
-import net.rubygrapefruit.app.internal.applications
-import net.rubygrapefruit.app.internal.toModuleName
+import net.rubygrapefruit.app.internal.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSetContainer
@@ -16,7 +13,7 @@ class JvmApplicationBasePlugin : Plugin<Project> {
             plugins.apply(ApplicationBasePlugin::class.java)
             plugins.apply(JvmConventionsPlugin::class.java)
 
-            applications.withApp<DefaultJvmApplication> { app ->
+            applications.withApp<MutableJvmApplication> { app ->
                 app.module.name.convention(app.appName.map(::toModuleName))
 
                 val jarTask = tasks.named("jar", Jar::class.java)

@@ -1,6 +1,6 @@
 package net.rubygrapefruit.app.plugins
 
-import net.rubygrapefruit.app.JvmApplication
+import net.rubygrapefruit.app.internal.MutableJvmApplication
 import net.rubygrapefruit.app.internal.applications
 import net.rubygrapefruit.app.tasks.EmbeddedJvmLauncher
 import org.gradle.api.Plugin
@@ -13,7 +13,7 @@ open class EmbeddedJvmLauncherPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             plugins.apply(ApplicationBasePlugin::class.java)
-            applications.withApp<JvmApplication> { app ->
+            applications.withApp<MutableJvmApplication> { app ->
                 val embeddedJvmTask = tasks.register("embeddedJvm", EmbeddedJvmLauncher::class.java) { t ->
                     t.imageDirectory.set(layout.buildDirectory.dir("embedded-jvm"))
                     t.module.set(app.module.name)

@@ -9,10 +9,10 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import javax.inject.Inject
 
-abstract class DefaultNativeApplication @Inject constructor(
+abstract class DefaultNativeCliApplication @Inject constructor(
     factory: ObjectFactory,
     private val providers: ProviderFactory
-) : MutableApplication, NativeApplication {
+) : MutableApplication, MutableNativeApplication, NativeApplication {
     private val outputs = mutableMapOf<NativeMachine, Provider<RegularFile>>()
 
     override val distribution: DefaultDistribution = factory.newInstance(DefaultDistribution::class.java)

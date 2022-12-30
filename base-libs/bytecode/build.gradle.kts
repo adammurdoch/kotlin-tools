@@ -8,3 +8,7 @@ group = "net.rubygrapefruit.libs"
 repositories {
     mavenCentral()
 }
+
+kotlin {
+    jvmToolchain(11)
+}

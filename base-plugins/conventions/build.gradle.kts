@@ -9,11 +9,15 @@ repositories {
     mavenCentral()
 }
 
-val targetKotlinVersion = "1.7.20"
+val targetKotlinVersion = "1.8.0"
 
 dependencies {
     api("org.jetbrains.kotlin:kotlin-gradle-plugin:${targetKotlinVersion}")
     implementation("net.rubygrapefruit.libs:bytecode:1.0")
+}
+
+kotlin {
+    jvmToolchain(11)
 }
 
 gradlePlugin {

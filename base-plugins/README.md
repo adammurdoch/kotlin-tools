@@ -2,7 +2,7 @@
 
 A collection of Gradle plugins for building applications and libraries using Kotlin.
 
-These plugins all target Kotlin 1.7.20 and a minimum of Java 11 (for Kotlin/JVM apps). The plugins require
+These plugins all target Kotlin 1.8.0 and a minimum of Java 11 (for Kotlin/JVM apps). The plugins require
 Gradle 7.5.1 or later.
 
 ## `net.rubygrapefruit.kotlin-apps`

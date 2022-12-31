@@ -2,7 +2,8 @@ package net.rubygrapefruit.app.plugins
 
 import net.rubygrapefruit.app.internal.DefaultJvmUiApplication
 import net.rubygrapefruit.app.internal.applications
-import net.rubygrapefruit.app.tasks.*
+import net.rubygrapefruit.app.tasks.LauncherConf
+import net.rubygrapefruit.app.tasks.NativeUiLauncher
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -14,8 +15,6 @@ class JvmUiApplicationPlugin : Plugin<Project> {
             plugins.apply(EmbeddedJvmLauncherPlugin::class.java)
 
             applications.withApp<DefaultJvmUiApplication> { app ->
-                app.iconFile.set(layout.projectDirectory.file("src/main/Icon1024.png"))
-
                 val capitalizedAppName = app.capitalizedAppName
 
                 val configTask = tasks.register("launcherConf", LauncherConf::class.java) {
@@ -29,26 +28,11 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                 val launcherTask = tasks.register("nativeLauncher", NativeUiLauncher::class.java) {
                     it.outputFile.set(layout.buildDirectory.file("app/native-launcher.kexe"))
                 }
-                val iconTask = tasks.register("appIcon", AppIcon::class.java) {
-                    it.outputIconSet.set(layout.buildDirectory.dir("app/app.iconset"))
-                    it.outputIcon.set(layout.buildDirectory.file("app/app.icns"))
-                    it.sourceIcon.set(app.iconFile)
-                }
 
                 app.distribution.launcherFile.set(launcherTask.flatMap { it.outputFile })
 
                 applications.applyToDistribution { dist ->
                     dist.includeFile("Resources/launcher.conf", configTask.flatMap { it.configFile })
-                    dist.includeFile(
-                        app.iconName.map { "Resources/$it" },
-                        iconTask.flatMap { if (it.sourceIcon.get().asFile.exists()) it.outputIcon else null })
-                }
-
-                tasks.register("releaseDist", ReleaseDistribution::class.java) { t ->
-                    t.imageDirectory.set(layout.buildDirectory.dir(capitalizedAppName.map { "release/$it.app" }))
-                    t.unsignedImage.set(app.distribution.imageOutputDirectory)
-                    t.signingIdentity.set(app.signingIdentity)
-                    t.notarizationProfileName.set(app.notarizationProfileName)
                 }
             }
 

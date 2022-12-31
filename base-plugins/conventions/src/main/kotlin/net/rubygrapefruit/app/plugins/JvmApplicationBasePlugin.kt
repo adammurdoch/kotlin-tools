@@ -22,8 +22,7 @@ class JvmApplicationBasePlugin : Plugin<Project> {
                 val jarTask = tasks.named("jar", Jar::class.java)
                 val runtimeClasspath = configurations.getByName("runtimeClasspath")
 
-                val moduleInfoCp = extensions.getByType(JvmModuleRegistry::class.java)
-                    .moduleInfoClasspathEntryFor(app.module, null, null, runtimeClasspath)
+                val moduleInfoCp = extensions.getByType(JvmModuleRegistry::class.java).moduleInfoClasspathEntryFor(app.module, null, null, runtimeClasspath)
 
                 val sourceSet = extensions.getByType(SourceSetContainer::class.java).getByName("main")
                 sourceSet.output.dir(moduleInfoCp)

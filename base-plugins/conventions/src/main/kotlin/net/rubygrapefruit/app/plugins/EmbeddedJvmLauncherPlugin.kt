@@ -20,7 +20,7 @@ open class EmbeddedJvmLauncherPlugin : Plugin<Project> {
                 val embeddedJvmTask = tasks.register("embeddedJvm", EmbeddedJvmLauncher::class.java) { t ->
                     t.imageDirectory.set(layout.buildDirectory.dir("embedded-jvm"))
                     t.module.set(app.module.name)
-                    t.modulePath.from(app.outputModulePath)
+                    t.modulePath.from(app.runtimeModulePath)
                     val toolchainService = extensions.getByType(JavaToolchainService::class.java)
                     val javaExtension = extensions.getByType(JavaPluginExtension::class.java)
                     val launcher = toolchainService.launcherFor(javaExtension.toolchain)
@@ -29,8 +29,6 @@ open class EmbeddedJvmLauncherPlugin : Plugin<Project> {
 
                 val jvmDir = "jvm"
                 app.distribution.javaLauncherPath.set("$jvmDir/bin/java")
-                app.distribution.modulePath.setFrom()
-                app.distribution.modulePathNames.empty()
 
                 applications.applyToDistribution { dist ->
                     dist.includeDir(jvmDir, embeddedJvmTask.flatMap { e -> e.imageDirectory })

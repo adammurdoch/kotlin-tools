@@ -2,21 +2,20 @@ package net.rubygrapefruit.app.internal
 
 import net.rubygrapefruit.app.JvmApplication
 import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.provider.ListProperty
 
 /**
  * A JVM based application.
  */
 interface MutableJvmApplication : JvmApplication {
-    /**
-     * The module path for this application. Includes the jar of the application plus those of all its runtime dependencies.
-     */
-    val outputModulePath: ConfigurableFileCollection
+    override val distribution: DefaultJvmDistribution
 
     /**
-     * The basename of the files in the module path for this application.
+     * The runtime module path for this application. Includes the jar of the application plus those of all its runtime dependencies.
      */
-    val outputModuleNames: ListProperty<String>
+    val runtimeModulePath: ConfigurableFileCollection
 
+    /**
+     * The packaging of this application.
+     */
     var packaging: JvmApplicationPackaging
 }

@@ -1,4 +1,6 @@
 package net.rubygrapefruit.app.internal
 
-class JvmApplicationWithExternalJvm: JvmApplicationWithLauncherScripts {
+class JvmApplicationWithExternalJvm : JvmApplicationWithLauncherScripts {
+    override val includeRuntimeModules: Boolean
+        get() = true
 }

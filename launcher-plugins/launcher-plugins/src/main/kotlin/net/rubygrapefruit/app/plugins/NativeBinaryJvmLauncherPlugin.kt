@@ -18,11 +18,9 @@ class NativeBinaryJvmLauncherPlugin : Plugin<Project> {
                     it.launcherFile.set(layout.buildDirectory.file("native-binary/launcher"))
                     it.module.set(app.module.name)
                     it.mainClass.set(app.mainClass)
-                    it.modulePath.from(app.outputModulePath)
+                    it.modulePath.from(app.runtimeModulePath)
                 }
                 app.distribution.launcherFile.set(binaryTask.flatMap { it.launcherFile })
-                app.distribution.modulePath.setFrom()
-                app.distribution.modulePathNames.empty()
             }
         }
     }

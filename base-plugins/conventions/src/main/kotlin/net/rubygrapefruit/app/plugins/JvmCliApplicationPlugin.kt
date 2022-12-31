@@ -14,6 +14,7 @@ class JvmCliApplicationPlugin : Plugin<Project> {
             plugins.apply(JvmApplicationBasePlugin::class.java)
             applications.withApp<DefaultJvmCliApplication> { app ->
                 val libsDirPath = "lib"
+                val libNames = objects.listProperty(String::class.java)
 
                 val launcherTask = tasks.register("launcherScript", LauncherBashScript::class.java) {
                     it.scriptFile.set(layout.buildDirectory.file("app/launcher.sh"))
@@ -21,7 +22,7 @@ class JvmCliApplicationPlugin : Plugin<Project> {
                     it.mainClass.set(app.mainClass)
                     it.libsDirPath.set(libsDirPath)
                     it.javaLauncherPath.set(app.distribution.javaLauncherPath)
-                    it.modulePath.addAll(app.distribution.modulePathNames)
+                    it.modulePath.set(libNames)
                 }
                 val launcherBatTask = tasks.register("launcherBatScript", LauncherBatScript::class.java) {
                     it.scriptFile.set(layout.buildDirectory.file("app/launcher.bat"))
@@ -29,11 +30,14 @@ class JvmCliApplicationPlugin : Plugin<Project> {
                     it.mainClass.set(app.mainClass)
                     it.libsDirPath.set(libsDirPath)
                     it.javaLauncherPath.set(app.distribution.javaLauncherPath)
-                    it.modulePath.addAll(app.distribution.modulePathNames)
+                    it.modulePath.set(libNames)
                 }
 
                 applications.applyToDistribution { dist ->
-                    dist.includeFilesInDir(libsDirPath, app.distribution.modulePath)
+                    if (app.packaging.includeRuntimeModules) {
+                        dist.includeFilesInDir(libsDirPath, app.runtimeModulePath)
+                        libNames.set(app.runtimeModulePath.elements.map { it.map { f -> f.asFile.name } })
+                    }
                     if (app.packaging is JvmApplicationWithLauncherScripts) {
                         dist.includeFile(app.appName.map { "$it.bat" }, launcherBatTask.flatMap { it.scriptFile })
                     }

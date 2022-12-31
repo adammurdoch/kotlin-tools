@@ -17,19 +17,11 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                 app.iconFile.set(layout.projectDirectory.file("src/main/Icon1024.png"))
 
                 val capitalizedAppName = app.capitalizedAppName
-                val iconName = capitalizedAppName.map { "$it.icns" }
 
-                val infoPlistTask = tasks.register("infoPlist", InfoPlist::class.java) {
-                    it.plistFile.set(layout.buildDirectory.file("app/Info.plist"))
-                    it.bundleName.set(capitalizedAppName)
-                    it.bundleIdentifier.set(capitalizedAppName)
-                    it.executableName.set(capitalizedAppName)
-                    it.iconName.set(iconName)
-                }
                 val configTask = tasks.register("launcherConf", LauncherConf::class.java) {
                     it.configFile.set(layout.buildDirectory.file("app/launcher.conf"))
                     it.applicationDisplayName.set(capitalizedAppName)
-                    it.iconName.set(iconName)
+                    it.iconName.set(app.iconName)
                     it.javaCommand.set(app.distribution.javaLauncherPath)
                     it.module.set(app.module.name)
                     it.mainClass.set(app.mainClass)
@@ -46,10 +38,9 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                 app.distribution.launcherFile.set(launcherTask.flatMap { it.outputFile })
 
                 applications.applyToDistribution { dist ->
-                    dist.includeFile("Info.plist", infoPlistTask.flatMap { it.plistFile })
                     dist.includeFile("Resources/launcher.conf", configTask.flatMap { it.configFile })
                     dist.includeFile(
-                        iconName.map { "Resources/$it" },
+                        app.iconName.map { "Resources/$it" },
                         iconTask.flatMap { if (it.sourceIcon.get().asFile.exists()) it.outputIcon else null })
                 }
 

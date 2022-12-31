@@ -5,6 +5,7 @@ import net.rubygrapefruit.app.internal.ComponentTargets
 import net.rubygrapefruit.app.internal.DefaultNativeUiApplication
 import net.rubygrapefruit.app.internal.applications
 import net.rubygrapefruit.app.internal.multiplatformComponents
+import net.rubygrapefruit.app.tasks.NativeLauncher
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -37,6 +38,13 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                 val nativeTarget = extension.targets.getByName(NativeMachine.MacOSArm64.kotlinTarget) as KotlinNativeTarget
                 val executable = nativeTarget.binaries.withType(Executable::class.java).first()
                 val binaryFile = layout.file(executable.linkTaskProvider.map { it.binary.outputFile })
+
+                val generatorTask = tasks.register("nativeLauncher", NativeLauncher::class.java) {
+                    it.sourceDirectory.set(layout.buildDirectory.dir("generated-main"))
+                    it.delegateClass.set(app.delegateClass)
+                }
+                val macosMain = extension.sourceSets.getByName("macosMain")
+                macosMain.kotlin.srcDir(generatorTask.flatMap { it.sourceDirectory })
 
                 app.distribution.launcherFile.set(binaryFile)
             }

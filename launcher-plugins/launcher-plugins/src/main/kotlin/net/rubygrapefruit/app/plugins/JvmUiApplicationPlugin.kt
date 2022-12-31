@@ -21,7 +21,7 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                     it.configFile.set(layout.buildDirectory.file("app/launcher.conf"))
                     it.applicationDisplayName.set(capitalizedAppName)
                     it.iconName.set(app.iconName)
-                    it.javaCommand.set(app.distribution.javaLauncherPath)
+                    it.javaCommand.set(app.javaLauncherPath)
                     it.module.set(app.module.name)
                     it.mainClass.set(app.mainClass)
                 }

@@ -4,8 +4,6 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Nested
 
 interface JvmApplication : Application {
-    override val distribution: JvmDistribution
-
     /**
      * The module for this application.
      */

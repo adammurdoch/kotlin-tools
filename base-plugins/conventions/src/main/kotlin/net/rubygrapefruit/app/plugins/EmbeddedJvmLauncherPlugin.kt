@@ -28,7 +28,7 @@ open class EmbeddedJvmLauncherPlugin : Plugin<Project> {
                 }
 
                 val jvmDir = "jvm"
-                app.distribution.javaLauncherPath.set("$jvmDir/bin/java")
+                app.javaLauncherPath.set("$jvmDir/bin/java")
 
                 applications.applyToDistribution { dist ->
                     dist.includeDir(jvmDir, embeddedJvmTask.flatMap { e -> e.imageDirectory })

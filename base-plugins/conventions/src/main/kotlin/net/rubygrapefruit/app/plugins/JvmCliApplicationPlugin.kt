@@ -21,7 +21,7 @@ class JvmCliApplicationPlugin : Plugin<Project> {
                     it.module.set(app.module.name)
                     it.mainClass.set(app.mainClass)
                     it.libsDirPath.set(libsDirPath)
-                    it.javaLauncherPath.set(app.distribution.javaLauncherPath)
+                    it.javaLauncherPath.set(app.javaLauncherPath)
                     it.modulePath.set(libNames)
                 }
                 val launcherBatTask = tasks.register("launcherBatScript", LauncherBatScript::class.java) {
@@ -29,7 +29,7 @@ class JvmCliApplicationPlugin : Plugin<Project> {
                     it.module.set(app.module.name)
                     it.mainClass.set(app.mainClass)
                     it.libsDirPath.set(libsDirPath)
-                    it.javaLauncherPath.set(app.distribution.javaLauncherPath)
+                    it.javaLauncherPath.set(app.javaLauncherPath)
                     it.modulePath.set(libNames)
                 }
 

@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 abstract class DefaultJvmCliApplication @Inject constructor(factory: ObjectFactory) : MutableApplication,
     MutableJvmApplication, JvmApplication {
-    override val distribution: DefaultJvmDistribution = factory.newInstance(DefaultJvmDistribution::class.java)
+    override val distribution: DefaultDistribution = factory.newInstance(DefaultDistribution::class.java)
 
     override var packaging: JvmApplicationPackaging = JvmApplicationWithExternalJvm()
 

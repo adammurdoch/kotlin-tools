@@ -8,7 +8,7 @@ import javax.inject.Inject
 abstract class DefaultJvmUiApplication @Inject constructor(factory: ObjectFactory) : DefaultUiApplication(),
     MutableJvmApplication, JvmUiApplication {
 
-    override val distribution: DefaultJvmDistribution = factory.newInstance(DefaultJvmDistribution::class.java)
+    override val distribution: DefaultDistribution = factory.newInstance(DefaultDistribution::class.java)
 
     override var packaging: JvmApplicationPackaging = JvmApplicationWithEmbeddedJvm()
 

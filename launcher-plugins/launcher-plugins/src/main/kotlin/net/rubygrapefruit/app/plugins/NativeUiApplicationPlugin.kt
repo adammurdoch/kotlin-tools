@@ -8,27 +8,39 @@ import net.rubygrapefruit.app.internal.multiplatformComponents
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.mpp.Executable
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 class NativeUiApplicationPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
-            plugins.apply(ApplicationBasePlugin::class.java)
+            plugins.apply(UiApplicationBasePlugin::class.java)
             multiplatformComponents.registerSourceSets(ComponentTargets(false, setOf(NativeMachine.MacOSArm64, NativeMachine.MacOSX64)))
-            with(extensions.getByType(KotlinMultiplatformExtension::class.java)) {
-                macosX64 {
-                    binaries {
-                        executable {
+            applications.withApp<DefaultNativeUiApplication> { app ->
+                with(extensions.getByType(KotlinMultiplatformExtension::class.java)) {
+                    macosX64 {
+                        binaries {
+                            executable {
+                            }
+                        }
+                    }
+                    macosArm64 {
+                        binaries {
+                            executable {
+                            }
                         }
                     }
                 }
-                macosArm64 {
-                    binaries {
-                        executable {
-                        }
-                    }
-                }
+
+                val extension = extensions.getByType(KotlinMultiplatformExtension::class.java)
+                val nativeTarget = extension.targets.getByName(NativeMachine.MacOSArm64.kotlinTarget) as KotlinNativeTarget
+                val executable = nativeTarget.binaries.withType(Executable::class.java).first()
+                val binaryFile = layout.file(executable.linkTaskProvider.map { it.binary.outputFile })
+
+                app.distribution.launcherFile.set(binaryFile)
             }
+
             val app = extensions.create("application", DefaultNativeUiApplication::class.java)
             applications.register(app)
         }

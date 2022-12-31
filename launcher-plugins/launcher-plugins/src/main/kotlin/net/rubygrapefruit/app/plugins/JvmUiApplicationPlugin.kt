@@ -10,12 +10,13 @@ class JvmUiApplicationPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             plugins.apply(JvmApplicationBasePlugin::class.java)
+            plugins.apply(UiApplicationBasePlugin::class.java)
             plugins.apply(EmbeddedJvmLauncherPlugin::class.java)
 
             applications.withApp<DefaultJvmUiApplication> { app ->
                 app.iconFile.set(layout.projectDirectory.file("src/main/Icon1024.png"))
 
-                val capitalizedAppName = app.appName.map { it.replaceFirstChar { it.uppercase() } }
+                val capitalizedAppName = app.capitalizedAppName
                 val iconName = capitalizedAppName.map { "$it.icns" }
 
                 val infoPlistTask = tasks.register("infoPlist", InfoPlist::class.java) {
@@ -42,12 +43,9 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                     it.sourceIcon.set(app.iconFile)
                 }
 
-                app.distribution.launcherFilePath.set(capitalizedAppName.map { "MacOS/$it" })
                 app.distribution.launcherFile.set(launcherTask.flatMap { it.outputFile })
 
                 applications.applyToDistribution { dist ->
-                    dist.imageDirectory.set(layout.buildDirectory.dir(capitalizedAppName.map { "debug/$it.app" }))
-                    dist.rootDirPath.set("Contents")
                     dist.includeFile("Info.plist", infoPlistTask.flatMap { it.plistFile })
                     dist.includeFile("Resources/launcher.conf", configTask.flatMap { it.configFile })
                     dist.includeFile(

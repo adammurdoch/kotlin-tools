@@ -6,6 +6,7 @@ application {
     mainClass.set("sample.MainKt")
     module.requires.add("kotlin.stdlib")
     module.requires.add("java.desktop")
+    module.requires.add("sample.calc")
 }
 
 dependencies {

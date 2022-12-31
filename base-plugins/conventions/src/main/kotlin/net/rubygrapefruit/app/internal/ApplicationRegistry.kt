@@ -3,12 +3,12 @@ package net.rubygrapefruit.app.internal
 import net.rubygrapefruit.app.Application
 import net.rubygrapefruit.app.tasks.DistributionImage
 import org.gradle.api.Project
-import org.gradle.api.tasks.TaskProvider
 
 open class ApplicationRegistry(private val project: Project) {
     private var main: MutableApplication? = null
-    private var mainDistTask: TaskProvider<DistributionImage>? = null
     private val whenAppSet = mutableListOf<Project.(Application) -> Unit>()
+    private var distConfigured = false
+    private val applyToDist = mutableListOf<Project.(DistributionImage) -> Unit>()
 
     fun register(app: MutableApplication) {
         if (main != null) {
@@ -24,22 +24,30 @@ open class ApplicationRegistry(private val project: Project) {
         val distTask = project.tasks.register("dist", DistributionImage::class.java) { t ->
             t.imageDirectory.set(dist.imageDirectory)
             t.rootDirPath.set(".")
-            t.includeFile(dist.launcherFilePath, dist.launcherFile)
         }
         dist.imageOutputDirectory.set(distTask.flatMap { t -> t.imageDirectory })
         dist.launcherOutputFile.set(distTask.flatMap { t -> t.imageDirectory.map { it.file(app.distribution.launcherFilePath.get()) } })
-        mainDistTask = distTask
+        applyToDistribution {
+            it.includeFile(dist.launcherFilePath, dist.launcherFile)
+        }
 
         for (builder in whenAppSet) {
             builder(project, app)
         }
         whenAppSet.clear()
+
+        distTask.configure {
+            for (builder in applyToDist) {
+                builder(project, it)
+            }
+            applyToDist.clear()
+            distConfigured = true
+        }
     }
 
     fun applyToDistribution(builder: Project.(DistributionImage) -> Unit) {
-        mainDistTask!!.configure {
-            builder(project, it)
-        }
+        require(!distConfigured)
+        applyToDist.add(builder)
     }
 
     fun applyToApp(builder: Project.(Application) -> Unit) {

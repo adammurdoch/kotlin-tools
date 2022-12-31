@@ -1,5 +1,6 @@
 package net.rubygrapefruit.app.plugins
 
+import net.rubygrapefruit.app.internal.JvmApplicationWithEmbeddedJvm
 import net.rubygrapefruit.app.internal.MutableJvmApplication
 import net.rubygrapefruit.app.internal.applications
 import net.rubygrapefruit.app.tasks.EmbeddedJvmLauncher
@@ -14,6 +15,8 @@ open class EmbeddedJvmLauncherPlugin : Plugin<Project> {
         with(target) {
             plugins.apply(ApplicationBasePlugin::class.java)
             applications.withApp<MutableJvmApplication> { app ->
+                app.packaging = JvmApplicationWithEmbeddedJvm()
+
                 val embeddedJvmTask = tasks.register("embeddedJvm", EmbeddedJvmLauncher::class.java) { t ->
                     t.imageDirectory.set(layout.buildDirectory.dir("embedded-jvm"))
                     t.module.set(app.module.name)
@@ -29,8 +32,8 @@ open class EmbeddedJvmLauncherPlugin : Plugin<Project> {
                 app.distribution.modulePath.setFrom()
                 app.distribution.modulePathNames.empty()
 
-                applications.applyToDistribution { t ->
-                    t.includeDir(jvmDir, embeddedJvmTask.flatMap { e -> e.imageDirectory })
+                applications.applyToDistribution { dist ->
+                    dist.includeDir(jvmDir, embeddedJvmTask.flatMap { e -> e.imageDirectory })
                 }
             }
         }

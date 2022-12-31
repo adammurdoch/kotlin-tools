@@ -1,6 +1,7 @@
 package net.rubygrapefruit.app.plugins
 
 import net.rubygrapefruit.app.internal.DefaultJvmCliApplication
+import net.rubygrapefruit.app.internal.JvmApplicationWithLauncherScripts
 import net.rubygrapefruit.app.internal.applications
 import net.rubygrapefruit.app.tasks.LauncherBashScript
 import net.rubygrapefruit.app.tasks.LauncherBatScript
@@ -31,9 +32,11 @@ class JvmCliApplicationPlugin : Plugin<Project> {
                     it.modulePath.addAll(app.distribution.modulePathNames)
                 }
 
-                applications.applyToDistribution { t ->
-                    t.includeFilesInDir(libsDirPath, app.distribution.modulePath)
-                    t.includeFile(app.appName.map { "$it.bat" }, launcherBatTask.flatMap { it.scriptFile })
+                applications.applyToDistribution { dist ->
+                    dist.includeFilesInDir(libsDirPath, app.distribution.modulePath)
+                    if (app.packaging is JvmApplicationWithLauncherScripts) {
+                        dist.includeFile(app.appName.map { "$it.bat" }, launcherBatTask.flatMap { it.scriptFile })
+                    }
                 }
 
                 app.distribution.launcherFile.set(launcherTask.flatMap { it.scriptFile })

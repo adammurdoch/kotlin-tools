@@ -6,8 +6,11 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import javax.inject.Inject
 
-abstract class DefaultJvmCliApplication @Inject constructor(factory: ObjectFactory) : MutableApplication, MutableJvmApplication, JvmApplication {
+abstract class DefaultJvmCliApplication @Inject constructor(factory: ObjectFactory) : MutableApplication,
+    MutableJvmApplication, JvmApplication {
     override val distribution: DefaultJvmDistribution = factory.newInstance(DefaultJvmDistribution::class.java)
+
+    override var packaging: JvmApplicationPackaging = JvmApplicationWithExternalJvm()
 
     override val outputModulePath: ConfigurableFileCollection = factory.fileCollection()
 

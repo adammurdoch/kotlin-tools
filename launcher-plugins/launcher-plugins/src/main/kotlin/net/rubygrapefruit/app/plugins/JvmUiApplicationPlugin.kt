@@ -45,12 +45,12 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                 app.distribution.launcherFilePath.set(capitalizedAppName.map { "MacOS/$it" })
                 app.distribution.launcherFile.set(launcherTask.flatMap { it.outputFile })
 
-                applications.applyToDistribution { t ->
-                    t.imageDirectory.set(layout.buildDirectory.dir(capitalizedAppName.map { "debug/$it.app" }))
-                    t.rootDirPath.set("Contents")
-                    t.includeFile("Info.plist", infoPlistTask.flatMap { it.plistFile })
-                    t.includeFile("Resources/launcher.conf", configTask.flatMap { it.configFile })
-                    t.includeFile(
+                applications.applyToDistribution { dist ->
+                    dist.imageDirectory.set(layout.buildDirectory.dir(capitalizedAppName.map { "debug/$it.app" }))
+                    dist.rootDirPath.set("Contents")
+                    dist.includeFile("Info.plist", infoPlistTask.flatMap { it.plistFile })
+                    dist.includeFile("Resources/launcher.conf", configTask.flatMap { it.configFile })
+                    dist.includeFile(
                         iconName.map { "Resources/$it" },
                         iconTask.flatMap { if (it.sourceIcon.get().asFile.exists()) it.outputIcon else null })
                 }

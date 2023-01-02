@@ -52,16 +52,11 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
             // Some hacks to avoid duplicate symbol problem
 
             val commonTest = sourceSets.getByName("commonTest")
-            val nativeTest by lazy {
-                sourceSets.create("nativeTest") {
-                    it.dependsOn(nativeMain)
-                    it.dependsOn(commonTest)
-                }
+            val nativeTest = sourceSets.create("nativeTest") {
+                it.dependsOn(commonTest)
             }
-            if (targets.testSourceSets) {
-                for (sourceSet in nativeTestSourceSets) {
-                    sourceSet.dependsOn(nativeTest)
-                }
+            for (sourceSet in nativeTestSourceSets) {
+                sourceSet.dependsOn(nativeTest)
             }
             if (unixSourceSets.isNotEmpty() || macosSourceSets.isNotEmpty()) {
                 val unixMain = sourceSets.create("unixMain") {
@@ -70,16 +65,11 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
                 for (sourceSet in unixSourceSets) {
                     sourceSet.dependsOn(unixMain)
                 }
-                val unixTest by lazy {
-                    sourceSets.create("unixTest") {
-                        it.dependsOn(unixMain)
-                        it.dependsOn(nativeTest)
-                    }
+                val unixTest = sourceSets.create("unixTest") {
+                    it.dependsOn(nativeTest)
                 }
-                if (targets.testSourceSets) {
-                    for (sourceSet in unixTestSourceSets) {
-                        sourceSet.dependsOn(unixTest)
-                    }
+                for (sourceSet in unixTestSourceSets) {
+                    sourceSet.dependsOn(unixTest)
                 }
                 if (macosSourceSets.isNotEmpty()) {
                     val macosMain = sourceSets.create("macosMain") {
@@ -88,14 +78,11 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
                     for (sourceSet in macosSourceSets) {
                         sourceSet.dependsOn(macosMain)
                     }
-                    if (targets.testSourceSets) {
-                        val macosTest = sourceSets.create("macosTest") {
-                            it.dependsOn(macosMain)
-                            it.dependsOn(unixTest)
-                        }
-                        for (sourceSet in macosTestSourceSets) {
-                            sourceSet.dependsOn(macosTest)
-                        }
+                    val macosTest = sourceSets.create("macosTest") {
+                        it.dependsOn(unixTest)
+                    }
+                    for (sourceSet in macosTestSourceSets) {
+                        sourceSet.dependsOn(macosTest)
                     }
                 }
             }

@@ -78,11 +78,11 @@ Expects that the application uses the JVM module system.
 - Use `releaseDist` to build the release application bundle
 - Adds `application { }` block, see below for the available settings.
 
-## `net.rubygrapefruit.plugin`
+## `net.rubygrapefruit.gradle-plugin`
 
 A convention plugin for implementing Gradle plugins in Kotlin/JVM.
 
-- Adds dependencies and repository definitions so that a fixed version of Kotlin available (currently 1.7.20).
+- Adds dependencies and repository definitions so that a fixed version of Kotlin available (currently 1.8.0).
 
 ## Common application settings for all targets
 

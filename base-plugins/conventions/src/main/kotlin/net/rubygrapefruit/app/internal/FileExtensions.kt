@@ -6,6 +6,7 @@ import java.nio.file.FileVisitor
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.attribute.BasicFileAttributes
+import kotlin.io.path.createDirectories
 import kotlin.io.path.name
 
 internal fun Path.makeEmpty() {
@@ -32,7 +33,8 @@ internal fun Path.makeEmpty() {
     })
 }
 
-internal fun copyDir(source: Path, target: Path) {
+fun copyDir(source: Path, target: Path) {
+    target.createDirectories()
     Files.walkFileTree(source, object : FileVisitor<Path?> {
         val path = mutableListOf<String>()
         override fun preVisitDirectory(dir: Path?, attrs: BasicFileAttributes?): FileVisitResult {

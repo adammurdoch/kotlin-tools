@@ -1,7 +1,7 @@
 package net.rubygrapefruit.app.internal
 
 import net.rubygrapefruit.app.NativeMachine
-import java.io.ByteArrayOutputStream
+import net.rubygrapefruit.machine.info.Machine
 
 sealed class Os {
     open fun exeName(name: String) = name
@@ -28,31 +28,32 @@ object Linux : Os() {
         get() = NativeMachine.LinuxX64
 }
 
-object MacOs : Os() {
+object MacOsX64 : Os() {
     override fun canBuild(machine: NativeMachine): Boolean {
         return true
     }
 
-    override val machine: NativeMachine by lazy {
-        val output = ByteArrayOutputStream()
-        val builder = ProcessBuilder("sysctl", "-n", "machdep.cpu.brand_string")
-        val process = builder.start()
-        process.inputStream.copyTo(output)
-        process.errorStream.copyTo(System.err)
-        if (output.toString().contains("Apple M1")) {
-            NativeMachine.MacOSArm64
-        } else {
-            NativeMachine.MacOSX64
-        }
+    override val machine: NativeMachine
+        get() = NativeMachine.MacOSX64
+}
+
+object MacOsArm64 : Os() {
+    override fun canBuild(machine: NativeMachine): Boolean {
+        return true
     }
+
+    override val machine: NativeMachine
+        get() = NativeMachine.MacOSArm64
 }
 
 val currentOs: Os by lazy {
-    if (System.getProperty("os.name").contains("linux", true)) {
-        Linux
-    } else if (System.getProperty("os.name").contains("windows", true)) {
-        Windows
-    } else {
-        MacOs
+    val machine = Machine.thisMachine
+    when (machine) {
+        Machine.WindowsX64 -> Windows
+        Machine.LinuxX64 -> Linux
+        Machine.MacOSX64 -> MacOsX64
+        Machine.MacOSArm64 -> MacOsArm64
+    }.also {
+        println("-> CURRENT MACHINE: $it")
     }
 }

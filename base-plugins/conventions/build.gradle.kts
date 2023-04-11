@@ -14,6 +14,7 @@ val targetKotlinVersion = "1.8.20"
 dependencies {
     api("org.jetbrains.kotlin:kotlin-gradle-plugin:${targetKotlinVersion}")
     implementation("net.rubygrapefruit.libs:bytecode:1.0")
+    implementation("net.rubygrapefruit.libs:machine-info:1.0")
 }
 
 kotlin {

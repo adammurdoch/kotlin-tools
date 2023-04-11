@@ -2,9 +2,16 @@ package net.rubygrapefruit.machine.info
 
 import java.io.ByteArrayOutputStream
 
+/**
+ * Contains information about the host operating system family and CPU architecture.
+ */
 sealed class Machine {
-    object WindowsX64 : Machine()
-    object LinuxX64 : Machine()
+    sealed class Windows: Machine()
+    object WindowsX64 : Windows()
+
+    sealed class Linux: Machine()
+    object LinuxX64 : Linux()
+
     sealed class MacOSMachine : Machine()
     object MacOSArm64 : MacOSMachine()
     object MacOSX64 : MacOSMachine()
@@ -28,7 +35,7 @@ sealed class Machine {
                     MacOSX64
                 }
             } else {
-                throw IllegalStateException("Could not determine the OS family of this machine.")
+                throw IllegalStateException("Could not determine the OS family of this machine from OS name '$osName'.")
             }
         }
     }

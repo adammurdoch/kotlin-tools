@@ -46,7 +46,10 @@ class UiApplicationBasePlugin : Plugin<Project> {
                                 // Should be able to return 'null' here to mean "there is no icon". This works with the
                                 // Gradle APIs, but is broken for Kotlin compilation
                                 val dummyFile = layout.buildDirectory.file(DistributionImage.FileContribution.dummyName)
-                                dummyFile.get().asFile.createNewFile()
+                                with(dummyFile.get().asFile) {
+                                    parentFile.mkdirs()
+                                    createNewFile()
+                                }
                                 dummyFile
                             }
                         })

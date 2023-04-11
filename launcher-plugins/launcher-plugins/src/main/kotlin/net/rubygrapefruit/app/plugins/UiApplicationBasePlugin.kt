@@ -3,12 +3,13 @@ package net.rubygrapefruit.app.plugins
 import net.rubygrapefruit.app.internal.DefaultUiApplication
 import net.rubygrapefruit.app.internal.applications
 import net.rubygrapefruit.app.tasks.AppIcon
+import net.rubygrapefruit.app.tasks.DistributionImage
 import net.rubygrapefruit.app.tasks.InfoPlist
 import net.rubygrapefruit.app.tasks.ReleaseDistribution
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
-class UiApplicationBasePlugin: Plugin<Project> {
+class UiApplicationBasePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             plugins.apply(ApplicationBasePlugin::class.java)
@@ -38,7 +39,17 @@ class UiApplicationBasePlugin: Plugin<Project> {
                     dist.includeFile("Info.plist", infoPlistTask.flatMap { it.plistFile })
                     dist.includeFile(
                         app.iconName.map { "Resources/$it" },
-                        iconTask.flatMap { if (it.sourceIcon.get().asFile.exists()) it.outputIcon else null })
+                        iconTask.flatMap {
+                            if (it.sourceIcon.get().asFile.exists()) {
+                                it.outputIcon
+                            } else {
+                                // Should be able to return 'null' here to mean "there is no icon". This works with the
+                                // Gradle APIs, but is broken for Kotlin compilation
+                                val dummyFile = layout.buildDirectory.file(DistributionImage.FileContribution.dummyName)
+                                dummyFile.get().asFile.createNewFile()
+                                dummyFile
+                            }
+                        })
                 }
 
                 tasks.register("releaseDist", ReleaseDistribution::class.java) { t ->

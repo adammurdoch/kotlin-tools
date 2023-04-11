@@ -33,8 +33,7 @@ abstract class ReleaseDistribution : DefaultTask() {
         val imageDirectory = imageDirectory.get().asFile.toPath()
         val unsignedImage = unsignedImage.get().asFile.toPath()
         imageDirectory.toFile().deleteRecursively()
-        TODO()
-//        unsignedImage.recursiveCopyTo(imageDirectory)
+        unsignedImage.toFile().copyRecursively(imageDirectory.toFile())
         execOperations.exec {
             it.commandLine("codesign", "--options", "runtime", "--sign", signingIdentity.get(), imageDirectory.pathString)
         }

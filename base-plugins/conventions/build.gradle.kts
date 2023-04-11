@@ -9,7 +9,7 @@ repositories {
     mavenCentral()
 }
 
-val targetKotlinVersion = "1.8.10"
+val targetKotlinVersion = "1.8.20"
 
 dependencies {
     api("org.jetbrains.kotlin:kotlin-gradle-plugin:${targetKotlinVersion}")

@@ -8,7 +8,6 @@ import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
-import org.jetbrains.kotlin.konan.file.recursiveCopyTo
 import javax.inject.Inject
 import kotlin.io.path.name
 import kotlin.io.path.pathString
@@ -34,7 +33,8 @@ abstract class ReleaseDistribution : DefaultTask() {
         val imageDirectory = imageDirectory.get().asFile.toPath()
         val unsignedImage = unsignedImage.get().asFile.toPath()
         imageDirectory.toFile().deleteRecursively()
-        unsignedImage.recursiveCopyTo(imageDirectory)
+        TODO()
+//        unsignedImage.recursiveCopyTo(imageDirectory)
         execOperations.exec {
             it.commandLine("codesign", "--options", "runtime", "--sign", signingIdentity.get(), imageDirectory.pathString)
         }

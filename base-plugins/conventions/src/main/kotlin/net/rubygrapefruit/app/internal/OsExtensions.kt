@@ -47,13 +47,10 @@ object MacOsArm64 : Os() {
 }
 
 val currentOs: Os by lazy {
-    val machine = Machine.thisMachine
-    when (machine) {
+    when (Machine.thisMachine) {
         Machine.WindowsX64 -> Windows
         Machine.LinuxX64 -> Linux
         Machine.MacOSX64 -> MacOsX64
         Machine.MacOSArm64 -> MacOsArm64
-    }.also {
-        println("-> CURRENT MACHINE: $it")
     }
 }

@@ -12,9 +12,9 @@ sealed class Machine {
     sealed class Linux: Machine()
     object LinuxX64 : Linux()
 
-    sealed class MacOSMachine : Machine()
-    object MacOSArm64 : MacOSMachine()
-    object MacOSX64 : MacOSMachine()
+    sealed class MacOS : Machine()
+    object MacOSArm64 : MacOS()
+    object MacOSX64 : MacOS()
 
     companion object {
         val thisMachine by lazy {

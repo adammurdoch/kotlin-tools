@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalForeignApi::class, ExperimentalForeignApi::class)
+
 package net.rubygrapefruit.file
 
 import kotlinx.cinterop.*
@@ -21,6 +23,7 @@ internal open class UnixFileSystemElement(path: String) : PathFileSystemElement(
         return metadata().map { SnapshotImpl(path, it) }
     }
 
+    @OptIn(UnsafeNumber::class)
     override fun posixPermissions(): Result<PosixPermissions> {
         return memScoped {
             val statBuf = alloc<stat>()
@@ -31,6 +34,7 @@ internal open class UnixFileSystemElement(path: String) : PathFileSystemElement(
         }
     }
 
+    @OptIn(UnsafeNumber::class)
     override fun setPermissions(permissions: PosixPermissions) {
         if (lchmod(path, permissions.mode.convert()) != 0) {
             throw NativeException("Could not set permissions on $path.")
@@ -320,7 +324,7 @@ internal fun createTempDir(baseDir: UnixDirectory): Directory {
 @OptIn(UnsafeNumber::class)
 internal fun createDir(dir: UnixDirectory) {
     memScoped {
-        val result = mkdir(dir.path, S_IRWXU)
+        val result = mkdir(dir.path, S_IRWXU.convert())
         if (result != 0) {
             if (errno != EEXIST) {
                 throw NativeException("Could not create directory $dir.")

@@ -1,5 +1,5 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm").version("1.8.20").apply(false)
+    id("org.jetbrains.kotlin.jvm").version("1.9.10").apply(false)
 }
 
 for (task in listOf("clean", "assemble", "check", "build")) {

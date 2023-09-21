@@ -1,5 +1,8 @@
+@file:OptIn(ExperimentalForeignApi::class)
+
 package sample
 
+import kotlinx.cinterop.ExperimentalForeignApi
 import platform.AppKit.*
 import platform.Foundation.NSMakeRect
 import platform.Foundation.NSNotification

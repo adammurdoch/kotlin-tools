@@ -6,7 +6,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 
-class DownloadRepository(val silent: Boolean = false) {
+class DownloadRepository(private val silent: Boolean = false) {
     private val downloadsDir = File(System.getProperty("user.home"), "bin/downloads").toPath()
 
     /**

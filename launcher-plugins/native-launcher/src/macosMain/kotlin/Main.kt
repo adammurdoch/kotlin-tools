@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalForeignApi::class, ExperimentalForeignApi::class)
+
 import kotlinx.cinterop.*
 import platform.Foundation.NSBundle
 import platform.posix.*
@@ -38,7 +40,7 @@ fun main() {
 private fun redirectStdoutAndErr(appId: String) {
     val homeDir = getHomeDir()
     val logsDir = "$homeDir/Library/Logs/$appId"
-    if (mkdir(logsDir, S_IRWXU) == -1) {
+    if (mkdir(logsDir, S_IRWXU.convert()) == -1) {
         if (errno != EEXIST) {
             failed("Could not create log directory")
         }
@@ -66,7 +68,7 @@ private fun readConfigFile(configFilePath: String): List<String> {
         try {
             val size = 1024 * 4
             val buffer = allocArray<ByteVar>(size)
-            val nread = fread(buffer, 1, size.convert(), configFile)
+            val nread = fread(buffer, 1.convert(), size.convert(), configFile)
             buffer[nread.convert()] = 0
             buffer.toKString().lines().map { it.trim() }
         } finally {
@@ -93,8 +95,7 @@ private fun getHomeDir(): String {
     if (pwd == null) {
         failed("Could not get user home directory.")
     }
-    val homeDir = pwd.pointed.pw_dir!!.toKString()
-    return homeDir
+    return pwd.pointed.pw_dir!!.toKString()
 }
 
 fun failed(message: String): Nothing {

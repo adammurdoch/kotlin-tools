@@ -15,7 +15,11 @@ interface DerivedSample {
 }
 
 sealed class AppNature {
-    abstract fun derive(launcher: String): AppNature
+    abstract fun launcher(launcher: String): AppNature
+
+    abstract fun embedded(): AppNature
+
+    abstract fun native(): AppNature
 
     abstract val distDirName: String
 
@@ -25,8 +29,16 @@ sealed class AppNature {
 }
 
 class JvmCliApp(override val cliLauncherPath: String, private val embeddedJvm: Boolean) : AppNature() {
-    override fun derive(launcher: String): AppNature {
+    override fun launcher(launcher: String): AppNature {
         return JvmCliApp(launcher, embeddedJvm)
+    }
+
+    override fun embedded(): AppNature {
+        return JvmCliApp(cliLauncherPath, true)
+    }
+
+    override fun native(): AppNature {
+        return NativeBinaryCliApp(cliLauncherPath)
     }
 
     override val distDirName: String
@@ -40,8 +52,16 @@ class JvmCliApp(override val cliLauncherPath: String, private val embeddedJvm: B
 }
 
 class NativeBinaryCliApp(override val cliLauncherPath: String) : AppNature() {
-    override fun derive(launcher: String): AppNature {
+    override fun launcher(launcher: String): AppNature {
         return NativeBinaryCliApp(launcher)
+    }
+
+    override fun embedded(): AppNature {
+        throw IllegalStateException()
+    }
+
+    override fun native(): AppNature {
+        return this
     }
 
     override val distDirName: String
@@ -53,8 +73,16 @@ class NativeBinaryCliApp(override val cliLauncherPath: String) : AppNature() {
 }
 
 class UiApp(private val appName: String) : AppNature() {
-    override fun derive(launcher: String): AppNature {
+    override fun launcher(launcher: String): AppNature {
         return UiApp(launcher)
+    }
+
+    override fun embedded(): AppNature {
+        throw IllegalStateException()
+    }
+
+    override fun native(): AppNature {
+        return this
     }
 
     override val distDirName: String
@@ -88,9 +116,9 @@ sealed class App(name: String, baseDir: File, val nature: AppNature, srcDirName:
 class BaseApp(name: String, baseDir: File, nature: AppNature, srcDirName: String) :
     App(name, baseDir, nature, srcDirName) {
 
-    fun derive(suffix: String, launcher: String? = null): DerivedApp {
+    fun derive(suffix: String, builder: (AppNature) -> AppNature = { it }): DerivedApp {
         val sampleName = "$name-$suffix"
-        return DerivedApp(sampleName, this, baseDir, nature.derive(launcher ?: sampleName))
+        return DerivedApp(sampleName, this, baseDir, builder(nature.launcher(sampleName)))
     }
 }
 
@@ -122,20 +150,20 @@ val samples = listOf(
     mppLib.derive("customized"),
 
     jvmCliApp,
-    jvmCliApp.derive("customized", "app"),
-    jvmCliApp.derive("embedded"),
-    jvmCliApp.derive("embedded-customized", "app"),
-    jvmCliApp.derive("native-binary"),
-    jvmCliApp.derive("native-binary-customized", "app"),
+    jvmCliApp.derive("customized") { it.launcher("app") },
+    jvmCliApp.derive("embedded") { it.embedded() },
+    jvmCliApp.derive("embedded-customized") { it.embedded().launcher("app") },
+    jvmCliApp.derive("native-binary") { it.native() },
+    jvmCliApp.derive("native-binary-customized") { it.native().launcher("app") },
 
     jvmUiApp,
-    jvmUiApp.derive("customized", "App"),
+    jvmUiApp.derive("customized") { it.launcher("App") },
 
     nativeCliApp,
-    nativeCliApp.derive("customized", "app"),
+    nativeCliApp.derive("customized") { it.launcher("app") },
 
     nativeUiApp,
-    nativeUiApp.derive("customized", "App")
+    nativeUiApp.derive("customized") { it.launcher("App") }
 )
 
 val sampleApps = samples.filterIsInstance<App>()
@@ -199,6 +227,7 @@ val script = tasks.register("generate-script") {
                     println("DU_ARR=(\$DU_OUT)")
                     println("echo \"dist size: \${DU_ARR[0]}\"")
                     if (sample.nativeBinary != null) {
+                        println("otool -hv ${sample.nativeBinary}")
                         println("echo \"arch: ??\"")
                     }
                     println("echo")

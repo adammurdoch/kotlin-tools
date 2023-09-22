@@ -14,17 +14,36 @@ interface DerivedSample {
     val srcDir: File
 }
 
-sealed class App(name: String, baseDir: File, val launcher: String, srcDirName: String) : Sample(name, baseDir, srcDirName)
+sealed class AppNature {
+    abstract fun derive(launcher: String): AppNature
+}
 
-class BaseApp(name: String, baseDir: File, launcher: String, srcDirName: String) : App(name, baseDir, launcher, srcDirName) {
-    fun derive(suffix: String, launcher: String? = null): DerivedApp {
-        val sampleName = "$name-$suffix"
-        return DerivedApp(sampleName, this, baseDir, launcher ?: sampleName)
+class CliApp(val launcher: String, val embeddedJvm: Boolean) : AppNature() {
+    override fun derive(launcher: String): AppNature {
+        return CliApp(launcher, embeddedJvm)
     }
 }
 
-class DerivedApp(name: String, override val derivedFrom: BaseApp, baseDir: File, launcher: String) :
-    App(name, baseDir, launcher, derivedFrom.srcDirName), DerivedSample
+object UiApp : AppNature() {
+    override fun derive(launcher: String): AppNature {
+        return this
+    }
+}
+
+sealed class App(name: String, baseDir: File, val nature: AppNature, srcDirName: String) :
+    Sample(name, baseDir, srcDirName)
+
+class BaseApp(name: String, baseDir: File, nature: AppNature, srcDirName: String) :
+    App(name, baseDir, nature, srcDirName) {
+
+    fun derive(suffix: String, launcher: String? = null): DerivedApp {
+        val sampleName = "$name-$suffix"
+        return DerivedApp(sampleName, this, baseDir, nature.derive(launcher ?: sampleName))
+    }
+}
+
+class DerivedApp(name: String, override val derivedFrom: BaseApp, baseDir: File, nature: AppNature) :
+    App(name, baseDir, nature, derivedFrom.srcDirName), DerivedSample
 
 class BaseLib(name: String, baseDir: File, srcDirName: String) : Sample(name, baseDir, srcDirName) {
     fun derive(suffix: String): DerivedLib {
@@ -36,12 +55,12 @@ class BaseLib(name: String, baseDir: File, srcDirName: String) : Sample(name, ba
 class DerivedLib(name: String, override val derivedFrom: BaseLib, baseDir: File, srcDirName: String) :
     Sample(name, baseDir, srcDirName), DerivedSample
 
-val jvmCliApp = app("jvm-cli-app")
-val jvmUiApp = app("jvm-ui-app")
-val jvmLib = lib("jvm-lib")
+val jvmCliApp = jvmCliApp("jvm-cli-app")
+val jvmUiApp = jvmUiApp("jvm-ui-app")
+val jvmLib = jvmLib("jvm-lib")
 val mppLib = mppLib("mpp-lib")
-val nativeCliApp = app("native-cli-app")
-val nativeUiApp = macOsApp("native-ui-app")
+val nativeCliApp = jvmCliApp("native-cli-app")
+val nativeUiApp = macOsUiApp("native-ui-app")
 
 val samples = listOf(
     jvmLib,
@@ -88,7 +107,12 @@ val script = tasks.register("generate-script") {
             writer.run {
                 for (sample in samples.filterIsInstance<App>()) {
                     println("echo '==== ${sample.name} ===='")
-                    println("${sample.dir}/build/dist-image/${sample.launcher} 1 + 2")
+                    if (sample.nature is CliApp) {
+                        println("${sample.dir}/build/dist-image/${sample.nature.launcher} 1 + 2")
+                    } else {
+                        println("echo UI app")
+                    }
+                    println("echo")
                     println()
                 }
             }
@@ -101,10 +125,12 @@ tasks.register("generate") {
     dependsOn(generators, script)
 }
 
-fun app(name: String) = BaseApp(name, projectDir, name, "main")
+fun jvmCliApp(name: String) = BaseApp(name, projectDir, CliApp(name, false), "main")
 
-fun macOsApp(name: String) = BaseApp(name, projectDir, name, "macosMain")
+fun jvmUiApp(name: String) = BaseApp(name, projectDir, UiApp, "main")
 
-fun lib(name: String) = BaseLib(name, projectDir, "main")
+fun macOsUiApp(name: String) = BaseApp(name, projectDir, UiApp, "macosMain")
+
+fun jvmLib(name: String) = BaseLib(name, projectDir, "main")
 
 fun mppLib(name: String) = BaseLib(name, projectDir, "commonMain")

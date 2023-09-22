@@ -7,6 +7,7 @@ application {
     appName = "app"
     mainClass = "sample.MainKt"
     module.name = "sample.app"
+    targetJavaVersion = 11
 }
 
 dependencies {

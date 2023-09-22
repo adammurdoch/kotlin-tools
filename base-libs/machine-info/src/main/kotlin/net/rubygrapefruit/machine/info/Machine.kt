@@ -35,7 +35,7 @@ sealed class Machine {
                     MacOSX64
                 }
             } else {
-                throw IllegalStateException("Could not determine the OS family of this machine from OS name '$osName'.")
+                throw IllegalStateException("Could not determine the OS family of this machine using OS name '$osName'.")
             }
         }
     }

@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("bootstrap-plugins")
     includeBuild("base-plugins")
 }
 plugins {

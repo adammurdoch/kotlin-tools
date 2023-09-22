@@ -17,7 +17,7 @@ class NativeUiApplicationPlugin : Plugin<Project> {
         with(target) {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
             plugins.apply(UiApplicationBasePlugin::class.java)
-            multiplatformComponents.registerSourceSets(ComponentTargets(false, setOf(NativeMachine.MacOSArm64, NativeMachine.MacOSX64)))
+            multiplatformComponents.registerSourceSets(ComponentTargets(null, setOf(NativeMachine.MacOSArm64, NativeMachine.MacOSX64)))
             applications.withApp<DefaultNativeUiApplication> { app ->
                 with(extensions.getByType(KotlinMultiplatformExtension::class.java)) {
                     macosX64 {

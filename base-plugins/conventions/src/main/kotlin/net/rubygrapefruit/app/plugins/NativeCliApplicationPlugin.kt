@@ -16,7 +16,7 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
 
             multiplatformComponents.registerSourceSets(
                 ComponentTargets(
-                    false,
+                    null,
                     setOf(
                         NativeMachine.LinuxX64,
                         NativeMachine.MacOSX64,

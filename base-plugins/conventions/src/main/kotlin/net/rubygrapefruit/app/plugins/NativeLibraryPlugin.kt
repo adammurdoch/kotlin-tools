@@ -12,7 +12,7 @@ class NativeLibraryPlugin : Plugin<Project> {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
             plugins.apply(LibraryBasePlugin::class.java)
 
-            multiplatformComponents.registerSourceSets(ComponentTargets(false, setOf(NativeMachine.LinuxX64, NativeMachine.MacOSX64, NativeMachine.MacOSArm64, NativeMachine.WindowsX64)))
+            multiplatformComponents.registerSourceSets(ComponentTargets(null, setOf(NativeMachine.LinuxX64, NativeMachine.MacOSX64, NativeMachine.MacOSArm64, NativeMachine.WindowsX64)))
         }
     }
 }

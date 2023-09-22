@@ -20,12 +20,11 @@ class MppLibraryPlugin : Plugin<Project> {
             plugins.apply(LibraryBasePlugin::class.java)
             plugins.apply(JvmConventionsPlugin::class.java)
 
-            multiplatformComponents.registerSourceSets(ComponentTargets(true, setOf(NativeMachine.LinuxX64, NativeMachine.MacOSX64, NativeMachine.MacOSArm64, NativeMachine.WindowsX64)))
-
             val lib = extensions.create("library", JvmLibrary::class.java)
             lib.module.name.convention(toModuleName(project.name))
             lib.targetJavaVersion.convention(Versions.java)
-            JvmConventionsPlugin.javaVersion(this, lib.targetJavaVersion)
+
+            multiplatformComponents.registerSourceSets(ComponentTargets(lib.targetJavaVersion, setOf(NativeMachine.LinuxX64, NativeMachine.MacOSX64, NativeMachine.MacOSArm64, NativeMachine.WindowsX64)))
 
             val extension = extensions.getByType(KotlinMultiplatformExtension::class.java)
             val jvmTarget = extension.targets.getByName("jvm") as KotlinJvmTarget

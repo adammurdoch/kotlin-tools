@@ -234,6 +234,9 @@ val script = tasks.register("generate-script") {
                     println("echo")
                     if (sample.cliLauncher != null) {
                         println("${sample.cliLauncher} 1 + 2")
+                        println("if [ $? != 0 ]; then")
+                        println("  exit 1")
+                        println("fi")
                     } else {
                         println("echo '(UI app)'")
                     }

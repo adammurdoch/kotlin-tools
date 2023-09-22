@@ -19,11 +19,11 @@ class JvmLibraryPlugin : Plugin<Project> {
             plugins.apply(LibraryBasePlugin::class.java)
             plugins.apply(JvmConventionsPlugin::class.java)
 
-            multiplatformComponents.registerSourceSets(ComponentTargets(true, emptySet()))
-
             val lib = extensions.create("library", JvmLibrary::class.java)
             lib.module.name.convention(toModuleName(project.name))
             lib.targetJavaVersion.convention(Versions.java)
+
+            multiplatformComponents.registerSourceSets(ComponentTargets(lib.targetJavaVersion, emptySet()))
             JvmConventionsPlugin.javaVersion(this, lib.targetJavaVersion)
 
             val runtimeClasspath = configurations.getByName("runtimeClasspath")

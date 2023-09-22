@@ -4,7 +4,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 
-class JvmPlugin: Plugin<Project> {
+class JvmBasePlugin: Plugin<Project> {
     override fun apply(target: Project) {
         target.run {
             plugins.apply("org.jetbrains.kotlin.jvm")

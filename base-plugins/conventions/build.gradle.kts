@@ -1,24 +1,17 @@
+import net.rubygrapefruit.plugins.bootstrap.Versions
+
 plugins {
-    id("java-gradle-plugin")
-    id("org.jetbrains.kotlin.jvm")
+    id("net.rubygrapefruit.bootstrap.gradle-plugin")
 }
 
 group = "net.rubygrapefruit.plugins"
 
-repositories {
-    mavenCentral()
-}
-
-val targetKotlinVersion = "1.9.10"
+val targetKotlinVersion = Versions.kotlin
 
 dependencies {
     api("org.jetbrains.kotlin:kotlin-gradle-plugin:${targetKotlinVersion}")
     implementation("net.rubygrapefruit.libs:bytecode:1.0")
     implementation("net.rubygrapefruit.libs:machine-info:1.0")
-}
-
-kotlin {
-    jvmToolchain(11)
 }
 
 gradlePlugin {

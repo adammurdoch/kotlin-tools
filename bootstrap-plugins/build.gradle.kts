@@ -31,8 +31,16 @@ kotlin {
 gradlePlugin {
     plugins {
         create("bootstrap-jvm") {
-            id = "net.rubygrapefruit.bootstrap.jvm"
-            implementationClass = "net.rubygrapefruit.plugins.bootstrap.JvmPlugin"
+            id = "net.rubygrapefruit.bootstrap.jvm-base"
+            implementationClass = "net.rubygrapefruit.plugins.bootstrap.JvmBasePlugin"
+        }
+        create("bootstrap-jvm-lib") {
+            id = "net.rubygrapefruit.bootstrap.jvm.lib"
+            implementationClass = "net.rubygrapefruit.plugins.bootstrap.JvmLibraryPlugin"
+        }
+        create("bootstrap-plugin") {
+            id = "net.rubygrapefruit.bootstrap.gradle-plugin"
+            implementationClass = "net.rubygrapefruit.plugins.bootstrap.JvmGradlePlugin"
         }
     }
 }
@@ -45,6 +53,10 @@ val generateResource = tasks.register("generate-version-resource") {
             package net.rubygrapefruit.plugins.bootstrap
             
             object Versions {
+                val kotlin = "${Versions.kotlin}"
+                val serialization = "${Versions.serialization}"
+                val serializationJson = "${Versions.serializationJson}"
+                val java = ${Versions.java}
                 val pluginsJava = ${Versions.pluginsJava}
             }
         """.trimIndent())

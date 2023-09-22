@@ -1,6 +1,5 @@
 plugins {
-    id("java-library")
-    id("net.rubygrapefruit.bootstrap.jvm")
+    id("net.rubygrapefruit.bootstrap.jvm.lib")
 }
 
 group = "net.rubygrapefruit.libs"

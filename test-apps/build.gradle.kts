@@ -1,9 +1,9 @@
 import java.io.PrintWriter
 
-sealed class Sample(val name: String, val baseDir: File) {
+sealed class Sample(val name: String, val baseDir: File, val srcDirName: String = "main") {
     val dir = baseDir.resolve(name)
 
-    val srcDir = dir.resolve("src/main")
+    val srcDir = dir.resolve("src/$srcDirName/kotlin")
 }
 
 interface DerivedSample {
@@ -26,20 +26,28 @@ class BaseApp(name: String, baseDir: File, launcher: String) : App(name, baseDir
 class DerivedApp(name: String, override val derivedFrom: BaseApp, baseDir: File, launcher: String) :
     App(name, baseDir, launcher), DerivedSample
 
-class BaseLib(name: String, baseDir: File) : Sample(name, baseDir) {
+class BaseLib(name: String, baseDir: File, srcDirName: String) : Sample(name, baseDir, srcDirName) {
     fun derive(suffix: String): DerivedLib {
         val sampleName = "$name-$suffix"
-        return DerivedLib(sampleName, this, baseDir)
+        return DerivedLib(sampleName, this, baseDir, srcDirName)
     }
 }
 
-class DerivedLib(name: String, override val derivedFrom: BaseLib, baseDir: File) :
-    Sample(name, baseDir), DerivedSample
+class DerivedLib(name: String, override val derivedFrom: BaseLib, baseDir: File, srcDirName: String) :
+    Sample(name, baseDir, srcDirName), DerivedSample
 
 val jvmCliApp = app("jvm-cli-app")
+val jvmUiApp = app("jvm-ui-app")
 val jvmLib = lib("jvm-lib")
+val mppLib = mppLib("mpp-lib")
 
 val samples = listOf(
+    jvmLib,
+    jvmLib.derive("customized"),
+
+    mppLib,
+    mppLib.derive("customized"),
+
     jvmCliApp,
     jvmCliApp.derive("customized", "app"),
     jvmCliApp.derive("embedded"),
@@ -47,14 +55,18 @@ val samples = listOf(
     jvmCliApp.derive("native-binary"),
     jvmCliApp.derive("native-binary-customized", "app"),
 
-    jvmLib,
-    jvmLib.derive("customized")
+    jvmUiApp,
+    jvmUiApp.derive("customized"),
 )
 
 val generators = samples.filterIsInstance<DerivedSample>().map { sample ->
-    tasks.register("generate-${sample.name}", Sync::class.java) {
-        from(sample.derivedFrom.srcDir)
-        into(sample.srcDir)
+    tasks.register("generate-${sample.name}") {
+        doLast {
+            sync {
+                from(sample.derivedFrom.srcDir)
+                into(sample.srcDir)
+            }
+        }
     }
 }
 
@@ -80,4 +92,6 @@ tasks.register("generate") {
 
 fun app(name: String) = BaseApp(name, projectDir, name)
 
-fun lib(name: String) = BaseLib(name, projectDir)
+fun lib(name: String) = BaseLib(name, projectDir, "main")
+
+fun mppLib(name: String) = BaseLib(name, projectDir, "commonMain")

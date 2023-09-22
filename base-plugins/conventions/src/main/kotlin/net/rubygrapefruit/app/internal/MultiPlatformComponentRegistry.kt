@@ -1,6 +1,7 @@
 package net.rubygrapefruit.app.internal
 
 import net.rubygrapefruit.app.NativeMachine
+import net.rubygrapefruit.plugins.bootstrap.Versions
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
@@ -12,7 +13,7 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
         }
         with(project.extensions.getByType(KotlinMultiplatformExtension::class.java)) {
             if (targets.jvm) {
-                jvmToolchain(11)
+                jvmToolchain(Versions.java)
                 jvm()
             }
             val nativeSourceSets = mutableListOf<KotlinSourceSet>()

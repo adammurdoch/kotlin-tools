@@ -1,8 +1,10 @@
+import net.rubygrapefruit.plugins.bootstrap.Versions
+
 plugins {
     id("net.rubygrapefruit.bootstrap.gradle-plugin")
 }
 
-group = "net.rubygrapefruit.plugins"
+group = Versions.pluginsGroup
 
 dependencies {
     implementation("net.rubygrapefruit.libs:bytecode:1.0")

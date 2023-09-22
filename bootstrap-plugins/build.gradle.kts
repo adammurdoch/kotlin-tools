@@ -3,7 +3,7 @@ plugins {
     id("java-gradle-plugin")
 }
 
-object Versions {
+object Constants {
     val kotlin = "1.9.10"
     val serialization = "1.9.10"
     val serializationJson = "1.5.1"
@@ -14,22 +14,23 @@ object Versions {
         get() = "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlin}"
 
     val pluginsGroup = "net.rubygrapefruit.plugins"
+    val pluginsVersion = "0.1-dev"
     val bootstrapPluginCoordinates
-        get() = "$pluginsGroup:bootstrap-plugins:0.1-dev"
+        get() = "$pluginsGroup:bootstrap-plugins:$pluginsVersion"
 }
 
-group = Versions.pluginsGroup
+group = Constants.pluginsGroup
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    api(Versions.kotlinPluginCoordinates)
+    api(Constants.kotlinPluginCoordinates)
 }
 
 kotlin {
-    jvmToolchain(Versions.pluginsJava)
+    jvmToolchain(Constants.pluginsJava)
 }
 
 gradlePlugin {
@@ -64,14 +65,19 @@ val generateResource = tasks.register("generate-version-resource") {
         outFile.get().asFile.writeText("""
             package net.rubygrapefruit.plugins.bootstrap
             
+            /*
+             * THIS IS A GENERATED FILE. DO NOT EDIT.
+             */
             object Versions {
-                val kotlin = "${Versions.kotlin}"
-                val serialization = "${Versions.serialization}"
-                val serializationJson = "${Versions.serializationJson}"
-                val java = ${Versions.java}
-                val pluginsJava = ${Versions.pluginsJava}
-                val kotlinPluginCoordinates = "${Versions.kotlinPluginCoordinates}"
-                val bootstrapPluginCoordinates = "${Versions.bootstrapPluginCoordinates}"
+                val kotlin = "${Constants.kotlin}"
+                val serialization = "${Constants.serialization}"
+                val serializationJson = "${Constants.serializationJson}"
+                val java = ${Constants.java}
+                val pluginsJava = ${Constants.pluginsJava}
+                val kotlinPluginCoordinates = "${Constants.kotlinPluginCoordinates}"
+                val pluginsGroup = "${Constants.pluginsGroup}"
+                val pluginsVersion = "${Constants.pluginsVersion}"
+                val bootstrapPluginCoordinates = "${Constants.bootstrapPluginCoordinates}"
             }
         """.trimIndent())
     }

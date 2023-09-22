@@ -1,8 +1,11 @@
 import net.rubygrapefruit.app.NativeMachine
+import net.rubygrapefruit.plugins.bootstrap.Versions
 
 plugins {
     id("net.rubygrapefruit.native.cli-app")
 }
+
+group = Versions.pluginsGroup
 
 for (machine in listOf(NativeMachine.MacOSX64, NativeMachine.MacOSArm64)) {
     configurations.create("outgoingNativeBinary${machine.name}") {

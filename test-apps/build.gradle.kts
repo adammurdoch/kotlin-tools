@@ -223,12 +223,13 @@ val script = tasks.register("generate-script") {
                 for (sample in sampleApps) {
                     println()
                     println("echo '==== ${sample.name} ===='")
-                    println("DU_OUT=`du -sh ${sample.distDir}`")
-                    println("DU_ARR=(\$DU_OUT)")
-                    println("echo \"dist size: \${DU_ARR[0]}\"")
+                    // xargs trims whitespace, cut selects the 1st field
+                    println("DU_OUT=`du -sh ${sample.distDir} | xargs | cut -f 1 -w`")
+                    println("echo \"dist size: \${DU_OUT}\"")
                     if (sample.nativeBinary != null) {
-                        println("otool -hv ${sample.nativeBinary}")
-                        println("echo \"arch: ??\"")
+                        // Select line 4 and 2nd field
+                        println("OTOOL_OUT=`otool -hv ${sample.nativeBinary} | sed -n '4p' | cut -f 2 -w`")
+                        println("echo \"arch: \${OTOOL_OUT}\"")
                     }
                     println("echo")
                     if (sample.cliLauncher != null) {

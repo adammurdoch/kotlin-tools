@@ -11,5 +11,5 @@ application {
 
 dependencies {
     implementation(project(":mpp-lib"))
-    implementation(project(":jvm-lib"))
+    implementation(project(":jvm-lib-customized"))
 }

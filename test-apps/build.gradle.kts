@@ -6,26 +6,49 @@ sealed class Sample(val name: String, val baseDir: File) {
     val srcDir = dir.resolve("src/main")
 }
 
+interface DerivedSample {
+    val name: String
+
+    val derivedFrom: Sample
+
+    val srcDir: File
+}
+
 sealed class App(name: String, baseDir: File, val launcher: String) : Sample(name, baseDir)
 
 class BaseApp(name: String, baseDir: File, launcher: String) : App(name, baseDir, launcher) {
-    fun derive(suffix: String, launcher: String? = null): DerivedSample {
+    fun derive(suffix: String, launcher: String? = null): DerivedApp {
         val sampleName = "$name-$suffix"
-        return DerivedSample(sampleName, this, baseDir, launcher ?: sampleName)
+        return DerivedApp(sampleName, this, baseDir, launcher ?: sampleName)
     }
 }
 
-class DerivedSample(name: String, val derivedFrom: BaseApp, baseDir: File, launcher: String) :
-    App(name, baseDir, launcher)
+class DerivedApp(name: String, override val derivedFrom: BaseApp, baseDir: File, launcher: String) :
+    App(name, baseDir, launcher), DerivedSample
 
-val jvmCliApp = sample("jvm-cli-app")
+class BaseLib(name: String, baseDir: File) : Sample(name, baseDir) {
+    fun derive(suffix: String): DerivedLib {
+        val sampleName = "$name-$suffix"
+        return DerivedLib(sampleName, this, baseDir)
+    }
+}
+
+class DerivedLib(name: String, override val derivedFrom: BaseLib, baseDir: File) :
+    Sample(name, baseDir), DerivedSample
+
+val jvmCliApp = app("jvm-cli-app")
+val jvmLib = lib("jvm-lib")
+
 val samples = listOf(
     jvmCliApp,
     jvmCliApp.derive("customized", "app"),
     jvmCliApp.derive("embedded"),
     jvmCliApp.derive("embedded-customized", "app"),
     jvmCliApp.derive("native-binary"),
-    jvmCliApp.derive("native-binary-customized", "app")
+    jvmCliApp.derive("native-binary-customized", "app"),
+
+    jvmLib,
+    jvmLib.derive("customized")
 )
 
 val generators = samples.filterIsInstance<DerivedSample>().map { sample ->
@@ -40,7 +63,7 @@ val script = tasks.register("generate-script") {
         val scriptFile = file("run-all-2.sh")
         PrintWriter(scriptFile.bufferedWriter()).use { writer ->
             writer.run {
-                for (sample in samples) {
+                for (sample in samples.filterIsInstance<App>()) {
                     println("echo '==== ${sample.name} ===='")
                     println("${sample.dir}/build/dist-image/${sample.launcher} 1 + 2")
                     println()
@@ -55,4 +78,6 @@ tasks.register("generate") {
     dependsOn(generators, script)
 }
 
-fun sample(name: String): BaseApp = BaseApp(name, projectDir, name)
+fun app(name: String) = BaseApp(name, projectDir, name)
+
+fun lib(name: String) = BaseLib(name, projectDir)

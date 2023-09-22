@@ -59,7 +59,7 @@ val jvmCliApp = jvmCliApp("jvm-cli-app")
 val jvmUiApp = jvmUiApp("jvm-ui-app")
 val jvmLib = jvmLib("jvm-lib")
 val mppLib = mppLib("mpp-lib")
-val nativeCliApp = jvmCliApp("native-cli-app")
+val nativeCliApp = nativeCliApp("native-cli-app")
 val nativeUiApp = macOsUiApp("native-ui-app")
 
 val samples = listOf(
@@ -80,12 +80,16 @@ val samples = listOf(
     jvmUiApp.derive("customized"),
 
     nativeCliApp,
+    nativeCliApp.derive("customized", "app"),
 
     nativeUiApp,
     nativeUiApp.derive("customized")
 )
 
-val generators = samples.filterIsInstance<DerivedSample>().map { sample ->
+val sampleApps = samples.filterIsInstance<App>()
+val derivedSamples = samples.filterIsInstance<DerivedSample>()
+
+val generators = derivedSamples.map { sample ->
     if (!sample.derivedFrom.srcDir.isDirectory) {
         throw IllegalArgumentException("Missing source directory ${sample.derivedFrom.srcDir}")
     }
@@ -105,15 +109,25 @@ val script = tasks.register("generate-script") {
         val scriptFile = file("run-all-2.sh")
         PrintWriter(scriptFile.bufferedWriter()).use { writer ->
             writer.run {
-                for (sample in samples.filterIsInstance<App>()) {
+                for (sample in sampleApps) {
+                    if (sample.nature is CliApp) {
+                        println("""
+                            if [ ! -f ${sample.dir}/build/dist-image/${sample.nature.launcher} ]; then
+                               echo '${sample.name} launcher "${sample.nature.launcher}" not found'
+                               exit 1
+                            fi
+                        """.trimIndent())
+                    }
+                }
+                for (sample in sampleApps) {
+                    println()
                     println("echo '==== ${sample.name} ===='")
                     if (sample.nature is CliApp) {
                         println("${sample.dir}/build/dist-image/${sample.nature.launcher} 1 + 2")
                     } else {
-                        println("echo UI app")
+                        println("echo '(UI app)'")
                     }
                     println("echo")
-                    println()
                 }
             }
         }
@@ -128,6 +142,8 @@ tasks.register("generate") {
 fun jvmCliApp(name: String) = BaseApp(name, projectDir, CliApp(name, false), "main")
 
 fun jvmUiApp(name: String) = BaseApp(name, projectDir, UiApp, "main")
+
+fun nativeCliApp(name: String) = BaseApp(name, projectDir, CliApp(name, false), "commonMain")
 
 fun macOsUiApp(name: String) = BaseApp(name, projectDir, UiApp, "macosMain")
 

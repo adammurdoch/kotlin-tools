@@ -1,9 +1,9 @@
 package net.rubygrapefruit.app.tasks
 
 import net.rubygrapefruit.app.NativeMachine
-import net.rubygrapefruit.app.Versions
 import net.rubygrapefruit.app.internal.currentOs
 import net.rubygrapefruit.download.DownloadRepository
+import net.rubygrapefruit.plugins.bootstrap.Versions
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
@@ -38,17 +38,30 @@ abstract class NativeBinary : DefaultTask() {
     fun install() {
         val repository = DownloadRepository()
         val args = when (currentOs.machine) {
-            NativeMachine.LinuxX64 -> Args(
-                URI("https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-22.2.0/graalvm-ce-java11-linux-amd64-22.2.0.tar.gz"),
-                "graalvm-ce-java11-linux-amd64-22.2.0"
-            )
-            NativeMachine.MacOSX64, NativeMachine.MacOSArm64 -> {
-                val baseName = "graalvm-jdk-${Versions().java}_macos-x64"
+            NativeMachine.LinuxX64 -> {
+                val baseName = "graalvm-jdk-${Versions.java}_linux-x64"
                 Args(
-                    URI("https://download.oracle.com/graalvm/${Versions().java}/latest/${baseName}_bin.tar.gz"),
+                    URI("https://download.oracle.com/graalvm/${Versions.java}/latest/${baseName}_bin.tar.gz"),
                     baseName
                 )
             }
+
+            NativeMachine.MacOSX64 -> {
+                val baseName = "graalvm-jdk-${Versions.java}_macos-x64"
+                Args(
+                    URI("https://download.oracle.com/graalvm/${Versions.java}/latest/${baseName}_bin.tar.gz"),
+                    baseName
+                )
+            }
+
+            NativeMachine.MacOSArm64 -> {
+                val baseName = "graalvm-jdk-${Versions.java}_macos-aarch64"
+                Args(
+                    URI("https://download.oracle.com/graalvm/${Versions.java}/latest/${baseName}_bin.tar.gz"),
+                    baseName
+                )
+            }
+
             else -> TODO()
         }
 

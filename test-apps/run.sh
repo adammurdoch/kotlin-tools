@@ -6,10 +6,17 @@ function run_app() {
   else
     NAME=$2
   fi
+  DIST_IMAGE="./test-apps/$1/build/dist-image"
+  LAUNCHER=""$DIST_IMAGE/$NAME""
   echo ""
   echo "== $1 =="
-  du -sh ./test-apps/$1/build/dist-image
-  time ./test-apps/$1/build/dist-image/$NAME $ARGS
+  du -sh "$DIST_IMAGE" || exit 1
+  if [ -f "$DIST_IMAGE/jvm/bin/java" ]; then
+    otool -hv "$DIST_IMAGE/jvm/bin/java"
+  else
+    otool -hv "$LAUNCHER"
+  fi
+  time "$LAUNCHER" $ARGS || exit 1
 }
 
 run_app jvm-cli-app

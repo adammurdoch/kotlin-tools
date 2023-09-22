@@ -16,22 +16,32 @@ interface DerivedSample {
 
 sealed class AppNature {
     abstract fun derive(launcher: String): AppNature
+
+    abstract val distDirName: String
 }
 
-class CliApp(val launcher: String, val embeddedJvm: Boolean) : AppNature() {
+class CliApp(val launcher: String, private val embeddedJvm: Boolean) : AppNature() {
     override fun derive(launcher: String): AppNature {
         return CliApp(launcher, embeddedJvm)
     }
+
+    override val distDirName: String
+        get() = "build/dist-image"
 }
 
-object UiApp : AppNature() {
+class UiApp(private val appName: String) : AppNature() {
     override fun derive(launcher: String): AppNature {
-        return this
+        return UiApp(launcher)
     }
+
+    override val distDirName: String
+        get() = "build/debug/${appName}.app"
 }
 
 sealed class App(name: String, baseDir: File, val nature: AppNature, srcDirName: String) :
-    Sample(name, baseDir, srcDirName)
+    Sample(name, baseDir, srcDirName) {
+    val distDir = dir.resolve(nature.distDirName)
+}
 
 class BaseApp(name: String, baseDir: File, nature: AppNature, srcDirName: String) :
     App(name, baseDir, nature, srcDirName) {
@@ -77,13 +87,13 @@ val samples = listOf(
     jvmCliApp.derive("native-binary-customized", "app"),
 
     jvmUiApp,
-    jvmUiApp.derive("customized"),
+    jvmUiApp.derive("customized", "App"),
 
     nativeCliApp,
     nativeCliApp.derive("customized", "app"),
 
     nativeUiApp,
-    nativeUiApp.derive("customized")
+    nativeUiApp.derive("customized", "App")
 )
 
 val sampleApps = samples.filterIsInstance<App>()
@@ -110,20 +120,35 @@ val script = tasks.register("generate-script") {
         PrintWriter(scriptFile.bufferedWriter()).use { writer ->
             writer.run {
                 for (sample in sampleApps) {
+                    println(
+                        """
+                            if [ ! -d ${sample.distDir} ]; then
+                               echo '${sample.name} distribution "${sample.distDir}" not found'
+                               exit 1
+                            fi
+                        """.trimIndent()
+                    )
                     if (sample.nature is CliApp) {
-                        println("""
-                            if [ ! -f ${sample.dir}/build/dist-image/${sample.nature.launcher} ]; then
+                        println(
+                            """
+                            if [ ! -f ${sample.distDir}/${sample.nature.launcher} ]; then
                                echo '${sample.name} launcher "${sample.nature.launcher}" not found'
                                exit 1
                             fi
-                        """.trimIndent())
+                        """.trimIndent()
+                        )
                     }
                 }
+
                 for (sample in sampleApps) {
                     println()
                     println("echo '==== ${sample.name} ===='")
+                    println("DU_OUT=`du -sh ${sample.distDir}`")
+                    println("DU_ARR=(\$DU_OUT)")
+                    println("echo \"dist size: \${DU_ARR[0]}\"")
+                    println("echo")
                     if (sample.nature is CliApp) {
-                        println("${sample.dir}/build/dist-image/${sample.nature.launcher} 1 + 2")
+                        println("${sample.distDir}/${sample.nature.launcher} 1 + 2")
                     } else {
                         println("echo '(UI app)'")
                     }
@@ -141,11 +166,11 @@ tasks.register("generate") {
 
 fun jvmCliApp(name: String) = BaseApp(name, projectDir, CliApp(name, false), "main")
 
-fun jvmUiApp(name: String) = BaseApp(name, projectDir, UiApp, "main")
+fun jvmUiApp(name: String) = BaseApp(name, projectDir, UiApp(name.capitalize()), "main")
 
 fun nativeCliApp(name: String) = BaseApp(name, projectDir, CliApp(name, false), "commonMain")
 
-fun macOsUiApp(name: String) = BaseApp(name, projectDir, UiApp, "macosMain")
+fun macOsUiApp(name: String) = BaseApp(name, projectDir, UiApp(name.capitalize()), "macosMain")
 
 fun jvmLib(name: String) = BaseLib(name, projectDir, "main")
 

@@ -34,17 +34,25 @@ kotlin {
 
 gradlePlugin {
     plugins {
-        create("bootstrap-jvm") {
+        create("jvm-base") {
             id = "net.rubygrapefruit.bootstrap.jvm-base"
             implementationClass = "net.rubygrapefruit.plugins.bootstrap.JvmBasePlugin"
         }
-        create("bootstrap-jvm-lib") {
+        create("jvm-lib") {
             id = "net.rubygrapefruit.bootstrap.jvm.lib"
             implementationClass = "net.rubygrapefruit.plugins.bootstrap.JvmLibraryPlugin"
         }
-        create("bootstrap-plugin") {
+        create("gradle-plugin") {
             id = "net.rubygrapefruit.bootstrap.gradle-plugin"
             implementationClass = "net.rubygrapefruit.plugins.bootstrap.JvmGradlePlugin"
+        }
+        create("settings") {
+            id = "net.rubygrapefruit.bootstrap.settings"
+            implementationClass = "net.rubygrapefruit.plugins.bootstrap.SettingsPlugin"
+        }
+        create("included-builds") {
+            id = "net.rubygrapefruit.bootstrap.included-build"
+            implementationClass = "net.rubygrapefruit.plugins.bootstrap.IncludedBuildPlugin"
         }
     }
 }

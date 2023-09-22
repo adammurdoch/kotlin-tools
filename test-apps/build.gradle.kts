@@ -18,15 +18,38 @@ sealed class AppNature {
     abstract fun derive(launcher: String): AppNature
 
     abstract val distDirName: String
+
+    abstract val cliLauncherPath: String?
+
+    abstract val nativeBinaryPath: String?
 }
 
-class CliApp(val launcher: String, private val embeddedJvm: Boolean) : AppNature() {
+class JvmCliApp(override val cliLauncherPath: String, private val embeddedJvm: Boolean) : AppNature() {
     override fun derive(launcher: String): AppNature {
-        return CliApp(launcher, embeddedJvm)
+        return JvmCliApp(launcher, embeddedJvm)
     }
 
     override val distDirName: String
         get() = "build/dist-image"
+
+    override val nativeBinaryPath = if (embeddedJvm) {
+        "jvm/bin/java"
+    } else {
+        null
+    }
+}
+
+class NativeBinaryCliApp(override val cliLauncherPath: String) : AppNature() {
+    override fun derive(launcher: String): AppNature {
+        return NativeBinaryCliApp(launcher)
+    }
+
+    override val distDirName: String
+        get() = "build/dist-image"
+
+
+    override val nativeBinaryPath: String
+        get() = cliLauncherPath
 }
 
 class UiApp(private val appName: String) : AppNature() {
@@ -36,11 +59,30 @@ class UiApp(private val appName: String) : AppNature() {
 
     override val distDirName: String
         get() = "build/debug/${appName}.app"
+
+    override val cliLauncherPath: String?
+        get() = null
+
+    override val nativeBinaryPath: String
+        get() = "Contents/MacOS/${appName}"
 }
 
 sealed class App(name: String, baseDir: File, val nature: AppNature, srcDirName: String) :
     Sample(name, baseDir, srcDirName) {
+
     val distDir = dir.resolve(nature.distDirName)
+
+    val cliLauncher = if (nature.cliLauncherPath != null) {
+        distDir.resolve(nature.cliLauncherPath!!)
+    } else {
+        null
+    }
+
+    val nativeBinary = if (nature.nativeBinaryPath != null) {
+        distDir.resolve(nature.nativeBinaryPath!!)
+    } else {
+        null
+    }
 }
 
 class BaseApp(name: String, baseDir: File, nature: AppNature, srcDirName: String) :
@@ -128,11 +170,21 @@ val script = tasks.register("generate-script") {
                             fi
                         """.trimIndent()
                     )
-                    if (sample.nature is CliApp) {
+                    if (sample.cliLauncher != null) {
                         println(
                             """
-                            if [ ! -f ${sample.distDir}/${sample.nature.launcher} ]; then
-                               echo '${sample.name} launcher "${sample.nature.launcher}" not found'
+                            if [ ! -f ${sample.cliLauncher} ]; then
+                               echo '${sample.name} launcher "${sample.cliLauncher}" not found'
+                               exit 1
+                            fi
+                        """.trimIndent()
+                        )
+                    }
+                    if (sample.nativeBinary != null && sample.nativeBinary != sample.cliLauncher) {
+                        println(
+                            """
+                            if [ ! -f ${sample.nativeBinary} ]; then
+                               echo '${sample.name} binary "${sample.nativeBinary}" not found'
                                exit 1
                             fi
                         """.trimIndent()
@@ -146,9 +198,12 @@ val script = tasks.register("generate-script") {
                     println("DU_OUT=`du -sh ${sample.distDir}`")
                     println("DU_ARR=(\$DU_OUT)")
                     println("echo \"dist size: \${DU_ARR[0]}\"")
+                    if (sample.nativeBinary != null) {
+                        println("echo \"arch: ??\"")
+                    }
                     println("echo")
-                    if (sample.nature is CliApp) {
-                        println("${sample.distDir}/${sample.nature.launcher} 1 + 2")
+                    if (sample.cliLauncher != null) {
+                        println("${sample.cliLauncher} 1 + 2")
                     } else {
                         println("echo '(UI app)'")
                     }
@@ -164,11 +219,11 @@ tasks.register("generate") {
     dependsOn(generators, script)
 }
 
-fun jvmCliApp(name: String) = BaseApp(name, projectDir, CliApp(name, false), "main")
+fun jvmCliApp(name: String) = BaseApp(name, projectDir, JvmCliApp(name, false), "main")
 
 fun jvmUiApp(name: String) = BaseApp(name, projectDir, UiApp(name.capitalize()), "main")
 
-fun nativeCliApp(name: String) = BaseApp(name, projectDir, CliApp(name, false), "commonMain")
+fun nativeCliApp(name: String) = BaseApp(name, projectDir, NativeBinaryCliApp(name), "commonMain")
 
 fun macOsUiApp(name: String) = BaseApp(name, projectDir, UiApp(name.capitalize()), "macosMain")
 

@@ -1,7 +1,7 @@
 
 # TODO
 
-- Native-launcher: build both macOS binaries, do not build on non-macOS machine
+- Native-launcher: build both macOS binaries, do not build on non-macOS machine, default to arm64 on an M1 machine
 - Don't include windows launcher script for embedded JVM and native exe JVM apps
 - Fix native image for windows
 - Don't add a dist task when there is no source for the current target (eg native-launcher on linux)
@@ -12,6 +12,7 @@
 - Native macOS bundle plugin
 - Configurable bundle id, app display name, app version
 - Infer the main class for a JVM app
+- Configurable target JVM
 - Module-info
     - Default module name to top-most package
     - Only export packages that contain public non-internal types

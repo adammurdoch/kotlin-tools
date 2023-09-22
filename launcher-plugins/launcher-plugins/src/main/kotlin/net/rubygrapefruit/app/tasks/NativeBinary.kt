@@ -1,6 +1,7 @@
 package net.rubygrapefruit.app.tasks
 
 import net.rubygrapefruit.app.NativeMachine
+import net.rubygrapefruit.app.Versions
 import net.rubygrapefruit.app.internal.currentOs
 import net.rubygrapefruit.download.DownloadRepository
 import org.gradle.api.DefaultTask
@@ -14,6 +15,8 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.net.URI
 import javax.inject.Inject
+import kotlin.io.path.isDirectory
+import kotlin.io.path.listDirectoryEntries
 
 abstract class NativeBinary : DefaultTask() {
     @get:OutputFile
@@ -41,28 +44,27 @@ abstract class NativeBinary : DefaultTask() {
                 "graalvm-ce-java11-22.2.0/bin",
                 "linux-amd64"
             )
-            NativeMachine.MacOSX64, NativeMachine.MacOSArm64 -> Args(
-                URI("https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-22.2.0/graalvm-ce-java11-darwin-amd64-22.2.0.tar.gz"),
-                "graalvm-ce-java11-darwin-amd64-22.2.0",
-                "graalvm-ce-java11-22.2.0/Contents/Home/bin",
-                "darwin-amd64"
-            )
+            NativeMachine.MacOSX64, NativeMachine.MacOSArm64 -> {
+                val baseName = "graalvm-jdk-${Versions().java}_macos-x64"
+                Args(
+                    URI("https://download.oracle.com/graalvm/${Versions().java}/latest/${baseName}_bin.tar.gz"),
+                    baseName,
+                    "??",
+                    "darwin-amd64"
+                )
+            }
             else -> TODO()
         }
 
-        val dir = repository.install(args.distribution, args.installName) { dir ->
-            val tool = dir.resolve("${args.binDirPath}/gu")
-            processOperations.exec { spec ->
-                spec.commandLine(tool, "install", "native-image")
-            }
-        }
+        val dir = repository.install(args.distribution, args.installName)
+        val binDir = dir.listDirectoryEntries().first { it.isDirectory() }.resolve("Contents/Home/bin")
+        require(binDir.isDirectory())
 
-        val nativeImage = dir.resolve("${args.binDirPath}/native-image")
+        val nativeImage = binDir.resolve("native-image")
         processOperations.exec { spec ->
             spec.commandLine(
                 nativeImage,
                 "-o", launcherFile.get().asFile.absolutePath,
-                "--target=${args.target}",
                 "--no-fallback",
                 "--module-path", modulePath.asPath,
                 "--module", "${module.get()}/${mainClass.get()}"

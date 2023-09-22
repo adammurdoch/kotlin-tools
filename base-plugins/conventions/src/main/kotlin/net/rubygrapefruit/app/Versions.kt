@@ -5,7 +5,7 @@ import net.rubygrapefruit.plugins.bootstrap.Versions
 /**
  * Various target versions for the plugins.
  */
-abstract class Versions {
+open class Versions {
     val kotlin: String
         get() = Versions.kotlin
 

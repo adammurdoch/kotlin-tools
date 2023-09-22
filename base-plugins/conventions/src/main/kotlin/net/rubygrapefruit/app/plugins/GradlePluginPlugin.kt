@@ -13,9 +13,12 @@ class GradlePluginPlugin : Plugin<Project> {
             plugins.apply("java-gradle-plugin")
             plugins.apply("org.jetbrains.kotlin.jvm")
             plugins.apply(JvmConventionsPlugin::class.java)
-            JvmConventionsPlugin.javaVersion(this, Versions.pluginsJava)
 
             repositories.mavenCentral()
+
+            extensions.create("versions", net.rubygrapefruit.app.Versions::class.java)
+
+            JvmConventionsPlugin.javaVersion(this, Versions.pluginsJava)
             dependencies.add("implementation", "${Versions.pluginsGroup}:conventions:${Versions.pluginsVersion}")
         }
     }

@@ -2,12 +2,12 @@
 # TODO
 
 - Native-launcher: build both macOS binaries, do not build on non-macOS machine, default to arm64 on an M1 machine
+- Native-launcher: fix for linux and Windows
 - Don't include windows launcher script for embedded JVM and native exe JVM apps
 - Fix native image for windows
+- Use `jlink` from arm64 toolchain on m1 macOS
 - Don't add a dist task when there is no source for the current target (eg native-launcher on linux)
 - Download service: don't keep the install dir when install action fails
-- Set JDK to correct architecture somehow?
-- Use `jlink` from arm64 toolchain on m1 macOS
 - Native app plugin creates distributions for all targets
 - Native macOS bundle plugin
 - Configurable bundle id, app display name, app version
@@ -18,8 +18,6 @@
     - Only export packages that contain public non-internal types
     - Figure out how to enforce for Kotlin JVM compilation
     - Use an artifact transform to extract the module info for dependencies
-- Use correct architecture for macOS native binary, embedded JVM and GraalVM native binary output.
-    - Bundle native launcher for each platform in the plugins.
 - Add some kind `assembleDebug` task to build a single dev target.
 - Add functional tests for plugins.
     - Customisation
@@ -33,7 +31,6 @@
     - Get the jlink tool for a toolchain
     - Add some way to get a dependency on all tasks with a given name in a build
     - Add some way to get a dependency on task with given path in a build, where the task may not exist
-    - Fix running `gradlew test-apps:x` (needs leading `:` and error message does not mention this)
     - Fix `task.flatMap { it.someOutputDir.file("some-file") }` -> does not carry task dependencies
     - Awkward to discard property value from Kotlin (set(null) is ambiguous)
     - Set property using `Path`.

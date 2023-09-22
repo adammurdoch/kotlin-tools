@@ -40,17 +40,13 @@ abstract class NativeBinary : DefaultTask() {
         val args = when (currentOs.machine) {
             NativeMachine.LinuxX64 -> Args(
                 URI("https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-22.2.0/graalvm-ce-java11-linux-amd64-22.2.0.tar.gz"),
-                "graalvm-ce-java11-linux-amd64-22.2.0",
-                "graalvm-ce-java11-22.2.0/bin",
-                "linux-amd64"
+                "graalvm-ce-java11-linux-amd64-22.2.0"
             )
             NativeMachine.MacOSX64, NativeMachine.MacOSArm64 -> {
                 val baseName = "graalvm-jdk-${Versions().java}_macos-x64"
                 Args(
                     URI("https://download.oracle.com/graalvm/${Versions().java}/latest/${baseName}_bin.tar.gz"),
-                    baseName,
-                    "??",
-                    "darwin-amd64"
+                    baseName
                 )
             }
             else -> TODO()
@@ -72,5 +68,5 @@ abstract class NativeBinary : DefaultTask() {
         }
     }
 
-    private class Args(val distribution: URI, val installName: String, val binDirPath: String, val target: String)
+    private class Args(val distribution: URI, val installName: String)
 }

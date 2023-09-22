@@ -6,6 +6,8 @@
 - Don't include windows launcher script for embedded JVM and native exe JVM apps
 - Fix native image for windows
 - Use `jlink` from arm64 toolchain on m1 macOS
+- Use `--launcher` instead of `--add-modules` with `jlink`
+- Convert automatic modules to real modules prior to using with `jlink`
 - Don't add a dist task when there is no source for the current target (eg native-launcher on linux)
 - Download service: don't keep the install dir when install action fails
 - Native app plugin creates distributions for all targets

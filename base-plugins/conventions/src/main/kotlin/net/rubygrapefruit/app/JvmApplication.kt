@@ -3,7 +3,7 @@ package net.rubygrapefruit.app
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Nested
 
-interface JvmApplication : Application {
+interface JvmApplication : Application, JvmComponent {
     /**
      * The module for this application.
      */

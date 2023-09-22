@@ -5,6 +5,7 @@ import net.rubygrapefruit.app.internal.ComponentTargets
 import net.rubygrapefruit.app.internal.JvmModuleRegistry
 import net.rubygrapefruit.app.internal.multiplatformComponents
 import net.rubygrapefruit.app.internal.toModuleName
+import net.rubygrapefruit.plugins.bootstrap.Versions
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSetContainer
@@ -22,6 +23,8 @@ class JvmLibraryPlugin : Plugin<Project> {
 
             val lib = extensions.create("library", JvmLibrary::class.java)
             lib.module.name.convention(toModuleName(project.name))
+            lib.targetJavaVersion.convention(Versions.java)
+            JvmConventionsPlugin.javaVersion(this, lib.targetJavaVersion)
 
             val runtimeClasspath = configurations.getByName("runtimeClasspath")
             val apiConfig = configurations.getByName("api")

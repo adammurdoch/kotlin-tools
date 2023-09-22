@@ -2,7 +2,7 @@ package net.rubygrapefruit.app
 
 import org.gradle.api.tasks.Nested
 
-interface JvmLibrary {
+interface JvmLibrary: JvmComponent {
     @get:Nested
     val module: JvmModule
 }

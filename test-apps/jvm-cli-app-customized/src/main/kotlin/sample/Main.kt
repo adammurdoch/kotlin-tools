@@ -1,4 +1,4 @@
-package sample.app
+package sample
 
 import sample.calc.Failure
 import sample.calc.Parser

@@ -4,6 +4,7 @@ import net.rubygrapefruit.app.internal.JvmModuleRegistry
 import net.rubygrapefruit.app.internal.MutableJvmApplication
 import net.rubygrapefruit.app.internal.applications
 import net.rubygrapefruit.app.internal.toModuleName
+import net.rubygrapefruit.plugins.bootstrap.Versions
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSetContainer
@@ -18,6 +19,9 @@ class JvmApplicationBasePlugin : Plugin<Project> {
 
             applications.withApp<MutableJvmApplication> { app ->
                 app.module.name.convention(app.appName.map(::toModuleName))
+
+                app.targetJavaVersion.convention(Versions.java)
+                JvmConventionsPlugin.javaVersion(this, app.targetJavaVersion)
 
                 val jarTask = tasks.named("jar", Jar::class.java)
                 val runtimeClasspath = configurations.getByName("runtimeClasspath")

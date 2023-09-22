@@ -12,9 +12,13 @@ object Versions {
 
     val kotlinPluginCoordinates
         get() = "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlin}"
+
+    val pluginsGroup = "net.rubygrapefruit.plugins"
+    val bootstrapPluginCoordinates
+        get() = "$pluginsGroup:bootstrap-plugins:0.1-dev"
 }
 
-group = "net.rubygrapefruit.plugins"
+group = Versions.pluginsGroup
 
 repositories {
     mavenCentral()
@@ -58,6 +62,8 @@ val generateResource = tasks.register("generate-version-resource") {
                 val serializationJson = "${Versions.serializationJson}"
                 val java = ${Versions.java}
                 val pluginsJava = ${Versions.pluginsJava}
+                val kotlinPluginCoordinates = "${Versions.kotlinPluginCoordinates}"
+                val bootstrapPluginCoordinates = "${Versions.bootstrapPluginCoordinates}"
             }
         """.trimIndent())
     }

@@ -1,15 +1,10 @@
-import net.rubygrapefruit.plugins.bootstrap.Versions
-
 plugins {
     id("net.rubygrapefruit.bootstrap.gradle-plugin")
 }
 
 group = "net.rubygrapefruit.plugins"
 
-val targetKotlinVersion = Versions.kotlin
-
 dependencies {
-    api("org.jetbrains.kotlin:kotlin-gradle-plugin:${targetKotlinVersion}")
     implementation("net.rubygrapefruit.libs:bytecode:1.0")
     implementation("net.rubygrapefruit.libs:machine-info:1.0")
 }
@@ -54,13 +49,3 @@ gradlePlugin {
         }
     }
 }
-
-val outFile = layout.buildDirectory.file("app/resources/kotlin-version.txt")
-val generateResource = tasks.register("generate-version-resource") {
-    outputs.file(outFile)
-    doLast {
-        outFile.get().asFile.writeText(targetKotlinVersion)
-    }
-}
-
-sourceSets.getByName("main").output.dir(generateResource.map { outFile.get().asFile.parentFile })

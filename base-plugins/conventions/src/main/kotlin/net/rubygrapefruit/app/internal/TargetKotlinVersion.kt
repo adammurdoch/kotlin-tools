@@ -1,7 +1,7 @@
 package net.rubygrapefruit.app.internal
 
-import net.rubygrapefruit.app.plugins.KotlinBasePlugin
+import net.rubygrapefruit.plugins.bootstrap.Versions
 
 internal val targetKotlinVersion by lazy {
-    KotlinBasePlugin::class.java.getResource("/kotlin-version.txt")!!.readText()
+    Versions.kotlin
 }

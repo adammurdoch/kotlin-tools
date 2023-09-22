@@ -4,7 +4,7 @@ plugins {
 }
 
 application {
-    mainClass.set("sample.MainKt")
+    mainClass = "sample.MainKt"
 }
 
 dependencies {

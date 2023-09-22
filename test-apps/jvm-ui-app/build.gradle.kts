@@ -3,7 +3,7 @@ plugins {
 }
 
 application {
-    mainClass.set("sample.MainKt")
+    mainClass = "sample.MainKt"
     module.requires.add("java.desktop")
 }
 

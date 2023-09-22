@@ -3,9 +3,9 @@ plugins {
 }
 
 application {
-    appName.set("app")
-    mainClass.set("sample.app.MainKt")
-    module.name.set("sample.app")
+    appName = "app"
+    mainClass = "sample.app.MainKt"
+    module.name = "sample.app"
 }
 
 dependencies {

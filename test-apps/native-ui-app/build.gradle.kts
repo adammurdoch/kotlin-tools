@@ -3,5 +3,5 @@ plugins {
 }
 
 application {
-    delegateClass.set("sample.AppDelegate")
+    delegateClass = "sample.AppDelegate"
 }

@@ -3,5 +3,5 @@ plugins {
 }
 
 library {
-    module.name.set("sample.calc")
+    module.name = "sample.calc"
 }

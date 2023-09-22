@@ -3,6 +3,6 @@ plugins {
 }
 
 application {
-    appName.set("app")
-    delegateClass.set("sample.AppDelegate")
+    appName = "app"
+    delegateClass = "sample.AppDelegate"
 }

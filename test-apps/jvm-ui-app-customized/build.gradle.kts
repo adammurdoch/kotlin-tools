@@ -3,9 +3,9 @@ plugins {
 }
 
 application {
-    appName.set("app")
-    module.name.set("sample.app")
-    mainClass.set("sample.MainKt")
+    appName = "app"
+    module.name = "sample.app"
+    mainClass = "sample.MainKt"
     module.requires.add("java.desktop")
 }
 

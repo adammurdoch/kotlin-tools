@@ -5,5 +5,5 @@ plugins {
 group = "net.rubygrapefruit.libs"
 
 library {
-    module.name.set("net.rubygrapefruit.tools.download")
+    module.name = "net.rubygrapefruit.tools.download"
 }

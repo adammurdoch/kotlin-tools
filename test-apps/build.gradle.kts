@@ -186,7 +186,7 @@ val generators = derivedSamples.map { sample ->
 
 val script = tasks.register("generate-script") {
     doLast {
-        val scriptFile = file("run-all-2.sh")
+        val scriptFile = file("run.sh")
         PrintWriter(scriptFile.bufferedWriter()).use { writer ->
             writer.run {
                 for (sample in sampleApps) {

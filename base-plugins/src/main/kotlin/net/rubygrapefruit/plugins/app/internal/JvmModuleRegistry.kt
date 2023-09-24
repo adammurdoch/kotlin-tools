@@ -1,9 +1,9 @@
 package net.rubygrapefruit.plugins.app.internal
 
 import net.rubygrapefruit.plugins.app.JvmModule
-import net.rubygrapefruit.plugins.app.tasks.InferExportedPackages
-import net.rubygrapefruit.plugins.app.tasks.InferRequiredModules
-import net.rubygrapefruit.plugins.app.tasks.JvmModuleInfo
+import net.rubygrapefruit.plugins.app.internal.tasks.InferExportedPackages
+import net.rubygrapefruit.plugins.app.internal.tasks.InferRequiredModules
+import net.rubygrapefruit.plugins.app.internal.tasks.JvmModuleInfo
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
 import org.gradle.api.file.FileCollection

@@ -15,15 +15,15 @@ gradlePlugin {
     plugins {
         create("native-binary") {
             id = "net.rubygrapefruit.jvm.native-binary"
-            implementationClass = "net.rubygrapefruit.app.plugins.NativeBinaryJvmLauncherPlugin"
+            implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.NativeBinaryJvmLauncherPlugin"
         }
         create("jvm-ui-app") {
             id = "net.rubygrapefruit.jvm.ui-app"
-            implementationClass = "net.rubygrapefruit.app.plugins.JvmUiApplicationPlugin"
+            implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.JvmUiApplicationPlugin"
         }
         create("native-ui-app") {
             id = "net.rubygrapefruit.native.ui-app"
-            implementationClass = "net.rubygrapefruit.app.plugins.NativeUiApplicationPlugin"
+            implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.NativeUiApplicationPlugin"
         }
     }
 }

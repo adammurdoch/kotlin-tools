@@ -1,7 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal
 
 import net.rubygrapefruit.plugins.app.Application
-import net.rubygrapefruit.plugins.app.tasks.DistributionImage
+import net.rubygrapefruit.plugins.app.internal.tasks.DistributionImage
 import org.gradle.api.Project
 
 open class ApplicationRegistry(private val project: Project) {

@@ -1,10 +1,12 @@
 package net.rubygrapefruit.app.plugins
 
 import net.rubygrapefruit.app.internal.DefaultJvmUiApplication
-import net.rubygrapefruit.app.internal.applications
-import net.rubygrapefruit.app.internal.currentOs
 import net.rubygrapefruit.app.tasks.LauncherConf
 import net.rubygrapefruit.app.tasks.NativeUiLauncher
+import net.rubygrapefruit.plugins.app.internal.EmbeddedJvmLauncherPlugin
+import net.rubygrapefruit.plugins.app.internal.JvmApplicationBasePlugin
+import net.rubygrapefruit.plugins.app.internal.applications
+import net.rubygrapefruit.plugins.app.internal.currentOs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.attributes.Usage

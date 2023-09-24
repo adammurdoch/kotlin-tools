@@ -1,11 +1,11 @@
 package net.rubygrapefruit.app.plugins
 
-import net.rubygrapefruit.app.NativeMachine
-import net.rubygrapefruit.app.internal.ComponentTargets
 import net.rubygrapefruit.app.internal.DefaultNativeUiApplication
-import net.rubygrapefruit.app.internal.applications
-import net.rubygrapefruit.app.internal.multiplatformComponents
 import net.rubygrapefruit.app.tasks.NativeLauncher
+import net.rubygrapefruit.plugins.app.NativeMachine
+import net.rubygrapefruit.plugins.app.internal.ComponentTargets
+import net.rubygrapefruit.plugins.app.internal.applications
+import net.rubygrapefruit.plugins.app.internal.multiplatformComponents
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -35,7 +35,7 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                 }
 
                 val extension = extensions.getByType(KotlinMultiplatformExtension::class.java)
-                val nativeTarget = extension.targets.getByName(NativeMachine.MacOSArm64.kotlinTarget) as KotlinNativeTarget
+                val nativeTarget = extension.targets.getByName(net.rubygrapefruit.plugins.app.NativeMachine.MacOSArm64.kotlinTarget) as KotlinNativeTarget
                 val executable = nativeTarget.binaries.withType(Executable::class.java).first()
                 val binaryFile = layout.file(executable.linkTaskProvider.map { it.binary.outputFile })
 

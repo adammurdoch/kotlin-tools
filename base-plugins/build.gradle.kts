@@ -15,39 +15,39 @@ gradlePlugin {
     plugins {
         create("settings") {
             id = "net.rubygrapefruit.kotlin-base"
-            implementationClass = "net.rubygrapefruit.app.plugins.KotlinBasePlugin"
+            implementationClass = "net.rubygrapefruit.plugins.app.internal.KotlinBasePlugin"
         }
         create("included-builds") {
             id = "net.rubygrapefruit.included-build"
-            implementationClass = "net.rubygrapefruit.app.plugins.IncludedBuildLifecyclePlugin"
+            implementationClass = "net.rubygrapefruit.plugins.app.internal.IncludedBuildLifecyclePlugin"
         }
         create("plugin") {
             id = "net.rubygrapefruit.gradle-plugin"
-            implementationClass = "net.rubygrapefruit.app.plugins.GradlePluginPlugin"
+            implementationClass = "net.rubygrapefruit.plugins.app.internal.GradlePluginPlugin"
         }
         create("mpp-lib") {
             id = "net.rubygrapefruit.mpp.lib"
-            implementationClass = "net.rubygrapefruit.app.plugins.MppLibraryPlugin"
+            implementationClass = "net.rubygrapefruit.plugins.app.internal.MppLibraryPlugin"
         }
         create("native-lib") {
             id = "net.rubygrapefruit.native.lib"
-            implementationClass = "net.rubygrapefruit.app.plugins.NativeLibraryPlugin"
+            implementationClass = "net.rubygrapefruit.plugins.app.internal.NativeLibraryPlugin"
         }
         create("native-cli-app") {
             id = "net.rubygrapefruit.native.cli-app"
-            implementationClass = "net.rubygrapefruit.app.plugins.NativeCliApplicationPlugin"
+            implementationClass = "net.rubygrapefruit.plugins.app.internal.NativeCliApplicationPlugin"
         }
         create("jvm-lib") {
             id = "net.rubygrapefruit.jvm.lib"
-            implementationClass = "net.rubygrapefruit.app.plugins.JvmLibraryPlugin"
+            implementationClass = "net.rubygrapefruit.plugins.app.internal.JvmLibraryPlugin"
         }
         create("jvm-cli-app") {
             id = "net.rubygrapefruit.jvm.cli-app"
-            implementationClass = "net.rubygrapefruit.app.plugins.JvmCliApplicationPlugin"
+            implementationClass = "net.rubygrapefruit.plugins.app.internal.JvmCliApplicationPlugin"
         }
         create("embedded-jvm") {
             id = "net.rubygrapefruit.jvm.embedded-jvm"
-            implementationClass = "net.rubygrapefruit.app.plugins.EmbeddedJvmLauncherPlugin"
+            implementationClass = "net.rubygrapefruit.plugins.app.internal.EmbeddedJvmLauncherPlugin"
         }
     }
 }

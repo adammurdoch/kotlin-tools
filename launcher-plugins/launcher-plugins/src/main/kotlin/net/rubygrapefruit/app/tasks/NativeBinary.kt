@@ -1,8 +1,8 @@
 package net.rubygrapefruit.app.tasks
 
-import net.rubygrapefruit.app.NativeMachine
-import net.rubygrapefruit.app.internal.currentOs
 import net.rubygrapefruit.download.DownloadRepository
+import net.rubygrapefruit.plugins.app.NativeMachine
+import net.rubygrapefruit.plugins.app.internal.currentOs
 import net.rubygrapefruit.plugins.bootstrap.Versions
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection

@@ -1,11 +1,12 @@
 package net.rubygrapefruit.app.plugins
 
 import net.rubygrapefruit.app.internal.DefaultUiApplication
-import net.rubygrapefruit.app.internal.applications
 import net.rubygrapefruit.app.tasks.AppIcon
-import net.rubygrapefruit.app.tasks.DistributionImage
 import net.rubygrapefruit.app.tasks.InfoPlist
 import net.rubygrapefruit.app.tasks.ReleaseDistribution
+import net.rubygrapefruit.plugins.app.internal.ApplicationBasePlugin
+import net.rubygrapefruit.plugins.app.internal.applications
+import net.rubygrapefruit.plugins.app.tasks.DistributionImage
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 

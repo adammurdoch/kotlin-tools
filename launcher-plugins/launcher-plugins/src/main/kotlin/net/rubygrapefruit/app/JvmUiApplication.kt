@@ -1,4 +1,4 @@
 package net.rubygrapefruit.app
 
-interface JvmUiApplication : JvmApplication, UiApplication {
+interface JvmUiApplication : net.rubygrapefruit.plugins.app.JvmApplication, UiApplication {
 }

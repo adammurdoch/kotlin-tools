@@ -1,6 +1,6 @@
 package net.rubygrapefruit.app.tasks
 
-import net.rubygrapefruit.app.internal.copyDir
+import net.rubygrapefruit.plugins.app.internal.copyDir
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property

@@ -1,4 +1,4 @@
-import net.rubygrapefruit.app.NativeMachine
+import net.rubygrapefruit.plugins.app.NativeMachine
 import net.rubygrapefruit.plugins.bootstrap.Versions
 
 plugins {

@@ -1,9 +1,10 @@
 package net.rubygrapefruit.app.plugins
 
 import net.rubygrapefruit.app.internal.JvmApplicationWithNativeBinary
-import net.rubygrapefruit.app.internal.MutableJvmApplication
-import net.rubygrapefruit.app.internal.applications
 import net.rubygrapefruit.app.tasks.NativeBinary
+import net.rubygrapefruit.plugins.app.internal.ApplicationBasePlugin
+import net.rubygrapefruit.plugins.app.internal.MutableJvmApplication
+import net.rubygrapefruit.plugins.app.internal.applications
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 

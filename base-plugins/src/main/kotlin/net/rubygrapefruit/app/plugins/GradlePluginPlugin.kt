@@ -19,7 +19,7 @@ class GradlePluginPlugin : Plugin<Project> {
             extensions.create("versions", net.rubygrapefruit.app.Versions::class.java)
 
             JvmConventionsPlugin.javaVersion(this, Versions.pluginsJava)
-            dependencies.add("implementation", "${Versions.pluginsGroup}:conventions:${Versions.pluginsVersion}")
+            dependencies.add("implementation", "${Versions.pluginsGroup}:base-plugins:${Versions.pluginsVersion}")
         }
     }
 }

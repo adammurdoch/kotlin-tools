@@ -5,7 +5,7 @@ A collection of Gradle plugins for building applications and libraries using Kot
 These plugins all target Kotlin 1.9.10 and Java 17 (for Kotlin/JVM apps).
 The plugins require Gradle 7.5.1 or later and Java 11 or later.
 
-## `net.rubygrapefruit.kotlin-apps`
+## `net.rubygrapefruit.kotlin-base`
 
 A settings plugin that must be applied to the settings of any build that uses these plugins.
 
@@ -82,7 +82,10 @@ Expects that the application uses the JVM module system.
 
 A convention plugin for implementing Gradle plugins in Kotlin/JVM.
 
-- Adds dependencies and repository definitions so that a fixed version of Kotlin available (currently 1.9.10).
+- Adds dependencies and repository definitions so that a fixed version of Kotlin (currently 1.9.10) is used to compile the plugin.
+- Targets Java 11.
+- Adds `versions` extension
+- Adds a dependency on these plugins, so their API can be used in other plugins.
 
 ## Common application settings for all targets
 

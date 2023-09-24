@@ -1,11 +1,11 @@
 
 # TODO
 
-- Native-launcher: build both macOS binaries, do not build on non-macOS machine, default to arm64 on an M1 machine
-- Native-launcher: fix for linux and Windows
+- Enable CC
+- Native ui plugin uses incorrect arch for binary on macOS x64
+- Native-launcher: build both macOS binaries, do not build on non-macOS machine
+- Native-launcher: fix Windows
 - Don't include windows launcher script for embedded JVM and native exe JVM apps
-- Fix native image for windows
-- Use `jlink` from arm64 toolchain on m1 macOS
 - Use `--launcher` instead of `--add-modules` with `jlink`
 - Convert automatic modules to real modules prior to using with `jlink`
 - Don't add a dist task when there is no source for the current target (eg native-launcher on linux)

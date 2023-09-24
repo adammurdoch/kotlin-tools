@@ -8,7 +8,6 @@ import net.rubygrapefruit.app.tasks.NativeUiLauncher
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.attributes.Usage
-import org.gradle.api.file.RegularFile
 
 class JvmUiApplicationPlugin : Plugin<Project> {
     override fun apply(target: Project) {

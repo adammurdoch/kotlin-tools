@@ -11,5 +11,5 @@ interface Application {
     /**
      * The debug distribution for this application.
      */
-    val distribution: net.rubygrapefruit.plugins.app.Distribution
+    val distribution: Distribution
 }

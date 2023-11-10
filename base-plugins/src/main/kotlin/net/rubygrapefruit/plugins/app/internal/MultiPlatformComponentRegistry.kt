@@ -18,75 +18,44 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
                 }
                 jvm()
             }
-            val nativeSourceSets = mutableListOf<KotlinSourceSet>()
-            val nativeTestSourceSets = mutableListOf<KotlinSourceSet>()
-            val unixSourceSets = mutableListOf<KotlinSourceSet>()
-            val unixTestSourceSets = mutableListOf<KotlinSourceSet>()
-            val macosSourceSets = mutableListOf<KotlinSourceSet>()
-            val macosTestSourceSets = mutableListOf<KotlinSourceSet>()
+            val unixSourceSets = mutableSetOf<String>()
+            val unixTestSourceSets = mutableSetOf<String>()
 
             if (targets.nativeTargets.contains(NativeMachine.MacOSX64)) {
                 macosX64()
-                macosSourceSets.add(sourceSets.getByName("macosX64Main"))
-                macosTestSourceSets.add(sourceSets.getByName("macosX64Test"))
+                unixSourceSets.add("macosMain")
+                unixTestSourceSets.add("macosTest")
             }
             if (targets.nativeTargets.contains(NativeMachine.MacOSArm64)) {
                 macosArm64()
-                macosSourceSets.add(sourceSets.getByName("macosArm64Main"))
-                macosTestSourceSets.add(sourceSets.getByName("macosArm64Test"))
+                unixSourceSets.add("macosMain")
+                unixTestSourceSets.add("macosTest")
             }
             if (targets.nativeTargets.contains(NativeMachine.LinuxX64)) {
                 linuxX64()
-                unixSourceSets.add(sourceSets.getByName("linuxX64Main"))
-                unixTestSourceSets.add(sourceSets.getByName("linuxX64Test"))
+                unixSourceSets.add("linuxMain")
+                unixTestSourceSets.add("linuxTest")
             }
             if (targets.nativeTargets.contains(NativeMachine.WindowsX64)) {
                 mingwX64()
-                nativeSourceSets.add(sourceSets.getByName("mingwX64Main"))
-                nativeTestSourceSets.add(sourceSets.getByName("mingwX64Test"))
             }
-            val nativeMain = sourceSets.create("nativeMain") {
-                it.dependsOn(sourceSets.getByName("commonMain"))
-            }
-            for (sourceSet in nativeSourceSets) {
-                sourceSet.dependsOn(nativeMain)
-            }
+            applyDefaultHierarchyTemplate()
 
-            // Some hacks to avoid duplicate symbol problem
+            val nativeMain = sourceSets.getByName("nativeMain")
+            val nativeTest = sourceSets.getByName("nativeTest")
 
-            val commonTest = sourceSets.getByName("commonTest")
-            val nativeTest = sourceSets.create("nativeTest") {
-                it.dependsOn(commonTest)
-            }
-            for (sourceSet in nativeTestSourceSets) {
-                sourceSet.dependsOn(nativeTest)
-            }
-            if (unixSourceSets.isNotEmpty() || macosSourceSets.isNotEmpty()) {
+            if (unixSourceSets.isNotEmpty()) {
                 val unixMain = sourceSets.create("unixMain") {
                     it.dependsOn(nativeMain)
                 }
                 for (sourceSet in unixSourceSets) {
-                    sourceSet.dependsOn(unixMain)
+                    sourceSets.getByName(sourceSet).dependsOn(unixMain)
                 }
                 val unixTest = sourceSets.create("unixTest") {
                     it.dependsOn(nativeTest)
                 }
                 for (sourceSet in unixTestSourceSets) {
-                    sourceSet.dependsOn(unixTest)
-                }
-                if (macosSourceSets.isNotEmpty()) {
-                    val macosMain = sourceSets.create("macosMain") {
-                        it.dependsOn(unixMain)
-                    }
-                    for (sourceSet in macosSourceSets) {
-                        sourceSet.dependsOn(macosMain)
-                    }
-                    val macosTest = sourceSets.create("macosTest") {
-                        it.dependsOn(unixTest)
-                    }
-                    for (sourceSet in macosTestSourceSets) {
-                        sourceSet.dependsOn(macosTest)
-                    }
+                    sourceSets.getByName(sourceSet).dependsOn(unixTest)
                 }
             }
         }

@@ -15,7 +15,6 @@ Builds a library implemented in Kotlin/Native that targets native desktop platfo
 
 - Adds Linux and Windows x64 targets and macOS x64 and arm64 targets.
 - Adds `unixMain` source sets for Kotlin code that is shared by macOS and Linux targets.
-- Adds `macosMain` source set for Kotlin code that is shared by macOS targets.
 
 ## `net.rubygrapefruit.native.cli-app`
 
@@ -23,7 +22,6 @@ Builds a command-line application implemented in Kotlin/Native that targets nati
 
 - Adds Linux and Windows x64 targets and macOS x64 and arm64 targets.
 - Adds `unixMain` and `unixTest` source sets for Kotlin code that is shared by macOS and Linux targets.
-- Adds `macosMain` and `macosTest` source set for Kotlin code that is shared by macOS targets.
 - Adds `application { }` block, see below for the available settings.
 
 ## `net.rubygrapefruit.native.ui-app`
@@ -36,7 +34,6 @@ Builds a library implemented in Kotlin multiplatform that targets the JVM and na
 
 - Add JVM target.
 - Adds Linux and Windows x64 targets and macOS x64 and arm64 targets.
-- Adds `nativeMain` source set for Kotlin code that is shared by native targets.
 - Adds `library { }` block, see below for the available settings.
 - Generates a `module-info` for the JVM target.
 

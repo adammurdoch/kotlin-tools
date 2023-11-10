@@ -12,6 +12,8 @@ object Constants {
 
     val kotlinPluginCoordinates
         get() = "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlin}"
+    val serializationPluginCoordinates
+        get() = "org.jetbrains.kotlin:kotlin-serialization:${serialization}"
 
     val pluginsGroup = "net.rubygrapefruit.plugins"
     val pluginsVersion = "0.1-dev"
@@ -27,6 +29,7 @@ repositories {
 
 dependencies {
     api(Constants.kotlinPluginCoordinates)
+    api(Constants.serializationPluginCoordinates)
 }
 
 kotlin {

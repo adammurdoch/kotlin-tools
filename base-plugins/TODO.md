@@ -2,6 +2,9 @@
 # TODO
 
 - Move dependency declarations into library and application blocks
+    - Jvm library and application 
+    - UI applications 
+    - commonTest for applications 
 - KMP base library - generate module file when JVM is a target
 - Enable CC
 - Native ui plugin uses incorrect arch for binary on macOS x64

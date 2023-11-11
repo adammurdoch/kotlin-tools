@@ -13,60 +13,33 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
 
     init {
         project.afterEvaluate {
-            if (unixSourceSets.isNotEmpty()) {
-                with(it.kotlin) {
-                    println("-> DEFINE UNIX SOURCE SETS")
-                    var unixMain: KotlinSourceSet? = null
-                    var unixTest: KotlinSourceSet? = null
-                    sourceSets.whenObjectAdded { sourceSet ->
-                        if (sourceSet.name == "nativeMain") {
-                            unixMain = sourceSets.create("unixMain") {
-                                println("-> ${it.name} -> ${sourceSet.name}")
-                                it.dependsOn(sourceSet)
-                            }
-                            val iter = unixSourceSets.iterator()
-                            for (name in iter) {
-                                val s = sourceSets.findByName(name)
-                                if (s != null) {
-                                    println("-> ${s.name} -> ${unixMain!!.name}")
-                                    s.dependsOn(unixMain!!)
-                                    iter.remove()
-                                }
-                            }
-                        } else if (unixMain != null && unixSourceSets.contains(sourceSet.name)) {
-                            println("-> ${sourceSet.name} -> ${unixMain!!.name}")
-                            unixSourceSets.remove(sourceSet.name)
-                            sourceSet.dependsOn(unixMain!!)
-                        } else if (sourceSet.name == "nativeTest") {
-                            unixTest = sourceSets.create("unixTest") {
-                                println("-> ${it.name} -> ${sourceSet.name}")
-                                it.dependsOn(sourceSet)
-                            }
-                        } else if (unixTest != null && unixTestSourceSets.contains(sourceSet.name)) {
-                            println("-> ${sourceSet.name} -> ${unixTest!!.name}")
-                            unixTestSourceSets.remove(sourceSet.name)
-                            sourceSet.dependsOn(unixTest!!)
+            createIntermediateSourceSet("unixMain", "nativeMain", unixSourceSets)
+            createIntermediateSourceSet("unixTest", "nativeTest", unixTestSourceSets)
+        }
+    }
+
+    private fun createIntermediateSourceSet(name: String, parent: String, children: MutableSet<String>) {
+        if (children.isEmpty()) {
+            return
+        }
+        with(project.kotlin) {
+            var intermediate: KotlinSourceSet? = null
+            sourceSets.whenObjectAdded { sourceSet ->
+                if (sourceSet.name == parent) {
+                    intermediate = sourceSets.create(name) {
+                        it.dependsOn(sourceSet)
+                    }
+                    val iter = children.iterator()
+                    for (childName in iter) {
+                        val child = sourceSets.findByName(childName)
+                        if (child != null) {
+                            child.dependsOn(intermediate!!)
+                            iter.remove()
                         }
                     }
-
-                    /*
-                    applyDefaultHierarchyTemplate()
-                    println("-> SOURCE SETS: ${sourceSets.names}")
-                    val nativeMain = sourceSets.getByName("nativeMain")
-                    val nativeTest = sourceSets.getByName("nativeTest")
-                    val unixMain = sourceSets.create("unixMain") {
-                        it.dependsOn(nativeMain)
-                    }
-                    for (sourceSet in unixSourceSets) {
-                        sourceSets.getByName(sourceSet).dependsOn(unixMain)
-                    }
-                    val unixTest = sourceSets.create("unixTest") {
-                        it.dependsOn(nativeTest)
-                    }
-                    for (sourceSet in unixTestSourceSets) {
-                        sourceSets.getByName(sourceSet).dependsOn(unixTest)
-                    }
-                    */
+                } else if (intermediate != null && children.contains(sourceSet.name)) {
+                    children.remove(sourceSet.name)
+                    sourceSet.dependsOn(intermediate!!)
                 }
             }
         }

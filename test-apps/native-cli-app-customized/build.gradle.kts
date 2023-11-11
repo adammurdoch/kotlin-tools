@@ -4,15 +4,8 @@ plugins {
 
 application {
     appName = "app"
-}
-
-kotlin {
-    sourceSets {
-        named("commonMain") {
-            dependencies {
-                implementation(project(":kmp-lib-customized"))
-                implementation(project(":native-lib"))
-            }
-        }
+    common {
+        implementation(project(":kmp-lib-customized"))
+        implementation(project(":native-lib"))
     }
 }

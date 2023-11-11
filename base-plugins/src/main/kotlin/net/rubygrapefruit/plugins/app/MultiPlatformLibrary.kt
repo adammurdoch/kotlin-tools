@@ -32,4 +32,9 @@ interface MultiPlatformLibrary {
      * Configures common dependencies.
      */
     fun common(config: KotlinDependencyHandler.() -> Unit)
+
+    /**
+     * Configures common test dependencies.
+     */
+    fun test(config: KotlinDependencyHandler.() -> Unit)
 }

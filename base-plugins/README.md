@@ -15,6 +15,7 @@ Builds a library implemented in Kotlin multiplatform that targets native desktop
 
 - Adds Linux and Windows x64 targets and macOS x64 and arm64 targets.
 - Adds `unixMain` source sets for Kotlin code that is shared by macOS and Linux targets.
+- Adds a `library { }` block.
 
 ## `net.rubygrapefruit.native.cli-app`
 
@@ -28,11 +29,17 @@ Builds a command-line application implemented in Kotlin multiplatform that targe
 
 Builds a UI application implemented in Kotlin multiplatform that targets native desktop platforms.
 
+## `net.rubygrapefruit.kmp.base-lib`
+
+Builds a library implemented in Kotlin multiplatform. Does not define any targets, these have to be explicitly 
+defined.
+
 ## `net.rubygrapefruit.kmp.lib`
 
 Builds a library implemented in Kotlin multiplatform that targets the JVM, browser and native desktop platforms.
 
 - Add JVM target.
+- Add browser target.
 - Adds Linux and Windows x64 targets and macOS x64 and arm64 targets.
 - Adds `library { }` block, see below for the available settings.
 - Generates a `module-info` for the JVM target.

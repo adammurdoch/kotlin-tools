@@ -2,7 +2,7 @@
 # TODO
 
 - Move dependency declarations into library and application blocks
-- KMP base library - allow Java target to be configured
+- KMP base library - generate module file when JVM is a target
 - Enable CC
 - Native ui plugin uses incorrect arch for binary on macOS x64
 - Native-launcher: build both macOS binaries, do not build on non-macOS machine
@@ -16,7 +16,6 @@
 - Native macOS bundle plugin
 - Configurable bundle id, app display name, app version
 - Infer the main class for a JVM app
-- Configurable target JVM
 - Module-info
     - Default module name to top-most package
     - Only export packages that contain public non-internal types

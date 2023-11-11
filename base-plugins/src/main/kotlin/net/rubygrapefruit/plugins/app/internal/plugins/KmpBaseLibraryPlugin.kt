@@ -18,7 +18,7 @@ class KmpBaseLibraryPlugin : Plugin<Project> {
                 DefaultMultiPlatformLibrary::class.java,
                 multiplatformComponents,
                 objects,
-                project.name
+                project
             )
         }
     }

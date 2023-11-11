@@ -3,15 +3,16 @@ package net.rubygrapefruit.plugins.app.internal
 import net.rubygrapefruit.plugins.app.JvmLibrary
 import net.rubygrapefruit.plugins.app.JvmModule
 import net.rubygrapefruit.plugins.app.MultiPlatformLibrary
-import net.rubygrapefruit.plugins.app.NativeMachine
 import net.rubygrapefruit.plugins.bootstrap.Versions
+import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
+import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import javax.inject.Inject
 
 internal open class DefaultMultiPlatformLibrary @Inject constructor(
     private val componentRegistry: MultiPlatformComponentRegistry,
     private val factory: ObjectFactory,
-    private val projectName: String
+    private val project: Project
 ) : MultiPlatformLibrary {
     private var jvm: JvmLibrary? = null
 
@@ -25,7 +26,7 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
     override fun jvm(config: JvmLibrary.() -> Unit) {
         if (jvm == null) {
             val lib = factory.newInstance(JvmLibrary::class.java)
-            lib.module.name.convention(toModuleName(projectName))
+            lib.module.name.convention(toModuleName(project.name))
             lib.targetJavaVersion.convention(Versions.java)
             jvm = lib
             componentRegistry.jvm(lib.targetJavaVersion)
@@ -37,14 +38,15 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
         componentRegistry.browser()
     }
 
+    override fun macOS() {
+        componentRegistry.macOS()
+    }
+
     override fun nativeDesktop() {
-        componentRegistry.native(
-            setOf(
-                NativeMachine.LinuxX64,
-                NativeMachine.MacOSX64,
-                NativeMachine.MacOSArm64,
-                NativeMachine.WindowsX64
-            )
-        )
+        componentRegistry.desktop()
+    }
+
+    override fun common(config: KotlinDependencyHandler.() -> Unit) {
+        project.kotlin.sourceSets.getByName("commonMain").dependencies { config() }
     }
 }

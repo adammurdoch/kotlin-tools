@@ -6,8 +6,5 @@ group = "net.rubygrapefruit.libs"
 
 library {
     module.name = "net.rubygrapefruit.tools.download"
-}
-
-kotlin {
-    jvmToolchain(versions.pluginsJava)
+    targetJavaVersion = versions.pluginsJava
 }

@@ -17,42 +17,11 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
             plugins.apply(ApplicationBasePlugin::class.java)
 
-            multiplatformComponents.native(
-                setOf(
-                    NativeMachine.LinuxX64,
-                    NativeMachine.MacOSX64,
-                    NativeMachine.MacOSArm64,
-                    NativeMachine.WindowsX64
-                )
-            )
-            applications.withApp<DefaultNativeCliApplication> { app ->
-                with(extensions.getByType(KotlinMultiplatformExtension::class.java)) {
-                    macosX64 {
-                        binaries {
-                            executable {
-                            }
-                        }
-                    }
-                    macosArm64 {
-                        binaries {
-                            executable {
-                            }
-                        }
-                    }
-                    linuxX64 {
-                        binaries {
-                            executable {
-                            }
-                        }
-                    }
-                    mingwX64 {
-                        binaries {
-                            executable {
-                            }
-                        }
-                    }
-                }
+            multiplatformComponents.desktop {
+                executable { }
+            }
 
+            applications.withApp<DefaultNativeCliApplication> { app ->
                 val extension = extensions.getByType(KotlinMultiplatformExtension::class.java)
                 for (machine in NativeMachine.values()) {
                     if (currentOs.canBuild(machine)) {

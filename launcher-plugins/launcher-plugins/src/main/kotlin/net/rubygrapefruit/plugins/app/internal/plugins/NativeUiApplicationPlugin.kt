@@ -1,11 +1,10 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
-import net.rubygrapefruit.plugins.app.internal.DefaultNativeUiApplication
-import net.rubygrapefruit.plugins.app.internal.tasks.NativeLauncher
 import net.rubygrapefruit.plugins.app.NativeMachine
-import net.rubygrapefruit.plugins.app.internal.ComponentTargets
+import net.rubygrapefruit.plugins.app.internal.DefaultNativeUiApplication
 import net.rubygrapefruit.plugins.app.internal.applications
 import net.rubygrapefruit.plugins.app.internal.multiplatformComponents
+import net.rubygrapefruit.plugins.app.internal.tasks.NativeLauncher
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -17,7 +16,7 @@ class NativeUiApplicationPlugin : Plugin<Project> {
         with(target) {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
             plugins.apply(UiApplicationBasePlugin::class.java)
-            multiplatformComponents.registerSourceSets(ComponentTargets(null, setOf(NativeMachine.MacOSArm64, NativeMachine.MacOSX64)))
+            multiplatformComponents.native(setOf(NativeMachine.MacOSArm64, NativeMachine.MacOSX64))
             applications.withApp<DefaultNativeUiApplication> { app ->
                 with(extensions.getByType(KotlinMultiplatformExtension::class.java)) {
                     macosX64 {
@@ -35,7 +34,8 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                 }
 
                 val extension = extensions.getByType(KotlinMultiplatformExtension::class.java)
-                val nativeTarget = extension.targets.getByName(net.rubygrapefruit.plugins.app.NativeMachine.MacOSArm64.kotlinTarget) as KotlinNativeTarget
+                val nativeTarget =
+                    extension.targets.getByName(net.rubygrapefruit.plugins.app.NativeMachine.MacOSArm64.kotlinTarget) as KotlinNativeTarget
                 val executable = nativeTarget.binaries.withType(Executable::class.java).first()
                 val binaryFile = layout.file(executable.linkTaskProvider.map { it.binary.outputFile })
 

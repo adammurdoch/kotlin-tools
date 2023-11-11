@@ -6,7 +6,6 @@ import net.rubygrapefruit.plugins.app.MultiPlatformLibrary
 import net.rubygrapefruit.plugins.app.NativeMachine
 import net.rubygrapefruit.plugins.bootstrap.Versions
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.Provider
 import javax.inject.Inject
 
 internal open class DefaultMultiPlatformLibrary @Inject constructor(
@@ -23,31 +22,29 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
         jvm {}
     }
 
-    override fun jvm(body: JvmLibrary.() -> Unit) {
+    override fun jvm(config: JvmLibrary.() -> Unit) {
         if (jvm == null) {
             val lib = factory.newInstance(JvmLibrary::class.java)
             lib.module.name.convention(toModuleName(projectName))
             lib.targetJavaVersion.convention(Versions.java)
             jvm = lib
+            componentRegistry.jvm(lib.targetJavaVersion)
         }
-        body(jvm!!)
+        config(jvm!!)
+    }
+
+    override fun browser() {
+        componentRegistry.browser()
     }
 
     override fun nativeDesktop() {
-        componentRegistry.registerSourceSets(
-            ComponentTargets(
-                targetJavaVersion(),
-                setOf(
-                    NativeMachine.LinuxX64,
-                    NativeMachine.MacOSX64,
-                    NativeMachine.MacOSArm64,
-                    NativeMachine.WindowsX64
-                )
+        componentRegistry.native(
+            setOf(
+                NativeMachine.LinuxX64,
+                NativeMachine.MacOSX64,
+                NativeMachine.MacOSArm64,
+                NativeMachine.WindowsX64
             )
         )
-    }
-
-    private fun targetJavaVersion(): Provider<Int>? {
-        return jvm?.targetJavaVersion
     }
 }

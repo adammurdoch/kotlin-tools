@@ -2,10 +2,10 @@ package net.rubygrapefruit.plugins.app.internal
 
 import org.gradle.api.Project
 
-val Project.applications
+val Project.applications: ApplicationRegistry
     get() = extensions.getByType(ApplicationRegistry::class.java)
 
-val Project.multiplatformComponents
+val Project.multiplatformComponents: MultiPlatformComponentRegistry
     get() = extensions.getByType(MultiPlatformComponentRegistry::class.java)
 
 internal fun Project.settingsPluginApplied() {

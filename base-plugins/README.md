@@ -30,7 +30,7 @@ Builds a UI application implemented in Kotlin multiplatform that targets native 
 
 ## `net.rubygrapefruit.kmp.lib`
 
-Builds a library implemented in Kotlin multiplatform that targets the JVM and native desktop platforms.
+Builds a library implemented in Kotlin multiplatform that targets the JVM, browser and native desktop platforms.
 
 - Add JVM target.
 - Adds Linux and Windows x64 targets and macOS x64 and arm64 targets.

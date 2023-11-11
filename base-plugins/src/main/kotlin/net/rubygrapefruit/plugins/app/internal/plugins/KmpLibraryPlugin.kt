@@ -18,6 +18,7 @@ class KmpLibraryPlugin : Plugin<Project> {
 
             val lib = extensions.getByType(MultiPlatformLibrary::class.java) as DefaultMultiPlatformLibrary
             lib.jvm()
+            lib.browser()
             lib.nativeDesktop()
 
             val extension = extensions.getByType(KotlinMultiplatformExtension::class.java)

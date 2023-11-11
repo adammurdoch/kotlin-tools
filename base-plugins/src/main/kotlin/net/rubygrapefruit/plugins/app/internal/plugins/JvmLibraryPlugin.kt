@@ -1,7 +1,6 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.JvmLibrary
-import net.rubygrapefruit.plugins.app.internal.ComponentTargets
 import net.rubygrapefruit.plugins.app.internal.JvmModuleRegistry
 import net.rubygrapefruit.plugins.app.internal.multiplatformComponents
 import net.rubygrapefruit.plugins.app.internal.toModuleName
@@ -23,7 +22,6 @@ class JvmLibraryPlugin : Plugin<Project> {
             lib.module.name.convention(toModuleName(project.name))
             lib.targetJavaVersion.convention(Versions.java)
 
-            multiplatformComponents.registerSourceSets(ComponentTargets(lib.targetJavaVersion, emptySet()))
             JvmConventionsPlugin.javaVersion(this, lib.targetJavaVersion)
 
             val runtimeClasspath = configurations.getByName("runtimeClasspath")

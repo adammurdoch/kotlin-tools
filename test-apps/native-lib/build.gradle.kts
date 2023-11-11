@@ -1,3 +1,3 @@
 plugins {
-    id("net.rubygrapefruit.native.lib")
+    id("net.rubygrapefruit.native.desktop-lib")
 }

@@ -12,15 +12,15 @@ class IncludedBuildPlugin : Plugin<Settings> {
                     val includedBuilds = target.gradle.includedBuilds
                     tasks.named("clean") {
                         it.dependsOn(includedBuilds.map { it.task(":clean") })
-                        it.dependsOn(subprojects.map { it.tasks.findByName("clean") })
+                        it.dependsOn(subprojects.mapNotNull { it.tasks.findByName("clean") })
                     }
                     tasks.named("check") {
                         it.dependsOn(includedBuilds.map { it.task(":check") })
-                        it.dependsOn(subprojects.map { it.tasks.findByName("check") })
+                        it.dependsOn(subprojects.mapNotNull { it.tasks.findByName("check") })
                     }
                     tasks.named("assemble") {
                         it.dependsOn(includedBuilds.map { it.task(":assemble") })
-                        it.dependsOn(subprojects.map { it.tasks.findByName("assemble") })
+                        it.dependsOn(subprojects.mapNotNull { it.tasks.findByName("assemble") })
                     }
                     tasks.register("dist") {
                         it.dependsOn(includedBuilds.map { it.task(":dist") })

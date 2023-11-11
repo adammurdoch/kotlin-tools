@@ -26,12 +26,12 @@ gradlePlugin {
             implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.GradlePluginPlugin"
         }
         create("mpp-lib") {
-            id = "net.rubygrapefruit.mpp.lib"
-            implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.MppLibraryPlugin"
+            id = "net.rubygrapefruit.kmp.lib"
+            implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.KmpLibraryPlugin"
         }
         create("native-lib") {
-            id = "net.rubygrapefruit.native.lib"
-            implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.NativeLibraryPlugin"
+            id = "net.rubygrapefruit.native.desktop-lib"
+            implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.NativeDesktopLibraryPlugin"
         }
         create("native-cli-app") {
             id = "net.rubygrapefruit.native.cli-app"

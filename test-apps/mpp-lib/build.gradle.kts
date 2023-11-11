@@ -1,5 +1,5 @@
 plugins {
-    id("net.rubygrapefruit.mpp.lib")
+    id("net.rubygrapefruit.kmp.lib")
 }
 
 library {

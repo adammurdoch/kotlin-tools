@@ -9,16 +9,16 @@ The plugins require Gradle 7.5.1 or later and Java 11 or later.
 
 A settings plugin that must be applied to the settings of any build that uses these plugins.
 
-## `net.rubygrapefruit.native.lib`
+## `net.rubygrapefruit.native.desktop-lib`
 
-Builds a library implemented in Kotlin/Native that targets native desktop platforms.
+Builds a library implemented in Kotlin multiplatform that targets native desktop platforms.
 
 - Adds Linux and Windows x64 targets and macOS x64 and arm64 targets.
 - Adds `unixMain` source sets for Kotlin code that is shared by macOS and Linux targets.
 
 ## `net.rubygrapefruit.native.cli-app`
 
-Builds a command-line application implemented in Kotlin/Native that targets native desktop platforms.
+Builds a command-line application implemented in Kotlin multiplatform that targets native desktop platforms.
 
 - Adds Linux and Windows x64 targets and macOS x64 and arm64 targets.
 - Adds `unixMain` and `unixTest` source sets for Kotlin code that is shared by macOS and Linux targets.
@@ -26,9 +26,9 @@ Builds a command-line application implemented in Kotlin/Native that targets nati
 
 ## `net.rubygrapefruit.native.ui-app`
 
-Builds a UI application implemented in Kotlin/Native that targets native desktop platforms.
+Builds a UI application implemented in Kotlin multiplatform that targets native desktop platforms.
 
-## `net.rubygrapefruit.mpp.lib`
+## `net.rubygrapefruit.kmp.lib`
 
 Builds a library implemented in Kotlin multiplatform that targets the JVM and native desktop platforms.
 

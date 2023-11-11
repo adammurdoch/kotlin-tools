@@ -18,6 +18,12 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
                 }
                 jvm()
             }
+            if (targets.browser) {
+                js {
+                    browser()
+                }
+            }
+
             val unixSourceSets = mutableSetOf<String>()
             val unixTestSourceSets = mutableSetOf<String>()
 

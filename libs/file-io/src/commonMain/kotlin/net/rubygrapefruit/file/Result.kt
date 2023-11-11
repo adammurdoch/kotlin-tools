@@ -8,7 +8,7 @@ sealed class Result<T> {
     abstract fun <S> map(transform: (T) -> S): Result<S>
 }
 
-sealed class Failed<T>() : Result<T>() {
+sealed class Failed<T> : Result<T>() {
     @Suppress("UNCHECKED_CAST")
     override fun <S> map(transform: (T) -> S) = this as Result<S>
 
@@ -31,7 +31,7 @@ class UnreadableEntry<T> internal constructor(private val path: String) : Failed
     }
 }
 
-class Success<T> internal constructor(val result: T) : Result<T>() {
+class Success<T> internal constructor(private val result: T) : Result<T>() {
     override fun get() = result
 
     override fun getOrNull() = result

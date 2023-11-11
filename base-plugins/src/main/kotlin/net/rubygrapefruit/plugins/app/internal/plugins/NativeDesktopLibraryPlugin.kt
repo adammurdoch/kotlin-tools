@@ -6,7 +6,7 @@ import net.rubygrapefruit.plugins.app.internal.multiplatformComponents
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
-class NativeLibraryPlugin : Plugin<Project> {
+class NativeDesktopLibraryPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             plugins.apply("org.jetbrains.kotlin.multiplatform")

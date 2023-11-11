@@ -10,9 +10,6 @@ library {
 }
 
 kotlin {
-    jvm {
-        jvmToolchain(17)
-    }
     sourceSets {
         named("commonTest") {
             dependencies {

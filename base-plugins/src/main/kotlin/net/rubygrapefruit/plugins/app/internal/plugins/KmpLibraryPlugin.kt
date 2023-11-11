@@ -1,12 +1,8 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
-import net.rubygrapefruit.plugins.app.JvmLibrary
-import net.rubygrapefruit.plugins.app.NativeMachine
-import net.rubygrapefruit.plugins.app.internal.ComponentTargets
+import net.rubygrapefruit.plugins.app.MultiPlatformLibrary
+import net.rubygrapefruit.plugins.app.internal.DefaultMultiPlatformLibrary
 import net.rubygrapefruit.plugins.app.internal.JvmModuleRegistry
-import net.rubygrapefruit.plugins.app.internal.multiplatformComponents
-import net.rubygrapefruit.plugins.app.internal.toModuleName
-import net.rubygrapefruit.plugins.bootstrap.Versions
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.jvm.tasks.Jar
@@ -17,14 +13,12 @@ class KmpLibraryPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
-            plugins.apply(LibraryBasePlugin::class.java)
+            plugins.apply(KmpBaseLibraryPlugin::class.java)
             plugins.apply(JvmConventionsPlugin::class.java)
 
-            val lib = extensions.create("library", JvmLibrary::class.java)
-            lib.module.name.convention(toModuleName(project.name))
-            lib.targetJavaVersion.convention(Versions.java)
-
-            multiplatformComponents.registerSourceSets(ComponentTargets(lib.targetJavaVersion, setOf(NativeMachine.LinuxX64, NativeMachine.MacOSX64, NativeMachine.MacOSArm64, NativeMachine.WindowsX64)))
+            val lib = extensions.getByType(MultiPlatformLibrary::class.java) as DefaultMultiPlatformLibrary
+            lib.jvm()
+            lib.nativeDesktop()
 
             val extension = extensions.getByType(KotlinMultiplatformExtension::class.java)
             val jvmTarget = extension.targets.getByName("jvm") as KotlinJvmTarget

@@ -12,7 +12,14 @@ class KmpBaseLibraryPlugin : Plugin<Project> {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
             plugins.apply(LibraryBasePlugin::class.java)
 
-            extensions.create(MultiPlatformLibrary::class.java, "library", DefaultMultiPlatformLibrary::class.java, multiplatformComponents)
+            extensions.create(
+                MultiPlatformLibrary::class.java,
+                "library",
+                DefaultMultiPlatformLibrary::class.java,
+                multiplatformComponents,
+                objects,
+                project.name
+            )
         }
     }
 }

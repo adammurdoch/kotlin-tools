@@ -3,6 +3,8 @@ plugins {
 }
 
 library {
-    module.name = "sample.calc"
-    targetJavaVersion = 11
+    jvm {
+        module.name = "sample.calc"
+        targetJavaVersion = 11
+    }
 }

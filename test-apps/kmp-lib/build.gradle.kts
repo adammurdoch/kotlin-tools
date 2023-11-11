@@ -3,5 +3,7 @@ plugins {
 }
 
 library {
-    module.name = "sample.calc"
+    jvm {
+        module.name = "sample.calc"
+    }
 }

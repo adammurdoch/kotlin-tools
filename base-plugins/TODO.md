@@ -1,6 +1,8 @@
 
 # TODO
 
+- Move dependency declarations into library and application blocks
+- KMP base library - allow Java target to be configured
 - Enable CC
 - Native ui plugin uses incorrect arch for binary on macOS x64
 - Native-launcher: build both macOS binaries, do not build on non-macOS machine

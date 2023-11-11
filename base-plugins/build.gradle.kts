@@ -25,7 +25,11 @@ gradlePlugin {
             id = "net.rubygrapefruit.gradle-plugin"
             implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.GradlePluginPlugin"
         }
-        create("mpp-lib") {
+        create("kmp-base-lib") {
+            id = "net.rubygrapefruit.kmp.base-lib"
+            implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.KmpBaseLibraryPlugin"
+        }
+        create("kmp-lib") {
             id = "net.rubygrapefruit.kmp.lib"
             implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.KmpLibraryPlugin"
         }

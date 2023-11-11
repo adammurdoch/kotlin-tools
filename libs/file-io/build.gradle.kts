@@ -1,8 +1,13 @@
 plugins {
-    id("net.rubygrapefruit.native.desktop-lib")
+    id("net.rubygrapefruit.kmp.base-lib")
 }
 
 group = "net.rubygrapefruit.libs"
+
+library {
+    jvm()
+    nativeDesktop()
+}
 
 kotlin {
     jvm {

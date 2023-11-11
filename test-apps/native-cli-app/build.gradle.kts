@@ -6,7 +6,7 @@ kotlin {
     sourceSets {
         named("commonMain") {
             dependencies {
-                implementation(project(":mpp-lib"))
+                implementation(project(":kmp-lib"))
                 implementation(project(":native-lib"))
             }
         }

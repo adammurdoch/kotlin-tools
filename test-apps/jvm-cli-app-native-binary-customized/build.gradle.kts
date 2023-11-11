@@ -10,6 +10,6 @@ application {
 }
 
 dependencies {
-    implementation(project(":mpp-lib-customized"))
+    implementation(project(":kmp-lib-customized"))
     implementation(project(":jvm-lib-customized"))
 }

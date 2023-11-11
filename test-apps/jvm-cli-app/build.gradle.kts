@@ -7,6 +7,6 @@ application {
 }
 
 dependencies {
-    implementation(project(":mpp-lib"))
+    implementation(project(":kmp-lib"))
     implementation(project(":jvm-lib"))
 }

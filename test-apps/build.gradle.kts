@@ -138,7 +138,7 @@ class DerivedLib(name: String, override val derivedFrom: BaseLib, baseDir: File,
 val jvmCliApp = jvmCliApp("jvm-cli-app")
 val jvmUiApp = jvmUiApp("jvm-ui-app")
 val jvmLib = jvmLib("jvm-lib")
-val mppLib = mppLib("mpp-lib")
+val kmpLib = mppLib("kmp-lib")
 val nativeCliApp = nativeCliApp("native-cli-app")
 val nativeUiApp = macOsUiApp("native-ui-app")
 
@@ -146,8 +146,8 @@ val samples = listOf(
     jvmLib,
     jvmLib.derive("customized"),
 
-    mppLib,
-    mppLib.derive("customized"),
+    kmpLib,
+    kmpLib.derive("customized"),
 
     jvmCliApp,
     jvmCliApp.derive("customized") { it.launcher("app") },

@@ -10,7 +10,7 @@ kotlin {
     sourceSets {
         named("commonMain") {
             dependencies {
-                implementation(project(":mpp-lib-customized"))
+                implementation(project(":kmp-lib-customized"))
                 implementation(project(":native-lib"))
             }
         }

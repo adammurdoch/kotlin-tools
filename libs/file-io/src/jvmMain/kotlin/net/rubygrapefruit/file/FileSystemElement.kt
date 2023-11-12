@@ -9,32 +9,12 @@ import kotlin.io.path.name
 import kotlin.io.path.pathString
 import kotlin.streams.toList
 
-actual sealed interface FileSystemElement {
-    /**
-     * Returns this element as a JVM `Path`.
-     */
-    fun toPath(): Path
+fun FileSystemElement.toPath(): Path {
+    return (this as JvmFileSystemElement).toPath()
+}
 
-    /**
-     * Returns this element as a JVM `File`.
-     */
-    fun toFile(): File
-
-    actual val parent: Directory?
-
-    actual val name: String
-
-    actual val absolutePath: String
-
-    actual fun metadata(): Result<ElementMetadata>
-
-    actual fun snapshot(): Result<ElementSnapshot>
-
-    actual fun posixPermissions(): Result<PosixPermissions>
-
-    actual fun setPermissions(permissions: PosixPermissions)
-
-    actual fun supports(capability: FileSystemCapability): Boolean
+fun FileSystemElement.toFile(): File {
+    return (this as JvmFileSystemElement).toFile()
 }
 
 internal open class JvmFileSystemElement(protected val path: Path) : AbstractFileSystemElement() {
@@ -58,9 +38,9 @@ internal open class JvmFileSystemElement(protected val path: Path) : AbstractFil
     override val absolutePath: String
         get() = path.pathString
 
-    override fun toPath(): Path = path
+    fun toPath(): Path = path
 
-    override fun toFile(): File = path.toFile()
+    fun toFile(): File = path.toFile()
 
     override fun metadata(): Result<ElementMetadata> {
         if (!Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
@@ -70,7 +50,8 @@ internal open class JvmFileSystemElement(protected val path: Path) : AbstractFil
     }
 
     protected fun metadataOfExistingFile(path: Path): ElementMetadata {
-        val attributes = Files.getFileAttributeView(path, BasicFileAttributeView::class.java, LinkOption.NOFOLLOW_LINKS).readAttributes()
+        val attributes = Files.getFileAttributeView(path, BasicFileAttributeView::class.java, LinkOption.NOFOLLOW_LINKS)
+            .readAttributes()
         return when {
             attributes.isRegularFile -> RegularFileMetadata(attributes.size().toULong())
             attributes.isDirectory -> DirectoryMetadata
@@ -84,12 +65,14 @@ internal open class JvmFileSystemElement(protected val path: Path) : AbstractFil
     }
 
     override fun posixPermissions(): Result<PosixPermissions> {
-        val attributes = Files.getFileAttributeView(path, PosixFileAttributeView::class.java, LinkOption.NOFOLLOW_LINKS).readAttributes()
+        val attributes = Files.getFileAttributeView(path, PosixFileAttributeView::class.java, LinkOption.NOFOLLOW_LINKS)
+            .readAttributes()
         return Success(attributes.permissions().permissions())
     }
 
     override fun setPermissions(permissions: PosixPermissions) {
-        Files.getFileAttributeView(path, PosixFileAttributeView::class.java, LinkOption.NOFOLLOW_LINKS).setPermissions(permissions.permSet())
+        Files.getFileAttributeView(path, PosixFileAttributeView::class.java, LinkOption.NOFOLLOW_LINKS)
+            .setPermissions(permissions.permSet())
     }
 
     override fun supports(capability: FileSystemCapability): Boolean {

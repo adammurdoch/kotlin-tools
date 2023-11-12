@@ -1,6 +1,7 @@
 
 ## TODO
 
+- Provide specialized subtypes of FileSystemElement for each platform
 - Add context exceptions to all operations
 - Test delete files, directories and symlinks
 - Test set/get permissions on symlinks and directories

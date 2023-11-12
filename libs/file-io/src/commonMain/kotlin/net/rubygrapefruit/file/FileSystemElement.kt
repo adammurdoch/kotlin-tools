@@ -3,7 +3,7 @@ package net.rubygrapefruit.file
 /**
  * A reference to an element in the file system.
  */
-expect sealed interface FileSystemElement {
+sealed interface FileSystemElement {
     /**
      * Returns the parent of this element, or null if this element is the root of the file system
      */
@@ -53,6 +53,7 @@ interface RegularFile : FileSystemElement {
     /**
      * Deletes this file, if it exists.
      */
+    @Throws(FileSystemException::class)
     fun delete()
 
     /**
@@ -94,6 +95,7 @@ interface Directory : FileSystemElement {
     /**
      * Deletes this directory and all of its entries recursively, if the directory exists.
      */
+    @Throws(FileSystemException::class)
     fun deleteRecursively()
 
     /**

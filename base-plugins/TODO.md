@@ -5,6 +5,7 @@
     - Jvm library and application 
     - UI applications 
     - commonTest for applications 
+- Libraries should target Java 11?
 - KMP base library - generate module file when JVM is a target
 - Enable CC
 - Native ui plugin uses incorrect arch for binary on macOS x64
@@ -28,8 +29,6 @@
 - Add functional tests for plugins.
     - Customisation
 - Refactor `DownloadRepository` to use Gradle exec service when used in a plugin.
-- Kotlin issues:
-    - Duplicate symbol error linking native test executable for mpp library when all test source sets defined 
 - Gradle issues:
     - Fix import of `test-apps` - does not seem to be included
     - Use version catalog

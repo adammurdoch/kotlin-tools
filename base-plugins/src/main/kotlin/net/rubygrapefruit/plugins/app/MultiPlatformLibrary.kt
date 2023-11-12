@@ -1,8 +1,6 @@
 package net.rubygrapefruit.plugins.app
 
-import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
-
-interface MultiPlatformLibrary {
+interface MultiPlatformLibrary : MultiPlatformComponent {
     /**
      * Adds the JVM as a target, if not already, using the defaults.
      */
@@ -27,14 +25,4 @@ interface MultiPlatformLibrary {
      * Adds the browser as a target, if not already.
      */
     fun browser()
-
-    /**
-     * Configures common dependencies.
-     */
-    fun common(config: KotlinDependencyHandler.() -> Unit)
-
-    /**
-     * Configures common test dependencies.
-     */
-    fun test(config: KotlinDependencyHandler.() -> Unit)
 }

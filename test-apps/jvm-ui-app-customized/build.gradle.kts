@@ -8,9 +8,9 @@ application {
     mainClass = "sample.MainKt"
     module.requires.add("java.desktop")
     targetJavaVersion = 11
-}
 
-dependencies {
-    implementation(project(":kmp-lib-customized"))
-    implementation(project(":jvm-lib-customized"))
+    dependencies {
+        implementation(project(":kmp-lib-customized"))
+        implementation(project(":jvm-lib-customized"))
+    }
 }

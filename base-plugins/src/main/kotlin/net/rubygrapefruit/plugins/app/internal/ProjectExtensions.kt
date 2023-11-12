@@ -1,6 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal
 
 import org.gradle.api.Project
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 val Project.applications: ApplicationRegistry
@@ -11,6 +12,9 @@ val Project.multiplatformComponents: MultiPlatformComponentRegistry
 
 val Project.kotlin: KotlinMultiplatformExtension
     get() = extensions.getByType(KotlinMultiplatformExtension::class.java)
+
+val Project.jvmKotlin: KotlinJvmProjectExtension
+    get() = extensions.getByType(KotlinJvmProjectExtension::class.java)
 
 internal fun Project.settingsPluginApplied() {
     extensions.add("__settings_plugin_applied__", "true")

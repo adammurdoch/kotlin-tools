@@ -36,4 +36,8 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     override fun common(config: KotlinDependencyHandler.() -> Unit) {
         project.kotlin.sourceSets.getByName("commonMain").dependencies { config() }
     }
+
+    override fun test(config: KotlinDependencyHandler.() -> Unit) {
+        project.kotlin.sourceSets.getByName("commonTest").dependencies { config() }
+    }
 }

@@ -5,9 +5,9 @@ plugins {
 application {
     mainClass = "sample.MainKt"
     module.requires.add("java.desktop")
-}
 
-dependencies {
-    implementation(project(":kmp-lib"))
-    implementation(project(":jvm-lib"))
+    dependencies {
+        implementation(project(":kmp-lib"))
+        implementation(project(":jvm-lib"))
+    }
 }

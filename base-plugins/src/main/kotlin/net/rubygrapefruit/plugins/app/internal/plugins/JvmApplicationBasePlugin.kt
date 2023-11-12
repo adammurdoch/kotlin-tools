@@ -21,7 +21,7 @@ class JvmApplicationBasePlugin : Plugin<Project> {
                 app.module.name.convention(app.appName.map(::toModuleName))
 
                 app.targetJavaVersion.convention(Versions.java)
-                JvmConventionsPlugin.Companion.javaVersion(this, app.targetJavaVersion)
+                JvmConventionsPlugin.javaVersion(this, app.targetJavaVersion)
 
                 val jarTask = tasks.named("jar", Jar::class.java)
                 val runtimeClasspath = configurations.getByName("runtimeClasspath")

@@ -1,8 +1,8 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.JvmLibrary
+import net.rubygrapefruit.plugins.app.internal.DefaultJvmLibrary
 import net.rubygrapefruit.plugins.app.internal.JvmModuleRegistry
-import net.rubygrapefruit.plugins.app.internal.multiplatformComponents
 import net.rubygrapefruit.plugins.app.internal.toModuleName
 import net.rubygrapefruit.plugins.bootstrap.Versions
 import org.gradle.api.Plugin
@@ -18,7 +18,7 @@ class JvmLibraryPlugin : Plugin<Project> {
             plugins.apply(LibraryBasePlugin::class.java)
             plugins.apply(JvmConventionsPlugin::class.java)
 
-            val lib = extensions.create("library", JvmLibrary::class.java)
+            val lib = extensions.create(JvmLibrary::class.java, "library", DefaultJvmLibrary::class.java)
             lib.module.name.convention(toModuleName(project.name))
             lib.targetJavaVersion.convention(Versions.java)
 

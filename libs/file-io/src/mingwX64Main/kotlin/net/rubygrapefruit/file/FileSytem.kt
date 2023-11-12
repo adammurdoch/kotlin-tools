@@ -1,9 +1,9 @@
 package net.rubygrapefruit.file
 
-actual class FileSystem {
-    actual companion object {
-        actual val currentDirectory: Directory = TODO()
+private class WinFileSystem : FileSystem {
+    override val currentDirectory: Directory = TODO()
 
-        actual val userHomeDirectory: Directory = TODO()
-    }
+    override val userHomeDirectory: Directory = TODO()
 }
+
+actual val fileSystem: FileSystem = WinFileSystem()

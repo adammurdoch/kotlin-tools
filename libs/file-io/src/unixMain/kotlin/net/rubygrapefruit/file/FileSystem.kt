@@ -1,11 +1,11 @@
 package net.rubygrapefruit.file
 
-actual class FileSystem {
-    actual companion object {
-        actual val currentDirectory: Directory
-            get() = getCurrentDir()
+private class NativeFileSystem : FileSystem {
+    override val currentDirectory: Directory
+        get() = getCurrentDir()
 
-        actual val userHomeDirectory: Directory
-            get() = getUserHomeDir()
-    }
+    override val userHomeDirectory: Directory
+        get() = getUserHomeDir()
 }
+
+actual val fileSystem: FileSystem = NativeFileSystem()

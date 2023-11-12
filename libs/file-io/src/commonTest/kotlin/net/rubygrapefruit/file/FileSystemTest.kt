@@ -6,7 +6,7 @@ import kotlin.test.assertNotNull
 class FileSystemTest {
     @Test
     fun `can query home and current directories`() {
-        assertNotNull(FileSystem.currentDirectory)
-        assertNotNull(FileSystem.userHomeDirectory)
+        assertNotNull(fileSystem.currentDirectory)
+        assertNotNull(fileSystem.userHomeDirectory)
     }
 }

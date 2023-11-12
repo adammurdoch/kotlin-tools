@@ -1,13 +1,13 @@
 package net.rubygrapefruit.file.fixtures
 
 import net.rubygrapefruit.file.Directory
-import net.rubygrapefruit.file.FileSystem
 import net.rubygrapefruit.file.RegularFile
 import net.rubygrapefruit.file.SymLink
+import net.rubygrapefruit.file.fileSystem
 
 class FilesFixture {
     val testDir by lazy {
-        val baseDir = FileSystem.currentDirectory.dir("build/test files")
+        val baseDir = fileSystem.currentDirectory.dir("build/test files")
         baseDir.createDirectories()
         baseDir.createTemporaryDirectory()
     }

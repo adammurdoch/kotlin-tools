@@ -1,7 +1,7 @@
 package net.rubygrapefruit.file
 
 /**
- * The absolute path to a file system element.
+ * The absolute path of a file system element.
  */
 interface ElementPath {
     /**

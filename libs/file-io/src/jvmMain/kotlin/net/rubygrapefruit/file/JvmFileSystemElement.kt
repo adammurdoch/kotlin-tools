@@ -9,14 +9,6 @@ import kotlin.io.path.name
 import kotlin.io.path.pathString
 import kotlin.streams.toList
 
-fun FileSystemElement.toPath(): Path {
-    return (this as JvmFileSystemElement).toPath()
-}
-
-fun FileSystemElement.toFile(): File {
-    return (this as JvmFileSystemElement).toFile()
-}
-
 internal open class JvmFileSystemElement(protected val delegate: Path) : AbstractFileSystemElement() {
     init {
         require(delegate.isAbsolute)

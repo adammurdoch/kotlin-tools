@@ -9,7 +9,6 @@ abstract class AbstractFileSystemElementTest {
     @AfterTest
     fun cleanup() {
         fixture.testDir.visitTopDown {
-            println("-> reset permissions on ${toElement()}")
             // Try to reset the test file permissions
             when (type) {
                 ElementType.Directory -> toDir().setPermissions(PosixPermissions.readWriteDirectory)

@@ -4,6 +4,15 @@ import kotlin.test.*
 
 class RegularFileTest : AbstractFileSystemElementTest() {
     @Test
+    fun `can query path elements`() {
+        val file = fixture.file("file")
+        assertEquals("file", file.name)
+        assertEquals(file.name, file.path.name)
+        assertEquals(file.absolutePath, file.path.absolutePath)
+        assertEquals(file.absolutePath, file.path.toString())
+    }
+
+    @Test
     fun `can write text to a file to create it`() {
         listOf("1234", "日本語").forEachIndexed { index, text ->
             val file = fixture.testDir.file("file-$index")

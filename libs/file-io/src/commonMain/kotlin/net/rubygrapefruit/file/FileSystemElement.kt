@@ -20,6 +20,11 @@ sealed interface FileSystemElement {
     val absolutePath: String
 
     /**
+     * Returns the absolute path of this element.
+     */
+    val path: ElementPath
+
+    /**
      * Returns a snapshot of the current metadata of the file. Does not follow symlinks.
      */
     fun metadata(): Result<ElementMetadata>

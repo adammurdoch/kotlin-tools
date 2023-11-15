@@ -7,17 +7,17 @@ sealed class ElementMetadata {
     abstract val type: ElementType
 }
 
-object DirectoryMetadata : ElementMetadata() {
+data object DirectoryMetadata : ElementMetadata() {
     override val type: ElementType
         get() = ElementType.Directory
 }
 
-object SymlinkMetadata : ElementMetadata() {
+data object SymlinkMetadata : ElementMetadata() {
     override val type: ElementType
         get() = ElementType.SymLink
 }
 
-object OtherMetadata : ElementMetadata() {
+data object OtherMetadata : ElementMetadata() {
     override val type: ElementType
         get() = ElementType.Other
 }

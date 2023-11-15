@@ -5,6 +5,12 @@ abstract class AbstractFileSystemElement : FileSystemElement {
         return absolutePath
     }
 
+    override val name: String
+        get() = path.name
+
+    override val absolutePath: String
+        get() = path.absolutePath
+
     protected fun visitTopDown(dir: Directory, visitor: (DirectoryEntry) -> Unit) {
         val result = dir.listEntries()
         if (result !is Success) {

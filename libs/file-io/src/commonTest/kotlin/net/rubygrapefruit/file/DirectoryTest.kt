@@ -4,6 +4,15 @@ import kotlin.test.*
 
 class DirectoryTest : AbstractFileSystemElementTest() {
     @Test
+    fun `can query path elements`() {
+        val dir = fixture.dir("file")
+        assertEquals("file", dir.name)
+        assertEquals(dir.name, dir.path.name)
+        assertEquals(dir.absolutePath, dir.path.absolutePath)
+        assertEquals(dir.absolutePath, dir.path.toString())
+    }
+
+    @Test
     fun `can create temporary directory`() {
         val dir = fixture.dir("parent")
         val d1 = dir.createTemporaryDirectory()

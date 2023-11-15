@@ -7,6 +7,15 @@ import kotlin.test.assertNotEquals
 
 class SymLinkTest : AbstractFileSystemElementTest() {
     @Test
+    fun `can query path elements`() {
+        val link = fixture.symlink("file", "target")
+        assertEquals("file", link.name)
+        assertEquals(link.name, link.path.name)
+        assertEquals(link.absolutePath, link.path.absolutePath)
+        assertEquals(link.absolutePath, link.path.toString())
+    }
+
+    @Test
     fun `can create a symlink`() {
         val link = fixture.testDir.symLink("link")
 

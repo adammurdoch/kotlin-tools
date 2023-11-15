@@ -5,29 +5,29 @@ package net.rubygrapefruit.file
 import kotlinx.cinterop.*
 import platform.posix.*
 
-internal open class UnixFileSystemElement(path: String) : PathFileSystemElement(path) {
+internal open class UnixFileSystemElement(path: String) : NativeFileSystemElement(path) {
     override val parent: Directory?
         get() {
-            return if (path == "/") {
+            return if (absolutePath == "/") {
                 null
             } else {
-                UnixDirectory(path.substringBeforeLast("/"))
+                UnixDirectory(absolutePath.substringBeforeLast("/"))
             }
         }
 
     override fun metadata(): Result<ElementMetadata> {
-        return stat(path)
+        return stat(path.absolutePath)
     }
 
     override fun snapshot(): Result<ElementSnapshot> {
-        return metadata().map { SnapshotImpl(path, it) }
+        return metadata().map { SnapshotImpl(path.absolutePath, it) }
     }
 
     @OptIn(UnsafeNumber::class)
     override fun posixPermissions(): Result<PosixPermissions> {
         return memScoped {
             val statBuf = alloc<stat>()
-            if (lstat(path, statBuf.ptr) != 0) {
+            if (lstat(path.absolutePath, statBuf.ptr) != 0) {
                 throw NativeException("Could not stat $path.")
             }
             Success(PosixPermissions((statBuf.st_mode.convert<UInt>() and (S_IRWXU or S_IRWXG or S_IRWXO).convert())))
@@ -36,7 +36,7 @@ internal open class UnixFileSystemElement(path: String) : PathFileSystemElement(
 
     @OptIn(UnsafeNumber::class)
     override fun setPermissions(permissions: PosixPermissions) {
-        if (lchmod(path, permissions.mode.convert()) != 0) {
+        if (lchmod(path.absolutePath, permissions.mode.convert()) != 0) {
             throw NativeException("Could not set permissions on $path.")
         }
     }
@@ -47,7 +47,7 @@ internal open class UnixFileSystemElement(path: String) : PathFileSystemElement(
 
     protected fun MemScope.fileSize(): Long {
         val statBuf = alloc<stat>()
-        if (lstat(path, statBuf.ptr) != 0) {
+        if (lstat(path.absolutePath, statBuf.ptr) != 0) {
             throw NativeException("Could not stat $path.")
         }
         return statBuf.st_size
@@ -56,17 +56,17 @@ internal open class UnixFileSystemElement(path: String) : PathFileSystemElement(
 
 internal class UnixRegularFile(path: String) : UnixFileSystemElement(path), RegularFile {
     override fun delete() {
-        if (remove(path) != 0) {
+        if (remove(path.absolutePath) != 0) {
             throw NativeException("Could not delete $path.")
         }
     }
 
     override fun writeText(text: String) {
         memScoped {
-            val des = fopen(path, "w")
+            val des = fopen(path.absolutePath, "w")
             if (des == null) {
                 if (errno == EISDIR) {
-                    throw fileExistsAndIsNotAFile(path)
+                    throw fileExistsAndIsNotAFile(path.absolutePath)
                 }
                 val errnoValue = errno
                 throw writeToFile(this@UnixRegularFile, null) { message, _ -> NativeException(message, errnoValue) }
@@ -74,7 +74,7 @@ internal class UnixRegularFile(path: String) : UnixFileSystemElement(path), Regu
             try {
                 if (fputs(text, des) == EOF) {
                     if (errno == ENOTDIR) {
-                        throw fileExistsAndIsNotAFile(path)
+                        throw fileExistsAndIsNotAFile(path.absolutePath)
                     }
                     val errnoValue = errno
                     throw writeToFile(this@UnixRegularFile, null) { message, _ -> NativeException(message, errnoValue) }
@@ -87,7 +87,7 @@ internal class UnixRegularFile(path: String) : UnixFileSystemElement(path), Regu
 
     override fun readText(): Result<String> {
         return memScoped {
-            val des = open(path, O_RDONLY)
+            val des = open(path.absolutePath, O_RDONLY)
             if (des < 0) {
                 throw NativeException("Could not open $path.")
             }
@@ -120,7 +120,7 @@ internal class UnixDirectory(path: String) : UnixFileSystemElement(path), Direct
     }
 
     override fun deleteRecursively() {
-        if (remove(path) != 0) {
+        if (remove(path.absolutePath) != 0) {
             throw NativeException("Could not delete $path.")
         }
     }
@@ -147,13 +147,13 @@ internal class UnixDirectory(path: String) : UnixFileSystemElement(path), Direct
     }
 
     override fun listEntries(): Result<List<DirectoryEntry>> {
-        val dirPointer = opendir(path)
+        val dirPointer = opendir(path.absolutePath)
         if (dirPointer == null) {
             if (errno == ENOENT) {
-                return MissingEntry(path)
+                return MissingEntry(path.absolutePath)
             }
             if (errno == EPERM || errno == EACCES) {
-                return UnreadableEntry(path)
+                return UnreadableEntry(path.absolutePath)
             }
             throw NativeException("Could not list directory '$path'.")
         }
@@ -170,13 +170,13 @@ internal class UnixDirectory(path: String) : UnixFileSystemElement(path), Direct
                         continue
                     }
                     if (entryPointer.pointed.d_type.convert<Int>() == DT_DIR) {
-                        entries.add(DirectoryEntryImpl(path, name, ElementType.Directory))
+                        entries.add(DirectoryEntryImpl(path.absolutePath, name, ElementType.Directory))
                     } else if (entryPointer.pointed.d_type.convert<Int>() == DT_LNK) {
-                        entries.add(DirectoryEntryImpl(path, name, ElementType.SymLink))
+                        entries.add(DirectoryEntryImpl(path.absolutePath, name, ElementType.SymLink))
                     } else if (entryPointer.pointed.d_type.convert<Int>() == DT_REG) {
-                        entries.add(DirectoryEntryImpl(path, name, ElementType.RegularFile))
+                        entries.add(DirectoryEntryImpl(path.absolutePath, name, ElementType.RegularFile))
                     } else {
-                        entries.add(DirectoryEntryImpl(path, name, ElementType.Other))
+                        entries.add(DirectoryEntryImpl(path.absolutePath, name, ElementType.Other))
                     }
                 }
             }
@@ -194,7 +194,7 @@ internal class UnixDirectory(path: String) : UnixFileSystemElement(path), Direct
         if (name.startsWith("/")) {
             return name
         } else if (name == ".") {
-            return path
+            return path.absolutePath
         } else if (name.startsWith("./")) {
             return resolveName(name.substring(2))
         } else if (name == "..") {
@@ -202,7 +202,7 @@ internal class UnixDirectory(path: String) : UnixFileSystemElement(path), Direct
         } else if (name.startsWith("../")) {
             return (parent as UnixDirectory).resolveName(name.substring(3))
         } else {
-            return "$path/$name"
+            return "${path.absolutePath}/$name"
         }
     }
 }
@@ -212,10 +212,10 @@ internal class UnixSymLink(path: String) : UnixFileSystemElement(path), SymLink 
         memScoped {
             val size = fileSize()
             val buffer = ByteArray(size.convert())
-            val count = readlink(path, buffer.refTo(0), size.convert())
+            val count = readlink(path.absolutePath, buffer.refTo(0), size.convert())
             if (count < 0) {
                 if (errno == EACCES) {
-                    return UnreadableEntry(path)
+                    return UnreadableEntry(path.absolutePath)
                 } else {
                     throw NativeException("Could not read symlink '$path'.")
                 }
@@ -225,13 +225,13 @@ internal class UnixSymLink(path: String) : UnixFileSystemElement(path), SymLink 
     }
 
     override fun writeSymLink(target: String) {
-        val stat = stat(path)
+        val stat = stat(path.absolutePath)
         if (stat is Success && stat.get() is SymlinkMetadata) {
-            if (remove(path) < 0) {
+            if (remove(path.absolutePath) < 0) {
                 throw NativeException("Could not delete symlink $path.")
             }
         }
-        if (symlink(target, path) < 0) {
+        if (symlink(target, path.absolutePath) < 0) {
             throw NativeException("Could not create symlink $path.")
         }
     }
@@ -324,14 +324,14 @@ internal fun createTempDir(baseDir: UnixDirectory): Directory {
 @OptIn(UnsafeNumber::class)
 internal fun createDir(dir: UnixDirectory) {
     memScoped {
-        val result = mkdir(dir.path, S_IRWXU.convert())
+        val result = mkdir(dir.path.absolutePath, S_IRWXU.convert())
         if (result != 0) {
             if (errno != EEXIST) {
                 throw NativeException("Could not create directory $dir.")
             }
-            val stat = stat(dir.path)
+            val stat = stat(dir.path.absolutePath)
             if (!stat.directory) {
-                throw directoryExistsAndIsNotADir(dir.path)
+                throw directoryExistsAndIsNotADir(dir.path.absolutePath)
             }
         }
     }

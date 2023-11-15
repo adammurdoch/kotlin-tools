@@ -17,14 +17,16 @@ fun FileSystemElement.toFile(): File {
     return (this as JvmFileSystemElement).toFile()
 }
 
-internal open class JvmFileSystemElement(protected val path: Path) : AbstractFileSystemElement() {
+internal open class JvmFileSystemElement(protected val delegate: Path) : AbstractFileSystemElement() {
     init {
-        require(path.isAbsolute)
+        require(delegate.isAbsolute)
     }
+
+    override val path: ElementPath = JvmElementPath(delegate)
 
     override val parent: Directory?
         get() {
-            val parent = path.parent
+            val parent = delegate.parent
             return if (parent != null) {
                 JvmDirectory(parent)
             } else {
@@ -32,21 +34,15 @@ internal open class JvmFileSystemElement(protected val path: Path) : AbstractFil
             }
         }
 
-    override val name: String
-        get() = path.name
+    fun toPath(): Path = delegate
 
-    override val absolutePath: String
-        get() = path.pathString
-
-    fun toPath(): Path = path
-
-    fun toFile(): File = path.toFile()
+    fun toFile(): File = delegate.toFile()
 
     override fun metadata(): Result<ElementMetadata> {
-        if (!Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
+        if (!Files.exists(delegate, LinkOption.NOFOLLOW_LINKS)) {
             return MissingEntry(absolutePath)
         }
-        return Success(metadataOfExistingFile(path))
+        return Success(metadataOfExistingFile(delegate))
     }
 
     protected fun metadataOfExistingFile(path: Path): ElementMetadata {
@@ -61,17 +57,17 @@ internal open class JvmFileSystemElement(protected val path: Path) : AbstractFil
     }
 
     override fun snapshot(): Result<ElementSnapshot> {
-        return metadata().map { SnapshotImpl(path, it) }
+        return metadata().map { SnapshotImpl(delegate, it) }
     }
 
     override fun posixPermissions(): Result<PosixPermissions> {
-        val attributes = Files.getFileAttributeView(path, PosixFileAttributeView::class.java, LinkOption.NOFOLLOW_LINKS)
+        val attributes = Files.getFileAttributeView(delegate, PosixFileAttributeView::class.java, LinkOption.NOFOLLOW_LINKS)
             .readAttributes()
         return Success(attributes.permissions().permissions())
     }
 
     override fun setPermissions(permissions: PosixPermissions) {
-        Files.getFileAttributeView(path, PosixFileAttributeView::class.java, LinkOption.NOFOLLOW_LINKS)
+        Files.getFileAttributeView(delegate, PosixFileAttributeView::class.java, LinkOption.NOFOLLOW_LINKS)
             .setPermissions(permissions.permSet())
     }
 
@@ -84,48 +80,48 @@ internal open class JvmFileSystemElement(protected val path: Path) : AbstractFil
 
 internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularFile {
     override fun delete() {
-        Files.deleteIfExists(path)
+        Files.deleteIfExists(delegate)
     }
 
     override fun writeText(text: String) {
         try {
-            Files.writeString(path, text, Charsets.UTF_8)
+            Files.writeString(delegate, text, Charsets.UTF_8)
         } catch (e: IOException) {
             throw writeToFile(this, e)
         }
     }
 
     override fun readText(): Result<String> {
-        return Success(Files.readString(path, Charsets.UTF_8))
+        return Success(Files.readString(delegate, Charsets.UTF_8))
     }
 }
 
 internal class JvmDirectory(path: Path) : JvmFileSystemElement(path), Directory {
     override fun file(name: String): RegularFile {
-        return JvmRegularFile(path.resolve(name))
+        return JvmRegularFile(delegate.resolve(name))
     }
 
     override fun dir(name: String): Directory {
-        return JvmDirectory(path.resolve(name))
+        return JvmDirectory(delegate.resolve(name))
     }
 
     override fun symLink(name: String): SymLink {
-        return JvmSymlink(path.resolve(name))
+        return JvmSymlink(delegate.resolve(name))
     }
 
     override fun deleteRecursively() {
-        path.toFile().deleteRecursively()
+        delegate.toFile().deleteRecursively()
     }
 
     override fun createTemporaryDirectory(): Directory {
-        return JvmDirectory(Files.createTempDirectory(this.path, "dir"))
+        return JvmDirectory(Files.createTempDirectory(this.delegate, "dir"))
     }
 
     override fun createDirectories() {
         try {
-            Files.createDirectories(path)
+            Files.createDirectories(delegate)
         } catch (e: FileAlreadyExistsException) {
-            throw directoryExistsAndIsNotADir(path.pathString, e)
+            throw directoryExistsAndIsNotADir(delegate.pathString, e)
         } catch (e: IOException) {
             var p = parent
             while (p != null) {
@@ -137,26 +133,26 @@ internal class JvmDirectory(path: Path) : JvmFileSystemElement(path), Directory 
                 }
                 if (metadata.directory) {
                     // Found a directory - should have been able to create dir so rethrow original failure
-                    throw createDirectory(path.pathString, e)
+                    throw createDirectory(delegate.pathString, e)
                 }
                 // Found something else - fail
                 throw directoryExistsAndIsNotADir(p.absolutePath, e)
             }
             // Nothing in the hierarchy exists, which is unexpected, so rethrow original failure
-            throw createDirectory(path.pathString, e)
+            throw createDirectory(delegate.pathString, e)
         }
     }
 
     override fun resolve(name: String): FileSystemElement {
-        val path = path.resolve(name)
+        val path = delegate.resolve(name)
         return JvmRegularFile(path)
     }
 
     override fun listEntries(): Result<List<DirectoryEntry>> {
         val stream = try {
-            Files.list(path)
+            Files.list(delegate)
         } catch (e: NoSuchFileException) {
-            return MissingEntry(path.pathString, e)
+            return MissingEntry(delegate.pathString, e)
         }
         val entries = stream.map { DirectoryEntryImpl(it, metadataOfExistingFile(it).type) }.toList()
         return Success(entries)
@@ -169,15 +165,15 @@ internal class JvmDirectory(path: Path) : JvmFileSystemElement(path), Directory 
 
 internal class JvmSymlink(path: Path) : JvmFileSystemElement(path), SymLink {
     override fun readSymLink(): Result<String> {
-        return Success(Files.readSymbolicLink(path).pathString)
+        return Success(Files.readSymbolicLink(delegate).pathString)
     }
 
     override fun writeSymLink(target: String) {
         val metadata = metadata()
         if (metadata is Success && metadata.get() is SymlinkMetadata) {
-            Files.delete(this.path)
+            Files.delete(this.delegate)
         }
-        Files.createSymbolicLink(this.path, Path.of(target))
+        Files.createSymbolicLink(this.delegate, Path.of(target))
     }
 }
 

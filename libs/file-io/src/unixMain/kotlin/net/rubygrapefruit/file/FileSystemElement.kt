@@ -153,9 +153,9 @@ internal class UnixDirectory(path: String) : UnixFileSystemElement(path), Direct
         createDir(this)
     }
 
-    override fun resolve(name: String): FileSystemElement {
+    override fun resolve(name: String): ElementPath {
         val path = resolveName(name)
-        return UnixRegularFile(path)
+        return AbsolutePath(path)
     }
 
     override fun listEntries(): Result<List<DirectoryEntry>> {

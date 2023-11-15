@@ -80,7 +80,7 @@ interface Directory : FileSystemElement {
     /**
      * Resolves a name relative to this directory. Note: does not determine the type.
      */
-    fun resolve(name: String): FileSystemElement
+    fun resolve(name: String): ElementPath
 
     /**
      * Deletes this directory and all of its entries recursively, if the directory exists.

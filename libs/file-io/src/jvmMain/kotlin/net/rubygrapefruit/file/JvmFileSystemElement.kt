@@ -143,9 +143,9 @@ internal class JvmDirectory(path: Path) : JvmFileSystemElement(path), Directory 
         }
     }
 
-    override fun resolve(name: String): FileSystemElement {
+    override fun resolve(name: String): ElementPath {
         val path = delegate.resolve(name)
-        return JvmRegularFile(path)
+        return JvmElementPath(path)
     }
 
     override fun listEntries(): Result<List<DirectoryEntry>> {

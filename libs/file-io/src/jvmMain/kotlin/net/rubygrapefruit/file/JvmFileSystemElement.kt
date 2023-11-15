@@ -1,11 +1,9 @@
 package net.rubygrapefruit.file
 
-import java.io.File
 import java.io.IOException
 import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributeView
 import java.nio.file.attribute.PosixFileAttributeView
-import kotlin.io.path.name
 import kotlin.io.path.pathString
 import kotlin.streams.toList
 
@@ -14,7 +12,7 @@ internal open class JvmFileSystemElement(protected val delegate: Path) : Abstrac
         require(delegate.isAbsolute)
     }
 
-    override val path: ElementPath = JvmElementPath(delegate)
+    override val path = JvmElementPath(delegate)
 
     override val parent: Directory?
         get() {
@@ -28,7 +26,17 @@ internal open class JvmFileSystemElement(protected val delegate: Path) : Abstrac
 
     fun toPath(): Path = delegate
 
-    fun toFile(): File = delegate.toFile()
+    override fun toFile(): RegularFile {
+        return JvmRegularFile(delegate)
+    }
+
+    override fun toDir(): Directory {
+        return JvmDirectory(delegate)
+    }
+
+    override fun toSymLink(): SymLink {
+        return JvmSymlink(delegate)
+    }
 
     override fun metadata(): Result<ElementMetadata> {
         if (!Files.exists(delegate, LinkOption.NOFOLLOW_LINKS)) {
@@ -49,7 +57,7 @@ internal open class JvmFileSystemElement(protected val delegate: Path) : Abstrac
     }
 
     override fun snapshot(): Result<ElementSnapshot> {
-        return metadata().map { SnapshotImpl(delegate, it) }
+        return metadata().map { SnapshotImpl(path, it) }
     }
 
     override fun posixPermissions(): Result<PosixPermissions> {
@@ -169,32 +177,33 @@ internal class JvmSymlink(path: Path) : JvmFileSystemElement(path), SymLink {
     }
 }
 
-private class DirectoryEntryImpl(private val path: Path, override val type: ElementType) : DirectoryEntry {
-    override val name: String
-        get() = path.name
+private class DirectoryEntryImpl(private val delegate: Path, override val type: ElementType) : DirectoryEntry {
+    override val path: ElementPath
+        get() = JvmElementPath(delegate)
 
     override fun toDir(): Directory {
-        return JvmDirectory(path)
+        return JvmDirectory(delegate)
     }
 
-    override fun toElement(): FileSystemElement {
-        return JvmFileSystemElement(path)
+    override fun toFile(): RegularFile {
+        return JvmRegularFile(delegate)
+    }
+
+    override fun toSymLink(): SymLink {
+        return JvmSymlink(delegate)
     }
 }
 
-private class SnapshotImpl(private val path: Path, override val metadata: ElementMetadata) : AbstractElementSnapshot() {
-    override val absolutePath: String
-        get() = path.pathString
-
+private class SnapshotImpl(override val path: JvmElementPath, override val metadata: ElementMetadata) : AbstractElementSnapshot() {
     override fun asRegularFile(): RegularFile {
-        return JvmRegularFile(path)
+        return JvmRegularFile(path.delegate)
     }
 
     override fun asDirectory(): Directory {
-        return JvmDirectory(path)
+        return JvmDirectory(path.delegate)
     }
 
     override fun asSymLink(): SymLink {
-        return JvmSymlink(path)
+        return JvmSymlink(path.delegate)
     }
 }

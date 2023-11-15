@@ -11,7 +11,7 @@ class JvmExtensionsTest : AbstractFileSystemElementTest() {
     @Test
     fun `can convert RegularFile to absolute Java File`() {
         val element = fixture.file("file.txt")
-        val file = element.toFile()
+        val file = element.file()
         assertEquals(element.absolutePath, file.absolutePath)
         assertTrue(file.isAbsolute)
     }
@@ -19,7 +19,7 @@ class JvmExtensionsTest : AbstractFileSystemElementTest() {
     @Test
     fun `can convert RegularFile to absolute Java Path`() {
         val element = fixture.file("file.txt")
-        val path = element.toPath()
+        val path = element.path()
         assertEquals(element.absolutePath, path.pathString)
         assertTrue(path.isAbsolute)
     }

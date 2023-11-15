@@ -13,12 +13,13 @@ abstract class AbstractFileSystemElementTest {
             when (type) {
                 ElementType.Directory -> toDir().setPermissions(PosixPermissions.readWriteDirectory)
                 ElementType.SymLink -> {
-                    val element = toElement();
+                    val element = toSymLink();
                     if (element.supports(FileSystemCapability.SetSymLinkPosixPermissions)) {
-                        toElement().setPermissions(PosixPermissions.readWriteFile)
+                        element.setPermissions(PosixPermissions.readWriteFile)
                     }
                 }
-                else -> toElement().setPermissions(PosixPermissions.readWriteFile)
+                ElementType.RegularFile -> toFile().setPermissions(PosixPermissions.readWriteFile)
+                ElementType.Other -> {}
             }
         }
     }

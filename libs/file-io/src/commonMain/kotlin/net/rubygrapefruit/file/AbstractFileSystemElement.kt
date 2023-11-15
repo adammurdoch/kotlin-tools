@@ -17,8 +17,8 @@ abstract class AbstractFileSystemElement : FileSystemElement {
             throw FileSystemException("Could not visit entries of $dir.")
         }
         val dirEntry = object : DirectoryEntry {
-            override val name: String
-                get() = dir.name
+            override val path: ElementPath
+                get() = dir.path
 
             override val type: ElementType
                 get() = ElementType.Directory
@@ -27,10 +27,15 @@ abstract class AbstractFileSystemElement : FileSystemElement {
                 return dir
             }
 
-            override fun toElement(): FileSystemElement {
-                return dir
+            override fun toFile(): RegularFile {
+                return dir.toFile()
+            }
+
+            override fun toSymLink(): SymLink {
+                return dir.toSymLink()
             }
         }
+
         val queue = mutableListOf<DirectoryEntry>(dirEntry)
         while (queue.isNotEmpty()) {
             val entry = queue.removeFirst()

@@ -66,6 +66,7 @@ class DirectoryTest : AbstractFileSystemElementTest() {
         assertIs<Success<*>>(entries2)
         val sorted = entries2.get().sortedBy { it.name }
         assertEquals(listOf("dir1", "file1", "link1"), sorted.map { it.name })
+        assertEquals(listOf("dir1", "file1", "link1"), sorted.map { it.path.name })
         assertEquals(listOf(ElementType.Directory, ElementType.RegularFile, ElementType.SymLink), sorted.map { it.type })
     }
 

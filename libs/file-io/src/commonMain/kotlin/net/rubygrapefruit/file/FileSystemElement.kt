@@ -3,26 +3,11 @@ package net.rubygrapefruit.file
 /**
  * A reference to an element in the file system.
  */
-sealed interface FileSystemElement {
+sealed interface FileSystemElement : HasPath {
     /**
      * Returns the parent of this element, or null if this element is the root of the file system
      */
     val parent: Directory?
-
-    /**
-     * Returns the base name of this element.
-     */
-    val name: String
-
-    /**
-     * Returns the absolute path of this element.
-     */
-    val absolutePath: String
-
-    /**
-     * Returns the absolute path of this element.
-     */
-    val path: ElementPath
 
     /**
      * Returns a snapshot of the current metadata of the file. Does not follow symlinks.

@@ -20,7 +20,19 @@ internal open class UnixFileSystemElement(path: String) : NativeFileSystemElemen
     }
 
     override fun snapshot(): Result<ElementSnapshot> {
-        return metadata().map { SnapshotImpl(path.absolutePath, it) }
+        return metadata().map { SnapshotImpl(path, it) }
+    }
+
+    override fun toDir(): Directory {
+        return UnixDirectory(absolutePath)
+    }
+
+    override fun toFile(): RegularFile {
+        return UnixRegularFile(absolutePath)
+    }
+
+    override fun toSymLink(): SymLink {
+        return UnixSymLink(absolutePath)
     }
 
     @OptIn(UnsafeNumber::class)
@@ -191,18 +203,18 @@ internal class UnixDirectory(path: String) : UnixFileSystemElement(path), Direct
     }
 
     private fun resolveName(name: String): String {
-        if (name.startsWith("/")) {
-            return name
+        return if (name.startsWith("/")) {
+            name
         } else if (name == ".") {
-            return path.absolutePath
+            path.absolutePath
         } else if (name.startsWith("./")) {
-            return resolveName(name.substring(2))
+            resolveName(name.substring(2))
         } else if (name == "..") {
-            return parent!!.absolutePath
+            parent!!.absolutePath
         } else if (name.startsWith("../")) {
-            return (parent as UnixDirectory).resolveName(name.substring(3))
+            (parent as UnixDirectory).resolveName(name.substring(3))
         } else {
-            return "${path.absolutePath}/$name"
+            "${path.absolutePath}/$name"
         }
     }
 }
@@ -238,16 +250,23 @@ internal class UnixSymLink(path: String) : UnixFileSystemElement(path), SymLink 
 }
 
 private class DirectoryEntryImpl(private val parentPath: String, override val name: String, override val type: ElementType) : DirectoryEntry {
+    override val path: ElementPath
+        get() = AbsolutePath("$parentPath/$name")
+
     override fun toDir(): Directory {
-        return UnixDirectory("$parentPath/$name")
+        return UnixDirectory(path.absolutePath)
     }
 
-    override fun toElement(): FileSystemElement {
-        return UnixFileSystemElement("$parentPath/$name")
+    override fun toFile(): RegularFile {
+        return UnixRegularFile(path.absolutePath)
+    }
+
+    override fun toSymLink(): SymLink {
+        return UnixSymLink(path.absolutePath)
     }
 }
 
-private class SnapshotImpl(override val absolutePath: String, override val metadata: ElementMetadata) : AbstractElementSnapshot() {
+private class SnapshotImpl(override val path: AbsolutePath, override val metadata: ElementMetadata) : AbstractElementSnapshot() {
     override fun asRegularFile(): RegularFile {
         return UnixRegularFile(absolutePath)
     }

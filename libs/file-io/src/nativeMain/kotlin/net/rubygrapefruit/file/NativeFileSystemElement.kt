@@ -5,5 +5,5 @@ internal abstract class NativeFileSystemElement(path: String) : AbstractFileSyst
         require(path.startsWith("/"))
     }
 
-    override val path: ElementPath = AbsolutePath(path)
+    override val path = AbsolutePath(path)
 }

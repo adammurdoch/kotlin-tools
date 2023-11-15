@@ -13,6 +13,22 @@ class RegularFileTest : AbstractFileSystemElementTest() {
     }
 
     @Test
+    fun `can write bytes to a file to create it`() {
+        val bytes = "123".encodeToByteArray()
+        val file = fixture.testDir.file("file")
+
+        assertIs<MissingEntry<*>>(file.metadata())
+
+        file.writeBytes(bytes)
+
+        val metadata = file.metadata().get()
+        assertIs<RegularFileMetadata>(metadata)
+        assertEquals(bytes.size.toULong(), metadata.size)
+
+        assertContentEquals(bytes, file.readBytes().get())
+    }
+
+    @Test
     fun `can write text to a file to create it`() {
         listOf("1234", "日本語").forEachIndexed { index, text ->
             val file = fixture.testDir.file("file-$index")

@@ -83,6 +83,14 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
         Files.deleteIfExists(delegate)
     }
 
+    override fun writeBytes(bytes: ByteArray) {
+        Files.write(delegate, bytes)
+    }
+
+    override fun readBytes(): Result<ByteArray> {
+        return Success(Files.readAllBytes(delegate))
+    }
+
     override fun writeText(text: String) {
         try {
             Files.writeString(delegate, text, Charsets.UTF_8)

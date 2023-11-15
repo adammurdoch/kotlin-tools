@@ -6,7 +6,8 @@
 - Test delete files, directories and symlinks
 - Test set/get permissions on symlinks and directories
 - Test visiting tree top down
-- Test failure modes for reading text
+- Test failure modes for reading/writing text
+- Test failure modes for reading/writing bytes
 - Test failure modes for reading/writing symlinks
 - Test failure modes for listing directory contents (exists and is not a directory, etc)
 - Test failure modes for get/set permissions

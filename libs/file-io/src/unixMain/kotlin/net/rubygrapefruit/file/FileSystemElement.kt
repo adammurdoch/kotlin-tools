@@ -73,7 +73,25 @@ internal class UnixRegularFile(path: String) : UnixFileSystemElement(path), Regu
         }
     }
 
+    override fun writeBytes(bytes: ByteArray) {
+        writing { file ->
+            fwrite(bytes.refTo(0), 1.convert(), bytes.size.convert(), file)
+        }
+    }
+
     override fun writeText(text: String) {
+        writing { file ->
+            if (fputs(text, file) == EOF) {
+                if (errno == ENOTDIR) {
+                    throw fileExistsAndIsNotAFile(path.absolutePath)
+                }
+                val errnoValue = errno
+                throw writeToFile(this@UnixRegularFile, null) { message, _ -> NativeException(message, errnoValue) }
+            }
+        }
+    }
+
+    private fun writing(action: (CPointer<FILE>) -> Unit) {
         memScoped {
             val des = fopen(path.absolutePath, "w")
             if (des == null) {
@@ -84,20 +102,22 @@ internal class UnixRegularFile(path: String) : UnixFileSystemElement(path), Regu
                 throw writeToFile(this@UnixRegularFile, null) { message, _ -> NativeException(message, errnoValue) }
             }
             try {
-                if (fputs(text, des) == EOF) {
-                    if (errno == ENOTDIR) {
-                        throw fileExistsAndIsNotAFile(path.absolutePath)
-                    }
-                    val errnoValue = errno
-                    throw writeToFile(this@UnixRegularFile, null) { message, _ -> NativeException(message, errnoValue) }
-                }
+                action(des)
             } finally {
                 fclose(des)
             }
         }
     }
 
+    override fun readBytes(): Result<ByteArray> {
+        return reading { buffer, len -> buffer.sliceArray(0 until len.toInt()) }
+    }
+
     override fun readText(): Result<String> {
+        return reading { buffer, len -> buffer.decodeToString(0, len.convert()) }
+    }
+
+    private fun <T> reading(action: (ByteArray, Long) -> T): Result<T> {
         return memScoped {
             val des = open(path.absolutePath, O_RDONLY)
             if (des < 0) {
@@ -110,7 +130,7 @@ internal class UnixRegularFile(path: String) : UnixFileSystemElement(path), Regu
                 if (nread < 0) {
                     throw NativeException("Could not read from $path.")
                 }
-                Success(buffer.decodeToString(0, nread.convert()))
+                Success(action(buffer, nread))
             } finally {
                 close(des)
             }

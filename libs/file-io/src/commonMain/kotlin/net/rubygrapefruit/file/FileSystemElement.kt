@@ -47,6 +47,17 @@ interface RegularFile : FileSystemElement {
     fun delete()
 
     /**
+     * Writes the given bytes to the file.
+     */
+    @Throws(FileSystemException::class)
+    fun writeBytes(bytes: ByteArray)
+
+    /**
+     * Reads bytes from the file.
+     */
+    fun readBytes(): Result<ByteArray>
+
+    /**
      * Writes the given text to the file, using UTF-8 encoding.
      */
     @Throws(FileSystemException::class)

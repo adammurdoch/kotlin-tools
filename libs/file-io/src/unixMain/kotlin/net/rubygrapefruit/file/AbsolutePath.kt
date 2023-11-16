@@ -7,4 +7,8 @@ internal class AbsolutePath(override val absolutePath: String) : ElementPath {
 
     override val name: String
         get() = absolutePath.substringAfterLast("/")
+
+    override fun snapshot(): Result<ElementSnapshot> {
+        return stat(absolutePath).map { SnapshotImpl(this, it) }
+    }
 }

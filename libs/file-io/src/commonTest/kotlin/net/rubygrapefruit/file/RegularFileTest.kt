@@ -24,7 +24,22 @@ class RegularFileTest : AbstractFileSystemElementTest() {
     fun `can query file snapshot`() {
         val file = fixture.file("file", "test")
         val snapshot = file.snapshot().get()
-        assertIs<RegularFileMetadata>(snapshot.metadata)
+        assertIsFileSnapshot(snapshot, file)
+
+        val snapshot2 = file.path.snapshot().get()
+        assertIsFileSnapshot(snapshot2, file)
+
+        val snapshot3 = snapshot.snapshot().get()
+        assertSame(snapshot, snapshot3)
+
+        val snapshot4 = fixture.testDir.resolve(file.name).snapshot().get()
+        assertIsFileSnapshot(snapshot4, file)
+    }
+
+    private fun assertIsFileSnapshot(snapshot: ElementSnapshot, file: RegularFile) {
+        val metadata = snapshot.metadata
+        assertIs<RegularFileMetadata>(metadata)
+        assertEquals(4.toULong(), metadata.size)
         assertEquals(file.absolutePath, snapshot.absolutePath)
     }
 
@@ -40,6 +55,12 @@ class RegularFileTest : AbstractFileSystemElementTest() {
         val file = fixture.testDir.file("missing")
         val result = file.snapshot()
         assertIs<MissingEntry<*>>(result)
+
+        val result2 = file.path.snapshot()
+        assertIs<MissingEntry<*>>(result2)
+
+        val result3 = fixture.testDir.resolve(file.name).snapshot()
+        assertIs<MissingEntry<*>>(result3)
     }
 
     @Test

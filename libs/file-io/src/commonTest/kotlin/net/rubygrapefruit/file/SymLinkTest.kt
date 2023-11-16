@@ -25,8 +25,12 @@ class SymLinkTest : AbstractFileSystemElementTest() {
     @Test
     fun `can query symlink snapshot`() {
         val link = fixture.symlink("file", "test")
+
         val snapshot = link.snapshot().get()
         assertEquals(SymlinkMetadata, snapshot.metadata)
+
+        val snapshot2 = link.path.snapshot().get()
+        assertEquals(SymlinkMetadata, snapshot2.metadata)
     }
 
     @Test
@@ -39,8 +43,12 @@ class SymLinkTest : AbstractFileSystemElementTest() {
     @Test
     fun `can query snapshot of missing symlink`() {
         val link = fixture.testDir.symLink("missing")
+
         val result = link.snapshot()
         assertIs<MissingEntry<*>>(result)
+
+        val result2 = link.path.snapshot()
+        assertIs<MissingEntry<*>>(result2)
     }
 
     @Test

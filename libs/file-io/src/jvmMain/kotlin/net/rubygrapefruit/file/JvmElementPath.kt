@@ -4,7 +4,7 @@ import java.nio.file.Path
 import kotlin.io.path.name
 import kotlin.io.path.pathString
 
-internal class JvmElementPath(val delegate: Path): ElementPath {
+internal class JvmElementPath(val delegate: Path) : ElementPath {
     override fun toString(): String {
         return absolutePath
     }
@@ -14,4 +14,8 @@ internal class JvmElementPath(val delegate: Path): ElementPath {
 
     override val absolutePath: String
         get() = delegate.pathString
+
+    override fun snapshot(): Result<ElementSnapshot> {
+        return metadata(delegate).map { SnapshotImpl(this, it) }
+    }
 }

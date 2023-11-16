@@ -290,7 +290,7 @@ private class DirectoryEntryImpl(private val parentPath: String, override val na
     }
 }
 
-private class SnapshotImpl(override val path: AbsolutePath, override val metadata: ElementMetadata) : AbstractElementSnapshot() {
+internal class SnapshotImpl(override val path: AbsolutePath, override val metadata: ElementMetadata) : AbstractElementSnapshot() {
     override fun asRegularFile(): RegularFile {
         return UnixRegularFile(absolutePath)
     }

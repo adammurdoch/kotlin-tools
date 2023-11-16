@@ -2,27 +2,9 @@ package net.rubygrapefruit.file
 
 import java.io.IOException
 import java.nio.file.*
-import java.nio.file.attribute.BasicFileAttributeView
 import java.nio.file.attribute.PosixFileAttributeView
 import kotlin.io.path.pathString
 import kotlin.streams.toList
-
-private fun metadata(path: Path): Result<ElementMetadata> {
-    if (!Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
-        return MissingEntry(path.pathString)
-    }
-    return Success(metadataOfExistingFile(path))
-}
-
-private fun metadataOfExistingFile(path: Path): ElementMetadata {
-    val attributes = Files.getFileAttributeView(path, BasicFileAttributeView::class.java, LinkOption.NOFOLLOW_LINKS).readAttributes()
-    return when {
-        attributes.isRegularFile -> RegularFileMetadata(attributes.size().toULong())
-        attributes.isDirectory -> DirectoryMetadata
-        attributes.isSymbolicLink -> SymlinkMetadata
-        else -> OtherMetadata
-    }
-}
 
 internal open class JvmFileSystemElement(protected val delegate: Path) : AbstractFileSystemElement() {
     init {
@@ -209,7 +191,7 @@ private class DirectoryEntryImpl(private val delegate: Path, override val type: 
     }
 }
 
-private class SnapshotImpl(override val path: JvmElementPath, override val metadata: ElementMetadata) : AbstractElementSnapshot() {
+internal class SnapshotImpl(override val path: JvmElementPath, override val metadata: ElementMetadata) : AbstractElementSnapshot() {
     override fun asRegularFile(): RegularFile {
         return JvmRegularFile(path.delegate)
     }

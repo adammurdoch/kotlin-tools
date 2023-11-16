@@ -23,6 +23,16 @@ class DirectoryTest : AbstractFileSystemElementTest() {
     fun `can query directory snapshot`() {
         val dir = fixture.dir("file")
         val snapshot = dir.snapshot().get()
+        assertIsDirectorySnapshot(snapshot, dir)
+
+        val snapshot2 = dir.path.snapshot().get()
+        assertIsDirectorySnapshot(snapshot2, dir)
+
+        val snapshot3 = fixture.testDir.resolve(dir.name).snapshot().get()
+        assertIsDirectorySnapshot(snapshot3, dir)
+    }
+
+    private fun assertIsDirectorySnapshot(snapshot: ElementSnapshot, dir: Directory) {
         assertEquals(DirectoryMetadata, snapshot.metadata)
         assertEquals(dir.absolutePath, snapshot.absolutePath)
     }
@@ -37,8 +47,15 @@ class DirectoryTest : AbstractFileSystemElementTest() {
     @Test
     fun `can query snapshot of missing file`() {
         val dir = fixture.testDir.dir("missing")
+
         val result = dir.snapshot()
         assertIs<MissingEntry<*>>(result)
+
+        val result2 = dir.path.snapshot()
+        assertIs<MissingEntry<*>>(result2)
+
+        val result3 = fixture.testDir.resolve(dir.name).snapshot()
+        assertIs<MissingEntry<*>>(result3)
     }
 
     @Test

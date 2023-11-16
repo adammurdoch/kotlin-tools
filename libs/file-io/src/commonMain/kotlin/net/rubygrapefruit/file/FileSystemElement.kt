@@ -1,7 +1,7 @@
 package net.rubygrapefruit.file
 
 /**
- * A reference to an element in the file system.
+ * Represents an element in the file system.
  */
 sealed interface FileSystemElement : HasPath {
     /**
@@ -13,11 +13,6 @@ sealed interface FileSystemElement : HasPath {
      * Returns a snapshot of the current metadata of the file. Does not follow symlinks.
      */
     fun metadata(): Result<ElementMetadata>
-
-    /**
-     * Returns a snapshot of the element, which contains the path of this element and a snapshot of its metadata. Does not follow symlinks.
-     */
-    fun snapshot(): Result<ElementSnapshot>
 
     /**
      * Returns a snapshot of the current permissions. Does not follow symlinks.

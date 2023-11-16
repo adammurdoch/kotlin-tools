@@ -20,9 +20,9 @@ class FilesFixture {
         builder(DirFixture(testDir))
     }
 
-    fun file(name: String): RegularFile {
+    fun file(name: String, content: String = "test"): RegularFile {
         val file = testDir.file(name)
-        file.writeText("test")
+        file.writeText(content)
         return file
     }
 

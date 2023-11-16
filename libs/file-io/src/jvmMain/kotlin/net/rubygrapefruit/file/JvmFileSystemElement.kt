@@ -7,6 +7,23 @@ import java.nio.file.attribute.PosixFileAttributeView
 import kotlin.io.path.pathString
 import kotlin.streams.toList
 
+private fun metadata(path: Path): Result<ElementMetadata> {
+    if (!Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
+        return MissingEntry(path.pathString)
+    }
+    return Success(metadataOfExistingFile(path))
+}
+
+private fun metadataOfExistingFile(path: Path): ElementMetadata {
+    val attributes = Files.getFileAttributeView(path, BasicFileAttributeView::class.java, LinkOption.NOFOLLOW_LINKS).readAttributes()
+    return when {
+        attributes.isRegularFile -> RegularFileMetadata(attributes.size().toULong())
+        attributes.isDirectory -> DirectoryMetadata
+        attributes.isSymbolicLink -> SymlinkMetadata
+        else -> OtherMetadata
+    }
+}
+
 internal open class JvmFileSystemElement(protected val delegate: Path) : AbstractFileSystemElement() {
     init {
         require(delegate.isAbsolute)
@@ -39,21 +56,7 @@ internal open class JvmFileSystemElement(protected val delegate: Path) : Abstrac
     }
 
     override fun metadata(): Result<ElementMetadata> {
-        if (!Files.exists(delegate, LinkOption.NOFOLLOW_LINKS)) {
-            return MissingEntry(absolutePath)
-        }
-        return Success(metadataOfExistingFile(delegate))
-    }
-
-    protected fun metadataOfExistingFile(path: Path): ElementMetadata {
-        val attributes = Files.getFileAttributeView(path, BasicFileAttributeView::class.java, LinkOption.NOFOLLOW_LINKS)
-            .readAttributes()
-        return when {
-            attributes.isRegularFile -> RegularFileMetadata(attributes.size().toULong())
-            attributes.isDirectory -> DirectoryMetadata
-            attributes.isSymbolicLink -> SymlinkMetadata
-            else -> OtherMetadata
-        }
+        return metadata(delegate)
     }
 
     override fun snapshot(): Result<ElementSnapshot> {
@@ -186,8 +189,12 @@ internal class JvmSymlink(path: Path) : JvmFileSystemElement(path), SymLink {
 }
 
 private class DirectoryEntryImpl(private val delegate: Path, override val type: ElementType) : DirectoryEntry {
-    override val path: ElementPath
+    override val path: JvmElementPath
         get() = JvmElementPath(delegate)
+
+    override fun snapshot(): Result<ElementSnapshot> {
+        return metadata(delegate).map { SnapshotImpl(path, it) }
+    }
 
     override fun toDir(): Directory {
         return JvmDirectory(delegate)

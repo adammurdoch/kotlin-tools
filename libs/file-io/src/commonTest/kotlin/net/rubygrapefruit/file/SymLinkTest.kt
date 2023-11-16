@@ -16,6 +16,34 @@ class SymLinkTest : AbstractFileSystemElementTest() {
     }
 
     @Test
+    fun `can query symlink metadata`() {
+        val link = fixture.symlink("file", "test")
+        val metadata = link.metadata().get()
+        assertEquals(SymlinkMetadata, metadata)
+    }
+
+    @Test
+    fun `can query symlink snapshot`() {
+        val link = fixture.symlink("file", "test")
+        val snapshot = link.snapshot().get()
+        assertEquals(SymlinkMetadata, snapshot.metadata)
+    }
+
+    @Test
+    fun `can query metadata of missing symlink`() {
+        val link = fixture.testDir.symLink("missing")
+        val result = link.metadata()
+        assertIs<MissingEntry<*>>(result)
+    }
+
+    @Test
+    fun `can query snapshot of missing symlink`() {
+        val link = fixture.testDir.symLink("missing")
+        val result = link.snapshot()
+        assertIs<MissingEntry<*>>(result)
+    }
+
+    @Test
     fun `can create a symlink`() {
         val link = fixture.testDir.symLink("link")
 

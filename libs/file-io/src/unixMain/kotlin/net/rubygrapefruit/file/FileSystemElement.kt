@@ -270,8 +270,12 @@ internal class UnixSymLink(path: String) : UnixFileSystemElement(path), SymLink 
 }
 
 private class DirectoryEntryImpl(private val parentPath: String, override val name: String, override val type: ElementType) : DirectoryEntry {
-    override val path: ElementPath
+    override val path: AbsolutePath
         get() = AbsolutePath("$parentPath/$name")
+
+    override fun snapshot(): Result<ElementSnapshot> {
+        return stat(path.absolutePath).map { SnapshotImpl(path, it) }
+    }
 
     override fun toDir(): Directory {
         return UnixDirectory(path.absolutePath)

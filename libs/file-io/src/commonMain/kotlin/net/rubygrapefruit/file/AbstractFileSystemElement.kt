@@ -23,6 +23,10 @@ abstract class AbstractFileSystemElement : FileSystemElement {
             override val type: ElementType
                 get() = ElementType.Directory
 
+            override fun snapshot(): Result<ElementSnapshot> {
+                return dir.snapshot()
+            }
+
             override fun toDir(): Directory {
                 return dir
             }

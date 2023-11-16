@@ -1,5 +1,8 @@
 package net.rubygrapefruit.file
 
+/**
+ * Represents a file system element.
+ */
 interface HasPath {
     /**
      * Returns the base name of this element.
@@ -19,17 +22,22 @@ interface HasPath {
     val path: ElementPath
 
     /**
-     * View the element as a regular file.
+     * Returns a snapshot of the element, which contains the path of this element and a snapshot of its metadata. Does not follow symlinks.
+     */
+    fun snapshot(): Result<ElementSnapshot>
+
+    /**
+     * View the element as a regular file. Does not check whether the file system element is a regular file.
      */
     fun toFile(): RegularFile
 
     /**
-     * View the element as a directory.
+     * View the element as a directory. Does not check whether the file system element is a directory file.
      */
     fun toDir(): Directory
 
     /**
-     * View the element as a symlink.
+     * View the element as a symlink. Does not check whether the file system element is a symlink file.
      */
     fun toSymLink(): SymLink
 }

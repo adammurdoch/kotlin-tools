@@ -40,6 +40,9 @@ value class PosixPermissions internal constructor(internal val mode: UInt) {
             get() = PosixPermissions(ownerRead or ownerWrite or groupRead or othersRead)
     }
 
+    val isOwnerExecutable: Boolean
+        get() = (mode and ownerExecute) == ownerExecute
+
     override fun toString(): String {
         return mode.toString(8).padStart(3, '0')
     }
@@ -49,5 +52,12 @@ value class PosixPermissions internal constructor(internal val mode: UInt) {
      */
     fun userOnly(): PosixPermissions {
         return PosixPermissions(mode and (ownerRead or ownerWrite or ownerExecute))
+    }
+
+    /**
+     * Returns a copy of this permission set with execute permissions added.
+     */
+    fun executable(): PosixPermissions {
+        return PosixPermissions(mode or (ownerExecute or groupExecute or othersExecute))
     }
 }

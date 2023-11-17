@@ -336,8 +336,10 @@ internal fun stat(file: String): Result<ElementMetadata> {
 
 internal expect fun lastModified(stat: stat): Timestamp
 
+internal expect fun mode(stat: stat): UInt
+
 private fun posixPermissions(stat: stat): PosixPermissions {
-    return PosixPermissions((stat.st_mode.convert<UInt>() and (S_IRWXU or S_IRWXG or S_IRWXO).convert()))
+    return PosixPermissions((mode(stat) and (S_IRWXU or S_IRWXG or S_IRWXO).convert()))
 }
 
 internal fun getUserHomeDir(): UnixDirectory {

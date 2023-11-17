@@ -42,7 +42,7 @@ internal open class UnixFileSystemElement(path: String) : NativeFileSystemElemen
             if (lstat(path.absolutePath, statBuf.ptr) != 0) {
                 throw NativeException("Could not stat $path.")
             }
-            Success(PosixPermissions((statBuf.st_mode.convert<UInt>() and (S_IRWXU or S_IRWXG or S_IRWXO).convert())))
+            Success(posixPermissions(statBuf))
         }
     }
 
@@ -319,16 +319,25 @@ internal fun stat(file: String): Result<ElementMetadata> {
             }
         }
         val mode = statBuf.st_mode.convert<Int>()
+        val lastModified = lastModified(statBuf)
+        val permissions = posixPermissions(statBuf)
         if (mode and S_IFDIR == S_IFDIR) {
-            Success(DirectoryMetadata)
+            Success(DirectoryMetadata(lastModified, permissions))
         } else if (mode and S_IFLNK == S_IFLNK) {
-            Success(SymlinkMetadata)
+            Success(SymlinkMetadata(lastModified, permissions))
         } else if (mode and S_IFREG == S_IFREG) {
-            Success(RegularFileMetadata(statBuf.st_size.convert()))
+            val size = statBuf.st_size
+            Success(RegularFileMetadata(size, lastModified, permissions))
         } else {
-            Success(OtherMetadata)
+            Success(OtherMetadata(lastModified, permissions))
         }
     }
+}
+
+internal expect fun lastModified(stat: stat): Timestamp
+
+private fun posixPermissions(stat: stat): PosixPermissions {
+    return PosixPermissions((stat.st_mode.convert<UInt>() and (S_IRWXU or S_IRWXG or S_IRWXO).convert()))
 }
 
 internal fun getUserHomeDir(): UnixDirectory {

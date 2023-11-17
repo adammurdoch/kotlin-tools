@@ -19,7 +19,7 @@ class SymLinkTest : AbstractFileSystemElementTest() {
     fun `can query symlink metadata`() {
         val link = fixture.symlink("file", "test")
         val metadata = link.metadata().get()
-        assertEquals(SymlinkMetadata, metadata)
+        assertIs<SymlinkMetadata>(metadata)
     }
 
     @Test
@@ -27,10 +27,10 @@ class SymLinkTest : AbstractFileSystemElementTest() {
         val link = fixture.symlink("file", "test")
 
         val snapshot = link.snapshot().get()
-        assertEquals(SymlinkMetadata, snapshot.metadata)
+        assertIs<SymlinkMetadata>(snapshot.metadata)
 
         val snapshot2 = link.path.snapshot().get()
-        assertEquals(SymlinkMetadata, snapshot2.metadata)
+        assertIs<SymlinkMetadata>(snapshot2.metadata)
     }
 
     @Test
@@ -59,7 +59,7 @@ class SymLinkTest : AbstractFileSystemElementTest() {
 
         link.writeSymLink("1234")
 
-        assertEquals(SymlinkMetadata, link.metadata().get())
+        assertIs<SymlinkMetadata>(link.metadata().get())
         assertEquals("1234", link.readSymLink().get())
     }
 
@@ -70,7 +70,7 @@ class SymLinkTest : AbstractFileSystemElementTest() {
 
         link.writeSymLink("abc")
 
-        assertEquals(SymlinkMetadata, link.metadata().get())
+        assertIs<SymlinkMetadata>(link.metadata().get())
         assertEquals("abc", link.readSymLink().get())
     }
 

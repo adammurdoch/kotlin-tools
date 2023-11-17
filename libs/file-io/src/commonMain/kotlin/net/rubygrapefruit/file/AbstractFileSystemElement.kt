@@ -1,6 +1,6 @@
 package net.rubygrapefruit.file
 
-abstract class AbstractFileSystemElement : FileSystemElement {
+internal abstract class AbstractFileSystemElement : FileSystemElement {
     override fun toString(): String {
         return absolutePath
     }

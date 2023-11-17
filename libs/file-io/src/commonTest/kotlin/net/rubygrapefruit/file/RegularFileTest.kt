@@ -17,7 +17,7 @@ class RegularFileTest : AbstractFileSystemElementTest() {
         val file = fixture.file("file", "test")
         val metadata = file.metadata().get()
         assertIs<RegularFileMetadata>(metadata)
-        assertEquals(4.toULong(), metadata.size)
+        assertEquals(4, metadata.size)
     }
 
     @Test
@@ -39,7 +39,7 @@ class RegularFileTest : AbstractFileSystemElementTest() {
     private fun assertIsFileSnapshot(snapshot: ElementSnapshot, file: RegularFile) {
         val metadata = snapshot.metadata
         assertIs<RegularFileMetadata>(metadata)
-        assertEquals(4.toULong(), metadata.size)
+        assertEquals(4, metadata.size)
         assertEquals(file.absolutePath, snapshot.absolutePath)
     }
 
@@ -74,7 +74,7 @@ class RegularFileTest : AbstractFileSystemElementTest() {
 
         val metadata = file.metadata().get()
         assertIs<RegularFileMetadata>(metadata)
-        assertEquals(bytes.size.toULong(), metadata.size)
+        assertEquals(bytes.size.toLong(), metadata.size)
 
         assertContentEquals(bytes, file.readBytes().get())
     }
@@ -90,7 +90,7 @@ class RegularFileTest : AbstractFileSystemElementTest() {
 
             val metadata = file.metadata().get()
             assertIs<RegularFileMetadata>(metadata)
-            assertEquals(text.encodeToByteArray().size.toULong(), metadata.size)
+            assertEquals(text.encodeToByteArray().size.toLong(), metadata.size)
 
             assertEquals(text, file.readText().get())
         }
@@ -116,7 +116,7 @@ class RegularFileTest : AbstractFileSystemElementTest() {
 
         val metadata = file.metadata().get()
         assertIs<RegularFileMetadata>(metadata)
-        assertEquals(8u, metadata.size)
+        assertEquals(8, metadata.size)
     }
 
     @Test

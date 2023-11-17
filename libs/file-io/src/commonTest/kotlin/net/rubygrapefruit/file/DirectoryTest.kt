@@ -16,7 +16,7 @@ class DirectoryTest : AbstractFileSystemElementTest() {
     fun `can query directory metadata`() {
         val dir = fixture.dir("file")
         val metadata = dir.metadata().get()
-        assertEquals(DirectoryMetadata, metadata)
+        assertIs<DirectoryMetadata>(metadata)
     }
 
     @Test
@@ -33,7 +33,7 @@ class DirectoryTest : AbstractFileSystemElementTest() {
     }
 
     private fun assertIsDirectorySnapshot(snapshot: ElementSnapshot, dir: Directory) {
-        assertEquals(DirectoryMetadata, snapshot.metadata)
+        assertIs<DirectoryMetadata>(snapshot.metadata)
         assertEquals(dir.absolutePath, snapshot.absolutePath)
     }
 
@@ -86,7 +86,7 @@ class DirectoryTest : AbstractFileSystemElementTest() {
 
         dir.createDirectories()
 
-        assertEquals(DirectoryMetadata, dir.metadata().get())
+        assertIs<DirectoryMetadata>(dir.metadata().get())
         val entries2 = dir.listEntries()
         assertIs<Success<*>>(entries2)
         assertTrue(entries2.get().isEmpty())
@@ -151,19 +151,19 @@ class DirectoryTest : AbstractFileSystemElementTest() {
 
         dir.createDirectories()
 
-        assertEquals(DirectoryMetadata, dir.metadata().get())
-        assertEquals(DirectoryMetadata, dir.parent?.metadata()?.get())
+        assertIs<DirectoryMetadata>(dir.metadata().get())
+        assertIs<DirectoryMetadata>(dir.parent?.metadata()?.get())
     }
 
     @Test
     fun `can create directory that already exists`() {
         val dir = fixture.testDir.dir("dir")
         dir.createDirectories()
-        assertEquals(DirectoryMetadata, dir.metadata().get())
+        assertIs<DirectoryMetadata>(dir.metadata().get())
 
         dir.createDirectories()
 
-        assertEquals(DirectoryMetadata, dir.metadata().get())
+        assertIs<DirectoryMetadata>(dir.metadata().get())
     }
 
     @Test

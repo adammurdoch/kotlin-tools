@@ -3,26 +3,33 @@ package net.rubygrapefruit.file
 /**
  * An immutable snapshot of some basic metadata about a file system element.
  */
-sealed class ElementMetadata {
-    abstract val type: ElementType
+sealed interface ElementMetadata {
+    val type: ElementType
+
+    val lastModified: Timestamp
+
+    /**
+     * The POSIX permissions, if available.
+     */
+    val posixPermissions: PosixPermissions?
 }
 
-data object DirectoryMetadata : ElementMetadata() {
+data class DirectoryMetadata(override val lastModified: Timestamp, override val posixPermissions: PosixPermissions?) : ElementMetadata {
     override val type: ElementType
         get() = ElementType.Directory
 }
 
-data object SymlinkMetadata : ElementMetadata() {
+data class SymlinkMetadata(override val lastModified: Timestamp, override val posixPermissions: PosixPermissions?) : ElementMetadata {
     override val type: ElementType
         get() = ElementType.SymLink
 }
 
-data object OtherMetadata : ElementMetadata() {
+data class OtherMetadata(override val lastModified: Timestamp, override val posixPermissions: PosixPermissions?) : ElementMetadata {
     override val type: ElementType
         get() = ElementType.Other
 }
 
-data class RegularFileMetadata(val size: ULong) : ElementMetadata() {
+data class RegularFileMetadata(val size: Long, override val lastModified: Timestamp, override val posixPermissions: PosixPermissions?) : ElementMetadata {
     override val type: ElementType
         get() = ElementType.RegularFile
 }

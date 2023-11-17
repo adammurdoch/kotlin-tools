@@ -1,9 +1,6 @@
 package net.rubygrapefruit.file
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertIs
-import kotlin.test.assertNotEquals
+import kotlin.test.*
 
 class SymLinkTest : AbstractFileSystemElementTest() {
     @Test
@@ -20,6 +17,7 @@ class SymLinkTest : AbstractFileSystemElementTest() {
         val link = fixture.symlink("file", "test")
         val metadata = link.metadata().get()
         assertIs<SymlinkMetadata>(metadata)
+        assertNotNull(metadata.posixPermissions)
     }
 
     @Test

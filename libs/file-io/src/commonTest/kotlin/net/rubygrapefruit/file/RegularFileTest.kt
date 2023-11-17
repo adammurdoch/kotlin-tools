@@ -18,6 +18,7 @@ class RegularFileTest : AbstractFileSystemElementTest() {
         val metadata = file.metadata().get()
         assertIs<RegularFileMetadata>(metadata)
         assertEquals(4, metadata.size)
+        assertNotNull(metadata.posixPermissions)
     }
 
     @Test

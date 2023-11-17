@@ -17,6 +17,7 @@ class DirectoryTest : AbstractFileSystemElementTest() {
         val dir = fixture.dir("file")
         val metadata = dir.metadata().get()
         assertIs<DirectoryMetadata>(metadata)
+        assertNotNull(metadata.posixPermissions)
     }
 
     @Test

@@ -24,14 +24,16 @@ abstract class JvmModuleRegistry(
                     it.classPath.from(apiClassPath)
                     it.outputFile.set(project.layout.buildDirectory.file("jvm/required-transitive-modules.txt"))
                 }
-            module.requiresTransitive.convention(requiresTransitive.map { it.outputFile.get().asFile.readLines() })
+            // TODO - should use convention
+            module.requiresTransitive.set(requiresTransitive.map { it.outputFile.get().asFile.readLines() })
         }
 
         val requires = project.tasks.register("requiredModules", InferRequiredModules::class.java) {
             it.classPath.from(compileClasspath)
             it.outputFile.set(project.layout.buildDirectory.file("jvm/required-modules.txt"))
         }
-        module.requires.convention(requires.map { it.outputFile.get().asFile.readLines() })
+        // TODO - should use convention
+        module.requires.set(requires.map { it.outputFile.get().asFile.readLines() })
 
         val exports = project.tasks.register("classInfo", InspectClasses::class.java) {
             it.classesDirs.from(classesDirs)

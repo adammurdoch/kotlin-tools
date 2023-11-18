@@ -38,7 +38,8 @@ abstract class JvmModuleRegistry(
             it.packagesFile.set(project.layout.buildDirectory.file("jvm/exported-packages.txt"))
             it.mainClassesFile.set(project.layout.buildDirectory.file("jvm/main-classes.txt"))
         }
-        module.exports.convention(exports.map { it.packagesFile.get().asFile.readLines() })
+        // TODO - should use convention
+        module.exports.set(exports.map { it.packagesFile.get().asFile.readLines() })
         if (jvmApplication != null) {
             jvmApplication.mainClass.convention(exports.map { it.mainClassesFile.get().asFile.readLines().first() })
         }

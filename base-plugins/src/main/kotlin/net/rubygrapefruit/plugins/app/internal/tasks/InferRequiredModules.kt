@@ -28,8 +28,8 @@ abstract class InferRequiredModules : DefaultTask() {
                     val moduleInfoEntry = jar.getJarEntry("module-info.class")
                     if (moduleInfoEntry != null) {
                         parser.readFrom(jar.getInputStream(moduleInfoEntry), object : ClassFileVisitor {
-                            override fun module(info: ModuleInfo) {
-                                writer.write(info.name)
+                            override fun module(module: ModuleInfo) {
+                                writer.write(module.name)
                                 writer.write("\n")
                             }
                         })

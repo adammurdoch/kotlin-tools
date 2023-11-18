@@ -15,7 +15,7 @@ interface JvmComponent {
     fun dependencies(config: KotlinDependencyHandler.() -> Unit)
 
     /**
-     * Configures tje test dependencies for this component.
+     * Configures test dependencies for this component.
      */
     fun test(config: KotlinDependencyHandler.() -> Unit)
 }

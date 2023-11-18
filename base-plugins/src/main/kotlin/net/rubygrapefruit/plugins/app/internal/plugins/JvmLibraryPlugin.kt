@@ -30,10 +30,9 @@ class JvmLibraryPlugin : Plugin<Project> {
             val apiClasspath = configurations.create("apiClasspath")
             apiClasspath.extendsFrom(apiConfig)
 
-            val classesDir = tasks.named("compileKotlin", KotlinCompile::class.java).map { it.destinationDirectory }
+            val classesDir = files(tasks.named("compileKotlin", KotlinCompile::class.java).map { it.destinationDirectory })
 
-            val moduleInfoCp = extensions.getByType(JvmModuleRegistry::class.java)
-                .moduleInfoClasspathEntryFor(lib.module, files(classesDir), apiClasspath, runtimeClasspath)
+            val moduleInfoCp = extensions.getByType(JvmModuleRegistry::class.java).inspectClassPathsFor(lib.module, null, classesDir, apiClasspath, runtimeClasspath).moduleInfoClasspath
 
             val sourceSet = extensions.getByType(SourceSetContainer::class.java).getByName("main")
             sourceSet.output.dir(moduleInfoCp)

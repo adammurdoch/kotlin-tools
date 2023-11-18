@@ -2,13 +2,12 @@
 # TODO
 
 - Move dependency declarations into library and application blocks
-    - Jvm library and application 
     - UI applications 
     - commonTest for applications 
-- Libraries should target Java 11?
+- Libraries in this repo should target Java 11?
 - KMP base library - generate module file when JVM is a target
 - Enable CC
-- Native ui plugin uses incorrect arch for binary on macOS x64
+- Native UI plugin uses incorrect arch for binary on macOS x64
 - Native-launcher: build both macOS binaries, do not build on non-macOS machine
 - Native-launcher: fix Windows
 - Don't include windows launcher script for embedded JVM and native exe JVM apps
@@ -19,7 +18,7 @@
 - Native app plugin creates distributions for all targets
 - Native macOS bundle plugin
 - Configurable bundle id, app display name, app version
-- Infer the main class for a JVM app
+- Handle missing main class or multiple main classes
 - Module-info
     - Default module name to top-most package
     - Only export packages that contain public non-internal types

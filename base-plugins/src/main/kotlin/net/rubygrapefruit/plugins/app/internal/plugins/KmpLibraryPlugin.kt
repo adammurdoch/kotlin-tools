@@ -31,9 +31,9 @@ class KmpLibraryPlugin : Plugin<Project> {
 
             val compilation = jvmTarget.compilations.first()
 
-            val classesDir = compilation.compileKotlinTaskProvider.flatMap { it.destinationDirectory }
+            val classesDir = files(compilation.compileKotlinTaskProvider.flatMap { it.destinationDirectory })
 
-            val moduleInfoCp = extensions.getByType(JvmModuleRegistry::class.java).moduleInfoClasspathEntryFor(lib.module, files(classesDir), apiClasspath, compilation.compileDependencyFiles)
+            val moduleInfoCp = extensions.getByType(JvmModuleRegistry::class.java).inspectClassPathsFor(lib.module, null, classesDir, apiClasspath, compilation.compileDependencyFiles).moduleInfoClasspath
             tasks.named("jvmJar", Jar::class.java) {
                 it.from(moduleInfoCp)
             }

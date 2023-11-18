@@ -3,7 +3,6 @@ plugins {
 }
 
 application {
-    mainClass = "sample.MainKt"
     module.requires.add("java.desktop")
 
     dependencies {

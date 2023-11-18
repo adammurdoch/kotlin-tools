@@ -59,6 +59,7 @@ Expects that the application uses the JVM module system.
 - The distribution contains the jars for the application and a launcher script. 
   This script requires that a compatible JVM can be found on the machine's `$PATH`. 
 - Adds `application { }` block, see below for the available settings.
+- Automatically determines the application main class.
 - Generates a `module-info`.
 
 ## `net.rubygrapefruit.jvm.embedded-jvm`
@@ -99,18 +100,37 @@ A convention plugin for implementing Gradle plugins in Kotlin/JVM.
 - Adds a `dist` task to create a distribution image containing the app ready for installation.
   By default, this is created in `build/dist-image`
 
-## Common application settings for JVM targets
+## JVM application settings
 
 - Adds `application { }` block
-  - `application.mainClass` - must be specified.
+  - `application.mainClass` - defaults to main class determined by inspecting the bytecode
   - `application.module.name` - defaults to the application name
+  - `application.targetJavaVersion` - defaults to 17
+  - `application.dependencies { }` - production dependencies
+  - `application.test { }` - test dependencies
 
-## Common JVM library settings
+## JVM library settings
 
 - Adds `library { }` block
   - `library.module.name` - defaults to the project name 
   - `library.module.exports` 
   - `library.module.requires` - calculated from compile (implementation) dependencies 
   - `library.module.requiresTransitive` - calculated from the API dependencies
+  - `library.targetJavaVersion` - defaults to 17
+  - `library.dependencies { }` - production dependencies
+  - `library.test { }` - test dependencies
+
+## Native application settings
+
+- Adds `application { }` block
+  - `application.common { }` - production dependencies common to all targets
+  - `application.test { }` - test dependencies common to all targets
+
+## Multi-platform library settings
+
+- Adds `library { }` block
+  - `library.jvm { }` - JVM target settings (same as JVM library above) 
+  - `library.common { }` - production dependencies common to all targets
+  - `library.test { }` - test dependencies common to all targets
 
 See [`../test-apps`](../test-apps/) for some samples.

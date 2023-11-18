@@ -3,8 +3,6 @@ plugins {
 }
 
 application {
-    mainClass = "sample.MainKt"
-
     dependencies {
         implementation(project(":kmp-lib"))
         implementation(project(":jvm-lib"))

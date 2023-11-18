@@ -9,6 +9,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.jvm.tasks.Jar
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 class JvmApplicationBasePlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -26,7 +27,9 @@ class JvmApplicationBasePlugin : Plugin<Project> {
                 val jarTask = tasks.named("jar", Jar::class.java)
                 val runtimeClasspath = configurations.getByName("runtimeClasspath")
 
-                val moduleInfoCp = extensions.getByType(JvmModuleRegistry::class.java).moduleInfoClasspathEntryFor(app.module, null, null, runtimeClasspath)
+                val classesDir = files(tasks.named("compileKotlin", KotlinCompile::class.java).map { it.destinationDirectory })
+
+                val moduleInfoCp = extensions.getByType(JvmModuleRegistry::class.java).inspectClassPathsFor(app.module, app, classesDir, null, runtimeClasspath).moduleInfoClasspath
 
                 val sourceSet = extensions.getByType(SourceSetContainer::class.java).getByName("main")
                 sourceSet.output.dir(moduleInfoCp)

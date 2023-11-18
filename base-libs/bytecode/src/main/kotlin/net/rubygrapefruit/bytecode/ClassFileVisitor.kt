@@ -4,17 +4,17 @@ interface ClassFileVisitor {
     /**
      * Visits a module.
      */
-    fun module(info: ModuleInfo) {}
+    fun module(module: ModuleInfo) {}
 
     /**
      * Visits a type. Can return a `TypeVisitor` to receive information about the methods and fields of the type.
      */
-    fun type(info: TypeInfo): TypeVisitor? = null
+    fun type(type: TypeInfo): TypeVisitor? = null
 }
 
 interface TypeVisitor {
-    fun method(info: MethodInfo) {}
-    fun field(info: FieldInfo) {}
+    fun method(method: MethodInfo) {}
+    fun field(field: FieldInfo) {}
 }
 
 internal object NoOpTypeVisitor : TypeVisitor

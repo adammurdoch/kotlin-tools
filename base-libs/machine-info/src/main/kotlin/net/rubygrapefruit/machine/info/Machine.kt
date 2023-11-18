@@ -7,14 +7,14 @@ import java.io.ByteArrayOutputStream
  */
 sealed class Machine {
     sealed class Windows: Machine()
-    object WindowsX64 : Windows()
+    data object WindowsX64 : Windows()
 
     sealed class Linux: Machine()
-    object LinuxX64 : Linux()
+    data object LinuxX64 : Linux()
 
     sealed class MacOS : Machine()
-    object MacOSArm64 : MacOS()
-    object MacOSX64 : MacOS()
+    data object MacOSArm64 : MacOS()
+    data object MacOSX64 : MacOS()
 
     companion object {
         val thisMachine by lazy {

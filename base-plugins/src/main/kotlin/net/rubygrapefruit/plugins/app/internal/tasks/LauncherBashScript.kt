@@ -1,7 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal.tasks
 
+import net.rubygrapefruit.plugins.app.internal.HostMachine
 import net.rubygrapefruit.plugins.app.internal.Windows
-import net.rubygrapefruit.plugins.app.internal.currentOs
 import org.gradle.api.tasks.TaskAction
 import java.nio.file.Files
 import java.nio.file.attribute.PosixFilePermission
@@ -34,7 +34,7 @@ BASE_DIR=${'$'}( cd -P "${'$'}( dirname "${'$'}SOURCE" )" >/dev/null 2>&1 && pwd
 $javaCommand $modulePathArg --module ${module.get()}/${mainClass.get()} "$@"
 """
         )
-        if (currentOs != Windows) {
+        if (HostMachine.current !is Windows) {
             Files.setPosixFilePermissions(
                 scriptFile,
                 setOf(

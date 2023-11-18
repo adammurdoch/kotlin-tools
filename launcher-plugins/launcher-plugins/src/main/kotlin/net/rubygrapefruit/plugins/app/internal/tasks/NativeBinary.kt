@@ -1,8 +1,10 @@
 package net.rubygrapefruit.plugins.app.internal.tasks
 
 import net.rubygrapefruit.download.DownloadRepository
-import net.rubygrapefruit.plugins.app.NativeMachine
-import net.rubygrapefruit.plugins.app.internal.currentOs
+import net.rubygrapefruit.plugins.app.internal.HostMachine
+import net.rubygrapefruit.plugins.app.internal.LinuxX64
+import net.rubygrapefruit.plugins.app.internal.MacOsArm64
+import net.rubygrapefruit.plugins.app.internal.MacOsX64
 import net.rubygrapefruit.plugins.bootstrap.Versions
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
@@ -37,8 +39,8 @@ abstract class NativeBinary : DefaultTask() {
     @TaskAction
     fun install() {
         val repository = DownloadRepository()
-        val args = when (currentOs.machine) {
-            NativeMachine.LinuxX64 -> {
+        val args = when (HostMachine.current) {
+            LinuxX64 -> {
                 val baseName = "graalvm-jdk-${Versions.java}_linux-x64"
                 Args(
                     URI("https://download.oracle.com/graalvm/${Versions.java}/latest/${baseName}_bin.tar.gz"),
@@ -46,7 +48,7 @@ abstract class NativeBinary : DefaultTask() {
                 )
             }
 
-            NativeMachine.MacOSX64 -> {
+            MacOsX64 -> {
                 val baseName = "graalvm-jdk-${Versions.java}_macos-x64"
                 Args(
                     URI("https://download.oracle.com/graalvm/${Versions.java}/latest/${baseName}_bin.tar.gz"),
@@ -54,7 +56,7 @@ abstract class NativeBinary : DefaultTask() {
                 )
             }
 
-            NativeMachine.MacOSArm64 -> {
+            MacOsArm64 -> {
                 val baseName = "graalvm-jdk-${Versions.java}_macos-aarch64"
                 Args(
                     URI("https://download.oracle.com/graalvm/${Versions.java}/latest/${baseName}_bin.tar.gz"),

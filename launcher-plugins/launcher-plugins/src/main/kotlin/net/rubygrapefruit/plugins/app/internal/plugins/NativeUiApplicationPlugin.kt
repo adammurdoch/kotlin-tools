@@ -1,10 +1,6 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
-import net.rubygrapefruit.plugins.app.NativeMachine
-import net.rubygrapefruit.plugins.app.internal.DefaultNativeUiApplication
-import net.rubygrapefruit.plugins.app.internal.applications
-import net.rubygrapefruit.plugins.app.internal.kotlin
-import net.rubygrapefruit.plugins.app.internal.multiplatformComponents
+import net.rubygrapefruit.plugins.app.internal.*
 import net.rubygrapefruit.plugins.app.internal.tasks.NativeLauncher
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -22,9 +18,7 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                 executable { }
             }
             applications.withApp<DefaultNativeUiApplication> { app ->
-                val extension = kotlin
-                val nativeTarget =
-                    extension.targets.getByName(NativeMachine.MacOSArm64.kotlinTarget) as KotlinNativeTarget
+                val nativeTarget = kotlin.targets.getByName(HostMachine.current.machine.kotlinTarget) as KotlinNativeTarget
                 val executable = nativeTarget.binaries.withType(Executable::class.java).first()
                 val binaryFile = layout.file(executable.linkTaskProvider.map { it.binary.outputFile })
 
@@ -32,7 +26,7 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                     it.sourceDirectory.set(layout.buildDirectory.dir("generated-main"))
                     it.delegateClass.set(app.delegateClass)
                 }
-                withMacosMain(extension) {
+                withMacosMain(kotlin) {
                     it.kotlin.srcDir(generatorTask.flatMap { it.sourceDirectory })
                 }
 

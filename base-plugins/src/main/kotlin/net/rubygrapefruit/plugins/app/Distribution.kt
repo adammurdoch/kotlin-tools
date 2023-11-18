@@ -12,12 +12,12 @@ interface Distribution {
     val imageDirectory: DirectoryProperty
 
     /**
-     * The final distribution image. You can use this to use the distribution from other tasks, eg an `install` or `zip` task
+     * The final distribution image. You can use this to use the distribution from other tasks, e.g. an `install` or `zip` task
      */
     val imageOutputDirectory: Provider<Directory>
 
     /**
-     * The launcher file in the distribution image. You can use this to use the launcher from other tasks, eg a `run` task.
+     * The launcher file in the distribution image. You can use this to use the launcher from other tasks, e.g. a `run` task.
      */
     val launcherOutputFile: Provider<RegularFile>
 }

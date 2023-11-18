@@ -3,7 +3,18 @@ package net.rubygrapefruit.plugins.app.internal
 import net.rubygrapefruit.machine.info.Machine
 import net.rubygrapefruit.plugins.app.NativeMachine
 
-sealed class Os {
+sealed class HostMachine {
+    companion object {
+        val current: HostMachine by lazy {
+            when (Machine.thisMachine) {
+                Machine.WindowsX64 -> WindowsX64
+                Machine.LinuxX64 -> LinuxX64
+                Machine.MacOSX64 -> MacOsX64
+                Machine.MacOSArm64 -> MacOsArm64
+            }
+        }
+    }
+
     open fun exeName(name: String) = name
 
     open fun canBuild(machine: NativeMachine): Boolean {
@@ -16,41 +27,34 @@ sealed class Os {
     abstract val machine: NativeMachine
 }
 
-object Windows : Os() {
+sealed class Windows : HostMachine() {
     override fun exeName(name: String) = "$name.exec"
+}
 
+data object WindowsX64 : Windows() {
     override val machine: NativeMachine
         get() = NativeMachine.WindowsX64
 }
 
-object Linux : Os() {
+sealed class Linux : HostMachine()
+
+data object LinuxX64 : Linux() {
     override val machine: NativeMachine
         get() = NativeMachine.LinuxX64
 }
 
-object MacOsX64 : Os() {
+sealed class MacOS : HostMachine() {
     override fun canBuild(machine: NativeMachine): Boolean {
         return true
     }
+}
 
+data object MacOsX64 : MacOS() {
     override val machine: NativeMachine
         get() = NativeMachine.MacOSX64
 }
 
-object MacOsArm64 : Os() {
-    override fun canBuild(machine: NativeMachine): Boolean {
-        return true
-    }
-
+data object MacOsArm64 : MacOS() {
     override val machine: NativeMachine
         get() = NativeMachine.MacOSArm64
-}
-
-val currentOs: Os by lazy {
-    when (Machine.thisMachine) {
-        Machine.WindowsX64 -> Windows
-        Machine.LinuxX64 -> Linux
-        Machine.MacOSX64 -> MacOsX64
-        Machine.MacOSArm64 -> MacOsArm64
-    }
 }

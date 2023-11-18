@@ -1,10 +1,10 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.internal.DefaultJvmUiApplication
+import net.rubygrapefruit.plugins.app.internal.HostMachine
+import net.rubygrapefruit.plugins.app.internal.applications
 import net.rubygrapefruit.plugins.app.internal.tasks.LauncherConf
 import net.rubygrapefruit.plugins.app.internal.tasks.NativeUiLauncher
-import net.rubygrapefruit.plugins.app.internal.applications
-import net.rubygrapefruit.plugins.app.internal.currentOs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.attributes.Usage
@@ -28,7 +28,7 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                     it.mainClass.set(app.mainClass)
                 }
 
-                val host = currentOs.machine
+                val host = HostMachine.current.machine
                 val nativeBinary = configurations.create("nativeBinaries${host.name}") {
                     it.attributes.attribute(
                         Usage.USAGE_ATTRIBUTE,

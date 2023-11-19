@@ -3,7 +3,7 @@ package net.rubygrapefruit.file
 import kotlin.jvm.JvmInline
 
 @JvmInline
-value class PosixPermissions internal constructor(internal val mode: UInt) {
+value class PosixPermissions internal constructor(val mode: UInt) {
     companion object {
         internal const val ownerRead = 0x100u
         internal const val ownerWrite = 0x80u

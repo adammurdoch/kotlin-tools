@@ -18,19 +18,21 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                 executable { }
             }
             applications.withApp<DefaultNativeUiApplication> { app ->
-                val nativeTarget = kotlin.targets.getByName(HostMachine.current.machine.kotlinTarget) as KotlinNativeTarget
-                val executable = nativeTarget.binaries.withType(Executable::class.java).first()
-                val binaryFile = layout.file(executable.linkTaskProvider.map { it.binary.outputFile })
+                if (HostMachine.current is MacOS) {
+                    val nativeTarget = kotlin.targets.getByName(HostMachine.current.machine.kotlinTarget) as KotlinNativeTarget
+                    val executable = nativeTarget.binaries.withType(Executable::class.java).first()
+                    val binaryFile = layout.file(executable.linkTaskProvider.map { it.binary.outputFile })
 
-                val generatorTask = tasks.register("nativeLauncher", NativeLauncher::class.java) {
-                    it.sourceDirectory.set(layout.buildDirectory.dir("generated-main"))
-                    it.delegateClass.set(app.delegateClass)
-                }
-                withMacosMain(kotlin) {
-                    it.kotlin.srcDir(generatorTask.flatMap { it.sourceDirectory })
-                }
+                    val generatorTask = tasks.register("nativeLauncher", NativeLauncher::class.java) {
+                        it.sourceDirectory.set(layout.buildDirectory.dir("generated-main"))
+                        it.delegateClass.set(app.delegateClass)
+                    }
+                    withMacosMain(kotlin) {
+                        it.kotlin.srcDir(generatorTask.flatMap { it.sourceDirectory })
+                    }
 
-                app.distribution.launcherFile.set(binaryFile)
+                    app.distribution.launcherFile.set(binaryFile)
+                }
             }
 
             val app = extensions.create("application", DefaultNativeUiApplication::class.java)

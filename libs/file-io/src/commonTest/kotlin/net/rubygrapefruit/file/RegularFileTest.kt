@@ -15,7 +15,11 @@ class RegularFileTest : AbstractFileSystemElementTest() {
     @Test
     fun `can query file metadata`() {
         val file = fixture.file("file", "test")
-        val metadata = file.metadata().get()
+
+        val result = file.metadata()
+        assertTrue(result.regularFile)
+
+        val metadata = result.get()
         assertIs<RegularFileMetadata>(metadata)
         assertEquals(4, metadata.size)
         assertNotNull(metadata.posixPermissions)
@@ -47,8 +51,10 @@ class RegularFileTest : AbstractFileSystemElementTest() {
     @Test
     fun `can query metadata of missing file`() {
         val file = fixture.testDir.file("missing")
+
         val result = file.metadata()
         assertIs<MissingEntry<*>>(result)
+        assertTrue(result.missing)
     }
 
     @Test

@@ -51,3 +51,9 @@ val Result<ElementMetadata>.directory: Boolean
  */
 val Result<ElementMetadata>.regularFile: Boolean
     get() = getOrNull() is RegularFileMetadata
+
+/**
+ * Is the element a symlink?
+ */
+val Result<ElementMetadata>.symlink: Boolean
+    get() = getOrNull() is SymlinkMetadata

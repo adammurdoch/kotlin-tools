@@ -13,3 +13,6 @@ internal actual fun lastModified(stat: stat): Timestamp {
 internal actual fun mode(stat: stat): UInt {
     return stat.st_mode.convert()
 }
+
+actual val canSetSymLinkPermissions: Boolean
+    get() = false

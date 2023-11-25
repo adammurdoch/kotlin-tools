@@ -25,6 +25,9 @@ class MissingEntry<T> internal constructor(private val path: String, private val
     }
 }
 
+/**
+ * An entry that cannot be read due to insufficient permissions.
+ */
 class UnreadableEntry<T> internal constructor(private val path: String) : Failed<T>() {
     override fun rethrow(): Nothing {
         throw unreadableElement(path)

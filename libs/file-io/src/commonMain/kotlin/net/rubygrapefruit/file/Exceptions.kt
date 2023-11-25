@@ -14,6 +14,8 @@ internal fun parentDirectoryDoesNotExist(path: String, ancestor: String, cause: 
 
 internal fun parentDirectoryIsNotADir(path: String, ancestor: String, cause: Throwable? = null) = FileSystemException("Could not write to $path as $ancestor exists but is not a directory.", cause)
 
+internal fun setPermissionsNotSupported(path: String) = FileSystemException("Could not set permissions on $path as it is not supported by this filesystem.")
+
 /**
  * Tries to infer why a file could not be written to.
  */

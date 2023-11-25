@@ -52,8 +52,16 @@ internal open class JvmFileSystemElement(protected val delegate: Path) : Abstrac
     }
 
     override fun setPermissions(permissions: PosixPermissions) {
-        Files.getFileAttributeView(delegate, PosixFileAttributeView::class.java, LinkOption.NOFOLLOW_LINKS)
-            .setPermissions(permissions.permSet())
+        val view = Files.getFileAttributeView(delegate, PosixFileAttributeView::class.java, LinkOption.NOFOLLOW_LINKS)
+        try {
+            view.setPermissions(permissions.permSet())
+        } catch (e: IOException) {
+            if (metadata().symlink) {
+                throw setPermissionsNotSupported(path.absolutePath)
+            } else {
+                throw FileSystemException("Could not set permissions on $path.", e)
+            }
+        }
     }
 
     override fun supports(capability: FileSystemCapability): Boolean {

@@ -15,7 +15,11 @@ class SymLinkTest : AbstractFileSystemElementTest() {
     @Test
     fun `can query symlink metadata`() {
         val link = fixture.symlink("file", "test")
-        val metadata = link.metadata().get()
+
+        val result = link.metadata()
+        assertTrue(result.symlink)
+
+        val metadata = result.get()
         assertIs<SymlinkMetadata>(metadata)
         assertNotNull(metadata.posixPermissions)
     }
@@ -36,6 +40,7 @@ class SymLinkTest : AbstractFileSystemElementTest() {
         val link = fixture.testDir.symLink("missing")
         val result = link.metadata()
         assertIs<MissingEntry<*>>(result)
+        assertTrue(result.missing)
     }
 
     @Test
@@ -86,10 +91,6 @@ class SymLinkTest : AbstractFileSystemElementTest() {
 
     @Test
     fun `can set and query symlink posix permissions`() {
-        if (!fixture.testDir.supports(FileSystemCapability.SetSymLinkPosixPermissions)) {
-            return
-        }
-
         val file = fixture.file("file")
         val symLink = fixture.symlink("link", file.name)
 
@@ -100,8 +101,28 @@ class SymLinkTest : AbstractFileSystemElementTest() {
 
         assertNotEquals(file.posixPermissions().get(), symLink.posixPermissions().get())
 
+        if (!symLink.supports(FileSystemCapability.SetSymLinkPosixPermissions)) {
+            return
+        }
         symLink.setPermissions(PosixPermissions.readWriteFile)
 
         assertEquals(PosixPermissions.readWriteFile, symLink.posixPermissions().get())
+    }
+
+    @Test
+    fun `cannot set symlink posix permissions when not supported`() {
+        val file = fixture.file("file")
+        val symLink = fixture.symlink("link", file.name)
+
+        if (symLink.supports(FileSystemCapability.SetSymLinkPosixPermissions)) {
+            return
+        }
+
+        try {
+            symLink.setPermissions(PosixPermissions.readWriteFile)
+            fail()
+        } catch (e: FileSystemException) {
+            assertEquals("Could not set permissions on $symLink as it is not supported by this filesystem.", e.message)
+        }
     }
 }

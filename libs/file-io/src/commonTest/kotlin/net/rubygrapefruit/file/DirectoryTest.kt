@@ -15,7 +15,11 @@ class DirectoryTest : AbstractFileSystemElementTest() {
     @Test
     fun `can query directory metadata`() {
         val dir = fixture.dir("file")
-        val metadata = dir.metadata().get()
+
+        val result = dir.metadata()
+        assertTrue(result.directory)
+
+        val metadata = result.get()
         assertIs<DirectoryMetadata>(metadata)
         assertNotNull(metadata.posixPermissions)
     }
@@ -43,6 +47,7 @@ class DirectoryTest : AbstractFileSystemElementTest() {
         val dir = fixture.testDir.dir("missing")
         val result = dir.metadata()
         assertIs<MissingEntry<*>>(result)
+        assertTrue(result.missing)
     }
 
     @Test

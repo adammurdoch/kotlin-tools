@@ -49,12 +49,20 @@ internal open class UnixFileSystemElement(path: String) : NativeFileSystemElemen
     @OptIn(UnsafeNumber::class)
     override fun setPermissions(permissions: PosixPermissions) {
         if (lchmod(path.absolutePath, permissions.mode.convert()) != 0) {
-            throw NativeException("Could not set permissions on $path.")
+            if (errno == ENOTSUP) {
+                throw setPermissionsNotSupported(path.absolutePath)
+            } else {
+                throw NativeException("Could not set permissions on $path.")
+            }
         }
     }
 
     override fun supports(capability: FileSystemCapability): Boolean {
-        return true
+        return if (capability == FileSystemCapability.SetSymLinkPosixPermissions) {
+            canSetSymLinkPermissions
+        } else {
+            true
+        }
     }
 
     protected fun MemScope.fileSize(): Long {
@@ -238,6 +246,9 @@ internal class UnixDirectory(path: String) : UnixFileSystemElement(path), Direct
         }
     }
 }
+
+
+expect val canSetSymLinkPermissions: Boolean
 
 internal class UnixSymLink(path: String) : UnixFileSystemElement(path), SymLink {
     override fun readSymLink(): Result<String> {

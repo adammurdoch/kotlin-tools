@@ -5,13 +5,14 @@ package net.rubygrapefruit.file
 import kotlinx.cinterop.*
 import platform.posix.*
 
-internal open class UnixFileSystemElement(path: String) : NativeFileSystemElement(path) {
+internal open class UnixFileSystemElement(override val path: AbsolutePath) : AbstractFileSystemElement() {
     override val parent: Directory?
         get() {
-            return if (absolutePath == "/") {
+            val parentPath = path.parent
+            return if (parentPath == null) {
                 null
             } else {
-                UnixDirectory(absolutePath.substringBeforeLast("/"))
+                UnixDirectory(parentPath)
             }
         }
 
@@ -24,15 +25,15 @@ internal open class UnixFileSystemElement(path: String) : NativeFileSystemElemen
     }
 
     override fun toDir(): Directory {
-        return UnixDirectory(absolutePath)
+        return UnixDirectory(path)
     }
 
     override fun toFile(): RegularFile {
-        return UnixRegularFile(absolutePath)
+        return UnixRegularFile(path)
     }
 
     override fun toSymLink(): SymLink {
-        return UnixSymLink(absolutePath)
+        return UnixSymLink(path)
     }
 
     @OptIn(UnsafeNumber::class)
@@ -73,7 +74,12 @@ internal open class UnixFileSystemElement(path: String) : NativeFileSystemElemen
     }
 }
 
-internal class UnixRegularFile(path: String) : UnixFileSystemElement(path), RegularFile {
+internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path), RegularFile {
+
+    override fun toFile(): RegularFile {
+        return this
+    }
+
     override fun delete() {
         if (remove(path.absolutePath) != 0) {
             throw NativeException("Could not delete $path.")
@@ -145,17 +151,21 @@ internal class UnixRegularFile(path: String) : UnixFileSystemElement(path), Regu
     }
 }
 
-internal class UnixDirectory(path: String) : UnixFileSystemElement(path), Directory {
+internal class UnixDirectory(path: AbsolutePath) : UnixFileSystemElement(path), Directory {
     override fun file(name: String): RegularFile {
-        return UnixRegularFile(resolveName(name))
+        return UnixRegularFile(AbsolutePath((resolveName(name))))
+    }
+
+    override fun toDir(): Directory {
+        return this
     }
 
     override fun dir(name: String): Directory {
-        return UnixDirectory(resolveName(name))
+        return UnixDirectory(AbsolutePath(resolveName(name)))
     }
 
     override fun symLink(name: String): SymLink {
-        return UnixSymLink(resolveName(name))
+        return UnixSymLink(AbsolutePath(resolveName(name)))
     }
 
     override fun deleteRecursively() {
@@ -249,7 +259,12 @@ internal class UnixDirectory(path: String) : UnixFileSystemElement(path), Direct
 
 expect val canSetSymLinkPermissions: Boolean
 
-internal class UnixSymLink(path: String) : UnixFileSystemElement(path), SymLink {
+internal class UnixSymLink(path: AbsolutePath) : UnixFileSystemElement(path), SymLink {
+
+    override fun toSymLink(): SymLink {
+        return this
+    }
+
     override fun readSymLink(): Result<String> {
         memScoped {
             val size = fileSize()
@@ -288,29 +303,29 @@ private class DirectoryEntryImpl(private val parentPath: String, override val na
     }
 
     override fun toDir(): Directory {
-        return UnixDirectory(path.absolutePath)
+        return UnixDirectory(path)
     }
 
     override fun toFile(): RegularFile {
-        return UnixRegularFile(path.absolutePath)
+        return UnixRegularFile(path)
     }
 
     override fun toSymLink(): SymLink {
-        return UnixSymLink(path.absolutePath)
+        return UnixSymLink(path)
     }
 }
 
 internal class SnapshotImpl(override val path: AbsolutePath, override val metadata: ElementMetadata) : AbstractElementSnapshot() {
     override fun asRegularFile(): RegularFile {
-        return UnixRegularFile(absolutePath)
+        return UnixRegularFile(path)
     }
 
     override fun asDirectory(): Directory {
-        return UnixDirectory(absolutePath)
+        return UnixDirectory(path)
     }
 
     override fun asSymLink(): SymLink {
-        return UnixSymLink(absolutePath)
+        return UnixSymLink(path)
     }
 }
 
@@ -359,7 +374,7 @@ internal fun getUserHomeDir(): UnixDirectory {
         if (pwd == null) {
             throw NativeException("Could not get user home directory.")
         }
-        UnixDirectory(pwd.pointed.pw_dir!!.toKString())
+        UnixDirectory(AbsolutePath(pwd.pointed.pw_dir!!.toKString()))
     }
 }
 
@@ -371,7 +386,7 @@ internal fun getCurrentDir(): UnixDirectory {
         if (path == null) {
             throw NativeException("Could not get current directory.")
         }
-        UnixDirectory(buffer.toKString())
+        UnixDirectory(AbsolutePath(buffer.toKString()))
     }
 }
 
@@ -381,7 +396,7 @@ internal fun createTempDir(baseDir: UnixDirectory): Directory {
         if (mkdtemp(pathCopy) == null) {
             throw NativeException("Could not create temporary directory in ${baseDir}.")
         }
-        UnixDirectory(pathCopy.toKString())
+        UnixDirectory(AbsolutePath(pathCopy.toKString()))
     }
 }
 

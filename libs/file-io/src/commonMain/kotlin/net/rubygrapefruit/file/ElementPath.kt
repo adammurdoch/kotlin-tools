@@ -10,7 +10,12 @@ interface ElementPath {
     val name: String
 
     /**
-     * Returns the path of this element.
+     * Returns the parent of this path.
+     */
+    val parent: ElementPath?
+
+    /**
+     * Returns the path of this element, using file system separators and formatting.
      */
     val absolutePath: String
 

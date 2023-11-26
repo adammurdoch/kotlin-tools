@@ -15,6 +15,16 @@ internal class JvmElementPath(val delegate: Path) : ElementPath {
     override val absolutePath: String
         get() = delegate.pathString
 
+    override val parent: JvmElementPath?
+        get() {
+            val parent = delegate.parent
+            return if (parent == null) {
+                null
+            } else {
+                JvmElementPath(delegate)
+            }
+        }
+
     override fun snapshot(): Result<ElementSnapshot> {
         return metadata(delegate).map { SnapshotImpl(this, it) }
     }

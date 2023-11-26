@@ -1,17 +1,26 @@
+@file:OptIn(ExperimentalPathApi::class)
+
 package net.rubygrapefruit.download
 
 import net.rubygrapefruit.machine.info.Machine
 import java.io.File
 import java.net.URI
+import java.nio.channels.FileChannel
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
+import java.nio.file.StandardOpenOption
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.locks.ReentrantLock
 import java.util.zip.ZipInputStream
-import kotlin.io.path.createDirectories
-import kotlin.io.path.inputStream
-import kotlin.io.path.outputStream
+import kotlin.concurrent.withLock
+import kotlin.io.path.*
 
 class DownloadRepository(private val silent: Boolean = false) {
+    companion object {
+        val locks = ConcurrentHashMap<String, ReentrantLock>()
+    }
+
     private val downloadsDir = File(System.getProperty("user.home"), "bin/downloads").toPath()
 
     /**
@@ -30,35 +39,91 @@ class DownloadRepository(private val silent: Boolean = false) {
      * Downloads and installs the given Zip
      */
     fun install(uri: URI, name: String, onInstall: (Path) -> Unit = {}): Path {
-        Files.createDirectories(downloadsDir)
-        val dir = downloadsDir.resolve(name)
-        if (Files.exists(dir)) {
-            return dir
-        } else {
-            val format = when {
-                uri.path.endsWith(Zip.extension, true) -> Zip
-                uri.path.endsWith(TarGz.extension, true) -> TarGz
-                else -> throw RuntimeException("Don't know how to install $uri")
-            }
-
-            val tmpFile = downloadsDir.resolve("${name}.download.${format.extension}")
-            val tmpDir = downloadsDir.resolve("${name}.expanded-tmp")
-            Files.createDirectories(tmpDir)
-            if (!silent) {
-                println("Downloading $uri")
-            }
-            try {
-                uri.toURL().openConnection().getInputStream().use {
-                    Files.copy(it, tmpFile, StandardCopyOption.REPLACE_EXISTING)
-                }
-                format.unpack(tmpFile, tmpDir)
-                Files.move(tmpDir, dir, StandardCopyOption.ATOMIC_MOVE)
-                onInstall(dir)
-            } finally {
-                Files.deleteIfExists(tmpFile)
-            }
-            return dir
+        val format = when {
+            uri.path.endsWith(Zip.extension, true) -> Zip
+            uri.path.endsWith(TarGz.extension, true) -> TarGz
+            else -> throw RuntimeException("Don't know how to install $uri")
         }
+
+        downloadsDir.createDirectories()
+        val installDir = downloadsDir.resolve(name)
+        val workDir = downloadsDir.resolve("work")
+        workDir.createDirectories()
+
+        val markerFile = workDir.resolve("${name}.done")
+
+        if (markerFile.isRegularFile()) {
+            return installDir
+        }
+
+        return maybeInstall(uri, name, format, markerFile, workDir, installDir, onInstall)
+    }
+
+    private fun maybeInstall(
+        uri: URI,
+        name: String,
+        format: Format,
+        markerFile: Path,
+        workDir: Path,
+        installDir: Path,
+        onInstall: (Path) -> Unit
+    ): Path {
+        // Block until no other threads are installing
+        return locks.computeIfAbsent(name) { ReentrantLock() }.withLock {
+            maybeInstallHoldingThreadLock(uri, name, format, markerFile, workDir, installDir, onInstall)
+        }
+    }
+
+    private fun maybeInstallHoldingThreadLock(
+        uri: URI,
+        name: String,
+        format: Format,
+        markerFile: Path,
+        workDir: Path,
+        installDir: Path,
+        onInstall: (Path) -> Unit
+    ): Path {
+        val lockFile = workDir.resolve("${name}.lock")
+        val tmpFile = workDir.resolve("${name}.download.${format.extension}")
+        val tmpDir = workDir.resolve("${name}.expanded-archive")
+
+        FileChannel.open(lockFile, StandardOpenOption.CREATE, StandardOpenOption.WRITE).use { channel ->
+            val lock = channel.lock()
+            try {
+                // May have been installed while waiting to acquire the lock
+                if (markerFile.isRegularFile()) {
+                    return installDir
+                }
+
+                // Clean up any partially installed left-overs
+                if (installDir.isDirectory()) {
+                    installDir.deleteRecursively()
+                }
+
+                if (!silent) {
+                    println("Downloading $uri")
+                }
+                try {
+                    tmpFile.parent.createDirectories()
+                    uri.toURL().openConnection().getInputStream().use { instr ->
+                        Files.copy(instr, tmpFile, StandardCopyOption.REPLACE_EXISTING)
+                    }
+                    require(tmpFile.isRegularFile())
+
+                    tmpDir.createDirectories()
+                    format.unpack(tmpFile, tmpDir)
+                    Files.move(tmpDir, installDir, StandardCopyOption.ATOMIC_MOVE)
+                    onInstall(installDir)
+                } finally {
+                    tmpFile.deleteIfExists()
+                }
+                markerFile.createFile()
+            } finally {
+                lock.release()
+            }
+        }
+
+        return installDir
     }
 
     private sealed interface Format {
@@ -75,7 +140,7 @@ class DownloadRepository(private val silent: Boolean = false) {
             if (Machine.thisMachine is Machine.Windows) {
                 file.inputStream().use { stream ->
                     val zip = ZipInputStream(stream)
-                    while(true) {
+                    while (true) {
                         val entry = zip.nextEntry
                         if (entry == null) {
                             break

@@ -80,6 +80,11 @@ internal open class JvmFileSystemElement(protected val delegate: Path) : Abstrac
 }
 
 internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularFile {
+
+    override fun toFile(): RegularFile {
+        return this
+    }
+
     override fun delete() {
         Files.deleteIfExists(delegate)
     }
@@ -106,6 +111,11 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
 }
 
 internal class JvmDirectory(path: Path) : JvmFileSystemElement(path), Directory {
+
+    override fun toDir(): Directory {
+        return this
+    }
+
     override fun file(name: String): RegularFile {
         return JvmRegularFile(delegate.resolve(name))
     }
@@ -173,6 +183,10 @@ internal class JvmDirectory(path: Path) : JvmFileSystemElement(path), Directory 
 }
 
 internal class JvmSymlink(path: Path) : JvmFileSystemElement(path), SymLink {
+    override fun toSymLink(): SymLink {
+        return this
+    }
+
     override fun readSymLink(): Result<String> {
         return Success(Files.readSymbolicLink(delegate).pathString)
     }

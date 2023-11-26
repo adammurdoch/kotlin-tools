@@ -19,6 +19,9 @@ sealed class Failed<T> : Result<T>() {
     abstract fun rethrow(): Nothing
 }
 
+/**
+ * An entry that does not exist.
+ */
 class MissingEntry<T> internal constructor(private val path: String, private val cause: Throwable? = null) : Failed<T>() {
     override fun rethrow(): Nothing {
         throw missingElement(path, cause)
@@ -31,6 +34,12 @@ class MissingEntry<T> internal constructor(private val path: String, private val
 class UnreadableEntry<T> internal constructor(private val path: String) : Failed<T>() {
     override fun rethrow(): Nothing {
         throw unreadableElement(path)
+    }
+}
+
+class UnsupportedOperation<T> internal constructor(private val path: String, private val operation: String) : Failed<T>() {
+    override fun rethrow(): Nothing {
+        throw notSupported(path, operation)
     }
 }
 

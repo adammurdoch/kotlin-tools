@@ -46,9 +46,13 @@ internal open class JvmFileSystemElement(protected val delegate: Path) : Abstrac
     }
 
     override fun posixPermissions(): Result<PosixPermissions> {
-        val attributes = Files.getFileAttributeView(delegate, PosixFileAttributeView::class.java, LinkOption.NOFOLLOW_LINKS)
-            .readAttributes()
-        return Success(attributes.permissions().permissions())
+        val view = Files.getFileAttributeView(delegate, PosixFileAttributeView::class.java, LinkOption.NOFOLLOW_LINKS)
+        return if (view == null) {
+            UnsupportedOperation(absolutePath, "read POSIX permissions for")
+        } else {
+            val attributes = view.readAttributes()
+            Success(attributes.permissions().permissions())
+        }
     }
 
     override fun setPermissions(permissions: PosixPermissions) {

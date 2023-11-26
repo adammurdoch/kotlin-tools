@@ -1,12 +1,14 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm").version("1.9.20")
+    id("org.jetbrains.kotlin.jvm").version("1.9.21")
     id("java-gradle-plugin")
 }
 
 object Constants {
-    val kotlin = "1.9.20"
-    val serialization = "1.9.20"
+    val kotlin = "1.9.21"
+    val serialization = "1.9.21"
     val serializationJson = "1.6.0"
+    val coroutines = "1.7.3"
+    val dateTime = "0.4.1"
     val java = 17
     val pluginsJava = 11
 
@@ -14,6 +16,12 @@ object Constants {
         get() = "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlin}"
     val serializationPluginCoordinates
         get() = "org.jetbrains.kotlin:kotlin-serialization:${serialization}"
+    val serializationJsonCoordinates
+        get() = "org.jetbrains.kotlinx:kotlinx-serialization-json:${serializationJson}"
+    val coroutinesCoordinates
+        get() = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutines}"
+    val dateTimeCoordinates
+        get() = "org.jetbrains.kotlinx:kotlinx-datetime:${dateTime}"
 
     val pluginsGroup = "net.rubygrapefruit.plugins"
     val pluginsVersion = "0.1-dev"
@@ -75,12 +83,17 @@ val generateResource = tasks.register("generate-version-resource") {
                 val kotlin = "${Constants.kotlin}"
                 val serialization = "${Constants.serialization}"
                 val serializationJson = "${Constants.serializationJson}"
+                val coroutines = "${Constants.coroutines}"
+                val dateTime = "${Constants.dateTime}"
                 val java = ${Constants.java}
                 val pluginsJava = ${Constants.pluginsJava}
                 val kotlinPluginCoordinates = "${Constants.kotlinPluginCoordinates}"
                 val pluginsGroup = "${Constants.pluginsGroup}"
                 val pluginsVersion = "${Constants.pluginsVersion}"
                 val bootstrapPluginCoordinates = "${Constants.bootstrapPluginCoordinates}"
+                val serializationJsonCoordinates = "${Constants.serializationJsonCoordinates}"
+                val coroutinesCoordinates = "${Constants.coroutinesCoordinates}"
+                val dateTimeCoordinates = "${Constants.dateTimeCoordinates}"
             }
         """.trimIndent())
     }

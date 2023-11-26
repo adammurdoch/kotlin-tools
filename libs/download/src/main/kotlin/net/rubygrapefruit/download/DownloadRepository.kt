@@ -1,10 +1,15 @@
 package net.rubygrapefruit.download
 
+import net.rubygrapefruit.machine.info.Machine
 import java.io.File
 import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
+import java.util.zip.ZipInputStream
+import kotlin.io.path.createDirectories
+import kotlin.io.path.inputStream
+import kotlin.io.path.outputStream
 
 class DownloadRepository(private val silent: Boolean = false) {
     private val downloadsDir = File(System.getProperty("user.home"), "bin/downloads").toPath()
@@ -67,7 +72,27 @@ class DownloadRepository(private val silent: Boolean = false) {
             get() = "zip"
 
         override fun unpack(file: Path, dir: Path) {
-            if (!exec("unzip", "-q", file.toString(), "-d", dir.toString())) {
+            if (Machine.thisMachine is Machine.Windows) {
+                file.inputStream().use { stream ->
+                    val zip = ZipInputStream(stream)
+                    while(true) {
+                        val entry = zip.nextEntry
+                        if (entry == null) {
+                            break
+                        }
+                        val target = dir.resolve(entry.name)
+                        require(target.startsWith(dir))
+                        if (entry.isDirectory) {
+                            target.createDirectories()
+                        } else {
+                            target.parent.createDirectories()
+                            target.outputStream().use {
+                                zip.copyTo(it)
+                            }
+                        }
+                    }
+                }
+            } else if (!exec("unzip", "-q", file.toString(), "-d", dir.toString())) {
                 throw RuntimeException("Could not unzip $file")
             }
         }

@@ -233,6 +233,7 @@ class DirectoryTest : AbstractFileSystemElementTest() {
     @Test
     fun `can set and query directory posix permissions`() {
         val dir = fixture.dir("dir")
+        assertTrue(dir.supports(FileSystemCapability.PosixPermissions))
         assertNotEquals(PosixPermissions.readOnlyDirectory, dir.posixPermissions().get())
 
         dir.setPermissions(PosixPermissions.readOnlyDirectory)

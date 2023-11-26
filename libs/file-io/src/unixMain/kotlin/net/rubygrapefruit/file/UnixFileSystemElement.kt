@@ -58,10 +58,9 @@ internal open class UnixFileSystemElement(path: String) : NativeFileSystemElemen
     }
 
     override fun supports(capability: FileSystemCapability): Boolean {
-        return if (capability == FileSystemCapability.SetSymLinkPosixPermissions) {
-            canSetSymLinkPermissions
-        } else {
-            true
+        return when (capability) {
+            FileSystemCapability.SetSymLinkPosixPermissions -> canSetSymLinkPermissions
+            FileSystemCapability.PosixPermissions -> true
         }
     }
 

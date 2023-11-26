@@ -194,6 +194,7 @@ class RegularFileTest : AbstractFileSystemElementTest() {
     @Test
     fun `can set and query file posix permissions`() {
         val file = fixture.file("file")
+        assertTrue(file.supports(FileSystemCapability.PosixPermissions))
         assertNotEquals(PosixPermissions.readOnlyFile, file.posixPermissions().get())
 
         file.setPermissions(PosixPermissions.readOnlyFile)

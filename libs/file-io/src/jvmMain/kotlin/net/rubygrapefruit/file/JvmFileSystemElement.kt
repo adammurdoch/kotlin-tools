@@ -46,7 +46,7 @@ internal open class JvmFileSystemElement(protected val delegate: Path) : Abstrac
     }
 
     override fun posixPermissions(): Result<PosixPermissions> {
-        val view = Files.getFileAttributeView(delegate, PosixFileAttributeView::class.java, LinkOption.NOFOLLOW_LINKS)
+        val view = posixFileAttributeView()
         return if (view == null) {
             UnsupportedOperation(absolutePath, "read POSIX permissions for")
         } else {
@@ -56,9 +56,9 @@ internal open class JvmFileSystemElement(protected val delegate: Path) : Abstrac
     }
 
     override fun setPermissions(permissions: PosixPermissions) {
-        val view = Files.getFileAttributeView(delegate, PosixFileAttributeView::class.java, LinkOption.NOFOLLOW_LINKS)
+        val view = posixFileAttributeView()
         try {
-            view.setPermissions(permissions.permSet())
+            view!!.setPermissions(permissions.permSet())
         } catch (e: IOException) {
             if (metadata().symlink) {
                 throw setPermissionsNotSupported(path.absolutePath)
@@ -70,9 +70,13 @@ internal open class JvmFileSystemElement(protected val delegate: Path) : Abstrac
 
     override fun supports(capability: FileSystemCapability): Boolean {
         return when (capability) {
+            FileSystemCapability.PosixPermissions -> posixFileAttributeView() != null
             FileSystemCapability.SetSymLinkPosixPermissions -> false
         }
     }
+
+    private fun posixFileAttributeView(): PosixFileAttributeView? =
+        Files.getFileAttributeView(delegate, PosixFileAttributeView::class.java, LinkOption.NOFOLLOW_LINKS)
 }
 
 internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularFile {

@@ -7,4 +7,7 @@ import javax.inject.Inject
 abstract class DefaultNativeUiApplication @Inject constructor(factory: ObjectFactory) : DefaultUiApplication(),
     MutableNativeApplication, NativeUIApplication {
     override val distribution: DefaultDistribution = factory.newInstance(DefaultDistribution::class.java)
+
+    override val canBuildDistributionForHostMachine: Boolean
+        get() = true
 }

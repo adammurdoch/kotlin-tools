@@ -28,7 +28,7 @@ sealed class HostMachine {
 }
 
 sealed class Windows : HostMachine() {
-    override fun exeName(name: String) = "$name.exec"
+    override fun exeName(name: String) = "$name.exe"
 }
 
 data object WindowsX64 : Windows() {

@@ -20,6 +20,9 @@ abstract class DefaultNativeCliApplication @Inject constructor(
 
     override val distribution: DefaultDistribution = factory.newInstance(DefaultDistribution::class.java)
 
+    override val canBuildDistributionForHostMachine: Boolean
+        get() = outputs.containsKey(HostMachine.current.machine)
+
     override val outputBinary: RegularFileProperty = factory.fileProperty()
 
     override fun outputBinary(target: NativeMachine): Provider<RegularFile> {

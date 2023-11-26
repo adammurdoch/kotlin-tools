@@ -13,6 +13,9 @@ abstract class DefaultJvmUiApplication @Inject constructor(factory: ObjectFactor
 
     override val distribution: DefaultDistribution = factory.newInstance(DefaultDistribution::class.java)
 
+    override val canBuildDistributionForHostMachine: Boolean
+        get() = true
+
     override var packaging: JvmApplicationPackaging = JvmApplicationWithEmbeddedJvm()
 
     override val runtimeModulePath: ConfigurableFileCollection = factory.fileCollection()

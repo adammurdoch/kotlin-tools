@@ -7,9 +7,11 @@ import org.gradle.api.model.ObjectFactory
 import javax.inject.Inject
 
 abstract class DefaultJvmCliApplication @Inject constructor(factory: ObjectFactory, project: Project) :
-    DefaultJvmComponent(project), MutableApplication,
-    MutableJvmApplication, JvmApplication {
+    DefaultJvmComponent(project), MutableApplication, MutableJvmApplication, JvmApplication {
     override val distribution: DefaultDistribution = factory.newInstance(DefaultDistribution::class.java)
+
+    override val canBuildDistributionForHostMachine: Boolean
+        get() = true
 
     override var packaging: JvmApplicationPackaging = JvmApplicationWithExternalJvm()
 

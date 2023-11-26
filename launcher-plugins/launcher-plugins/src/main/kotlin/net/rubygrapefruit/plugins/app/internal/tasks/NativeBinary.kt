@@ -1,11 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal.tasks
 
 import net.rubygrapefruit.download.DownloadRepository
-import net.rubygrapefruit.plugins.app.internal.HostMachine
-import net.rubygrapefruit.plugins.app.internal.LinuxX64
-import net.rubygrapefruit.plugins.app.internal.MacOsArm64
-import net.rubygrapefruit.plugins.app.internal.MacOsX64
-import net.rubygrapefruit.plugins.bootstrap.Versions
+import net.rubygrapefruit.plugins.app.internal.*
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
@@ -30,6 +26,9 @@ abstract class NativeBinary : DefaultTask() {
     @get:Input
     abstract val mainClass: Property<String>
 
+    @get:Input
+    abstract val javaVersion: Property<Int>
+
     @get:InputFiles
     abstract val modulePath: ConfigurableFileCollection
 
@@ -39,32 +38,27 @@ abstract class NativeBinary : DefaultTask() {
     @TaskAction
     fun install() {
         val repository = DownloadRepository()
+        val jdkVersion = javaVersion.get()
         val args = when (HostMachine.current) {
             LinuxX64 -> {
-                val baseName = "graalvm-jdk-${Versions.java}_linux-x64"
-                Args(
-                    URI("https://download.oracle.com/graalvm/${Versions.java}/latest/${baseName}_bin.tar.gz"),
-                    baseName
-                )
+                val baseName = "graalvm-jdk-${jdkVersion}_linux-x64"
+                Args(URI("https://download.oracle.com/graalvm/${jdkVersion}/latest/${baseName}_bin.tar.gz"), baseName)
             }
 
             MacOsX64 -> {
-                val baseName = "graalvm-jdk-${Versions.java}_macos-x64"
-                Args(
-                    URI("https://download.oracle.com/graalvm/${Versions.java}/latest/${baseName}_bin.tar.gz"),
-                    baseName
-                )
+                val baseName = "graalvm-jdk-${jdkVersion}_macos-x64"
+                Args(URI("https://download.oracle.com/graalvm/${jdkVersion}/latest/${baseName}_bin.tar.gz"), baseName)
             }
 
             MacOsArm64 -> {
-                val baseName = "graalvm-jdk-${Versions.java}_macos-aarch64"
-                Args(
-                    URI("https://download.oracle.com/graalvm/${Versions.java}/latest/${baseName}_bin.tar.gz"),
-                    baseName
-                )
+                val baseName = "graalvm-jdk-${jdkVersion}_macos-aarch64"
+                Args(URI("https://download.oracle.com/graalvm/${jdkVersion}/latest/${baseName}_bin.tar.gz"), baseName)
             }
 
-            else -> TODO()
+            WindowsX64 -> {
+                val baseName = "graalvm-jdk-${jdkVersion}_windows-x64"
+                Args(URI("https://download.oracle.com/graalvm/${jdkVersion}/latest/${baseName}_bin.zip"), baseName)
+            }
         }
 
         val dir = repository.install(args.distribution, args.installName)

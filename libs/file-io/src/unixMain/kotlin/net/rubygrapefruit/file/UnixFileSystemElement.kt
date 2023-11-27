@@ -82,7 +82,7 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
 
     override fun delete() {
         if (remove(path.absolutePath) != 0) {
-            throw NativeException("Could not delete $path.")
+            throw deleteFile(path.absolutePath)
         }
     }
 
@@ -98,8 +98,7 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
                 if (errno == ENOTDIR) {
                     throw writeFileThatExistsAndIsNotAFile(path.absolutePath)
                 }
-                val errnoValue = errno
-                throw writeToFile(this@UnixRegularFile, null) { message, _ -> NativeException(message, errnoValue) }
+                throw writeToFile(this@UnixRegularFile, UnixErrorCode.last())
             }
         }
     }
@@ -111,8 +110,7 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
                 if (errno == EISDIR) {
                     throw writeFileThatExistsAndIsNotAFile(path.absolutePath)
                 }
-                val errnoValue = errno
-                throw writeToFile(this@UnixRegularFile, null) { message, _ -> NativeException(message, errnoValue) }
+                throw writeToFile(this@UnixRegularFile, UnixErrorCode.last())
             }
             try {
                 action(des)
@@ -134,16 +132,27 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
         return memScoped {
             val des = open(path.absolutePath, O_RDONLY)
             if (des < 0) {
-                throw NativeException("Could not open $path.")
+                if (errno == ENOENT) {
+                    return readFileThatDoesNotExist(path.absolutePath)
+                }
+                throw NativeException("Could not read from $path.")
             }
             try {
                 val fileSize = fileSize()
                 val buffer = ByteArray(fileSize.convert())
-                val nread = read(des, buffer.refTo(0), fileSize.convert())
-                if (nread < 0) {
-                    throw NativeException("Could not read from $path.")
+                if (fileSize > 0) {
+                    val nread = read(des, buffer.refTo(0), fileSize.convert())
+                    if (nread < 0) {
+                        if (errno == EISDIR) {
+                            return readFileThatIsNotAFile(path.absolutePath)
+                        } else {
+                            throw NativeException("Could not read from $path.")
+                        }
+                    }
+                    Success(action(buffer, nread))
+                } else {
+                    Success(action(buffer, 0))
                 }
-                Success(action(buffer, nread))
             } finally {
                 close(des)
             }

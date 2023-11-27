@@ -21,7 +21,10 @@ internal fun writeFileInDirectoryThatIsNotADir(path: String, ancestor: String, c
     FileSystemException("Could not write to $path as $ancestor exists but is not a directory.", cause)
 
 internal fun <T> readFileThatDoesNotExist(path: String, cause: Throwable? = null) =
-    MissingEntry<T> { FileSystemException("Could not read from $path as it does not exist.", cause) }
+    MissingEntry<T> { FileSystemException("Could not read from file $path as it does not exist.", cause) }
+
+internal fun <T> readFileThatIsNotAFile(path: String, cause: Throwable? = null) =
+    FailedOperation<T>(FileSystemException("Could not read from file $path as it is not a file.", cause))
 
 internal fun deleteFileThatIsNotAFile(path: String, cause: Throwable? = null) = FileSystemException("Could not delete file $path as it is not a file.", cause)
 
@@ -65,7 +68,7 @@ internal fun <T> readFile(file: RegularFile, cause: Throwable? = null): Failed<T
     } else if (fileMetadata.missing) {
         readFileThatDoesNotExist(file.absolutePath, cause)
     } else {
-        FailedOperation(FileSystemException("Could not read from ${file.absolutePath} as it is not a file.", cause))
+        readFileThatIsNotAFile(file.absolutePath, cause)
     }
 }
 
@@ -74,12 +77,12 @@ internal fun <T> readFile(file: RegularFile, cause: Throwable? = null): Failed<T
  */
 internal fun writeToFile(
     file: RegularFile,
+    errorCode: ErrorCode = NoErrorCode,
     cause: Throwable? = null,
-    factory: (String, Throwable?) -> FileSystemException = { m, c -> FileSystemException(m, c) }
 ): FileSystemException {
     val fileMetadata = file.metadata()
     if (fileMetadata.regularFile) {
-        return factory("Could not write to ${file.absolutePath}", cause)
+        return FileSystemException("Could not write to ${file.absolutePath}", errorCode, cause)
     }
     if (fileMetadata.missing) {
         var lastMissing: Directory? = null
@@ -101,7 +104,7 @@ internal fun writeToFile(
             }
             p = p.parent
         }
-        return factory("Could not write to ${file.absolutePath}", cause)
+        return FileSystemException("Could not write to ${file.absolutePath}", errorCode, cause)
     }
     return writeFileThatExistsAndIsNotAFile(file.absolutePath, cause)
 }

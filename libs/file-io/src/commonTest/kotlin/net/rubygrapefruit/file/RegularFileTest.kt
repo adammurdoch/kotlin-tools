@@ -201,7 +201,7 @@ class RegularFileTest : AbstractFileSystemElementTest() {
         try {
             result.get()
         } catch (e: FileSystemException) {
-            assertEquals("Could not read from $file as it does not exist.", e.message)
+            assertEquals("Could not read from file $file as it does not exist.", e.message)
         }
     }
 
@@ -214,7 +214,7 @@ class RegularFileTest : AbstractFileSystemElementTest() {
         try {
             result.get()
         } catch (e: FileSystemException) {
-            assertEquals("Could not read from $file as it is not a file.", e.message)
+            assertEquals("Could not read from file $file as it is not a file.", e.message)
         }
     }
 

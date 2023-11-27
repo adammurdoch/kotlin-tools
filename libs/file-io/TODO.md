@@ -1,6 +1,7 @@
 
 ## TODO
 
+- Unix readBytes() does not stream
 - Add some abstract permission functions, e.g. can read, set readable, etc
 - Atomic Directory.createTemporaryDirectory() implementation on Windows
 - Query Windows ACLs

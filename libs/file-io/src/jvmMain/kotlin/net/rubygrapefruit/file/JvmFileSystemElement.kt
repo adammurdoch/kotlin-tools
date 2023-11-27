@@ -111,7 +111,7 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
         try {
             Files.writeString(delegate, text, Charsets.UTF_8)
         } catch (e: IOException) {
-            throw writeToFile(this, e)
+            throw writeToFile(this, NoErrorCode, e)
         }
     }
 

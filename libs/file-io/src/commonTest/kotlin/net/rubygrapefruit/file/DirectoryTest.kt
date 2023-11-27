@@ -189,8 +189,11 @@ class DirectoryTest : AbstractFileSystemElementTest() {
         val empty = fixture.dir("empty")
         val dir = fixture.dir("dir") {
             file("file1")
-            dir("dir1")
+            dir("dir1") {
+                file("nested")
+            }
             symLink("link1", "nothing")
+            symLink("link2", "dir1")
         }
 
         val entries1 = empty.listEntries()
@@ -200,9 +203,9 @@ class DirectoryTest : AbstractFileSystemElementTest() {
         val entries2 = dir.listEntries()
         assertIs<Success<*>>(entries2)
         val sorted = entries2.get().sortedBy { it.name }
-        assertEquals(listOf("dir1", "file1", "link1"), sorted.map { it.name })
-        assertEquals(listOf("dir1", "file1", "link1"), sorted.map { it.path.name })
-        assertEquals(listOf(ElementType.Directory, ElementType.RegularFile, ElementType.SymLink), sorted.map { it.type })
+        assertEquals(listOf("dir1", "file1", "link1", "link2"), sorted.map { it.name })
+        assertEquals(listOf("dir1", "file1", "link1", "link2"), sorted.map { it.path.name })
+        assertEquals(listOf(ElementType.Directory, ElementType.RegularFile, ElementType.SymLink, ElementType.SymLink), sorted.map { it.type })
     }
 
     @Test
@@ -214,7 +217,7 @@ class DirectoryTest : AbstractFileSystemElementTest() {
         try {
             entries.get()
         } catch (e: FileSystemException) {
-            assertEquals("??", e.message)
+            assertEquals("Could not list directory $dir as it does not exist.", e.message)
         }
     }
 
@@ -228,7 +231,7 @@ class DirectoryTest : AbstractFileSystemElementTest() {
         try {
             entries.get()
         } catch (e: FileSystemException) {
-            assertEquals("??", e.message)
+            assertEquals("Could not list directory $dir as it does not exist.", e.message)
         }
     }
 
@@ -242,7 +245,7 @@ class DirectoryTest : AbstractFileSystemElementTest() {
         try {
             entries.get()
         } catch (e: FileSystemException) {
-            assertEquals("??", e.message)
+            assertEquals("Could not list directory $dir as it does not exist.", e.message)
         }
     }
 
@@ -255,7 +258,7 @@ class DirectoryTest : AbstractFileSystemElementTest() {
         try {
             entries.get()
         } catch (e: FileSystemException) {
-            assertEquals("??", e.message)
+            assertEquals("Could not list directory $dir as it is not a directory.", e.message)
         }
     }
 
@@ -269,6 +272,7 @@ class DirectoryTest : AbstractFileSystemElementTest() {
                 dir("dir2")
             }
             symLink("link1", "nothing")
+            symLink("link2", "dir1")
         }
 
         val visited1 = mutableListOf<String>()
@@ -278,7 +282,7 @@ class DirectoryTest : AbstractFileSystemElementTest() {
         val visited2 = mutableListOf<String>()
         dir.visitTopDown { visited2.add(name) }
         assertEquals("dir", visited2[0])
-        assertEquals(listOf("dir", "dir1", "nested", "dir2", "file1", "link1"), visited2.sorted())
+        assertEquals(listOf("dir", "dir1", "dir2", "file1", "link1", "link2", "nested"), visited2.sorted())
         assertTrue(visited2.indexOf("dir1") < visited2.indexOf("nested"))
     }
 

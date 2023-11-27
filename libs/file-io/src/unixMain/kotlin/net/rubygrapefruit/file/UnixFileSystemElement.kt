@@ -96,7 +96,7 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
         writing { file ->
             if (fputs(text, file) == EOF) {
                 if (errno == ENOTDIR) {
-                    throw fileExistsAndIsNotAFile(path.absolutePath)
+                    throw writeFileThatExistsAndIsNotAFile(path.absolutePath)
                 }
                 val errnoValue = errno
                 throw writeToFile(this@UnixRegularFile, null) { message, _ -> NativeException(message, errnoValue) }
@@ -109,7 +109,7 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
             val des = fopen(path.absolutePath, "w")
             if (des == null) {
                 if (errno == EISDIR) {
-                    throw fileExistsAndIsNotAFile(path.absolutePath)
+                    throw writeFileThatExistsAndIsNotAFile(path.absolutePath)
                 }
                 val errnoValue = errno
                 throw writeToFile(this@UnixRegularFile, null) { message, _ -> NativeException(message, errnoValue) }
@@ -392,7 +392,7 @@ internal fun createDir(dir: UnixDirectory) {
             }
             val stat = stat(dir.path.absolutePath)
             if (!stat.directory) {
-                throw directoryExistsAndIsNotADir(dir.path.absolutePath)
+                throw createDirectoryThatExistsAndIsNotADir(dir.path.absolutePath)
             }
         }
     }

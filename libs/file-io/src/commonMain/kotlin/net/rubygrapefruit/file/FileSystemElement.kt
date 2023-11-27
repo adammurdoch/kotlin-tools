@@ -88,6 +88,8 @@ interface Directory : FileSystemElement {
      * Does nothing if the directory does not exist.
      *
      * Does not follow symlinks.
+     *
+     * Note: the implementation is not guaranteed to be atomic.
      */
     @Throws(FileSystemException::class)
     fun deleteRecursively()
@@ -101,7 +103,7 @@ interface Directory : FileSystemElement {
 
     /**
      * Creates a new temporary directory in this directory.
-     * Note: the implementation is currently not guaranteed to be atomic.
+     * Note: the implementation is not guaranteed to be atomic.
      */
     @Throws(FileSystemException::class)
     fun createTemporaryDirectory(): Directory

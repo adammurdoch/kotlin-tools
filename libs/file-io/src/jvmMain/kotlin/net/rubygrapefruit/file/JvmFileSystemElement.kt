@@ -90,7 +90,13 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
     }
 
     override fun delete() {
-        Files.deleteIfExists(delegate)
+        val result = metadata()
+        when {
+            result.missing -> return
+            result.regularFile -> Files.deleteIfExists(delegate)
+            result is Success -> throw deleteFileThatIsNotAFile(absolutePath)
+            result is Failed -> throw deleteFile(absolutePath, result.failure)
+        }
     }
 
     override fun writeBytes(bytes: ByteArray) {
@@ -110,7 +116,13 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
     }
 
     override fun readText(): Result<String> {
-        return Success(Files.readString(delegate, Charsets.UTF_8))
+        return try {
+            Success(Files.readString(delegate, Charsets.UTF_8))
+        } catch (e: NoSuchFileException) {
+            readFileThatDoesNotExist(absolutePath, e)
+        } catch (e: Exception) {
+            readFile(this, e)
+        }
     }
 }
 
@@ -150,7 +162,7 @@ internal class JvmDirectory(path: Path) : JvmFileSystemElement(path), Directory 
         try {
             Files.createDirectories(delegate)
         } catch (e: FileAlreadyExistsException) {
-            throw directoryExistsAndIsNotADir(delegate.pathString, e)
+            throw createDirectoryThatExistsAndIsNotADir(delegate.pathString, e)
         } catch (e: IOException) {
             var p = parent
             while (p != null) {
@@ -165,7 +177,7 @@ internal class JvmDirectory(path: Path) : JvmFileSystemElement(path), Directory 
                     throw createDirectory(delegate.pathString, e)
                 }
                 // Found something else - fail
-                throw directoryExistsAndIsNotADir(p.absolutePath, e)
+                throw createDirectoryThatExistsAndIsNotADir(p.absolutePath, e)
             }
             // Nothing in the hierarchy exists, which is unexpected, so rethrow original failure
             throw createDirectory(delegate.pathString, e)

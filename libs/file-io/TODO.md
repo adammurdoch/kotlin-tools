@@ -7,6 +7,8 @@
 - Query file systems on the machine
 - Provide specialized subtypes of FileSystemElement for each platform
 - Windows directory entry could carry metadata for the entry
+- Atomic move
+- Atomic recursive delete, if supported by FS
 - Remove a symlink
 - Follow symlinks
 - Canonicalize a element

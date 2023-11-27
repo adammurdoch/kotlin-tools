@@ -44,16 +44,13 @@ internal abstract class AbstractFileSystemElement : FileSystemElement {
         val queue = result.get().toMutableList()
         while (queue.isNotEmpty()) {
             val entry = queue.first()
-            if (entry.type == ElementType.Directory) {
-                if (visiting.add(entry)) {
-                    val childDir = entry.toDir()
-                    val childResult = childDir.listEntries()
-                    if (childResult is Failed) {
-                        throw FileSystemException("Could not visit entries of $childDir.", childResult.failure)
-                    }
-                    queue.addAll(0, childResult.get())
-                    continue
+            if (entry.type == ElementType.Directory && visiting.add(entry)) {
+                val childDir = entry.toDir()
+                val childResult = childDir.listEntries()
+                if (childResult is Failed) {
+                    throw FileSystemException("Could not visit entries of $childDir.", childResult.failure)
                 }
+                queue.addAll(0, childResult.get())
             } else {
                 queue.removeFirst()
                 visitor(entry)

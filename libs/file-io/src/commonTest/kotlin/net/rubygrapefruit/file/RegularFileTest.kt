@@ -136,7 +136,7 @@ class RegularFileTest : AbstractFileSystemElementTest() {
             file.writeText("broken")
             fail()
         } catch (e: FileSystemException) {
-            assertEquals("Could not write to $file as it already exists but is not a file.", e.message)
+            assertEquals("Could not write to $file as it is not a file.", e.message)
         }
     }
 
@@ -201,7 +201,7 @@ class RegularFileTest : AbstractFileSystemElementTest() {
         try {
             result.get()
         } catch (e: FileSystemException) {
-            assertEquals("??", e.message)
+            assertEquals("Could not read from $file as it does not exist.", e.message)
         }
     }
 
@@ -214,7 +214,7 @@ class RegularFileTest : AbstractFileSystemElementTest() {
         try {
             result.get()
         } catch (e: FileSystemException) {
-            assertEquals("??", e.message)
+            assertEquals("Could not read from $file as it is not a file.", e.message)
         }
     }
 
@@ -235,7 +235,19 @@ class RegularFileTest : AbstractFileSystemElementTest() {
             file.delete()
             fail()
         } catch (e: FileSystemException) {
-            assertEquals("??", e.message)
+            assertEquals("Could not delete $file as it is not a file.", e.message)
+        }
+    }
+
+    @Test
+    fun `cannot delete a file that exists as a symlink`() {
+        val file = fixture.symlink("link", "something").toFile()
+
+        try {
+            file.delete()
+            fail()
+        } catch (e: FileSystemException) {
+            assertEquals("Could not delete $file as it is not a file.", e.message)
         }
     }
 

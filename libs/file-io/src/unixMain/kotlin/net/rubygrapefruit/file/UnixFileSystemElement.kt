@@ -3,6 +3,8 @@
 package net.rubygrapefruit.file
 
 import kotlinx.cinterop.*
+import net.rubygrapefruit.io.stream.FileBackedWriteStream
+import net.rubygrapefruit.io.stream.WriteStream
 import platform.posix.*
 
 internal open class UnixFileSystemElement(override val path: AbsolutePath) : AbstractFileSystemElement() {
@@ -89,23 +91,18 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
     }
 
     override fun writeBytes(bytes: ByteArray) {
-        writing { file ->
-            fwrite(bytes.refTo(0), 1.convert(), bytes.size.convert(), file)
+        writing { stream ->
+            stream.write(bytes)
         }
     }
 
     override fun writeText(text: String) {
-        writing { file ->
-            if (fputs(text, file) == EOF) {
-                if (errno == ENOTDIR) {
-                    throw writeFileThatExistsAndIsNotAFile(path.absolutePath)
-                }
-                throw writeToFile(this@UnixRegularFile, UnixErrorCode.last())
-            }
+        writing { stream ->
+            stream.write(text.encodeToByteArray())
         }
     }
 
-    private fun writing(action: (CPointer<FILE>) -> Unit) {
+    private fun writing(action: (WriteStream) -> Unit) {
         memScoped {
             val des = fopen(path.absolutePath, "w")
             if (des == null) {
@@ -115,7 +112,7 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
                 throw writeToFile(this@UnixRegularFile, UnixErrorCode.last())
             }
             try {
-                action(des)
+                action(FileBackedWriteStream(path.absolutePath, des))
             } finally {
                 fclose(des)
             }

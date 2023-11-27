@@ -26,9 +26,11 @@ sealed class Failed<T> : Result<T>() {
 /**
  * An entry that does not exist.
  */
-class MissingEntry<T> internal constructor(private val path: String, private val cause: Throwable? = null) : Failed<T>() {
-    override val failure: FileSystemException
-        get() = missingElement(path, cause)
+class MissingEntry<T> internal constructor(private val factory: () -> FileSystemException) : Failed<T>() {
+
+    internal constructor(path: String, cause: Throwable? = null) : this({ missingElement(path, cause) })
+
+    override val failure: FileSystemException by lazy { factory() }
 }
 
 /**

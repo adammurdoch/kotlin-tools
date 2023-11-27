@@ -235,7 +235,7 @@ class RegularFileTest : AbstractFileSystemElementTest() {
             file.delete()
             fail()
         } catch (e: FileSystemException) {
-            assertEquals("Could not delete $file as it is not a file.", e.message)
+            assertEquals("Could not delete file $file as it is not a file.", e.message)
         }
     }
 
@@ -247,7 +247,7 @@ class RegularFileTest : AbstractFileSystemElementTest() {
             file.delete()
             fail()
         } catch (e: FileSystemException) {
-            assertEquals("Could not delete $file as it is not a file.", e.message)
+            assertEquals("Could not delete file $file as it is not a file.", e.message)
         }
     }
 

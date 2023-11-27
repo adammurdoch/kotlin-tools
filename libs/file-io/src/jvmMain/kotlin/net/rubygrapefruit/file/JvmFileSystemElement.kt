@@ -188,7 +188,9 @@ internal class JvmDirectory(path: Path) : JvmFileSystemElement(path), Directory 
         val stream = try {
             Files.list(delegate)
         } catch (e: NoSuchFileException) {
-            return MissingEntry(delegate.pathString, e)
+            return listDirectoryThatDoesNotExist(delegate.pathString, e)
+        } catch (e: Exception) {
+            return listDirectory(this, e)
         }
         val entries = stream.map { JvmDirectoryEntry(it, metadataOfExistingFile(it).type) }.toList()
         return Success(entries)

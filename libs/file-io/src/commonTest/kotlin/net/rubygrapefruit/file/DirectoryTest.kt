@@ -326,7 +326,18 @@ class DirectoryTest : AbstractFileSystemElementTest() {
 
     @Test
     fun `delete does not follow symlinks`() {
-        fail()
+        val file = fixture.file("target")
+        file.writeText("content")
+
+        val dir = fixture.dir("dir") {
+            symLink("link", file.absolutePath)
+        }
+
+        assertEquals("content", dir.file("link").readText().get())
+
+        dir.deleteRecursively()
+
+        assertTrue(file.metadata().regularFile)
     }
 
     @Test
@@ -338,7 +349,7 @@ class DirectoryTest : AbstractFileSystemElementTest() {
             dir.deleteRecursively()
             fail()
         } catch (e: FileSystemException) {
-            assertEquals("??", e.message)
+            assertEquals("Could not delete directory $dir as it is not a directory.", e.message)
         }
     }
 

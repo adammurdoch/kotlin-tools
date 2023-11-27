@@ -4,28 +4,59 @@ internal fun missingElement(path: String, cause: Throwable? = null) = FileSystem
 
 internal fun unreadableElement(path: String, cause: Throwable? = null) = FileSystemException("File $path is not readable.", cause)
 
-internal fun createDirectoryThatExistsAndIsNotADir(path: String, cause: Throwable? = null) = FileSystemException("Could not create directory $path as it already exists but is not a directory.", cause)
+internal fun createDirectoryThatExistsAndIsNotADir(path: String, cause: Throwable? = null) =
+    FileSystemException("Could not create directory $path as it already exists but is not a directory.", cause)
 
 internal fun createDirectory(path: String, cause: Throwable? = null) = FileSystemException("Could not create directory $path.", cause)
 
+internal fun <T> listDirectoryThatDoesNotExist(path: String, cause: Throwable? = null) =
+    MissingEntry<T> { FileSystemException("Could not list directory $path as it does not exist.", cause) }
+
 internal fun writeFileThatExistsAndIsNotAFile(path: String, cause: Throwable? = null) = FileSystemException("Could not write to $path as it is not a file.", cause)
 
-internal fun writeFileInDirectoryThatDoesNotExist(path: String, ancestor: String, cause: Throwable? = null) = FileSystemException("Could not write to $path as directory $ancestor does not exist.", cause)
+internal fun writeFileInDirectoryThatDoesNotExist(path: String, ancestor: String, cause: Throwable? = null) =
+    FileSystemException("Could not write to $path as directory $ancestor does not exist.", cause)
 
-internal fun writeFileInDirectoryThatIsNotADir(path: String, ancestor: String, cause: Throwable? = null) = FileSystemException("Could not write to $path as $ancestor exists but is not a directory.", cause)
+internal fun writeFileInDirectoryThatIsNotADir(path: String, ancestor: String, cause: Throwable? = null) =
+    FileSystemException("Could not write to $path as $ancestor exists but is not a directory.", cause)
 
-internal fun deleteFileThatIsNotAFile(path: String, cause: Throwable? = null) = FileSystemException("Could not delete $path as it is not a file.", cause)
+internal fun <T> readFileThatDoesNotExist(path: String, cause: Throwable? = null) =
+    MissingEntry<T> { FileSystemException("Could not read from $path as it does not exist.", cause) }
 
-internal fun <T> readFileThatDoesNotExist(path: String, cause: Throwable? = null) = MissingEntry<T>(path, cause)
+internal fun deleteFileThatIsNotAFile(path: String, cause: Throwable? = null) = FileSystemException("Could not delete file $path as it is not a file.", cause)
 
-internal fun deleteFile(path: String, cause: Throwable? = null) = FileSystemException("Could not delete $path.", cause)
+internal fun deleteFile(path: String, cause: Throwable? = null) = FileSystemException("Could not delete file $path.", cause)
 
 internal fun notSupported(path: String, operation: String) = FileSystemException("Could not $operation $path as it is not supported by this filesystem.")
 
 internal fun setPermissionsNotSupported(path: String) = notSupported(path, "set permissions on")
 
 /**
- * Tries to infer why a file could not be read .
+ * Tries to infer why a directory could not be listed.
+ */
+internal fun <T> listDirectory(directory: Directory, cause: Throwable? = null): Failed<T> {
+    val metadata = directory.metadata()
+    return if (!metadata.missing) {
+        FailedOperation(FileSystemException("Could not list directory ${directory.absolutePath} as it is not a directory.", cause))
+    } else {
+        FailedOperation(FileSystemException("Could not list directory ${directory.absolutePath}.", cause))
+    }
+}
+
+/**
+ * Tries to infer why a directory could not be deleted.
+ */
+internal fun deleteDirectory(directory: Directory, cause: Throwable? = null): FileSystemException {
+    val metadata = directory.metadata()
+    return if (!metadata.missing) {
+        FileSystemException("Could not delete directory ${directory.absolutePath} as it is not a directory.", cause)
+    } else {
+        FileSystemException("Could not delete directory ${directory.absolutePath}.", cause)
+    }
+}
+
+/**
+ * Tries to infer why a file could not be read.
  */
 internal fun <T> readFile(file: RegularFile, cause: Throwable? = null): Failed<T> {
     val fileMetadata = file.metadata()
@@ -41,7 +72,11 @@ internal fun <T> readFile(file: RegularFile, cause: Throwable? = null): Failed<T
 /**
  * Tries to infer why a file could not be written to.
  */
-internal fun writeToFile(file: RegularFile, cause: Throwable? = null, factory: (String, Throwable?) -> FileSystemException = { m, c -> FileSystemException(m, c) }): FileSystemException {
+internal fun writeToFile(
+    file: RegularFile,
+    cause: Throwable? = null,
+    factory: (String, Throwable?) -> FileSystemException = { m, c -> FileSystemException(m, c) }
+): FileSystemException {
     val fileMetadata = file.metadata()
     if (fileMetadata.regularFile) {
         return factory("Could not write to ${file.absolutePath}", cause)

@@ -34,14 +34,9 @@ internal abstract class AbstractFileSystemElement : FileSystemElement {
         }
     }
 
-    protected fun visitBottomUp(dir: Directory, visitor: (DirectoryEntry) -> Unit) {
-        val result = dir.listEntries()
-        if (result is Failed) {
-            throw FileSystemException("Could not visit entries of $dir.", result.failure)
-        }
-
+    private fun visitBottomUp(dir: Directory, entries: List<DirectoryEntry>, visitor: (DirectoryEntry) -> Unit) {
         val visiting = mutableSetOf<DirectoryEntry>()
-        val queue = result.get().toMutableList()
+        val queue = entries.toMutableList()
         while (queue.isNotEmpty()) {
             val entry = queue.first()
             if (entry.type == ElementType.Directory && visiting.add(entry)) {
@@ -61,7 +56,14 @@ internal abstract class AbstractFileSystemElement : FileSystemElement {
     }
 
     protected fun deleteRecursively(dir: Directory, delete: (DirectoryEntry) -> Unit) {
-        visitBottomUp(dir, delete)
+        val result = dir.listEntries()
+        if (result is MissingEntry) {
+            return
+        } else if (result is Failed) {
+            throw deleteDirectory(dir, result.failure)
+        }
+
+        visitBottomUp(dir, result.get(), delete)
     }
 
     private class DirBackedEntry(val dir: Directory) : DirectoryEntry {

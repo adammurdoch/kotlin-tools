@@ -9,6 +9,7 @@ class DirectoryTest : AbstractFileSystemElementTest() {
         assertEquals("file", dir.name)
         assertEquals(dir.name, dir.path.name)
         assertEquals(dir.absolutePath, dir.path.absolutePath)
+        assertEquals(dir.absolutePath, dir.toString())
         assertEquals(dir.absolutePath, dir.path.toString())
     }
 
@@ -21,7 +22,7 @@ class DirectoryTest : AbstractFileSystemElementTest() {
 
         val metadata = result.get()
         assertIs<DirectoryMetadata>(metadata)
-        assertNotNull(metadata.posixPermissions)
+        assertEquals(dir.supports(FileSystemCapability.PosixPermissions), metadata.posixPermissions != null)
     }
 
     @Test

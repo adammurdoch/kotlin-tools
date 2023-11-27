@@ -9,6 +9,7 @@ class SymLinkTest : AbstractFileSystemElementTest() {
         assertEquals("file", link.name)
         assertEquals(link.name, link.path.name)
         assertEquals(link.absolutePath, link.path.absolutePath)
+        assertEquals(link.absolutePath, link.toString())
         assertEquals(link.absolutePath, link.path.toString())
     }
 
@@ -21,7 +22,7 @@ class SymLinkTest : AbstractFileSystemElementTest() {
 
         val metadata = result.get()
         assertIs<SymlinkMetadata>(metadata)
-        assertNotNull(metadata.posixPermissions)
+        assertEquals(link.supports(FileSystemCapability.PosixPermissions), metadata.posixPermissions != null)
     }
 
     @Test

@@ -9,6 +9,7 @@ class RegularFileTest : AbstractFileSystemElementTest() {
         assertEquals("file", file.name)
         assertEquals(file.name, file.path.name)
         assertEquals(file.absolutePath, file.path.absolutePath)
+        assertEquals(file.absolutePath, file.toString())
         assertEquals(file.absolutePath, file.path.toString())
     }
 
@@ -22,7 +23,7 @@ class RegularFileTest : AbstractFileSystemElementTest() {
         val metadata = result.get()
         assertIs<RegularFileMetadata>(metadata)
         assertEquals(4, metadata.size)
-        assertNotNull(metadata.posixPermissions)
+        assertEquals(file.supports(FileSystemCapability.PosixPermissions), metadata.posixPermissions != null)
     }
 
     @Test
@@ -194,7 +195,10 @@ class RegularFileTest : AbstractFileSystemElementTest() {
     @Test
     fun `can set and query file posix permissions`() {
         val file = fixture.file("file")
-        assertTrue(file.supports(FileSystemCapability.PosixPermissions))
+        if (!file.supports(FileSystemCapability.PosixPermissions)) {
+            return
+        }
+
         assertNotEquals(PosixPermissions.readOnlyFile, file.posixPermissions().get())
 
         file.setPermissions(PosixPermissions.readOnlyFile)
@@ -202,9 +206,42 @@ class RegularFileTest : AbstractFileSystemElementTest() {
     }
 
     @Test
+    fun `cannot query file posix permissions when not supported`() {
+        val file = fixture.file("file")
+        if (file.supports(FileSystemCapability.PosixPermissions)) {
+            return
+        }
+
+        val result = file.posixPermissions()
+        assertIs<UnsupportedOperation<*>>(result)
+        try {
+            result.get()
+        } catch (e: FileSystemException) {
+            assertEquals("Could not read POSIX permissions for $file as it is not supported by this filesystem.", e.message)
+        }
+    }
+
+    @Test
+    fun `cannot set file posix permissions when not supported`() {
+        val file = fixture.file("file")
+        if (file.supports(FileSystemCapability.PosixPermissions)) {
+            return
+        }
+
+        try {
+            file.setPermissions(PosixPermissions.readOnlyFile)
+        } catch (e: FileSystemException) {
+            assertEquals("Could not set POSIX permissions for $file as it is not supported by this filesystem.", e.message)
+        }
+    }
+
+    @Test
     fun `can make file executable`() {
         val file = fixture.file("file")
-        assertTrue(file.supports(FileSystemCapability.PosixPermissions))
+        if (!file.supports(FileSystemCapability.PosixPermissions)) {
+            return
+        }
+
         assertFalse(file.posixPermissions().get().isOwnerExecutable)
 
         file.setPermissions(file.posixPermissions().get().executable())

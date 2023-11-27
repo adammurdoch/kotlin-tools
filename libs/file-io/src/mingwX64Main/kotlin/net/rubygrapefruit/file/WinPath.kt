@@ -6,7 +6,7 @@ internal class WinPath(override val absolutePath: String) : ElementPath {
     }
 
     override val name: String
-        get() = TODO("Not yet implemented")
+        get() = absolutePath.substringAfter("\\")
 
     override val parent: WinPath?
         get() {

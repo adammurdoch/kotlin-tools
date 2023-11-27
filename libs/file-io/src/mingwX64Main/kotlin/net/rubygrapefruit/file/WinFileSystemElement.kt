@@ -72,9 +72,6 @@ internal open class WinFileSystemElement(override val path: WinPath) : AbstractF
 }
 
 internal class WinDirectory(path: WinPath) : WinFileSystemElement(path), Directory {
-    init {
-        println("-> CREATED DIR INSTANCE: $this")
-    }
 
     override fun toDir(): Directory {
         return this
@@ -85,8 +82,7 @@ internal class WinDirectory(path: WinPath) : WinFileSystemElement(path), Directo
     }
 
     override fun dir(name: String): Directory {
-        println("-> RESOLVE $name AGAINST $this")
-        return WinDirectory(path.resolve(name).also { println("-> RESOLVED TO $it") })
+        return WinDirectory(path.resolve(name))
     }
 
     override fun symLink(name: String): SymLink {
@@ -140,11 +136,56 @@ internal class WinDirectory(path: WinPath) : WinFileSystemElement(path), Directo
     }
 
     override fun listEntries(): Result<List<DirectoryEntry>> {
-        TODO("Not yet implemented")
+        return memScoped {
+            val data = alloc<WIN32_FIND_DATAW>()
+            val handle = FindFirstFileW(absolutePath, data.ptr)
+            if (handle == INVALID_HANDLE_VALUE) {
+                throw NativeException("Could not list entries for directory $absolutePath.")
+            }
+            try {
+                val result = mutableListOf<DirectoryEntry>()
+                while (true) {
+                    val name = data.cFileName.toKString()
+                    if (name != "." && name != "..") {
+                        result.add(WinDirectoryEntry(path, name, ElementType.Other))
+                    }
+                    if (FindNextFileW(handle, data.ptr) == 0) {
+                        if (GetLastError().convert<Int>() == ERROR_NO_MORE_FILES) {
+                            break
+                        }
+                        throw NativeException("Could not list entries for directory $absolutePath.")
+                    }
+                }
+                Success(result)
+            } finally {
+                FindClose(handle)
+            }
+        }
     }
 
     override fun visitTopDown(visitor: DirectoryEntry.() -> Unit) {
         TODO("Not yet implemented")
+    }
+}
+
+private class WinDirectoryEntry(private val parentPath: WinPath, override val name: String, override val type: ElementType) : DirectoryEntry {
+    override val path: WinPath
+        get() = parentPath.resolve(name)
+
+    override fun snapshot(): Result<ElementSnapshot> {
+        TODO()
+    }
+
+    override fun toDir(): Directory {
+        TODO()
+    }
+
+    override fun toFile(): RegularFile {
+        TODO()
+    }
+
+    override fun toSymLink(): SymLink {
+        TODO()
     }
 }
 

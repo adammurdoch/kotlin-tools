@@ -214,13 +214,13 @@ internal class UnixDirectory(path: AbsolutePath) : UnixFileSystemElement(path), 
                         continue
                     }
                     if (entryPointer.pointed.d_type.convert<Int>() == DT_DIR) {
-                        entries.add(DirectoryEntryImpl(path.absolutePath, name, ElementType.Directory))
+                        entries.add(UnixDirectoryEntry(path, name, ElementType.Directory))
                     } else if (entryPointer.pointed.d_type.convert<Int>() == DT_LNK) {
-                        entries.add(DirectoryEntryImpl(path.absolutePath, name, ElementType.SymLink))
+                        entries.add(UnixDirectoryEntry(path, name, ElementType.SymLink))
                     } else if (entryPointer.pointed.d_type.convert<Int>() == DT_REG) {
-                        entries.add(DirectoryEntryImpl(path.absolutePath, name, ElementType.RegularFile))
+                        entries.add(UnixDirectoryEntry(path, name, ElementType.RegularFile))
                     } else {
-                        entries.add(DirectoryEntryImpl(path.absolutePath, name, ElementType.Other))
+                        entries.add(UnixDirectoryEntry(path, name, ElementType.Other))
                     }
                 }
             }
@@ -273,9 +273,9 @@ internal class UnixSymLink(path: AbsolutePath) : UnixFileSystemElement(path), Sy
     }
 }
 
-private class DirectoryEntryImpl(private val parentPath: String, override val name: String, override val type: ElementType) : DirectoryEntry {
+private class UnixDirectoryEntry(private val parentPath: AbsolutePath, override val name: String, override val type: ElementType) : DirectoryEntry {
     override val path: AbsolutePath
-        get() = AbsolutePath("$parentPath/$name")
+        get() = parentPath.resolve(name)
 
     override fun snapshot(): Result<ElementSnapshot> {
         return stat(path.absolutePath).map { SnapshotImpl(path, it) }

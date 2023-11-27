@@ -23,4 +23,3 @@
 - Test case-insensitive lookup
 - Windows get user home dir: https://docs.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-getuserprofiledirectorya
 - Windows list directory: https://docs.microsoft.com/en-us/windows/win32/fileio/listing-the-files-in-a-directory
-- Windows get file info: https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getfileattributesexw

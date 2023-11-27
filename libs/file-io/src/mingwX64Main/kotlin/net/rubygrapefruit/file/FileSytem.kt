@@ -31,14 +31,10 @@ private fun getCurrentDirectory(): WinDirectory {
 
 private fun getHomeDirectory(): WinDirectory {
     return memScoped {
-        val buffer = alloc<PWCHARVar>()
-        if (SHGetKnownFolderPath(FOLDERID_Profile.ptr, KF_FLAG_DEFAULT, NULL, buffer.ptr) != S_OK) {
+        val buffer = allocArray<WCHARVar>(MAX_PATH)
+        if (SHGetFolderPathW(null, CSIDL_PROFILE, null, SHGFP_TYPE_CURRENT, buffer) != S_OK) {
             throw FileSystemException("Could not get user home directory.")
         }
-        try {
-            WinDirectory(WinPath(buffer.value!!.toKString()))
-        } finally {
-            free(buffer.value)
-        }
+        WinDirectory(WinPath(buffer.toKString()))
     }
 }

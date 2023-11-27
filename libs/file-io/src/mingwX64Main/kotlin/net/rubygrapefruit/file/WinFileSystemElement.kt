@@ -45,6 +45,9 @@ internal open class WinFileSystemElement(override val path: WinPath) : AbstractF
 }
 
 internal class WinDirectory(path: WinPath) : WinFileSystemElement(path), Directory {
+    init {
+        println("-> CREATED DIR INSTANCE: $this")
+    }
 
     override fun toDir(): Directory {
         return this
@@ -55,7 +58,8 @@ internal class WinDirectory(path: WinPath) : WinFileSystemElement(path), Directo
     }
 
     override fun dir(name: String): Directory {
-        return WinDirectory(path.resolve(name))
+        println("-> RESOLVE $name AGAINST $this")
+        return WinDirectory(path.resolve(name).also { println("-> RESOLVED TO $it") })
     }
 
     override fun symLink(name: String): SymLink {

@@ -33,7 +33,7 @@ class DirectoryTest : AbstractFileSystemElementTest() {
         val snapshot2 = dir.path.snapshot().get()
         assertIsDirectorySnapshot(snapshot2, dir)
 
-        val snapshot3 = fixture.testDir.resolve(dir.name).snapshot().get()
+        val snapshot3 = fixture.testDir.path.resolve(dir.name).snapshot().get()
         assertIsDirectorySnapshot(snapshot3, dir)
     }
 
@@ -60,7 +60,7 @@ class DirectoryTest : AbstractFileSystemElementTest() {
         val result2 = dir.path.snapshot()
         assertIs<MissingEntry<*>>(result2)
 
-        val result3 = fixture.testDir.resolve(dir.name).snapshot()
+        val result3 = fixture.testDir.path.resolve(dir.name).snapshot()
         assertIs<MissingEntry<*>>(result3)
     }
 

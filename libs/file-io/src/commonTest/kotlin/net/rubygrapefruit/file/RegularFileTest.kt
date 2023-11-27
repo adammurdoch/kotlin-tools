@@ -37,7 +37,7 @@ class RegularFileTest : AbstractFileSystemElementTest() {
         val snapshot3 = snapshot.snapshot().get()
         assertSame(snapshot, snapshot3)
 
-        val snapshot4 = fixture.testDir.resolve(file.name).snapshot().get()
+        val snapshot4 = fixture.testDir.path.resolve(file.name).snapshot().get()
         assertIsFileSnapshot(snapshot4, file)
     }
 
@@ -66,7 +66,7 @@ class RegularFileTest : AbstractFileSystemElementTest() {
         val result2 = file.path.snapshot()
         assertIs<MissingEntry<*>>(result2)
 
-        val result3 = fixture.testDir.resolve(file.name).snapshot()
+        val result3 = fixture.testDir.path.resolve(file.name).snapshot()
         assertIs<MissingEntry<*>>(result3)
     }
 

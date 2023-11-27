@@ -153,7 +153,7 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
 
 internal class UnixDirectory(path: AbsolutePath) : UnixFileSystemElement(path), Directory {
     override fun file(name: String): RegularFile {
-        return UnixRegularFile(AbsolutePath((resolveName(name))))
+        return UnixRegularFile(path.resolve(name))
     }
 
     override fun toDir(): Directory {
@@ -161,11 +161,11 @@ internal class UnixDirectory(path: AbsolutePath) : UnixFileSystemElement(path), 
     }
 
     override fun dir(name: String): Directory {
-        return UnixDirectory(AbsolutePath(resolveName(name)))
+        return UnixDirectory(path.resolve(name))
     }
 
     override fun symLink(name: String): SymLink {
-        return UnixSymLink(AbsolutePath(resolveName(name)))
+        return UnixSymLink(path.resolve(name))
     }
 
     override fun deleteRecursively() {
@@ -188,11 +188,6 @@ internal class UnixDirectory(path: AbsolutePath) : UnixFileSystemElement(path), 
             }
         }
         createDir(this)
-    }
-
-    override fun resolve(name: String): ElementPath {
-        val path = resolveName(name)
-        return AbsolutePath(path)
     }
 
     override fun listEntries(): Result<List<DirectoryEntry>> {
@@ -237,22 +232,6 @@ internal class UnixDirectory(path: AbsolutePath) : UnixFileSystemElement(path), 
 
     override fun visitTopDown(visitor: (DirectoryEntry) -> Unit) {
         visitTopDown(this, visitor)
-    }
-
-    private fun resolveName(name: String): String {
-        return if (name.startsWith("/")) {
-            name
-        } else if (name == ".") {
-            path.absolutePath
-        } else if (name.startsWith("./")) {
-            resolveName(name.substring(2))
-        } else if (name == "..") {
-            parent!!.absolutePath
-        } else if (name.startsWith("../")) {
-            (parent as UnixDirectory).resolveName(name.substring(3))
-        } else {
-            "${path.absolutePath}/$name"
-        }
     }
 }
 

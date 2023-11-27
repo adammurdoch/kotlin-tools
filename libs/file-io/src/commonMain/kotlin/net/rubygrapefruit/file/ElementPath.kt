@@ -20,6 +20,11 @@ interface ElementPath {
     val absolutePath: String
 
     /**
+     * Resolves the given path relative to this path.
+     */
+    fun resolve(path: String): ElementPath
+
+    /**
      * Returns a snapshot of the element, which contains the path of this element and a snapshot of its metadata. Does not follow symlinks.
      */
     fun snapshot(): Result<ElementSnapshot>

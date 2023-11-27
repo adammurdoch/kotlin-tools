@@ -45,19 +45,15 @@ internal class WinDirectory(path: WinPath) : WinFileSystemElement(path), Directo
     }
 
     override fun file(name: String): RegularFile {
-        TODO("Not yet implemented")
+        return WinRegularFile(path.resolve(name))
     }
 
     override fun dir(name: String): Directory {
-        TODO("Not yet implemented")
+        return WinDirectory(path.resolve(name))
     }
 
     override fun symLink(name: String): SymLink {
-        TODO("Not yet implemented")
-    }
-
-    override fun resolve(name: String): ElementPath {
-        TODO("Not yet implemented")
+        return WinSymLink(path.resolve(name))
     }
 
     override fun deleteRecursively() {

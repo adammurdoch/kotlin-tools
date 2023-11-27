@@ -25,6 +25,10 @@ internal class JvmElementPath(val delegate: Path) : ElementPath {
             }
         }
 
+    override fun resolve(path: String): ElementPath {
+        return JvmElementPath(delegate.resolve(path))
+    }
+
     override fun snapshot(): Result<ElementSnapshot> {
         return metadata(delegate).map { SnapshotImpl(this, it) }
     }

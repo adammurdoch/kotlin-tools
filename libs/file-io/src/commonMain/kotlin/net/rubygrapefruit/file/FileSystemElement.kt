@@ -84,11 +84,6 @@ interface Directory : FileSystemElement {
     fun symLink(name: String): SymLink
 
     /**
-     * Resolves a name relative to this directory. Note: does not determine the type.
-     */
-    fun resolve(name: String): ElementPath
-
-    /**
      * Deletes this directory and all of its entries recursively, if the directory exists.
      */
     @Throws(FileSystemException::class)

@@ -43,6 +43,12 @@ class UnsupportedOperation<T> internal constructor(private val path: String, pri
     }
 }
 
+class FailedOperation<T> internal constructor(private val failure: FileSystemException) : Failed<T>() {
+    override fun rethrow(): Nothing {
+        throw failure
+    }
+}
+
 class Success<T> internal constructor(private val result: T) : Result<T>() {
     override fun get() = result
 

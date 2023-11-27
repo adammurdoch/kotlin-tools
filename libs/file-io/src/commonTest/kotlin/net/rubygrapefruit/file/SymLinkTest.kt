@@ -59,7 +59,7 @@ class SymLinkTest : AbstractFileSystemElementTest() {
     fun `can create a symlink`() {
         val link = fixture.testDir.symLink("link")
 
-        assertIs<MissingEntry<*>>(link.metadata())
+        assertTrue(link.metadata().missing)
 
         link.writeSymLink("1234")
 

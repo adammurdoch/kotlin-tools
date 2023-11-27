@@ -208,7 +208,27 @@ internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), Regul
     }
 
     override fun writeText(text: String) {
-        TODO("Not yet implemented")
+        memScoped {
+            val handle = CreateFileW(absolutePath, GENERIC_WRITE.convert(), 0.convert(), null, CREATE_ALWAYS.convert(), FILE_ATTRIBUTE_NORMAL.convert(), null)
+            if (handle == INVALID_HANDLE_VALUE) {
+                throw NativeException("Could not write to file $absolutePath")
+            }
+            try {
+                val bytes = text.encodeToByteArray()
+                var pos = 0
+                val nbytes = alloc<DWORDVar>()
+                while (pos < bytes.size) {
+                    bytes.usePinned { ptr ->
+                        if (WriteFile(handle, ptr.addressOf(pos), (bytes.size - pos).convert(), nbytes.ptr, null) == 0) {
+                            throw NativeException("Could not write to file $absolutePath")
+                        }
+                        pos += nbytes.value.convert<Int>()
+                    }
+                }
+            } finally {
+                CloseHandle(handle)
+            }
+        }
     }
 
     override fun readText(): Result<String> {

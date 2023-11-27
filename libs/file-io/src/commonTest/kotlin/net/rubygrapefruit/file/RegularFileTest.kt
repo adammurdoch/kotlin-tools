@@ -73,26 +73,26 @@ class RegularFileTest : AbstractFileSystemElementTest() {
 
     @Test
     fun `can write bytes to a file to create it`() {
-        val bytes = "123".encodeToByteArray()
-        val file = fixture.testDir.file("file")
+        listOf("123".encodeToByteArray(), byteArrayOf()).forEachIndexed { index, bytes ->
+            val file = fixture.testDir.file("file-$index")
+            assertTrue(file.metadata().missing)
 
-        assertIs<MissingEntry<*>>(file.metadata())
+            file.writeBytes(bytes)
 
-        file.writeBytes(bytes)
+            val metadata = file.metadata().get()
+            assertIs<RegularFileMetadata>(metadata)
+            assertEquals(bytes.size.toLong(), metadata.size)
 
-        val metadata = file.metadata().get()
-        assertIs<RegularFileMetadata>(metadata)
-        assertEquals(bytes.size.toLong(), metadata.size)
-
-        assertContentEquals(bytes, file.readBytes().get())
+            assertContentEquals(bytes, file.readBytes().get())
+        }
     }
 
     @Test
     fun `can write text to a file to create it`() {
-        listOf("1234", "日本語").forEachIndexed { index, text ->
+        listOf("1234", "日本語", "").forEachIndexed { index, text ->
             val file = fixture.testDir.file("file-$index")
 
-            assertIs<MissingEntry<*>>(file.metadata())
+            assertTrue(file.metadata().missing)
 
             file.writeText(text)
 
@@ -114,23 +114,23 @@ class RegularFileTest : AbstractFileSystemElementTest() {
     }
 
     @Test
-    fun `can write text to an existing file`() {
+    fun `can write text to an existing file to replace its contents`() {
         val file = fixture.testDir.file("file")
         file.writeText("1234")
+        assertTrue(file.metadata().regularFile)
 
-        assertIs<RegularFileMetadata>(file.metadata().get())
-
-        file.writeText("12345678")
+        file.writeText("abcdefgh")
 
         val metadata = file.metadata().get()
         assertIs<RegularFileMetadata>(metadata)
         assertEquals(8, metadata.size)
+
+        assertEquals("abcdefgh", file.readText().get())
     }
 
     @Test
-    fun `cannot write to a file that is a directory`() {
-        fixture.dir("dir1")
-        val file = fixture.testDir.file("dir1")
+    fun `cannot write to a file that exists as a directory`() {
+        val file = fixture.dir("dir1").toFile()
 
         try {
             file.writeText("broken")
@@ -189,6 +189,53 @@ class RegularFileTest : AbstractFileSystemElementTest() {
             fail()
         } catch (e: FileSystemException) {
             assertEquals("Could not write to $file as $ancestor exists but is not a directory.", e.message)
+        }
+    }
+
+    @Test
+    fun `cannot read from a file that does not exist`() {
+        val file = fixture.testDir.file("missing")
+
+        val result = file.readText()
+        assertIs<MissingEntry<*>>(result)
+        try {
+            result.get()
+        } catch (e: FileSystemException) {
+            assertEquals("??", e.message)
+        }
+    }
+
+    @Test
+    fun `cannot read from a file that exists as a directory`() {
+        val file = fixture.dir("dir1").toFile()
+
+        val result = file.readText()
+        assertIs<FailedOperation<*>>(result)
+        try {
+            result.get()
+        } catch (e: FileSystemException) {
+            assertEquals("??", e.message)
+        }
+    }
+
+    @Test
+    fun `can delete a file`() {
+        val file = fixture.file("file.txt")
+        assertTrue(file.metadata().regularFile)
+
+        file.delete()
+        assertTrue(file.metadata().missing)
+    }
+
+    @Test
+    fun `cannot delete a file that exists as a directory`() {
+        val file = fixture.dir("empty").toFile()
+
+        try {
+            file.delete()
+            fail()
+        } catch (e: FileSystemException) {
+            assertEquals("??", e.message)
         }
     }
 

@@ -129,6 +129,11 @@ class DirectoryTest : AbstractFileSystemElementTest() {
 
         val entries = dir.listEntries()
         assertIs<MissingEntry<*>>(entries)
+        try {
+            entries.get()
+        } catch (e: FileSystemException) {
+            assertEquals("??", e.message)
+        }
     }
 
     @Test
@@ -138,6 +143,11 @@ class DirectoryTest : AbstractFileSystemElementTest() {
 
         val entries = dir.listEntries()
         assertIs<MissingEntry<*>>(entries)
+        try {
+            entries.get()
+        } catch (e: FileSystemException) {
+            assertEquals("??", e.message)
+        }
     }
 
     @Test
@@ -147,6 +157,24 @@ class DirectoryTest : AbstractFileSystemElementTest() {
 
         val entries = dir.listEntries()
         assertIs<MissingEntry<*>>(entries)
+        try {
+            entries.get()
+        } catch (e: FileSystemException) {
+            assertEquals("??", e.message)
+        }
+    }
+
+    @Test
+    fun `cannot list contents of a directory that exists as a file`() {
+        val dir = fixture.file("file").toDir()
+
+        val entries = dir.listEntries()
+        assertIs<FailedOperation<*>>(entries)
+        try {
+            entries.get()
+        } catch (e: FileSystemException) {
+            assertEquals("??", e.message)
+        }
     }
 
     @Test
@@ -229,6 +257,57 @@ class DirectoryTest : AbstractFileSystemElementTest() {
         assertIs<RegularFileMetadata>(file.metadata().get())
         assertIs<MissingEntry<*>>(parent.metadata())
         assertIs<MissingEntry<*>>(dir.metadata())
+    }
+
+    @Test
+    fun `can delete an empty directory`() {
+        val dir = fixture.dir("empty")
+        assertTrue(dir.metadata().directory)
+
+        dir.deleteRecursively()
+
+        assertTrue(dir.metadata().missing)
+    }
+
+    @Test
+    fun `can delete a non-empty directory`() {
+        val dir = fixture.dir("empty") {
+            dir("sub1") {
+                dir("sub2") {
+                    file("file.txt")
+                }
+                file("file.txt")
+            }
+            file("file.txt")
+        }
+        assertTrue(dir.metadata().directory)
+
+        dir.deleteRecursively()
+
+        assertTrue(dir.metadata().missing)
+    }
+
+    @Test
+    fun `can delete a directory that does not exist`() {
+        val dir = fixture.testDir.dir("missing")
+        assertTrue(dir.metadata().missing)
+
+        dir.deleteRecursively()
+
+        assertTrue(dir.metadata().missing)
+    }
+
+    @Test
+    fun `cannot delete a directory that exists as a file`() {
+        val dir = fixture.file("file").toDir()
+        assertTrue(dir.metadata().regularFile)
+
+        try {
+            dir.deleteRecursively()
+            fail()
+        } catch (e: FileSystemException) {
+            assertEquals("??", e.message)
+        }
     }
 
     @Test

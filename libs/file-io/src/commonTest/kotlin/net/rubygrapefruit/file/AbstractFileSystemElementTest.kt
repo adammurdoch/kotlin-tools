@@ -8,23 +8,24 @@ abstract class AbstractFileSystemElementTest {
 
     @AfterTest
     fun cleanup() {
-        if (!fixture.testDir.supports(FileSystemCapability.PosixPermissions)) {
-            return
-        }
-
-        fixture.testDir.visitTopDown {
-            // Try to reset the test file permissions
-            when (type) {
-                ElementType.Directory -> toDir().setPermissions(PosixPermissions.readWriteDirectory)
-                ElementType.SymLink -> {
-                    val element = toSymLink();
-                    if (element.supports(FileSystemCapability.SetSymLinkPosixPermissions)) {
-                        element.setPermissions(PosixPermissions.readWriteFile)
+        // Try to reset the test file permissions
+        if (fixture.testDir.supports(FileSystemCapability.PosixPermissions)) {
+            fixture.testDir.visitTopDown {
+                when (type) {
+                    ElementType.Directory -> toDir().setPermissions(PosixPermissions.readWriteDirectory)
+                    ElementType.SymLink -> {
+                        val element = toSymLink();
+                        if (element.supports(FileSystemCapability.SetSymLinkPosixPermissions)) {
+                            element.setPermissions(PosixPermissions.readWriteFile)
+                        }
                     }
+
+                    ElementType.RegularFile -> toFile().setPermissions(PosixPermissions.readWriteFile)
+                    ElementType.Other -> {}
                 }
-                ElementType.RegularFile -> toFile().setPermissions(PosixPermissions.readWriteFile)
-                ElementType.Other -> {}
             }
         }
+
+        fixture.testDir.deleteRecursively()
     }
 }

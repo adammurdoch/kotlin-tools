@@ -8,6 +8,10 @@ abstract class AbstractFileSystemElementTest {
 
     @AfterTest
     fun cleanup() {
+        if (!fixture.testDir.supports(FileSystemCapability.PosixPermissions)) {
+            return
+        }
+
         fixture.testDir.visitTopDown {
             // Try to reset the test file permissions
             when (type) {

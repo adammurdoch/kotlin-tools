@@ -1,4 +1,10 @@
+@file:OptIn(ExperimentalForeignApi::class)
+
 package net.rubygrapefruit.file
+
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.memScoped
+import platform.windows.CreateDirectoryW
 
 internal open class WinFileSystemElement(override val path: WinPath) : AbstractFileSystemElement() {
 
@@ -61,7 +67,12 @@ internal class WinDirectory(path: WinPath) : WinFileSystemElement(path), Directo
     }
 
     override fun createDirectories() {
-        TODO("Not yet implemented")
+        parent?.createDirectories()
+        memScoped {
+            if (CreateDirectoryW(absolutePath, null) != 0) {
+                throw NativeException("Could not create directory $absolutePath")
+            }
+        }
     }
 
     override fun createTemporaryDirectory(): Directory {

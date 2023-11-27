@@ -204,6 +204,7 @@ class RegularFileTest : AbstractFileSystemElementTest() {
     @Test
     fun `can make file executable`() {
         val file = fixture.file("file")
+        assertTrue(file.supports(FileSystemCapability.PosixPermissions))
         assertFalse(file.posixPermissions().get().isOwnerExecutable)
 
         file.setPermissions(file.posixPermissions().get().executable())

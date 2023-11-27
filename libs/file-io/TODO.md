@@ -1,6 +1,9 @@
 
 ## TODO
 
+- Add some abstract permission functions, eg can read, set readable, etc
+- Query Windows ACLs
+- Query file systems on the machine
 - Provide specialized subtypes of FileSystemElement for each platform
 - Add context exceptions to all operations
 - Test delete files, directories and symlinks

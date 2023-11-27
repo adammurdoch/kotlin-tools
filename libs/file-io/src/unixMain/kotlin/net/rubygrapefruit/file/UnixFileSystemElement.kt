@@ -81,8 +81,10 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
     }
 
     override fun delete() {
-        if (remove(path.absolutePath) != 0) {
-            throw deleteFile(path.absolutePath)
+        delete(this) {
+            if (remove(it.path.absolutePath) != 0) {
+                throw deleteFile(it.path.absolutePath, UnixErrorCode.last())
+            }
         }
     }
 
@@ -206,12 +208,15 @@ internal class UnixDirectory(path: AbsolutePath) : UnixFileSystemElement(path), 
         val dirPointer = opendir(path.absolutePath)
         if (dirPointer == null) {
             if (errno == ENOENT) {
-                return MissingEntry(path.absolutePath)
+                return listDirectoryThatDoesNotExist(path.absolutePath)
             }
             if (errno == EPERM || errno == EACCES) {
                 return UnreadableEntry(path.absolutePath)
             }
-            throw NativeException("Could not list directory '$path'.")
+            if (errno == ENOTDIR) {
+                return listDirectoryThatIsNotADirectory(path.absolutePath)
+            }
+            return listDirectory(this, UnixErrorCode.last())
         }
         try {
             val entries = mutableListOf<DirectoryEntry>()

@@ -90,13 +90,7 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
     }
 
     override fun delete() {
-        val result = metadata()
-        when {
-            result.missing -> return
-            result.regularFile -> Files.deleteIfExists(delegate)
-            result is Success -> throw deleteFileThatIsNotAFile(absolutePath)
-            result is Failed -> throw deleteFile(absolutePath, result.failure)
-        }
+        delete(this) { Files.deleteIfExists(it.delegate) }
     }
 
     override fun writeBytes(bytes: ByteArray) {
@@ -111,7 +105,7 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
         try {
             Files.writeString(delegate, text, Charsets.UTF_8)
         } catch (e: IOException) {
-            throw writeToFile(this, NoErrorCode, e)
+            throw writeToFile(this, cause = e)
         }
     }
 
@@ -188,9 +182,9 @@ internal class JvmDirectory(path: Path) : JvmFileSystemElement(path), Directory 
         val stream = try {
             Files.list(delegate)
         } catch (e: NoSuchFileException) {
-            return listDirectoryThatDoesNotExist(delegate.pathString, e)
+            return listDirectoryThatDoesNotExist(delegate.pathString, cause = e)
         } catch (e: Exception) {
-            return listDirectory(this, e)
+            return listDirectory(this, cause = e)
         }
         val entries = stream.map { JvmDirectoryEntry(it, metadataOfExistingFile(it).type) }.toList()
         return Success(entries)

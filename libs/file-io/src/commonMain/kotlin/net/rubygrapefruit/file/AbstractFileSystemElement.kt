@@ -66,6 +66,16 @@ internal abstract class AbstractFileSystemElement : FileSystemElement {
         visitBottomUp(dir, result.get(), delete)
     }
 
+    protected fun <T : RegularFile> delete(file: T, delete: (T) -> Unit) {
+        val result = metadata()
+        when {
+            result.missing -> return
+            result.regularFile -> delete(file)
+            result is Success -> throw deleteFileThatIsNotAFile(absolutePath)
+            result is Failed -> throw deleteFile(absolutePath, cause = result.failure)
+        }
+    }
+
     private class DirBackedEntry(val dir: Directory) : DirectoryEntry {
         override val path: ElementPath
             get() = dir.path

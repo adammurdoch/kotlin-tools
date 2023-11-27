@@ -25,18 +25,19 @@ internal class WinPath(override val absolutePath: String) : ElementPath {
         }
 
     override fun resolve(path: String): WinPath {
-        return if (isAbsolute(path)) {
-            WinPath(path)
-        } else if (path == ".") {
+        val normalized = path.replace("/", "\\")
+        return if (isAbsolute(normalized)) {
+            WinPath(normalized)
+        } else if (normalized == ".") {
             this
-        } else if (path.startsWith("./")) {
-            resolve(path.substring(2))
-        } else if (path == "..") {
+        } else if (normalized.startsWith("./")) {
+            resolve(normalized.substring(2))
+        } else if (normalized == "..") {
             parent!!
-        } else if (path.startsWith("../")) {
-            parent!!.resolve(path.substring(3))
+        } else if (normalized.startsWith("../")) {
+            parent!!.resolve(normalized.substring(3))
         } else {
-            WinPath("${absolutePath}/$path")
+            WinPath("${absolutePath}/$normalized")
         }
     }
 

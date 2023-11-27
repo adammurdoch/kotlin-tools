@@ -138,7 +138,7 @@ internal class WinDirectory(path: WinPath) : WinFileSystemElement(path), Directo
     override fun listEntries(): Result<List<DirectoryEntry>> {
         return memScoped {
             val data = alloc<WIN32_FIND_DATAW>()
-            val handle = FindFirstFileW(absolutePath, data.ptr)
+            val handle = FindFirstFileW("$absolutePath\\*", data.ptr)
             if (handle == INVALID_HANDLE_VALUE) {
                 throw NativeException("Could not list entries for directory $absolutePath.")
             }

@@ -57,13 +57,16 @@ internal open class JvmFileSystemElement(protected val delegate: Path) : Abstrac
 
     override fun setPermissions(permissions: PosixPermissions) {
         val view = posixFileAttributeView()
+        if (view == null) {
+            throw notSupported(absolutePath, "set POSIX permissions for")
+        }
         try {
-            view!!.setPermissions(permissions.permSet())
+            view.setPermissions(permissions.permSet())
         } catch (e: IOException) {
             if (metadata().symlink) {
                 throw setPermissionsNotSupported(path.absolutePath)
             } else {
-                throw FileSystemException("Could not set permissions on $path.", e)
+                throw FileSystemException("Could not set POSIX permissions on $path.", e)
             }
         }
     }

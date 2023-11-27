@@ -2,18 +2,25 @@ package net.rubygrapefruit.file
 
 internal class WinPath(override val absolutePath: String) : ElementPath {
     init {
-        require(isAbsolute(absolutePath))
+        require(isAbsolute(absolutePath)) { "'$absolutePath' is not absolute" }
     }
 
     override val name: String
-        get() = absolutePath.substringAfter("\\")
+        get() = absolutePath.substringAfterLast("\\")
 
     override val parent: WinPath?
         get() {
             return if (absolutePath.length == 3) {
+                // Is root
                 null
             } else {
-                WinPath(absolutePath.substringBeforeLast("\\"))
+                val parentPath = absolutePath.substringBeforeLast("\\")
+                return if (parentPath.length == 2) {
+                    // Direct child of the root
+                    WinPath(absolutePath.substring(0, 3))
+                } else {
+                    WinPath(parentPath)
+                }
             }
         }
 

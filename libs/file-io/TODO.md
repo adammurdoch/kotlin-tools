@@ -2,6 +2,7 @@
 ## TODO
 
 - Add some abstract permission functions, eg can read, set readable, etc
+- Atomic Directory.createTemporaryDirectory() implementation on Windows
 - Query Windows ACLs
 - Query file systems on the machine
 - Provide specialized subtypes of FileSystemElement for each platform

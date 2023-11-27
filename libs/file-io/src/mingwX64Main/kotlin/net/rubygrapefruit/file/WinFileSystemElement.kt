@@ -2,14 +2,20 @@
 
 package net.rubygrapefruit.file
 
-import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.memScoped
-import platform.windows.CreateDirectoryW
+import kotlinx.cinterop.*
+import platform.windows.*
 
 internal open class WinFileSystemElement(override val path: WinPath) : AbstractFileSystemElement() {
 
-    override val parent: Directory?
-        get() = TODO("Not yet implemented")
+    override val parent: WinDirectory?
+        get() {
+            val parentPath = path.parent
+            return if (parentPath == null) {
+                null
+            } else {
+                WinDirectory(parentPath)
+            }
+        }
 
     override fun metadata(): Result<ElementMetadata> {
         TODO("Not yet implemented")
@@ -24,7 +30,10 @@ internal open class WinFileSystemElement(override val path: WinPath) : AbstractF
     }
 
     override fun supports(capability: FileSystemCapability): Boolean {
-        TODO("Not yet implemented")
+        return when (capability) {
+            FileSystemCapability.PosixPermissions -> false
+            FileSystemCapability.SetSymLinkPosixPermissions -> false
+        }
     }
 
     override fun snapshot(): Result<ElementSnapshot> {
@@ -71,16 +80,45 @@ internal class WinDirectory(path: WinPath) : WinFileSystemElement(path), Directo
     }
 
     override fun createDirectories() {
+        memScoped {
+            if (CreateDirectoryW(absolutePath, null) == 0) {
+                when (GetLastError().convert<Int>()) {
+                    ERROR_ALREADY_EXISTS -> return
+                    ERROR_PATH_NOT_FOUND -> {
+                        // Continue below
+                    }
+
+                    else -> throw NativeException("Could not create directory $absolutePath.")
+                }
+            }
+        }
         parent?.createDirectories()
         memScoped {
-            if (CreateDirectoryW(absolutePath, null) != 0) {
-                throw NativeException("Could not create directory $absolutePath")
+            if (CreateDirectoryW(absolutePath, null) == 0) {
+                when (GetLastError().convert<Int>()) {
+                    ERROR_ALREADY_EXISTS -> return
+                    else -> throw NativeException("Could not create directory $absolutePath.")
+                }
             }
         }
     }
 
     override fun createTemporaryDirectory(): Directory {
-        TODO("Not yet implemented")
+        return memScoped {
+            val buffer = allocArray<WCHARVar>(MAX_PATH)
+            if (GetTempFileNameW(absolutePath, "tmp", 0.convert(), buffer) == 0.convert<UINT>()) {
+                throw NativeException("Could not create temporary directory in $absolutePath.")
+            }
+            // This is not atomic, should fail
+            val dirName = buffer.toKString()
+            if (DeleteFileW(dirName) == 0) {
+                throw NativeException("Could not delete temporary file $dirName.")
+            }
+            if (CreateDirectoryW(dirName, null) == 0) {
+                throw NativeException("Could not create temporary directory $dirName.")
+            }
+            WinDirectory(WinPath(dirName))
+        }
     }
 
     override fun listEntries(): Result<List<DirectoryEntry>> {

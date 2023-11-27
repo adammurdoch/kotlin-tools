@@ -17,7 +17,12 @@ internal class AbsolutePath(override val absolutePath: String) : ElementPath {
             return if (absolutePath == "/") {
                 null
             } else {
-                AbsolutePath(absolutePath.substringBeforeLast("/"))
+                val parentPath = absolutePath.substringBeforeLast("/")
+                return if (parentPath.length == 0) {
+                    AbsolutePath("/")
+                } else {
+                    AbsolutePath(parentPath)
+                }
             }
         }
 

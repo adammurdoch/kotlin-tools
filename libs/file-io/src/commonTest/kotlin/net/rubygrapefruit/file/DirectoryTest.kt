@@ -103,81 +103,6 @@ class DirectoryTest : AbstractFileSystemElementTest() {
     }
 
     @Test
-    fun `can list contents of directory`() {
-        val empty = fixture.dir("empty")
-        val dir = fixture.dir("dir") {
-            file("file1")
-            dir("dir1")
-            symLink("link1", "nothing")
-        }
-
-        val entries1 = empty.listEntries()
-        assertIs<Success<*>>(entries1)
-        assertTrue(entries1.get().isEmpty())
-
-        val entries2 = dir.listEntries()
-        assertIs<Success<*>>(entries2)
-        val sorted = entries2.get().sortedBy { it.name }
-        assertEquals(listOf("dir1", "file1", "link1"), sorted.map { it.name })
-        assertEquals(listOf("dir1", "file1", "link1"), sorted.map { it.path.name })
-        assertEquals(listOf(ElementType.Directory, ElementType.RegularFile, ElementType.SymLink), sorted.map { it.type })
-    }
-
-    @Test
-    fun `cannot list contents of a directory that does not exist`() {
-        val dir = fixture.testDir.dir("dir1")
-
-        val entries = dir.listEntries()
-        assertIs<MissingEntry<*>>(entries)
-        try {
-            entries.get()
-        } catch (e: FileSystemException) {
-            assertEquals("??", e.message)
-        }
-    }
-
-    @Test
-    fun `cannot list contents of a directory whose parent does not exist`() {
-        val parent = fixture.testDir.dir("dir")
-        val dir = parent.dir("dir1")
-
-        val entries = dir.listEntries()
-        assertIs<MissingEntry<*>>(entries)
-        try {
-            entries.get()
-        } catch (e: FileSystemException) {
-            assertEquals("??", e.message)
-        }
-    }
-
-    @Test
-    fun `cannot list contents of a directory whose ancestor does not exist`() {
-        val ancestor = fixture.testDir.dir("dir")
-        val dir = ancestor.dir("dir1/dir2")
-
-        val entries = dir.listEntries()
-        assertIs<MissingEntry<*>>(entries)
-        try {
-            entries.get()
-        } catch (e: FileSystemException) {
-            assertEquals("??", e.message)
-        }
-    }
-
-    @Test
-    fun `cannot list contents of a directory that exists as a file`() {
-        val dir = fixture.file("file").toDir()
-
-        val entries = dir.listEntries()
-        assertIs<FailedOperation<*>>(entries)
-        try {
-            entries.get()
-        } catch (e: FileSystemException) {
-            assertEquals("??", e.message)
-        }
-    }
-
-    @Test
     fun `can create intermediate directories`() {
         val dir = fixture.testDir.dir("dir1/dir2/dir3")
 
@@ -260,6 +185,104 @@ class DirectoryTest : AbstractFileSystemElementTest() {
     }
 
     @Test
+    fun `can list contents of directory`() {
+        val empty = fixture.dir("empty")
+        val dir = fixture.dir("dir") {
+            file("file1")
+            dir("dir1")
+            symLink("link1", "nothing")
+        }
+
+        val entries1 = empty.listEntries()
+        assertIs<Success<*>>(entries1)
+        assertTrue(entries1.get().isEmpty())
+
+        val entries2 = dir.listEntries()
+        assertIs<Success<*>>(entries2)
+        val sorted = entries2.get().sortedBy { it.name }
+        assertEquals(listOf("dir1", "file1", "link1"), sorted.map { it.name })
+        assertEquals(listOf("dir1", "file1", "link1"), sorted.map { it.path.name })
+        assertEquals(listOf(ElementType.Directory, ElementType.RegularFile, ElementType.SymLink), sorted.map { it.type })
+    }
+
+    @Test
+    fun `cannot list contents of a directory that does not exist`() {
+        val dir = fixture.testDir.dir("dir1")
+
+        val entries = dir.listEntries()
+        assertIs<MissingEntry<*>>(entries)
+        try {
+            entries.get()
+        } catch (e: FileSystemException) {
+            assertEquals("??", e.message)
+        }
+    }
+
+    @Test
+    fun `cannot list contents of a directory whose parent does not exist`() {
+        val parent = fixture.testDir.dir("dir")
+        val dir = parent.dir("dir1")
+
+        val entries = dir.listEntries()
+        assertIs<MissingEntry<*>>(entries)
+        try {
+            entries.get()
+        } catch (e: FileSystemException) {
+            assertEquals("??", e.message)
+        }
+    }
+
+    @Test
+    fun `cannot list contents of a directory whose ancestor does not exist`() {
+        val ancestor = fixture.testDir.dir("dir")
+        val dir = ancestor.dir("dir1/dir2")
+
+        val entries = dir.listEntries()
+        assertIs<MissingEntry<*>>(entries)
+        try {
+            entries.get()
+        } catch (e: FileSystemException) {
+            assertEquals("??", e.message)
+        }
+    }
+
+    @Test
+    fun `cannot list contents of a directory that exists as a file`() {
+        val dir = fixture.file("file").toDir()
+
+        val entries = dir.listEntries()
+        assertIs<FailedOperation<*>>(entries)
+        try {
+            entries.get()
+        } catch (e: FileSystemException) {
+            assertEquals("??", e.message)
+        }
+    }
+
+    @Test
+    fun `can visit contents of directory in top down order`() {
+        val empty = fixture.dir("empty")
+        val dir = fixture.dir("dir") {
+            file("file1")
+            dir("dir1") {
+                file("nested")
+                dir("dir2")
+            }
+            symLink("link1", "nothing")
+        }
+
+        val visited1 = mutableListOf<String>()
+        empty.visitTopDown { visited1.add(name) }
+        assertEquals(listOf("empty"), visited1)
+
+        val visited2 = mutableListOf<String>()
+        dir.visitTopDown { visited2.add(name) }
+        assertEquals("dir", visited2[0])
+        assertEquals(listOf("dir", "dir1", "nested", "dir2", "file1", "link1"), visited2.sorted())
+        assertTrue(visited2.indexOf("dir1") < visited2.indexOf("nested"))
+    }
+
+    @Test
     fun `can delete an empty directory`() {
         val dir = fixture.dir("empty")
         assertTrue(dir.metadata().directory)
@@ -295,6 +318,11 @@ class DirectoryTest : AbstractFileSystemElementTest() {
         dir.deleteRecursively()
 
         assertTrue(dir.metadata().missing)
+    }
+
+    @Test
+    fun `delete does not follow symlinks`() {
+        fail()
     }
 
     @Test

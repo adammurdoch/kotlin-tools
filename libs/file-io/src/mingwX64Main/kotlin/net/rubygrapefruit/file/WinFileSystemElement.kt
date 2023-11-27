@@ -90,7 +90,17 @@ internal class WinDirectory(path: WinPath) : WinFileSystemElement(path), Directo
     }
 
     override fun deleteRecursively() {
-        TODO("Not yet implemented")
+        deleteRecursively(this) { entry ->
+            if (entry.type == ElementType.Directory) {
+                if (RemoveDirectoryW(entry.absolutePath) == 0) {
+                    throw NativeException("Could not delete ${entry.absolutePath}")
+                }
+            } else {
+                if (DeleteFileW(entry.absolutePath) == 0) {
+                    throw NativeException("Could not delete ${entry.absolutePath}")
+                }
+            }
+        }
     }
 
     override fun createDirectories() {

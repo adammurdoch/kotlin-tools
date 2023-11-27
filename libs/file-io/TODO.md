@@ -1,11 +1,17 @@
 
 ## TODO
 
-- Add some abstract permission functions, eg can read, set readable, etc
+- Add some abstract permission functions, e.g. can read, set readable, etc
 - Atomic Directory.createTemporaryDirectory() implementation on Windows
 - Query Windows ACLs
 - Query file systems on the machine
 - Provide specialized subtypes of FileSystemElement for each platform
+- Windows directory entry could carry metadata for the entry
+- Remove a symlink
+- Follow symlinks
+- Canonicalize a element
+- Normalize paths
+- Calculate relative paths
 - Add context exceptions to all operations
 - Test delete files, directories and symlinks
 - Test set/get permissions on symlinks and directories
@@ -22,4 +28,3 @@
 - Test name resolution
 - Test case-insensitive lookup
 - Windows get user home dir: https://docs.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-getuserprofiledirectorya
-- Windows list directory: https://docs.microsoft.com/en-us/windows/win32/fileio/listing-the-files-in-a-directory

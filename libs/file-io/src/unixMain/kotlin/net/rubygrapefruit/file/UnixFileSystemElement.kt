@@ -169,8 +169,11 @@ internal class UnixDirectory(path: AbsolutePath) : UnixFileSystemElement(path), 
     }
 
     override fun deleteRecursively() {
-        if (remove(path.absolutePath) != 0) {
-            throw NativeException("Could not delete $path.")
+        deleteRecursively(this) { entry ->
+            val absolutePath = entry.absolutePath
+            if (remove(absolutePath) != 0) {
+                throw NativeException("Could not delete $path.")
+            }
         }
     }
 

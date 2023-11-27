@@ -85,18 +85,23 @@ interface Directory : FileSystemElement {
 
     /**
      * Deletes this directory and all of its entries recursively, if the directory exists.
+     * Does nothing if the directory does not exist.
+     *
+     * Does not follow symlinks.
      */
     @Throws(FileSystemException::class)
     fun deleteRecursively()
 
     /**
      * Creates this directory and its ancestors if they do not exist.
+     * Does nothing if the directory already exists.
      */
     @Throws(FileSystemException::class)
     fun createDirectories()
 
     /**
      * Creates a new temporary directory in this directory.
+     * Note: the implementation is currently not guaranteed to be atomic.
      */
     @Throws(FileSystemException::class)
     fun createTemporaryDirectory(): Directory
@@ -108,6 +113,8 @@ interface Directory : FileSystemElement {
 
     /**
      * Visits the contents of this directory tree. Visits a directory before its entries.
+     *
+     * Does not follow symlinks.
      */
     fun visitTopDown(visitor: DirectoryEntry.() -> Unit)
 }

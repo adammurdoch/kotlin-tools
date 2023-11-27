@@ -3,6 +3,7 @@ package net.rubygrapefruit.file
 import java.io.IOException
 import java.nio.file.*
 import java.nio.file.attribute.PosixFileAttributeView
+import kotlin.io.path.deleteExisting
 import kotlin.io.path.pathString
 import kotlin.streams.toList
 
@@ -132,7 +133,13 @@ internal class JvmDirectory(path: Path) : JvmFileSystemElement(path), Directory 
     }
 
     override fun deleteRecursively() {
-        delegate.toFile().deleteRecursively()
+        deleteRecursively(this) { entry ->
+            if (entry is JvmDirectoryEntry) {
+                entry.delegate.deleteExisting()
+            } else {
+                Paths.get(entry.absolutePath).deleteExisting()
+            }
+        }
     }
 
     override fun createTemporaryDirectory(): Directory {
@@ -171,7 +178,7 @@ internal class JvmDirectory(path: Path) : JvmFileSystemElement(path), Directory 
         } catch (e: NoSuchFileException) {
             return MissingEntry(delegate.pathString, e)
         }
-        val entries = stream.map { DirectoryEntryImpl(it, metadataOfExistingFile(it).type) }.toList()
+        val entries = stream.map { JvmDirectoryEntry(it, metadataOfExistingFile(it).type) }.toList()
         return Success(entries)
     }
 
@@ -198,7 +205,7 @@ internal class JvmSymlink(path: Path) : JvmFileSystemElement(path), SymLink {
     }
 }
 
-private class DirectoryEntryImpl(private val delegate: Path, override val type: ElementType) : DirectoryEntry {
+private class JvmDirectoryEntry(val delegate: Path, override val type: ElementType) : DirectoryEntry {
     override val path: JvmElementPath
         get() = JvmElementPath(delegate)
 

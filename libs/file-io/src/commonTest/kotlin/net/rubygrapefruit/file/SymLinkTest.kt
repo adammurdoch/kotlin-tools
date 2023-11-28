@@ -2,15 +2,18 @@ package net.rubygrapefruit.file
 
 import kotlin.test.*
 
-class SymLinkTest : AbstractFileSystemElementTest() {
-    @Test
-    fun `can query path elements`() {
-        val link = fixture.symlink("file", "target")
-        assertEquals("file", link.name)
-        assertEquals(link.name, link.path.name)
-        assertEquals(link.absolutePath, link.path.absolutePath)
-        assertEquals(link.absolutePath, link.toString())
-        assertEquals(link.absolutePath, link.path.toString())
+class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
+
+    override fun create(name: String): SymLink {
+        return fixture.symlink(name, "target")
+    }
+
+    override fun missing(name: String): SymLink {
+        return fixture.testDir.symLink(name)
+    }
+
+    override fun canSetPermissions(element: SymLink): Boolean {
+        return element.supports(FileSystemCapability.SetSymLinkPosixPermissions)
     }
 
     @Test

@@ -2,15 +2,14 @@ package net.rubygrapefruit.file
 
 import kotlin.test.*
 
-class RegularFileTest : AbstractFileSystemElementTest() {
-    @Test
-    fun `can query path elements`() {
-        val file = fixture.file("file")
-        assertEquals("file", file.name)
-        assertEquals(file.name, file.path.name)
-        assertEquals(file.absolutePath, file.path.absolutePath)
-        assertEquals(file.absolutePath, file.toString())
-        assertEquals(file.absolutePath, file.path.toString())
+class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
+
+    override fun create(name: String): RegularFile {
+        return fixture.file(name)
+    }
+
+    override fun missing(name: String): RegularFile {
+        return fixture.testDir.file(name)
     }
 
     @Test
@@ -248,49 +247,6 @@ class RegularFileTest : AbstractFileSystemElementTest() {
             fail()
         } catch (e: FileSystemException) {
             assertEquals("Could not delete file $file as it is not a file.", e.message)
-        }
-    }
-
-    @Test
-    fun `can set and query file posix permissions`() {
-        val file = fixture.file("file")
-        if (!file.supports(FileSystemCapability.PosixPermissions)) {
-            return
-        }
-
-        assertNotEquals(PosixPermissions.readOnlyFile, file.posixPermissions().get())
-
-        file.setPermissions(PosixPermissions.readOnlyFile)
-        assertEquals(PosixPermissions.readOnlyFile, file.posixPermissions().get())
-    }
-
-    @Test
-    fun `cannot query file posix permissions when not supported`() {
-        val file = fixture.file("file")
-        if (file.supports(FileSystemCapability.PosixPermissions)) {
-            return
-        }
-
-        val result = file.posixPermissions()
-        assertIs<UnsupportedOperation<*>>(result)
-        try {
-            result.get()
-        } catch (e: FileSystemException) {
-            assertEquals("Could not read POSIX permissions for $file as it is not supported by this filesystem.", e.message)
-        }
-    }
-
-    @Test
-    fun `cannot set file posix permissions when not supported`() {
-        val file = fixture.file("file")
-        if (file.supports(FileSystemCapability.PosixPermissions)) {
-            return
-        }
-
-        try {
-            file.setPermissions(PosixPermissions.readOnlyFile)
-        } catch (e: FileSystemException) {
-            assertEquals("Could not set POSIX permissions for $file as it is not supported by this filesystem.", e.message)
         }
     }
 

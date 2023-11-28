@@ -2,15 +2,16 @@ package net.rubygrapefruit.file
 
 import kotlin.test.*
 
-class DirectoryTest : AbstractFileSystemElementTest() {
-    @Test
-    fun `can query path elements`() {
-        val dir = fixture.dir("file")
-        assertEquals("file", dir.name)
-        assertEquals(dir.name, dir.path.name)
-        assertEquals(dir.absolutePath, dir.path.absolutePath)
-        assertEquals(dir.absolutePath, dir.toString())
-        assertEquals(dir.absolutePath, dir.path.toString())
+class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
+
+    override fun create(name: String): Directory {
+        return fixture.dir(name) {
+            file("not-empty")
+        }
+    }
+
+    override fun missing(name: String): Directory {
+        return fixture.testDir.dir(name)
     }
 
     @Test

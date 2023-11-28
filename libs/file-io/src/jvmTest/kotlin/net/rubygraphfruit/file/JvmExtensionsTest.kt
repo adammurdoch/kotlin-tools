@@ -7,7 +7,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class JvmExtensionsTest : AbstractFileSystemElementTest() {
+class JvmExtensionsTest : AbstractFileTest() {
     @Test
     fun `can convert RegularFile to absolute Java File`() {
         val element = fixture.file("file.txt")

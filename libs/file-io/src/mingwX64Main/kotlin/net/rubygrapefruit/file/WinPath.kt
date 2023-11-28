@@ -5,6 +5,10 @@ internal class WinPath(override val absolutePath: String) : ElementPath {
         require(isAbsolute(absolutePath)) { "'$absolutePath' is not absolute" }
     }
 
+    override fun toString(): String {
+        return absolutePath
+    }
+
     override val name: String
         get() = absolutePath.substringAfterLast("\\")
 
@@ -37,7 +41,7 @@ internal class WinPath(override val absolutePath: String) : ElementPath {
         } else if (normalized.startsWith("../")) {
             parent!!.resolve(normalized.substring(3))
         } else {
-            WinPath("${absolutePath}/$normalized")
+            WinPath("${absolutePath}\\$normalized")
         }
     }
 

@@ -258,14 +258,23 @@ tasks.register("generate") {
 }
 
 val runTasks = sampleApps.associateWith { app ->
-    if (app.cliLauncher != null) {
-        tasks.register("run-${app.name}", Exec::class.java) {
-            dependsOn(":${app.name}:dist")
-            commandLine(app.cliLauncher.absolutePath, "1 + 2")
-        }
-    } else {
-        tasks.register("run-${app.name}") {
-            doLast {
+    tasks.register("run-${app.name}") {
+        dependsOn(":${app.name}:dist")
+        doLast {
+            if (!app.distDir.isDirectory) {
+                throw IllegalStateException("Application distribution directory does not exist.")
+            }
+            if (app.cliLauncher != null && !app.cliLauncher.isFile) {
+                throw IllegalStateException("Application launcher does not exist.")
+            }
+            if (app.nativeBinary != null && app.nativeBinary != app.cliLauncher && !app.nativeBinary.isFile) {
+                throw IllegalStateException("Application binary does not exist.")
+            }
+            if (app.cliLauncher != null) {
+                exec {
+                    commandLine(app.cliLauncher.absolutePath, "1 + 2")
+                }
+            } else {
                 println("(UI app)")
             }
         }

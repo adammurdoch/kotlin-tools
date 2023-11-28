@@ -1,3 +1,4 @@
+import net.rubygrapefruit.machine.info.Machine
 import java.io.PrintWriter
 
 sealed class Sample(val name: String, val baseDir: File, val srcDirName: String) {
@@ -95,7 +96,7 @@ class UiApp(private val appName: String) : AppNature() {
         get() = "Contents/MacOS/${appName}"
 }
 
-sealed class App(name: String, baseDir: File, val nature: AppNature, srcDirName: String) :
+sealed class App(name: String, baseDir: File, val nature: AppNature, srcDirName: String, val allPlatforms: Boolean) :
     Sample(name, baseDir, srcDirName) {
 
     val distDir = dir.resolve(nature.distDirName)
@@ -113,17 +114,21 @@ sealed class App(name: String, baseDir: File, val nature: AppNature, srcDirName:
     }
 }
 
-class BaseApp(name: String, baseDir: File, nature: AppNature, srcDirName: String) :
-    App(name, baseDir, nature, srcDirName) {
+class BaseApp(name: String, baseDir: File, nature: AppNature, srcDirName: String, allPlatforms: Boolean = false) :
+    App(name, baseDir, nature, srcDirName, allPlatforms) {
 
     fun derive(suffix: String, builder: (AppNature) -> AppNature = { it }): DerivedApp {
         val sampleName = "$name-$suffix"
         return DerivedApp(sampleName, this, baseDir, builder(nature.launcher(sampleName)))
     }
+
+    fun allPlatforms(): BaseApp {
+        return BaseApp(name, baseDir, nature, srcDirName, true)
+    }
 }
 
 class DerivedApp(name: String, override val derivedFrom: BaseApp, baseDir: File, nature: AppNature) :
-    App(name, baseDir, nature, derivedFrom.srcDirName), DerivedSample
+    App(name, baseDir, nature, derivedFrom.srcDirName, false), DerivedSample
 
 class BaseLib(name: String, baseDir: File, srcDirName: String) : Sample(name, baseDir, srcDirName) {
     fun derive(suffix: String): DerivedLib {
@@ -135,11 +140,11 @@ class BaseLib(name: String, baseDir: File, srcDirName: String) : Sample(name, ba
 class DerivedLib(name: String, override val derivedFrom: BaseLib, baseDir: File, srcDirName: String) :
     Sample(name, baseDir, srcDirName), DerivedSample
 
-val jvmCliApp = jvmCliApp("jvm-cli-app")
+val jvmCliApp = jvmCliApp("jvm-cli-app").allPlatforms()
 val jvmUiApp = jvmUiApp("jvm-ui-app")
 val jvmLib = jvmLib("jvm-lib")
 val kmpLib = mppLib("kmp-lib")
-val nativeCliApp = nativeCliApp("native-cli-app")
+val nativeCliApp = nativeCliApp("native-cli-app").allPlatforms()
 val nativeUiApp = macOsUiApp("native-ui-app")
 
 val samples = listOf(
@@ -252,7 +257,37 @@ tasks.register("generate") {
     dependsOn(generators, script)
 }
 
-fun jvmCliApp(name: String) = BaseApp(name, projectDir, JvmCliApp(name, false), "main")
+val runTasks = sampleApps.associateWith { app ->
+    if (app.cliLauncher != null) {
+        tasks.register("run-${app.name}", Exec::class.java) {
+            dependsOn(":${app.name}:dist")
+            commandLine(app.cliLauncher.absolutePath, "1 + 2")
+        }
+    } else {
+        tasks.register("run-${app.name}") {
+            doLast {
+                println("(UI app)")
+            }
+        }
+    }
+}
+
+tasks.register("run") {
+    dependsOn(runTasks.values)
+}
+
+tasks.register("runMin") {
+    dependsOn(runTasks.filterKeys { it.allPlatforms }.values)
+}
+
+fun jvmCliApp(name: String): BaseApp {
+    val launcher = if(Machine.thisMachine is Machine.Windows) {
+        "$name.bat"
+    } else {
+        name
+    }
+    return BaseApp(name, projectDir, JvmCliApp(launcher, false), "main")
+}
 
 fun jvmUiApp(name: String) = BaseApp(name, projectDir, UiApp(name.capitalize()), "main")
 

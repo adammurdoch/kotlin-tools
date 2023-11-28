@@ -6,6 +6,9 @@ import kotlinx.cinterop.*
 import net.rubygrapefruit.io.stream.CollectingBuffer
 import platform.windows.*
 
+private val dirMask = FILE_ATTRIBUTE_DIRECTORY.convert<DWORD>()
+private val symLinkMask = FILE_ATTRIBUTE_REPARSE_POINT.convert<DWORD>()
+
 internal open class WinFileSystemElement(override val path: WinPath) : AbstractFileSystemElement() {
 
     override val parent: WinDirectory?
@@ -27,11 +30,11 @@ internal open class WinFileSystemElement(override val path: WinPath) : AbstractF
                     else -> throw NativeException("Could not query metadata of $absolutePath.")
                 }
             }
-            val dirMask = FILE_ATTRIBUTE_DIRECTORY.convert<DWORD>()
             val centaNanos = toLong(data.ftLastWriteTime.dwHighDateTime, data.ftLastWriteTime.dwLowDateTime)
             val timestamp = Timestamp(centaNanos * 100)
             val metadata = when {
                 data.dwFileAttributes and dirMask == dirMask -> DirectoryMetadata(timestamp, null)
+                data.dwFileAttributes and symLinkMask == symLinkMask -> SymlinkMetadata(timestamp, null)
                 else -> RegularFileMetadata(toLong(data.nFileSizeHigh, data.nFileSizeLow), timestamp, null)
             }
             Success(metadata)
@@ -255,7 +258,17 @@ internal class WinSymLink(path: WinPath) : WinFileSystemElement(path), SymLink {
     }
 
     override fun readSymLink(): Result<String> {
-        TODO("Not yet implemented")
+        return memScoped {
+            val handle = CreateFileW(absolutePath, GENERIC_READ, 0.convert(), null, OPEN_EXISTING.convert(), FILE_ATTRIBUTE_NORMAL.convert(), null)
+            try {
+                val size = GetFinalPathNameByHandleW(handle, null, 0.convert(), FILE_NAME_NORMALIZED.convert())
+                val buffer = allocArray<WCHARVar>(size.convert())
+                GetFinalPathNameByHandleW(handle, buffer, size, FILE_NAME_NORMALIZED.convert())
+                Success(buffer.toKString())
+            } finally {
+                CloseHandle(handle)
+            }
+        }
     }
 
     override fun writeSymLink(target: String) {

@@ -7,7 +7,7 @@
   - Only use `UnsupportedOperation` in cases where it can actually be received
   - boolean result
   - unit result
-- Unix readBytes() does not stream
+- More efficient readText() and writeText() 
 - Add some abstract permission functions, e.g. can read, set readable, etc
 - Atomic Directory.createTemporaryDirectory() implementation on Windows
 - Query Windows ACLs

@@ -210,39 +210,39 @@ internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), Regul
     }
 
     override fun writeBytes(bytes: ByteArray) {
-        TODO("Not yet implemented")
-    }
-
-    override fun readBytes(): Result<ByteArray> {
-        TODO("Not yet implemented")
-    }
-
-    override fun writeText(text: String) {
         memScoped {
             val handle = CreateFileW(absolutePath, GENERIC_WRITE.convert(), 0.convert(), null, CREATE_ALWAYS.convert(), FILE_ATTRIBUTE_NORMAL.convert(), null)
             if (handle == INVALID_HANDLE_VALUE) {
                 throw NativeException("Could not write to file $absolutePath")
             }
             try {
-                val bytes = text.encodeToByteArray()
-                var pos = 0
-                val nbytes = alloc<DWORDVar>()
-                while (pos < bytes.size) {
-                    bytes.usePinned { ptr ->
-                        if (WriteFile(handle, ptr.addressOf(pos), (bytes.size - pos).convert(), nbytes.ptr, null) == 0) {
-                            throw NativeException("Could not write to file $absolutePath")
-                        }
-                        pos += nbytes.value.convert<Int>()
-                    }
-                }
+                FileBackedWriteStream(absolutePath, handle).write(bytes)
             } finally {
                 CloseHandle(handle)
             }
         }
     }
 
+    override fun readBytes(): Result<ByteArray> {
+        memScoped {
+            val handle = CreateFileW(absolutePath, GENERIC_WRITE.convert(), 0.convert(), null, CREATE_ALWAYS.convert(), FILE_ATTRIBUTE_NORMAL.convert(), null)
+            if (handle == INVALID_HANDLE_VALUE) {
+                throw NativeException("Could not write to file $absolutePath")
+            }
+            try {
+                TODO()
+            } finally {
+                CloseHandle(handle)
+            }
+        }
+    }
+
+    override fun writeText(text: String) {
+        writeBytes(text.encodeToByteArray())
+    }
+
     override fun readText(): Result<String> {
-        TODO("Not yet implemented")
+        return readBytes().map { it.decodeToString() }
     }
 }
 

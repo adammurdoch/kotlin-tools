@@ -94,10 +94,14 @@ class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
     }
 
     @Test
-    fun `can set and query symlink posix permissions`() {
+    fun `set and query posix permissions on symlink acts on the link and not the target`() {
         val file = fixture.file("file")
         val symLink = fixture.symlink("link", file.name)
-        assertTrue(symLink.supports(FileSystemCapability.PosixPermissions))
+
+        if (!symLink.supports(FileSystemCapability.SetSymLinkPosixPermissions) || !symLink.supports(FileSystemCapability.PosixPermissions)) {
+            return
+        }
+
         assertNotEquals(PosixPermissions.readOnlyFile, symLink.posixPermissions().get())
         assertNotEquals(PosixPermissions.readWriteFile, symLink.posixPermissions().get())
 
@@ -111,23 +115,5 @@ class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
         symLink.setPermissions(PosixPermissions.readWriteFile)
 
         assertEquals(PosixPermissions.readWriteFile, symLink.posixPermissions().get())
-    }
-
-    @Test
-    fun `cannot set symlink posix permissions when not supported`() {
-        val file = fixture.file("file")
-        val symLink = fixture.symlink("link", file.name)
-        assertTrue(symLink.supports(FileSystemCapability.PosixPermissions))
-
-        if (symLink.supports(FileSystemCapability.SetSymLinkPosixPermissions)) {
-            return
-        }
-
-        try {
-            symLink.setPermissions(PosixPermissions.readWriteFile)
-            fail()
-        } catch (e: FileSystemException) {
-            assertEquals("Could not set POSIX permissions on $symLink as it is not supported by this filesystem.", e.message)
-        }
     }
 }

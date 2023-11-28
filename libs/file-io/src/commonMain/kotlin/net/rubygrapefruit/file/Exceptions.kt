@@ -37,6 +37,16 @@ internal fun notSupported(path: String, operation: String) = FileSystemException
 
 internal fun setPermissionsNotSupported(path: String) = notSupported(path, "set POSIX permissions on")
 
+internal fun setPermissionsOnMissingElement(path: String) = FileSystemException("Could not set POSIX permissions on $path as it does not exist.")
+
+internal fun setPermissions(path: String, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null) = FileSystemException("Could not set POSIX permissions on $path.", errorCode, cause)
+
+internal fun <T> readPermissionNotSupported(path: String) = UnsupportedOperation<T>(path, "read POSIX permissions for")
+
+internal fun <T> readPermissionOnMissingElement(path: String) = MissingEntry<T>() { FileSystemException("Could not read POSIX permissions for $path as it does not exist.") }
+
+internal fun <T> readPermission(path: String, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null) = FailedOperation<T>(FileSystemException("Could not read POSIX permissions for $path.", errorCode, cause))
+
 /**
  * Tries to infer why a directory could not be listed.
  */

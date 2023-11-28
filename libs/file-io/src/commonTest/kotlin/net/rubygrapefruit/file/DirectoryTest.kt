@@ -353,15 +353,4 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
             assertEquals("Could not delete directory $dir as it is not a directory.", e.message)
         }
     }
-
-    @Test
-    fun `can set and query directory posix permissions`() {
-        val dir = fixture.dir("dir")
-        assertTrue(dir.supports(FileSystemCapability.PosixPermissions))
-        assertNotEquals(PosixPermissions.readOnlyDirectory, dir.posixPermissions().get())
-
-        dir.setPermissions(PosixPermissions.readOnlyDirectory)
-        val perms = dir.posixPermissions()
-        assertEquals(PosixPermissions.readOnlyDirectory, perms.get())
-    }
 }

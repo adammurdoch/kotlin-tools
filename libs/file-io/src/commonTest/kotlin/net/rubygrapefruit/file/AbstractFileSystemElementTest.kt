@@ -52,6 +52,22 @@ abstract class AbstractFileSystemElementTest<T : FileSystemElement> : AbstractFi
     }
 
     @Test
+    fun `cannot query posix permissions on missing element`() {
+        val element = missing("file")
+        if (!canQueryPermissions(element)) {
+            return
+        }
+
+        val result = element.posixPermissions()
+        assertIs<MissingEntry<*>>(result)
+        try {
+            result.get()
+        } catch (e: FileSystemException) {
+            assertEquals("Could not read POSIX permissions for $element as it does not exist.", e.message)
+        }
+    }
+
+    @Test
     fun `cannot query posix permissions when not supported`() {
         val element = create("file")
         if (canQueryPermissions(element)) {
@@ -64,6 +80,20 @@ abstract class AbstractFileSystemElementTest<T : FileSystemElement> : AbstractFi
             result.get()
         } catch (e: FileSystemException) {
             assertEquals("Could not read POSIX permissions for $element as it is not supported by this filesystem.", e.message)
+        }
+    }
+
+    @Test
+    fun `cannot set file posix permissions on missing element`() {
+        val element = missing("file")
+        if (!canSetPermissions(element)) {
+            return
+        }
+
+        try {
+            element.setPermissions(PosixPermissions.readOnlyFile)
+        } catch (e: FileSystemException) {
+            assertEquals("Could not set POSIX permissions on $element as it does not exist.", e.message)
         }
     }
 

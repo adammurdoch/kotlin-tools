@@ -40,7 +40,7 @@ internal open class WinFileSystemElement(override val path: WinPath) : AbstractF
     private inline fun toLong(high: DWORD, low: DWORD): Long = (high.convert<Long>() shl 32) or (low.convert())
 
     override fun posixPermissions(): Result<PosixPermissions> {
-        TODO("Not yet implemented")
+        return readPermissionNotSupported(path.absolutePath)
     }
 
     override fun setPermissions(permissions: PosixPermissions) {

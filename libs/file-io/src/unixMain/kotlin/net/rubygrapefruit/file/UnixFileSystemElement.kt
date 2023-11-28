@@ -45,9 +45,14 @@ internal open class UnixFileSystemElement(override val path: AbsolutePath) : Abs
         return memScoped {
             val statBuf = alloc<stat>()
             if (lstat(path.absolutePath, statBuf.ptr) != 0) {
-                throw NativeException("Could not stat $path.")
+                if (errno == ENOENT) {
+                    readPermissionOnMissingElement(absolutePath)
+                } else {
+                    readPermission(absolutePath, errorCode = UnixErrorCode.last())
+                }
+            } else {
+                Success(posixPermissions(statBuf))
             }
-            Success(posixPermissions(statBuf))
         }
     }
 
@@ -55,9 +60,11 @@ internal open class UnixFileSystemElement(override val path: AbsolutePath) : Abs
     override fun setPermissions(permissions: PosixPermissions) {
         if (lchmod(path.absolutePath, permissions.mode.convert()) != 0) {
             if (errno == ENOTSUP) {
-                throw setPermissionsNotSupported(path.absolutePath)
+                throw setPermissionsNotSupported(absolutePath)
+            } else if (errno == ENOENT) {
+                throw setPermissionsOnMissingElement(absolutePath)
             } else {
-                throw NativeException("Could not set permissions on $path.")
+                throw setPermissions(absolutePath, errorCode = UnixErrorCode.last())
             }
         }
     }

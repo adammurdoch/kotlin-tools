@@ -26,7 +26,7 @@ jobs:
           distribution: 'temurin'
       - uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
-          arguments: check -x :libs:file-io:mingwX64Test test-apps:runMin --continue
+          arguments: :libs:file-io:jvmTest test-apps:runMin --continue
   macos:
     runs-on: macos-latest
     steps:

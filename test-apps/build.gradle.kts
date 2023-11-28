@@ -1,5 +1,7 @@
 import net.rubygrapefruit.machine.info.Machine
+import java.io.ByteArrayOutputStream
 import java.io.PrintWriter
+import javax.annotation.RegEx
 
 sealed class Sample(val name: String, val baseDir: File, val srcDirName: String) {
     val dir = baseDir.resolve(name)
@@ -189,72 +191,8 @@ val generators = derivedSamples.map { sample ->
     }
 }
 
-val script = tasks.register("generate-script") {
-    doLast {
-        val scriptFile = file("run.sh")
-        PrintWriter(scriptFile.bufferedWriter()).use { writer ->
-            writer.run {
-                for (sample in sampleApps) {
-                    println(
-                        """
-                            if [ ! -d ${sample.distDir} ]; then
-                               echo '${sample.name} distribution "${sample.distDir}" not found'
-                               exit 1
-                            fi
-                        """.trimIndent()
-                    )
-                    if (sample.cliLauncher != null) {
-                        println(
-                            """
-                            if [ ! -f ${sample.cliLauncher} ]; then
-                               echo '${sample.name} launcher "${sample.cliLauncher}" not found'
-                               exit 1
-                            fi
-                        """.trimIndent()
-                        )
-                    }
-                    if (sample.nativeBinary != null && sample.nativeBinary != sample.cliLauncher) {
-                        println(
-                            """
-                            if [ ! -f ${sample.nativeBinary} ]; then
-                               echo '${sample.name} binary "${sample.nativeBinary}" not found'
-                               exit 1
-                            fi
-                        """.trimIndent()
-                        )
-                    }
-                }
-
-                for (sample in sampleApps) {
-                    println()
-                    println("echo '==== ${sample.name} ===='")
-                    // xargs trims whitespace, cut selects the 1st field
-                    println("DU_OUT=`du -sh ${sample.distDir} | xargs | cut -f 1 -w`")
-                    println("echo \"dist size: \${DU_OUT}\"")
-                    if (sample.nativeBinary != null) {
-                        // Select line 4 and 2nd field
-                        println("OTOOL_OUT=`otool -hv ${sample.nativeBinary} | sed -n '4p' | cut -f 2 -w`")
-                        println("echo \"arch: \${OTOOL_OUT}\"")
-                    }
-                    println("echo")
-                    if (sample.cliLauncher != null) {
-                        println("${sample.cliLauncher} 1 + 2")
-                        println("if [ $? != 0 ]; then")
-                        println("  exit 1")
-                        println("fi")
-                    } else {
-                        println("echo '(UI app)'")
-                    }
-                    println("echo")
-                }
-            }
-        }
-        scriptFile.setExecutable(true, true)
-    }
-}
-
 tasks.register("generate") {
-    dependsOn(generators, script)
+    dependsOn(generators)
 }
 
 val runTasks = sampleApps.associateWith { app ->
@@ -270,11 +208,24 @@ val runTasks = sampleApps.associateWith { app ->
             if (app.nativeBinary != null && app.nativeBinary != app.cliLauncher && !app.nativeBinary.isFile) {
                 throw IllegalStateException("Application binary does not exist.")
             }
+            println("dist size: " + app.distDir.directorySize().formatSize())
+            if (app.nativeBinary != null && Machine.thisMachine is Machine.MacOS) {
+                val str = ByteArrayOutputStream()
+                exec {
+                    commandLine("otool", "-hv", app.nativeBinary)
+                    standardOutput = str
+                }
+                println("binary: ${str.toString().lines()[3].split(Regex("\\s+"))[1]}")
+            }
             if (app.cliLauncher != null) {
+                println()
+                println("----")
                 exec {
                     commandLine(app.cliLauncher.absolutePath, "1 + 2")
                 }
+                println("----")
             } else {
+                println()
                 println("(UI app)")
             }
         }
@@ -290,7 +241,7 @@ tasks.register("runMin") {
 }
 
 fun jvmCliApp(name: String): BaseApp {
-    val launcher = if(Machine.thisMachine is Machine.Windows) {
+    val launcher = if (Machine.thisMachine is Machine.Windows) {
         "$name.bat"
     } else {
         name
@@ -307,3 +258,18 @@ fun macOsUiApp(name: String) = BaseApp(name, projectDir, UiApp(name.capitalize()
 fun jvmLib(name: String) = BaseLib(name, projectDir, "main")
 
 fun mppLib(name: String) = BaseLib(name, projectDir, "commonMain")
+
+fun File.directorySize(): Long {
+    var size: Long = 0
+    for (file in this.walkBottomUp()) {
+        if (file.isFile) {
+            size += file.length()
+        }
+    }
+    return size
+}
+
+fun Long.formatSize(): String {
+    val mb = this.toBigDecimal().setScale(2) / (1000 * 1000).toBigDecimal()
+    return "$mb MB"
+}

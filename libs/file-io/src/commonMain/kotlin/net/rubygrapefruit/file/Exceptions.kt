@@ -35,7 +35,7 @@ internal fun deleteFile(path: String, errorCode: ErrorCode = NoErrorCode, cause:
 
 internal fun notSupported(path: String, operation: String) = FileSystemException("Could not $operation $path as it is not supported by this filesystem.")
 
-internal fun setPermissionsNotSupported(path: String) = notSupported(path, "set permissions on")
+internal fun setPermissionsNotSupported(path: String) = notSupported(path, "set POSIX permissions on")
 
 /**
  * Tries to infer why a directory could not be listed.

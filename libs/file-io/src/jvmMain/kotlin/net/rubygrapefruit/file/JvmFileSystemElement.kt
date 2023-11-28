@@ -43,7 +43,7 @@ internal open class JvmFileSystemElement(protected val delegate: Path) : Abstrac
     }
 
     override fun snapshot(): Result<ElementSnapshot> {
-        return metadata().map { SnapshotImpl(path, it) }
+        return metadata().map { JvmSnapshot(path, it) }
     }
 
     override fun posixPermissions(): Result<PosixPermissions> {
@@ -218,7 +218,7 @@ private class JvmDirectoryEntry(val delegate: Path, override val type: ElementTy
         get() = JvmElementPath(delegate)
 
     override fun snapshot(): Result<ElementSnapshot> {
-        return metadata(delegate).map { SnapshotImpl(path, it) }
+        return metadata(delegate).map { JvmSnapshot(path, it) }
     }
 
     override fun toDir(): Directory {
@@ -234,7 +234,7 @@ private class JvmDirectoryEntry(val delegate: Path, override val type: ElementTy
     }
 }
 
-internal class SnapshotImpl(override val path: JvmElementPath, override val metadata: ElementMetadata) : AbstractElementSnapshot() {
+internal class JvmSnapshot(override val path: JvmElementPath, override val metadata: ElementMetadata) : AbstractElementSnapshot() {
     override fun asRegularFile(): RegularFile {
         return JvmRegularFile(path.delegate)
     }

@@ -25,7 +25,7 @@ internal open class UnixFileSystemElement(override val path: AbsolutePath) : Abs
     }
 
     override fun snapshot(): Result<ElementSnapshot> {
-        return metadata().map { SnapshotImpl(path, it) }
+        return metadata().map { UnixSnapshot(path, it) }
     }
 
     override fun toDir(): Directory {
@@ -287,7 +287,7 @@ private class UnixDirectoryEntry(private val parentPath: AbsolutePath, override 
         get() = parentPath.resolve(name)
 
     override fun snapshot(): Result<ElementSnapshot> {
-        return stat(path.absolutePath).map { SnapshotImpl(path, it) }
+        return stat(path.absolutePath).map { UnixSnapshot(path, it) }
     }
 
     override fun toDir(): Directory {
@@ -303,7 +303,7 @@ private class UnixDirectoryEntry(private val parentPath: AbsolutePath, override 
     }
 }
 
-internal class SnapshotImpl(override val path: AbsolutePath, override val metadata: ElementMetadata) : AbstractElementSnapshot() {
+internal class UnixSnapshot(override val path: AbsolutePath, override val metadata: ElementMetadata) : AbstractElementSnapshot() {
     override fun asRegularFile(): RegularFile {
         return UnixRegularFile(path)
     }

@@ -30,6 +30,6 @@ internal class JvmElementPath(val delegate: Path) : ElementPath {
     }
 
     override fun snapshot(): Result<ElementSnapshot> {
-        return metadata(delegate).map { SnapshotImpl(this, it) }
+        return metadata(delegate).map { JvmSnapshot(this, it) }
     }
 }

@@ -43,6 +43,6 @@ internal class AbsolutePath(override val absolutePath: String) : ElementPath {
     }
 
     override fun snapshot(): Result<ElementSnapshot> {
-        return stat(absolutePath).map { SnapshotImpl(this, it) }
+        return stat(absolutePath).map { UnixSnapshot(this, it) }
     }
 }

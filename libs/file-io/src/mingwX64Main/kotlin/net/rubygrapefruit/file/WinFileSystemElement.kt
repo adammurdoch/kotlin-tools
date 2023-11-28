@@ -44,7 +44,7 @@ internal open class WinFileSystemElement(override val path: WinPath) : AbstractF
     }
 
     override fun setPermissions(permissions: PosixPermissions) {
-        TODO("Not yet implemented")
+        throw setPermissionsNotSupported(path.absolutePath)
     }
 
     override fun supports(capability: FileSystemCapability): Boolean {
@@ -257,6 +257,8 @@ internal class WinSymLink(path: WinPath) : WinFileSystemElement(path), SymLink {
     }
 
     override fun writeSymLink(target: String) {
-        TODO("Not yet implemented")
+        if (CreateSymbolicLinkW(absolutePath, target, 0.convert()) == 0.convert<BOOLEAN>()) {
+            throw NativeException("Could not create symbolic link $absolutePath.")
+        }
     }
 }

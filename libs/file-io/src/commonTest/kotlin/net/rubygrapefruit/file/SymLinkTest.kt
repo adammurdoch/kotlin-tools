@@ -124,7 +124,7 @@ class SymLinkTest : AbstractFileSystemElementTest() {
             symLink.setPermissions(PosixPermissions.readWriteFile)
             fail()
         } catch (e: FileSystemException) {
-            assertEquals("Could not set permissions on $symLink as it is not supported by this filesystem.", e.message)
+            assertEquals("Could not set POSIX permissions on $symLink as it is not supported by this filesystem.", e.message)
         }
     }
 }

@@ -3,6 +3,8 @@
 package net.rubygrapefruit.file
 
 import kotlinx.cinterop.*
+import net.rubygrapefruit.io.stream.CollectingBuffer
+import net.rubygrapefruit.io.stream.FileBackedReadStream
 import net.rubygrapefruit.io.stream.FileBackedWriteStream
 import net.rubygrapefruit.io.stream.WriteStream
 import platform.posix.*
@@ -120,14 +122,14 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
     }
 
     override fun readBytes(): Result<ByteArray> {
-        return reading { buffer, len -> buffer.sliceArray(0 until len.toInt()) }
+        return reading { buffer -> buffer.toByteArray() }
     }
 
     override fun readText(): Result<String> {
-        return reading { buffer, len -> buffer.decodeToString(0, len.convert()) }
+        return reading { buffer -> buffer.decodeToString() }
     }
 
-    private fun <T> reading(action: (ByteArray, Long) -> T): Result<T> {
+    private fun <T> reading(action: (CollectingBuffer) -> T): Result<T> {
         return memScoped {
             val des = open(path.absolutePath, O_RDONLY)
             if (des < 0) {
@@ -137,20 +139,13 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
                 throw NativeException("Could not read from $path.")
             }
             try {
-                val fileSize = fileSize()
-                val buffer = ByteArray(fileSize.convert())
-                if (fileSize > 0) {
-                    val nread = read(des, buffer.refTo(0), fileSize.convert())
-                    if (nread < 0) {
-                        if (errno == EISDIR) {
-                            return readFileThatIsNotAFile(path.absolutePath)
-                        } else {
-                            throw NativeException("Could not read from $path.")
-                        }
-                    }
-                    Success(action(buffer, nread))
+                val buffer = CollectingBuffer()
+                val stream = FileBackedReadStream(path.absolutePath, des)
+                val result = buffer.readFrom(stream)
+                if (result is Failed) {
+                    result.cast()
                 } else {
-                    Success(action(buffer, 0))
+                    Success(action(buffer))
                 }
             } finally {
                 close(des)

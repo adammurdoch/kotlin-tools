@@ -1,6 +1,6 @@
 package net.rubygrapefruit.file
 
-sealed class Result<T> {
+sealed class Result<out T> {
     abstract fun get(): T
 
     abstract fun getOrNull(): T?
@@ -9,12 +9,19 @@ sealed class Result<T> {
 }
 
 sealed class Failed<T> : Result<T>() {
-    @Suppress("UNCHECKED_CAST")
-    override fun <S> map(transform: (T) -> S) = this as Result<S>
+    override fun <S> map(transform: (T) -> S): Result<S> {
+        @Suppress("UNCHECKED_CAST")
+        return this as Result<S>
+    }
 
     override fun get() = rethrow()
 
     override fun getOrNull() = null
+
+    fun <S> cast(): Result<S> {
+        @Suppress("UNCHECKED_CAST")
+        return this as Result<S>
+    }
 
     fun rethrow(): Nothing {
         throw failure

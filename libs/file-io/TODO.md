@@ -1,6 +1,12 @@
 
 ## TODO
 
+- Add specialized kinds of `Failure` and `Success` types for specific operations
+  - read() reaches end of stream
+  - Mismatched type for an operation, eg read text from a directory
+  - Only use `UnsupportedOperation` in cases where it can actually be received
+  - boolean result
+  - unit result
 - Unix readBytes() does not stream
 - Add some abstract permission functions, e.g. can read, set readable, etc
 - Atomic Directory.createTemporaryDirectory() implementation on Windows

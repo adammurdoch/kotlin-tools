@@ -12,7 +12,7 @@ internal class FileBackedWriteStream(private val path: String, private val file:
     override fun write(bytes: ByteArray, offset: Int, count: Int) {
         if (count > 0) {
             memScoped {
-                if (fwrite(bytes.refTo(0), 1.convert(), bytes.size.convert(), file) < bytes.size.convert()) {
+                if (fwrite(bytes.refTo(offset), 1.convert(), count.convert(), file) < count.convert()) {
                     throw FileSystemException(path, UnixErrorCode.last())
                 }
             }

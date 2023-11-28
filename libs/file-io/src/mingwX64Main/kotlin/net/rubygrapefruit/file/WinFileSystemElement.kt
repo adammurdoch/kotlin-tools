@@ -3,6 +3,7 @@
 package net.rubygrapefruit.file
 
 import kotlinx.cinterop.*
+import net.rubygrapefruit.io.stream.CollectingBuffer
 import platform.windows.*
 
 internal open class WinFileSystemElement(override val path: WinPath) : AbstractFileSystemElement() {
@@ -225,12 +226,13 @@ internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), Regul
 
     override fun readBytes(): Result<ByteArray> {
         memScoped {
-            val handle = CreateFileW(absolutePath, GENERIC_WRITE.convert(), 0.convert(), null, CREATE_ALWAYS.convert(), FILE_ATTRIBUTE_NORMAL.convert(), null)
+            val handle = CreateFileW(absolutePath, GENERIC_READ.convert(), 0.convert(), null, OPEN_EXISTING.convert(), FILE_ATTRIBUTE_NORMAL.convert(), null)
             if (handle == INVALID_HANDLE_VALUE) {
                 throw NativeException("Could not write to file $absolutePath")
             }
             try {
-                TODO()
+                val buffer = CollectingBuffer()
+                return buffer.readFrom(FileBackedReadStream(absolutePath, handle)).map { buffer.toByteArray() }
             } finally {
                 CloseHandle(handle)
             }

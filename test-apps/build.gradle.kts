@@ -251,7 +251,14 @@ fun jvmCliApp(name: String): BaseApp {
 
 fun jvmUiApp(name: String) = BaseApp(name, projectDir, UiApp(name.capitalize()), "main")
 
-fun nativeCliApp(name: String) = BaseApp(name, projectDir, NativeBinaryCliApp(name), "commonMain")
+fun nativeCliApp(name: String): BaseApp {
+    val launcher = if (Machine.thisMachine is Machine.Windows) {
+        "$name.exe"
+    } else {
+        name
+    }
+    return BaseApp(name, projectDir, NativeBinaryCliApp(launcher), "commonMain")
+}
 
 fun macOsUiApp(name: String) = BaseApp(name, projectDir, UiApp(name.capitalize()), "macosMain")
 

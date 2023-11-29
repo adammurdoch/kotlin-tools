@@ -29,7 +29,7 @@ sealed class Machine {
                 val process = builder.start()
                 process.inputStream.copyTo(output)
                 process.errorStream.copyTo(System.err)
-                if (output.toString().contains("Apple M1")) {
+                if (output.toString().trim().matches(Regex("Apple M\\d+.*"))) {
                     MacOSArm64
                 } else {
                     MacOSX64

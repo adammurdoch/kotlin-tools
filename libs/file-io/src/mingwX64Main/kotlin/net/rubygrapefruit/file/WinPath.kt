@@ -46,7 +46,7 @@ internal class WinPath(override val absolutePath: String) : ElementPath {
     }
 
     override fun snapshot(): Result<ElementSnapshot> {
-        TODO("Not yet implemented")
+        return metadata(absolutePath).map { WinElementSnapshot(this, it) }
     }
 
     private fun isAbsolute(path: String): Boolean {

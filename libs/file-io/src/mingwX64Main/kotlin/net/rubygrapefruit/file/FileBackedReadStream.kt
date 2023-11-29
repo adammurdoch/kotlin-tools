@@ -9,7 +9,7 @@ import platform.windows.DWORDVar
 import platform.windows.HANDLE
 import platform.windows.ReadFile
 
-class FileBackedReadStream(private val path: String, private val handle: HANDLE?) : ReadStream {
+internal class FileBackedReadStream(private val path: String, private val handle: HANDLE?) : ReadStream {
     override fun read(buffer: ByteArray, offset: Int, max: Int): Result<Int> {
         return memScoped {
             val nbytes = alloc<DWORDVar>()

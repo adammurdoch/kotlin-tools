@@ -3,7 +3,7 @@ package net.rubygrapefruit.file
 import platform.windows.DWORD
 import platform.windows.GetLastError
 
-class WinErrorCode(private val code: DWORD): ErrorCode {
+internal class WinErrorCode(private val code: DWORD): ErrorCode {
     companion object {
         fun last() = WinErrorCode(GetLastError())
     }

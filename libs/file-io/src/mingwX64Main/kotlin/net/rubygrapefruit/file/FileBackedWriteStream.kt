@@ -8,7 +8,7 @@ import platform.windows.DWORDVar
 import platform.windows.HANDLE
 import platform.windows.WriteFile
 
-class FileBackedWriteStream(private val path: String, private val handle: HANDLE?) : WriteStream {
+internal class FileBackedWriteStream(private val path: String, private val handle: HANDLE?) : WriteStream {
     override fun write(bytes: ByteArray, offset: Int, count: Int) {
         memScoped {
             var pos = 0

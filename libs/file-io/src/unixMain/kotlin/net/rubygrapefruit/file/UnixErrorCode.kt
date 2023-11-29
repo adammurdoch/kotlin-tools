@@ -7,7 +7,7 @@ import kotlinx.cinterop.toKString
 import platform.posix.errno
 import platform.posix.strerror
 
-class UnixErrorCode(private val code: Int) : ErrorCode {
+internal class UnixErrorCode(private val code: Int) : ErrorCode {
     companion object {
         fun last() = UnixErrorCode(errno)
     }

@@ -21,7 +21,7 @@ internal open class UnixFileSystemElement(override val path: AbsolutePath) : Abs
         }
 
     override fun metadata(): Result<ElementMetadata> {
-        return stat(path.absolutePath)
+        return metadata(path.absolutePath)
     }
 
     override fun snapshot(): Result<ElementSnapshot> {
@@ -277,7 +277,7 @@ internal class UnixSymLink(path: AbsolutePath) : UnixFileSystemElement(path), Sy
     }
 
     override fun writeSymLink(target: String) {
-        val stat = stat(path.absolutePath)
+        val stat = metadata(path.absolutePath)
         if (stat is Success && stat.get() is SymlinkMetadata) {
             if (remove(path.absolutePath) < 0) {
                 throw NativeException("Could not delete symlink $path.")
@@ -294,7 +294,7 @@ private class UnixDirectoryEntry(private val parentPath: AbsolutePath, override 
         get() = parentPath.resolve(name)
 
     override fun snapshot(): Result<ElementSnapshot> {
-        return stat(path.absolutePath).map { UnixSnapshot(path, it) }
+        return metadata(path.absolutePath).map { UnixSnapshot(path, it) }
     }
 
     override fun toDir(): Directory {
@@ -324,66 +324,9 @@ internal class UnixSnapshot(override val path: AbsolutePath, override val metada
     }
 }
 
-@OptIn(UnsafeNumber::class)
-internal fun stat(file: String): Result<ElementMetadata> {
-    return memScoped {
-        val statBuf = alloc<stat>()
-        if (lstat(file, statBuf.ptr) != 0) {
-            if (errno == ENOENT || errno == ENOTDIR) {
-                return MissingEntry(file)
-            }
-            if (errno == EACCES) {
-                return UnreadableEntry(file)
-            } else {
-                throw NativeException("Could not stat file '$file'.")
-            }
-        }
-        val mode = statBuf.st_mode.convert<Int>()
-        val lastModified = lastModified(statBuf)
-        val permissions = posixPermissions(statBuf)
-        if (mode and S_IFDIR == S_IFDIR) {
-            Success(DirectoryMetadata(lastModified, permissions))
-        } else if (mode and S_IFLNK == S_IFLNK) {
-            Success(SymlinkMetadata(lastModified, permissions))
-        } else if (mode and S_IFREG == S_IFREG) {
-            val size = statBuf.st_size
-            Success(RegularFileMetadata(size, lastModified, permissions))
-        } else {
-            Success(OtherMetadata(lastModified, permissions))
-        }
-    }
-}
-
 internal expect fun lastModified(stat: stat): Timestamp
 
 internal expect fun mode(stat: stat): UInt
-
-private fun posixPermissions(stat: stat): PosixPermissions {
-    return PosixPermissions((mode(stat) and (S_IRWXU or S_IRWXG or S_IRWXO).convert()))
-}
-
-internal fun getUserHomeDir(): UnixDirectory {
-    return memScoped {
-        val uid = getuid()
-        val pwd = getpwuid(uid)
-        if (pwd == null) {
-            throw NativeException("Could not get user home directory.")
-        }
-        UnixDirectory(AbsolutePath(pwd.pointed.pw_dir!!.toKString()))
-    }
-}
-
-internal fun getCurrentDir(): UnixDirectory {
-    return memScoped {
-        val length = MAXPATHLEN
-        val buffer = allocArray<ByteVar>(length)
-        val path = getcwd(buffer, length.convert())
-        if (path == null) {
-            throw NativeException("Could not get current directory.")
-        }
-        UnixDirectory(AbsolutePath(buffer.toKString()))
-    }
-}
 
 internal fun createTempDir(baseDir: UnixDirectory): Directory {
     return memScoped {
@@ -403,7 +346,7 @@ internal fun createDir(dir: UnixDirectory) {
             if (errno != EEXIST) {
                 throw NativeException("Could not create directory $dir.")
             }
-            val stat = stat(dir.path.absolutePath)
+            val stat = metadata(dir.path.absolutePath)
             if (!stat.directory) {
                 throw createDirectoryThatExistsAndIsNotADir(dir.path.absolutePath)
             }

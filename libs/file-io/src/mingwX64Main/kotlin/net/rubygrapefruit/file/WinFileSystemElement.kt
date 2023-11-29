@@ -59,7 +59,7 @@ internal open class WinFileSystemElement(override val path: WinPath) : AbstractF
     }
 
     override fun snapshot(): Result<ElementSnapshot> {
-        TODO("Not yet implemented")
+        return metadata().map { WinElementSnapshot(path, it) }
     }
 
     override fun toFile(): RegularFile {
@@ -72,6 +72,20 @@ internal open class WinFileSystemElement(override val path: WinPath) : AbstractF
 
     override fun toSymLink(): SymLink {
         return WinSymLink(path)
+    }
+}
+
+private class WinElementSnapshot(override val path: WinPath, override val metadata: ElementMetadata): AbstractElementSnapshot() {
+    override fun asDirectory(): Directory {
+        TODO("Not yet implemented")
+    }
+
+    override fun asRegularFile(): RegularFile {
+        TODO("Not yet implemented")
+    }
+
+    override fun asSymLink(): SymLink {
+        TODO("Not yet implemented")
     }
 }
 
@@ -97,11 +111,11 @@ internal class WinDirectory(path: WinPath) : WinFileSystemElement(path), Directo
         deleteRecursively(this) { entry ->
             if (entry.type == ElementType.Directory) {
                 if (RemoveDirectoryW(entry.absolutePath) == 0) {
-                    throw NativeException("Could not delete ${entry.absolutePath}")
+                    throw NativeException("Could not delete directory ${entry.absolutePath}")
                 }
             } else {
                 if (DeleteFileW(entry.absolutePath) == 0) {
-                    throw NativeException("Could not delete ${entry.absolutePath}")
+                    throw NativeException("Could not delete file ${entry.absolutePath}")
                 }
             }
         }
@@ -161,7 +175,12 @@ internal class WinDirectory(path: WinPath) : WinFileSystemElement(path), Directo
                 while (true) {
                     val name = data.cFileName.toKString()
                     if (name != "." && name != "..") {
-                        result.add(WinDirectoryEntry(path, name, ElementType.Other))
+                        val type = when {
+                            data.dwFileAttributes and dirMask == dirMask -> ElementType.Directory
+                            data.dwFileAttributes and symLinkMask == symLinkMask -> ElementType.SymLink
+                            else -> ElementType.RegularFile
+                        }
+                        result.add(WinDirectoryEntry(path, name, type))
                     }
                     if (FindNextFileW(handle, data.ptr) == 0) {
                         if (GetLastError().convert<Int>() == ERROR_NO_MORE_FILES) {
@@ -178,7 +197,7 @@ internal class WinDirectory(path: WinPath) : WinFileSystemElement(path), Directo
     }
 
     override fun visitTopDown(visitor: DirectoryEntry.() -> Unit) {
-        TODO("Not yet implemented")
+        visitTopDown(this, visitor)
     }
 }
 
@@ -191,7 +210,7 @@ private class WinDirectoryEntry(private val parentPath: WinPath, override val na
     }
 
     override fun toDir(): Directory {
-        TODO()
+        return WinDirectory(path)
     }
 
     override fun toFile(): RegularFile {

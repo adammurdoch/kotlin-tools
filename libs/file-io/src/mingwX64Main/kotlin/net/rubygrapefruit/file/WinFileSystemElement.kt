@@ -147,7 +147,11 @@ internal class WinDirectory(path: WinPath) : WinFileSystemElement(path), Directo
             val data = alloc<WIN32_FIND_DATAW>()
             val handle = FindFirstFileW("$absolutePath\\*", data.ptr)
             if (handle == INVALID_HANDLE_VALUE) {
-                throw NativeException("Could not list entries for directory $absolutePath.")
+                return if (GetLastError().convert<Int>() == ERROR_FILE_NOT_FOUND) {
+                    listDirectoryThatDoesNotExist(absolutePath)
+                } else {
+                    listDirectory(this@WinDirectory, errorCode = WinErrorCode.last())
+                }
             }
             try {
                 val result = mutableListOf<DirectoryEntry>()
@@ -165,7 +169,7 @@ internal class WinDirectory(path: WinPath) : WinFileSystemElement(path), Directo
                         if (GetLastError().convert<Int>() == ERROR_NO_MORE_FILES) {
                             break
                         }
-                        throw NativeException("Could not list entries for directory $absolutePath.")
+                        return listDirectory(this@WinDirectory, errorCode = WinErrorCode.last())
                     }
                 }
                 Success(result)
@@ -208,7 +212,9 @@ internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), Regul
     }
 
     override fun delete() {
-        TODO("Not yet implemented")
+        if (DeleteFileW(absolutePath) == 0) {
+            throw NativeException("Could not delete file $absolutePath.")
+        }
     }
 
     override fun writeBytes(bytes: ByteArray) {

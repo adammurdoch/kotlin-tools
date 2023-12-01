@@ -99,6 +99,8 @@ class DownloadRepository(private val silent: Boolean = false) {
                     return installDir
                 }
 
+                println("-> DOWNLOAD $uri")
+
                 // Clean up any partially installed left-overs
                 if (installDir.isDirectory()) {
                     installDir.deleteRecursively()
@@ -113,17 +115,19 @@ class DownloadRepository(private val silent: Boolean = false) {
                         Files.copy(instr, tmpFile, StandardCopyOption.REPLACE_EXISTING)
                     }
                     require(tmpFile.isRegularFile())
-                    actions.download(tmpDir)
+                    println("-> DOWNLOAD ACTION ON $tmpDir")
+                    actions.download(tmpFile)
 
                     tmpDir.createDirectories()
                     format.unpack(tmpFile, tmpDir)
+                    println("-> INSTALL ACTION ON $tmpDir")
                     actions.install(tmpDir)
 
                     Files.move(tmpDir, installDir, StandardCopyOption.ATOMIC_MOVE)
+                    markerFile.createFile()
                 } finally {
                     tmpFile.deleteIfExists()
                 }
-                markerFile.createFile()
             } finally {
                 lock.release()
             }

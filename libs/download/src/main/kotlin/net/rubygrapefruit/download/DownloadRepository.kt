@@ -99,11 +99,13 @@ class DownloadRepository(private val silent: Boolean = false) {
                     return installDir
                 }
 
-                println("-> DOWNLOAD $uri")
-
                 // Clean up any partially installed left-overs
                 if (installDir.isDirectory()) {
                     installDir.deleteRecursively()
+                }
+                markerFile.deleteIfExists()
+                if (tmpDir.isDirectory()) {
+                    tmpDir.deleteRecursively()
                 }
 
                 if (!silent) {
@@ -115,12 +117,10 @@ class DownloadRepository(private val silent: Boolean = false) {
                         Files.copy(instr, tmpFile, StandardCopyOption.REPLACE_EXISTING)
                     }
                     require(tmpFile.isRegularFile())
-                    println("-> DOWNLOAD ACTION ON $tmpDir")
                     actions.download(tmpFile)
 
                     tmpDir.createDirectories()
                     format.unpack(tmpFile, tmpDir)
-                    println("-> INSTALL ACTION ON $tmpDir")
                     actions.install(tmpDir)
 
                     Files.move(tmpDir, installDir, StandardCopyOption.ATOMIC_MOVE)
@@ -148,7 +148,7 @@ class DownloadRepository(private val silent: Boolean = false) {
         fun onInstall(action: (Path) -> Unit)
     }
 
-    private class DefaultActions: Actions {
+    private class DefaultActions : Actions {
         var install: (Path) -> Unit = {}
         var download: (Path) -> Unit = {}
 

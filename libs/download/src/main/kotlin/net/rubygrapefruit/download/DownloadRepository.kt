@@ -51,12 +51,12 @@ class DownloadRepository(private val silent: Boolean = false) {
 
         downloadsDir.createDirectories()
         val installDir = downloadsDir.resolve(name)
+
         val workDir = downloadsDir.resolve("work")
         workDir.createDirectories()
-
         val markerFile = workDir.resolve("${name}.done")
 
-        if (markerFile.isRegularFile()) {
+        if (installDir.isDirectory() && markerFile.isRegularFile()) {
             return installDir
         }
 
@@ -95,7 +95,7 @@ class DownloadRepository(private val silent: Boolean = false) {
             val lock = channel.lock()
             try {
                 // May have been installed while waiting to acquire the lock
-                if (markerFile.isRegularFile()) {
+                if (installDir.isDirectory() && markerFile.isRegularFile()) {
                     return installDir
                 }
 

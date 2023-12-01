@@ -13,6 +13,7 @@ import java.nio.file.StandardOpenOption
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReentrantLock
 import java.util.zip.ZipInputStream
+import javax.swing.Action
 import kotlin.concurrent.withLock
 import kotlin.io.path.*
 
@@ -38,7 +39,10 @@ class DownloadRepository(private val silent: Boolean = false) {
     /**
      * Downloads and installs the given Zip
      */
-    fun install(uri: URI, name: String, onInstall: (Path) -> Unit = {}): Path {
+    fun install(uri: URI, name: String, configure: Actions.() -> Unit = {}): Path {
+        val actions = DefaultActions()
+        configure(actions)
+
         val format = when {
             uri.path.endsWith(Zip.extension, true) -> Zip
             uri.path.endsWith(TarGz.extension, true) -> TarGz
@@ -56,7 +60,7 @@ class DownloadRepository(private val silent: Boolean = false) {
             return installDir
         }
 
-        return maybeInstall(uri, name, format, markerFile, workDir, installDir, onInstall)
+        return maybeInstall(uri, name, format, markerFile, workDir, installDir, actions)
     }
 
     private fun maybeInstall(
@@ -66,11 +70,11 @@ class DownloadRepository(private val silent: Boolean = false) {
         markerFile: Path,
         workDir: Path,
         installDir: Path,
-        onInstall: (Path) -> Unit
+        actions: DefaultActions
     ): Path {
         // Block until no other threads are installing
         return locks.computeIfAbsent(name) { ReentrantLock() }.withLock {
-            maybeInstallHoldingThreadLock(uri, name, format, markerFile, workDir, installDir, onInstall)
+            maybeInstallHoldingThreadLock(uri, name, format, markerFile, workDir, installDir, actions)
         }
     }
 
@@ -81,7 +85,7 @@ class DownloadRepository(private val silent: Boolean = false) {
         markerFile: Path,
         workDir: Path,
         installDir: Path,
-        onInstall: (Path) -> Unit
+        actions: DefaultActions
     ): Path {
         val lockFile = workDir.resolve("${name}.lock")
         val tmpFile = workDir.resolve("${name}.download.${format.extension}")
@@ -109,11 +113,13 @@ class DownloadRepository(private val silent: Boolean = false) {
                         Files.copy(instr, tmpFile, StandardCopyOption.REPLACE_EXISTING)
                     }
                     require(tmpFile.isRegularFile())
+                    actions.download(tmpDir)
 
                     tmpDir.createDirectories()
                     format.unpack(tmpFile, tmpDir)
+                    actions.install(tmpDir)
+
                     Files.move(tmpDir, installDir, StandardCopyOption.ATOMIC_MOVE)
-                    onInstall(installDir)
                 } finally {
                     tmpFile.deleteIfExists()
                 }
@@ -124,6 +130,31 @@ class DownloadRepository(private val silent: Boolean = false) {
         }
 
         return installDir
+    }
+
+    interface Actions {
+        /**
+         * Called when the distribution has been downloaded and prior to it being expanded.
+         */
+        fun onDownload(action: (Path) -> Unit)
+
+        /**
+         * Called when the distribution has been expanded and prior to it being made visible.
+         */
+        fun onInstall(action: (Path) -> Unit)
+    }
+
+    private class DefaultActions: Actions {
+        var install: (Path) -> Unit = {}
+        var download: (Path) -> Unit = {}
+
+        override fun onDownload(action: (Path) -> Unit) {
+            download = action
+        }
+
+        override fun onInstall(action: (Path) -> Unit) {
+            install = action
+        }
     }
 
     private sealed interface Format {

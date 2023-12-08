@@ -23,9 +23,9 @@ open class NativeBaseCliApplicationPlugin : Plugin<Project> {
                             app.addOutputBinary(machine, binaryFile)
                         }
                     }
+                    app.distribution.launcherFilePath.set(app.appName.map { HostMachine.current.exeName(it) })
+                    app.distribution.launcherFile.set(app.outputBinary)
                 }
-                app.distribution.launcherFilePath.set(app.appName.map { HostMachine.current.exeName(it) })
-                app.distribution.launcherFile.set(app.outputBinary)
             }
 
             val app = extensions.create(NativeApplication::class.java, "application", DefaultNativeCliApplication::class.java, multiplatformComponents)

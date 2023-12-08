@@ -22,7 +22,9 @@ open class ApplicationRegistry(private val project: Project) {
         dist.launcherFilePath.convention(app.appName)
 
         val distTask = project.tasks.register("dist", DistributionImage::class.java) { t ->
-            t.enabled = app.canBuildDistributionForHostMachine
+            t.onlyIf {
+                app.canBuildDistributionForHostMachine
+            }
             t.imageDirectory.set(dist.imageDirectory)
             t.rootDirPath.set(".")
         }

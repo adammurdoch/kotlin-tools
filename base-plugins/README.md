@@ -29,6 +29,11 @@ Builds a command-line application implemented in Kotlin multiplatform that targe
 
 Builds a UI application implemented in Kotlin multiplatform that targets native desktop platforms.
 
+## `net.rubygrapefruit.native.base-cli-app`
+
+Builds a CLI app implemented in Kotlin multiplatform. Does not define any targets, these have to be explicitly 
+defined.
+
 ## `net.rubygrapefruit.kmp.base-lib`
 
 Builds a library implemented in Kotlin multiplatform. Does not define any targets, these have to be explicitly 

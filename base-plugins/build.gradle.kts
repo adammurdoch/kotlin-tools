@@ -37,6 +37,10 @@ gradlePlugin {
             id = "net.rubygrapefruit.native.desktop-lib"
             implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.NativeDesktopLibraryPlugin"
         }
+        create("native-base-cli-app") {
+            id = "net.rubygrapefruit.native.base-cli-app"
+            implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.NativeBaseCliApplicationPlugin"
+        }
         create("native-cli-app") {
             id = "net.rubygrapefruit.native.cli-app"
             implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.NativeCliApplicationPlugin"

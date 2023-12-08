@@ -10,6 +10,9 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 open class MultiPlatformComponentRegistry(private val project: Project) {
     private val unixSourceSets = mutableSetOf<String>()
     private val unixTestSourceSets = mutableSetOf<String>()
+    private val machines = mutableSetOf<NativeMachine>()
+    val targetMachines: Set<NativeMachine>
+        get() = machines
 
     init {
         project.afterEvaluate {
@@ -55,6 +58,7 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
     }
 
     private fun native(targets: Set<NativeMachine>, config: KotlinNativeBinaryContainer.() -> Unit) {
+        machines.addAll(targets)
         with(project.kotlin) {
             if (targets.contains(NativeMachine.MacOSX64)) {
                 macosX64 {

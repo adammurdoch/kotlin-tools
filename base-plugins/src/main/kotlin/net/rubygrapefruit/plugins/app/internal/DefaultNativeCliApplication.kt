@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import javax.inject.Inject
 
 abstract class DefaultNativeCliApplication @Inject constructor(
+    private val componentRegistry: MultiPlatformComponentRegistry,
     factory: ObjectFactory,
     private val providers: ProviderFactory,
     private val project: Project
@@ -22,6 +23,18 @@ abstract class DefaultNativeCliApplication @Inject constructor(
 
     override val canBuildDistributionForHostMachine: Boolean
         get() = outputs.containsKey(HostMachine.current.machine)
+
+    override fun macOS() {
+        componentRegistry.macOS {
+            executable()
+        }
+    }
+
+    override fun nativeDesktop() {
+        componentRegistry.desktop {
+            executable()
+        }
+    }
 
     override val outputBinary: RegularFileProperty = factory.fileProperty()
 

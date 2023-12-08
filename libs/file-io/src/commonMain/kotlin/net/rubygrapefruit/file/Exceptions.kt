@@ -76,10 +76,10 @@ internal fun deleteDirectory(directory: Directory, cause: Throwable? = null): Fi
 /**
  * Tries to infer why a file could not be read.
  */
-internal fun <T> readFile(file: RegularFile, cause: Throwable? = null): Failed<T> {
+internal fun <T> readFile(file: RegularFile, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null): Failed<T> {
     val fileMetadata = file.metadata()
     return if (fileMetadata.regularFile) {
-        FailedOperation(FileSystemException("Could not read from ${file.absolutePath}", cause))
+        FailedOperation(FileSystemException("Could not read from ${file.absolutePath}", errorCode, cause))
     } else if (fileMetadata.missing) {
         readFileThatDoesNotExist(file.absolutePath, cause)
     } else {

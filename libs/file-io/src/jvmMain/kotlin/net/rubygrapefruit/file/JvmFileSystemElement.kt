@@ -123,7 +123,7 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
         } catch (e: NoSuchFileException) {
             readFileThatDoesNotExist(absolutePath, e)
         } catch (e: Exception) {
-            readFile(this, e)
+            readFile(this, cause = e)
         }
     }
 }

@@ -56,15 +56,15 @@ internal open class WinFileSystemElement(override val path: WinPath) : AbstractF
 
 internal class WinElementSnapshot(override val path: WinPath, override val metadata: ElementMetadata) : AbstractElementSnapshot() {
     override fun asDirectory(): Directory {
-        TODO("Not yet implemented")
+        return WinDirectory(path)
     }
 
     override fun asRegularFile(): RegularFile {
-        TODO("Not yet implemented")
+        return WinRegularFile(path)
     }
 
     override fun asSymLink(): SymLink {
-        TODO("Not yet implemented")
+        return WinSymLink(path)
     }
 }
 
@@ -212,8 +212,10 @@ internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), Regul
     }
 
     override fun delete() {
-        if (DeleteFileW(absolutePath) == 0) {
-            throw NativeException("Could not delete file $absolutePath.")
+        delete(this) { file ->
+            if (DeleteFileW(file.absolutePath) == 0) {
+                throw deleteFile(absolutePath, WinErrorCode.last())
+            }
         }
     }
 
@@ -221,7 +223,7 @@ internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), Regul
         memScoped {
             val handle = CreateFileW(absolutePath, GENERIC_WRITE.convert(), 0.convert(), null, CREATE_ALWAYS.convert(), FILE_ATTRIBUTE_NORMAL.convert(), null)
             if (handle == INVALID_HANDLE_VALUE) {
-                throw NativeException("Could not write to file $absolutePath")
+                throw writeToFile(this@WinRegularFile, WinErrorCode.last())
             }
             try {
                 FileBackedWriteStream(absolutePath, handle).write(bytes)
@@ -235,7 +237,11 @@ internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), Regul
         memScoped {
             val handle = CreateFileW(absolutePath, GENERIC_READ.convert(), 0.convert(), null, OPEN_EXISTING.convert(), FILE_ATTRIBUTE_NORMAL.convert(), null)
             if (handle == INVALID_HANDLE_VALUE) {
-                throw NativeException("Could not write to file $absolutePath")
+                return if (GetLastError().convert<Int>() == ERROR_FILE_NOT_FOUND) {
+                    readFileThatDoesNotExist(absolutePath)
+                } else {
+                    readFile(this@WinRegularFile, WinErrorCode.last())
+                }
             }
             try {
                 val buffer = CollectingBuffer()

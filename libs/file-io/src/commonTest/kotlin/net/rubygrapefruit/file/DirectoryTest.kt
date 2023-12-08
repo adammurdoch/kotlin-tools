@@ -45,28 +45,6 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
     }
 
     @Test
-    fun `can query metadata of missing directory`() {
-        val dir = fixture.testDir.dir("missing")
-        val result = dir.metadata()
-        assertIs<MissingEntry<*>>(result)
-        assertTrue(result.missing)
-    }
-
-    @Test
-    fun `can query snapshot of missing file`() {
-        val dir = fixture.testDir.dir("missing")
-
-        val result = dir.snapshot()
-        assertIs<MissingEntry<*>>(result)
-
-        val result2 = dir.path.snapshot()
-        assertIs<MissingEntry<*>>(result2)
-
-        val result3 = fixture.testDir.path.resolve(dir.name).snapshot()
-        assertIs<MissingEntry<*>>(result3)
-    }
-
-    @Test
     fun `can create temporary directory`() {
         val dir = fixture.dir("parent")
         val d1 = dir.createTemporaryDirectory()

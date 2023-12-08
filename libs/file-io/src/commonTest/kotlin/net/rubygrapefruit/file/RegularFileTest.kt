@@ -49,28 +49,6 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     }
 
     @Test
-    fun `can query metadata of missing file`() {
-        val file = fixture.testDir.file("missing")
-
-        val result = file.metadata()
-        assertIs<MissingEntry<*>>(result)
-        assertTrue(result.missing)
-    }
-
-    @Test
-    fun `can query snapshot of missing file`() {
-        val file = fixture.testDir.file("missing")
-        val result = file.snapshot()
-        assertIs<MissingEntry<*>>(result)
-
-        val result2 = file.path.snapshot()
-        assertIs<MissingEntry<*>>(result2)
-
-        val result3 = fixture.testDir.path.resolve(file.name).snapshot()
-        assertIs<MissingEntry<*>>(result3)
-    }
-
-    @Test
     fun `can write bytes to a file to create it`() {
         listOf("123".encodeToByteArray(), byteArrayOf()).forEachIndexed { index, bytes ->
             val file = fixture.testDir.file("file-$index")

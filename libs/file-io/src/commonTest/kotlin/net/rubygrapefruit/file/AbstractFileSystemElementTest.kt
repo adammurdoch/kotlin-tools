@@ -1,9 +1,6 @@
 package net.rubygrapefruit.file
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertIs
-import kotlin.test.assertNotEquals
+import kotlin.test.*
 
 abstract class AbstractFileSystemElementTest<T : FileSystemElement> : AbstractFileTest() {
     abstract fun create(name: String): T
@@ -26,6 +23,48 @@ abstract class AbstractFileSystemElementTest<T : FileSystemElement> : AbstractFi
         assertEquals(element.absolutePath, element.path.absolutePath)
         assertEquals(element.absolutePath, element.toString())
         assertEquals(element.absolutePath, element.path.toString())
+    }
+
+    @Test
+    fun `can query metadata of missing element`() {
+        val element = missing("missing")
+
+        val result = element.metadata()
+        assertIs<MissingEntry<*>>(result)
+        assertTrue(result.missing)
+    }
+
+    @Test
+    fun `can query snapshot of missing element`() {
+        val element = missing("missing")
+        val result = element.snapshot()
+        assertIs<MissingEntry<*>>(result)
+
+        val result2 = element.path.snapshot()
+        assertIs<MissingEntry<*>>(result2)
+
+        val result3 = fixture.testDir.path.resolve(element.name).snapshot()
+        assertIs<MissingEntry<*>>(result3)
+    }
+
+    @Test
+    fun `can coerce element to various element types`() {
+        val element = create("file")
+        element.toFile()
+        element.toDir()
+        element.toSymLink()
+    }
+
+    @Test
+    fun `can coerce snapshot to various element types`() {
+        val element = create("file")
+        val result = element.snapshot()
+        assertIs<Success<*>>(result)
+
+        val snapshot = result.get()
+        snapshot.toFile()
+        snapshot.toDir()
+        snapshot.toSymLink()
     }
 
     @Test

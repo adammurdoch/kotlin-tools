@@ -48,42 +48,42 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
         }
     }
 
-    fun desktop(config: KotlinNativeBinaryContainer.() -> Unit = {}) {
+    fun desktop(config: KotlinNativeBinaryContainer.(NativeMachine) -> Unit = {}) {
         macOS(config)
         native(setOf(NativeMachine.LinuxX64, NativeMachine.WindowsX64), config)
     }
 
-    fun macOS(config: KotlinNativeBinaryContainer.() -> Unit = {}) {
+    fun macOS(config: KotlinNativeBinaryContainer.(NativeMachine) -> Unit = {}) {
         native(setOf(NativeMachine.MacOSX64, NativeMachine.MacOSArm64), config)
     }
 
-    private fun native(targets: Set<NativeMachine>, config: KotlinNativeBinaryContainer.() -> Unit) {
+    private fun native(targets: Set<NativeMachine>, config: KotlinNativeBinaryContainer.(NativeMachine) -> Unit) {
         machines.addAll(targets)
         with(project.kotlin) {
             if (targets.contains(NativeMachine.MacOSX64)) {
                 macosX64 {
-                    config(binaries)
+                    config(binaries, NativeMachine.MacOSX64)
                 }
                 unixSourceSets.add("macosMain")
                 unixTestSourceSets.add("macosTest")
             }
             if (targets.contains(NativeMachine.MacOSArm64)) {
                 macosArm64 {
-                    config(binaries)
+                    config(binaries, NativeMachine.MacOSArm64)
                 }
                 unixSourceSets.add("macosMain")
                 unixTestSourceSets.add("macosTest")
             }
             if (targets.contains(NativeMachine.LinuxX64)) {
                 linuxX64 {
-                    config(binaries)
+                    config(binaries, NativeMachine.LinuxX64)
                 }
                 unixSourceSets.add("linuxMain")
                 unixTestSourceSets.add("linuxTest")
             }
             if (targets.contains(NativeMachine.WindowsX64)) {
                 mingwX64 {
-                    config(binaries)
+                    config(binaries, NativeMachine.WindowsX64)
                 }
             }
         }

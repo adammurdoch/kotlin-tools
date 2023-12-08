@@ -15,12 +15,12 @@ interface NativeApplication : Application, MultiPlatformComponent {
     fun macOS()
 
     /**
-     * The output binary for the host machine.
+     * The current set of native executables for this application.
      */
-    val outputBinary: Provider<RegularFile>
+    val executables: List<NativeExecutable>
 
     /**
-     * The output binary for the given machine, if buildable.
+     * The output binary for the host machine, if any.
      */
-    fun outputBinary(target: NativeMachine): Provider<RegularFile>
+    val outputBinary: Provider<RegularFile>
 }

@@ -1,4 +1,3 @@
-import net.rubygrapefruit.plugins.app.NativeMachine
 import net.rubygrapefruit.plugins.bootstrap.Versions
 
 plugins {
@@ -11,16 +10,13 @@ application {
     macOS()
 }
 
-afterEvaluate {
-    for (machine in listOf(NativeMachine.MacOSX64, NativeMachine.MacOSArm64)) {
-        configurations.create("outgoingNativeBinary${machine.name}") {
-            attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named("native-binary-${machine.kotlinTarget}"))
+for (executable in application.executables) {
+    if (executable.canBuild) {
+        configurations.create("outgoingNativeBinary${executable.targetMachine.name}") {
+            attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named("native-binary-${executable.targetMachine.kotlinTarget}"))
             isCanBeResolved = false
             isCanBeConsumed = true
-            val binary = application.outputBinary(machine)
-            if (binary.isPresent) {
-                outgoing.artifact(binary)
-            }
+            outgoing.artifact(executable.outputBinary)
         }
     }
 }

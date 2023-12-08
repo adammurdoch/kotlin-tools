@@ -20,7 +20,7 @@ open class NativeBaseCliApplicationPlugin : Plugin<Project> {
                             val nativeTarget = kotlin.targets.getByName(machine.kotlinTarget) as KotlinNativeTarget
                             val executable = nativeTarget.binaries.withType(Executable::class.java).first()
                             val binaryFile = layout.file(executable.linkTaskProvider.map { it.binary.outputFile })
-                            app.addOutputBinary(machine, binaryFile, HostMachine.current.machine == machine)
+                            app.addOutputBinary(machine, binaryFile)
                         }
                     }
                 }

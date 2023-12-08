@@ -9,5 +9,5 @@ abstract class DefaultNativeUiApplication @Inject constructor(factory: ObjectFac
     override val distribution: DefaultDistribution = factory.newInstance(DefaultDistribution::class.java)
 
     override val canBuildDistributionForHostMachine: Boolean
-        get() = true
+        get() = HostMachine.current is MacOS
 }

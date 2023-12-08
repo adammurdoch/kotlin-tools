@@ -1,7 +1,5 @@
 import net.rubygrapefruit.machine.info.Machine
 import java.io.ByteArrayOutputStream
-import java.io.PrintWriter
-import javax.annotation.RegEx
 
 sealed class Sample(val name: String, val baseDir: File, val srcDirName: String) {
     val dir = baseDir.resolve(name)
@@ -28,20 +26,37 @@ sealed class AppNature {
 
     abstract val cliLauncherPath: String?
 
+    open val launcherCommand: List<String>
+        get() = emptyList()
+
     abstract val nativeBinaryPath: String?
 }
 
-class JvmCliApp(override val cliLauncherPath: String, private val embeddedJvm: Boolean) : AppNature() {
+class JvmCliApp(private val name: String, private val embeddedJvm: Boolean) : AppNature() {
     override fun launcher(launcher: String): AppNature {
         return JvmCliApp(launcher, embeddedJvm)
     }
 
     override fun embedded(): AppNature {
-        return JvmCliApp(cliLauncherPath, true)
+        return JvmCliApp(name, true)
     }
 
+    override val cliLauncherPath: String
+        get() = if (Machine.thisMachine is Machine.Windows) {
+            "$name.bat"
+        } else {
+            name
+        }
+
+    override val launcherCommand: List<String>
+        get() = if (Machine.thisMachine is Machine.Windows) {
+            listOf("cmd", "/C")
+        } else {
+            emptyList()
+        }
+
     override fun native(): AppNature {
-        return NativeBinaryCliApp(cliLauncherPath)
+        return NativeBinaryCliApp(name)
     }
 
     override val distDirName: String
@@ -105,6 +120,12 @@ sealed class App(name: String, baseDir: File, val nature: AppNature, srcDirName:
 
     val cliLauncher = if (nature.cliLauncherPath != null) {
         distDir.resolve(nature.cliLauncherPath!!)
+    } else {
+        null
+    }
+
+    val commandLine = if (nature.cliLauncherPath != null) {
+        nature.launcherCommand + distDir.resolve(nature.cliLauncherPath!!)
     } else {
         null
     }
@@ -217,11 +238,12 @@ val runTasks = sampleApps.associateWith { app ->
                 }
                 println("binary: ${str.toString().lines()[3].split(Regex("\\s+"))[1]}")
             }
-            if (app.cliLauncher != null) {
+            if (app.commandLine != null) {
+                println("-> APP CLI: ${app.commandLine}")
                 println()
                 println("----")
                 exec {
-                    commandLine(app.cliLauncher.absolutePath, "1 + 2")
+                    commandLine(app.commandLine + "1 + 2")
                 }
                 println("----")
             } else {
@@ -241,12 +263,7 @@ tasks.register("runMin") {
 }
 
 fun jvmCliApp(name: String): BaseApp {
-    val launcher = if (Machine.thisMachine is Machine.Windows) {
-        "$name.bat"
-    } else {
-        name
-    }
-    return BaseApp(name, projectDir, JvmCliApp(launcher, false), "main")
+    return BaseApp(name, projectDir, JvmCliApp(name, false), "main")
 }
 
 fun jvmUiApp(name: String) = BaseApp(name, projectDir, UiApp(name.capitalize()), "main")

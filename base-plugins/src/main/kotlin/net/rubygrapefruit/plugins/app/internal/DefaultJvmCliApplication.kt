@@ -11,7 +11,7 @@ abstract class DefaultJvmCliApplication @Inject constructor(factory: ObjectFacto
     override val distribution: DefaultDistribution = factory.newInstance(DefaultDistribution::class.java)
 
     override val canBuildDistributionForHostMachine: Boolean
-        get() = true
+        get() = HostMachine.current is MacOS
 
     override var packaging: JvmApplicationPackaging = JvmApplicationWithExternalJvm()
 

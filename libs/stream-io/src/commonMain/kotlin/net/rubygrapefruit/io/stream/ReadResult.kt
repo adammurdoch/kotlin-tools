@@ -10,4 +10,4 @@ class ReadBytes(count: Int) : ReadResult, DefaultSuccess<Int, IOException>(count
 
 data object EndOfStream : ReadResult, DefaultSuccess<Unit, IOException>(Unit)
 
-class ReadFailure(exception: IOException) : ReadResult, DefaultFailure<Unit, IOException>(exception)
+class ReadFailed(exception: IOException) : ReadResult, DefaultFailure<Unit, IOException>(exception)

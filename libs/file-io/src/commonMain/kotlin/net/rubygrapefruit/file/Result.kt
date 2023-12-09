@@ -1,5 +1,7 @@
 package net.rubygrapefruit.file
 
+import net.rubygrapefruit.io.IOException
+
 sealed class Result<out T> {
     abstract fun get(): T
 
@@ -27,7 +29,7 @@ sealed class Failed<T> : Result<T>() {
         throw failure
     }
 
-    abstract val failure: FileSystemException
+    abstract val failure: IOException
 }
 
 /**
@@ -53,7 +55,7 @@ class UnsupportedOperation<T> internal constructor(private val path: String, pri
         get() = notSupported(path, operation)
 }
 
-class FailedOperation<T> internal constructor(override val failure: FileSystemException) : Failed<T>()
+class FailedOperation<T> internal constructor(override val failure: IOException) : Failed<T>()
 
 class Success<T> internal constructor(private val result: T) : Result<T>() {
     override fun get() = result

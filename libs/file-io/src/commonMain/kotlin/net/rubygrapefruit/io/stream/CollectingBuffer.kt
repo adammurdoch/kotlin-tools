@@ -1,6 +1,6 @@
 package net.rubygrapefruit.io.stream
 
-import net.rubygrapefruit.file.Failed
+import net.rubygrapefruit.file.FailedOperation
 import net.rubygrapefruit.file.Result
 import net.rubygrapefruit.file.Success
 
@@ -60,15 +60,18 @@ class CollectingBuffer {
 
         fun readFrom(stream: ReadStream, count: Int): Result<Boolean> {
             val result = stream.read(bytes, writePos, count)
-            if (result is Failed) {
-                return result.cast()
+            return when (result) {
+                is ReadFailed -> return FailedOperation(result.exception)
+                is EndOfStream -> Success(false)
+                is ReadBytes -> {
+                    val nread = result.get()
+                    if (nread < 0) {
+                        return Success(false)
+                    }
+                    writePos += nread
+                    return Success(true)
+                }
             }
-            val nread = result.get()
-            if (nread < 0) {
-                return Success(false)
-            }
-            writePos += nread
-            return Success(true)
         }
     }
 }

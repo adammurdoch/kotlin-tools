@@ -8,6 +8,7 @@ plugins {
 }
 
 include("download")
+include("stream-io")
 include("file-io")
 include("file-fixtures")
 include("process")

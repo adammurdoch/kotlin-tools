@@ -3,10 +3,7 @@
 package net.rubygrapefruit.process
 
 import kotlinx.cinterop.*
-import platform.posix.errno
-import platform.posix.execvp
-import platform.posix.fork
-import platform.posix.waitpid
+import platform.posix.*
 
 internal actual fun start(spec: ProcessStartSpec): Process {
     val pid = fork()
@@ -25,8 +22,18 @@ internal actual fun start(spec: ProcessStartSpec): Process {
             override fun waitFor() {
                 memScoped {
                     val exitCode = alloc<IntVar>()
-                    val result = waitpid(pid, exitCode.ptr, 0)
-                    println("-> COMPLETED WITH ${exitCode.value}")
+                    while (true) {
+                        val result = waitpid(pid, exitCode.ptr, 0)
+                        if (result == pid) {
+                            if (exitCode.value != 0) {
+                                throw RuntimeException("Command failed with exit code ${exitCode.value}")
+                            }
+                            return
+                        } else if (errno != EINTR) {
+                            throw RuntimeException("Could not wait for child process. errno = $errno")
+                        }
+                        // Interrupted, continue
+                    }
                 }
             }
         }

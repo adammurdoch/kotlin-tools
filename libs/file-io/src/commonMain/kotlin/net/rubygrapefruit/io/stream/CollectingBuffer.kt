@@ -1,8 +1,7 @@
 package net.rubygrapefruit.io.stream
 
-import net.rubygrapefruit.file.FailedOperation
-import net.rubygrapefruit.file.Result
-import net.rubygrapefruit.file.Success
+import net.rubygrapefruit.io.IOException
+import net.rubygrapefruit.io.Try
 
 class CollectingBuffer {
     private val head = Buffer(0)
@@ -11,7 +10,7 @@ class CollectingBuffer {
     /**
      * Reads the content of the given steam into this buffer.
      */
-    fun readFrom(stream: ReadStream): Result<Any> {
+    fun readFrom(stream: ReadStream): Try<Unit, IOException> {
         while (true) {
             var capacity = current.remaining
             if (capacity == 0) {
@@ -21,8 +20,12 @@ class CollectingBuffer {
                 capacity = current.remaining
             }
             val result = current.readFrom(stream, capacity)
-            if (result !is Success || !result.get()) {
-                return result
+            when (result) {
+                is EndOfStream -> return Try.succeeded(Unit)
+                is ReadFailed -> return Try.failed(result.exception)
+                is ReadBytes -> {
+                    // Continue
+                }
             }
         }
     }
@@ -58,19 +61,15 @@ class CollectingBuffer {
         val remaining: Int
             get() = bytes.size - writePos
 
-        fun readFrom(stream: ReadStream, count: Int): Result<Boolean> {
+        fun readFrom(stream: ReadStream, count: Int): ReadResult {
             val result = stream.read(bytes, writePos, count)
             return when (result) {
-                is ReadFailed -> return FailedOperation(result.exception)
-                is EndOfStream -> Success(false)
                 is ReadBytes -> {
-                    val nread = result.get()
-                    if (nread < 0) {
-                        return Success(false)
-                    }
-                    writePos += nread
-                    return Success(true)
+                    writePos += result.get()
+                    result
                 }
+
+                is ReadFailed, EndOfStream -> result
             }
         }
     }

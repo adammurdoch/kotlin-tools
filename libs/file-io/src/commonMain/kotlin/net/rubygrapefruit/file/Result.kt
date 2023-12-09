@@ -1,6 +1,7 @@
 package net.rubygrapefruit.file
 
 import net.rubygrapefruit.io.IOException
+import net.rubygrapefruit.io.Try
 
 sealed class Result<out T> {
     abstract fun get(): T

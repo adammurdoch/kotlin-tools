@@ -3,6 +3,7 @@
 package net.rubygrapefruit.file
 
 import kotlinx.cinterop.*
+import net.rubygrapefruit.io.TryFailure
 import net.rubygrapefruit.io.stream.CollectingBuffer
 import net.rubygrapefruit.io.stream.FileBackedReadStream
 import net.rubygrapefruit.io.stream.FileBackedWriteStream
@@ -149,8 +150,8 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
                 val buffer = CollectingBuffer()
                 val stream = FileBackedReadStream(path.absolutePath, des)
                 val result = buffer.readFrom(stream)
-                if (result is Failed) {
-                    result.cast()
+                if (result is TryFailure) {
+                    FailedOperation(result.exception)
                 } else {
                     Success(action(buffer))
                 }

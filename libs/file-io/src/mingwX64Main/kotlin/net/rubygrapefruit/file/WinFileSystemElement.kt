@@ -3,6 +3,7 @@
 package net.rubygrapefruit.file
 
 import kotlinx.cinterop.*
+import net.rubygrapefruit.io.TryFailure
 import net.rubygrapefruit.io.stream.CollectingBuffer
 import platform.windows.*
 
@@ -245,7 +246,12 @@ internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), Regul
             }
             try {
                 val buffer = CollectingBuffer()
-                return buffer.readFrom(FileBackedReadStream(absolutePath, handle)).map { buffer.toByteArray() }
+                val result = buffer.readFrom(FileBackedReadStream(absolutePath, handle))
+                return if (result is TryFailure) {
+                    FailedOperation(result.exception)
+                } else {
+                    Success(buffer.toByteArray())
+                }
             } finally {
                 CloseHandle(handle)
             }

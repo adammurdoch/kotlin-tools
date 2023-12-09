@@ -5,6 +5,8 @@ package net.rubygrapefruit.file
 import kotlinx.cinterop.*
 import net.rubygrapefruit.io.TryFailure
 import net.rubygrapefruit.io.stream.CollectingBuffer
+import net.rubygrapefruit.io.stream.FileBackedReadStream
+import net.rubygrapefruit.io.stream.FileBackedWriteStream
 import platform.windows.*
 
 internal open class WinFileSystemElement(override val path: WinPath) : AbstractFileSystemElement() {

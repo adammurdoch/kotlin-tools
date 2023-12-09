@@ -1,12 +1,9 @@
 @file:OptIn(ExperimentalForeignApi::class)
 
-package net.rubygrapefruit.file
+package net.rubygrapefruit.io.stream
 
 import kotlinx.cinterop.*
-import net.rubygrapefruit.io.stream.EndOfStream
-import net.rubygrapefruit.io.stream.ReadBytes
-import net.rubygrapefruit.io.stream.ReadResult
-import net.rubygrapefruit.io.stream.ReadStream
+import net.rubygrapefruit.file.NativeException
 import platform.windows.DWORD
 import platform.windows.DWORDVar
 import platform.windows.HANDLE

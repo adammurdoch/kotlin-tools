@@ -1,9 +1,9 @@
 @file:OptIn(ExperimentalForeignApi::class)
 
-package net.rubygrapefruit.file
+package net.rubygrapefruit.io.stream
 
 import kotlinx.cinterop.*
-import net.rubygrapefruit.io.stream.WriteStream
+import net.rubygrapefruit.file.NativeException
 import platform.windows.DWORDVar
 import platform.windows.HANDLE
 import platform.windows.WriteFile

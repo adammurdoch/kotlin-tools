@@ -1,13 +1,13 @@
-package net.rubygrapefruit.file
+package net.rubygrapefruit.io
 
-internal interface ErrorCode {
+interface ErrorCode {
     /**
      * Can be empty.
      */
     val formatted: String
 }
 
-internal object NoErrorCode : ErrorCode {
+data object NoErrorCode : ErrorCode {
     override val formatted: String
         get() = ""
 }

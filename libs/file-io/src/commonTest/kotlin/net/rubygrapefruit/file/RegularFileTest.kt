@@ -1,5 +1,6 @@
 package net.rubygrapefruit.file
 
+import net.rubygrapefruit.io.IOException
 import kotlin.test.*
 
 class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
@@ -177,7 +178,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         assertIs<MissingEntry<*>>(result)
         try {
             result.get()
-        } catch (e: FileSystemException) {
+        } catch (e: IOException) {
             assertEquals("Could not read from file $file as it does not exist.", e.message)
         }
     }
@@ -190,7 +191,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         assertIs<FailedOperation<*>>(result)
         try {
             result.get()
-        } catch (e: FileSystemException) {
+        } catch (e: IOException) {
             assertEquals("Could not read from file $file as it is not a file.", e.message)
         }
     }

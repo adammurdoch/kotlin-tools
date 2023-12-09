@@ -1,5 +1,6 @@
 package net.rubygrapefruit.file
 
+import net.rubygrapefruit.io.ErrorCode
 import net.rubygrapefruit.io.IOException
 
 /**

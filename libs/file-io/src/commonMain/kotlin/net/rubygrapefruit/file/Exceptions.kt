@@ -1,5 +1,8 @@
 package net.rubygrapefruit.file
 
+import net.rubygrapefruit.io.ErrorCode
+import net.rubygrapefruit.io.NoErrorCode
+
 internal fun missingElement(path: String, cause: Throwable? = null) = FileSystemException("File $path does not exist.", cause)
 
 internal fun unreadableElement(path: String, cause: Throwable? = null) = FileSystemException("File $path is not readable.", cause)

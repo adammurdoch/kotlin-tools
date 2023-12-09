@@ -3,13 +3,12 @@
 package net.rubygrapefruit.io.stream
 
 import kotlinx.cinterop.*
-import net.rubygrapefruit.file.FileSystemException
-import net.rubygrapefruit.file.UnixErrorCode
+import net.rubygrapefruit.io.UnixErrorCode
 import net.rubygrapefruit.io.IOException
 import platform.posix.FILE
 import platform.posix.fwrite
 
-internal class FileBackedWriteStream(private val path: String, private val file: CPointer<FILE>) : WriteStream {
+class FileBackedWriteStream(private val path: String, private val file: CPointer<FILE>) : WriteStream {
     override fun write(bytes: ByteArray, offset: Int, count: Int) {
         if (count > 0) {
             memScoped {

@@ -4,6 +4,7 @@ package net.rubygrapefruit.file
 
 import kotlinx.cinterop.*
 import net.rubygrapefruit.io.TryFailure
+import net.rubygrapefruit.io.UnixErrorCode
 import net.rubygrapefruit.io.stream.CollectingBuffer
 import net.rubygrapefruit.io.stream.FileBackedReadStream
 import net.rubygrapefruit.io.stream.FileBackedWriteStream

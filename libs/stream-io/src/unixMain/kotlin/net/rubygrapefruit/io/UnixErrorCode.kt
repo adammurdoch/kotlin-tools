@@ -1,14 +1,13 @@
 @file:OptIn(ExperimentalForeignApi::class)
 
-package net.rubygrapefruit.file
+package net.rubygrapefruit.io
 
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.toKString
-import net.rubygrapefruit.io.ErrorCode
 import platform.posix.errno
 import platform.posix.strerror
 
-internal class UnixErrorCode(private val code: Int) : ErrorCode {
+class UnixErrorCode(private val code: Int) : ErrorCode {
     companion object {
         fun last() = UnixErrorCode(errno)
     }

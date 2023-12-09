@@ -7,7 +7,7 @@ import platform.posix.EINTR
 import platform.posix.errno
 import platform.posix.waitpid
 
-internal class UnixProcess(private val pid: Int) : Process {
+internal class UnixProcess(private val pid: Int) : ProcessControl {
     override fun waitFor() {
         memScoped {
             val exitCode = alloc<IntVar>()

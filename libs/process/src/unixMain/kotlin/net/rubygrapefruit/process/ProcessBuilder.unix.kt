@@ -7,7 +7,7 @@ import platform.posix.errno
 import platform.posix.execvp
 import platform.posix.fork
 
-internal actual fun start(spec: ProcessStartSpec): Process {
+internal actual fun start(spec: ProcessStartSpec): ProcessControl {
     val pid = fork()
     when {
         pid == 0 -> exec(spec)

@@ -1,20 +1,24 @@
 package net.rubygrapefruit.process
 
-interface Process {
+interface Process<T> {
     /**
      * Blocks until the process completes.
      */
-    fun waitFor()
+    fun waitFor(): T
 
     companion object {
         /**
          * Starts a process with the given command-line. The command is interpreted as if provided to the shell.
          */
-        fun start(commandLine: List<String>, config: ProcessBuilder.() -> Unit = {}): Process {
-            val builder = DefaultProcessBuilder()
-            builder.commandLine(commandLine)
-            config(builder)
-            return builder.start()
+        fun start(commandLine: List<String>): Process<Unit> {
+            return command(commandLine).start()
+        }
+
+        /**
+         * Returns a process builder for the given command-line. The command is interpreted as if provided to the shell.
+         */
+        fun command(commandLine: List<String>): ProcessBuilder {
+            return DefaultProcessBuilder(commandLine)
         }
     }
 }

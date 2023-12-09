@@ -1,22 +1,32 @@
 package net.rubygrapefruit.process
 
 interface ProcessBuilder {
-    fun commandLine(commandLine: List<String>)
+    fun start(): Process<Unit>
+
+    fun startAndCollectOutput(): Process<String>
 }
 
-internal class DefaultProcessBuilder : ProcessBuilder {
-    private val commandLine = mutableListOf<String>()
-
-    override fun commandLine(commandLine: List<String>) {
-        this.commandLine.clear()
-        this.commandLine.addAll(commandLine)
+internal class DefaultProcessBuilder(private val commandLine: List<String>) : ProcessBuilder {
+    override fun start(): Process<Unit> {
+        return ProcessWithNoResult(start(ProcessStartSpec(commandLine)))
     }
 
-    fun start(): Process {
-        return start(ProcessStartSpec(commandLine))
+    override fun startAndCollectOutput(): Process<String> {
+        TODO("Not yet implemented")
     }
 }
 
-internal class ProcessStartSpec(val commandLine: List<String>)
+internal abstract class AbstractProcess<T>(private val control: ProcessControl) : Process<T> {
+    override fun waitFor(): T {
+        control.waitFor()
+        return result()
+    }
 
-internal expect fun start(spec: ProcessStartSpec): Process
+    protected abstract fun result(): T
+}
+
+internal class ProcessWithNoResult(control: ProcessControl) : AbstractProcess<Unit>(control) {
+    override fun result() {
+        return Unit
+    }
+}

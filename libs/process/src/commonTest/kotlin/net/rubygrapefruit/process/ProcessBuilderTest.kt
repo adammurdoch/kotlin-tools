@@ -81,13 +81,13 @@ class ProcessBuilderTest {
 
     @Test
     fun `can run command and act on input and output`() {
-        val result = Process.command("echo").withInputAndOutput { read, write ->
-            write.write("greetings".encodeToByteArray())
+        val result = Process.command("head", "-n", "1").withInputAndOutput { read, write ->
+            write.write("greetings\nignore this\n".encodeToByteArray())
             val buffer = CollectingBuffer()
             buffer.readFrom(read)
             buffer.decodeToString()
         }.start().waitFor()
 
-        assertEquals("greeting", result)
+        assertEquals("greetings\n", result)
     }
 }

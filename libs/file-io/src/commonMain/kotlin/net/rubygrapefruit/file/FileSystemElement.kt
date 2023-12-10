@@ -42,10 +42,16 @@ interface RegularFile : FileSystemElement {
     fun delete()
 
     /**
-     * Writes the given bytes to the file.
+     * Writes the given bytes to the file, replacing its content.
      */
     @Throws(FileSystemException::class)
     fun writeBytes(bytes: ByteArray)
+
+    /**
+     * Writes the given text to the file, replacing it content. The text is encoded using UTF-8.
+     */
+    @Throws(FileSystemException::class)
+    fun writeText(text: String)
 
     /**
      * Reads bytes from the file.
@@ -53,13 +59,7 @@ interface RegularFile : FileSystemElement {
     fun readBytes(): Result<ByteArray>
 
     /**
-     * Writes the given text to the file, using UTF-8 encoding.
-     */
-    @Throws(FileSystemException::class)
-    fun writeText(text: String)
-
-    /**
-     * Reads text from the file, using UTF-8 encoding.
+     * Reads text from the file. The file content is decoded using UTF-8.
      */
     fun readText(): Result<String>
 }

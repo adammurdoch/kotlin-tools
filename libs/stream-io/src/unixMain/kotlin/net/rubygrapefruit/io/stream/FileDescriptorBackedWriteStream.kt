@@ -10,7 +10,7 @@ import net.rubygrapefruit.io.IOException
 import net.rubygrapefruit.io.UnixErrorCode
 import platform.posix.write
 
-class FileDescriptorBackedWriteStream(private val path: String, private val descriptor: FileDescriptor) : WriteStream {
+class FileDescriptorBackedWriteStream(private val source: Source, private val descriptor: WriteDescriptor) : WriteStream {
     override fun write(bytes: ByteArray, offset: Int, count: Int) {
         memScoped {
             var pos = offset
@@ -18,7 +18,7 @@ class FileDescriptorBackedWriteStream(private val path: String, private val desc
             while (remaining > 0) {
                 val bytesWritten = write(descriptor.descriptor, bytes.refTo(pos), remaining.convert()).convert<Int>()
                 if (bytesWritten < 0) {
-                    throw IOException("Could not write to file $path.", UnixErrorCode.last())
+                    throw IOException("Could not write to ${source.displayName}.", UnixErrorCode.last())
                 }
                 pos += bytesWritten
                 remaining -= bytesWritten

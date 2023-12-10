@@ -121,7 +121,7 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
                 throw writeToFile(this@UnixRegularFile, UnixErrorCode.last())
             }
             try {
-                action(FileDescriptorBackedWriteStream(path.absolutePath, FileDescriptor(des)))
+                action(FileDescriptorBackedWriteStream(FileSource(path), WriteDescriptor(des)))
             } finally {
                 close(des)
             }
@@ -148,7 +148,7 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
             }
             try {
                 val buffer = CollectingBuffer()
-                val stream = FileDescriptorBackedReadStream(FileSource(path), FileDescriptor(des))
+                val stream = FileDescriptorBackedReadStream(FileSource(path), ReadDescriptor(des))
                 val result = buffer.readFrom(stream)
                 if (result is TryFailure) {
                     FailedOperation(result.exception)

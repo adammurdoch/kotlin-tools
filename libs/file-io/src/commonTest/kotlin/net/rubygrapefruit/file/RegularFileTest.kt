@@ -107,6 +107,23 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     }
 
     @Test
+    fun `can write long string to an existing file`() {
+        val file = fixture.testDir.file("file")
+        file.writeText("1234")
+        assertTrue(file.metadata().regularFile)
+
+        val longString = (0..2000).joinToString(",")
+
+        file.writeText(longString)
+
+        val metadata = file.metadata().get()
+        assertIs<RegularFileMetadata>(metadata)
+        assertEquals(longString.length.toLong(), metadata.size)
+
+        assertEquals(longString, file.readText().get())
+    }
+
+    @Test
     fun `cannot write to a file that exists as a directory`() {
         val file = fixture.dir("dir1").toFile()
 

@@ -10,12 +10,17 @@ import platform.posix.EINTR
 import platform.posix.errno
 import platform.posix.waitpid
 
-internal class UnixProcess(private val spec: ProcessStartSpec, private val pid: Int, private val stdoutDescriptor: FileDescriptor?) : ProcessControl {
+internal class UnixProcess(
+    private val spec: ProcessStartSpec,
+    private val pid: Int,
+    private val stdoutDescriptor: ReadDescriptor?,
+    private val stdinDescriptor: WriteDescriptor?
+) : ProcessControl {
     override val stdout: ReadStream
         get() = FileDescriptorBackedReadStream(ProcessSource, stdoutDescriptor!!)
 
     override val stdin: WriteStream
-        get() = TODO("Not yet implemented")
+        get() = FileDescriptorBackedWriteStream(ProcessSource, stdinDescriptor!!)
 
     override fun waitFor(): Int {
         try {
@@ -24,6 +29,7 @@ internal class UnixProcess(private val spec: ProcessStartSpec, private val pid: 
             }
         } finally {
             stdoutDescriptor?.close()
+            stdinDescriptor?.close()
         }
     }
 

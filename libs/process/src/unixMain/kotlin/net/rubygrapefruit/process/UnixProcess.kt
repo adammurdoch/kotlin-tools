@@ -3,15 +3,17 @@
 package net.rubygrapefruit.process
 
 import kotlinx.cinterop.*
+import net.rubygrapefruit.io.IOException
+import net.rubygrapefruit.io.UnixErrorCode
+import net.rubygrapefruit.io.stream.FileDescriptor
 import net.rubygrapefruit.io.stream.FileDescriptorBackedReadStream
 import net.rubygrapefruit.io.stream.ReadStream
 import net.rubygrapefruit.io.stream.Source
 import platform.posix.EINTR
-import platform.posix.close
 import platform.posix.errno
 import platform.posix.waitpid
 
-internal class UnixProcess(private val pid: Int, private val stdoutDescriptor: Int?) : ProcessControl {
+internal class UnixProcess(private val pid: Int, private val stdoutDescriptor: FileDescriptor?) : ProcessControl {
     override val stdout: ReadStream
         get() = FileDescriptorBackedReadStream(ProcessSource, stdoutDescriptor!!)
 
@@ -22,18 +24,16 @@ internal class UnixProcess(private val pid: Int, private val stdoutDescriptor: I
                 val result = waitpid(pid, exitCode.ptr, 0)
                 if (result == pid) {
                     if (exitCode.value != 0) {
-                        throw RuntimeException("Command failed with exit code ${exitCode.value}")
+                        throw IOException("Command failed with exit code ${exitCode.value}")
                     }
                     return
                 } else if (errno != EINTR) {
-                    throw RuntimeException("Could not wait for child process. errno = $errno")
+                    throw IOException("Could not wait for child process.", UnixErrorCode.last())
                 }
                 // Interrupted, continue
             }
         }
-        if (stdoutDescriptor != null) {
-            close(stdoutDescriptor)
-        }
+        stdoutDescriptor?.close()
     }
 
     private object ProcessSource : Source {

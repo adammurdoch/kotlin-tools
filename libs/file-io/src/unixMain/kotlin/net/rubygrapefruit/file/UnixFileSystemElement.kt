@@ -146,7 +146,7 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
             }
             try {
                 val buffer = CollectingBuffer()
-                val stream = FileDescriptorBackedReadStream(FileSource(path), des)
+                val stream = FileDescriptorBackedReadStream(FileSource(path), FileDescriptor(des))
                 val result = buffer.readFrom(stream)
                 if (result is TryFailure) {
                     FailedOperation(result.exception)

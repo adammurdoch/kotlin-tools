@@ -24,7 +24,7 @@ internal actual fun start(spec: ProcessStartSpec): ProcessControl {
     val pid = fork()
     return when {
         pid == 0 -> exec(spec, pipeDescriptors)
-        pid > 0 -> processControl(pid, pipeDescriptors)
+        pid > 0 -> processControl(spec, pid, pipeDescriptors)
         else -> {
             pipeDescriptors?.close()
             throw IOException("Could not fork child process.", UnixErrorCode.last())
@@ -39,12 +39,12 @@ private class Descriptors(val read: FileDescriptor, val write: FileDescriptor) {
     }
 }
 
-private fun processControl(pid: Int, pipe: Descriptors?): ProcessControl {
+private fun processControl(spec: ProcessStartSpec, pid: Int, pipe: Descriptors?): ProcessControl {
     return if (pipe != null) {
         pipe.write.close()
-        UnixProcess(pid, pipe.read)
+        UnixProcess(spec, pid, pipe.read)
     } else {
-        UnixProcess(pid, null)
+        UnixProcess(spec, pid, null)
     }
 }
 

@@ -13,27 +13,34 @@ import platform.posix.EINTR
 import platform.posix.errno
 import platform.posix.waitpid
 
-internal class UnixProcess(private val pid: Int, private val stdoutDescriptor: FileDescriptor?) : ProcessControl {
+internal class UnixProcess(private val spec: ProcessStartSpec, private val pid: Int, private val stdoutDescriptor: FileDescriptor?) : ProcessControl {
     override val stdout: ReadStream
         get() = FileDescriptorBackedReadStream(ProcessSource, stdoutDescriptor!!)
 
-    override fun waitFor() {
-        memScoped {
-            val exitCode = alloc<IntVar>()
-            while (true) {
-                val result = waitpid(pid, exitCode.ptr, 0)
-                if (result == pid) {
-                    if (exitCode.value != 0) {
-                        throw IOException("Command failed with exit code ${exitCode.value}")
-                    }
-                    return
-                } else if (errno != EINTR) {
-                    throw IOException("Could not wait for child process.", UnixErrorCode.last())
-                }
-                // Interrupted, continue
+    override fun waitFor(): Int {
+        try {
+            return memScoped {
+                waitAndGetExitCode()
             }
+        } finally {
+            stdoutDescriptor?.close()
         }
-        stdoutDescriptor?.close()
+    }
+
+    private fun MemScope.waitAndGetExitCode(): Int {
+        val exitCode = alloc<IntVar>()
+        while (true) {
+            val result = waitpid(pid, exitCode.ptr, 0)
+            if (result == pid) {
+                if (spec.checkExitCode && exitCode.value != 0) {
+                    throw IOException("Command failed with exit code ${exitCode.value}")
+                }
+                return exitCode.value
+            } else if (errno != EINTR) {
+                throw IOException("Could not wait for child process.", UnixErrorCode.last())
+            }
+            // Interrupted, continue
+        }
     }
 
     private object ProcessSource : Source {

@@ -17,10 +17,19 @@ interface ProcessBuilder : ProcessStarter<Unit> {
      */
     override fun start(): Process<Unit>
 
+    /**
+     * Collect the output of the child process into a String.
+     */
     fun collectOutput(): ProcessStarter<String>
 
+    /**
+     * Collect the exit code of the child process.
+     */
     fun collectExitCode(): ProcessStarter<Int>
 
+    /**
+     * Uses the given action to read from and write to the child process to produce a result.
+     */
     fun <T> withInputAndOutput(action: (ReadStream, WriteStream) -> T): ProcessStarter<T>
 }
 

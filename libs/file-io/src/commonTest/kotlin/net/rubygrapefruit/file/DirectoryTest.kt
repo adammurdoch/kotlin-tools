@@ -312,10 +312,11 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
             symLink("link", file.absolutePath)
         }
 
-        assertEquals("content", dir.file("link").readText().get())
+        assertTrue(file.metadata().regularFile)
 
         dir.deleteRecursively()
 
+        assertTrue(dir.metadata().missing)
         assertTrue(file.metadata().regularFile)
     }
 

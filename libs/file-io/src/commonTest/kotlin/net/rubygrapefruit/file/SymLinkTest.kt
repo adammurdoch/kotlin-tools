@@ -71,7 +71,8 @@ class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
 
         link.writeSymLink(file.name)
 
-        assertEquals("1234", fixture.testDir.file("link").readText().get())
+        assertIs<SymlinkMetadata>(link.metadata().get())
+        assertEquals(file.name, link.readSymLink().get())
     }
 
     @Test

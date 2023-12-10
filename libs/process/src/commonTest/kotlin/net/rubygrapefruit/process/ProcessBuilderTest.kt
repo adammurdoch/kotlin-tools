@@ -1,10 +1,9 @@
-package net.reubgrapefruit.process
+package net.rubygrapefruit.process
 
 import net.rubygrapefruit.file.fileSystem
 import net.rubygrapefruit.file.fixtures.FilesFixture
 import net.rubygrapefruit.io.IOException
 import net.rubygrapefruit.io.stream.CollectingBuffer
-import net.rubygrapefruit.process.Process
 import kotlin.test.*
 
 class ProcessBuilderTest {

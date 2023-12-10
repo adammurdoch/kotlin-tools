@@ -110,19 +110,20 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
         }
     }
 
+    @OptIn(UnsafeNumber::class)
     private fun writing(action: (WriteStream) -> Unit) {
         memScoped {
-            val des = fopen(path.absolutePath, "w")
-            if (des == null) {
+            val des = open(path.absolutePath, O_WRONLY or O_CREAT or O_TRUNC or O_NOFOLLOW, PosixPermissions.readWriteFile.mode.convert<mode_t>())
+            if (des < 0) {
                 if (errno == EISDIR) {
                     throw writeFileThatExistsAndIsNotAFile(path.absolutePath)
                 }
                 throw writeToFile(this@UnixRegularFile, UnixErrorCode.last())
             }
             try {
-                action(FileBackedWriteStream(path.absolutePath, des))
+                action(FileDescriptorBackedWriteStream(path.absolutePath, FileDescriptor(des)))
             } finally {
-                fclose(des)
+                close(des)
             }
         }
     }
@@ -137,12 +138,13 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
 
     private fun <T> reading(action: (CollectingBuffer) -> T): Result<T> {
         return memScoped {
-            val des = open(path.absolutePath, O_RDONLY)
+            val des = open(path.absolutePath, O_RDONLY or O_NOFOLLOW)
             if (des < 0) {
-                if (errno == ENOENT) {
-                    return readFileThatDoesNotExist(path.absolutePath)
+                return if (errno == ENOENT) {
+                    readFileThatDoesNotExist(path.absolutePath)
+                } else {
+                    readFile(this@UnixRegularFile, UnixErrorCode.last())
                 }
-                throw NativeException("Could not read from $path.")
             }
             try {
                 val buffer = CollectingBuffer()

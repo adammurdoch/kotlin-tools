@@ -1,8 +1,14 @@
 package net.rubygrapefruit.process
 
+import net.rubygrapefruit.file.Directory
 import net.rubygrapefruit.io.stream.CollectingBuffer
 
 interface ProcessBuilder {
+    /**
+     * Specifies the directory to start the process in. Defaults to the current directory of this process.
+     */
+    fun directory(dir: Directory): ProcessBuilder
+
     fun start(): Process<Unit>
 
     fun startAndCollectOutput(): Process<String>
@@ -11,16 +17,23 @@ interface ProcessBuilder {
 }
 
 internal class DefaultProcessBuilder(private val commandLine: List<String>) : ProcessBuilder {
+    private var dir: Directory? = null
+
+    override fun directory(dir: Directory): ProcessBuilder {
+        this.dir = dir
+        return this
+    }
+
     override fun start(): Process<Unit> {
-        return ProcessWithNoResult(start(ProcessStartSpec(commandLine, false, true)))
+        return ProcessWithNoResult(start(ProcessStartSpec(commandLine, dir, false, true)))
     }
 
     override fun startAndCollectOutput(): Process<String> {
-        return ProcessWithStringResult(start(ProcessStartSpec(commandLine, true, true)))
+        return ProcessWithStringResult(start(ProcessStartSpec(commandLine, dir, true, true)))
     }
 
     override fun startAndGetExitCode(): Process<Int> {
-        return ProcessWithExitCodeResult(start(ProcessStartSpec(commandLine, false, false)))
+        return ProcessWithExitCodeResult(start(ProcessStartSpec(commandLine, dir, false, false)))
     }
 }
 

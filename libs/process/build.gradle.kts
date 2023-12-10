@@ -7,6 +7,7 @@ group = "net.rubygrapefruit.libs"
 library {
     nativeDesktop()
     common {
+        api(project(":file-io"))
         implementation(project(":stream-io"))
     }
     test {

@@ -1,11 +1,19 @@
 package net.reubgrapefruit.process
 
 import net.rubygrapefruit.file.fileSystem
+import net.rubygrapefruit.file.fixtures.FilesFixture
 import net.rubygrapefruit.io.IOException
 import net.rubygrapefruit.process.Process
 import kotlin.test.*
 
 class ProcessBuilderTest {
+    private val fixture = FilesFixture()
+
+    @AfterTest
+    fun cleanup() {
+        fixture.testDir.deleteRecursively()
+    }
+
     @Test
     fun `can run command`() {
         Process.start(listOf("pwd")).waitFor()
@@ -48,8 +56,26 @@ class ProcessBuilderTest {
         val pwd = Process.command(listOf("pwd")).startAndCollectOutput().waitFor()
         assertEquals(fileSystem.currentDirectory.absolutePath, pwd.trim())
 
-        val ls = Process.command(listOf("ls")).startAndCollectOutput().waitFor()
-        println("ls output: $ls")
-        assertTrue(ls.isNotEmpty())
+        val dir = fixture.dir("test") {
+            file("1")
+            file("2")
+        }
+
+        val ls = Process.command(listOf("ls", dir.absolutePath)).startAndCollectOutput().waitFor()
+        assertEquals(listOf("1", "2"), ls.trim().lines().sorted())
+    }
+
+    @Test
+    fun `can run command in directory`() {
+        val dir = fixture.dir("test") {
+            file("1")
+            file("2")
+        }
+
+        val pwd = Process.command(listOf("pwd")).directory(dir).startAndCollectOutput().waitFor()
+        assertEquals(dir.absolutePath, pwd.trim())
+
+        val ls = Process.command(listOf("ls")).directory(dir).startAndCollectOutput().waitFor()
+        assertEquals(listOf("1", "2"), ls.trim().lines().sorted())
     }
 }

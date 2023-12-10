@@ -55,6 +55,9 @@ private fun exec(spec: ProcessStartSpec, pipe: Descriptors?): Nothing {
             if (dup2(pipe.write.descriptor, STDOUT_FILENO) == -1) {
                 throw IOException("Could initialize stdout.", UnixErrorCode.last())
             }
+            if (spec.directory != null) {
+                chdir(spec.directory.absolutePath)
+            }
         }
         val args = allocArray<CPointerVar<ByteVar>>(spec.commandLine.size + 1)
         for (index in spec.commandLine.indices) {

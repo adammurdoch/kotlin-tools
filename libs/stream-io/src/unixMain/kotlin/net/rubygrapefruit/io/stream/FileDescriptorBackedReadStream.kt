@@ -10,14 +10,14 @@ import platform.posix.EISDIR
 import platform.posix.errno
 import platform.posix.read
 
-class FileBackedReadStream(private val path: String, private val des: Int) : ReadStream {
+class FileDescriptorBackedReadStream(private val source: Source, private val des: Int) : ReadStream {
     override fun read(buffer: ByteArray, offset: Int, max: Int): ReadResult {
         val nread = read(des, buffer.refTo(offset), max.convert()).convert<Int>()
         if (nread < 0) {
             if (errno == EISDIR) {
-                return ReadFailed.isNotFile(path)
+                return ReadFailed.isNotFile(source)
             } else {
-                return ReadFailed.readFile(path, UnixErrorCode.last())
+                return ReadFailed.readFile(source, UnixErrorCode.last())
             }
         }
         if (nread == 0) {

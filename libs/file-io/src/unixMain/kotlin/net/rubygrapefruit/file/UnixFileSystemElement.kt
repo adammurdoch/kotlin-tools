@@ -5,10 +5,7 @@ package net.rubygrapefruit.file
 import kotlinx.cinterop.*
 import net.rubygrapefruit.io.TryFailure
 import net.rubygrapefruit.io.UnixErrorCode
-import net.rubygrapefruit.io.stream.CollectingBuffer
-import net.rubygrapefruit.io.stream.FileBackedReadStream
-import net.rubygrapefruit.io.stream.FileBackedWriteStream
-import net.rubygrapefruit.io.stream.WriteStream
+import net.rubygrapefruit.io.stream.*
 import platform.posix.*
 
 internal open class UnixFileSystemElement(override val path: AbsolutePath) : AbstractFileSystemElement() {
@@ -149,7 +146,7 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
             }
             try {
                 val buffer = CollectingBuffer()
-                val stream = FileBackedReadStream(path.absolutePath, des)
+                val stream = FileDescriptorBackedReadStream(FileSource(path), des)
                 val result = buffer.readFrom(stream)
                 if (result is TryFailure) {
                     FailedOperation(result.exception)
@@ -160,6 +157,11 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
                 close(des)
             }
         }
+    }
+
+    internal class FileSource(val path: AbsolutePath) : Source {
+        override val displayName: String
+            get() = "file $path"
     }
 }
 

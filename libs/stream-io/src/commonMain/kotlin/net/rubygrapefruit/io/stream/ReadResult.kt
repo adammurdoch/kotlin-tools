@@ -14,8 +14,12 @@ data object EndOfStream : ReadResult, DefaultSuccess<Unit, IOException>(Unit)
 class ReadFailed(exception: IOException) : ReadResult, DefaultFailure<Unit, IOException>(exception) {
     companion object {
 
-        fun isNotFile(path: String ) = ReadFailed(IOException("Could not read from file $path as it is not a file."))
+        fun isNotFile(source: Source) = ReadFailed(IOException("Could not read from ${source.displayName} as it is not a file."))
 
-        fun readFile(path: String, errorCode: ErrorCode) = ReadFailed(IOException("Could not read from file $path.", errorCode))
+        fun readFile(source: Source, errorCode: ErrorCode) = ReadFailed(IOException("Could not read from ${source.displayName}.", errorCode))
     }
+}
+
+interface Source {
+    val displayName: String
 }

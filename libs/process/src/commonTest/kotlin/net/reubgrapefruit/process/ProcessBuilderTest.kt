@@ -3,6 +3,7 @@ package net.reubgrapefruit.process
 import net.rubygrapefruit.file.fileSystem
 import net.rubygrapefruit.file.fixtures.FilesFixture
 import net.rubygrapefruit.io.IOException
+import net.rubygrapefruit.io.stream.CollectingBuffer
 import net.rubygrapefruit.process.Process
 import kotlin.test.*
 
@@ -30,7 +31,7 @@ class ProcessBuilderTest {
             // Expected
         }
 
-        val process2 = Process.command(listOf("ls", "missing")).startAndCollectOutput()
+        val process2 = Process.command(listOf("ls", "missing")).collectOutput().start()
         try {
             process2.waitFor()
             fail()
@@ -41,19 +42,19 @@ class ProcessBuilderTest {
 
     @Test
     fun `can run command and get exit code`() {
-        val pwd = Process.command(listOf("pwd")).startAndGetExitCode().waitFor()
+        val pwd = Process.command(listOf("pwd")).collectExitCode().start().waitFor()
         assertEquals(0, pwd)
 
-        val ls = Process.command(listOf("ls")).startAndGetExitCode().waitFor()
+        val ls = Process.command(listOf("ls")).collectExitCode().start().waitFor()
         assertEquals(0, ls)
 
-        val ls2 = Process.command(listOf("ls", "missing")).startAndGetExitCode().waitFor()
+        val ls2 = Process.command(listOf("ls", "missing")).collectExitCode().start().waitFor()
         assertNotEquals(0, ls2)
     }
 
     @Test
     fun `can run command and collect output`() {
-        val pwd = Process.command(listOf("pwd")).startAndCollectOutput().waitFor()
+        val pwd = Process.command(listOf("pwd")).collectOutput().start().waitFor()
         assertEquals(fileSystem.currentDirectory.absolutePath, pwd.trim())
 
         val dir = fixture.dir("test") {
@@ -61,7 +62,7 @@ class ProcessBuilderTest {
             file("2")
         }
 
-        val ls = Process.command(listOf("ls", dir.absolutePath)).startAndCollectOutput().waitFor()
+        val ls = Process.command(listOf("ls", dir.absolutePath)).collectOutput().start().waitFor()
         assertEquals(listOf("1", "2"), ls.trim().lines().sorted())
     }
 
@@ -72,10 +73,22 @@ class ProcessBuilderTest {
             file("2")
         }
 
-        val pwd = Process.command(listOf("pwd")).directory(dir).startAndCollectOutput().waitFor()
+        val pwd = Process.command(listOf("pwd")).directory(dir).collectOutput().start().waitFor()
         assertEquals(dir.absolutePath, pwd.trim())
 
-        val ls = Process.command(listOf("ls")).directory(dir).startAndCollectOutput().waitFor()
+        val ls = Process.command(listOf("ls")).directory(dir).collectOutput().start().waitFor()
         assertEquals(listOf("1", "2"), ls.trim().lines().sorted())
+    }
+
+    @Test
+    fun `can run command and act on input and output`() {
+        val result = Process.command("echo").withInputAndOutput { read, write ->
+            write.write("greetings".encodeToByteArray())
+            val buffer = CollectingBuffer()
+            buffer.readFrom(read)
+            buffer.decodeToString()
+        }.start().waitFor()
+
+        assertEquals("greeting", result)
     }
 }

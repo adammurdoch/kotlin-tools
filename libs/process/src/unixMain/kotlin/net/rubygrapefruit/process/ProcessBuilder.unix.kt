@@ -9,7 +9,20 @@ import net.rubygrapefruit.io.stream.FileDescriptor
 import platform.posix.*
 
 internal actual fun start(spec: ProcessStartSpec): ProcessControl {
-    val pipeDescriptors = if (spec.collectStdout) {
+    val pipeDescriptors = createPipe(spec)
+    val pid = fork()
+    return when {
+        pid == 0 -> exec(spec, pipeDescriptors)
+        pid > 0 -> processControl(spec, pid, pipeDescriptors)
+        else -> {
+            pipeDescriptors?.close()
+            throw IOException("Could not fork child process.", UnixErrorCode.last())
+        }
+    }
+}
+
+private fun createPipe(spec: ProcessStartSpec): Descriptors? {
+    return if (spec.collectStdout) {
         memScoped {
             val desc = allocArray<IntVar>(2)
             if (pipe(desc) != 0) {
@@ -19,16 +32,6 @@ internal actual fun start(spec: ProcessStartSpec): ProcessControl {
         }
     } else {
         null
-    }
-
-    val pid = fork()
-    return when {
-        pid == 0 -> exec(spec, pipeDescriptors)
-        pid > 0 -> processControl(spec, pid, pipeDescriptors)
-        else -> {
-            pipeDescriptors?.close()
-            throw IOException("Could not fork child process.", UnixErrorCode.last())
-        }
     }
 }
 
@@ -56,7 +59,9 @@ private fun exec(spec: ProcessStartSpec, pipe: Descriptors?): Nothing {
                 throw IOException("Could initialize stdout.", UnixErrorCode.last())
             }
             if (spec.directory != null) {
-                chdir(spec.directory.absolutePath)
+                if (chdir(spec.directory.absolutePath) != 0) {
+                    throw IOException("Could change working directory to ${spec.directory.absolutePath}.", UnixErrorCode.last())
+                }
             }
         }
         val args = allocArray<CPointerVar<ByteVar>>(spec.commandLine.size + 1)

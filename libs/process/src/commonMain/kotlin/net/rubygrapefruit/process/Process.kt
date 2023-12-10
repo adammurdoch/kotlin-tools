@@ -20,5 +20,12 @@ interface Process<T> {
         fun command(commandLine: List<String>): ProcessBuilder {
             return DefaultProcessBuilder(commandLine)
         }
+
+        /**
+         * Returns a process builder for the given command-line. The command is interpreted as if provided to the shell.
+         */
+        fun command(vararg commandLine: String): ProcessBuilder {
+            return command(commandLine.toList())
+        }
     }
 }

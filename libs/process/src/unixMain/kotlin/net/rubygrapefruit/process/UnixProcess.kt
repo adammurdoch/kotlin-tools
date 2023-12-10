@@ -5,10 +5,7 @@ package net.rubygrapefruit.process
 import kotlinx.cinterop.*
 import net.rubygrapefruit.io.IOException
 import net.rubygrapefruit.io.UnixErrorCode
-import net.rubygrapefruit.io.stream.FileDescriptor
-import net.rubygrapefruit.io.stream.FileDescriptorBackedReadStream
-import net.rubygrapefruit.io.stream.ReadStream
-import net.rubygrapefruit.io.stream.Source
+import net.rubygrapefruit.io.stream.*
 import platform.posix.EINTR
 import platform.posix.errno
 import platform.posix.waitpid
@@ -16,6 +13,9 @@ import platform.posix.waitpid
 internal class UnixProcess(private val spec: ProcessStartSpec, private val pid: Int, private val stdoutDescriptor: FileDescriptor?) : ProcessControl {
     override val stdout: ReadStream
         get() = FileDescriptorBackedReadStream(ProcessSource, stdoutDescriptor!!)
+
+    override val stdin: WriteStream
+        get() = TODO("Not yet implemented")
 
     override fun waitFor(): Int {
         try {

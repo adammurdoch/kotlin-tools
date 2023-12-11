@@ -7,6 +7,9 @@
 - Libraries in this repo should target Java 11?
 - KMP base library - generate module file when JVM is a target
 - Enable CC
+- Add `run` task for apps
+- Add `install` task for apps
+- Support KMP app that targets native + jvm + browser + node
 - Native UI plugin uses incorrect arch for binary on macOS x64
 - Native-launcher: build both macOS binaries, do not build on non-macOS machine
 - Native-launcher: fix Windows

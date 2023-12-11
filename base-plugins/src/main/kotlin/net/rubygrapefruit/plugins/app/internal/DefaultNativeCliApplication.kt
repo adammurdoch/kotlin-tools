@@ -42,11 +42,10 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     override val executables: List<NativeExecutable>
         get() = executableForMachine.values.toList()
 
-    override val outputBinary: Provider<RegularFile>
-        get() = executableForMachine[HostMachine.current.machine]?.outputBinary ?: providers.provider { null }
-
-    fun addOutputBinary(machine: NativeMachine, binaryFile: Provider<RegularFile>) {
-        executableForMachine.getValue(machine).outputBinary.set(binaryFile)
+    fun addOutputBinary(machine: NativeMachine, binaryFile: Provider<RegularFile>): NativeExecutable {
+        val executable = executableForMachine.getValue(machine)
+        executable.outputBinary.set(binaryFile)
+        return executable
     }
 
     override fun common(config: KotlinDependencyHandler.() -> Unit) {

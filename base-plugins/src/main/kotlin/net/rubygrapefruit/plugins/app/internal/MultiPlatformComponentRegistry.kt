@@ -6,11 +6,17 @@ import org.gradle.api.provider.Provider
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.jetbrains.kotlin.gradle.dsl.KotlinNativeBinaryContainer
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 open class MultiPlatformComponentRegistry(private val project: Project) {
     private val unixSourceSets = mutableSetOf<String>()
     private val unixTestSourceSets = mutableSetOf<String>()
     private val machines = mutableSetOf<NativeMachine>()
+    private val machineActions = mutableListOf<(NativeMachine, KotlinNativeTarget) -> Unit>()
+
+    /**
+     * The current set of target machines.
+     */
     val targetMachines: Set<NativeMachine>
         get() = machines
 
@@ -18,6 +24,39 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
         project.afterEvaluate {
             createIntermediateSourceSet("unixMain", "nativeMain", unixSourceSets)
             createIntermediateSourceSet("unixTest", "nativeTest", unixTestSourceSets)
+        }
+    }
+
+    fun desktop(config: KotlinNativeBinaryContainer.(NativeMachine) -> Unit = {}) {
+        macOS(config)
+        native(setOf(NativeMachine.LinuxX64, NativeMachine.WindowsX64), config)
+    }
+
+    fun macOS(config: KotlinNativeBinaryContainer.(NativeMachine) -> Unit = {}) {
+        native(setOf(NativeMachine.MacOSX64, NativeMachine.MacOSArm64), config)
+    }
+
+    fun jvm(targetVersion: Provider<Int>) {
+        with(project.kotlin) {
+            jvmToolchain {
+                it.languageVersion.set(targetVersion.map { JavaLanguageVersion.of(it) })
+            }
+            jvm()
+        }
+    }
+
+    fun browser() {
+        with(project.kotlin) {
+            js {
+                browser()
+            }
+        }
+    }
+
+    fun eachNativeTarget(action: (NativeMachine, KotlinNativeTarget) -> Unit) {
+        machineActions.add(action)
+        for (machine in machines) {
+            action(machine, project.kotlin.targets.getByName(machine.kotlinTarget) as KotlinNativeTarget)
         }
     }
 
@@ -48,17 +87,7 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
         }
     }
 
-    fun desktop(config: KotlinNativeBinaryContainer.(NativeMachine) -> Unit = {}) {
-        macOS(config)
-        native(setOf(NativeMachine.LinuxX64, NativeMachine.WindowsX64), config)
-    }
-
-    fun macOS(config: KotlinNativeBinaryContainer.(NativeMachine) -> Unit = {}) {
-        native(setOf(NativeMachine.MacOSX64, NativeMachine.MacOSArm64), config)
-    }
-
     private fun native(targets: Set<NativeMachine>, config: KotlinNativeBinaryContainer.(NativeMachine) -> Unit) {
-        machines.addAll(targets)
         with(project.kotlin) {
             if (targets.contains(NativeMachine.MacOSX64)) {
                 macosX64 {
@@ -87,21 +116,12 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
                 }
             }
         }
-    }
-
-    fun jvm(targetVersion: Provider<Int>) {
-        with(project.kotlin) {
-            jvmToolchain {
-                it.languageVersion.set(targetVersion.map { JavaLanguageVersion.of(it) })
-            }
-            jvm()
-        }
-    }
-
-    fun browser() {
-        with(project.kotlin) {
-            js {
-                browser()
+        for (target in targets) {
+            if (machines.add(target)) {
+                val nativeTarget = project.kotlin.targets.getByName(target.kotlinTarget) as KotlinNativeTarget
+                for (action in machineActions) {
+                    action(target, nativeTarget)
+                }
             }
         }
     }

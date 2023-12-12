@@ -8,8 +8,12 @@ import org.gradle.api.provider.ProviderFactory
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import javax.inject.Inject
 
-abstract class DefaultJvmUiApplication @Inject constructor(objects: ObjectFactory, providers: ProviderFactory, private val project: Project) :
-    DefaultUiApplication(objects, providers),
+abstract class DefaultJvmUiApplication @Inject constructor(
+    objects: ObjectFactory,
+    providers: ProviderFactory,
+    private val project: Project
+) :
+    DefaultUiApplication(objects, providers, project),
     MutableJvmApplication, JvmUiApplication {
 
     override var packaging: JvmApplicationPackaging = JvmApplicationWithEmbeddedJvm()

@@ -1,6 +1,5 @@
 package net.rubygrapefruit.plugins.app.internal
 
-import net.rubygrapefruit.plugins.app.Distribution
 import net.rubygrapefruit.plugins.app.NativeApplication
 import net.rubygrapefruit.plugins.app.NativeExecutable
 import net.rubygrapefruit.plugins.app.NativeMachine
@@ -16,18 +15,14 @@ import javax.inject.Inject
 
 abstract class DefaultNativeCliApplication @Inject constructor(
     private val componentRegistry: MultiPlatformComponentRegistry,
-    private val factory: ObjectFactory,
+    private val objects: ObjectFactory,
     providers: ProviderFactory,
     private val project: Project
 ) : MutableApplication, MutableNativeApplication, NativeApplication {
 
     private val targets = mutableMapOf<NativeMachine, TargetInfo>()
 
-    override val distributionContainer = SimpleContainer<DefaultDistribution>()
-
-    override val distributions: Provider<List<Distribution>> = providers.provider { distributionContainer.all }
-
-    override val distribution: Provider<Distribution> = providers.provider { targets[HostMachine.current.machine]?.distribution }
+    override val distributionContainer = DistributionContainer(project.tasks, objects, providers)
 
     override val executables: Provider<List<NativeExecutable>> = providers.provider { targets.values.map { it.executable } }
 
@@ -44,15 +39,13 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     private fun KotlinNativeBinaryContainer.register(target: NativeMachine) {
         executable()
         if (!targets.containsKey(target)) {
-            val executable = DefaultNativeExecutable(target, HostMachine.current.canBuild(target), factory)
-            val distribution = factory.newInstance(
-                DefaultDistribution::class.java,
+            val executable = DefaultNativeExecutable(target, HostMachine.current.canBuild(target), objects)
+            val distribution = distributionContainer.add(
                 target.kotlinTarget,
                 target == HostMachine.current.machine,
                 HostMachine.current.canBuild(target)
             )
             distribution.launcherFile.set(executable.outputBinary)
-            distributionContainer.add(distribution)
             targets[target] = TargetInfo(executable, distribution)
         }
     }

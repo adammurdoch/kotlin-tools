@@ -27,7 +27,8 @@ open class ApplicationRegistry(private val project: Project) {
             dist.imageDirectory.convention(project.layout.buildDirectory.dir(dist.name("dist-image")))
             dist.launcherFilePath.convention(app.appName)
 
-            val distTask = project.tasks.register(dist.name("dist"), DistributionImage::class.java) { t ->
+            val distTask = dist.distTask
+            distTask.configure { t ->
                 t.onlyIf {
                     dist.canBuildForHostMachine
                 }

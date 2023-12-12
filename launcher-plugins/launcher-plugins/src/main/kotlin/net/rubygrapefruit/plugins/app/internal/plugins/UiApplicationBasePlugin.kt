@@ -31,28 +31,30 @@ class UiApplicationBasePlugin : Plugin<Project> {
                     it.sourceIcon.set(app.iconFile)
                 }
 
-                applications.applyToDistribution { dist, distImage ->
+                app.distributionContainer.each { dist ->
                     dist.launcherFilePath.set(capitalizedAppName.map { "MacOS/$it" })
 
-                    distImage.imageDirectory.set(layout.buildDirectory.dir(dist.name("dist-image") + capitalizedAppName.map { "$it.app" }))
-                    distImage.rootDirPath.set("Contents")
-                    distImage.includeFile("Info.plist", infoPlistTask.flatMap { it.plistFile })
-                    distImage.includeFile(
-                        app.iconName.map { "Resources/$it" },
-                        iconTask.flatMap {
-                            if (it.sourceIcon.get().asFile.exists()) {
-                                it.outputIcon
-                            } else {
-                                // Should be able to return 'null' here to mean "there is no icon". This works with the
-                                // Gradle APIs, but is broken for Kotlin compilation
-                                val dummyFile = layout.buildDirectory.file(DistributionImage.FileContribution.dummyName)
-                                with(dummyFile.get().asFile) {
-                                    parentFile.mkdirs()
-                                    createNewFile()
+                    dist.distTask.configure { distImage ->
+                        distImage.imageDirectory.set(layout.buildDirectory.dir(dist.name("dist-image") + capitalizedAppName.map { "$it.app" }))
+                        distImage.rootDirPath.set("Contents")
+                        distImage.includeFile("Info.plist", infoPlistTask.flatMap { it.plistFile })
+                        distImage.includeFile(
+                            app.iconName.map { "Resources/$it" },
+                            iconTask.flatMap {
+                                if (it.sourceIcon.get().asFile.exists()) {
+                                    it.outputIcon
+                                } else {
+                                    // Should be able to return 'null' here to mean "there is no icon". This works with the
+                                    // Gradle APIs, but is broken for Kotlin compilation
+                                    val dummyFile = layout.buildDirectory.file(DistributionImage.FileContribution.dummyName)
+                                    with(dummyFile.get().asFile) {
+                                        parentFile.mkdirs()
+                                        createNewFile()
+                                    }
+                                    dummyFile
                                 }
-                                dummyFile
-                            }
-                        })
+                            })
+                    }
 
                     tasks.register(dist.name("releaseDist"), ReleaseDistribution::class.java) { t ->
                         t.imageDirectory.set(layout.buildDirectory.dir(dist.name("release") + capitalizedAppName.map { "$it.app" }))

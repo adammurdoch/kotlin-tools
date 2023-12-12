@@ -22,7 +22,7 @@ class NativeBinaryJvmLauncherPlugin : Plugin<Project> {
                     it.modulePath.from(app.runtimeModulePath)
                 }
 
-                applications.applyToDistribution { dist, _ ->
+                app.distributionContainer.each { dist ->
                     dist.launcherFile.set(binaryTask.flatMap { it.launcherFile })
                 }
             }

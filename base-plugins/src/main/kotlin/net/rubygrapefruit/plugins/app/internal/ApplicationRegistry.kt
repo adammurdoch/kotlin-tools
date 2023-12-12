@@ -1,14 +1,11 @@
 package net.rubygrapefruit.plugins.app.internal
 
 import net.rubygrapefruit.plugins.app.Application
-import net.rubygrapefruit.plugins.app.internal.tasks.DistributionImage
 import org.gradle.api.Project
-import org.gradle.api.tasks.TaskProvider
 
 open class ApplicationRegistry(private val project: Project) {
     private var main: MutableApplication? = null
     private val whenAppSet = mutableListOf<Project.(Application) -> Unit>()
-    private val distributions = SimpleContainer<DistInfo>()
 
     fun register(app: MutableApplication) {
         if (main != null) {
@@ -32,6 +29,8 @@ open class ApplicationRegistry(private val project: Project) {
                 t.onlyIf {
                     dist.canBuildForHostMachine
                 }
+                t.description = "Builds the distribution image"
+                t.group = "Distribution"
                 t.imageDirectory.set(dist.imageDirectory)
                 t.rootDirPath.set(".")
             }
@@ -40,17 +39,6 @@ open class ApplicationRegistry(private val project: Project) {
 
             distTask.configure {
                 it.includeFile(dist.launcherFilePath, dist.launcherFile)
-            }
-            distributions.add(DistInfo(dist, distTask))
-        }
-    }
-
-    fun applyToDistribution(action: Project.(DefaultDistribution, DistributionImage) -> Unit) {
-        distributions.each { distInfo ->
-            distInfo.distImage.configure {
-                project.run {
-                    action(distInfo.distribution, it)
-                }
             }
         }
     }
@@ -71,9 +59,4 @@ open class ApplicationRegistry(private val project: Project) {
             }
         }
     }
-
-    private class DistInfo(
-        val distribution: DefaultDistribution,
-        val distImage: TaskProvider<DistributionImage>
-    )
 }

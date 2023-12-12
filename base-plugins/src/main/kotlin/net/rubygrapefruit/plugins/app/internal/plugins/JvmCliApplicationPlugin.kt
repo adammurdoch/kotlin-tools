@@ -14,7 +14,9 @@ class JvmCliApplicationPlugin : Plugin<Project> {
             plugins.apply(JvmApplicationBasePlugin::class.java)
             applications.withApp<DefaultJvmCliApplication> { app ->
                 val libsDirPath = "lib"
+
                 val libNames = objects.listProperty(String::class.java)
+                libNames.set(app.runtimeModulePath.elements.map { it.map { f -> f.asFile.name } })
 
                 val launcherTask = tasks.register("launcherScript", LauncherBashScript::class.java) {
                     it.scriptFile.set(layout.buildDirectory.file("app/launcher.sh"))
@@ -33,14 +35,15 @@ class JvmCliApplicationPlugin : Plugin<Project> {
                     it.modulePath.set(libNames)
                 }
 
-                applications.applyToDistribution { dist, distImage ->
+                app.distributionContainer.each { dist ->
                     dist.launcherFile.set(launcherTask.flatMap { it.scriptFile })
-                    if (app.packaging.includeRuntimeModules) {
-                        distImage.includeFilesInDir(libsDirPath, app.runtimeModulePath)
-                        libNames.set(app.runtimeModulePath.elements.map { it.map { f -> f.asFile.name } })
-                    }
-                    if (app.packaging is JvmApplicationWithLauncherScripts) {
-                        distImage.includeFile(app.appName.map { "$it.bat" }, launcherBatTask.flatMap { it.scriptFile })
+                    dist.distTask.configure { distImage ->
+                        if (app.packaging.includeRuntimeModules) {
+                            distImage.includeFilesInDir(libsDirPath, app.runtimeModulePath)
+                        }
+                        if (app.packaging is JvmApplicationWithLauncherScripts) {
+                            distImage.includeFile(app.appName.map { "$it.bat" }, launcherBatTask.flatMap { it.scriptFile })
+                        }
                     }
                 }
             }

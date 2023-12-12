@@ -25,4 +25,12 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
     fun each(action: (DefaultDistribution) -> Unit) {
         dists.each(action)
     }
+
+    fun eachImage(action: DistributionImage.() -> Unit) {
+        dists.each { dist ->
+            dist.distTask.configure {
+                action(it)
+            }
+        }
+    }
 }

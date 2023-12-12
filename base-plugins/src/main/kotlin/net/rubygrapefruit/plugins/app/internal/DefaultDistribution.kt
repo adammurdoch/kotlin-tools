@@ -8,7 +8,12 @@ import org.gradle.api.provider.Property
 import javax.inject.Inject
 
 
-abstract class DefaultDistribution @Inject constructor(factory: ObjectFactory) : Distribution {
+abstract class DefaultDistribution @Inject constructor(
+    val name: String,
+    val isDefault: Boolean,
+    val canBuildForHostMachine: Boolean,
+    factory: ObjectFactory
+) : Distribution {
     /**
      * The launcher file to copy into the distribution image.
      */
@@ -22,4 +27,12 @@ abstract class DefaultDistribution @Inject constructor(factory: ObjectFactory) :
     override val imageOutputDirectory: DirectoryProperty = factory.directoryProperty()
 
     override val launcherOutputFile: RegularFileProperty = factory.fileProperty()
+
+    fun name(base: String): String {
+        return if (isDefault) {
+            base
+        } else {
+            "$name-$base"
+        }
+    }
 }

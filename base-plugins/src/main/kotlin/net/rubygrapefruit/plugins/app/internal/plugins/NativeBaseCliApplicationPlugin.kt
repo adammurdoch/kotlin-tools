@@ -19,12 +19,11 @@ open class NativeBaseCliApplicationPlugin : Plugin<Project> {
                 multiplatformComponents.eachNativeTarget { machine, nativeTarget ->
                     val executable = nativeTarget.binaries.withType(Executable::class.java).first()
                     val binaryFile = layout.file(executable.linkTaskProvider.map { it.binary.outputFile })
-                    val exe = app.addOutputBinary(machine, binaryFile)
-                    if (machine == HostMachine.current.machine) {
-                        app.distribution.launcherFile.set(exe.outputBinary)
+                    app.addOutputExecutable(machine, binaryFile)
+                    app.configureTarget(machine) {
+                        launcherFilePath.set(app.appName.map { HostMachine.of(machine).exeName(it) })
                     }
                 }
-                app.distribution.launcherFilePath.set(app.appName.map { HostMachine.current.exeName(it) })
             }
 
             val app = extensions.create(NativeApplication::class.java, "application", DefaultNativeCliApplication::class.java, multiplatformComponents)

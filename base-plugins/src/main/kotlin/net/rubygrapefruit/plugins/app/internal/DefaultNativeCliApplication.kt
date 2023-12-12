@@ -1,5 +1,6 @@
 package net.rubygrapefruit.plugins.app.internal
 
+import net.rubygrapefruit.plugins.app.Distribution
 import net.rubygrapefruit.plugins.app.NativeApplication
 import net.rubygrapefruit.plugins.app.NativeExecutable
 import net.rubygrapefruit.plugins.app.NativeMachine
@@ -16,15 +17,21 @@ import javax.inject.Inject
 abstract class DefaultNativeCliApplication @Inject constructor(
     private val componentRegistry: MultiPlatformComponentRegistry,
     private val factory: ObjectFactory,
-    private val providers: ProviderFactory,
+    providers: ProviderFactory,
     private val project: Project
 ) : MutableApplication, MutableNativeApplication, NativeApplication {
-    private val executableForMachine = mutableMapOf<NativeMachine, DefaultNativeExecutable>()
 
-    override val distribution: DefaultDistribution = factory.newInstance(DefaultDistribution::class.java)
+    private val targets = mutableMapOf<NativeMachine, TargetInfo>()
 
-    override val canBuildDistributionForHostMachine: Boolean
-        get() = executableForMachine.containsKey(HostMachine.current.machine)
+    override val distributionContainer = SimpleContainer<DefaultDistribution>()
+
+    override val distributions: Provider<List<Distribution>> = providers.provider { distributionContainer.all }
+
+    override val distribution: Provider<Distribution> = providers.provider { targets[HostMachine.current.machine]?.distribution }
+
+    override val executables: Provider<List<NativeExecutable>> = providers.provider { targets.values.map { it.executable } }
+
+    override val executable: Provider<NativeExecutable> = providers.provider { targets[HostMachine.current.machine]?.executable }
 
     override fun macOS() {
         componentRegistry.macOS { register(it) }
@@ -36,16 +43,29 @@ abstract class DefaultNativeCliApplication @Inject constructor(
 
     private fun KotlinNativeBinaryContainer.register(target: NativeMachine) {
         executable()
-        executableForMachine.computeIfAbsent(target) { DefaultNativeExecutable(target, HostMachine.current.canBuild(target), factory) }
+        if (!targets.containsKey(target)) {
+            val executable = DefaultNativeExecutable(target, HostMachine.current.canBuild(target), factory)
+            val distribution = factory.newInstance(
+                DefaultDistribution::class.java,
+                target.kotlinTarget,
+                target == HostMachine.current.machine,
+                HostMachine.current.canBuild(target)
+            )
+            distribution.launcherFile.set(executable.outputBinary)
+            distributionContainer.add(distribution)
+            targets[target] = TargetInfo(executable, distribution)
+        }
     }
 
-    override val executables: List<NativeExecutable>
-        get() = executableForMachine.values.toList()
+    fun addOutputExecutable(machine: NativeMachine, binaryFile: Provider<RegularFile>) {
+        val executable = targets.getValue(machine).executable
+        if (HostMachine.current.canBuild(machine)) {
+            executable.outputBinary.set(binaryFile)
+        }
+    }
 
-    fun addOutputBinary(machine: NativeMachine, binaryFile: Provider<RegularFile>): NativeExecutable {
-        val executable = executableForMachine.getValue(machine)
-        executable.outputBinary.set(binaryFile)
-        return executable
+    fun configureTarget(machine: NativeMachine, action: DefaultDistribution.() -> Unit) {
+        action(targets.getValue(machine).distribution)
     }
 
     override fun common(config: KotlinDependencyHandler.() -> Unit) {
@@ -55,6 +75,11 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     override fun test(config: KotlinDependencyHandler.() -> Unit) {
         project.kotlin.sourceSets.getByName("commonTest").dependencies { config() }
     }
+
+    private class TargetInfo(
+        val executable: DefaultNativeExecutable,
+        val distribution: DefaultDistribution
+    )
 
     private class DefaultNativeExecutable(
         override val targetMachine: NativeMachine,

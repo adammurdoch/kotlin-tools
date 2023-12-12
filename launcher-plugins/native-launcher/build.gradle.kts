@@ -10,7 +10,7 @@ application {
     macOS()
 }
 
-for (executable in application.executables) {
+for (executable in application.executables.get()) {
     if (executable.canBuild) {
         configurations.create("outgoingNativeBinary${executable.targetMachine.name}") {
             attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named("native-binary-${executable.targetMachine.kotlinTarget}"))

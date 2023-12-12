@@ -46,10 +46,9 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                         it.outputFile.set(layout.buildDirectory.file("app/native-launcher.kexe"))
                     }
 
-                    app.distribution.launcherFile.set(launcherTask.flatMap { it.outputFile })
-
-                    applications.applyToDistribution { dist ->
-                        dist.includeFile("Resources/launcher.conf", configTask.flatMap { it.configFile })
+                    applications.applyToDistribution { dist, distImage ->
+                        dist.launcherFile.set(launcherTask.flatMap { it.outputFile })
+                        distImage.includeFile("Resources/launcher.conf", configTask.flatMap { it.configFile })
                     }
                 }
             }

@@ -13,6 +13,15 @@ sealed class HostMachine {
                 Machine.MacOSArm64 -> MacOsArm64
             }
         }
+
+        fun of(machine: NativeMachine): HostMachine {
+            return when (machine) {
+                NativeMachine.WindowsX64 -> WindowsX64
+                NativeMachine.LinuxX64 -> LinuxX64
+                NativeMachine.MacOSX64 -> MacOsX64
+                NativeMachine.MacOSArm64 -> MacOsArm64
+            }
+        }
     }
 
     open fun exeName(name: String) = name

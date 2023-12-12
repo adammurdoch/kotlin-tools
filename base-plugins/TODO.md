@@ -10,7 +10,6 @@
 - Add `run` task for apps
 - Add `install` task for apps
 - Support KMP app that targets native + jvm + browser + node
-- Native UI plugin uses incorrect arch for binary on macOS x64
 - Native-launcher: build both macOS binaries, do not build on non-macOS machine
 - Native-launcher: fix Windows
 - Don't include windows launcher script for embedded JVM and native exe JVM apps

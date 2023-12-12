@@ -33,17 +33,16 @@ class JvmCliApplicationPlugin : Plugin<Project> {
                     it.modulePath.set(libNames)
                 }
 
-                applications.applyToDistribution { dist ->
+                applications.applyToDistribution { dist, distImage ->
+                    dist.launcherFile.set(launcherTask.flatMap { it.scriptFile })
                     if (app.packaging.includeRuntimeModules) {
-                        dist.includeFilesInDir(libsDirPath, app.runtimeModulePath)
+                        distImage.includeFilesInDir(libsDirPath, app.runtimeModulePath)
                         libNames.set(app.runtimeModulePath.elements.map { it.map { f -> f.asFile.name } })
                     }
                     if (app.packaging is JvmApplicationWithLauncherScripts) {
-                        dist.includeFile(app.appName.map { "$it.bat" }, launcherBatTask.flatMap { it.scriptFile })
+                        distImage.includeFile(app.appName.map { "$it.bat" }, launcherBatTask.flatMap { it.scriptFile })
                     }
                 }
-
-                app.distribution.launcherFile.set(launcherTask.flatMap { it.scriptFile })
             }
 
             val app = extensions.create("application", DefaultJvmCliApplication::class.java)

@@ -1,9 +1,9 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.internal.JvmApplicationWithNativeBinary
-import net.rubygrapefruit.plugins.app.internal.tasks.NativeBinary
 import net.rubygrapefruit.plugins.app.internal.MutableJvmApplication
 import net.rubygrapefruit.plugins.app.internal.applications
+import net.rubygrapefruit.plugins.app.internal.tasks.NativeBinary
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -21,7 +21,10 @@ class NativeBinaryJvmLauncherPlugin : Plugin<Project> {
                     it.javaVersion.set(app.targetJavaVersion)
                     it.modulePath.from(app.runtimeModulePath)
                 }
-                app.distribution.launcherFile.set(binaryTask.flatMap { it.launcherFile })
+
+                applications.applyToDistribution { dist, _ ->
+                    dist.launcherFile.set(binaryTask.flatMap { it.launcherFile })
+                }
             }
         }
     }

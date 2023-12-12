@@ -1,6 +1,7 @@
 package net.rubygrapefruit.plugins.app
 
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 
 interface Application {
     /**
@@ -9,7 +10,12 @@ interface Application {
     val appName: Property<String>
 
     /**
-     * The debug distribution for this application.
+     * The distributions of this application.
      */
-    val distribution: Distribution
+    val distributions: Provider<List<Distribution>>
+
+    /**
+     * The debug distribution for this application to use on the current machine, if any.
+     */
+    val distribution: Provider<Distribution>
 }

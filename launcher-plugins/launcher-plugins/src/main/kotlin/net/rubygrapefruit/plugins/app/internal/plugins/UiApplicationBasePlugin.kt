@@ -1,11 +1,11 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.internal.DefaultUiApplication
+import net.rubygrapefruit.plugins.app.internal.applications
 import net.rubygrapefruit.plugins.app.internal.tasks.AppIcon
+import net.rubygrapefruit.plugins.app.internal.tasks.DistributionImage
 import net.rubygrapefruit.plugins.app.internal.tasks.InfoPlist
 import net.rubygrapefruit.plugins.app.internal.tasks.ReleaseDistribution
-import net.rubygrapefruit.plugins.app.internal.applications
-import net.rubygrapefruit.plugins.app.internal.tasks.DistributionImage
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -31,13 +31,13 @@ class UiApplicationBasePlugin : Plugin<Project> {
                     it.sourceIcon.set(app.iconFile)
                 }
 
-                app.distribution.launcherFilePath.set(capitalizedAppName.map { "MacOS/$it" })
+                applications.applyToDistribution { dist, distImage ->
+                    dist.launcherFilePath.set(capitalizedAppName.map { "MacOS/$it" })
 
-                applications.applyToDistribution { dist ->
-                    dist.imageDirectory.set(layout.buildDirectory.dir(capitalizedAppName.map { "debug/$it.app" }))
-                    dist.rootDirPath.set("Contents")
-                    dist.includeFile("Info.plist", infoPlistTask.flatMap { it.plistFile })
-                    dist.includeFile(
+                    distImage.imageDirectory.set(layout.buildDirectory.dir(dist.name("dist-image") + capitalizedAppName.map { "$it.app" }))
+                    distImage.rootDirPath.set("Contents")
+                    distImage.includeFile("Info.plist", infoPlistTask.flatMap { it.plistFile })
+                    distImage.includeFile(
                         app.iconName.map { "Resources/$it" },
                         iconTask.flatMap {
                             if (it.sourceIcon.get().asFile.exists()) {
@@ -53,13 +53,13 @@ class UiApplicationBasePlugin : Plugin<Project> {
                                 dummyFile
                             }
                         })
-                }
 
-                tasks.register("releaseDist", ReleaseDistribution::class.java) { t ->
-                    t.imageDirectory.set(layout.buildDirectory.dir(capitalizedAppName.map { "release/$it.app" }))
-                    t.unsignedImage.set(app.distribution.imageOutputDirectory)
-                    t.signingIdentity.set(app.signingIdentity)
-                    t.notarizationProfileName.set(app.notarizationProfileName)
+                    tasks.register(dist.name("releaseDist"), ReleaseDistribution::class.java) { t ->
+                        t.imageDirectory.set(layout.buildDirectory.dir(dist.name("release") + capitalizedAppName.map { "$it.app" }))
+                        t.unsignedImage.set(dist.imageOutputDirectory)
+                        t.signingIdentity.set(app.signingIdentity)
+                        t.notarizationProfileName.set(app.notarizationProfileName)
+                    }
                 }
             }
         }

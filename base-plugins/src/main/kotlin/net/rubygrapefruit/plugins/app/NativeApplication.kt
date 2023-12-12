@@ -1,5 +1,7 @@
 package net.rubygrapefruit.plugins.app
 
+import org.gradle.api.provider.Provider
+
 interface NativeApplication : Application, MultiPlatformComponent {
     /**
      * Adds the native desktops as a target, if not already.
@@ -12,7 +14,12 @@ interface NativeApplication : Application, MultiPlatformComponent {
     fun macOS()
 
     /**
-     * The current set of native executables for this application.
+     * The native executables for this application.
      */
-    val executables: List<NativeExecutable>
+    val executables: Provider<List<NativeExecutable>>
+
+    /**
+     * The native executable for this application to use on the current machine, if any.
+     */
+    val executable: Provider<NativeExecutable>
 }

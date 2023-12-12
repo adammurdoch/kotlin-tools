@@ -4,21 +4,17 @@ import net.rubygrapefruit.plugins.app.JvmUiApplication
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.ProviderFactory
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import javax.inject.Inject
 
-abstract class DefaultJvmUiApplication @Inject constructor(factory: ObjectFactory, private val project: Project) :
-    DefaultUiApplication(),
+abstract class DefaultJvmUiApplication @Inject constructor(objects: ObjectFactory, providers: ProviderFactory, private val project: Project) :
+    DefaultUiApplication(objects, providers),
     MutableJvmApplication, JvmUiApplication {
-
-    override val distribution: DefaultDistribution = factory.newInstance(DefaultDistribution::class.java)
-
-    override val canBuildDistributionForHostMachine: Boolean
-        get() = true
 
     override var packaging: JvmApplicationPackaging = JvmApplicationWithEmbeddedJvm()
 
-    override val runtimeModulePath: ConfigurableFileCollection = factory.fileCollection()
+    override val runtimeModulePath: ConfigurableFileCollection = objects.fileCollection()
 
     override fun dependencies(config: KotlinDependencyHandler.() -> Unit) {
         project.jvmKotlin.sourceSets.getByName("main").dependencies { config() }

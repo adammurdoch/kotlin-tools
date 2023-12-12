@@ -29,9 +29,8 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                 multiplatformComponents.eachNativeTarget { machine, nativeTarget ->
                     val executable = nativeTarget.binaries.withType(Executable::class.java).first()
                     val binaryFile = layout.file(executable.linkTaskProvider.map { it.binary.outputFile })
-
                     if (machine == HostMachine.current.machine) {
-                        app.distribution.launcherFile.set(binaryFile)
+                        app.distributionContainer.all.first { it.isDefault }.launcherFile.set(binaryFile)
                     }
                 }
             }

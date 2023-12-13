@@ -26,10 +26,12 @@ sealed class AppNature {
 
     abstract val cliLauncherPath: String?
 
-    open val launcherCommand: List<String>
+    open val cliLauncherPrefix: List<String>
         get() = emptyList()
 
     abstract val nativeBinaryPath: String?
+
+    abstract val openLauncherPath: String?
 }
 
 class JvmCliApp(private val name: String, private val embeddedJvm: Boolean) : AppNature() {
@@ -48,7 +50,7 @@ class JvmCliApp(private val name: String, private val embeddedJvm: Boolean) : Ap
             name
         }
 
-    override val launcherCommand: List<String>
+    override val cliLauncherPrefix: List<String>
         get() = if (Machine.thisMachine is Machine.Windows) {
             listOf("cmd", "/C")
         } else {
@@ -71,6 +73,9 @@ class JvmCliApp(private val name: String, private val embeddedJvm: Boolean) : Ap
     } else {
         null
     }
+
+    override val openLauncherPath: String?
+        get() = null
 }
 
 class NativeBinaryCliApp(private val name: String) : AppNature() {
@@ -98,6 +103,9 @@ class NativeBinaryCliApp(private val name: String) : AppNature() {
 
     override val nativeBinaryPath: String
         get() = cliLauncherPath
+
+    override val openLauncherPath: String?
+        get() = null
 }
 
 class UiApp(private val appName: String) : AppNature() {
@@ -121,6 +129,9 @@ class UiApp(private val appName: String) : AppNature() {
 
     override val nativeBinaryPath: String
         get() = "Contents/MacOS/${appName}"
+
+    override val openLauncherPath: String
+        get() = nativeBinaryPath
 }
 
 sealed class App(name: String, baseDir: File, val nature: AppNature, srcDirName: String, val allPlatforms: Boolean) :
@@ -134,14 +145,20 @@ sealed class App(name: String, baseDir: File, val nature: AppNature, srcDirName:
         null
     }
 
-    val commandLine = if (nature.cliLauncherPath != null) {
-        nature.launcherCommand + distDir.resolve(nature.cliLauncherPath!!)
+    val cliCommandLine = if (nature.cliLauncherPath != null) {
+        nature.cliLauncherPrefix + distDir.resolve(nature.cliLauncherPath!!)
     } else {
         null
     }
 
     val nativeBinary = if (nature.nativeBinaryPath != null) {
         distDir.resolve(nature.nativeBinaryPath!!)
+    } else {
+        null
+    }
+
+    val openCommandLine = if (nature.openLauncherPath != null) {
+        listOf("open", distDir.resolve(nature.openLauncherPath!!).absolutePath)
     } else {
         null
     }
@@ -210,6 +227,7 @@ val samples = listOf(
 
 val sampleApps = samples.filterIsInstance<App>()
 val derivedSamples = samples.filterIsInstance<DerivedSample>()
+val uiApps = sampleApps.filter { it.openCommandLine != null }
 
 val generators = derivedSamples.map { sample ->
     if (!sample.derivedFrom.srcDir.isDirectory) {
@@ -240,7 +258,8 @@ val runTasks = sampleApps.associateWith { app ->
             if (app.cliLauncher != null && !app.cliLauncher.isFile) {
                 throw IllegalStateException("Application launcher ${app.cliLauncher} does not exist.")
             }
-            if (app.nativeBinary != null && app.nativeBinary != app.cliLauncher && !app.nativeBinary.isFile) {
+            if (app.nativeBinary != null && !app.nativeBinary.isFile) {
+                // For example, embedded JVM app with launcher script, UI apps
                 throw IllegalStateException("Application binary ${app.nativeBinary} does not exist.")
             }
             println("dist size: " + app.distDir.directorySize().formatSize())
@@ -252,11 +271,11 @@ val runTasks = sampleApps.associateWith { app ->
                 }
                 println("binary: ${str.toString().lines()[3].split(Regex("\\s+"))[1]}")
             }
-            if (app.commandLine != null) {
+            if (app.cliCommandLine != null) {
                 println()
                 println("----")
                 exec {
-                    commandLine(app.commandLine + "1 + 2")
+                    commandLine(app.cliCommandLine + "1 + 2")
                 }
                 println("----")
             } else {
@@ -273,6 +292,21 @@ tasks.register("run") {
 
 tasks.register("runMin") {
     dependsOn(runTasks.filterKeys { it.allPlatforms }.values)
+}
+
+val openTasks = uiApps.map { app ->
+    tasks.register("open-${app.name}") {
+        dependsOn(":${app.name}:dist")
+        doLast {
+            exec {
+                commandLine(app.openCommandLine)
+            }
+        }
+    }
+}
+
+tasks.register("open") {
+    dependsOn(openTasks)
 }
 
 fun jvmCliApp(name: String): BaseApp {

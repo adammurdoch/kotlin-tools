@@ -35,7 +35,7 @@ class UiApplicationBasePlugin : Plugin<Project> {
                     dist.launcherFilePath.set(capitalizedAppName.map { "MacOS/$it" })
 
                     dist.distTask.configure { distImage ->
-                        distImage.imageDirectory.set(layout.buildDirectory.dir(dist.name("dist-image") + capitalizedAppName.map { "$it.app" }))
+                        distImage.imageDirectory.set(layout.buildDirectory.dir(capitalizedAppName.map { dist.name("dist-image") + "/$it.app" }))
                         distImage.rootDirPath.set("Contents")
                         distImage.includeFile("Info.plist", infoPlistTask.flatMap { it.plistFile })
                         distImage.includeFile(

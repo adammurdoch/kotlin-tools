@@ -114,7 +114,7 @@ class UiApp(private val appName: String) : AppNature() {
     }
 
     override val distDirName: String
-        get() = "build/debug/${appName}.app"
+        get() = "build/dist-image/${appName}.app"
 
     override val cliLauncherPath: String?
         get() = null

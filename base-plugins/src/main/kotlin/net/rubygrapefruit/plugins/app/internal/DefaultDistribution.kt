@@ -35,7 +35,7 @@ abstract class DefaultDistribution @Inject constructor(
         return if (isDefault) {
             base
         } else {
-            "$name-$base"
+            "$base-$name"
         }
     }
 }

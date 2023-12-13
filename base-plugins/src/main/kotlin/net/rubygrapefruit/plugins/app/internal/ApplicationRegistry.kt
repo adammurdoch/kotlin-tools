@@ -15,11 +15,6 @@ open class ApplicationRegistry(private val project: Project) {
 
         app.appName.convention(project.name)
 
-        for (builder in whenAppSet) {
-            builder(project, app)
-        }
-        whenAppSet.clear()
-
         app.distributionContainer.each { dist ->
             dist.imageDirectory.convention(project.layout.buildDirectory.dir(dist.name("dist-image")))
             dist.launcherFilePath.convention(app.appName)
@@ -41,6 +36,11 @@ open class ApplicationRegistry(private val project: Project) {
                 it.includeFile(dist.launcherFilePath, dist.launcherFile)
             }
         }
+
+        for (builder in whenAppSet) {
+            builder(project, app)
+        }
+        whenAppSet.clear()
     }
 
     fun applyToApp(builder: Project.(Application) -> Unit) {

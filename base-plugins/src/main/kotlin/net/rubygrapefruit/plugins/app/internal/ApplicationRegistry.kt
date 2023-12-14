@@ -1,6 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal
 
 import net.rubygrapefruit.plugins.app.Application
+import net.rubygrapefruit.plugins.app.internal.tasks.Distributions
 import org.gradle.api.Project
 
 open class ApplicationRegistry(private val project: Project) {
@@ -15,12 +16,14 @@ open class ApplicationRegistry(private val project: Project) {
 
         app.appName.convention(project.name)
 
+        val distTask = project.tasks.register("dist", Distributions::class.java)
+
         app.distributionContainer.each { dist ->
             dist.imageDirectory.convention(project.layout.buildDirectory.dir(dist.name("dist-image")))
             dist.launcherFilePath.convention(app.appName)
 
-            val distTask = dist.distTask
-            distTask.configure { t ->
+            val distImageTask = dist.distTask
+            distImageTask.configure { t ->
                 t.onlyIf {
                     dist.canBuildForHostMachine
                 }
@@ -28,12 +31,16 @@ open class ApplicationRegistry(private val project: Project) {
                 t.group = "Distribution"
                 t.imageDirectory.set(dist.imageDirectory)
                 t.rootDirPath.set(".")
+                t.includeFile(dist.launcherFilePath, dist.launcherFile)
             }
-            dist.imageOutputDirectory.set(distTask.flatMap { t -> t.imageDirectory })
-            dist.launcherOutputFile.set(distTask.flatMap { t -> t.imageDirectory.map { it.file(dist.launcherFilePath.get()) } })
+            dist.imageOutputDirectory.set(distImageTask.flatMap { t -> t.imageDirectory })
+            dist.launcherOutputFile.set(distImageTask.flatMap { t -> t.imageDirectory.map { it.file(dist.launcherFilePath.get()) } })
 
             distTask.configure {
-                it.includeFile(dist.launcherFilePath, dist.launcherFile)
+                if (dist.isDefault) {
+                    it.defaultDist.set(distImageTask)
+                }
+                it.allDists.add(distImageTask)
             }
         }
 

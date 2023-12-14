@@ -1,6 +1,9 @@
 
 # TODO
 
+- Don't add a dist task when there is no source for the current target (eg native-launcher on linux)
+- Native-launcher: build both macOS binaries, do not build on non-macOS machine
+- Native-launcher: fix Windows
 - Move dependency declarations into library and application blocks
     - UI applications 
     - commonTest for applications 
@@ -10,12 +13,9 @@
 - Add `run` task for apps
 - Add `install` task for apps
 - Support KMP app that targets native + jvm + browser + node
-- Native-launcher: build both macOS binaries, do not build on non-macOS machine
-- Native-launcher: fix Windows
 - Don't include windows launcher script for embedded JVM and native exe JVM apps
 - Use `--launcher` instead of `--add-modules` with `jlink`
 - Convert automatic modules to real modules prior to using with `jlink`
-- Don't add a dist task when there is no source for the current target (eg native-launcher on linux)
 - Download service: don't keep the install dir when install action fails
 - Native app plugin creates distributions for all targets
 - Native macOS bundle plugin

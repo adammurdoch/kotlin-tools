@@ -3,3 +3,9 @@ plugins {
 }
 
 group = "net.rubygrapefruit.libs"
+
+library {
+    jvm {
+        targetJavaVersion = versions.pluginsJava
+    }
+}

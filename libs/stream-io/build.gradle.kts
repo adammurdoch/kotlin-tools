@@ -5,7 +5,9 @@ plugins {
 group = "net.rubygrapefruit.libs"
 
 library {
-    jvm()
+    jvm {
+        targetJavaVersion = versions.pluginsJava
+    }
     nativeDesktop()
     test {
         implementation(kotlin("test"))

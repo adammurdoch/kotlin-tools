@@ -137,6 +137,8 @@ class UiApp(private val appName: String) : AppNature() {
 sealed class App(name: String, baseDir: File, val nature: AppNature, srcDirName: String, val allPlatforms: Boolean) :
     Sample(name, baseDir, srcDirName) {
 
+    val distTask = ":$name:dist"
+
     val distDir = dir.resolve(nature.distDirName)
 
     val cliLauncher = if (nature.cliLauncherPath != null) {
@@ -212,8 +214,8 @@ val samples = listOf(
     jvmCliApp.derive("customized") { it.launcher("app") }.allPlatforms(),
     jvmCliApp.derive("embedded") { it.embedded() }.allPlatforms(),
     jvmCliApp.derive("embedded-customized") { it.embedded().launcher("app") }.allPlatforms(),
-    jvmCliApp.derive("native-binary") { it.native() },
-    jvmCliApp.derive("native-binary-customized") { it.native().launcher("app") },
+    jvmCliApp.derive("native-binary") { it.native() }.allPlatforms(),
+    jvmCliApp.derive("native-binary-customized") { it.native().launcher("app") }.allPlatforms(),
 
     jvmUiApp,
     jvmUiApp.derive("customized") { it.launcher("App") },
@@ -250,7 +252,7 @@ tasks.register("generate") {
 
 val runTasks = sampleApps.associateWith { app ->
     tasks.register("run-${app.name}") {
-        dependsOn(":${app.name}:dist")
+        dependsOn(app.distTask)
         doLast {
             if (!app.distDir.isDirectory) {
                 throw IllegalStateException("Application distribution directory ${app.distDir} does not exist.")

@@ -31,7 +31,7 @@ class UiApplicationBasePlugin : Plugin<Project> {
                     it.sourceIcon.set(app.iconFile)
                 }
 
-                app.distributionContainer.each { dist ->
+                app.eachTarget { _, dist ->
                     dist.launcherFilePath.set(capitalizedAppName.map { "MacOS/$it" })
 
                     dist.distTask.configure { distImage ->

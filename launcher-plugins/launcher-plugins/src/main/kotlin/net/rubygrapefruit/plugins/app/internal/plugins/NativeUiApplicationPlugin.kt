@@ -29,14 +29,7 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                 multiplatformComponents.eachNativeTarget { machine, nativeTarget ->
                     val executable = nativeTarget.binaries.withType(Executable::class.java).first()
                     val binaryFile = layout.file(executable.linkTaskProvider.map { it.binary.outputFile })
-                    // TODO - add a distribution for each target
-                    if (machine == HostMachine.current.machine) {
-                        app.distributionContainer.each {
-                            if (it.isDefault) {
-                                it.launcherFile.set(binaryFile)
-                            }
-                        }
-                    }
+                    app.attachExecutable(machine, binaryFile)
                 }
             }
 

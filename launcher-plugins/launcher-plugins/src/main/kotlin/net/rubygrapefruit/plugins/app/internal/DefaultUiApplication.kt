@@ -1,7 +1,9 @@
 package net.rubygrapefruit.plugins.app.internal
 
+import net.rubygrapefruit.plugins.app.NativeMachine
 import net.rubygrapefruit.plugins.app.UiApplication
 import org.gradle.api.Project
+import org.gradle.api.file.RegularFile
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
@@ -11,13 +13,19 @@ abstract class DefaultUiApplication(
     providers: ProviderFactory,
     project: Project
 ) : MutableApplication, UiApplication {
-    final override val distributionContainer = DistributionContainer(project.tasks, objects, providers)
+    protected val targets = NativeTargetsContainer(objects, providers, project.tasks)
+
+    final override val distributionContainer = targets.distributions
 
     val capitalizedAppName: Provider<String> = appName.map { it.replaceFirstChar { it.uppercase() } }
 
     val iconName: Provider<String> = capitalizedAppName.map { "$it.icns" }
 
-    init {
-        distributionContainer.add("main", true, HostMachine.current is MacOS)
+    fun attachExecutable(machine: NativeMachine, binaryFile: Provider<RegularFile>) {
+        targets.attachExecutable(machine, binaryFile)
+    }
+
+    fun eachTarget(action: (NativeMachine, DefaultDistribution) -> Unit) {
+        targets.eachTarget(action)
     }
 }

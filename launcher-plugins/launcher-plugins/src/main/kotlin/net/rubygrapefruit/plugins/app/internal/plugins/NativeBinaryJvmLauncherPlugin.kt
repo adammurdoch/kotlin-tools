@@ -16,7 +16,7 @@ class NativeBinaryJvmLauncherPlugin : Plugin<Project> {
                 app.packaging = JvmApplicationWithNativeBinary()
 
                 val binaryTask = tasks.register("native-binary", NativeBinary::class.java) {
-                    it.launcherFile.set(layout.buildDirectory.file(HostMachine.current.exeName("native-binary/launcher")))
+                    it.launcherFile.set(layout.buildDirectory.file("native-binary/launcher"))
                     it.module.set(app.module.name)
                     it.mainClass.set(app.mainClass)
                     it.javaVersion.set(app.targetJavaVersion)
@@ -24,7 +24,7 @@ class NativeBinaryJvmLauncherPlugin : Plugin<Project> {
                 }
 
                 app.distributionContainer.each { dist ->
-                    dist.launcherFile.set(binaryTask.flatMap { it.launcherFile })
+                    dist.launcherFile.set(binaryTask.flatMap { it.launcherFile.map { layout.projectDirectory.file(HostMachine.current.exeName(it.asFile.absolutePath)) } })
                 }
             }
         }

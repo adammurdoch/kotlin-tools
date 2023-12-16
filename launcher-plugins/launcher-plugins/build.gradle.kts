@@ -1,4 +1,4 @@
-import net.rubygrapefruit.plugins.bootstrap.Versions
+import net.rubygrapefruit.plugins.app.Versions
 
 plugins {
     id("net.rubygrapefruit.gradle-plugin")

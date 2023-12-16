@@ -69,12 +69,12 @@ gradlePlugin {
     }
 }
 
-val outFile = layout.buildDirectory.file("generated-src/main/kotlin/net/rubygrapefruit/plugins/bootstrap/Versions.kt")
+val outFile = layout.buildDirectory.file("generated-src/main/kotlin/net/rubygrapefruit/plugins/app/Versions.kt")
 val generateResource = tasks.register("generate-version-resource") {
     outputs.file(outFile)
     doLast {
         outFile.get().asFile.writeText("""
-            package net.rubygrapefruit.plugins.bootstrap
+            package net.rubygrapefruit.plugins.app
             
             /*
              * THIS IS A GENERATED FILE. DO NOT EDIT.
@@ -88,6 +88,7 @@ val generateResource = tasks.register("generate-version-resource") {
                 val java = ${Constants.java}
                 val pluginsJava = ${Constants.pluginsJava}
                 val kotlinPluginCoordinates = "${Constants.kotlinPluginCoordinates}"
+                val serializationPluginCoordinates = "${Constants.serializationPluginCoordinates}"
                 val pluginsGroup = "${Constants.pluginsGroup}"
                 val pluginsVersion = "${Constants.pluginsVersion}"
                 val bootstrapPluginCoordinates = "${Constants.bootstrapPluginCoordinates}"

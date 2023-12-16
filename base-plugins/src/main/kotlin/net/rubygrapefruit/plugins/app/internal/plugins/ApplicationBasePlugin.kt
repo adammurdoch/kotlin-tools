@@ -1,6 +1,5 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
-import net.rubygrapefruit.plugins.app.Versions
 import net.rubygrapefruit.plugins.app.internal.ApplicationRegistry
 import net.rubygrapefruit.plugins.app.internal.MultiPlatformComponentRegistry
 import net.rubygrapefruit.plugins.app.internal.checkSettingsPluginApplied
@@ -16,7 +15,6 @@ class ApplicationBasePlugin : Plugin<Project> {
 
             target.extensions.create("multiplatformComponents", MultiPlatformComponentRegistry::class.java)
             target.extensions.create("applications", ApplicationRegistry::class.java)
-            target.extensions.create("versions", Versions::class.java)
         }
     }
 }

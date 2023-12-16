@@ -2,6 +2,7 @@ package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.internal.settingsPluginApplied
 import net.rubygrapefruit.plugins.bootstrap.SettingsPlugin
+import net.rubygrapefruit.plugins.app.Versions
 import org.gradle.api.Plugin
 import org.gradle.api.initialization.Settings
 
@@ -11,6 +12,8 @@ class KotlinBasePlugin : Plugin<Settings> {
             plugins.apply(SettingsPlugin::class.java)
             gradle.rootProject { project ->
                 project.run {
+                    buildscript.dependencies.add("classpath", Versions.serializationPluginCoordinates)
+
                     // Need this to resolve native tooling
                     repositories.mavenCentral()
 

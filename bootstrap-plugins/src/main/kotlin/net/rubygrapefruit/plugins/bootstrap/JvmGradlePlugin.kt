@@ -2,6 +2,7 @@ package net.rubygrapefruit.plugins.bootstrap
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import net.rubygrapefruit.plugins.app.Versions
 
 class JvmGradlePlugin : Plugin<Project> {
     override fun apply(target: Project) {

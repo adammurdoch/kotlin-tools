@@ -4,7 +4,7 @@ import net.rubygrapefruit.plugins.app.JvmLibrary
 import net.rubygrapefruit.plugins.app.internal.DefaultJvmLibrary
 import net.rubygrapefruit.plugins.app.internal.JvmModuleRegistry
 import net.rubygrapefruit.plugins.app.internal.toModuleName
-import net.rubygrapefruit.plugins.bootstrap.Versions
+import net.rubygrapefruit.plugins.app.Versions
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSetContainer

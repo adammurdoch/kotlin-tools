@@ -1,3 +1,5 @@
+import net.rubygrapefruit.plugins.app.Versions
+
 plugins {
     id("net.rubygrapefruit.jvm.lib")
 }
@@ -8,7 +10,7 @@ library {
     module.name = "net.rubygrapefruit.tools.download"
     // TODO - this should not be required
     module.requires.add("machine.info")
-    targetJavaVersion = versions.pluginsJava
+    targetJavaVersion = Versions.pluginsJava
     dependencies {
         implementation("net.rubygrapefruit.libs:machine-info:any")
     }

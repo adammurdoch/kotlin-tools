@@ -3,7 +3,7 @@ package net.rubygrapefruit.plugins.app.internal
 import net.rubygrapefruit.plugins.app.JvmLibrary
 import net.rubygrapefruit.plugins.app.JvmModule
 import net.rubygrapefruit.plugins.app.MultiPlatformLibrary
-import net.rubygrapefruit.plugins.bootstrap.Versions
+import net.rubygrapefruit.plugins.app.Versions
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler

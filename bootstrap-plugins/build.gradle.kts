@@ -78,15 +78,17 @@ val generateResource = tasks.register("generate-version-resource") {
              * THIS IS A GENERATED FILE. DO NOT EDIT.
              */
             object Versions {
-                val kotlin = "${Constants.kotlin}"
+                val kotlin = Kotlin
                 val serialization = Serialization
-                val coroutines = "${Constants.coroutines}"
-                val dateTime = "${Constants.dateTime}"
+                val coroutines = Coroutines
+                val dateTime = DateTime
                 val java = ${Constants.java}
                 val plugins = Plugins
-                val kotlinPluginCoordinates = "${Constants.kotlinPluginCoordinates}"
-                val coroutinesCoordinates = "${Constants.coroutinesCoordinates}"
-                val dateTimeCoordinates = "${Constants.dateTimeCoordinates}"
+            }
+
+            object Kotlin {
+                val version = "${Constants.kotlin}"
+                val pluginCoordinates = "${Constants.kotlinPluginCoordinates}"
             }
             
             object Plugins {
@@ -94,7 +96,7 @@ val generateResource = tasks.register("generate-version-resource") {
                 val group = "${Constants.pluginsGroup}"
                 val version = "${Constants.pluginsVersion}"
                 val basePluginsCoordinates = group + ":base-plugins:" + version
-                val bootstrapPluginCoordinates = group + ":bootstrap-plugins:"
+                val bootstrapPluginCoordinates = group + ":bootstrap-plugins:" + version
             }
 
             object Serialization {
@@ -107,6 +109,16 @@ val generateResource = tasks.register("generate-version-resource") {
             object SerializationJson {
                 val version = "${Constants.serializationJson}"
                 val coordinates = "${Constants.serializationJsonCoordinates}"
+            }
+
+            object Coroutines {
+                val version = "${Constants.coroutines}"
+                val coordinates = "${Constants.coroutinesCoordinates}"
+            }
+
+            object DateTime {
+                val version = "${Constants.dateTime}"
+                val coordinates = "${Constants.dateTimeCoordinates}"
             }
         """.trimIndent())
     }

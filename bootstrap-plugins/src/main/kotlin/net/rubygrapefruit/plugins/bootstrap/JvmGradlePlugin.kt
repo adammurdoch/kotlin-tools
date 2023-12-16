@@ -10,7 +10,7 @@ class JvmGradlePlugin : Plugin<Project> {
             plugins.apply("java-gradle-plugin")
             plugins.apply(JvmBasePlugin::class.java)
 
-            dependencies.add("api", Versions.kotlinPluginCoordinates)
+            dependencies.add("api", Versions.kotlin.pluginCoordinates)
             dependencies.add("implementation", Versions.plugins.bootstrapPluginCoordinates)
         }
     }

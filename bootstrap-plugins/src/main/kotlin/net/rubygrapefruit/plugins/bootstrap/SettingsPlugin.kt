@@ -10,7 +10,7 @@ class SettingsPlugin : Plugin<Settings> {
             gradle.rootProject { project ->
                 project.run {
                     buildscript.repositories.mavenCentral()
-                    buildscript.dependencies.add("classpath", Versions.kotlinPluginCoordinates)
+                    buildscript.dependencies.add("classpath", Versions.kotlin.pluginCoordinates)
                 }
             }
         }

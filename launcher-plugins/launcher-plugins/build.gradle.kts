@@ -4,11 +4,10 @@ plugins {
     id("net.rubygrapefruit.gradle-plugin")
 }
 
-group = Versions.pluginsGroup
+group = Versions.plugins.group
 
 dependencies {
     implementation("net.rubygrapefruit.libs:download:1.0")
-    implementation(Versions.bootstrapPluginCoordinates)
 }
 
 gradlePlugin {

@@ -13,7 +13,7 @@ class JvmBasePlugin: Plugin<Project> {
             repositories.mavenCentral()
 
             extensions.getByType(KotlinJvmProjectExtension::class.java).run {
-                jvmToolchain(Versions.pluginsJava)
+                jvmToolchain(Versions.plugins.java)
             }
         }
     }

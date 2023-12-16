@@ -25,8 +25,6 @@ object Constants {
 
     val pluginsGroup = "net.rubygrapefruit.plugins"
     val pluginsVersion = "0.1-dev"
-    val bootstrapPluginCoordinates
-        get() = "$pluginsGroup:bootstrap-plugins:$pluginsVersion"
 }
 
 group = Constants.pluginsGroup
@@ -81,20 +79,34 @@ val generateResource = tasks.register("generate-version-resource") {
              */
             object Versions {
                 val kotlin = "${Constants.kotlin}"
-                val serialization = "${Constants.serialization}"
-                val serializationJson = "${Constants.serializationJson}"
+                val serialization = Serialization
                 val coroutines = "${Constants.coroutines}"
                 val dateTime = "${Constants.dateTime}"
                 val java = ${Constants.java}
-                val pluginsJava = ${Constants.pluginsJava}
+                val plugins = Plugins
                 val kotlinPluginCoordinates = "${Constants.kotlinPluginCoordinates}"
-                val serializationPluginCoordinates = "${Constants.serializationPluginCoordinates}"
-                val pluginsGroup = "${Constants.pluginsGroup}"
-                val pluginsVersion = "${Constants.pluginsVersion}"
-                val bootstrapPluginCoordinates = "${Constants.bootstrapPluginCoordinates}"
-                val serializationJsonCoordinates = "${Constants.serializationJsonCoordinates}"
                 val coroutinesCoordinates = "${Constants.coroutinesCoordinates}"
                 val dateTimeCoordinates = "${Constants.dateTimeCoordinates}"
+            }
+            
+            object Plugins {
+                val java = ${Constants.pluginsJava}
+                val group = "${Constants.pluginsGroup}"
+                val version = "${Constants.pluginsVersion}"
+                val basePluginsCoordinates = group + ":base-plugins:" + version
+                val bootstrapPluginCoordinates = group + ":bootstrap-plugins:"
+            }
+
+            object Serialization {
+                val version = "${Constants.serialization}"
+                val pluginCoordinates = "${Constants.serializationPluginCoordinates}"
+                val pluginId = "org.jetbrains.kotlin.plugin.serialization"
+                val json = SerializationJson
+            }
+            
+            object SerializationJson {
+                val version = "${Constants.serializationJson}"
+                val coordinates = "${Constants.serializationJsonCoordinates}"
             }
         """.trimIndent())
     }

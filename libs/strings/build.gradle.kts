@@ -8,6 +8,6 @@ group = "net.rubygrapefruit.libs"
 
 library {
     jvm {
-        targetJavaVersion = Versions.pluginsJava
+        targetJavaVersion = Versions.plugins.java
     }
 }

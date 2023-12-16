@@ -11,7 +11,7 @@ class JvmGradlePlugin : Plugin<Project> {
             plugins.apply(JvmBasePlugin::class.java)
 
             dependencies.add("api", Versions.kotlinPluginCoordinates)
-            dependencies.add("implementation", Versions.bootstrapPluginCoordinates)
+            dependencies.add("implementation", Versions.plugins.bootstrapPluginCoordinates)
         }
     }
 }

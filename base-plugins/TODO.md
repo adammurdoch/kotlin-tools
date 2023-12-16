@@ -46,3 +46,5 @@
     - No way to have a generated output directory (eg a task that uses `DownloadRepository` to locate the output)
     - Improve error message when settings plugin is applied to project, and vice versa
     - Some way to apply concurrent limits across all builds (eg to work around `commonizeNativeDistribution` concurrency issue)
+    - Some way to map the base name of a Provider<RegularFile>
+    - Some way to convert a `File`, `Path`, or string path to `RegularFile`

@@ -29,14 +29,6 @@ class ProcessBuilderTest {
         } catch (e: IOException) {
             // Expected
         }
-
-        val process2 = Process.command(listOf("ls", "missing")).collectOutput().start()
-        try {
-            process2.waitFor()
-            fail()
-        } catch (e: IOException) {
-            // Expected
-        }
     }
 
     @Test
@@ -63,6 +55,17 @@ class ProcessBuilderTest {
 
         val ls = Process.command(listOf("ls", dir.absolutePath)).collectOutput().start().waitFor()
         assertEquals(listOf("1", "2"), ls.trim().lines().sorted())
+    }
+
+    @Test
+    fun `throws exception when collecting output and command exits with non-zero`() {
+        val process = Process.command(listOf("ls", "missing")).collectOutput().start()
+        try {
+            process.waitFor()
+            fail()
+        } catch (e: IOException) {
+            // Expected
+        }
     }
 
     @Test

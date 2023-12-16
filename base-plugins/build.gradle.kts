@@ -4,7 +4,7 @@ plugins {
     id("net.rubygrapefruit.bootstrap.gradle-plugin")
 }
 
-group = Versions.pluginsGroup
+group = Versions.plugins.group
 
 dependencies {
     implementation("net.rubygrapefruit.libs:bytecode:1.0")

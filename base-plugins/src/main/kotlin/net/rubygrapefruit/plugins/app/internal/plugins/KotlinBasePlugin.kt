@@ -12,7 +12,7 @@ class KotlinBasePlugin : Plugin<Settings> {
             plugins.apply(SettingsPlugin::class.java)
             gradle.rootProject { project ->
                 project.run {
-                    buildscript.dependencies.add("classpath", Versions.serializationPluginCoordinates)
+                    buildscript.dependencies.add("classpath", Versions.serialization.pluginCoordinates)
 
                     // Need this to resolve native tooling
                     repositories.mavenCentral()

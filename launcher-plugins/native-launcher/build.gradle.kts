@@ -4,7 +4,7 @@ plugins {
     id("net.rubygrapefruit.native.base-cli-app")
 }
 
-group = Versions.pluginsGroup
+group = Versions.plugins.group
 
 application {
     macOS()

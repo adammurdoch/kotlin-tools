@@ -24,6 +24,7 @@ class NativeBinaryJvmLauncherPlugin : Plugin<Project> {
                 }
 
                 app.distributionContainer.each { dist ->
+                    dist.launcherFilePath.set(app.appName.map { HostMachine.current.exeName(it) })
                     dist.launcherFile.set(binaryTask.flatMap { it.launcherFile.map { layout.projectDirectory.file(HostMachine.current.exeName(it.asFile.absolutePath)) } })
                 }
             }

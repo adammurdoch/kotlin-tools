@@ -43,7 +43,7 @@ abstract class JvmModuleRegistry(
         // TODO - should use convention
         module.exports.set(exports.map { it.packagesFile.get().asFile.readLines() })
         if (jvmApplication != null) {
-            jvmApplication.mainClass.convention(exports.map { it.mainClassesFile.get().asFile.readLines().first() })
+            jvmApplication.mainClass.convention(exports.map { it.mainClassesFile.get().asFile.readText().trim() })
         }
 
         val moduleTask = project.tasks.register("moduleInfo", JvmModuleInfo::class.java) {

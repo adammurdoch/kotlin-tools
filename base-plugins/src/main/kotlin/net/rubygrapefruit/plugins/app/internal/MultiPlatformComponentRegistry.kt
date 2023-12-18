@@ -13,12 +13,7 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
     private val unixTestSourceSets = mutableSetOf<String>()
     private val machines = mutableSetOf<NativeMachine>()
     private val machineActions = mutableListOf<(NativeMachine, KotlinNativeTarget) -> Unit>()
-
-    /**
-     * The current set of target machines.
-     */
-    val targetMachines: Set<NativeMachine>
-        get() = machines
+    private val jvm = SimpleContainer<Boolean>()
 
     init {
         project.afterEvaluate {
@@ -43,6 +38,7 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
             }
             jvm()
         }
+        jvm.add(true)
     }
 
     fun browser() {
@@ -58,6 +54,10 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
         for (machine in machines) {
             action(machine, project.kotlin.targets.getByName(machine.kotlinTarget) as KotlinNativeTarget)
         }
+    }
+
+    fun jvmTarget(action: () -> Unit) {
+        jvm.each { action() }
     }
 
     private fun createIntermediateSourceSet(name: String, parent: String, children: MutableSet<String>) {

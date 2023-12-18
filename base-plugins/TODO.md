@@ -1,19 +1,18 @@
 
 # TODO
 
+- Move JVM test dependency declarations into library and application blocks
 - Don't add a dist task when there is no source for the current target (eg native-launcher on linux)
-- Native-launcher: build both macOS binaries, do not build on non-macOS machine
 - Native-launcher: fix Windows
 - Move dependency declarations into library and application blocks
     - UI applications 
     - commonTest for applications 
 - Libraries in this repo should target Java 11?
-- KMP base library - generate module file when JVM is a target
 - Enable CC
 - Add `run` task for apps
 - Add `install` task for apps
 - Support KMP app that targets native + jvm + browser + node
-- Don't include windows launcher script for embedded JVM and native exe JVM apps
+- Don't include launcher script for all targets for embedded JVM and native exe JVM apps (eg don't include bat script for macOS dist)
 - Use `--launcher` instead of `--add-modules` with `jlink`
 - Convert automatic modules to real modules prior to using with `jlink`
 - Download service: don't keep the install dir when install action fails
@@ -31,6 +30,7 @@
     - Customisation
 - Refactor `DownloadRepository` to use Gradle exec service when used in a plugin.
 - Gradle issues:
+    - `MapProperty.getting()` does not seem to retain task dependencies
     - Fix import of `test-apps` - does not seem to be included
     - Use version catalog
     - "Included build 'x' does not exist" does not give any content, e.g. where is it defined?

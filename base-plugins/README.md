@@ -69,8 +69,8 @@ Expects that the application uses the JVM module system.
 
 ## `net.rubygrapefruit.jvm.embedded-jvm`
 
-Can be applied with `net.rubygrapefruit.jvm.cli-app` to include a copy of the JVM in the application distribution,
-instead of using a launcher script. Uses `jlink` to create the JVM image.
+Can be applied with `net.rubygrapefruit.jvm.cli-app` to include a copy of the JVM in the application distribution.
+The launcher script uses this embedded JVM. Uses `jlink` to create the JVM image.
 
 ## `net.rubygrapefruit.jvm.native-binary`
 
@@ -83,6 +83,7 @@ Builds a desktop UI application implemented in Kotlin/JVM and that presents a Sw
 Expects that the application uses the JVM module system.
 
 - Creates a debug (unsigned) macOS application bundle and a release (signed and notarized) application bundle
+- Includes an embedded JVM in the application bundle
 - Provides an application icon, default location is `src/main/Icon1024.png`
 - Use `dist` task to build the debug application bundle
 - Use `releaseDist` to build the release application bundle

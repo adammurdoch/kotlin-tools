@@ -40,6 +40,21 @@ abstract class JvmModuleInfo : DefaultTask() {
         val requiresTransitive = requiresTransitive.get()
         val requires = requires.get() - requiresTransitive
 
+        println("* Generating module-info.class")
+        println("* module: ${module.get()}")
+        println("* exports:")
+        for (export in exports.get()) {
+            println("  * $export")
+        }
+        println("* requires:")
+        for (p in requires) {
+            println("  * $p")
+        }
+        println("* requires transitive:")
+        for (p in requiresTransitive) {
+            println("  * $p")
+        }
+
         val outputFile = outputDirectory.resolve("module-info.class")
         BytecodeWriter().writeTo(outputFile) {
             module(module.get(), exports.get().sorted(), requires.sorted(), requiresTransitive.sorted())

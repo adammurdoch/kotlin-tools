@@ -31,6 +31,7 @@
 - Refactor `DownloadRepository` to use Gradle exec service when used in a plugin.
 - Gradle issues:
     - `MapProperty.getting()` does not seem to retain task dependencies
+    - Make it easier to use ArtifactCollection from task
     - Fix import of `test-apps` - does not seem to be included
     - Use version catalog
     - "Included build 'x' does not exist" does not give any content, e.g. where is it defined?

@@ -31,7 +31,8 @@ class KmpBaseLibraryPlugin : Plugin<Project> {
                 val extension = kotlin
                 val jvmTarget = extension.targets.getByName("jvm") as KotlinJvmTarget
 
-                val apiConfig = configurations.getByName(jvmTarget.apiElementsConfigurationName)
+                val apiConfig = configurations.getByName("jvmCompileClasspath")
+                val runtimeClasspath = configurations.getByName("jvmRuntimeClasspath")
 
                 val apiClasspath = configurations.create("apiClasspath")
                 apiClasspath.extendsFrom(apiConfig)
@@ -41,7 +42,7 @@ class KmpBaseLibraryPlugin : Plugin<Project> {
                 val classesDir = files(compilation.compileTaskProvider.flatMap { (it as KotlinJvmCompile).destinationDirectory })
 
                 val moduleInfoCp = extensions.getByType(JvmModuleRegistry::class.java)
-                    .inspectClassPathsFor(lib.module, null, classesDir, apiClasspath, compilation.compileDependencyFiles).moduleInfoClasspath
+                    .inspectClassPathsFor(lib.module, null, classesDir, apiClasspath, runtimeClasspath).moduleInfoClasspath
                 tasks.named("jvmJar", Jar::class.java) {
                     it.from(moduleInfoCp)
                 }

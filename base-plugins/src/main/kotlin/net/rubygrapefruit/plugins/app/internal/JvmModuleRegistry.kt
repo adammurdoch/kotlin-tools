@@ -2,11 +2,16 @@ package net.rubygrapefruit.plugins.app.internal
 
 import net.rubygrapefruit.plugins.app.JvmApplication
 import net.rubygrapefruit.plugins.app.JvmModule
-import net.rubygrapefruit.plugins.app.internal.tasks.InspectClasses
 import net.rubygrapefruit.plugins.app.internal.tasks.InferRequiredModules
+import net.rubygrapefruit.plugins.app.internal.tasks.InspectClasses
 import net.rubygrapefruit.plugins.app.internal.tasks.JvmModuleInfo
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier
+import org.gradle.api.artifacts.component.ProjectComponentIdentifier
 import org.gradle.api.file.FileCollection
+import org.gradle.api.provider.Provider
+import java.io.File
 
 abstract class JvmModuleRegistry(
     private val project: Project
@@ -15,25 +20,20 @@ abstract class JvmModuleRegistry(
         module: JvmModule,
         jvmApplication: JvmApplication?,
         classesDirs: FileCollection,
-        apiClassPath: FileCollection?,
-        compileClasspath: FileCollection
+        apiClassPath: Configuration?,
+        compileClasspath: Configuration
     ): ModuleClasspathInspectionResults {
-        if (apiClassPath != null) {
-            val requiresTransitive =
-                project.tasks.register("requiredTransitiveModules", InferRequiredModules::class.java) {
-                    it.classPath.from(apiClassPath)
-                    it.outputFile.set(project.layout.buildDirectory.file("jvm/required-transitive-modules.txt"))
-                }
-            // TODO - should use convention
-            module.requiresTransitive.set(requiresTransitive.map { it.outputFile.get().asFile.readLines() })
-        }
-
         val requires = project.tasks.register("requiredModules", InferRequiredModules::class.java) {
-            it.classPath.from(compileClasspath)
-            it.outputFile.set(project.layout.buildDirectory.file("jvm/required-modules.txt"))
+            it.runtimeClassPath.set(toLibraries(compileClasspath))
+            if (apiClassPath != null) {
+                it.apiClassPath.set(toLibraries(apiClassPath))
+            }
+            it.requiresTransitiveOutputFile.set(project.layout.buildDirectory.file("jvm/requires-transitive-modules.txt"))
+            it.requiresOutputFile.set(project.layout.buildDirectory.file("jvm/requires-modules.txt"))
         }
         // TODO - should use convention
-        module.requires.set(requires.map { it.outputFile.get().asFile.readLines() })
+        module.requiresTransitive.set(requires.map { it.requiresTransitiveOutputFile.get().asFile.readLines() })
+        module.requires.set(requires.map { it.requiresOutputFile.get().asFile.readLines() })
 
         val exports = project.tasks.register("classInfo", InspectClasses::class.java) {
             it.classesDirs.from(classesDirs)
@@ -56,5 +56,19 @@ abstract class JvmModuleRegistry(
         }
 
         return ModuleClasspathInspectionResults(moduleTask.flatMap { it.outputDirectory })
+    }
+
+    private fun toLibraries(configuration: Configuration): Provider<Map<String, File>> {
+        return configuration.incoming.artifacts.resolvedArtifacts.map {
+            it.associate {
+                val componentIdentifier = it.id.componentIdentifier
+                val id = when (componentIdentifier) {
+                    is ModuleComponentIdentifier -> "module:${componentIdentifier.group}:${componentIdentifier.module}"
+                    is ProjectComponentIdentifier -> "project:${componentIdentifier.buildTreePath}"
+                    else -> throw UnsupportedOperationException()
+                }
+                Pair(id, it.file)
+            }
+        }
     }
 }

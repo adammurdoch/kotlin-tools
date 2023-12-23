@@ -29,6 +29,7 @@ abstract class InferRequiredModules : DefaultTask() {
                     if (moduleInfoEntry != null) {
                         parser.readFrom(jar.getInputStream(moduleInfoEntry), object : ClassFileVisitor {
                             override fun module(module: ModuleInfo) {
+                                println("* using ${module.name} for ${file.name}, extracted from module-info.class")
                                 writer.write(module.name)
                                 writer.write("\n")
                             }
@@ -36,7 +37,18 @@ abstract class InferRequiredModules : DefaultTask() {
                     } else {
                         val moduleName = jar.manifest.mainAttributes.getValue("Automatic-Module-Name")
                         if (moduleName != null) {
+                            println("* using $moduleName for ${file.name}, extracted from manifest")
                             writer.write(moduleName)
+                            writer.write("\n")
+                        } else {
+                            var automaticName = file.name.removeSuffix(".jar")
+                            val match = Regex("-(\\d+(\\.|\$))").find(automaticName)
+                            if (match != null) {
+                               automaticName = automaticName.substring(0, match.range.first)
+                            }
+                            automaticName = automaticName.replace('-', '.')
+                            println("* using $automaticName for ${file.name}, extracted from file name")
+                            writer.write(automaticName)
                             writer.write("\n")
                         }
                     }

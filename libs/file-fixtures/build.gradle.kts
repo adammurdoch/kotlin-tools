@@ -9,6 +9,7 @@ group = "net.rubygrapefruit.libs"
 library {
     jvm {
         targetJavaVersion = Versions.plugins.java
+        module.name = "net.rubygrapefruit.file_fixtures"
     }
     nativeDesktop()
     common {

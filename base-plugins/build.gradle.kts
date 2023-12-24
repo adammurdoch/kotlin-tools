@@ -2,6 +2,7 @@ import net.rubygrapefruit.plugins.app.Versions
 
 plugins {
     id("net.rubygrapefruit.bootstrap.gradle-plugin")
+    kotlin("plugin.serialization")
 }
 
 group = Versions.plugins.group
@@ -9,6 +10,7 @@ group = Versions.plugins.group
 dependencies {
     implementation("net.rubygrapefruit.libs:bytecode:1.0")
     implementation("net.rubygrapefruit.libs:machine-info:1.0")
+    implementation(Versions.serialization.json.coordinates)
 }
 
 gradlePlugin {

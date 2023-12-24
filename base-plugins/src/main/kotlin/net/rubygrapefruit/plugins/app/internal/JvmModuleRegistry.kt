@@ -1,11 +1,13 @@
+@file:OptIn(ExperimentalSerializationApi::class)
+
 package net.rubygrapefruit.plugins.app.internal
 
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromStream
 import net.rubygrapefruit.plugins.app.JvmApplication
 import net.rubygrapefruit.plugins.app.JvmModule
-import net.rubygrapefruit.plugins.app.internal.tasks.InferRequiredModules
-import net.rubygrapefruit.plugins.app.internal.tasks.InspectClasses
-import net.rubygrapefruit.plugins.app.internal.tasks.JvmModuleInfo
-import net.rubygrapefruit.plugins.app.internal.tasks.LibraryInfo
+import net.rubygrapefruit.plugins.app.internal.tasks.*
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
@@ -32,12 +34,13 @@ abstract class JvmModuleRegistry(
                 it.dependsOn(apiClassPath.incoming.artifacts.resolvedArtifacts.map { emptyList<String>() })
                 it.apiClassPath.set(toLibraries(apiClassPath))
             }
-            it.requiresTransitiveOutputFile.set(project.layout.buildDirectory.file("jvm/requires-transitive-modules.txt"))
-            it.requiresOutputFile.set(project.layout.buildDirectory.file("jvm/requires-modules.txt"))
+            it.outputFile.set(project.layout.buildDirectory.file("jvm/module-info.txt"))
         }
+
+        val decoded = requires.map { it.outputFile.get().asFile.inputStream().use { Json.decodeFromStream<Modules>(it) } }
         // TODO - should use convention
-        module.requiresTransitive.set(requires.map { it.requiresTransitiveOutputFile.get().asFile.readLines() })
-        module.requires.set(requires.map { it.requiresOutputFile.get().asFile.readLines() })
+        module.requiresTransitive.set(decoded.map { it.transitive.map { it.name } })
+        module.requires.set(decoded.map { it.requires.map { it.name } })
 
         val exports = project.tasks.register("classInfo", InspectClasses::class.java) {
             it.classesDirs.from(classesDirs)

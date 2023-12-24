@@ -1,5 +1,10 @@
+@file:OptIn(ExperimentalSerializationApi::class)
+
 package net.rubygrapefruit.plugins.app.internal.tasks
 
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToStream
 import net.rubygrapefruit.bytecode.BytecodeReader
 import net.rubygrapefruit.bytecode.ClassFileVisitor
 import net.rubygrapefruit.bytecode.ModuleInfo
@@ -21,10 +26,7 @@ abstract class InferRequiredModules : DefaultTask() {
     abstract val runtimeClassPath: ListProperty<LibraryInfo>
 
     @get:OutputFile
-    abstract val requiresOutputFile: RegularFileProperty
-
-    @get:OutputFile
-    abstract val requiresTransitiveOutputFile: RegularFileProperty
+    abstract val outputFile: RegularFileProperty
 
     private val parser = BytecodeReader()
 
@@ -59,37 +61,34 @@ abstract class InferRequiredModules : DefaultTask() {
             println("  * ${entry.key} -> ${entry.value.name}")
         }
 
-        requiresTransitiveOutputFile.get().asFile.bufferedWriter().use { writer ->
-            for (lib in effectiveApi.values) {
-                writer.write(moduleForFile(lib))
-                writer.write("\n")
-            }
-        }
-        requiresOutputFile.get().asFile.bufferedWriter().use { writer ->
-            for (lib in effectiveRuntime.values) {
-                writer.write(moduleForFile(lib))
-                writer.write("\n")
-            }
+        println("* requires transitive")
+        val transitive = effectiveApi.values.map { moduleForFile(it) }
+        println("* requires")
+        val requires = effectiveRuntime.values.map { moduleForFile(it) }
+
+        val modules = Modules(requires, transitive)
+        outputFile.get().asFile.outputStream().use {
+            Json.encodeToStream(modules, it)
         }
     }
 
-    private fun moduleForFile(file: File): String {
+    private fun moduleForFile(file: File): InferredModule {
         return JarFile(file, true, ZipFile.OPEN_READ, Runtime.version()).use { jar ->
             val moduleInfoEntry = jar.getJarEntry("module-info.class")
             if (moduleInfoEntry != null) {
                 lateinit var moduleName: String
                 parser.readFrom(jar.getInputStream(moduleInfoEntry), object : ClassFileVisitor {
                     override fun module(module: ModuleInfo) {
-                        println("* using '${module.name}' for ${file.name}, extracted from module-info.class")
+                        println("  * ${file.name} -> ${module.name}, extracted from module-info.class")
                         moduleName = module.name
                     }
                 })
-                moduleName
+                InferredModule(moduleName, false)
             } else {
                 val moduleName = jar.manifest.mainAttributes.getValue("Automatic-Module-Name")
                 if (moduleName != null) {
-                    println("* using '$moduleName' for ${file.name}, extracted from manifest")
-                    moduleName
+                    println("  * ${file.name} -> $moduleName, extracted from manifest")
+                    InferredModule(moduleName, true)
                 } else {
                     var automaticName = file.name.removeSuffix(".jar")
                     val match = Regex("-(\\d+(\\.|\$))").find(automaticName)
@@ -97,8 +96,8 @@ abstract class InferRequiredModules : DefaultTask() {
                         automaticName = automaticName.substring(0, match.range.first)
                     }
                     automaticName = automaticName.replace('-', '.')
-                    println("* using '$automaticName' for ${file.name}, extracted from file name")
-                    automaticName
+                    println("  * ${file.name} -> $automaticName, extracted from file name")
+                    InferredModule(automaticName, true)
                 }
             }
         }

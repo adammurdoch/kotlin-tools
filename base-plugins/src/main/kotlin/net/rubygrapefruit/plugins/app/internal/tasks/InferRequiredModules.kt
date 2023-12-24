@@ -5,7 +5,7 @@ import net.rubygrapefruit.bytecode.ClassFileVisitor
 import net.rubygrapefruit.bytecode.ModuleInfo
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.provider.MapProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
@@ -15,10 +15,10 @@ import java.util.zip.ZipFile
 
 abstract class InferRequiredModules : DefaultTask() {
     @get:Nested
-    abstract val apiClassPath: MapProperty<String, File>
+    abstract val apiClassPath: ListProperty<LibraryInfo>
 
     @get:Nested
-    abstract val runtimeClassPath: MapProperty<String, File>
+    abstract val runtimeClassPath: ListProperty<LibraryInfo>
 
     @get:OutputFile
     abstract val requiresOutputFile: RegularFileProperty
@@ -30,44 +30,44 @@ abstract class InferRequiredModules : DefaultTask() {
 
     @TaskAction
     fun calculate() {
-        val apiElements = apiClassPath.get()
-        val runtimeElements = runtimeClassPath.get()
+        val apiElements = apiClassPath.get().associateBy { it.module }
+        val runtimeElements = runtimeClassPath.get().associateBy { it.module }
 
         val effectiveApi = mutableMapOf<String, File>()
-        for (entry in apiElements.entries) {
+        for (entry in apiElements) {
             val runtimeEntry = runtimeElements[entry.key]
             if (runtimeEntry != null) {
-                effectiveApi[entry.key] = runtimeEntry
+                effectiveApi[entry.key] = runtimeEntry.file
             } else {
-                effectiveApi[entry.key] = entry.value
+                effectiveApi[entry.key] = entry.value.file
             }
         }
 
         val effectiveRuntime = mutableMapOf<String, File>()
         for (entry in runtimeElements) {
             if (!effectiveApi.containsKey(entry.key)) {
-                effectiveRuntime[entry.key] = entry.value
+                effectiveRuntime[entry.key] = entry.value.file
             }
         }
 
         println("* using API elements:")
         for (entry in apiElements.entries) {
-            println("  * ${entry.key} -> ${entry.value.name}")
+            println("  * ${entry.key} -> ${entry.value.file.name}")
         }
         println("* using runtime elements:")
         for (entry in runtimeElements.entries) {
-            println("  * ${entry.key} -> ${entry.value.name}")
+            println("  * ${entry.key} -> ${entry.value.file.name}")
         }
 
         requiresTransitiveOutputFile.get().asFile.bufferedWriter().use { writer ->
             for (lib in apiElements.values) {
-                writer.write(moduleForFile(lib))
+                writer.write(moduleForFile(lib.file))
                 writer.write("\n")
             }
         }
         requiresOutputFile.get().asFile.bufferedWriter().use { writer ->
             for (lib in runtimeElements.values) {
-                writer.write(moduleForFile(lib))
+                writer.write(moduleForFile(lib.file))
                 writer.write("\n")
             }
         }

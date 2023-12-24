@@ -50,24 +50,24 @@ abstract class InferRequiredModules : DefaultTask() {
             }
         }
 
-        println("* using API elements:")
-        for (entry in apiElements.entries) {
-            println("  * ${entry.key} -> ${entry.value.file.name}")
+        println("* effective API elements:")
+        for (entry in effectiveApi.entries) {
+            println("  * ${entry.key} -> ${entry.value.name}")
         }
-        println("* using runtime elements:")
-        for (entry in runtimeElements.entries) {
-            println("  * ${entry.key} -> ${entry.value.file.name}")
+        println("* effective runtime elements:")
+        for (entry in effectiveRuntime.entries) {
+            println("  * ${entry.key} -> ${entry.value.name}")
         }
 
         requiresTransitiveOutputFile.get().asFile.bufferedWriter().use { writer ->
-            for (lib in apiElements.values) {
-                writer.write(moduleForFile(lib.file))
+            for (lib in effectiveApi.values) {
+                writer.write(moduleForFile(lib))
                 writer.write("\n")
             }
         }
         requiresOutputFile.get().asFile.bufferedWriter().use { writer ->
-            for (lib in runtimeElements.values) {
-                writer.write(moduleForFile(lib.file))
+            for (lib in effectiveRuntime.values) {
+                writer.write(moduleForFile(lib))
                 writer.write("\n")
             }
         }
@@ -80,7 +80,7 @@ abstract class InferRequiredModules : DefaultTask() {
                 lateinit var moduleName: String
                 parser.readFrom(jar.getInputStream(moduleInfoEntry), object : ClassFileVisitor {
                     override fun module(module: ModuleInfo) {
-                        println("* using ${module.name} for ${file.name}, extracted from module-info.class")
+                        println("* using '${module.name}' for ${file.name}, extracted from module-info.class")
                         moduleName = module.name
                     }
                 })
@@ -88,7 +88,7 @@ abstract class InferRequiredModules : DefaultTask() {
             } else {
                 val moduleName = jar.manifest.mainAttributes.getValue("Automatic-Module-Name")
                 if (moduleName != null) {
-                    println("* using $moduleName for ${file.name}, extracted from manifest")
+                    println("* using '$moduleName' for ${file.name}, extracted from manifest")
                     moduleName
                 } else {
                     var automaticName = file.name.removeSuffix(".jar")
@@ -97,7 +97,7 @@ abstract class InferRequiredModules : DefaultTask() {
                         automaticName = automaticName.substring(0, match.range.first)
                     }
                     automaticName = automaticName.replace('-', '.')
-                    println("* using $automaticName for ${file.name}, extracted from file name")
+                    println("* using '$automaticName' for ${file.name}, extracted from file name")
                     automaticName
                 }
             }

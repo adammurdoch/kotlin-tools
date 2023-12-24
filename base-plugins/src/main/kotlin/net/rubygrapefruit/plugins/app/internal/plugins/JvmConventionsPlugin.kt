@@ -27,6 +27,13 @@ class JvmConventionsPlugin : Plugin<Project> {
                 }
             }
         }
+
+        fun addApiConstraints(project: Project, apiConfiguration: String) {
+            project.dependencies.constraints.add(apiConfiguration, "org.jetbrains:annotations") {
+                it.version { it.require("16.0.3") }
+                it.because("Automatic module name is not defined for earlier versions")
+            }
+        }
     }
 
     override fun apply(target: Project) {

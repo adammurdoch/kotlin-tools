@@ -24,6 +24,8 @@ class JvmLibraryPlugin : Plugin<Project> {
 
             JvmConventionsPlugin.javaVersion(this, lib.targetJavaVersion)
 
+            JvmConventionsPlugin.addApiConstraints(this, "api")
+
             val runtimeClasspath = configurations.getByName("runtimeClasspath")
             val apiConfig = configurations.getByName("api")
 

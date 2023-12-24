@@ -18,6 +18,8 @@ class KmpBaseLibraryPlugin : Plugin<Project> {
             plugins.apply(LibraryBasePlugin::class.java)
             plugins.apply(JvmConventionsPlugin::class.java)
 
+            JvmConventionsPlugin.addApiConstraints(project, "commonMainApi")
+
             val lib = extensions.create(
                 MultiPlatformLibrary::class.java,
                 "library",

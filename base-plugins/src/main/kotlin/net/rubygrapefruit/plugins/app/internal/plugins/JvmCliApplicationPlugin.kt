@@ -3,6 +3,7 @@ package net.rubygrapefruit.plugins.app.internal.plugins
 import net.rubygrapefruit.plugins.app.internal.DefaultJvmCliApplication
 import net.rubygrapefruit.plugins.app.internal.JvmApplicationWithLauncherScripts
 import net.rubygrapefruit.plugins.app.internal.applications
+import net.rubygrapefruit.plugins.app.internal.tasks.RuntimeModulePath
 import net.rubygrapefruit.plugins.app.internal.tasks.LauncherBashScript
 import net.rubygrapefruit.plugins.app.internal.tasks.LauncherBatScript
 import org.gradle.api.Plugin
@@ -15,8 +16,7 @@ class JvmCliApplicationPlugin : Plugin<Project> {
             applications.withApp<DefaultJvmCliApplication> { app ->
                 val libsDirPath = "lib"
 
-                val libNames = objects.listProperty(String::class.java)
-                libNames.set(app.runtimeModulePath.elements.map { it.map { f -> f.asFile.name } })
+                val libNames = app.runtimeModulePath.elements.map { it.map { f -> f.asFile.name } }
 
                 val launcherTask = tasks.register("launcherScript", LauncherBashScript::class.java) {
                     it.scriptFile.set(layout.buildDirectory.file("app/launcher.sh"))

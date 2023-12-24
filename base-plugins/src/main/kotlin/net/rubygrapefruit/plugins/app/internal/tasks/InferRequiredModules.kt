@@ -83,12 +83,12 @@ abstract class InferRequiredModules : DefaultTask() {
                         moduleName = module.name
                     }
                 })
-                InferredModule(moduleName, false)
+                InferredModule(moduleName, file.name, false)
             } else {
                 val moduleName = jar.manifest.mainAttributes.getValue("Automatic-Module-Name")
                 if (moduleName != null) {
                     println("  * ${file.name} -> $moduleName, extracted from manifest")
-                    InferredModule(moduleName, true)
+                    InferredModule(moduleName, file.name, true)
                 } else {
                     var automaticName = file.name.removeSuffix(".jar")
                     val match = Regex("-(\\d+(\\.|\$))").find(automaticName)
@@ -97,7 +97,7 @@ abstract class InferRequiredModules : DefaultTask() {
                     }
                     automaticName = automaticName.replace('-', '.')
                     println("  * ${file.name} -> $automaticName, extracted from file name")
-                    InferredModule(automaticName, true)
+                    InferredModule(automaticName, file.name, true)
                 }
             }
         }

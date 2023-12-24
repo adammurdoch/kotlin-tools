@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 class InferredModule(
     val name: String,
+    val fileName: String,
     val automatic: Boolean
 )
 

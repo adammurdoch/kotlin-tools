@@ -62,7 +62,7 @@ abstract class JvmModuleRegistry(
             it.generate.set(project.provider { !project.file("src/main/java/module-info.java").isFile })
         }
 
-        return ModuleClasspathInspectionResults(moduleTask.flatMap { it.outputDirectory })
+        return ModuleClasspathInspectionResults(moduleTask.flatMap { it.outputDirectory }, requires.flatMap { it.outputFile })
     }
 
     private fun toLibraries(configuration: Configuration): Provider<List<LibraryInfo>> {

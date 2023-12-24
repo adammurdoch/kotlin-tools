@@ -4,6 +4,7 @@ import net.rubygrapefruit.plugins.app.Versions
 import net.rubygrapefruit.plugins.app.internal.JvmModuleRegistry
 import net.rubygrapefruit.plugins.app.internal.MutableJvmApplication
 import net.rubygrapefruit.plugins.app.internal.applications
+import net.rubygrapefruit.plugins.app.internal.tasks.RuntimeModulePath
 import net.rubygrapefruit.plugins.app.internal.toModuleName
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -30,13 +31,20 @@ class JvmApplicationBasePlugin : Plugin<Project> {
 
                 val classesDir = files(tasks.named("compileKotlin", KotlinCompile::class.java).map { it.destinationDirectory })
 
-                val moduleInfoCp = extensions.getByType(JvmModuleRegistry::class.java).inspectClassPathsFor(app.module, app, classesDir, null, runtimeClasspath).moduleInfoClasspath
+                val moduleInfo = extensions.getByType(JvmModuleRegistry::class.java).inspectClassPathsFor(app.module, app, classesDir, null, runtimeClasspath)
+                val moduleInfoCp = moduleInfo.moduleInfoClasspath
+
+                val runtimeModulePath = tasks.register("runtimeModulePath", RuntimeModulePath::class.java) {
+                    it.classpath.from(runtimeClasspath)
+                    it.inferredModulesFile.set(moduleInfo.inferredModulesFile)
+                    it.outputDirectory.set(layout.buildDirectory.dir("jvm/module-path"))
+                }
 
                 val sourceSet = extensions.getByType(SourceSetContainer::class.java).getByName("main")
                 sourceSet.output.dir(moduleInfoCp)
 
                 app.runtimeModulePath.from(jarTask.map { it.archiveFile })
-                app.runtimeModulePath.from(runtimeClasspath)
+                app.runtimeModulePath.from(runtimeModulePath.map { it.outputDirectory.asFileTree.matching { it.include("*.jar") } })
             }
         }
     }

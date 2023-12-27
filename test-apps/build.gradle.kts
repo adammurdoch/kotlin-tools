@@ -217,11 +217,17 @@ val samples = listOf(
     jvmCliApp.derive("native-binary") { it.native() }.allPlatforms(),
     jvmCliApp.derive("native-binary-customized") { it.native().launcher("app") }.allPlatforms(),
 
+    jvmCliApp("jvm-cli-app-min").allPlatforms(),
+    jvmCliApp("jvm-cli-app-full").allPlatforms(),
+
     jvmUiApp,
     jvmUiApp.derive("customized") { it.launcher("App") },
 
     nativeCliApp.allPlatforms(),
     nativeCliApp.derive("customized") { it.launcher("app") }.allPlatforms(),
+
+    nativeCliApp("native-cli-app-min").allPlatforms(),
+    nativeCliApp("native-cli-app-full").allPlatforms(),
 
     nativeUiApp,
     nativeUiApp.derive("customized") { it.launcher("App") }

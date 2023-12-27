@@ -134,7 +134,7 @@ class UiApp(private val appName: String) : AppNature() {
         get() = nativeBinaryPath
 }
 
-sealed class App(name: String, baseDir: File, val nature: AppNature, srcDirName: String, val allPlatforms: Boolean) :
+sealed class App(name: String, baseDir: File, val nature: AppNature, srcDirName: String, val allPlatforms: Boolean, protected val cliArgs: List<String>) :
     Sample(name, baseDir, srcDirName) {
 
     val distTask = ":$name:dist"
@@ -148,7 +148,7 @@ sealed class App(name: String, baseDir: File, val nature: AppNature, srcDirName:
     }
 
     val cliCommandLine = if (nature.cliLauncherPath != null) {
-        nature.cliLauncherPrefix + distDir.resolve(nature.cliLauncherPath!!)
+        nature.cliLauncherPrefix + distDir.resolve(nature.cliLauncherPath!!) + cliArgs
     } else {
         null
     }
@@ -166,8 +166,8 @@ sealed class App(name: String, baseDir: File, val nature: AppNature, srcDirName:
     }
 }
 
-class BaseApp(name: String, baseDir: File, nature: AppNature, srcDirName: String, allPlatforms: Boolean = false) :
-    App(name, baseDir, nature, srcDirName, allPlatforms) {
+class BaseApp(name: String, baseDir: File, nature: AppNature, srcDirName: String, allPlatforms: Boolean = false, cliArgs: List<String> = listOf("1", "+", "2")) :
+    App(name, baseDir, nature, srcDirName, allPlatforms, cliArgs) {
 
     fun derive(suffix: String, builder: (AppNature) -> AppNature = { it }): DerivedApp {
         val sampleName = "$name-$suffix"
@@ -175,14 +175,19 @@ class BaseApp(name: String, baseDir: File, nature: AppNature, srcDirName: String
     }
 
     fun allPlatforms(): BaseApp {
-        return BaseApp(name, baseDir, nature, srcDirName, true)
+        return BaseApp(name, baseDir, nature, srcDirName, true, cliArgs)
+    }
+
+    fun cliArgs(vararg args: String): BaseApp {
+        return BaseApp(name, baseDir, nature, srcDirName, allPlatforms, args.toList())
     }
 }
 
-class DerivedApp(name: String, override val derivedFrom: BaseApp, baseDir: File, nature: AppNature, allPlatforms: Boolean = false) :
-    App(name, baseDir, nature, derivedFrom.srcDirName, allPlatforms), DerivedSample {
+class DerivedApp(name: String, override val derivedFrom: BaseApp, baseDir: File, nature: AppNature, allPlatforms: Boolean = false, cliArgs: List<String> = listOf("1", "+", "2")) :
+    App(name, baseDir, nature, derivedFrom.srcDirName, allPlatforms, cliArgs), DerivedSample {
+
     fun allPlatforms(): DerivedApp {
-        return DerivedApp(name, derivedFrom, baseDir, nature, true)
+        return DerivedApp(name, derivedFrom, baseDir, nature, true, cliArgs)
     }
 }
 
@@ -203,6 +208,9 @@ val kmpLib = mppLib("kmp-lib")
 val nativeCliApp = nativeCliApp("native-cli-app")
 val nativeUiApp = macOsUiApp("native-ui-app")
 
+val jvmCliAppMin = jvmCliApp("jvm-cli-app-min").cliArgs()
+val jvmCliAppFull = jvmCliApp("jvm-cli-app-full").cliArgs("list")
+
 val samples = listOf(
     jvmLib,
     jvmLib.derive("customized"),
@@ -217,8 +225,8 @@ val samples = listOf(
     jvmCliApp.derive("native-binary") { it.native() }.allPlatforms(),
     jvmCliApp.derive("native-binary-customized") { it.native().launcher("app") }.allPlatforms(),
 
-    jvmCliApp("jvm-cli-app-min").allPlatforms(),
-    jvmCliApp("jvm-cli-app-full").allPlatforms(),
+    jvmCliAppMin.allPlatforms(),
+    jvmCliAppFull.allPlatforms(),
 
     jvmUiApp,
     jvmUiApp.derive("customized") { it.launcher("App") },
@@ -226,8 +234,8 @@ val samples = listOf(
     nativeCliApp.allPlatforms(),
     nativeCliApp.derive("customized") { it.launcher("app") }.allPlatforms(),
 
-    nativeCliApp("native-cli-app-min").allPlatforms(),
-    nativeCliApp("native-cli-app-full").allPlatforms(),
+    nativeCliApp("native-cli-app-min").cliArgs().allPlatforms(),
+    nativeCliApp("native-cli-app-full").cliArgs("list").allPlatforms(),
 
     nativeUiApp,
     nativeUiApp.derive("customized") { it.launcher("App") }
@@ -283,7 +291,7 @@ val runTasks = sampleApps.associateWith { app ->
                 println()
                 println("----")
                 exec {
-                    commandLine(app.cliCommandLine + "1 + 2")
+                    commandLine(app.cliCommandLine)
                 }
                 println("----")
             } else {

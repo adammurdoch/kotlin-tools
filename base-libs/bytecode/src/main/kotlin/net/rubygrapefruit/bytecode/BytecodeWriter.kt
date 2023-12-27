@@ -1,5 +1,6 @@
 package net.rubygrapefruit.bytecode
 
+import java.io.OutputStream
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.outputStream
@@ -11,11 +12,18 @@ class BytecodeWriter {
     fun writeTo(file: Path, builder: Builder.() -> Unit) {
         Files.createDirectories(file.parent)
         file.outputStream().buffered().use {
-            val encoder = StreamBackedEncoder(it)
-            val writer = BuilderImpl(encoder)
-            builder(writer)
-            encoder.flush()
+            writeTo(it, builder)
         }
+    }
+
+    /**
+     * Generates a class file to the given stream.
+     */
+    fun writeTo(outputStream: OutputStream, builder: Builder.() -> Unit) {
+        val encoder = StreamBackedEncoder(outputStream)
+        val writer = BuilderImpl(encoder)
+        builder(writer)
+        encoder.flush()
     }
 
     interface Builder {

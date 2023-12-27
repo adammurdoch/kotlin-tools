@@ -14,6 +14,7 @@ import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import java.io.File
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
@@ -44,30 +45,34 @@ abstract class RuntimeModulePath : DefaultTask() {
             val dest = dir.resolve(file.name)
             if (module.automatic) {
                 println("-> NEED TO PATCH ${file.name}")
-                file.inputStream().use { instr ->
-                    val zipInstr = ZipInputStream(instr)
-                    dest.outputStream().use { outstr ->
-                        val zipOutstr = ZipOutputStream(outstr)
-                        while (true) {
-                            val entry = zipInstr.nextEntry
-                            if (entry == null) {
-                                break
-                            }
-                            zipOutstr.putNextEntry(entry)
-                            zipInstr.copyTo(zipOutstr)
-                            zipOutstr.closeEntry()
-                        }
-                        zipOutstr.putNextEntry(ZipEntry("module-info.class"))
-                        bytecodeWriter.writeTo(zipOutstr) {
-                            module(module.name, emptyList(), emptyList(), emptyList())
-                        }
-                        zipOutstr.closeEntry()
-                        zipOutstr.finish()
-                    }
-                }
+                patchJarFile(file, dest, bytecodeWriter, module)
             } else {
                 println("-> DO NOT PATCH ${file.name}")
                 file.copyTo(dest)
+            }
+        }
+    }
+
+    private fun patchJarFile(file: File, dest: File, bytecodeWriter: BytecodeWriter, module: InferredModule) {
+        file.inputStream().use { instr ->
+            val zipInstr = ZipInputStream(instr)
+            dest.outputStream().use { outstr ->
+                val zipOutstr = ZipOutputStream(outstr)
+                while (true) {
+                    val entry = zipInstr.nextEntry
+                    if (entry == null) {
+                        break
+                    }
+                    zipOutstr.putNextEntry(entry)
+                    zipInstr.copyTo(zipOutstr)
+                    zipOutstr.closeEntry()
+                }
+                zipOutstr.putNextEntry(ZipEntry("module-info.class"))
+                bytecodeWriter.writeTo(zipOutstr) {
+                    module(module.name, emptyList(), emptyList(), emptyList())
+                }
+                zipOutstr.closeEntry()
+                zipOutstr.finish()
             }
         }
     }

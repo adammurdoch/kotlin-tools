@@ -108,41 +108,46 @@ abstract class InferModuleInfo : DefaultTask() {
         }
 
         fun moduleFor(library: LibraryInfo): InferredModule {
-            return moduleForLibrary.computeIfAbsent(library.componentId) {
-                val file = library.file
-                JarFile(file, true, ZipFile.OPEN_READ, Runtime.version()).use { jar ->
-                    val moduleInfoEntry = jar.getJarEntry("module-info.class")
-                    if (moduleInfoEntry != null) {
-                        lateinit var moduleName: String
-                        parser.readFrom(jar.getInputStream(moduleInfoEntry), object : ClassFileVisitor {
-                            override fun module(module: ModuleInfo) {
-                                println("  * ${file.name} -> ${module.name}, extracted from module-info.class")
-                                moduleName = module.name
-                            }
-                        })
-                        InferredModule(moduleName, file.name, false, emptyList())
-                    } else {
-                        val dependencies = componentDependencies[library.componentId] ?: emptySet()
-                        println("-> ${file.name} DEPENDENCIES: $dependencies")
-                        val requires = dependencies.map { moduleFor(it).name }
-
-                        val moduleName = jar.manifest.mainAttributes.getValue("Automatic-Module-Name")
-                        if (moduleName != null) {
-                            println("  * ${file.name} -> $moduleName, extracted from manifest")
-                            InferredModule(moduleName, file.name, true, requires)
-                        } else {
-                            var automaticName = file.name.removeSuffix(".jar")
-                            val match = Regex("-(\\d+(\\.|\$))").find(automaticName)
-                            if (match != null) {
-                                automaticName = automaticName.substring(0, match.range.first)
-                            }
-                            automaticName = automaticName.replace('-', '.')
-                            println("  * ${file.name} -> $automaticName, extracted from file name")
-                            InferredModule(automaticName, file.name, true, requires)
+            val module = moduleForLibrary.get(library.componentId)
+            if (module != null) {
+                return module
+            }
+            val file = library.file
+            val newModule = JarFile(file, true, ZipFile.OPEN_READ, Runtime.version()).use { jar ->
+                val moduleInfoEntry = jar.getJarEntry("module-info.class")
+                if (moduleInfoEntry != null) {
+                    lateinit var moduleName: String
+                    parser.readFrom(jar.getInputStream(moduleInfoEntry), object : ClassFileVisitor {
+                        override fun module(module: ModuleInfo) {
+                            println("  * ${file.name} -> ${module.name}, extracted from module-info.class")
+                            moduleName = module.name
                         }
+                    })
+                    InferredModule(moduleName, file.name, false, emptyList())
+                } else {
+                    val dependencies = componentDependencies[library.componentId] ?: emptySet()
+                    println("-> ${file.name} DEPENDENCIES: $dependencies")
+                    val requires = dependencies.map { moduleFor(it).name }
+                    println("-> ${file.name} REQUIRES: $requires")
+
+                    val moduleName = jar.manifest.mainAttributes.getValue("Automatic-Module-Name")
+                    if (moduleName != null) {
+                        println("  * ${file.name} -> $moduleName, extracted from manifest")
+                        InferredModule(moduleName, file.name, true, requires)
+                    } else {
+                        var automaticName = file.name.removeSuffix(".jar")
+                        val match = Regex("-(\\d+(\\.|\$))").find(automaticName)
+                        if (match != null) {
+                            automaticName = automaticName.substring(0, match.range.first)
+                        }
+                        automaticName = automaticName.replace('-', '.')
+                        println("  * ${file.name} -> $automaticName, extracted from file name")
+                        InferredModule(automaticName, file.name, true, requires)
                     }
                 }
             }
+            moduleForLibrary.put(library.componentId, newModule)
+            return newModule
         }
     }
 }

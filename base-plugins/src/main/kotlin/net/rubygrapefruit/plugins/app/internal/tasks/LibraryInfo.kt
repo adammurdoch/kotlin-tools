@@ -6,7 +6,7 @@ import java.io.File
 
 class LibraryInfo(
     @get:Input
-    val module: String,
+    val componentId: String,
     @get:InputFile
     val file: File
 )

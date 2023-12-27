@@ -38,7 +38,7 @@ abstract class RuntimeModulePath : DefaultTask() {
         dir.mkdirs()
 
         val modules = inferredModulesFile.get().asFile.inputStream().use { Json.decodeFromStream<Modules>(it) }
-        val modulesByFile = (modules.requires + modules.transitive).associateBy { it.fileName }
+        val modulesByFile = (modules.modules).associateBy { it.fileName }
 
         val bytecodeWriter = BytecodeWriter()
         val bytecodeReader = BytecodeReader()
@@ -47,16 +47,15 @@ abstract class RuntimeModulePath : DefaultTask() {
             val module = modulesByFile.getValue(file.name)
             val dest = dir.resolve(file.name)
             if (module.automatic) {
-                println("-> NEED TO PATCH ${file.name}")
                 patchJarFile(file, dest, bytecodeReader, bytecodeWriter, module)
             } else {
-                println("-> DO NOT PATCH ${file.name}")
                 file.copyTo(dest)
             }
         }
     }
 
     private fun patchJarFile(file: File, dest: File, bytecodeReader: BytecodeReader, bytecodeWriter: BytecodeWriter, module: InferredModule) {
+        println("* patch ${file.name}")
         file.inputStream().use { instr ->
             val zipInstr = ZipInputStream(instr)
             val packages = mutableSetOf<String>()
@@ -86,7 +85,14 @@ abstract class RuntimeModulePath : DefaultTask() {
                     zipOutstr.closeEntry()
                 }
                 zipOutstr.putNextEntry(ZipEntry("module-info.class"))
-                println("-> EXPORTS: $packages")
+                println("  * exports")
+                for (packageName in packages) {
+                    println("    * $packageName")
+                }
+                println("  * requires")
+                for (requires in module.requires) {
+                    println("    * $requires")
+                }
                 bytecodeWriter.writeTo(zipOutstr) {
                     module(module.name, packages.toList(), emptyList(), emptyList())
                 }

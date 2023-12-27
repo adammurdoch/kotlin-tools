@@ -10,8 +10,6 @@ import net.rubygrapefruit.plugins.app.JvmModule
 import net.rubygrapefruit.plugins.app.internal.tasks.*
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.component.ModuleComponentIdentifier
-import org.gradle.api.artifacts.component.ProjectComponentIdentifier
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Provider
 
@@ -23,24 +21,25 @@ abstract class JvmModuleRegistry(
         jvmApplication: JvmApplication?,
         classesDirs: FileCollection,
         apiClassPath: Configuration?,
-        compileClasspath: Configuration
+        runtimeClasspath: Configuration
     ): ModuleClasspathInspectionResults {
-        val requires = project.tasks.register("requiredModules", InferRequiredModules::class.java) {
+        val requires = project.tasks.register("requiredModules", InferModuleInfo::class.java) {
             // TODO - should not need this
-            it.dependsOn(compileClasspath.incoming.artifacts.resolvedArtifacts.map { emptyList<String>() })
-            it.runtimeClassPath.set(toLibraries(compileClasspath))
+            it.dependsOn(runtimeClasspath.incoming.artifacts.resolvedArtifacts.map { emptyList<String>() })
+            it.runtimeLibraries.set(toLibraries(runtimeClasspath))
+            it.runtimeGraph.set(runtimeClasspath.incoming.resolutionResult.rootComponent)
             if (apiClassPath != null) {
                 // TODO - should not need this
                 it.dependsOn(apiClassPath.incoming.artifacts.resolvedArtifacts.map { emptyList<String>() })
-                it.apiClassPath.set(toLibraries(apiClassPath))
+                it.apiLibraries.set(toLibraries(apiClassPath))
             }
             it.outputFile.set(project.layout.buildDirectory.file("jvm/module-info.txt"))
         }
 
         val decoded = requires.map { it.outputFile.get().asFile.inputStream().use { Json.decodeFromStream<Modules>(it) } }
         // TODO - should use convention
-        module.requiresTransitive.set(decoded.map { it.transitive.map { it.name } })
-        module.requires.set(decoded.map { it.requires.map { it.name } })
+        module.requiresTransitive.set(decoded.map { it.transitive })
+        module.requires.set(decoded.map { it.requires })
 
         val exports = project.tasks.register("classInfo", InspectClasses::class.java) {
             it.classesDirs.from(classesDirs)
@@ -67,14 +66,9 @@ abstract class JvmModuleRegistry(
 
     private fun toLibraries(configuration: Configuration): Provider<List<LibraryInfo>> {
         return configuration.incoming.artifacts.resolvedArtifacts.map {
-            it.map {
-                val componentIdentifier = it.id.componentIdentifier
-                val id = when (componentIdentifier) {
-                    is ModuleComponentIdentifier -> "module:${componentIdentifier.group}:${componentIdentifier.module}"
-                    is ProjectComponentIdentifier -> "project:${componentIdentifier.buildTreePath}"
-                    else -> throw UnsupportedOperationException()
-                }
-                LibraryInfo(id, it.file)
+            it.map { artifact ->
+                val id = artifact.id.componentIdentifier.stringId()
+                LibraryInfo(id, artifact.file)
             }
         }
     }

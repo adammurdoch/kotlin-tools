@@ -208,9 +208,6 @@ val kmpLib = mppLib("kmp-lib")
 val nativeCliApp = nativeCliApp("native-cli-app")
 val nativeUiApp = macOsUiApp("native-ui-app")
 
-val jvmCliAppMin = jvmCliApp("jvm-cli-app-min").cliArgs()
-val jvmCliAppFull = jvmCliApp("jvm-cli-app-full").cliArgs("list")
-
 val samples = listOf(
     jvmLib,
     jvmLib.derive("customized"),
@@ -225,8 +222,8 @@ val samples = listOf(
     jvmCliApp.derive("native-binary") { it.native() }.allPlatforms(),
     jvmCliApp.derive("native-binary-customized") { it.native().launcher("app") }.allPlatforms(),
 
-    jvmCliAppMin.allPlatforms(),
-    jvmCliAppFull.allPlatforms(),
+    jvmCliApp("jvm-cli-app-min").cliArgs().allPlatforms(),
+    jvmCliApp("jvm-cli-app-full").cliArgs("list").allPlatforms(),
 
     jvmUiApp,
     jvmUiApp.derive("customized") { it.launcher("App") },

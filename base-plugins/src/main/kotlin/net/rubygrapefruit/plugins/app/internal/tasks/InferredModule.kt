@@ -6,11 +6,13 @@ import kotlinx.serialization.Serializable
 class InferredModule(
     val name: String,
     val fileName: String,
-    val automatic: Boolean
+    val automatic: Boolean,
+    val requires: List<String>
 )
 
 @Serializable
 class Modules(
-    val requires: List<InferredModule>,
-    val transitive: List<InferredModule>
+    val modules: List<InferredModule>,
+    val requires: List<String>,
+    val transitive: List<String>
 )

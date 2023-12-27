@@ -9,4 +9,8 @@ class LibraryInfo(
     val componentId: String,
     @get:InputFile
     val file: File
-)
+) {
+    override fun toString(): String {
+        return "{componentId: $componentId, file: ${file.name}}"
+    }
+}

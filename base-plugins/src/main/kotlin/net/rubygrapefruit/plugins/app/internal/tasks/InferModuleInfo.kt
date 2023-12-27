@@ -81,12 +81,16 @@ abstract class InferModuleInfo : DefaultTask() {
 
     private class ModuleIndex(rootComponent: ResolvedComponentResult, runtimeLibraries: List<LibraryInfo>) {
         private val parser = BytecodeReader()
-        private val componentDependencies: Map<String, Set<String>>
+        private val componentDependencies: Map<String, Set<LibraryInfo>>
+        private val moduleForLibrary = mutableMapOf<String, InferredModule>()
 
         init {
+            val libForComponentId = runtimeLibraries.associateBy { it.componentId }
+            println("-> LIBS BY COMPONENT ID: $libForComponentId")
+
             val seen = mutableSetOf<String>()
             val queue = mutableListOf(rootComponent)
-            val result = mutableMapOf<String, Set<String>>()
+            val result = mutableMapOf<String, Set<LibraryInfo>>()
             while (queue.isNotEmpty()) {
                 val component = queue.removeFirst()
                 val id = component.id.stringId()
@@ -94,7 +98,7 @@ abstract class InferModuleInfo : DefaultTask() {
                     continue
                 }
                 val dependencies = component.dependencies.filterIsInstance<ResolvedDependencyResult>().map { it.selected }
-                result[id] = dependencies.map { it.id.stringId() }.toSet()
+                result[id] = dependencies.map { libForComponentId.get(it.id.stringId()) }.filterNotNull().toSet()
                 queue.addAll(dependencies)
             }
 
@@ -104,34 +108,38 @@ abstract class InferModuleInfo : DefaultTask() {
         }
 
         fun moduleFor(library: LibraryInfo): InferredModule {
-            val file = library.file
-            val dependencies = componentDependencies[library.componentId] ?: emptySet()
-            println("-> ${file.name} DEPENDENCIES: $dependencies")
-            return JarFile(file, true, ZipFile.OPEN_READ, Runtime.version()).use { jar ->
-                val moduleInfoEntry = jar.getJarEntry("module-info.class")
-                if (moduleInfoEntry != null) {
-                    lateinit var moduleName: String
-                    parser.readFrom(jar.getInputStream(moduleInfoEntry), object : ClassFileVisitor {
-                        override fun module(module: ModuleInfo) {
-                            println("  * ${file.name} -> ${module.name}, extracted from module-info.class")
-                            moduleName = module.name
-                        }
-                    })
-                    InferredModule(moduleName, file.name, false, emptyList())
-                } else {
-                    val moduleName = jar.manifest.mainAttributes.getValue("Automatic-Module-Name")
-                    if (moduleName != null) {
-                        println("  * ${file.name} -> $moduleName, extracted from manifest")
-                        InferredModule(moduleName, file.name, true, emptyList())
+            return moduleForLibrary.computeIfAbsent(library.componentId) {
+                val file = library.file
+                JarFile(file, true, ZipFile.OPEN_READ, Runtime.version()).use { jar ->
+                    val moduleInfoEntry = jar.getJarEntry("module-info.class")
+                    if (moduleInfoEntry != null) {
+                        lateinit var moduleName: String
+                        parser.readFrom(jar.getInputStream(moduleInfoEntry), object : ClassFileVisitor {
+                            override fun module(module: ModuleInfo) {
+                                println("  * ${file.name} -> ${module.name}, extracted from module-info.class")
+                                moduleName = module.name
+                            }
+                        })
+                        InferredModule(moduleName, file.name, false, emptyList())
                     } else {
-                        var automaticName = file.name.removeSuffix(".jar")
-                        val match = Regex("-(\\d+(\\.|\$))").find(automaticName)
-                        if (match != null) {
-                            automaticName = automaticName.substring(0, match.range.first)
+                        val dependencies = componentDependencies[library.componentId] ?: emptySet()
+                        println("-> ${file.name} DEPENDENCIES: $dependencies")
+                        val requires = dependencies.map { moduleFor(it).name }
+
+                        val moduleName = jar.manifest.mainAttributes.getValue("Automatic-Module-Name")
+                        if (moduleName != null) {
+                            println("  * ${file.name} -> $moduleName, extracted from manifest")
+                            InferredModule(moduleName, file.name, true, requires)
+                        } else {
+                            var automaticName = file.name.removeSuffix(".jar")
+                            val match = Regex("-(\\d+(\\.|\$))").find(automaticName)
+                            if (match != null) {
+                                automaticName = automaticName.substring(0, match.range.first)
+                            }
+                            automaticName = automaticName.replace('-', '.')
+                            println("  * ${file.name} -> $automaticName, extracted from file name")
+                            InferredModule(automaticName, file.name, true, requires)
                         }
-                        automaticName = automaticName.replace('-', '.')
-                        println("  * ${file.name} -> $automaticName, extracted from file name")
-                        InferredModule(automaticName, file.name, true, emptyList())
                     }
                 }
             }

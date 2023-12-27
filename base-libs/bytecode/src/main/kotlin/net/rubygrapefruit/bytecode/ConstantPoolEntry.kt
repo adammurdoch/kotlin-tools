@@ -30,6 +30,13 @@ internal class IntegerEntry(index: Int, val value: Int) : ConstantPoolEntry(inde
     }
 }
 
+internal class FloatEntry(index: Int, val value: Int) : ConstantPoolEntry(index) {
+    override fun Encoder.writeTo() {
+        u1(4u)
+        i4(value)
+    }
+}
+
 internal class LongEntry(index: Int, private val highValue: UInt, private val lowValue: UInt) : ConstantPoolEntry(index) {
     override val consumesTwoSlots: Boolean
         get() = true

@@ -79,6 +79,10 @@ internal class ConstantPool {
                     val value = i4()
                     IntegerEntry(index, value)
                 }
+                4 -> {
+                    val value = i4()
+                    FloatEntry(index, value)
+                }
                 5 -> {
                     val highValue = u4()
                     val lowValue = u4()

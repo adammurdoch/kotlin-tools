@@ -94,7 +94,7 @@ abstract class RuntimeModulePath : DefaultTask() {
                     println("    * $requires")
                 }
                 bytecodeWriter.writeTo(zipOutstr) {
-                    module(module.name, packages.toList(), emptyList(), emptyList())
+                    module(module.name, packages.toList(), module.requires, emptyList())
                 }
                 zipOutstr.closeEntry()
                 zipOutstr.finish()

@@ -68,7 +68,7 @@ abstract class InferModuleInfo : DefaultTask() {
         }
 
         println("* requires transitive")
-        val index = ModuleIndex(runtimeGraph.get(), runtimeLibraries.get())
+        val index = ModuleIndex(runtimeGraph.get(), apiLibraries.get(), runtimeLibraries.get())
         val transitive = effectiveApi.values.map { index.moduleFor(it) }
         println("* requires")
         val requires = effectiveRuntime.values.map { index.moduleFor(it) }
@@ -79,13 +79,13 @@ abstract class InferModuleInfo : DefaultTask() {
         }
     }
 
-    private class ModuleIndex(rootComponent: ResolvedComponentResult, runtimeLibraries: List<LibraryInfo>) {
+    private class ModuleIndex(rootComponent: ResolvedComponentResult, apiLibraries: List<LibraryInfo>, runtimeLibraries: List<LibraryInfo>) {
         private val parser = BytecodeReader()
         private val componentDependencies: Map<String, Set<LibraryInfo>>
         private val moduleForLibrary = mutableMapOf<String, InferredModule>()
 
         init {
-            val libForComponentId = runtimeLibraries.associateBy { it.componentId }
+            val libForComponentId = apiLibraries.associateBy { it.componentId } + runtimeLibraries.associateBy { it.componentId }
             println("-> LIBS BY COMPONENT ID: $libForComponentId")
 
             val seen = mutableSetOf<String>()
@@ -98,7 +98,18 @@ abstract class InferModuleInfo : DefaultTask() {
                     continue
                 }
                 val dependencies = component.dependencies.filterIsInstance<ResolvedDependencyResult>().map { it.selected }
-                result[id] = dependencies.map { libForComponentId.get(it.id.stringId()) }.filterNotNull().toSet()
+                println("-> DEPS FOR $id -> ${dependencies.map { it.id.stringId() }}")
+                val mapped = dependencies.flatMap { dep ->
+                    // TODO - if component has no artifact, inline its dependencies here
+                    val depLib = libForComponentId.get(dep.id.stringId())
+                    if (depLib != null) {
+                        listOf(depLib)
+                    } else {
+                        dep.dependencies.filterIsInstance<ResolvedDependencyResult>().map { it.selected }.map { libForComponentId.getValue(it.id.stringId()) }
+                    }
+                }.toSet()
+                println("-> MAPPED TO: $mapped")
+                result[id] = mapped
                 queue.addAll(dependencies)
             }
 
@@ -127,7 +138,7 @@ abstract class InferModuleInfo : DefaultTask() {
                 } else {
                     val dependencies = componentDependencies[library.componentId] ?: emptySet()
                     println("-> ${file.name} DEPENDENCIES: $dependencies")
-                    val requires = dependencies.map { moduleFor(it).name }
+                    val requires = dependencies.map { moduleFor(it).name } + listOf("java.logging")
                     println("-> ${file.name} REQUIRES: $requires")
 
                     val moduleName = jar.manifest.mainAttributes.getValue("Automatic-Module-Name")

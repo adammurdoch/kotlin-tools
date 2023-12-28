@@ -4,6 +4,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
+import kotlinx.coroutines.runBlocking
 
 class TodoApp : CliktCommand() {
     init {
@@ -16,7 +17,9 @@ class TodoApp : CliktCommand() {
 
 class ListCommand : CliktCommand(name = "list") {
     override fun run() {
-        println("list entries")
+        runBlocking {
+            println("list entries")
+        }
     }
 }
 
@@ -24,7 +27,9 @@ class AddCommand : CliktCommand(name = "add") {
     private val entry by argument().multiple()
 
     override fun run() {
-        println("add entry: $entry")
+        runBlocking {
+            println("add entry: $entry")
+        }
     }
 }
 

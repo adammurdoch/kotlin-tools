@@ -92,28 +92,44 @@ abstract class InferModuleInfo : DefaultTask() {
             val queue = mutableListOf(rootComponent)
             val result = mutableMapOf<String, Set<LibraryInfo>>()
             while (queue.isNotEmpty()) {
-                val component = queue.removeFirst()
+                val component = queue.first()
                 val id = component.id.stringId()
-                if (!seen.add(id)) {
+
+                if (result.containsKey(id)) {
+                    // Already visited
+                    queue.removeFirst()
                     continue
                 }
-                val dependencies = component.dependencies.filterIsInstance<ResolvedDependencyResult>().map { it.selected }
-                println("-> DEPS FOR $id -> ${dependencies.map { it.id.stringId() }}")
-                val mapped = dependencies.flatMap { dep ->
+
+                val dependencies = component.dependencies.filterIsInstance<ResolvedDependencyResult>().filter { !it.isConstraint }.map { it.selected }
+
+                if (seen.add(id)) {
+                    println("-> VISIT DEPS FOR $id -> ${dependencies.map { it.id.stringId() }}")
+
+                    // Not seen yet, visit dependencies
+                    queue.addAll(0, dependencies)
+                    continue
+                }
+                queue.removeFirst()
+
+                println("-> MAP DEPS FOR $id -> ${dependencies.map { it.id.stringId() }}")
+
+                val requires = dependencies.flatMap { dep ->
                     // TODO - if component has no artifact, inline its dependencies here
-                    val depLib = libForComponentId.get(dep.id.stringId())
+                    val depId = dep.id.stringId()
+                    val depLib = libForComponentId[depId]
                     if (depLib != null) {
+                        // Has an artifact, require
                         listOf(depLib)
                     } else {
-                        dep.dependencies.filterIsInstance<ResolvedDependencyResult>().map { it.selected }.map { libForComponentId.getValue(it.id.stringId()) }
+                        // No artifact, so require its dependencies
+                        result.getValue(depId)
                     }
                 }.toSet()
-                println("-> MAPPED TO: $mapped")
-                result[id] = mapped
+                println("-> MAPPED TO: $requires")
+                result[id] = requires
                 queue.addAll(dependencies)
             }
-
-            println("-> GRAPH: $result")
 
             componentDependencies = result
         }

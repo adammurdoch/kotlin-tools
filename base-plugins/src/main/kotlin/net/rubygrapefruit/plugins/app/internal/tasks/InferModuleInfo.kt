@@ -154,7 +154,7 @@ abstract class InferModuleInfo : DefaultTask() {
                 } else {
                     val dependencies = componentDependencies[library.componentId] ?: emptySet()
                     println("-> ${file.name} DEPENDENCIES: $dependencies")
-                    val requires = dependencies.map { moduleFor(it).name } + listOf("java.logging")
+                    val requires = dependencies.map { moduleFor(it).name } + listOf("java.logging", "java.management")
                     println("-> ${file.name} REQUIRES: $requires")
 
                     val moduleName = jar.manifest.mainAttributes.getValue("Automatic-Module-Name")

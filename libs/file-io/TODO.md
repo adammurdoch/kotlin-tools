@@ -1,13 +1,26 @@
 
 ## TODO
 
+- Don't inherit open files:
+  - Unix: open files with `O_CLOEXEC`
+  - Windows: does this by default 
+- Windows: open files with `FILE_SHARE_READ` when reading?
+- Seek to location
+  - `lseek()`, can also read file location using this method with relative offset of 0
+  - `SetFilePointer()`, can also read location
+- Lock file
+  - `flock()`, `lockf()` or `fctl()`
+  - `LockFileEx()` and `UnlockFile()`
+- Query platform specific locations for applications
+  - Directory for app to write data files to
+  - Directory for app configuration
 - Add specialized kinds of `Failure` and `Success` types for specific operations
   - read() reaches end of stream
   - Mismatched type for an operation, eg read text from a directory
   - Only use `UnsupportedOperation` in cases where it can actually be received
   - boolean result
   - unit result
-- More efficient readText() and writeText() 
+- More efficient `readText()` and `writeText()` 
 - Add some abstract permission functions, e.g. can read, set readable, etc
 - Atomic Directory.createTemporaryDirectory() implementation on Windows
 - Query Windows ACLs

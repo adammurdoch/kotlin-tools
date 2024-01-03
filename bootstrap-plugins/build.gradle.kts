@@ -5,8 +5,8 @@ plugins {
 
 object Constants {
     val kotlin = "1.9.21"
-    val serialization = "1.9.21"
-    val serializationJson = "1.6.0"
+    val serializationPlugin = "1.9.21"
+    val serializationLibrary = "1.6.0"
     val coroutines = "1.7.3"
     val dateTime = "0.4.1"
     val java = 17
@@ -15,13 +15,7 @@ object Constants {
     val kotlinPluginCoordinates
         get() = "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlin}"
     val serializationPluginCoordinates
-        get() = "org.jetbrains.kotlin:kotlin-serialization:${serialization}"
-    val serializationJsonCoordinates
-        get() = "org.jetbrains.kotlinx:kotlinx-serialization-json:${serializationJson}"
-    val coroutinesCoordinates
-        get() = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutines}"
-    val dateTimeCoordinates
-        get() = "org.jetbrains.kotlinx:kotlinx-datetime:${dateTime}"
+        get() = "org.jetbrains.kotlin:kotlin-serialization:${serializationPlugin}"
 
     val pluginsGroup = "net.rubygrapefruit.plugins"
     val pluginsVersion = "0.1-dev"
@@ -100,25 +94,26 @@ val generateResource = tasks.register("generate-version-resource") {
             }
 
             object Serialization {
-                val version = "${Constants.serialization}"
+                val version = "${Constants.serializationPlugin}"
+                val coordinates = "org.jetbrains.kotlinx:kotlinx-serialization-core:${Constants.serializationLibrary}"
                 val pluginCoordinates = "${Constants.serializationPluginCoordinates}"
                 val pluginId = "org.jetbrains.kotlin.plugin.serialization"
                 val json = SerializationJson
             }
             
             object SerializationJson {
-                val version = "${Constants.serializationJson}"
-                val coordinates = "${Constants.serializationJsonCoordinates}"
+                val version = "${Constants.serializationLibrary}"
+                val coordinates = "org.jetbrains.kotlinx:kotlinx-serialization-json:${Constants.serializationLibrary}"
             }
 
             object Coroutines {
                 val version = "${Constants.coroutines}"
-                val coordinates = "${Constants.coroutinesCoordinates}"
+                val coordinates = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Constants.coroutines}"
             }
 
             object DateTime {
                 val version = "${Constants.dateTime}"
-                val coordinates = "${Constants.dateTimeCoordinates}"
+                val coordinates = "org.jetbrains.kotlinx:kotlinx-datetime:${Constants.dateTime}"
             }
         """.trimIndent())
     }

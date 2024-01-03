@@ -28,7 +28,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
       - name: Execute Gradle build
-        run: ./gradlew :libs:file-io:jvmTest test-apps:runMin --continue
+        run: ./gradlew :libs:file-io:jvmTest :libs:store:allTest test-apps:runMin --continue
   macos:
     runs-on: macos-latest
     steps:

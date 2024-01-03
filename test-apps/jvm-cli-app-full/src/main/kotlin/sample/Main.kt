@@ -5,6 +5,11 @@ import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.Serializable
+import net.rubygrapefruit.file.fileSystem
+import net.rubygrapefruit.store.Store
+
+private val storeDirectory = fileSystem.userHomeDirectory.dir(".todo")
 
 class TodoApp : CliktCommand() {
     init {
@@ -15,10 +20,23 @@ class TodoApp : CliktCommand() {
     }
 }
 
-class ListCommand : CliktCommand(name = "list") {
+class ListCommand : CliktCommand(name = "list", help = "List TODO items") {
     override fun run() {
         runBlocking {
-            println("list entries")
+            Store.open(storeDirectory).use { store ->
+                val items = store.value("items", TodoItems.serializer()).get()
+                if (items != null) {
+                    println("TODO")
+                    for (item in items.items.filter { !it.completed }) {
+                        println("- ${item.description}")
+                    }
+                    for (item in items.items.filter { it.completed }) {
+                        println("- [x] ${item.description}")
+                    }
+                } else {
+                    println("No items")
+                }
+            }
         }
     }
 }
@@ -28,8 +46,27 @@ class AddCommand : CliktCommand(name = "add") {
 
     override fun run() {
         runBlocking {
-            println("add entry: $entry")
+            Store.open(storeDirectory).use { store ->
+                val value = store.value("items", TodoItems.serializer())
+                val items = value.get() ?: TodoItems(emptyList())
+                value.set(items.add(entry.joinToString(" ")))
+            }
         }
+    }
+}
+
+@Serializable
+data class TodoItem(
+    val description: String,
+    val completed: Boolean
+)
+
+@Serializable
+data class TodoItems(
+    val items: List<TodoItem>
+) {
+    fun add(description: String): TodoItems {
+        return TodoItems(items + TodoItem(description, false))
     }
 }
 

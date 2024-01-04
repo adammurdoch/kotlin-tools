@@ -1,6 +1,8 @@
 package net.rubygrapefruit.file
 
 import net.rubygrapefruit.io.IOException
+import net.rubygrapefruit.io.stream.EndOfStream
+import net.rubygrapefruit.io.stream.ReadBytes
 import kotlin.test.*
 
 class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
@@ -50,7 +52,39 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     }
 
     @Test
-    fun `can write bytes to a file to create it`() {
+    fun `can stream bytes to a file to create it`() {
+        listOf("123".encodeToByteArray(), byteArrayOf()).forEachIndexed { index, bytes ->
+            val file = fixture.testDir.file("file-$index")
+            assertTrue(file.metadata().missing)
+
+            file.writeBytes { stream ->
+                stream.write(bytes)
+            }
+
+            val metadata = file.metadata().get()
+            assertIs<RegularFileMetadata>(metadata)
+            assertEquals(bytes.size.toLong(), metadata.size)
+
+            assertContentEquals(bytes, file.readBytes().get())
+        }
+    }
+
+    @Test
+    fun `can stream nothing to a file to create it`() {
+        val file = fixture.testDir.file("file")
+        assertTrue(file.metadata().missing)
+
+        file.writeBytes { _ -> }
+
+        val metadata = file.metadata().get()
+        assertIs<RegularFileMetadata>(metadata)
+        assertEquals(0, metadata.size)
+
+        assertContentEquals(byteArrayOf(), file.readBytes().get())
+    }
+
+    @Test
+    fun `can write byte array to a file to create it`() {
         listOf("123".encodeToByteArray(), byteArrayOf()).forEachIndexed { index, bytes ->
             val file = fixture.testDir.file("file-$index")
             assertTrue(file.metadata().missing)
@@ -80,6 +114,55 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
 
             assertEquals(text, file.readText().get())
         }
+    }
+
+    @Test
+    fun `can stream bytes from file`() {
+        val bytes = "123".encodeToByteArray()
+        val file = fixture.testDir.file("file")
+        file.writeBytes(bytes)
+
+        val result = file.readBytes { stream ->
+            val buffer = ByteArray(1024)
+            val result = stream.read(buffer)
+            assertIs<ReadBytes>(result)
+            assertEquals(bytes.size, result.get())
+
+            val result2 = stream.read(buffer)
+            assertEquals(EndOfStream, result2)
+            Success(buffer.take(bytes.size).toByteArray())
+        }
+
+        assertIs<Success<*>>(result)
+        assertContentEquals(bytes, result.get())
+    }
+
+    @Test
+    fun `can stream bytes from empty file`() {
+        val bytes = byteArrayOf()
+        val file = fixture.testDir.file("file")
+        file.writeBytes(bytes)
+
+        val result = file.readBytes { stream ->
+            val buffer = ByteArray(1024)
+            val result = stream.read(buffer)
+            assertEquals(EndOfStream, result)
+            Success("result")
+        }
+
+        assertIs<Success<*>>(result)
+        assertEquals("result", result.get())
+    }
+
+    @Test
+    fun `can stream nothing bytes from file`() {
+        val file = fixture.testDir.file("file")
+        file.writeBytes(byteArrayOf())
+
+        val result = file.readBytes { _ -> Success("result") }
+
+        assertIs<Success<*>>(result)
+        assertEquals("result", result.get())
     }
 
     @Test

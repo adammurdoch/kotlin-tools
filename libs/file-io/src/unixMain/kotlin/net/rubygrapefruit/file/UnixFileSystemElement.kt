@@ -98,22 +98,9 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
         }
     }
 
-    override fun writeBytes(bytes: ByteArray) {
-        writing { stream ->
-            stream.write(bytes)
-        }
-    }
-
-    override fun writeText(text: String) {
-        writing { stream ->
-            stream.write(text.encodeToByteArray())
-        }
-    }
-
-    @OptIn(UnsafeNumber::class)
-    private fun writing(action: (WriteStream) -> Unit) {
+    override fun writeBytes(action: (WriteStream) -> Unit) {
         memScoped {
-            val des = open(path.absolutePath, O_WRONLY or O_CREAT or O_TRUNC or O_NOFOLLOW, PosixPermissions.readWriteFile.mode.convert<mode_t>())
+            val des = doOpen(path.absolutePath, O_WRONLY or O_CREAT or O_TRUNC or O_NOFOLLOW, PosixPermissions.readWriteFile.mode)
             if (des < 0) {
                 if (errno == EISDIR) {
                     throw writeFileThatExistsAndIsNotAFile(path.absolutePath)
@@ -129,14 +116,26 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
     }
 
     override fun readBytes(): Result<ByteArray> {
-        return reading { buffer -> buffer.toByteArray() }
+        return readIntoBuffer { buffer -> buffer.toByteArray() }
     }
 
     override fun readText(): Result<String> {
-        return reading { buffer -> buffer.decodeToString() }
+        return readIntoBuffer { buffer -> buffer.decodeToString() }
     }
 
-    private fun <T> reading(action: (CollectingBuffer) -> T): Result<T> {
+    private fun <T> readIntoBuffer(action: (CollectingBuffer) -> T): Result<T> {
+        return readBytes { stream ->
+            val buffer = CollectingBuffer()
+            val result = buffer.readFrom(stream)
+            if (result is TryFailure) {
+                FailedOperation(result.exception)
+            } else {
+                Success(action(buffer))
+            }
+        }
+    }
+
+    override fun <T> readBytes(action: (ReadStream) -> Result<T>): Result<T> {
         return memScoped {
             val des = open(path.absolutePath, O_RDONLY or O_NOFOLLOW)
             if (des < 0) {
@@ -147,14 +146,8 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
                 }
             }
             try {
-                val buffer = CollectingBuffer()
                 val stream = FileDescriptorBackedReadStream(FileSource(path), ReadDescriptor(des))
-                val result = buffer.readFrom(stream)
-                if (result is TryFailure) {
-                    FailedOperation(result.exception)
-                } else {
-                    Success(action(buffer))
-                }
+                action(stream)
             } finally {
                 close(des)
             }
@@ -333,6 +326,8 @@ internal class UnixSnapshot(override val path: AbsolutePath, override val metada
 internal expect fun lastModified(stat: stat): Timestamp
 
 internal expect fun mode(stat: stat): UInt
+
+internal expect fun doOpen(path: String, flags: Int, mode: UInt): Int
 
 internal fun createTempDir(baseDir: UnixDirectory): Directory {
     return memScoped {

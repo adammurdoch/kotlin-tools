@@ -1,5 +1,7 @@
 package net.rubygrapefruit.file
 
+import net.rubygrapefruit.io.stream.ReadStream
+import net.rubygrapefruit.io.stream.WriteStream
 import java.io.IOException
 import java.nio.file.*
 import java.nio.file.attribute.PosixFileAttributeView
@@ -105,16 +107,22 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
         Files.write(delegate, bytes)
     }
 
-    override fun readBytes(): Result<ByteArray> {
-        return Success(Files.readAllBytes(delegate))
-    }
-
     override fun writeText(text: String) {
         try {
             Files.writeString(delegate, text, Charsets.UTF_8)
         } catch (e: IOException) {
             throw writeToFile(this, cause = e)
         }
+    }
+
+    override fun writeBytes(action: (WriteStream) -> Unit) {
+        Files.newOutputStream(delegate).use { stream ->
+            action(OutputStreamBackedWriteStream(stream))
+        }
+    }
+
+    override fun readBytes(): Result<ByteArray> {
+        return Success(Files.readAllBytes(delegate))
     }
 
     override fun readText(): Result<String> {
@@ -124,6 +132,12 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
             readFileThatDoesNotExist(absolutePath, e)
         } catch (e: Exception) {
             readFile(this, cause = e)
+        }
+    }
+
+    override fun <T> readBytes(action: (ReadStream) -> Result<T>): Result<T> {
+        return Files.newInputStream(delegate).use { stream ->
+            action(InputStreamBackedReadStream(stream))
         }
     }
 }

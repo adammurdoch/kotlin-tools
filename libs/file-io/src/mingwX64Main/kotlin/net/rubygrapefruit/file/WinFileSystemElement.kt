@@ -4,9 +4,7 @@ package net.rubygrapefruit.file
 
 import kotlinx.cinterop.*
 import net.rubygrapefruit.io.TryFailure
-import net.rubygrapefruit.io.stream.CollectingBuffer
-import net.rubygrapefruit.io.stream.FileBackedReadStream
-import net.rubygrapefruit.io.stream.FileBackedWriteStream
+import net.rubygrapefruit.io.stream.*
 import platform.windows.*
 
 internal open class WinFileSystemElement(override val path: WinPath) : AbstractFileSystemElement() {
@@ -222,22 +220,39 @@ internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), Regul
         }
     }
 
-    override fun writeBytes(bytes: ByteArray) {
+    override fun writeBytes(action: (WriteStream) -> Unit) {
         memScoped {
             val handle = CreateFileW(absolutePath, GENERIC_WRITE.convert(), 0.convert(), null, CREATE_ALWAYS.convert(), FILE_ATTRIBUTE_NORMAL.convert(), null)
             if (handle == INVALID_HANDLE_VALUE) {
                 throw writeToFile(this@WinRegularFile, WinErrorCode.last())
             }
             try {
-                FileBackedWriteStream(absolutePath, handle).write(bytes)
+                val stream = FileBackedWriteStream(absolutePath, handle)
+                action(stream)
             } finally {
                 CloseHandle(handle)
             }
         }
     }
 
+    override fun readText(): Result<String> {
+        return readBytes().map { it.decodeToString() }
+    }
+
     override fun readBytes(): Result<ByteArray> {
-        memScoped {
+        return readBytes { stream ->
+            val buffer = CollectingBuffer()
+            val result = buffer.readFrom(stream)
+            if (result is TryFailure) {
+                FailedOperation(result.exception)
+            } else {
+                Success(buffer.toByteArray())
+            }
+        }
+    }
+
+    override fun <T> readBytes(action: (ReadStream) -> Result<T>): Result<T> {
+        return memScoped {
             val handle = CreateFileW(absolutePath, GENERIC_READ.convert(), 0.convert(), null, OPEN_EXISTING.convert(), FILE_ATTRIBUTE_NORMAL.convert(), null)
             if (handle == INVALID_HANDLE_VALUE) {
                 return if (GetLastError().convert<Int>() == ERROR_FILE_NOT_FOUND) {
@@ -247,25 +262,11 @@ internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), Regul
                 }
             }
             try {
-                val buffer = CollectingBuffer()
-                val result = buffer.readFrom(FileBackedReadStream(absolutePath, handle))
-                return if (result is TryFailure) {
-                    FailedOperation(result.exception)
-                } else {
-                    Success(buffer.toByteArray())
-                }
+                action(FileBackedReadStream(absolutePath, handle))
             } finally {
                 CloseHandle(handle)
             }
         }
-    }
-
-    override fun writeText(text: String) {
-        writeBytes(text.encodeToByteArray())
-    }
-
-    override fun readText(): Result<String> {
-        return readBytes().map { it.decodeToString() }
     }
 }
 

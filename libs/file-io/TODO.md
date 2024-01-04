@@ -21,6 +21,7 @@
   - boolean result
   - unit result
 - More efficient `readText()` and `writeText()` 
+- Error handling for read and write
 - Add some abstract permission functions, e.g. can read, set readable, etc
 - Atomic Directory.createTemporaryDirectory() implementation on Windows
 - Query Windows ACLs

@@ -1,5 +1,8 @@
 package net.rubygrapefruit.file
 
+import net.rubygrapefruit.io.stream.ReadStream
+import net.rubygrapefruit.io.stream.WriteStream
+
 /**
  * Represents an element in the file system.
  */
@@ -42,19 +45,38 @@ interface RegularFile : FileSystemElement {
     fun delete()
 
     /**
+     * Writes zero or more bytes to the file, replacing its content.
+     *
+     * The [WriteStream] is not buffered.
+     */
+    @Throws(FileSystemException::class)
+    fun writeBytes(action: (WriteStream) -> Unit)
+
+    /**
      * Writes the given bytes to the file, replacing its content.
      */
     @Throws(FileSystemException::class)
-    fun writeBytes(bytes: ByteArray)
+    fun writeBytes(bytes: ByteArray) {
+        writeBytes { stream -> stream.write(bytes) }
+    }
 
     /**
      * Writes the given text to the file, replacing it content. The text is encoded using UTF-8.
      */
     @Throws(FileSystemException::class)
-    fun writeText(text: String)
+    fun writeText(text: String) {
+        writeBytes { stream -> stream.write(text.encodeToByteArray()) }
+    }
 
     /**
      * Reads bytes from the file.
+     *
+     * The [ReadStream] is not buffered.
+     */
+    fun <T> readBytes(action: (ReadStream) -> Result<T>): Result<T>
+
+    /**
+     * Reads bytes from the file into a [ByteArray].
      */
     fun readBytes(): Result<ByteArray>
 

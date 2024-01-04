@@ -58,7 +58,7 @@ class UnsupportedOperation<T> internal constructor(private val path: String, pri
 
 class FailedOperation<T> internal constructor(override val failure: IOException) : Failed<T>()
 
-class Success<T> internal constructor(private val result: T) : Result<T>() {
+class Success<T>(private val result: T) : Result<T>() {
     override fun get() = result
 
     override fun getOrNull() = result

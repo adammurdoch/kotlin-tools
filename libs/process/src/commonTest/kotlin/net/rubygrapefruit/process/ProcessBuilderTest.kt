@@ -87,7 +87,7 @@ class ProcessBuilderTest {
         val result = Process.command("head", "-n", "1").withInputAndOutput { read, write ->
             write.write("greetings\nignore this\n".encodeToByteArray())
             val buffer = CollectingBuffer()
-            buffer.readFrom(read)
+            buffer.appendFrom(read)
             buffer.decodeToString()
         }.start().waitFor()
 

@@ -2,23 +2,24 @@ package net.rubygrapefruit.io.stream
 
 import net.rubygrapefruit.io.IOException
 import net.rubygrapefruit.io.Try
+import kotlin.math.min
 
+/**
+ * Collects a sequence of bytes in memory.
+ */
 class CollectingBuffer {
     private val head = Buffer(0)
     private var current = head
 
     /**
-     * Reads the content of the given steam into this buffer.
+     * Appends the content of the given steam to this buffer.
      */
-    fun readFrom(stream: ReadStream): Try<Unit, IOException> {
+    fun appendFrom(stream: ReadStream): Try<Unit, IOException> {
         while (true) {
-            var capacity = current.remaining
-            if (capacity == 0) {
-                val next = Buffer(current.endPos)
-                current.next = next
-                current = next
-                capacity = current.remaining
+            if (current.remaining == 0) {
+                expand()
             }
+            val capacity = current.remaining
             val result = current.readFrom(stream, capacity)
             when (result) {
                 is EndOfStream -> return Try.succeeded(Unit)
@@ -30,6 +31,29 @@ class CollectingBuffer {
         }
     }
 
+    fun append(bytes: ByteArray, offset: Int, count: Int) {
+        var remaining = count
+        var pos = offset
+        while (remaining > 0) {
+            if (current.remaining == 0) {
+                expand()
+            }
+            val copied = min(current.remaining, remaining)
+            current.append(bytes, pos, copied)
+            pos += copied
+            remaining -= copied
+        }
+    }
+
+    private fun expand() {
+        val next = Buffer(current.endPos)
+        current.next = next
+        current = next
+    }
+
+    /**
+     * Converts the contents of this buffer into a [ByteArray].
+     */
     fun toByteArray(): ByteArray {
         val result = ByteArray(current.endPos)
         var buffer: Buffer? = head
@@ -42,6 +66,9 @@ class CollectingBuffer {
         return result
     }
 
+    /**
+     * Decodes the convents of this buffer into a string using UTF-8 encoding.
+     */
     fun decodeToString(): String {
         return if (current == head) {
             current.bytes.decodeToString(0, current.writePos)
@@ -71,6 +98,11 @@ class CollectingBuffer {
 
                 is ReadFailed, EndOfStream -> result
             }
+        }
+
+        fun append(bytes: ByteArray, offset: Int, count: Int) {
+            bytes.copyInto(this.bytes, writePos, offset, offset + count)
+            writePos += count
         }
     }
 }

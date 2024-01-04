@@ -242,7 +242,7 @@ internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), Regul
     override fun readBytes(): Result<ByteArray> {
         return readBytes { stream ->
             val buffer = CollectingBuffer()
-            val result = buffer.readFrom(stream)
+            val result = buffer.appendFrom(stream)
             if (result is TryFailure) {
                 FailedOperation(result.exception)
             } else {

@@ -95,7 +95,7 @@ internal class ProcessWithExitCodeResult(control: ProcessControl) : AbstractProc
 internal class ProcessWithStringResult(control: ProcessControl) : AbstractProcess<String>(control) {
     override fun waitFor(): String {
         val buffer = CollectingBuffer()
-        buffer.readFrom(control.stdout)
+        buffer.appendFrom(control.stdout)
         control.waitFor()
         return buffer.decodeToString()
     }

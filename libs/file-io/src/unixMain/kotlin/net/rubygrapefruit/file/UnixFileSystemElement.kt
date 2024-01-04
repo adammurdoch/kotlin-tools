@@ -126,7 +126,7 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
     private fun <T> readIntoBuffer(action: (CollectingBuffer) -> T): Result<T> {
         return readBytes { stream ->
             val buffer = CollectingBuffer()
-            val result = buffer.readFrom(stream)
+            val result = buffer.appendFrom(stream)
             if (result is TryFailure) {
                 FailedOperation(result.exception)
             } else {

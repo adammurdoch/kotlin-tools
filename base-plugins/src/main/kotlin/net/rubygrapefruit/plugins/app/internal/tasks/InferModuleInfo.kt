@@ -86,8 +86,6 @@ abstract class InferModuleInfo : DefaultTask() {
 
         init {
             val libForComponentId = apiLibraries.associateBy { it.componentId } + runtimeLibraries.associateBy { it.componentId }
-            println("-> LIBS BY COMPONENT ID: $libForComponentId")
-
             val seen = mutableSetOf<String>()
             val queue = mutableListOf(rootComponent)
             val result = mutableMapOf<String, Set<LibraryInfo>>()
@@ -104,15 +102,11 @@ abstract class InferModuleInfo : DefaultTask() {
                 val dependencies = component.dependencies.filterIsInstance<ResolvedDependencyResult>().filter { !it.isConstraint }.map { it.selected }
 
                 if (seen.add(id)) {
-                    println("-> VISIT DEPS FOR $id -> ${dependencies.map { it.id.stringId() }}")
-
                     // Not seen yet, visit dependencies
                     queue.addAll(0, dependencies)
                     continue
                 }
                 queue.removeFirst()
-
-                println("-> MAP DEPS FOR $id -> ${dependencies.map { it.id.stringId() }}")
 
                 val requires = dependencies.flatMap { dep ->
                     // TODO - if component has no artifact, inline its dependencies here
@@ -126,7 +120,6 @@ abstract class InferModuleInfo : DefaultTask() {
                         result.getValue(depId)
                     }
                 }.toSet()
-                println("-> MAPPED TO: $requires")
                 result[id] = requires
                 queue.addAll(dependencies)
             }
@@ -153,9 +146,7 @@ abstract class InferModuleInfo : DefaultTask() {
                     InferredModule(moduleName, file.name, false, emptyList())
                 } else {
                     val dependencies = componentDependencies[library.componentId] ?: emptySet()
-                    println("-> ${file.name} DEPENDENCIES: $dependencies")
                     val requires = dependencies.map { moduleFor(it).name } + listOf("java.logging", "java.management")
-                    println("-> ${file.name} REQUIRES: $requires")
 
                     val moduleName = jar.manifest.mainAttributes.getValue("Automatic-Module-Name")
                     if (moduleName != null) {

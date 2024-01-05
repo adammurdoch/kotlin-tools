@@ -123,7 +123,7 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
             return readFile(this, cause = e)
         }
         return inputStream.use { stream ->
-            action(InputStreamBackedReadStream(stream))
+            action(InputStreamBackedReadStream(this, stream))
         }
     }
 }

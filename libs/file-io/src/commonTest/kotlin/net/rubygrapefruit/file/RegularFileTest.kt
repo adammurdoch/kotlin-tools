@@ -22,10 +22,17 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         { file -> file.writeBytes { } },
     )
 
-    private val readActions: List<(RegularFile) -> Result<*>> = listOf(
+    /**
+     * Read actions that attempt to read content from the file
+     */
+    private val readActionsThatStream: List<(RegularFile) -> Result<*>> = listOf(
         { file -> file.readText() },
         { file -> file.readBytes() },
         { file -> file.readBytes { Success(it.read(ByteArray(1024))) } },
+    )
+
+    private val readActions: List<(RegularFile) -> Result<*>> = readActionsThatStream + listOf(
+        { file -> file.readBytes { Success(it.read(ByteArray(0))) } },
         { file -> file.readBytes { Success(12) } },
     )
 
@@ -313,7 +320,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     fun `cannot read from a file that exists as a directory`() {
         val file = fixture.dir("dir1").toFile()
 
-        for (action in readActions) {
+        for (action in readActionsThatStream) {
             val result = action(file)
             assertIs<FailedOperation<*>>(result)
             try {

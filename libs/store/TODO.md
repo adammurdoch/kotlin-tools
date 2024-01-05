@@ -1,6 +1,8 @@
 ## TODO
 
 - Store single value
+- Write separate index and data files
+- Basic garbage collection
 - Store key-value pairs
 - Version the store format
   - Include the encoding version in store metadata

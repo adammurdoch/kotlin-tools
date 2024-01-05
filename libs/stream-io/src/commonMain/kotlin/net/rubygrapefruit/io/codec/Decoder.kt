@@ -7,6 +7,11 @@ interface Decoder {
     fun ushort(): UShort
 
     /**
+     * Decodes an [Int]
+     */
+    fun int(): Int
+
+    /**
      * Decodes a [String]
      */
     fun string(): String

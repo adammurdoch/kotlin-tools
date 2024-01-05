@@ -17,7 +17,7 @@ class SimpleEncoder(
         return this
     }
 
-    private fun int(value: Int): Encoder {
+    override fun int(value: Int): Encoder {
         buffer[0] = value.rotateRight(24).toByte()
         buffer[1] = value.rotateRight(16).toByte()
         buffer[2] = value.rotateRight(8).toByte()
@@ -27,9 +27,8 @@ class SimpleEncoder(
     }
 
     override fun string(value: String): Encoder {
-        val length = value.length
-        int(length)
         val bytes = value.encodeToByteArray()
+        int(bytes.size)
         stream.write(bytes)
         return this
     }

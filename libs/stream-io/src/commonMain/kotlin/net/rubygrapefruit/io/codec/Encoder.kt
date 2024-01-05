@@ -9,6 +9,13 @@ interface Encoder {
     fun ushort(value: UShort): Encoder
 
     /**
+     * Encodes the given [Int] value.
+     *
+     * @return this
+     */
+    fun int(value: Int): Encoder
+
+    /**
      * Encodes the given string.
      *
      * @return this

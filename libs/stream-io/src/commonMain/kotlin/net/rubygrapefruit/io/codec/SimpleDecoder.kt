@@ -20,12 +20,12 @@ class SimpleDecoder(
             .or(buffer[1].toUShort())
     }
 
-    private fun int(): Int {
+    override fun int(): Int {
         read(buffer, 4)
-        return buffer[0].toInt().rotateLeft(24)
-            .or(buffer[1].toInt().rotateLeft(16))
-            .or(buffer[2].toInt().rotateLeft(8))
-            .or(buffer[3].toInt())
+        return (buffer[0].toInt().and(0xff).shl(24))
+            .or(buffer[1].toInt().and(0xff).shl(16))
+            .or(buffer[2].toInt().and(0xff).shl(8))
+            .or(buffer[3].toInt().and(0xff))
     }
 
     override fun string(): String {

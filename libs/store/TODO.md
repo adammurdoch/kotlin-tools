@@ -3,7 +3,7 @@
 - Store single value
 - Store key-value pairs
 - Version the store format
-- Include the encoding version in store metadata
+  - Include the encoding version in store metadata
 - Atomic update
 - Concurrent reads
 - Thread and process safety

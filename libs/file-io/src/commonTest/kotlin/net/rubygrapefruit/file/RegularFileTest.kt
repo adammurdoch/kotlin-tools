@@ -15,6 +15,20 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         return fixture.testDir.file(name)
     }
 
+    private val writeActions: List<(RegularFile) -> Unit> = listOf(
+        { file -> file.writeText("text") },
+        { file -> file.writeBytes("text".encodeToByteArray()) },
+        { file -> file.writeBytes { it.write("text".encodeToByteArray()) } },
+        { file -> file.writeBytes { } },
+    )
+
+    private val readActions: List<(RegularFile) -> Result<*>> = listOf(
+        { file -> file.readText() },
+        { file -> file.readBytes() },
+        { file -> file.readBytes { Success(it.read(ByteArray(1024))) } },
+        { file -> file.readBytes { Success(12) } },
+    )
+
     @Test
     fun `can query file metadata`() {
         val file = fixture.file("file", "test")
@@ -210,11 +224,13 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     fun `cannot write to a file that exists as a directory`() {
         val file = fixture.dir("dir1").toFile()
 
-        try {
-            file.writeText("broken")
-            fail()
-        } catch (e: FileSystemException) {
-            assertEquals("Could not write to $file as it is not a file.", e.message)
+        for (action in writeActions) {
+            try {
+                action(file)
+                fail()
+            } catch (e: FileSystemException) {
+                assertEquals("Could not write to $file as it is not a file.", e.message)
+            }
         }
     }
 
@@ -223,11 +239,13 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         val parent = fixture.testDir.dir("dir1")
         val file = parent.file("file.txt")
 
-        try {
-            file.writeText("broken")
-            fail()
-        } catch (e: FileSystemException) {
-            assertEquals("Could not write to $file as directory $parent does not exist.", e.message)
+        for (action in writeActions) {
+            try {
+                action(file)
+                fail()
+            } catch (e: FileSystemException) {
+                assertEquals("Could not write to $file as directory $parent does not exist.", e.message)
+            }
         }
     }
 
@@ -236,11 +254,13 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         val ancestor = fixture.testDir.dir("dir1")
         val file = ancestor.file("dir2/file.txt")
 
-        try {
-            file.writeText("broken")
-            fail()
-        } catch (e: FileSystemException) {
-            assertEquals("Could not write to $file as directory $ancestor does not exist.", e.message)
+        for (action in writeActions) {
+            try {
+                action(file)
+                fail()
+            } catch (e: FileSystemException) {
+                assertEquals("Could not write to $file as directory $ancestor does not exist.", e.message)
+            }
         }
     }
 
@@ -249,11 +269,13 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         val parent = fixture.file("dir1")
         val file = fixture.testDir.file("dir1/file.txt")
 
-        try {
-            file.writeText("broken")
-            fail()
-        } catch (e: FileSystemException) {
-            assertEquals("Could not write to $file as $parent exists but is not a directory.", e.message)
+        for (action in writeActions) {
+            try {
+                action(file)
+                fail()
+            } catch (e: FileSystemException) {
+                assertEquals("Could not write to $file as $parent exists but is not a directory.", e.message)
+            }
         }
     }
 
@@ -262,11 +284,13 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         val ancestor = fixture.file("dir1")
         val file = fixture.testDir.file("dir1/dir2/file.txt")
 
-        try {
-            file.writeText("broken")
-            fail()
-        } catch (e: FileSystemException) {
-            assertEquals("Could not write to $file as $ancestor exists but is not a directory.", e.message)
+        for (action in writeActions) {
+            try {
+                action(file)
+                fail()
+            } catch (e: FileSystemException) {
+                assertEquals("Could not write to $file as $ancestor exists but is not a directory.", e.message)
+            }
         }
     }
 
@@ -274,12 +298,14 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     fun `cannot read from a file that does not exist`() {
         val file = fixture.testDir.file("missing")
 
-        val result = file.readText()
-        assertIs<MissingEntry<*>>(result)
-        try {
-            result.get()
-        } catch (e: IOException) {
-            assertEquals("Could not read from file $file as it does not exist.", e.message)
+        for (action in readActions) {
+            val result = action(file)
+            assertIs<MissingEntry<*>>(result)
+            try {
+                result.get()
+            } catch (e: IOException) {
+                assertEquals("Could not read from file $file as it does not exist.", e.message)
+            }
         }
     }
 
@@ -287,12 +313,14 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     fun `cannot read from a file that exists as a directory`() {
         val file = fixture.dir("dir1").toFile()
 
-        val result = file.readText()
-        assertIs<FailedOperation<*>>(result)
-        try {
-            result.get()
-        } catch (e: IOException) {
-            assertEquals("Could not read from file $file as it is not a file.", e.message)
+        for (action in readActions) {
+            val result = action(file)
+            assertIs<FailedOperation<*>>(result)
+            try {
+                result.get()
+            } catch (e: IOException) {
+                assertEquals("Could not read from file $file as it is not a file.", e.message)
+            }
         }
     }
 

@@ -103,40 +103,26 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
         delete(this) { Files.deleteIfExists(it.delegate) }
     }
 
-    override fun writeBytes(bytes: ByteArray) {
-        Files.write(delegate, bytes)
-    }
-
-    override fun writeText(text: String) {
-        try {
-            Files.writeString(delegate, text, Charsets.UTF_8)
-        } catch (e: IOException) {
+    override fun writeBytes(action: (WriteStream) -> Unit) {
+        val outputStream = try {
+            Files.newOutputStream(delegate)
+        } catch (e: Exception) {
             throw writeToFile(this, cause = e)
         }
-    }
-
-    override fun writeBytes(action: (WriteStream) -> Unit) {
-        Files.newOutputStream(delegate).use { stream ->
+        outputStream.use { stream ->
             action(OutputStreamBackedWriteStream(stream))
         }
     }
 
-    override fun readBytes(): Result<ByteArray> {
-        return Success(Files.readAllBytes(delegate))
-    }
-
-    override fun readText(): Result<String> {
-        return try {
-            Success(Files.readString(delegate, Charsets.UTF_8))
-        } catch (e: NoSuchFileException) {
-            readFileThatDoesNotExist(absolutePath, e)
-        } catch (e: Exception) {
-            readFile(this, cause = e)
-        }
-    }
-
     override fun <T> readBytes(action: (ReadStream) -> Result<T>): Result<T> {
-        return Files.newInputStream(delegate).use { stream ->
+        val inputStream = try {
+            Files.newInputStream(delegate)
+        } catch (e: NoSuchFileException) {
+            return readFileThatDoesNotExist(absolutePath, e)
+        } catch (e: Exception) {
+            return readFile(this, cause = e)
+        }
+        return inputStream.use { stream ->
             action(InputStreamBackedReadStream(stream))
         }
     }

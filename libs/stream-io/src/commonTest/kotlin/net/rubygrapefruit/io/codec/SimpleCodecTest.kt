@@ -33,14 +33,14 @@ class SimpleCodecTest {
         val writeStream = CollectingWriteStream()
         val encoder = SimpleEncoder(writeStream)
 
-        println("-> ENCODE ${value.dump()}")
+        println("encode: ${value.dump()}")
 
         encode(encoder, value)
 
         val decoder = SimpleDecoder(ByteArrayReadStream(writeStream.toByteArray()))
 
         return decode(decoder).also {
-            println("-> DECODED ${it.dump()}")
+            println("decoded: ${it.dump()}")
         }
     }
 

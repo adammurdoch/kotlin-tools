@@ -3,7 +3,6 @@
 package net.rubygrapefruit.file
 
 import kotlinx.cinterop.*
-import net.rubygrapefruit.io.TryFailure
 import net.rubygrapefruit.io.UnixErrorCode
 import net.rubygrapefruit.io.stream.*
 import platform.posix.*
@@ -111,26 +110,6 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
                 action(FileDescriptorBackedWriteStream(FileSource(path), WriteDescriptor(des)))
             } finally {
                 close(des)
-            }
-        }
-    }
-
-    override fun readBytes(): Result<ByteArray> {
-        return readIntoBuffer { buffer -> buffer.toByteArray() }
-    }
-
-    override fun readText(): Result<String> {
-        return readIntoBuffer { buffer -> buffer.decodeToString() }
-    }
-
-    private fun <T> readIntoBuffer(action: (CollectingBuffer) -> T): Result<T> {
-        return readBytes { stream ->
-            val buffer = CollectingBuffer()
-            val result = buffer.appendFrom(stream)
-            if (result is TryFailure) {
-                FailedOperation(result.exception)
-            } else {
-                Success(action(buffer))
             }
         }
     }

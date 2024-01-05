@@ -3,8 +3,10 @@
 package net.rubygrapefruit.file
 
 import kotlinx.cinterop.*
-import net.rubygrapefruit.io.TryFailure
-import net.rubygrapefruit.io.stream.*
+import net.rubygrapefruit.io.stream.FileBackedReadStream
+import net.rubygrapefruit.io.stream.FileBackedWriteStream
+import net.rubygrapefruit.io.stream.ReadStream
+import net.rubygrapefruit.io.stream.WriteStream
 import platform.windows.*
 
 internal open class WinFileSystemElement(override val path: WinPath) : AbstractFileSystemElement() {
@@ -231,22 +233,6 @@ internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), Regul
                 action(stream)
             } finally {
                 CloseHandle(handle)
-            }
-        }
-    }
-
-    override fun readText(): Result<String> {
-        return readBytes().map { it.decodeToString() }
-    }
-
-    override fun readBytes(): Result<ByteArray> {
-        return readBytes { stream ->
-            val buffer = CollectingBuffer()
-            val result = buffer.appendFrom(stream)
-            if (result is TryFailure) {
-                FailedOperation(result.exception)
-            } else {
-                Success(buffer.toByteArray())
             }
         }
     }

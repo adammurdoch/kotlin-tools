@@ -1,5 +1,7 @@
 package net.rubygrapefruit.file
 
+import net.rubygrapefruit.io.TryFailure
+import net.rubygrapefruit.io.stream.CollectingBuffer
 import net.rubygrapefruit.io.stream.ReadStream
 import net.rubygrapefruit.io.stream.WriteStream
 
@@ -78,12 +80,28 @@ interface RegularFile : FileSystemElement {
     /**
      * Reads bytes from the file into a [ByteArray].
      */
-    fun readBytes(): Result<ByteArray>
+    fun readBytes(): Result<ByteArray> {
+        return readIntoBuffer().map { buffer -> buffer.toByteArray() }
+    }
 
     /**
      * Reads text from the file. The file content is decoded using UTF-8.
      */
-    fun readText(): Result<String>
+    fun readText(): Result<String> {
+        return readIntoBuffer().map { buffer -> buffer.decodeToString() }
+    }
+}
+
+internal fun RegularFile.readIntoBuffer(): Result<CollectingBuffer> {
+    return readBytes { stream ->
+        val buffer = CollectingBuffer()
+        val result = buffer.appendFrom(stream)
+        if (result is TryFailure) {
+            FailedOperation(result.exception)
+        } else {
+            Success(buffer)
+        }
+    }
 }
 
 /**

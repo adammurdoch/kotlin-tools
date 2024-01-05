@@ -16,8 +16,8 @@ class SimpleDecoder(
 
     override fun ushort(): UShort {
         read(buffer, 2)
-        return buffer[0].toUShort().rotateLeft(8)
-            .or(buffer[1].toUShort())
+        return (buffer[0].toUShort().and(0xffu).rotateLeft(8))
+            .or(buffer[1].toUShort().and(0xffu))
     }
 
     override fun int(): Int {

@@ -23,9 +23,9 @@ class SimpleDecoder(
     private fun int(): Int {
         read(buffer, 4)
         return buffer[0].toInt().rotateLeft(24)
-            .or(buffer[0].toInt().rotateLeft(16))
-            .or(buffer[0].toInt().rotateLeft(8))
-            .or(buffer[1].toInt())
+            .or(buffer[1].toInt().rotateLeft(16))
+            .or(buffer[2].toInt().rotateLeft(8))
+            .or(buffer[3].toInt())
     }
 
     override fun string(): String {

@@ -3,6 +3,7 @@ package net.rubygrapefruit.file
 import net.rubygrapefruit.io.IOException
 import net.rubygrapefruit.io.stream.EndOfStream
 import net.rubygrapefruit.io.stream.ReadBytes
+import net.rubygrapefruit.io.stream.ReadFailed
 import kotlin.test.*
 
 class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
@@ -28,13 +29,27 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     private val readActionsThatStream: List<(RegularFile) -> Result<*>> = listOf(
         { file -> file.readText() },
         { file -> file.readBytes() },
-        { file -> file.readBytes { Success(it.read(ByteArray(1024))) } },
+        { file ->
+            file.readBytes { stream ->
+                val result = stream.read(ByteArray(1024))
+                when (result) {
+                    is ReadFailed -> {
+                        FailedOperation(result.exception)
+                    }
+
+                    EndOfStream, is ReadBytes -> {
+                        Success("ok")
+                    }
+                }
+            }
+        },
     )
 
-    private val readActions: List<(RegularFile) -> Result<*>> = readActionsThatStream + listOf(
-        { file -> file.readBytes { Success(it.read(ByteArray(0))) } },
-        { file -> file.readBytes { Success(12) } },
-    )
+    private val readActions: List<(RegularFile) -> Result<*>> =
+        readActionsThatStream + listOf(
+            { file -> file.readBytes { Success(it.read(ByteArray(0))) } },
+            { file -> file.readBytes { Success(12) } },
+        )
 
     @Test
     fun `can query file metadata`() {

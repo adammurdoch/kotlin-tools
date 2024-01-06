@@ -16,7 +16,14 @@ interface RegularFile : FileSystemElement {
     fun delete()
 
     /**
-     * Writes zero or more bytes to the file, replacing its content.
+     * Reads or writes to this file. The stream is positioned at the start of the file.
+     */
+    fun <T> withContent(action: (FileContent) -> T): Result<T> {
+        TODO()
+    }
+
+    /**
+     * Writes zero or more bytes to the file, replacing any existing content.
      *
      * The [WriteStream] is not buffered.
      */
@@ -24,7 +31,7 @@ interface RegularFile : FileSystemElement {
     fun writeBytes(action: (WriteStream) -> Unit)
 
     /**
-     * Writes the given bytes to the file, replacing its content.
+     * Writes the given bytes to the file, replacing any existing content.
      */
     @Throws(FileSystemException::class)
     fun writeBytes(bytes: ByteArray) {
@@ -32,7 +39,7 @@ interface RegularFile : FileSystemElement {
     }
 
     /**
-     * Writes the given text to the file, replacing it content. The text is encoded using UTF-8.
+     * Writes the given text to the file, replacing any existing content. The text is encoded using UTF-8.
      */
     @Throws(FileSystemException::class)
     fun writeText(text: String) {

@@ -6,6 +6,7 @@
   - Windows: does this by default 
 - Windows: open files with `FILE_SHARE_READ` when reading?
 - Seek to location
+  - Represent locations using `ULong`? 
   - `lseek()`, can also read file location using this method with relative offset of 0
   - `SetFilePointer()`, can also read location
 - Lock file

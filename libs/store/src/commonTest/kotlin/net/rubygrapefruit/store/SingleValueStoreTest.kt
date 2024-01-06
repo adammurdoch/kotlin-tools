@@ -11,7 +11,7 @@ import kotlin.test.assertNull
 
 class SingleValueStoreTest {
     private val fixture = FilesFixture()
-    val dir = fixture.dir("store")
+    private val dir = fixture.dir("store")
     private val store = Store.open(dir)
 
     @AfterTest

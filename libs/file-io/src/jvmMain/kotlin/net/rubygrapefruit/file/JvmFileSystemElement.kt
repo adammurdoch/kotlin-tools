@@ -3,6 +3,7 @@ package net.rubygrapefruit.file
 import net.rubygrapefruit.io.stream.ReadStream
 import net.rubygrapefruit.io.stream.WriteStream
 import java.io.IOException
+import java.io.RandomAccessFile
 import java.nio.file.*
 import java.nio.file.attribute.PosixFileAttributeView
 import kotlin.io.path.deleteExisting
@@ -101,6 +102,12 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
 
     override fun delete() {
         delete(this) { Files.deleteIfExists(it.delegate) }
+    }
+
+    override fun <T> withContent(action: (FileContent) -> T): Result<T> {
+        return RandomAccessFile(delegate.toFile(), "rw").use { file ->
+            Success(action(JvmFileContent(file)))
+        }
     }
 
     override fun writeBytes(action: (WriteStream) -> Unit) {

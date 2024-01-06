@@ -16,13 +16,11 @@ interface RegularFile : FileSystemElement {
     fun delete()
 
     /**
-     * Applies random-access reads or writes to this file. The stream is positioned at the start of the file.
+     * Applies a batch of random access reads or writes to this file. The stream is positioned at the start of the file.
      *
      * Creates the file if it does not exist.
      */
-    fun <T> withContent(action: (FileContent) -> T): Result<T> {
-        TODO()
-    }
+    fun <T> withContent(action: (FileContent) -> T): Result<T>
 
     /**
      * Writes zero or more bytes to the file, replacing any existing content.

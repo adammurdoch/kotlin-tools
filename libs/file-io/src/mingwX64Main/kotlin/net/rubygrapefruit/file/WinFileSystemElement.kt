@@ -222,6 +222,20 @@ internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), Regul
         }
     }
 
+    override fun <T> withContent(action: (FileContent) -> T): Result<T> {
+        return memScoped {
+            val handle = CreateFileW(absolutePath, (GENERIC_WRITE.toUInt() or GENERIC_READ).convert(), 0.convert(), null, CREATE_ALWAYS.convert(), FILE_ATTRIBUTE_NORMAL.convert(), null)
+            if (handle == INVALID_HANDLE_VALUE) {
+                throw NativeException("Could not open $absolutePath")
+            }
+            try {
+                Success(action(WinFileContent(absolutePath, handle)))
+            } finally {
+                CloseHandle(handle)
+            }
+        }
+    }
+
     override fun writeBytes(action: (WriteStream) -> Unit) {
         memScoped {
             val handle = CreateFileW(absolutePath, GENERIC_WRITE.convert(), 0.convert(), null, CREATE_ALWAYS.convert(), FILE_ATTRIBUTE_NORMAL.convert(), null)
@@ -229,8 +243,7 @@ internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), Regul
                 throw writeToFile(this@WinRegularFile, WinErrorCode.last())
             }
             try {
-                val stream = FileBackedWriteStream(absolutePath, handle)
-                action(stream)
+                action(FileBackedWriteStream(absolutePath, handle))
             } finally {
                 CloseHandle(handle)
             }

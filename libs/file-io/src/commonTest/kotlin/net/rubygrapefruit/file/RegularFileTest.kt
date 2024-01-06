@@ -120,6 +120,74 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     }
 
     @Test
+    fun `can random access write bytes to a file to create it`() {
+        listOf("123".encodeToByteArray(), byteArrayOf()).forEachIndexed { index, bytes ->
+            val file = fixture.testDir.file("file-$index")
+            assertTrue(file.metadata().missing)
+
+            val result = file.withContent { content ->
+                assertEquals(0u, content.length())
+                assertEquals(0u, content.currentPosition)
+                content.writeStream.write(bytes)
+                assertEquals(bytes.size.toUInt(), content.currentPosition)
+                "result"
+            }
+
+            assertIs<Success<*>>(result)
+            assertEquals("result", result.get())
+
+            val metadata = file.metadata().get()
+            assertIs<RegularFileMetadata>(metadata)
+            assertEquals(bytes.size.toLong(), metadata.size)
+
+            assertContentEquals(bytes, file.readBytes().get())
+        }
+    }
+
+    @Test
+    fun `can random access a file to create it`() {
+        val file = fixture.testDir.file("file")
+        assertTrue(file.metadata().missing)
+
+        val result = file.withContent { _ ->
+            "result"
+        }
+
+        assertIs<Success<*>>(result)
+        assertEquals("result", result.get())
+
+        val metadata = file.metadata().get()
+        assertIs<RegularFileMetadata>(metadata)
+        assertEquals(0, metadata.size)
+
+        assertContentEquals(byteArrayOf(), file.readBytes().get())
+    }
+
+    @Test
+    fun `can random access read bytes from a file to create it`() {
+        val file = fixture.testDir.file("file")
+        assertTrue(file.metadata().missing)
+
+        val result = file.withContent { content ->
+            assertEquals(0u, content.length())
+            assertEquals(0u, content.currentPosition)
+            val result = content.readStream.read(ByteArray(1024))
+            assertEquals(EndOfStream, result)
+            assertEquals(0u, content.currentPosition)
+            "result"
+        }
+
+        assertIs<Success<*>>(result)
+        assertEquals("result", result.get())
+
+        val metadata = file.metadata().get()
+        assertIs<RegularFileMetadata>(metadata)
+        assertEquals(0, metadata.size)
+
+        assertContentEquals(byteArrayOf(), file.readBytes().get())
+    }
+
+    @Test
     fun `can write byte array to a file to create it`() {
         listOf("123".encodeToByteArray(), byteArrayOf()).forEachIndexed { index, bytes ->
             val file = fixture.testDir.file("file-$index")
@@ -199,6 +267,62 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
 
         assertIs<Success<*>>(result)
         assertEquals("result", result.get())
+    }
+
+    @Test
+    fun `can random access read from file`() {
+        val bytes = "1234567".encodeToByteArray()
+        val file = fixture.testDir.file("file")
+        file.writeBytes(bytes)
+
+        val result = file.withContent { content ->
+            content.seek(3u)
+            val buffer = ByteArray(2)
+            content.readStream.readFully(buffer, 0, 2)
+            assertEquals("45", buffer.decodeToString())
+            "result"
+        }
+
+        assertIs<Success<*>>(result)
+        assertEquals("result", result.get())
+    }
+
+    @Test
+    fun `can random access write to file`() {
+        val bytes = "123__67".encodeToByteArray()
+        val file = fixture.testDir.file("file")
+        file.writeBytes(bytes)
+
+        val result = file.withContent { content ->
+            content.seek(3u)
+            val buffer = "45".encodeToByteArray()
+            content.writeStream.write(buffer, 0, 2)
+            "result"
+        }
+
+        assertIs<Success<*>>(result)
+        assertEquals("result", result.get())
+
+        assertEquals("1234567", file.readText().get())
+    }
+
+    @Test
+    fun `can random access append to file`() {
+        val bytes = "1234".encodeToByteArray()
+        val file = fixture.testDir.file("file")
+        file.writeBytes(bytes)
+
+        val result = file.withContent { content ->
+            content.seekToEnd()
+            val buffer = "567".encodeToByteArray()
+            content.writeStream.write(buffer)
+            "result"
+        }
+
+        assertIs<Success<*>>(result)
+        assertEquals("result", result.get())
+
+        assertEquals("1234567", file.readText().get())
     }
 
     @Test

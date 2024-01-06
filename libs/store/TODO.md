@@ -1,11 +1,11 @@
 ## TODO
 
 - Store single value
-- Write separate index and data files
-- Basic garbage collection
-- Multi-thread safety
-- Multi-process safety
+- Test app
 - Store key-value pairs
+- Multi-thread safety: threads use separate values, threads use same values
+- Multi-process safety
+- Basic garbage collection
 - Version the store format
   - Include the encoding version in store metadata
 - Atomic update

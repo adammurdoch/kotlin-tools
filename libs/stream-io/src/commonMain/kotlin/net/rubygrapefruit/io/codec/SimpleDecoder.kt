@@ -1,9 +1,5 @@
 package net.rubygrapefruit.io.codec
 
-import net.rubygrapefruit.io.IOException
-import net.rubygrapefruit.io.stream.EndOfStream
-import net.rubygrapefruit.io.stream.ReadBytes
-import net.rubygrapefruit.io.stream.ReadFailed
 import net.rubygrapefruit.io.stream.ReadStream
 
 /**
@@ -36,19 +32,6 @@ class SimpleDecoder(
     }
 
     private fun read(buffer: ByteArray, count: Int) {
-        var remaining = count
-        var pos = 0
-        while (remaining > 0) {
-            val result = stream.read(buffer, pos, remaining)
-            when (result) {
-                is ReadBytes -> {
-                    remaining -= result.get()
-                    pos += result.get()
-                }
-
-                EndOfStream -> throw IOException("Unexpected end of file")
-                is ReadFailed -> result.rethrow()
-            }
-        }
+        stream.readFully(buffer, 0, count)
     }
 }

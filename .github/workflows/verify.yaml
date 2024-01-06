@@ -1,6 +1,3 @@
-#
-# Verify on Ubuntu
-#
 
 on: [ push ]
 
@@ -29,7 +26,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
       - name: Execute Gradle build
-        run: ./gradlew check test-apps:runMin --continue
+        run: ./gradlew check test-apps:runMin --continue --info
         timeout-minutes: 60
   macos:
     runs-on: macos-latest

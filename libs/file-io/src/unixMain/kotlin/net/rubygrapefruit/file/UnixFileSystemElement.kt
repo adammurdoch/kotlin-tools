@@ -99,7 +99,7 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
 
     override fun <T> withContent(action: (FileContent) -> T): Result<T> {
         return memScoped {
-            val des = doOpen(path.absolutePath, O_RDWR or O_CREAT or O_NOFOLLOW, PosixPermissions.readWriteFile.mode)
+            val des = doOpen(path.absolutePath, O_RDWR or O_CREAT or O_NOFOLLOW or O_CLOEXEC, PosixPermissions.readWriteFile.mode)
             if (des < 0) {
                 throw NativeException("Could not open $absolutePath")
             }
@@ -113,7 +113,7 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
 
     override fun writeBytes(action: (WriteStream) -> Unit) {
         memScoped {
-            val des = doOpen(path.absolutePath, O_WRONLY or O_CREAT or O_TRUNC or O_NOFOLLOW, PosixPermissions.readWriteFile.mode)
+            val des = doOpen(path.absolutePath, O_WRONLY or O_CREAT or O_TRUNC or O_NOFOLLOW or O_CLOEXEC, PosixPermissions.readWriteFile.mode)
             if (des < 0) {
                 if (errno == EISDIR) {
                     throw writeFileThatExistsAndIsNotAFile(path.absolutePath)
@@ -130,7 +130,7 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
 
     override fun <T> readBytes(action: (ReadStream) -> Result<T>): Result<T> {
         return memScoped {
-            val des = open(path.absolutePath, O_RDONLY or O_NOFOLLOW)
+            val des = open(path.absolutePath, O_RDONLY or O_NOFOLLOW or O_CLOEXEC)
             if (des < 0) {
                 return if (errno == ENOENT) {
                     readFileThatDoesNotExist(path.absolutePath)
@@ -139,8 +139,7 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
                 }
             }
             try {
-                val stream = FileDescriptorBackedReadStream(FileSource(path), ReadDescriptor(des))
-                action(stream)
+                action(FileDescriptorBackedReadStream(FileSource(path), ReadDescriptor(des)))
             } finally {
                 close(des)
             }

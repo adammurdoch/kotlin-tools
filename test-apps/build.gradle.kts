@@ -222,8 +222,9 @@ val samples = listOf(
     jvmCliApp.derive("native-binary") { it.native() }.allPlatforms(),
     jvmCliApp.derive("native-binary-customized") { it.native().launcher("app") }.allPlatforms(),
 
-    jvmCliApp("jvm-cli-app-min").cliArgs().allPlatforms(),
+    jvmCliApp("jvm-cli-app-min").cliArgs("hello", "world").allPlatforms(),
     jvmCliApp("jvm-cli-app-full").cliArgs("list").allPlatforms(),
+    jvmCliApp("jvm-store-cli-app").cliArgs("--help").allPlatforms(),
 
     jvmUiApp,
     jvmUiApp.derive("customized") { it.launcher("App") },
@@ -231,7 +232,7 @@ val samples = listOf(
     nativeCliApp.allPlatforms(),
     nativeCliApp.derive("customized") { it.launcher("app") }.allPlatforms(),
 
-    nativeCliApp("native-cli-app-min").cliArgs().allPlatforms(),
+    nativeCliApp("native-cli-app-min").cliArgs("hello", "world").allPlatforms(),
     nativeCliApp("native-cli-app-full").cliArgs("list").allPlatforms(),
 
     nativeUiApp,

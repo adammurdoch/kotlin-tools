@@ -1,5 +1,5 @@
 package sample
 
 fun main(args: Array<String>) {
-    println("Hello world")
+    println("args: ${args.joinToString(", ")}")
 }

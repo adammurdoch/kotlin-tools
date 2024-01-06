@@ -3,7 +3,7 @@ package net.rubygrapefruit.file
 import net.rubygrapefruit.io.stream.*
 import java.io.RandomAccessFile
 
-class JvmFileContent(
+internal class JvmFileContent(
     private val file: RandomAccessFile
 ) : FileContent, ReadStream, WriteStream {
     override val currentPosition: UInt

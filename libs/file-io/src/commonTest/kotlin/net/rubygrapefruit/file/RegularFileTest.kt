@@ -1,6 +1,7 @@
 package net.rubygrapefruit.file
 
 import net.rubygrapefruit.io.IOException
+import net.rubygrapefruit.io.stream.CollectingBuffer
 import net.rubygrapefruit.io.stream.EndOfStream
 import net.rubygrapefruit.io.stream.ReadBytes
 import net.rubygrapefruit.io.stream.ReadFailed
@@ -128,8 +129,12 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
             val result = file.withContent { content ->
                 assertEquals(0u, content.length())
                 assertEquals(0u, content.currentPosition)
+
                 content.writeStream.write(bytes)
+
+                assertEquals(bytes.size.toUInt(), content.length())
                 assertEquals(bytes.size.toUInt(), content.currentPosition)
+
                 "result"
             }
 
@@ -171,9 +176,11 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         val result = file.withContent { content ->
             assertEquals(0u, content.length())
             assertEquals(0u, content.currentPosition)
+
             val result = content.readStream.read(ByteArray(1024))
             assertEquals(EndOfStream, result)
             assertEquals(0u, content.currentPosition)
+
             "result"
         }
 
@@ -277,9 +284,14 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
 
         val result = file.withContent { content ->
             content.seek(3u)
+            assertEquals(3u, content.currentPosition)
+
             val buffer = ByteArray(2)
             content.readStream.readFully(buffer, 0, 2)
             assertEquals("45", buffer.decodeToString())
+
+            assertEquals(5u, content.currentPosition)
+
             "result"
         }
 
@@ -295,8 +307,40 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
 
         val result = file.withContent { content ->
             content.seek(3u)
+            assertEquals(3u, content.currentPosition)
+
             val buffer = "45".encodeToByteArray()
             content.writeStream.write(buffer, 0, 2)
+
+            assertEquals(5u, content.currentPosition)
+            assertEquals(7u, content.length())
+
+            "result"
+        }
+
+        assertIs<Success<*>>(result)
+        assertEquals("result", result.get())
+
+        assertEquals("1234567", file.readText().get())
+    }
+
+    @Test
+    fun `can random access read and write to file`() {
+        val file = fixture.testDir.file("file")
+
+        val result = file.withContent { content ->
+            content.writeStream.write("1234567".encodeToByteArray())
+
+            assertEquals(7u, content.currentPosition)
+            assertEquals(7u, content.length())
+
+            content.seek(0u)
+
+            val buffer = CollectingBuffer()
+            buffer.appendFrom(content.readStream)
+
+            assertEquals("1234567", buffer.decodeToString())
+
             "result"
         }
 
@@ -314,8 +358,14 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
 
         val result = file.withContent { content ->
             content.seekToEnd()
+            assertEquals(4u, content.currentPosition)
+
             val buffer = "567".encodeToByteArray()
             content.writeStream.write(buffer)
+
+            assertEquals(7u, content.currentPosition)
+            assertEquals(7u, content.length())
+
             "result"
         }
 

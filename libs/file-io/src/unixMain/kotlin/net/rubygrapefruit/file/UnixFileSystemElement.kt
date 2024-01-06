@@ -97,6 +97,20 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
         }
     }
 
+    override fun <T> withContent(action: (FileContent) -> T): Result<T> {
+        return memScoped {
+            val des = doOpen(path.absolutePath, O_RDWR or O_CREAT or O_NOFOLLOW, PosixPermissions.readWriteFile.mode)
+            if (des < 0) {
+                throw NativeException("Could not open $absolutePath")
+            }
+            try {
+                Success(action(UnixFileContent(FileSource(path), des)))
+            } finally {
+                close(des)
+            }
+        }
+    }
+
     override fun writeBytes(action: (WriteStream) -> Unit) {
         memScoped {
             val des = doOpen(path.absolutePath, O_WRONLY or O_CREAT or O_TRUNC or O_NOFOLLOW, PosixPermissions.readWriteFile.mode)

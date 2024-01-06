@@ -224,7 +224,7 @@ internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), Regul
 
     override fun <T> withContent(action: (FileContent) -> T): Result<T> {
         return memScoped {
-            val handle = CreateFileW(absolutePath, (GENERIC_WRITE.toUInt() or GENERIC_READ).convert(), 0.convert(), null, CREATE_ALWAYS.convert(), FILE_ATTRIBUTE_NORMAL.convert(), null)
+            val handle = CreateFileW(absolutePath, (GENERIC_WRITE.toUInt() or GENERIC_READ).convert(), 0.convert(), null, OPEN_ALWAYS.convert(), FILE_ATTRIBUTE_NORMAL.convert(), null)
             if (handle == INVALID_HANDLE_VALUE) {
                 throw NativeException("Could not open $absolutePath")
             }

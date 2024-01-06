@@ -3,13 +3,16 @@
 package net.rubygrapefruit.store
 
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.serializer
 import net.rubygrapefruit.file.Directory
 import net.rubygrapefruit.file.RegularFile
 
 class Store private constructor(
-    private val index: RegularFile,
+    indexFile: RegularFile,
     private val data: RegularFile
 ) : AutoCloseable {
+    private val index = Index(indexFile)
+
     companion object {
         fun open(directory: Directory): Store {
             directory.createDirectories()
@@ -21,6 +24,14 @@ class Store private constructor(
 
     fun <T : Any> value(name: String, serializer: KSerializer<T>): SingleValueStore<T> {
         return DefaultSingleValueStore(name, index, data, serializer)
+    }
+
+    inline fun <reified T : Any> value(name: String): SingleValueStore<T> {
+        return value(name, serializer())
+    }
+
+    fun accept(visitor: ContentVisitor) {
+        index.accept(visitor)
     }
 
     override fun close() {

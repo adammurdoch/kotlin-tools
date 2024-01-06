@@ -1,14 +1,9 @@
 
 ## TODO
 
-- Don't inherit open files:
-  - Unix: open files with `O_CLOEXEC`
-  - Windows: does this by default 
 - Windows: open files with `FILE_SHARE_READ` when reading?
 - Seek to location
   - Represent locations using `ULong` 
-  - `lseek()`, can also read file location using this method with relative offset of 0
-  - `SetFilePointer()`, can also read location
 - Lock file
   - `flock()`, `lockf()` or `fctl()`
   - `LockFileEx()` and `UnlockFile()`
@@ -16,7 +11,6 @@
   - Directory for app to write data files to
   - Directory for app configuration
 - Add specialized kinds of `Failure` and `Success` types for specific operations
-  - read() reaches end of stream
   - Mismatched type for an operation, eg read text from a directory
   - Only use `UnsupportedOperation` in cases where it can actually be received
   - boolean result
@@ -25,10 +19,10 @@
 - Error handling for read and write on all platforms
 - Error handling for read and write actions that fail
 - Add some abstract permission functions, e.g. can read, set readable, etc
-- Atomic Directory.createTemporaryDirectory() implementation on Windows
+- Atomic `Directory.createTemporaryDirectory()` implementation on Windows
 - Query Windows ACLs
 - Query file systems on the machine
-- Provide specialized subtypes of FileSystemElement for each platform
+- Provide specialized subtypes of `FileSystemElement` for each platform
 - Windows directory entry could carry metadata for the entry
 - Atomic move
 - Atomic recursive delete, if supported by FS
@@ -52,4 +46,3 @@
 - Test unicode symlink names and contents
 - Test name resolution
 - Test case-insensitive lookup
-- Windows get user home dir: https://docs.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-getuserprofiledirectorya

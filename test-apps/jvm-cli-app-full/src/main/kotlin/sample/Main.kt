@@ -24,7 +24,7 @@ class ListCommand : CliktCommand(name = "list", help = "List TODO items") {
     override fun run() {
         runBlocking {
             Store.open(storeDirectory).use { store ->
-                val items = store.value("items", TodoItems.serializer()).get()
+                val items = store.value<TodoItems>("items").get()
                 if (items != null) {
                     println("TODO")
                     for (item in items.items.filter { !it.completed }) {
@@ -47,7 +47,7 @@ class AddCommand : CliktCommand(name = "add") {
     override fun run() {
         runBlocking {
             Store.open(storeDirectory).use { store ->
-                val value = store.value("items", TodoItems.serializer())
+                val value = store.value<TodoItems>("items")
                 val items = value.get() ?: TodoItems(emptyList())
                 value.set(items.add(entry.joinToString(" ")))
             }

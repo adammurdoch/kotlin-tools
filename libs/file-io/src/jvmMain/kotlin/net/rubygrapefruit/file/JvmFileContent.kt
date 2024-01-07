@@ -6,19 +6,19 @@ import java.io.RandomAccessFile
 internal class JvmFileContent(
     private val file: RandomAccessFile
 ) : FileContent, ReadStream, WriteStream {
-    override val currentPosition: UInt
-        get() = file.filePointer.toUInt()
+    override val currentPosition: Long
+        get() = file.filePointer
 
-    override fun seek(position: UInt) {
-        file.seek(position.toLong())
+    override fun seek(position: Long) {
+        file.seek(position)
     }
 
     override fun seekToEnd() {
         file.seek(file.length())
     }
 
-    override fun length(): UInt {
-        return file.length().toUInt()
+    override fun length(): Long {
+        return file.length()
     }
 
     override val writeStream: WriteStream

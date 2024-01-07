@@ -5,10 +5,10 @@ import net.rubygrapefruit.io.stream.ReadStream
 /**
  * Uses big-endian, fixed width encoding
  */
-class SimpleDecoder(
+internal class SimpleDecoder(
     private val stream: ReadStream
 ) : Decoder {
-    private val buffer = ByteArray(4)
+    private val buffer = ByteArray(8)
 
     override fun ushort(): UShort {
         read(buffer, 2)
@@ -22,6 +22,18 @@ class SimpleDecoder(
             .or(buffer[1].toInt().and(0xff).shl(16))
             .or(buffer[2].toInt().and(0xff).shl(8))
             .or(buffer[3].toInt().and(0xff))
+    }
+
+    override fun long(): Long {
+        read(buffer, 8)
+        return (buffer[0].toLong().and(0xff).shl(56))
+            .or(buffer[1].toLong().and(0xff).shl(48))
+            .or(buffer[2].toLong().and(0xff).shl(40))
+            .or(buffer[3].toLong().and(0xff).shl(32))
+            .or(buffer[4].toLong().and(0xff).shl(24))
+            .or(buffer[5].toLong().and(0xff).shl(16))
+            .or(buffer[6].toLong().and(0xff).shl(8))
+            .or(buffer[7].toLong().and(0xff))
     }
 
     override fun string(): String {

@@ -10,6 +10,7 @@
 - Multi-process safety
 - Basic garbage collection
 - Version the store format
+  - Version the data file 
   - Include the encoding version in store metadata
 - Atomic update
 - Concurrent reads

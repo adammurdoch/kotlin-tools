@@ -10,13 +10,13 @@ internal class UnixFileContent(
     source: UnixRegularFile.FileSource,
     private val des: Int
 ) : FileContent {
-    override val currentPosition: UInt
+    override val currentPosition: Long
         get() {
             val pos = lseek(des, 0, SEEK_CUR)
             return if (pos < 0) {
                 throw NativeException("Could not query current position.")
             } else {
-                pos.toUInt()
+                pos
             }
         }
 
@@ -24,7 +24,7 @@ internal class UnixFileContent(
 
     override val readStream: ReadStream = FileDescriptorBackedReadStream(source, ReadDescriptor(des))
 
-    override fun length(): UInt {
+    override fun length(): Long {
         return memScoped {
             val stat = alloc<stat>()
 
@@ -32,12 +32,12 @@ internal class UnixFileContent(
                 throw NativeException("Could not stat file")
             }
 
-            stat.st_size.convert()
+            stat.st_size
         }
     }
 
-    override fun seek(position: UInt) {
-        val pos = lseek(des, position.convert(), SEEK_SET)
+    override fun seek(position: Long) {
+        val pos = lseek(des, position, SEEK_SET)
         if (pos < 0) {
             throw NativeException("Could not set current position.")
         }

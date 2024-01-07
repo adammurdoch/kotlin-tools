@@ -16,6 +16,13 @@ interface Encoder {
     fun int(value: Int): Encoder
 
     /**
+     * Encodes the given [Long] value.
+     *
+     * @return this
+     */
+    fun long(value: Long): Encoder
+
+    /**
      * Encodes the given string.
      *
      * @return this

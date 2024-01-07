@@ -27,7 +27,7 @@ class ContentCommand : CliktCommand(name = "content", help = "Dump content") {
         Store.open(store.toDir()).use { store ->
             store.accept(object : ContentVisitor {
                 override fun value(name: String, details: ContentVisitor.ValueInfo) {
-                    println("- $name")
+                    println("- '$name' address ${details.address}")
                 }
             })
         }

@@ -12,6 +12,11 @@ interface Decoder {
     fun int(): Int
 
     /**
+     * Decodes a [Long]
+     */
+    fun long(): Long
+
+    /**
      * Decodes a [String]
      */
     fun string(): String

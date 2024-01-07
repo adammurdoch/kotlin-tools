@@ -1,0 +1,3 @@
+- Abstraction that can read or write individual bytes, use this in codecs
+- Variable length encoding for string length
+- "small" numeric values

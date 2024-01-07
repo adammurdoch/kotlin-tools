@@ -6,12 +6,14 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.serializer
 import net.rubygrapefruit.file.Directory
 import net.rubygrapefruit.file.RegularFile
+import net.rubygrapefruit.io.codec.SimpleCodec
 
 class Store private constructor(
     indexFile: RegularFile,
     private val data: RegularFile
 ) : AutoCloseable {
-    private val index = Index(indexFile)
+    private val codec = SimpleCodec()
+    private val index = Index(indexFile, codec)
 
     companion object {
         fun open(directory: Directory): Store {
@@ -23,7 +25,7 @@ class Store private constructor(
     }
 
     fun <T : Any> value(name: String, serializer: KSerializer<T>): SingleValueStore<T> {
-        return DefaultSingleValueStore(name, index, data, serializer)
+        return DefaultSingleValueStore(name, index, data, codec, serializer)
     }
 
     inline fun <reified T : Any> value(name: String): SingleValueStore<T> {

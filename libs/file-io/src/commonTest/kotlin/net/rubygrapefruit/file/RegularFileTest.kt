@@ -127,13 +127,13 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
             assertTrue(file.metadata().missing)
 
             val result = file.withContent { content ->
-                assertEquals(0u, content.length())
-                assertEquals(0u, content.currentPosition)
+                assertEquals(0L, content.length())
+                assertEquals(0L, content.currentPosition)
 
                 content.writeStream.write(bytes)
 
-                assertEquals(bytes.size.toUInt(), content.length())
-                assertEquals(bytes.size.toUInt(), content.currentPosition)
+                assertEquals(bytes.size.toLong(), content.length())
+                assertEquals(bytes.size.toLong(), content.currentPosition)
 
                 "result"
             }
@@ -174,12 +174,12 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         assertTrue(file.metadata().missing)
 
         val result = file.withContent { content ->
-            assertEquals(0u, content.length())
-            assertEquals(0u, content.currentPosition)
+            assertEquals(0L, content.length())
+            assertEquals(0L, content.currentPosition)
 
             val result = content.readStream.read(ByteArray(1024))
             assertEquals(EndOfStream, result)
-            assertEquals(0u, content.currentPosition)
+            assertEquals(0L, content.currentPosition)
 
             "result"
         }
@@ -283,14 +283,14 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         file.writeBytes(bytes)
 
         val result = file.withContent { content ->
-            content.seek(3u)
-            assertEquals(3u, content.currentPosition)
+            content.seek(3)
+            assertEquals(3L, content.currentPosition)
 
             val buffer = ByteArray(2)
             content.readStream.readFully(buffer, 0, 2)
             assertEquals("45", buffer.decodeToString())
 
-            assertEquals(5u, content.currentPosition)
+            assertEquals(5L, content.currentPosition)
 
             "result"
         }
@@ -306,14 +306,14 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         file.writeBytes(bytes)
 
         val result = file.withContent { content ->
-            content.seek(3u)
-            assertEquals(3u, content.currentPosition)
+            content.seek(3)
+            assertEquals(3L, content.currentPosition)
 
             val buffer = "45".encodeToByteArray()
             content.writeStream.write(buffer, 0, 2)
 
-            assertEquals(5u, content.currentPosition)
-            assertEquals(7u, content.length())
+            assertEquals(5L, content.currentPosition)
+            assertEquals(7L, content.length())
 
             "result"
         }
@@ -331,10 +331,10 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         val result = file.withContent { content ->
             content.writeStream.write("1234567".encodeToByteArray())
 
-            assertEquals(7u, content.currentPosition)
-            assertEquals(7u, content.length())
+            assertEquals(7L, content.currentPosition)
+            assertEquals(7L, content.length())
 
-            content.seek(0u)
+            content.seek(0)
 
             val buffer = CollectingBuffer()
             buffer.appendFrom(content.readStream)
@@ -358,13 +358,13 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
 
         val result = file.withContent { content ->
             content.seekToEnd()
-            assertEquals(4u, content.currentPosition)
+            assertEquals(4L, content.currentPosition)
 
             val buffer = "567".encodeToByteArray()
             content.writeStream.write(buffer)
 
-            assertEquals(7u, content.currentPosition)
-            assertEquals(7u, content.length())
+            assertEquals(7L, content.currentPosition)
+            assertEquals(7L, content.length())
 
             "result"
         }

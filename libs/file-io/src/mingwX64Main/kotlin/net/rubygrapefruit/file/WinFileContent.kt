@@ -13,33 +13,41 @@ class WinFileContent(
     path: String,
     private val handle: HANDLE?
 ) : FileContent {
-    override val currentPosition: UInt
+    override val currentPosition: Long
         get() {
-            val result = SetFilePointer(handle, 0, null, FILE_CURRENT.convert())
-            if (result == INVALID_SET_FILE_POINTER) {
-                throw NativeException("Could not get current position")
+            return memScoped {
+                val high = alloc<LONGVar>()
+                high.value = 0
+                val result = SetFilePointer(handle, 0, high.ptr, FILE_CURRENT.convert())
+                if (result == INVALID_SET_FILE_POINTER) {
+                    throw NativeException("Could not get current position")
+                }
+                high.value.long().shl(32).or(result.long())
             }
-            return result
         }
 
     override val writeStream: WriteStream = FileBackedWriteStream(path, handle)
 
     override val readStream: ReadStream = FileBackedReadStream(path, handle)
 
-    override fun length(): UInt {
+    override fun length(): Long {
         return memScoped {
             val size = alloc<LARGE_INTEGER>()
             if (GetFileSizeEx(handle, size.ptr) == 0) {
                 throw NativeException("Could not get file size")
             }
-            size.LowPart
+            size.HighPart.long().shl(32).or(size.LowPart.long())
         }
     }
 
-    override fun seek(position: UInt) {
-        val result = SetFilePointer(handle, position.convert(), null, FILE_BEGIN.convert())
-        if (result == INVALID_SET_FILE_POINTER) {
-            throw NativeException("Could not set current position")
+    override fun seek(position: Long) {
+        memScoped {
+            val high = alloc<LONGVar>()
+            high.value = position.ushr(32).toInt()
+            val result = SetFilePointer(handle, position.toInt(), high.ptr, FILE_BEGIN.convert())
+            if (result == INVALID_SET_FILE_POINTER) {
+                throw NativeException("Could not set current position")
+            }
         }
     }
 
@@ -49,4 +57,8 @@ class WinFileContent(
             throw NativeException("Could not set current position")
         }
     }
+
+    private fun LONG.long() = toLong().and(0xFFFF)
+
+    private fun DWORD.long() = toLong().and(0xFFFF)
 }

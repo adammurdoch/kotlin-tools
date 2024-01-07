@@ -7,7 +7,7 @@ interface FileContent {
     /**
      * Returns the current position in the file where the next read or write will happen.
      */
-    val currentPosition: UInt
+    val currentPosition: Long
 
     /**
      * Returns a [WriteStream] that writes to the current position in the file.
@@ -22,12 +22,12 @@ interface FileContent {
     /**
      * Returns the current file length.
      */
-    fun length(): UInt
+    fun length(): Long
 
     /**
      * Moves the current position to the given absolute position.
      */
-    fun seek(position: UInt)
+    fun seek(position: Long)
 
     /**
      * Moves the current position to the end of the file

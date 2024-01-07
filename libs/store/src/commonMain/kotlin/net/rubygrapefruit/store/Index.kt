@@ -9,19 +9,19 @@ internal class Index(
     private val index: RegularFile,
     private val codec: SimpleCodec
 ) {
+    private val currentIndex = readIndex()
+
     fun <T> query(query: (Map<String, Long>) -> T): T {
-        val index = readIndex()
-        return query(index)
+        return query(currentIndex)
     }
 
     fun update(update: (MutableMap<String, Long>) -> Unit) {
-        val index = readIndex()
-        update(index)
+        update(currentIndex)
         this.index.withContent { content ->
             val encoder = codec.encoder(content.writeStream)
             encoder.ushort(version)
             encoder.ushort(codec.version)
-            encoder.string(Json.encodeToString(serializer(), index))
+            encoder.string(Json.encodeToString(serializer(), currentIndex))
         }
     }
 

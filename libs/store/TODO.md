@@ -21,3 +21,6 @@
 - Async write to file
 - Option for storing secrets, eg set permissions, encode
 - Option to discard on incompatible version
+
+one-value --iterations 1000000: 15.66s user 81.66s system 99% cpu 1:38.04 total
+many-values --iterations 200: 40.70s user 19.55s system 100% cpu 1:00.19 total

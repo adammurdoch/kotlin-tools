@@ -1,8 +1,11 @@
-@file:OptIn(ExperimentalForeignApi::class)
+@file:OptIn(ExperimentalForeignApi::class, ExperimentalStdlibApi::class)
 
 package net.rubygrapefruit.file
 
 import kotlinx.cinterop.*
+import net.rubygrapefruit.io.Resource
+import net.rubygrapefruit.io.ResourceResult
+import net.rubygrapefruit.io.WinErrorCode
 import net.rubygrapefruit.io.stream.FileBackedReadStream
 import net.rubygrapefruit.io.stream.FileBackedWriteStream
 import net.rubygrapefruit.io.stream.ReadStream
@@ -223,16 +226,31 @@ internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), Regul
     }
 
     override fun <T> withContent(action: (FileContent) -> T): Result<T> {
+        val content = doOpenContent()
+        return content.use {
+            Success(action(content))
+        }
+    }
+
+    override fun openContent(): ResourceResult<FileContent> {
+        return Resource.of(doOpenContent())
+    }
+
+    private fun doOpenContent(): WinFileContent {
         return memScoped {
-            val handle = CreateFileW(absolutePath, (GENERIC_WRITE.toUInt() or GENERIC_READ).convert(), 0.convert(), null, OPEN_ALWAYS.convert(), FILE_ATTRIBUTE_NORMAL.convert(), null)
+            val handle = CreateFileW(
+                absolutePath,
+                (GENERIC_WRITE.toUInt() or GENERIC_READ).convert<DWORD>(),
+                0.convert<DWORD>(),
+                null,
+                OPEN_ALWAYS.convert<DWORD>(),
+                FILE_ATTRIBUTE_NORMAL.convert<DWORD>(),
+                null
+            )
             if (handle == INVALID_HANDLE_VALUE) {
                 throw NativeException("Could not open $absolutePath")
             }
-            try {
-                Success(action(WinFileContent(absolutePath, handle)))
-            } finally {
-                CloseHandle(handle)
-            }
+            WinFileContent(absolutePath, handle)
         }
     }
 

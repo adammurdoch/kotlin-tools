@@ -5,7 +5,7 @@ import java.io.RandomAccessFile
 
 internal class JvmFileContent(
     private val file: RandomAccessFile
-) : FileContent, ReadStream, WriteStream {
+) : FileContent, ReadStream, WriteStream, AutoCloseable {
     override val currentPosition: Long
         get() = file.filePointer
 
@@ -13,8 +13,10 @@ internal class JvmFileContent(
         file.seek(position)
     }
 
-    override fun seekToEnd() {
-        file.seek(file.length())
+    override fun seekToEnd(): Long {
+        val length = file.length()
+        file.seek(length)
+        return length;
     }
 
     override fun length(): Long {
@@ -38,5 +40,9 @@ internal class JvmFileContent(
 
     override fun write(bytes: ByteArray, offset: Int, count: Int) {
         file.write(bytes, offset, count)
+    }
+
+    override fun close() {
+        file.close()
     }
 }

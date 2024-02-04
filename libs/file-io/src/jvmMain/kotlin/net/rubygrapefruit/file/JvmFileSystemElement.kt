@@ -1,5 +1,7 @@
 package net.rubygrapefruit.file
 
+import net.rubygrapefruit.io.Resource
+import net.rubygrapefruit.io.ResourceResult
 import net.rubygrapefruit.io.stream.ReadStream
 import net.rubygrapefruit.io.stream.WriteStream
 import java.io.IOException
@@ -104,11 +106,17 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
         delete(this) { Files.deleteIfExists(it.delegate) }
     }
 
+    override fun openContent(): ResourceResult<FileContent> {
+        return Resource(doOpenContent()) { it.close() }
+    }
+
     override fun <T> withContent(action: (FileContent) -> T): Result<T> {
-        return RandomAccessFile(delegate.toFile(), "rw").use { file ->
-            Success(action(JvmFileContent(file)))
+        return doOpenContent().use { file ->
+            Success(action((file)))
         }
     }
+
+    private fun doOpenContent() = JvmFileContent(RandomAccessFile(delegate.toFile(), "rw"))
 
     override fun writeBytes(action: (WriteStream) -> Unit) {
         val outputStream = try {

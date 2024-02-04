@@ -3,6 +3,8 @@
 package net.rubygrapefruit.file
 
 import kotlinx.cinterop.*
+import net.rubygrapefruit.io.Resource
+import net.rubygrapefruit.io.ResourceResult
 import net.rubygrapefruit.io.UnixErrorCode
 import net.rubygrapefruit.io.stream.*
 import platform.posix.*
@@ -97,17 +99,26 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
         }
     }
 
+    override fun openContent(): ResourceResult<FileContent> {
+        return Resource.of(doOpenContent());
+    }
+
     override fun <T> withContent(action: (FileContent) -> T): Result<T> {
+        val content = doOpenContent()
+        return try {
+            Success(action(content))
+        } finally {
+            content.close()
+        }
+    }
+
+    private fun doOpenContent(): UnixFileContent {
         return memScoped {
             val des = doOpen(path.absolutePath, O_RDWR or O_CREAT or O_NOFOLLOW or O_CLOEXEC, PosixPermissions.readWriteFile.mode)
             if (des < 0) {
                 throw NativeException("Could not open $absolutePath")
             }
-            try {
-                Success(action(UnixFileContent(FileSource(path), des)))
-            } finally {
-                close(des)
-            }
+            UnixFileContent(FileSource(path), des)
         }
     }
 

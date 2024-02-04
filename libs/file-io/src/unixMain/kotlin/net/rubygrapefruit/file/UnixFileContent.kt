@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalForeignApi::class)
+@file:OptIn(ExperimentalForeignApi::class, ExperimentalStdlibApi::class)
 
 package net.rubygrapefruit.file
 
@@ -9,7 +9,7 @@ import platform.posix.*
 internal class UnixFileContent(
     source: UnixRegularFile.FileSource,
     private val des: Int
-) : FileContent {
+) : FileContent, AutoCloseable {
     override val currentPosition: Long
         get() {
             val pos = lseek(des, 0, SEEK_CUR)
@@ -43,10 +43,15 @@ internal class UnixFileContent(
         }
     }
 
-    override fun seekToEnd() {
+    override fun seekToEnd(): Long {
         val pos = lseek(des, 0, SEEK_END)
         if (pos < 0) {
             throw NativeException("Could not set current position.")
         }
+        return pos
+    }
+
+    override fun close() {
+        close(des)
     }
 }

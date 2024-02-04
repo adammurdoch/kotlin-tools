@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalForeignApi::class)
+@file:OptIn(ExperimentalForeignApi::class, ExperimentalStdlibApi::class)
 
 package net.rubygrapefruit.file
 
@@ -12,7 +12,7 @@ import platform.windows.*
 class WinFileContent(
     path: String,
     private val handle: HANDLE?
-) : FileContent {
+) : FileContent, AutoCloseable {
     override val currentPosition: Long
         get() {
             return memScoped {
@@ -51,11 +51,17 @@ class WinFileContent(
         }
     }
 
-    override fun seekToEnd() {
+    override fun seekToEnd(): Long {
         val result = SetFilePointer(handle, 0, null, FILE_END.convert())
         if (result == INVALID_SET_FILE_POINTER) {
             throw NativeException("Could not set current position")
         }
+        // Need to pass in parameter to get the high 4 bytes
+        TODO()
+    }
+
+    override fun close() {
+        CloseHandle(handle)
     }
 
     private fun LONG.long() = toLong().and(0xFFFF)

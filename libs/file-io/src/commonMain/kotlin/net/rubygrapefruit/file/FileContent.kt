@@ -31,6 +31,8 @@ interface FileContent {
 
     /**
      * Moves the current position to the end of the file
+     *
+     * @return the position after moving
      */
-    fun seekToEnd()
+    fun seekToEnd(): Long
 }

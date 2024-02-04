@@ -14,6 +14,8 @@ interface Success<out T, out F> : Result<T, F> {
 
 interface Failure<out T, out F> : Result<T, F> {
     fun rethrow(): Nothing
+
+    fun <S> cast(): Failure<S, F>
 }
 
 open class DefaultSuccess<out T, out F>(override val result: T) : Success<T, F> {
@@ -39,7 +41,7 @@ abstract class AbstractFailure<out T, out F> : Failure<T, F> {
 
     override fun getOrNull() = null
 
-    fun <S> cast(): Failure<S, F> {
+    override fun <S> cast(): Failure<S, F> {
         @Suppress("UNCHECKED_CAST")
         return this as Failure<S, F>
     }

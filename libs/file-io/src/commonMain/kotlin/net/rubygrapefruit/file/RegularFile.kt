@@ -1,5 +1,6 @@
 package net.rubygrapefruit.file
 
+import net.rubygrapefruit.io.ResourceResult
 import net.rubygrapefruit.io.TryFailure
 import net.rubygrapefruit.io.stream.CollectingBuffer
 import net.rubygrapefruit.io.stream.ReadStream
@@ -21,6 +22,15 @@ interface RegularFile : FileSystemElement {
      * Creates the file if it does not exist.
      */
     fun <T> withContent(action: (FileContent) -> T): Result<T>
+
+    /**
+     * Opens the content of this file. The stream is positioned at the start of the file.
+     *
+     * Creates the file if it does not exist.
+     *
+     * The caller is responsible for closing the contents.
+     */
+    fun openContent(): ResourceResult<FileContent>
 
     /**
      * Writes zero or more bytes to the file, replacing any existing content.

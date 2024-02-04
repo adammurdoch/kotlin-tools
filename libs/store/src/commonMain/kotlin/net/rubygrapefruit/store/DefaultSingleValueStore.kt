@@ -1,15 +1,11 @@
 package net.rubygrapefruit.store
 
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.json.Json
-import net.rubygrapefruit.file.RegularFile
-import net.rubygrapefruit.io.codec.SimpleCodec
 
 internal class DefaultSingleValueStore<T>(
     private val name: String,
     private val index: Index,
-    private val data: RegularFile,
-    private val codec: SimpleCodec,
+    private val data: DataFile,
     private val serializer: KSerializer<T>
 ) : SingleValueStore<T> {
     override fun get(): T? {
@@ -17,11 +13,7 @@ internal class DefaultSingleValueStore<T>(
         return if (address == null) {
             null
         } else {
-            data.withContent { content ->
-                content.seek(address)
-                val decoder = codec.decoder(content.readStream)
-                Json.decodeFromString(serializer, decoder.string())
-            }.get()
+            data.read(address, serializer)
         }
     }
 
@@ -32,13 +24,7 @@ internal class DefaultSingleValueStore<T>(
     }
 
     override fun set(value: T) {
-        val address = data.withContent { content ->
-            content.seekToEnd()
-            val pos = content.currentPosition
-            val encoder = codec.encoder(content.writeStream)
-            encoder.string(Json.encodeToString(serializer, value))
-            pos
-        }.get()
+        val address = data.write(value, serializer)
         index.update {
             it[name] = address
         }

@@ -1,5 +1,6 @@
 package net.rubygrapefruit.file
 
+import net.rubygrapefruit.file.fixtures.AbstractFileTest
 import kotlin.test.*
 
 abstract class AbstractFileSystemElementTest<T : FileSystemElement> : AbstractFileTest() {

@@ -14,6 +14,7 @@ library {
     nativeDesktop()
     common {
         api(kotlin("test"))
+        api(kotlin("test-junit"))
         api(project(":file-io"))
     }
 }

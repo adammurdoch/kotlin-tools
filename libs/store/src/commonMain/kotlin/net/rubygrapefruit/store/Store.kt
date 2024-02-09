@@ -25,12 +25,20 @@ class Store private constructor(
         }
     }
 
-    fun <T : Any> value(name: String, serializer: KSerializer<T>): SingleValueStore<T> {
-        return DefaultSingleValueStore(name, index, data, serializer)
+    fun <T : Any> value(name: String, serializer: KSerializer<T>): ValueStore<T> {
+        return DefaultValueStore(name, index, data, serializer)
     }
 
-    inline fun <reified T : Any> value(name: String): SingleValueStore<T> {
+    inline fun <reified T : Any> value(name: String): ValueStore<T> {
         return value(name, serializer())
+    }
+
+    fun <K : Any, V : Any> keyValue(name: String, keySerializer: KSerializer<K>, valueSerializer: KSerializer<V>): KeyValueStore<K, V> {
+        return DefaultKeyValueStore(name, index, data, keySerializer, valueSerializer)
+    }
+
+    inline fun <reified K : Any, reified V : Any> keyValue(name: String): KeyValueStore<K, V> {
+        return keyValue(name, serializer(), serializer())
     }
 
     fun accept(visitor: ContentVisitor) {

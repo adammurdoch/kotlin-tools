@@ -28,4 +28,4 @@
 - Use a more compact encoding than JSON, and stream to file rather than collecting in a string
 - Async write to file
 - Option for storing secrets, eg set permissions, encode
-- Option to discard on incompatible version
+- Optionally discard on incompatible version

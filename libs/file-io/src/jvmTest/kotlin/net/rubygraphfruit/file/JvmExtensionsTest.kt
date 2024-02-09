@@ -1,6 +1,7 @@
 package net.rubygraphfruit.file
 
 import net.rubygrapefruit.file.*
+import net.rubygrapefruit.file.fixtures.AbstractFileTest
 import java.io.File
 import kotlin.io.path.pathString
 import kotlin.test.Test

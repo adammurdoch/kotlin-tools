@@ -1,17 +1,11 @@
-@file:OptIn(ExperimentalStdlibApi::class)
-
 package net.rubygrapefruit.store
 
-import net.rubygrapefruit.file.fixtures.FilesFixture
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class SingleValueStoreTest {
-    private val fixture = FilesFixture()
-    private val dir = fixture.dir("store")
-
+class ValueStoreTest : AbstractStoreTest() {
     @Test
     fun `can read from empty store`() {
         withStore { store ->
@@ -134,21 +128,5 @@ class SingleValueStoreTest {
             val value = store.value<String>("value")
             assertEquals("value 2", value.get())
         }
-    }
-
-    private fun withStore(action: (Store) -> Unit) {
-        Store.open(dir).use {
-            action(it)
-        }
-    }
-
-    private fun Store.values(): List<String> {
-        val result = mutableListOf<String>()
-        accept(object : ContentVisitor {
-            override fun value(name: String, details: ContentVisitor.ValueInfo) {
-                result.add(name)
-            }
-        })
-        return result
     }
 }

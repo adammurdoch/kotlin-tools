@@ -1,6 +1,8 @@
-package net.rubygrapefruit.file
+package net.rubygrapefruit.file.fixtures
 
-import net.rubygrapefruit.file.fixtures.FilesFixture
+import net.rubygrapefruit.file.ElementType
+import net.rubygrapefruit.file.FileSystemCapability
+import net.rubygrapefruit.file.PosixPermissions
 import kotlin.test.AfterTest
 
 abstract class AbstractFileTest {
@@ -14,7 +16,7 @@ abstract class AbstractFileTest {
                 when (type) {
                     ElementType.Directory -> toDir().setPermissions(PosixPermissions.readWriteDirectory)
                     ElementType.SymLink -> {
-                        val element = toSymLink();
+                        val element = toSymLink()
                         if (element.supports(FileSystemCapability.SetSymLinkPosixPermissions)) {
                             element.setPermissions(PosixPermissions.readWriteFile)
                         }

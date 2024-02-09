@@ -2,12 +2,12 @@ package net.rubygrapefruit.store
 
 import kotlinx.serialization.KSerializer
 
-internal class DefaultSingleValueStore<T>(
+internal class DefaultValueStore<T>(
     private val name: String,
     private val index: Index,
     private val data: DataFile,
     private val serializer: KSerializer<T>
-) : SingleValueStore<T> {
+) : ValueStore<T> {
     override fun get(): T? {
         val address = index.query { it[name] }
         return if (address == null) {

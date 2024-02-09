@@ -1,6 +1,6 @@
 package net.rubygrapefruit.store
 
-interface SingleValueStore<T> {
+interface ValueStore<T> {
     /**
      * Returns the current value, if any.
      */

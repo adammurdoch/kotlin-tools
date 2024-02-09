@@ -31,7 +31,7 @@ class KeyValueStoreTest : AbstractStoreTest() {
     }
 
     @Test
-    fun `can read from then write to store`() {
+    fun `can read then write`() {
         withStore { store ->
             val value = store.keyValue<String, Int>("value")
             assertNull(value.get("a"))
@@ -53,7 +53,7 @@ class KeyValueStoreTest : AbstractStoreTest() {
     }
 
     @Test
-    fun `can write to then read from store`() {
+    fun `can write then read`() {
         withStore { store ->
             val value = store.keyValue<String, Int>("value")
 
@@ -100,7 +100,36 @@ class KeyValueStoreTest : AbstractStoreTest() {
     }
 
     @Test
-    fun `can remove an entry`() {
+    fun `can update`() {
+        withStore { store ->
+            val value = store.keyValue<String, Int>("value")
+            value.set("a", 12)
+            value.set("b", 44)
+        }
+
+        withStore { store ->
+            assertEquals(listOf("value"), store.values())
+
+            val value = store.keyValue<String, Int>("value")
+
+            value.set("a", 11)
+            assertEquals(11, value.get("a"))
+            assertEquals(listOf("a" to 11, "b" to 44), value.entries())
+
+            assertEquals(listOf("value"), store.values())
+        }
+
+        withStore { store ->
+            assertEquals(listOf("value"), store.values())
+
+            val value = store.keyValue<String, Int>("value")
+            assertEquals(11, value.get("a"))
+            assertEquals(listOf("a" to 11, "b" to 44), value.entries())
+        }
+    }
+
+    @Test
+    fun `can remove`() {
         withStore { store ->
             val value = store.keyValue<String, Int>("value")
             value.set("a", 1)
@@ -138,7 +167,40 @@ class KeyValueStoreTest : AbstractStoreTest() {
     }
 
     @Test
-    fun `can discard value`() {
+    fun `can remove then update`() {
+        withStore { store ->
+            val value = store.keyValue<String, Int>("value")
+            value.set("a", 12)
+            value.set("b", 44)
+        }
+
+        withStore { store ->
+            assertEquals(listOf("value"), store.values())
+
+            val value = store.keyValue<String, Int>("value")
+
+            value.remove("a")
+            assertNull(value.get("a"))
+            assertEquals(listOf("b" to 44), value.entries())
+
+            value.set("a", 11)
+            assertEquals(11, value.get("a"))
+            assertEquals(listOf("b" to 44, "a" to 11), value.entries())
+
+            assertEquals(listOf("value"), store.values())
+        }
+
+        withStore { store ->
+            assertEquals(listOf("value"), store.values())
+
+            val value = store.keyValue<String, Int>("value")
+            assertEquals(11, value.get("a"))
+            assertEquals(listOf("b" to 44, "a" to 11), value.entries())
+        }
+    }
+
+    @Test
+    fun `can discard all entries`() {
         withStore { store ->
             val value = store.keyValue<String, Int>("value")
             value.set("a", 1)
@@ -161,7 +223,7 @@ class KeyValueStoreTest : AbstractStoreTest() {
     }
 
     @Test
-    fun `can read and write multiple key-value stores in same session`() {
+    fun `can read and write multiple values in same session`() {
         withStore { store ->
             val value1 = store.keyValue<String, Int>("value 1")
             assertNull(value1.get("a"))

@@ -27,7 +27,7 @@ class ValueStoreTest : AbstractStoreTest() {
     }
 
     @Test
-    fun `can read from then write to store`() {
+    fun `can read then write`() {
         withStore { store ->
             val value = store.value<String>("value")
             assertNull(value.get())
@@ -46,7 +46,7 @@ class ValueStoreTest : AbstractStoreTest() {
     }
 
     @Test
-    fun `can write to then read from store`() {
+    fun `can write then read`() {
         withStore { store ->
             val value = store.value<String>("value")
 
@@ -84,7 +84,7 @@ class ValueStoreTest : AbstractStoreTest() {
     }
 
     @Test
-    fun `can discard then write value`() {
+    fun `can discard value then write in same session`() {
         withStore { store ->
             val value = store.value<String>("value")
             value.set("value 1")
@@ -108,11 +108,46 @@ class ValueStoreTest : AbstractStoreTest() {
     }
 
     @Test
-    fun `can update value`() {
+    fun `can discard value then write in different sessions`() {
         withStore { store ->
             val value = store.value<String>("value")
             value.set("value 1")
         }
+
+        withStore { store ->
+            val value = store.value<String>("value")
+            assertEquals("value 1", value.get())
+            assertEquals(listOf("value"), store.values())
+
+            value.discard()
+            assertNull(value.get())
+            assertTrue(store.values().isEmpty())
+        }
+        withStore { store ->
+            val value = store.value<String>("value")
+            assertNull(value.get())
+            assertTrue(store.values().isEmpty())
+
+            value.set("value 2")
+
+            assertEquals("value 2", value.get())
+            assertEquals(listOf("value"), store.values())
+        }
+        withStore { store ->
+            assertEquals(listOf("value"), store.values())
+
+            val value = store.value<String>("value")
+            assertEquals("value 2", value.get())
+        }
+    }
+
+    @Test
+    fun `can update`() {
+        withStore { store ->
+            val value = store.value<String>("value")
+            value.set("value 1")
+        }
+
         withStore { store ->
             assertEquals(listOf("value"), store.values())
 
@@ -129,11 +164,12 @@ class ValueStoreTest : AbstractStoreTest() {
     }
 
     @Test
-    fun `can update value multiple times`() {
+    fun `can update multiple times in same session`() {
         withStore { store ->
             val value = store.value<String>("value")
             value.set("value 1")
         }
+
         withStore { store ->
             assertEquals(listOf("value"), store.values())
 
@@ -151,7 +187,40 @@ class ValueStoreTest : AbstractStoreTest() {
     }
 
     @Test
-    fun `can read and write multiple values to store in same session`() {
+    fun `can update multiple times in different sessions`() {
+        withStore { store ->
+            val value = store.value<String>("value")
+            value.set("value 1")
+        }
+
+        withStore { store ->
+            assertEquals(listOf("value"), store.values())
+
+            val value = store.value<String>("value")
+            assertEquals("value 1", value.get())
+
+            value.set("value 2")
+            assertEquals("value 2", value.get())
+        }
+        withStore { store ->
+            assertEquals(listOf("value"), store.values())
+
+            val value = store.value<String>("value")
+            assertEquals("value 2", value.get())
+
+            value.set("value 3")
+            assertEquals("value 3", value.get())
+        }
+        withStore { store ->
+            assertEquals(listOf("value"), store.values())
+
+            val value = store.value<String>("value")
+            assertEquals("value 3", value.get())
+        }
+    }
+
+    @Test
+    fun `can read and write multiple values in same session`() {
         withStore { store ->
             val value1 = store.value<String>("value 1")
             assertNull(value1.get())
@@ -177,7 +246,7 @@ class ValueStoreTest : AbstractStoreTest() {
     }
 
     @Test
-    fun `can read and write multiple values to store in different sessions`() {
+    fun `can read and write multiple values in different sessions`() {
         withStore { store ->
             val value1 = store.value<String>("value 1")
             assertNull(value1.get())

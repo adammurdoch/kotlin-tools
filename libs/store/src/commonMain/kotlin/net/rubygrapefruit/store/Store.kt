@@ -17,10 +17,14 @@ class Store private constructor(
     private val data = DataFile(dataFile, codec)
 
     companion object {
-        fun open(directory: Directory): Store {
+        fun open(directory: Directory, discard: Boolean = false): Store {
             directory.createDirectories()
             val index = directory.file("index.bin")
             val data = directory.file("data.bin")
+            if (discard) {
+                index.delete()
+                data.delete()
+            }
             return Store(index, data)
         }
     }

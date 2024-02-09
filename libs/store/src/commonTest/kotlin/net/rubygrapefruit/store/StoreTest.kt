@@ -1,10 +1,31 @@
+@file:OptIn(ExperimentalStdlibApi::class)
+
 package net.rubygrapefruit.store
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import kotlin.test.fail
 
 class StoreTest : AbstractStoreTest() {
+    @Test
+    fun `can discard store contents on open`() {
+        val dir = fixture.testDir
+
+        Store.open(dir).use { store ->
+            store.value<Long>("long").set(123)
+            store.keyValue<Long, String>("longs").set(123, "value")
+        }
+
+        Store.open(dir, discard = true).use { store ->
+            assertTrue(store.values().isEmpty())
+        }
+
+        Store.open(dir).use { store ->
+            assertTrue(store.values().isEmpty())
+        }
+    }
+
     @Test
     fun `cannot open key value store as a value store`() {
         withStore { store ->

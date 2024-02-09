@@ -5,8 +5,8 @@ package net.rubygrapefruit.store
 interface ContentVisitor {
     fun value(name: String, details: ValueInfo) {}
 
-    class ValueInfo(private val offset: Long) {
-        val address: String
-            get() = "0x" + offset.toHexString(HexFormat.UpperCase)
+    class ValueInfo internal constructor(private val address: Address) {
+        val formatted: String
+            get() = "0x" + address.offset.toHexString(HexFormat.UpperCase)
     }
 }

@@ -12,26 +12,26 @@ internal class DataFile(
     file: RegularFile,
     private val codec: SimpleCodec
 ) : AutoCloseable {
-    private val contentResource = file.openContent().successful()
+    private val fileContent = file.openContent().successful()
 
     override fun close() {
-        contentResource.close()
+        fileContent.close()
     }
 
-    fun <T> read(address: Long, serializer: DeserializationStrategy<T>): T {
-        return contentResource.using { content ->
-            content.seek(address)
+    fun <T> read(address: Address, serializer: DeserializationStrategy<T>): T {
+        return fileContent.using { content ->
+            content.seek(address.offset)
             val decoder = codec.decoder(content.readStream)
             Json.decodeFromString(serializer, decoder.string())
         }
     }
 
-    fun <T> write(value: T, serializer: SerializationStrategy<T>): Long {
-        return contentResource.using { content ->
+    fun <T> write(value: T, serializer: SerializationStrategy<T>): Address {
+        return fileContent.using { content ->
             val pos = content.seekToEnd()
             val encoder = codec.encoder(content.writeStream)
             encoder.string(Json.encodeToString(serializer, value))
-            pos
+            Address(pos)
         }
     }
 }

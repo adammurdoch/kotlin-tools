@@ -2,8 +2,6 @@
 
 package net.rubygrapefruit.store
 
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.serializer
 import net.rubygrapefruit.file.FileContent
 import net.rubygrapefruit.file.RegularFile
 import net.rubygrapefruit.io.codec.SimpleCodec
@@ -19,18 +17,22 @@ internal class Index(
         contentResource.close()
     }
 
-    fun <T> query(query: (Map<String, Long>) -> T): T {
+    fun <T> query(query: (Map<String, Address>) -> T): T {
         return query(currentIndex)
     }
 
-    fun update(update: (MutableMap<String, Long>) -> Unit) {
+    fun update(update: (MutableMap<String, Address>) -> Unit) {
         update(currentIndex)
         contentResource.using { content ->
             content.seek(0)
             val encoder = codec.encoder(content.writeStream)
             encoder.ushort(version)
             encoder.ushort(codec.version)
-            encoder.string(Json.encodeToString(serializer(), currentIndex))
+            encoder.int(currentIndex.size)
+            for (entry in currentIndex.entries) {
+                encoder.string(entry.key)
+                encoder.long(entry.value.offset)
+            }
         }
     }
 
@@ -42,7 +44,7 @@ internal class Index(
         }
     }
 
-    private fun readIndex(content: FileContent, codec: SimpleCodec): MutableMap<String, Long> {
+    private fun readIndex(content: FileContent, codec: SimpleCodec): MutableMap<String, Address> {
         return if (content.length() == 0L) {
             mutableMapOf()
         } else {
@@ -50,7 +52,14 @@ internal class Index(
             val decoder = codec.decoder(content.readStream)
             require(decoder.ushort() == version)
             require(decoder.ushort() == codec.version)
-            Json.decodeFromString<MutableMap<String, Long>>(decoder.string())
+            val count = decoder.int()
+            val result = LinkedHashMap<String, Address>(count)
+            for (i in 0 until count) {
+                val key = decoder.string()
+                val address = Address(decoder.long())
+                result[key] = address
+            }
+            result
         }
     }
 }

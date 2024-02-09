@@ -242,7 +242,7 @@ class DerivedLib(name: String, override val derivedFrom: BaseLib, baseDir: File,
         get() = true
 }
 
-val jvmMinCliApp = jvmCliApp("jvm-cli-app-min").cliArgs("hello", "world")
+val jvmCliMinApp = jvmCliApp("jvm-cli-app-min").cliArgs("hello", "world")
 
 val jvmCliApp = jvmCliApp("jvm-cli-app")
 val jvmUiApp = jvmUiApp("jvm-ui-app")
@@ -251,6 +251,10 @@ val kmpLib = mppLib("kmp-lib")
 
 val nativeCliApp = jvmCliApp.deriveNative("native-cli-app")
 val nativeUiApp = macOsUiApp("native-ui-app")
+
+val jvmCliFullApp = jvmCliApp("jvm-cli-app-full").cliArgs("list")
+
+val jvmCliStoreApp = jvmCliApp("jvm-store-cli-app").cliArgs("content", "build/test")
 
 val samples = listOf(
     jvmLib,
@@ -266,9 +270,9 @@ val samples = listOf(
     jvmCliApp.derive("native-binary") { it.native() }.allPlatforms(),
     jvmCliApp.derive("native-binary-customized") { it.native().launcher("app") }.allPlatforms(),
 
-    jvmMinCliApp.allPlatforms(),
-    jvmCliApp("jvm-cli-app-full").cliArgs("list").allPlatforms(),
-    jvmCliApp("jvm-store-cli-app").cliArgs("content", "build/test").allPlatforms(),
+    jvmCliMinApp.allPlatforms(),
+    jvmCliFullApp.allPlatforms(),
+    jvmCliStoreApp.allPlatforms(),
 
     jvmUiApp,
     jvmUiApp.derive("customized") { it.launcher("App") },
@@ -276,8 +280,9 @@ val samples = listOf(
     nativeCliApp.allPlatforms(),
     nativeCliApp.derive("customized") { it.launcher("app") }.allPlatforms(),
 
-    jvmMinCliApp.deriveNative("native-cli-app-min").allPlatforms(),
-    nativeCliApp("native-cli-app-full").cliArgs("list").allPlatforms(),
+    jvmCliMinApp.deriveNative("native-cli-app-min").allPlatforms(),
+    jvmCliFullApp.deriveNative("native-cli-app-full").allPlatforms(),
+    jvmCliStoreApp.deriveNative("native-store-cli-app").allPlatforms(),
 
     nativeUiApp,
     nativeUiApp.derive("customized") { it.launcher("App") }
@@ -311,7 +316,10 @@ val generators = derivedSamples.map { sample ->
                     if (sample.includePackages) {
                         destFile.writeText(text)
                     } else {
-                        destFile.writeText(text.lines().drop(2).joinToString("\n"))
+                        val lines = text.lines()
+                        val packageIndex = lines.indexOfFirst { it.trim().startsWith("package ") }
+                        val modified = lines.subList(0, packageIndex) + lines.subList(packageIndex + 2, lines.size)
+                        destFile.writeText(modified.joinToString("\n"))
                     }
                 }
             }

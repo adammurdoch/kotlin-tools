@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalStdlibApi::class)
+
 package sample
 
 import com.github.ajalt.clikt.core.CliktCommand

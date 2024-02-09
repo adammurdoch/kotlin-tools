@@ -24,12 +24,15 @@ class ContentCommand : CliktCommand(name = "content", help = "Dump content") {
     private val store by argument("store", help = "The store to use").file()
 
     override fun run() {
-        Store.open(store.toDir()).use { store ->
+        val store = Store.open(store.toDir())
+        try {
             store.accept(object : ContentVisitor {
                 override fun value(name: String, details: ContentVisitor.ValueInfo) {
-                    println("- '$name' address ${details.address}")
+                    println("- '$name' ${details.formatted}")
                 }
             })
+        } finally {
+            store.close()
         }
     }
 }
@@ -38,8 +41,11 @@ abstract class AbstractBenchmarkCommand(name: String, help: String) : CliktComma
     private val store by argument("store", help = "The store to benchmark").file()
 
     override fun run() {
-        Store.open(store.toDir()).use { store ->
+        val store = Store.open(store.toDir())
+        try {
             benchmark(store)
+        } finally {
+            store.close()
         }
     }
 

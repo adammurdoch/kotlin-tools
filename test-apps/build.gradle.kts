@@ -25,9 +25,6 @@ sealed class AppNature {
 
     abstract fun native(): AppNature
 
-    open val includePackages: Boolean
-        get() = true
-
     abstract val distDirName: String
 
     abstract val cliLauncherPath: String?
@@ -97,9 +94,6 @@ class NativeBinaryCliApp(private val name: String) : AppNature() {
         return this
     }
 
-    override val includePackages: Boolean
-        get() = false
-
     override val distDirName: String
         get() = "build/dist-image"
 
@@ -143,7 +137,15 @@ class UiApp(private val appName: String) : AppNature() {
         get() = nativeBinaryPath
 }
 
-sealed class App(name: String, baseDir: File, val nature: AppNature, srcDirName: String, val allPlatforms: Boolean, protected val cliArgs: List<String>) :
+sealed class App(
+    name: String,
+    baseDir: File,
+    val nature: AppNature,
+    srcDirName: String,
+    val includePackages: Boolean,
+    val allPlatforms: Boolean,
+    protected val cliArgs: List<String>
+) :
     Sample(name, baseDir, srcDirName) {
 
     val distTask = ":$name:dist"
@@ -178,37 +180,51 @@ sealed class App(name: String, baseDir: File, val nature: AppNature, srcDirName:
 
     fun derive(suffix: String, builder: (AppNature) -> AppNature = { it }): DerivedApp {
         val sampleName = "$name-$suffix"
-        return DerivedApp(sampleName, derivedFrom, baseDir, builder(nature.launcher(sampleName)), srcDirName)
+        return DerivedApp(sampleName, derivedFrom, baseDir, builder(nature.launcher(sampleName)), srcDirName, includePackages)
     }
 }
 
-class BaseApp(name: String, baseDir: File, nature: AppNature, srcDirName: String, allPlatforms: Boolean = false, cliArgs: List<String> = listOf("1", "+", "2")) :
-    App(name, baseDir, nature, srcDirName, allPlatforms, cliArgs) {
+class BaseApp(
+    name: String,
+    baseDir: File,
+    nature: AppNature,
+    srcDirName: String,
+    includePackages: Boolean,
+    allPlatforms: Boolean = false,
+    cliArgs: List<String> = listOf("1", "+", "2")
+) :
+    App(name, baseDir, nature, srcDirName, includePackages, allPlatforms, cliArgs) {
 
     override val derivedFrom: BaseApp
         get() = this
 
     fun deriveNative(name: String): DerivedApp {
-        return DerivedApp(name, derivedFrom, baseDir, NativeBinaryCliApp(name), "commonMain")
+        return DerivedApp(name, derivedFrom, baseDir, NativeBinaryCliApp(name), "commonMain", false)
     }
 
     fun allPlatforms(): BaseApp {
-        return BaseApp(name, baseDir, nature, srcDirName, true, cliArgs)
+        return BaseApp(name, baseDir, nature, srcDirName, includePackages, true, cliArgs)
     }
 
     fun cliArgs(vararg args: String): BaseApp {
-        return BaseApp(name, baseDir, nature, srcDirName, allPlatforms, args.toList())
+        return BaseApp(name, baseDir, nature, srcDirName, includePackages, allPlatforms, args.toList())
     }
 }
 
-class DerivedApp(name: String, override val derivedFrom: BaseApp, baseDir: File, nature: AppNature, srcDirName: String, allPlatforms: Boolean = false, cliArgs: List<String> = listOf("1", "+", "2")) :
-    App(name, baseDir, nature, srcDirName, allPlatforms, cliArgs), DerivedSample {
-
-    override val includePackages: Boolean
-        get() = nature.includePackages
+class DerivedApp(
+    name: String,
+    override val derivedFrom: BaseApp,
+    baseDir: File,
+    nature: AppNature,
+    srcDirName: String,
+    includePackages: Boolean,
+    allPlatforms: Boolean = false,
+    cliArgs: List<String> = listOf("1", "+", "2")
+) :
+    App(name, baseDir, nature, srcDirName, includePackages, allPlatforms, cliArgs), DerivedSample {
 
     fun allPlatforms(): DerivedApp {
-        return DerivedApp(name, derivedFrom, baseDir, nature, srcDirName, true, cliArgs)
+        return DerivedApp(name, derivedFrom, baseDir, nature, srcDirName, includePackages, true, cliArgs)
     }
 }
 
@@ -276,7 +292,7 @@ val generators = derivedSamples.map { sample ->
 
     tasks.register("generate-${sample.name}") {
         doLast {
-            sample.srcDir.deleteRecursively()
+//            sample.srcDir.deleteRecursively()
 
             originDir.walkTopDown().forEach { file ->
                 val destFile = if (sample.includePackages) {
@@ -287,7 +303,12 @@ val generators = derivedSamples.map { sample ->
                 if (file.isDirectory && sample.includePackages) {
                     destFile.createDirectory()
                 } else if (file.isFile) {
-                    file.copyTo(destFile, true)
+                    val text = file.readText()
+                    if (sample.includePackages) {
+                        destFile.writeText(text)
+                    } else {
+                        destFile.writeText(text.lines().drop(2).joinToString("\n"))
+                    }
                 }
             }
         }
@@ -360,16 +381,16 @@ tasks.register("open") {
 }
 
 fun jvmCliApp(name: String): BaseApp {
-    return BaseApp(name, projectDir, JvmCliApp(name, false), "main")
+    return BaseApp(name, projectDir, JvmCliApp(name, false), "main", true)
 }
 
-fun jvmUiApp(name: String) = BaseApp(name, projectDir, UiApp(name.capitalize()), "main")
+fun jvmUiApp(name: String) = BaseApp(name, projectDir, UiApp(name.capitalize()), "main", true)
 
 fun nativeCliApp(name: String): BaseApp {
-    return BaseApp(name, projectDir, NativeBinaryCliApp(name), "commonMain")
+    return BaseApp(name, projectDir, NativeBinaryCliApp(name), "commonMain", false)
 }
 
-fun macOsUiApp(name: String) = BaseApp(name, projectDir, UiApp(name.capitalize()), "macosMain")
+fun macOsUiApp(name: String) = BaseApp(name, projectDir, UiApp(name.capitalize()), "macosMain", true)
 
 fun jvmLib(name: String) = BaseLib(name, projectDir, "main")
 

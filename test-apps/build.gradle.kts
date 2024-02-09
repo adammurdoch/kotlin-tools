@@ -1,4 +1,5 @@
 import net.rubygrapefruit.machine.info.Machine
+import org.jetbrains.kotlin.incremental.createDirectory
 import java.io.ByteArrayOutputStream
 
 sealed class Sample(val name: String, val baseDir: File, val srcDirName: String) {
@@ -13,6 +14,8 @@ interface DerivedSample {
     val derivedFrom: Sample
 
     val srcDir: File
+
+    val includePackages: Boolean
 }
 
 sealed class AppNature {
@@ -21,6 +24,9 @@ sealed class AppNature {
     abstract fun embedded(): AppNature
 
     abstract fun native(): AppNature
+
+    open val includePackages: Boolean
+        get() = true
 
     abstract val distDirName: String
 
@@ -43,6 +49,10 @@ class JvmCliApp(private val name: String, private val embeddedJvm: Boolean) : Ap
         return JvmCliApp(name, true)
     }
 
+    override fun native(): AppNature {
+        return NativeBinaryCliApp(name)
+    }
+
     override val cliLauncherPath: String
         get() = if (Machine.thisMachine is Machine.Windows) {
             "$name.bat"
@@ -56,10 +66,6 @@ class JvmCliApp(private val name: String, private val embeddedJvm: Boolean) : Ap
         } else {
             emptyList()
         }
-
-    override fun native(): AppNature {
-        return NativeBinaryCliApp(name)
-    }
 
     override val distDirName: String
         get() = "build/dist-image"
@@ -164,14 +170,23 @@ sealed class App(name: String, baseDir: File, val nature: AppNature, srcDirName:
     } else {
         null
     }
+
+    abstract val derivedFrom: BaseApp
+
+    fun derive(suffix: String, builder: (AppNature) -> AppNature = { it }): DerivedApp {
+        val sampleName = "$name-$suffix"
+        return DerivedApp(sampleName, derivedFrom, baseDir, builder(nature.launcher(sampleName)))
+    }
 }
 
 class BaseApp(name: String, baseDir: File, nature: AppNature, srcDirName: String, allPlatforms: Boolean = false, cliArgs: List<String> = listOf("1", "+", "2")) :
     App(name, baseDir, nature, srcDirName, allPlatforms, cliArgs) {
 
-    fun derive(suffix: String, builder: (AppNature) -> AppNature = { it }): DerivedApp {
-        val sampleName = "$name-$suffix"
-        return DerivedApp(sampleName, this, baseDir, builder(nature.launcher(sampleName)))
+    override val derivedFrom: BaseApp
+        get() = this
+
+    fun deriveNative(name: String): DerivedApp {
+        return DerivedApp(name, this, baseDir, NativeBinaryCliApp(name))
     }
 
     fun allPlatforms(): BaseApp {
@@ -186,6 +201,9 @@ class BaseApp(name: String, baseDir: File, nature: AppNature, srcDirName: String
 class DerivedApp(name: String, override val derivedFrom: BaseApp, baseDir: File, nature: AppNature, allPlatforms: Boolean = false, cliArgs: List<String> = listOf("1", "+", "2")) :
     App(name, baseDir, nature, derivedFrom.srcDirName, allPlatforms, cliArgs), DerivedSample {
 
+    override val includePackages: Boolean
+        get() = nature.includePackages
+
     fun allPlatforms(): DerivedApp {
         return DerivedApp(name, derivedFrom, baseDir, nature, true, cliArgs)
     }
@@ -199,13 +217,17 @@ class BaseLib(name: String, baseDir: File, srcDirName: String) : Sample(name, ba
 }
 
 class DerivedLib(name: String, override val derivedFrom: BaseLib, baseDir: File, srcDirName: String) :
-    Sample(name, baseDir, srcDirName), DerivedSample
+    Sample(name, baseDir, srcDirName), DerivedSample {
+
+    override val includePackages: Boolean
+        get() = true
+}
 
 val jvmCliApp = jvmCliApp("jvm-cli-app")
 val jvmUiApp = jvmUiApp("jvm-ui-app")
 val jvmLib = jvmLib("jvm-lib")
 val kmpLib = mppLib("kmp-lib")
-val nativeCliApp = nativeCliApp("native-cli-app")
+val nativeCliApp = jvmCliApp.deriveNative("native-cli-app")
 val nativeUiApp = macOsUiApp("native-ui-app")
 
 val samples = listOf(
@@ -244,15 +266,26 @@ val derivedSamples = samples.filterIsInstance<DerivedSample>()
 val uiApps = sampleApps.filter { it.openCommandLine != null }
 
 val generators = derivedSamples.map { sample ->
-    if (!sample.derivedFrom.srcDir.isDirectory) {
-        throw IllegalArgumentException("Missing source directory ${sample.derivedFrom.srcDir}")
+    val originDir = sample.derivedFrom.srcDir
+    if (!originDir.isDirectory) {
+        throw IllegalArgumentException("Missing source directory $originDir")
     }
 
     tasks.register("generate-${sample.name}") {
         doLast {
-            sync {
-                from(sample.derivedFrom.srcDir)
-                into(sample.srcDir)
+            sample.srcDir.deleteRecursively()
+            originDir.walkTopDown().onEnter { file ->
+                val destFile = if (sample.includePackages) {
+                    sample.srcDir.resolve(file.relativeTo(originDir))
+                } else {
+                    sample.srcDir.resolve(file.name)
+                }
+                if (file.isDirectory && sample.includePackages) {
+                    destFile.createDirectory()
+                } else {
+                    file.copyTo(destFile)
+                }
+                true
             }
         }
     }

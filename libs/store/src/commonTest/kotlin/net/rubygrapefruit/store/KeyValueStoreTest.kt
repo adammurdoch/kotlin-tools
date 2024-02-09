@@ -159,4 +159,30 @@ class KeyValueStoreTest : AbstractStoreTest() {
             assertTrue(store.values().isEmpty())
         }
     }
+
+    @Test
+    fun `can read and write multiple key-value stores in same session`() {
+        withStore { store ->
+            val value1 = store.keyValue<String, Int>("value 1")
+            assertNull(value1.get("a"))
+            val value2 = store.keyValue<String, String>("value 2")
+            assertNull(value2.get("a"))
+
+            value1.set("a", 123)
+            assertEquals(123, value1.get("a"))
+
+            value2.set("a", "value 2")
+            assertEquals("value 2", value2.get("a"))
+
+            assertEquals(listOf("value 1", "value 2"), store.values())
+        }
+
+        withStore { store ->
+            assertEquals(listOf("value 1", "value 2"), store.values())
+            val value1 = store.keyValue<String, Int>("value 1")
+            val value2 = store.keyValue<String, String>("value 2")
+            assertEquals(123, value1.get("a"))
+            assertEquals("value 2", value2.get("a"))
+        }
+    }
 }

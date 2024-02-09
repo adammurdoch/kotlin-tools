@@ -97,6 +97,9 @@ class NativeBinaryCliApp(private val name: String) : AppNature() {
         return this
     }
 
+    override val includePackages: Boolean
+        get() = false
+
     override val distDirName: String
         get() = "build/dist-image"
 
@@ -175,7 +178,7 @@ sealed class App(name: String, baseDir: File, val nature: AppNature, srcDirName:
 
     fun derive(suffix: String, builder: (AppNature) -> AppNature = { it }): DerivedApp {
         val sampleName = "$name-$suffix"
-        return DerivedApp(sampleName, derivedFrom, baseDir, builder(nature.launcher(sampleName)))
+        return DerivedApp(sampleName, derivedFrom, baseDir, builder(nature.launcher(sampleName)), srcDirName)
     }
 }
 
@@ -186,7 +189,7 @@ class BaseApp(name: String, baseDir: File, nature: AppNature, srcDirName: String
         get() = this
 
     fun deriveNative(name: String): DerivedApp {
-        return DerivedApp(name, this, baseDir, NativeBinaryCliApp(name))
+        return DerivedApp(name, derivedFrom, baseDir, NativeBinaryCliApp(name), "commonMain")
     }
 
     fun allPlatforms(): BaseApp {
@@ -198,14 +201,14 @@ class BaseApp(name: String, baseDir: File, nature: AppNature, srcDirName: String
     }
 }
 
-class DerivedApp(name: String, override val derivedFrom: BaseApp, baseDir: File, nature: AppNature, allPlatforms: Boolean = false, cliArgs: List<String> = listOf("1", "+", "2")) :
-    App(name, baseDir, nature, derivedFrom.srcDirName, allPlatforms, cliArgs), DerivedSample {
+class DerivedApp(name: String, override val derivedFrom: BaseApp, baseDir: File, nature: AppNature, srcDirName: String, allPlatforms: Boolean = false, cliArgs: List<String> = listOf("1", "+", "2")) :
+    App(name, baseDir, nature, srcDirName, allPlatforms, cliArgs), DerivedSample {
 
     override val includePackages: Boolean
         get() = nature.includePackages
 
     fun allPlatforms(): DerivedApp {
-        return DerivedApp(name, derivedFrom, baseDir, nature, true, cliArgs)
+        return DerivedApp(name, derivedFrom, baseDir, nature, srcDirName, true, cliArgs)
     }
 }
 
@@ -274,7 +277,8 @@ val generators = derivedSamples.map { sample ->
     tasks.register("generate-${sample.name}") {
         doLast {
             sample.srcDir.deleteRecursively()
-            originDir.walkTopDown().onEnter { file ->
+
+            originDir.walkTopDown().forEach { file ->
                 val destFile = if (sample.includePackages) {
                     sample.srcDir.resolve(file.relativeTo(originDir))
                 } else {
@@ -282,10 +286,9 @@ val generators = derivedSamples.map { sample ->
                 }
                 if (file.isDirectory && sample.includePackages) {
                     destFile.createDirectory()
-                } else {
-                    file.copyTo(destFile)
+                } else if (file.isFile) {
+                    file.copyTo(destFile, true)
                 }
-                true
             }
         }
     }

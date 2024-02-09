@@ -1,6 +1,10 @@
 ## TODO
 
 - Buffered writes
+- Cache the key -> encoded key mapping in memory for key-value store
+- Use the key hash in key-value store index
+- Use byte to tag each index entry (currently uses UShort)
+- Don't keep entire index in memory
 - Tests verify file contents
 - Test app dumps store contents
   - Value size

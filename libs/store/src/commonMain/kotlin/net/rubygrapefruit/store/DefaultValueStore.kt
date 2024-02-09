@@ -3,13 +3,15 @@ package net.rubygrapefruit.store
 import kotlinx.serialization.KSerializer
 
 internal class DefaultValueStore<T>(
-    private val name: String,
-    private val index: Index,
+    name: String,
+    index: Index,
     private val data: DataFile,
     private val serializer: KSerializer<T>
 ) : ValueStore<T> {
+    private val index = index.value(name)
+
     override fun get(): T? {
-        val address = index.query { it[name] }
+        val address = index.get()
         return if (address == null) {
             null
         } else {
@@ -18,15 +20,11 @@ internal class DefaultValueStore<T>(
     }
 
     override fun discard() {
-        index.update {
-            it.remove(name)
-        }
+        index.discard()
     }
 
     override fun set(value: T) {
         val address = data.write(value, serializer)
-        index.update {
-            it[name] = address
-        }
+        index.set(address)
     }
 }

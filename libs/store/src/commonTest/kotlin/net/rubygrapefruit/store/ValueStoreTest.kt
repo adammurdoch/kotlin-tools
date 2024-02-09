@@ -1,9 +1,6 @@
 package net.rubygrapefruit.store
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class ValueStoreTest : AbstractStoreTest() {
     @Test

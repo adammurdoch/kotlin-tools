@@ -1,11 +1,12 @@
+@file:OptIn(ExperimentalStdlibApi::class)
+
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.int
-import net.rubygrapefruit.file.toDir
+import net.rubygrapefruit.file.fileSystem
 import net.rubygrapefruit.store.ContentVisitor
 import net.rubygrapefruit.store.Store
 
@@ -19,14 +20,11 @@ class StoreApp : CliktCommand() {
 }
 
 abstract class AbstractStoreCommand(name: String, help: String) : CliktCommand(name = name, help = help) {
-    private val store by argument("store", help = "The store to use").file()
+    private val store by argument("store", help = "The store to use")
 
     override fun run() {
-        val store = Store.open(store.toDir())
-        try {
-            run(store)
-        } finally {
-            store.close()
+        Store.open(fileSystem.currentDirectory.dir(store)).use {
+            run(it)
         }
     }
 

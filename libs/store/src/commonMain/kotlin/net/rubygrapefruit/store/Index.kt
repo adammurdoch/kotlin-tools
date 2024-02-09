@@ -18,21 +18,13 @@ internal class Index(
     }
 
     fun value(name: String): ValueStoreIndex {
-        val index = currentIndex.getOrPut(name) { DefaultValueStoreIndex() }
-        return if (index is DefaultValueStoreIndex) {
-            index
-        } else {
-            throw IllegalArgumentException("Cannot open key-value store '$name' as a value store.")
-        }
+        val index = currentIndex.getOrPut(name) { DefaultValueStoreIndex(name) }
+        return index.asValueStore()
     }
 
     fun keyValue(name: String): KeyValueStoreIndex {
-        val index = currentIndex.getOrPut(name) { DefaultKeyValueStoreIndex() }
-        return if (index is KeyValueStoreIndex) {
-            index
-        } else {
-            throw IllegalArgumentException("Cannot open value store '$name' as a key-value store.")
-        }
+        val index = currentIndex.getOrPut(name) { DefaultKeyValueStoreIndex(name) }
+        return index.asKeyValueStore()
     }
 
     fun accept(visitor: ContentVisitor) {
@@ -91,7 +83,7 @@ internal class Index(
                 when (tag) {
                     1.toUShort() -> {
                         val address = Address(decoder.long())
-                        result[name] = DefaultValueStoreIndex(address)
+                        result[name] = DefaultValueStoreIndex(name, address)
                     }
 
                     2.toUShort() -> {
@@ -102,7 +94,7 @@ internal class Index(
                             val address = Address(decoder.long())
                             entries[key] = address
                         }
-                        result[name] = DefaultKeyValueStoreIndex(entries)
+                        result[name] = DefaultKeyValueStoreIndex(name, entries)
                     }
 
                     else -> throw IllegalArgumentException()
@@ -114,9 +106,14 @@ internal class Index(
 
     private sealed class IndexEntry : ContentVisitor.ValueInfo {
         abstract val hasValue: Boolean
+
+        abstract fun asValueStore(): ValueStoreIndex
+
+        abstract fun asKeyValueStore(): KeyValueStoreIndex
     }
 
     private inner class DefaultValueStoreIndex(
+        private val name: String,
         var address: Address? = null
     ) : IndexEntry(), ValueStoreIndex {
         override val hasValue: Boolean
@@ -131,6 +128,14 @@ internal class Index(
                     "0x" + current.offset.toHexString(HexFormat.UpperCase)
                 }
             }
+
+        override fun asValueStore(): ValueStoreIndex {
+            return this
+        }
+
+        override fun asKeyValueStore(): KeyValueStoreIndex {
+            throw IllegalArgumentException("Cannot open value store '$name' as a key-value store.")
+        }
 
         override fun get(): Address? {
             return address
@@ -148,7 +153,8 @@ internal class Index(
     }
 
     private inner class DefaultKeyValueStoreIndex(
-        val entries: MutableMap<String, Address> = mutableMapOf<String, Address>()
+        private val name: String,
+        val entries: MutableMap<String, Address> = mutableMapOf()
     ) : IndexEntry(), KeyValueStoreIndex {
 
         override val hasValue: Boolean
@@ -156,6 +162,14 @@ internal class Index(
 
         override val formatted: String
             get() = "${entries.size} entries"
+
+        override fun asValueStore(): ValueStoreIndex {
+            throw IllegalArgumentException("Cannot open key-value store '$name' as a value store.")
+        }
+
+        override fun asKeyValueStore(): KeyValueStoreIndex {
+            return this
+        }
 
         override fun get(): Map<String, Address> {
             return entries

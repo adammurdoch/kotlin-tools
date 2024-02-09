@@ -14,7 +14,7 @@ class StoreTest : AbstractStoreTest() {
                 store.value<String>("value")
                 fail()
             } catch (e: Exception) {
-                assertEquals("??", e.message)
+                assertEquals("Cannot open key-value store 'value' as a value store.", e.message)
             }
         }
         withStore { store ->
@@ -22,7 +22,7 @@ class StoreTest : AbstractStoreTest() {
                 store.value<String>("value")
                 fail()
             } catch (e: Exception) {
-                assertEquals("??", e.message)
+                assertEquals("Cannot open key-value store 'value' as a value store.", e.message)
             }
         }
     }
@@ -36,7 +36,7 @@ class StoreTest : AbstractStoreTest() {
                 store.keyValue<String, String>("value")
                 fail()
             } catch (e: Exception) {
-                assertEquals("??", e.message)
+                assertEquals("Cannot open value store 'value' as a key-value store.", e.message)
             }
         }
         withStore { store ->
@@ -44,7 +44,7 @@ class StoreTest : AbstractStoreTest() {
                 store.keyValue<String, String>("value")
                 fail()
             } catch (e: Exception) {
-                assertEquals("??", e.message)
+                assertEquals("Cannot open value store 'value' as a key-value store.", e.message)
             }
         }
     }

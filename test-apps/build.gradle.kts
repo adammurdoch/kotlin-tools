@@ -292,7 +292,7 @@ val generators = derivedSamples.map { sample ->
 
     tasks.register("generate-${sample.name}") {
         doLast {
-//            sample.srcDir.deleteRecursively()
+            sample.srcDir.deleteRecursively()
 
             originDir.walkTopDown().forEach { file ->
                 val destFile = if (sample.includePackages) {
@@ -303,6 +303,7 @@ val generators = derivedSamples.map { sample ->
                 if (file.isDirectory && sample.includePackages) {
                     destFile.createDirectory()
                 } else if (file.isFile) {
+                    destFile.parentFile.mkdirs()
                     val text = file.readText()
                     if (sample.includePackages) {
                         destFile.writeText(text)

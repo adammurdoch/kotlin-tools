@@ -199,7 +199,7 @@ class BaseApp(
         get() = this
 
     fun deriveNative(name: String): DerivedApp {
-        return DerivedApp(name, derivedFrom, baseDir, NativeBinaryCliApp(name), "commonMain", false)
+        return DerivedApp(name, derivedFrom, baseDir, NativeBinaryCliApp(name), "commonMain", false, allPlatforms, cliArgs)
     }
 
     fun allPlatforms(): BaseApp {
@@ -242,10 +242,13 @@ class DerivedLib(name: String, override val derivedFrom: BaseLib, baseDir: File,
         get() = true
 }
 
+val jvmMinCliApp = jvmCliApp("jvm-cli-app-min").cliArgs("hello", "world")
+
 val jvmCliApp = jvmCliApp("jvm-cli-app")
 val jvmUiApp = jvmUiApp("jvm-ui-app")
 val jvmLib = jvmLib("jvm-lib")
 val kmpLib = mppLib("kmp-lib")
+
 val nativeCliApp = jvmCliApp.deriveNative("native-cli-app")
 val nativeUiApp = macOsUiApp("native-ui-app")
 
@@ -263,7 +266,7 @@ val samples = listOf(
     jvmCliApp.derive("native-binary") { it.native() }.allPlatforms(),
     jvmCliApp.derive("native-binary-customized") { it.native().launcher("app") }.allPlatforms(),
 
-    jvmCliApp("jvm-cli-app-min").cliArgs("hello", "world").allPlatforms(),
+    jvmMinCliApp.allPlatforms(),
     jvmCliApp("jvm-cli-app-full").cliArgs("list").allPlatforms(),
     jvmCliApp("jvm-store-cli-app").cliArgs("content", "build/test").allPlatforms(),
 
@@ -273,7 +276,7 @@ val samples = listOf(
     nativeCliApp.allPlatforms(),
     nativeCliApp.derive("customized") { it.launcher("app") }.allPlatforms(),
 
-    nativeCliApp("native-cli-app-min").cliArgs("hello", "world").allPlatforms(),
+    jvmMinCliApp.deriveNative("native-cli-app-min").allPlatforms(),
     nativeCliApp("native-cli-app-full").cliArgs("list").allPlatforms(),
 
     nativeUiApp,

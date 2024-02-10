@@ -200,6 +200,31 @@ class KeyValueStoreTest : AbstractStoreTest() {
     }
 
     @Test
+    fun `can remove all entries`() {
+        withStore { store ->
+            val value = store.keyValue<String, Int>("value")
+            value.set("a", 1)
+            value.set("b", 2)
+            assertEquals(listOf("a" to 1, "b" to 2), value.entries())
+
+            value.remove("b")
+            value.remove("a")
+
+            assertNull(value.get("a"))
+            assertTrue(value.entries().isEmpty())
+            assertTrue(store.values().isEmpty())
+        }
+        withStore { store ->
+            assertTrue(store.values().isEmpty())
+
+            val value = store.keyValue<String, Int>("value")
+            assertNull(value.get("a"))
+            assertTrue(value.entries().isEmpty())
+            assertTrue(store.values().isEmpty())
+        }
+    }
+
+    @Test
     fun `can discard all entries`() {
         withStore { store ->
             val value = store.keyValue<String, Int>("value")

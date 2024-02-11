@@ -5,6 +5,7 @@
 - Use the key hash in key-value store index
 - Use byte to tag each index entry (currently uses UShort)
 - Don't keep entire index in memory
+- Reuse encoder and decoder instances
 - Tests verify file contents
 - Test app dumps store contents
   - Value size

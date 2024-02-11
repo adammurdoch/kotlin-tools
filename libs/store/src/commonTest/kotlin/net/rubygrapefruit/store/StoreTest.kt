@@ -2,6 +2,7 @@
 
 package net.rubygrapefruit.store
 
+import net.rubygrapefruit.file.regularFile
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -9,19 +10,40 @@ import kotlin.test.fail
 
 class StoreTest : AbstractStoreTest() {
     @Test
-    fun `can discard store contents on open`() {
-        val dir = fixture.testDir
+    fun `cannot open when index file has incorrect version`() {
+        withStore {
+            it.value<String>("value").set("ok")
+        }
 
-        Store.open(dir).use { store ->
+        val indexFile = testStore.file("index.bin")
+        assertTrue(indexFile.metadata().regularFile)
+        val index = indexFile.readBytes().get()
+        index[0] = 1
+        indexFile.writeBytes(index)
+
+        val dataFile = testStore.file("data.bin")
+        assertTrue(dataFile.metadata().regularFile)
+
+        try {
+            Store.open(testStore)
+            fail()
+        } catch (e: IllegalStateException) {
+            assertEquals("Unexpected version in file.", e.message)
+        }
+    }
+
+    @Test
+    fun `can discard store contents on open`() {
+        withStore { store ->
             store.value<Long>("long").set(123)
             store.keyValue<Long, String>("longs").set(123, "value")
         }
 
-        Store.open(dir, discard = true).use { store ->
+        Store.open(testStore, discard = true).use { store ->
             assertTrue(store.values().isEmpty())
         }
 
-        Store.open(dir).use { store ->
+        withStore { store ->
             assertTrue(store.values().isEmpty())
         }
     }
@@ -34,7 +56,7 @@ class StoreTest : AbstractStoreTest() {
             try {
                 store.value<String>("value")
                 fail()
-            } catch (e: Exception) {
+            } catch (e: IllegalArgumentException) {
                 assertEquals("Cannot open key-value store 'value' as a value store.", e.message)
             }
         }
@@ -42,7 +64,7 @@ class StoreTest : AbstractStoreTest() {
             try {
                 store.value<String>("value")
                 fail()
-            } catch (e: Exception) {
+            } catch (e: IllegalArgumentException) {
                 assertEquals("Cannot open key-value store 'value' as a value store.", e.message)
             }
         }
@@ -56,7 +78,7 @@ class StoreTest : AbstractStoreTest() {
             try {
                 store.keyValue<String, String>("value")
                 fail()
-            } catch (e: Exception) {
+            } catch (e: IllegalArgumentException) {
                 assertEquals("Cannot open value store 'value' as a key-value store.", e.message)
             }
         }
@@ -64,7 +86,7 @@ class StoreTest : AbstractStoreTest() {
             try {
                 store.keyValue<String, String>("value")
                 fail()
-            } catch (e: Exception) {
+            } catch (e: IllegalArgumentException) {
                 assertEquals("Cannot open value store 'value' as a key-value store.", e.message)
             }
         }

@@ -42,13 +42,11 @@ internal class Index(
         fileContent.using { content ->
             content.seek(0)
             val encoder = codec.encoder(content.writeStream)
-            encoder.ushort(version)
-            encoder.ushort(codec.version)
+            encoder.fileHeader(codec)
             encoder.int(entries.size)
             for (indexEntry in entries.entries) {
                 encoder.string(indexEntry.key)
-                val value = indexEntry.value
-                when (value) {
+                when (val value = indexEntry.value) {
                     is DefaultValueStoreIndex -> {
                         encoder.ushort(1u)
                         encoder.long(value.address!!.offset)
@@ -73,8 +71,7 @@ internal class Index(
         } else {
             content.seek(0)
             val decoder = codec.decoder(content.readStream)
-            require(decoder.ushort() == version)
-            require(decoder.ushort() == codec.version)
+            decoder.checkFileHeader(codec)
             val count = decoder.int()
             val result = LinkedHashMap<String, IndexEntry>(count)
             for (i in 0 until count) {

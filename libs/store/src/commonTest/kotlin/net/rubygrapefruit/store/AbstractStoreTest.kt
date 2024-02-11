@@ -2,11 +2,15 @@
 
 package net.rubygrapefruit.store
 
+import net.rubygrapefruit.file.Directory
 import net.rubygrapefruit.file.fixtures.AbstractFileTest
 
 abstract class AbstractStoreTest : AbstractFileTest() {
+    val testStore: Directory
+        get() = fixture.testDir
+
     fun withStore(action: (Store) -> Unit) {
-        Store.open(fixture.testDir).use {
+        Store.open(testStore).use {
             action(it)
         }
     }

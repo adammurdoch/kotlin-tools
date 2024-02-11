@@ -10,6 +10,11 @@ internal class SimpleDecoder(
 ) : Decoder {
     private val buffer = ByteArray(8)
 
+    override fun ubyte(): UByte {
+        read(buffer, 1)
+        return buffer[0].toUByte()
+    }
+
     override fun ushort(): UShort {
         read(buffer, 2)
         return (buffer[0].toUShort().and(0xffu).rotateLeft(8))

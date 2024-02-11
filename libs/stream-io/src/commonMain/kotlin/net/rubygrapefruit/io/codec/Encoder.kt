@@ -2,6 +2,13 @@ package net.rubygrapefruit.io.codec
 
 interface Encoder {
     /**
+     * Encodes the given [UByte] value.
+     *
+     * @return this
+     */
+    fun ubyte(value: UByte): Encoder
+
+    /**
      * Encodes the given [UShort] value.
      *
      * @return this

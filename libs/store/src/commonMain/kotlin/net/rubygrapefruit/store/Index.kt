@@ -4,6 +4,8 @@ package net.rubygrapefruit.store
 
 import net.rubygrapefruit.file.FileContent
 import net.rubygrapefruit.file.RegularFile
+import net.rubygrapefruit.io.codec.Decoder
+import net.rubygrapefruit.io.codec.Encoder
 import net.rubygrapefruit.io.codec.SimpleCodec
 
 internal class Index(
@@ -48,20 +50,28 @@ internal class Index(
                 encoder.string(indexEntry.key)
                 when (val value = indexEntry.value) {
                     is DefaultValueStoreIndex -> {
-                        encoder.ushort(1u)
-                        encoder.long(value.address!!.offset)
+                        encoder.ubyte(1u)
+                        encoder.valueStoreIndex(value)
                     }
 
                     is DefaultKeyValueStoreIndex -> {
-                        encoder.ushort(2u)
-                        encoder.int(value.entries.size)
-                        for (valueEntry in value.entries.entries) {
-                            encoder.string(valueEntry.key)
-                            encoder.long(valueEntry.value.offset)
-                        }
+                        encoder.ubyte(2u)
+                        encoder.keyValueStoreIndex(value)
                     }
                 }
             }
+        }
+    }
+
+    private fun Encoder.valueStoreIndex(value: DefaultValueStoreIndex) {
+        long(value.address!!.offset)
+    }
+
+    private fun Encoder.keyValueStoreIndex(value: DefaultKeyValueStoreIndex) {
+        int(value.entries.size)
+        for (valueEntry in value.entries.entries) {
+            string(valueEntry.key)
+            long(valueEntry.value.offset)
         }
     }
 
@@ -76,22 +86,14 @@ internal class Index(
             val result = LinkedHashMap<String, IndexEntry>(count)
             for (i in 0 until count) {
                 val name = decoder.string()
-                val tag = decoder.ushort()
+                val tag = decoder.ubyte()
                 when (tag) {
-                    1.toUShort() -> {
-                        val address = Address(decoder.long())
-                        result[name] = DefaultValueStoreIndex(name, address)
+                    1.toUByte() -> {
+                        result[name] = decoder.valueStoreIndex(name)
                     }
 
-                    2.toUShort() -> {
-                        val count = decoder.int()
-                        val entries = LinkedHashMap<String, Address>(count)
-                        for (i in 0 until count) {
-                            val key = decoder.string()
-                            val address = Address(decoder.long())
-                            entries[key] = address
-                        }
-                        result[name] = DefaultKeyValueStoreIndex(name, entries)
+                    2.toUByte() -> {
+                        result[name] = decoder.keyValueStoreIndex(name)
                     }
 
                     else -> throw IllegalArgumentException()
@@ -99,6 +101,24 @@ internal class Index(
             }
             result
         }
+    }
+
+    private fun Decoder.valueStoreIndex(name: String): DefaultValueStoreIndex {
+        val address = Address(long())
+        val index = DefaultValueStoreIndex(name, address)
+        return index
+    }
+
+    private fun Decoder.keyValueStoreIndex(name: String): DefaultKeyValueStoreIndex {
+        val count = int()
+        val entries = LinkedHashMap<String, Address>(count)
+        for (i in 0 until count) {
+            val key = string()
+            val address = Address(long())
+            entries[key] = address
+        }
+        val index = DefaultKeyValueStoreIndex(name, entries)
+        return index
     }
 
     private sealed class IndexEntry : ContentVisitor.ValueInfo {

@@ -10,6 +10,12 @@ internal class SimpleEncoder(
 ) : Encoder {
     private val buffer = ByteArray(8)
 
+    override fun ubyte(value: UByte): Encoder {
+        buffer[0] = value.toByte()
+        stream.write(buffer, 0, 1)
+        return this
+    }
+
     override fun ushort(value: UShort): Encoder {
         buffer[0] = value.rotateRight(8).toByte()
         buffer[1] = value.toByte()

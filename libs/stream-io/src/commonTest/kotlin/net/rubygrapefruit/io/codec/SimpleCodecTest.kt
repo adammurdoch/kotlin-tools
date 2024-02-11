@@ -9,6 +9,13 @@ import kotlin.test.assertEquals
 
 class SimpleCodecTest {
     @Test
+    fun `encodes and decodes UByte`() {
+        for (value in listOf(0u, 0x1u, 0x10u, 0xffu, UByte.MAX_VALUE)) {
+            assertEquals(value, encodeAndDecode(value, Encoder::ubyte, Decoder::ubyte))
+        }
+    }
+
+    @Test
     fun `encodes and decodes UShort`() {
         for (value in listOf(0u, 0x1u, 0xffu, 0x100u, 0xff01u, 0x1122u, UShort.MAX_VALUE)) {
             assertEquals(value, encodeAndDecode(value, Encoder::ushort, Decoder::ushort))

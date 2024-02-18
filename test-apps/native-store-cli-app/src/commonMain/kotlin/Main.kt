@@ -66,8 +66,8 @@ class BenchmarkOneValueCommand : AbstractStoreCommand(name = "one-value", help =
 }
 
 class BenchmarkManyValuesCommand : AbstractStoreCommand(name = "many-values", help = "Run benchmark for many values") {
-    private val values by option("--values", help = "The number of values").int().default(100)
-    private val iterations by option("--iterations", help = "The number of iterations").int().default(50)
+    private val values by option("--values", help = "The number of values").int().default(1000)
+    private val iterations by option("--iterations", help = "The number of iterations").int().default(200)
 
     override fun run(store: Store) {
         println("Benchmarking with $values values and $iterations iterations")
@@ -89,18 +89,23 @@ class BenchmarkManyValuesCommand : AbstractStoreCommand(name = "many-values", he
 }
 
 class BenchmarkOneKeyValueCommand : AbstractStoreCommand(name = "one-key-value", help = "Run benchmark for a single key-value store") {
-    private val entries by option("--entries", help = "The number of entries").int().default(1000)
+    private val entries by option("--entries", help = "The number of entries").int().default(1500)
+    private val iterations by option("--iterations", help = "The number of iterations").int().default(100)
 
     override fun run(store: Store) {
-        println("Benchmarking with $entries entries")
-        val source = ValueSource(entries)
+        println("Benchmarking with $entries entries and $iterations iterations")
+        val source = ValueSource(iterations)
         val value = store.keyValue<Int, String>("key-value")
-        for (i in 0 until entries) {
-            value.set(i, source.values[i])
+        for (i in 0 until iterations) {
+            for (e in 0 until entries) {
+                value.set(e, source.values[i])
+            }
         }
-        for (i in 0 until entries) {
-            val read = value.get(i)
-            require(read == source.values[i])
+        for (i in 0 until iterations) {
+            for (e in 0 until entries) {
+                val read = value.get(e)
+                require(read == source.values.last())
+            }
         }
     }
 }

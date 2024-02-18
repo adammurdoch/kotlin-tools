@@ -58,19 +58,19 @@ abstract class InferModuleInfo : DefaultTask() {
             }
         }
 
-        println("* effective API elements:")
+        info("* effective API elements:")
         for (entry in effectiveApi.entries) {
-            println("  * ${entry.key} -> ${entry.value.file.name}")
+            info("  * ${entry.key} -> ${entry.value.file.name}")
         }
-        println("* effective runtime elements:")
+        info("* effective runtime elements:")
         for (entry in effectiveRuntime.entries) {
-            println("  * ${entry.key} -> ${entry.value.file.name}")
+            info("  * ${entry.key} -> ${entry.value.file.name}")
         }
 
-        println("* requires transitive")
-        val index = ModuleIndex(runtimeGraph.get(), apiLibraries.get(), runtimeLibraries.get())
+        info("* requires transitive")
+        val index = ModuleIndex(runtimeGraph.get(), apiLibraries.get(), runtimeLibraries.get(), ::info)
         val transitive = effectiveApi.values.map { index.moduleFor(it) }
-        println("* requires")
+        info("* requires")
         val requires = effectiveRuntime.values.map { index.moduleFor(it) }
 
         val modules = Modules(requires + transitive, requires.map { it.name }, transitive.map { it.name })
@@ -79,7 +79,16 @@ abstract class InferModuleInfo : DefaultTask() {
         }
     }
 
-    private class ModuleIndex(rootComponent: ResolvedComponentResult, apiLibraries: List<LibraryInfo>, runtimeLibraries: List<LibraryInfo>) {
+    private fun info(message: String) {
+        logger.info(message)
+    }
+
+    private class ModuleIndex(
+        rootComponent: ResolvedComponentResult,
+        apiLibraries: List<LibraryInfo>,
+        runtimeLibraries: List<LibraryInfo>,
+        private val info: (String) -> Unit
+    ) {
         private val parser = BytecodeReader()
         private val componentDependencies: Map<String, Set<LibraryInfo>>
         private val moduleForLibrary = mutableMapOf<String, InferredModule>()
@@ -139,7 +148,7 @@ abstract class InferModuleInfo : DefaultTask() {
                     lateinit var moduleName: String
                     parser.readFrom(jar.getInputStream(moduleInfoEntry), object : ClassFileVisitor {
                         override fun module(module: ModuleInfo) {
-                            println("  * ${file.name} -> ${module.name}, extracted from module-info.class")
+                            info("  * ${file.name} -> ${module.name}, extracted from module-info.class")
                             moduleName = module.name
                         }
                     })
@@ -150,7 +159,7 @@ abstract class InferModuleInfo : DefaultTask() {
 
                     val moduleName = jar.manifest.mainAttributes.getValue("Automatic-Module-Name")
                     if (moduleName != null) {
-                        println("  * ${file.name} -> $moduleName, extracted from manifest")
+                        info("  * ${file.name} -> $moduleName, extracted from manifest")
                         InferredModule(moduleName, file.name, true, requires)
                     } else {
                         var automaticName = file.name.removeSuffix(".jar")
@@ -159,7 +168,7 @@ abstract class InferModuleInfo : DefaultTask() {
                             automaticName = automaticName.substring(0, match.range.first)
                         }
                         automaticName = automaticName.replace('-', '.')
-                        println("  * ${file.name} -> $automaticName, extracted from file name")
+                        info("  * ${file.name} -> $automaticName, extracted from file name")
                         InferredModule(automaticName, file.name, true, requires)
                     }
                 }

@@ -1,15 +1,16 @@
 ## TODO
 
+- Periodically compact index
+- Periodically compact data file
 - Buffered writes
+- Don't keep checking the current position when reading index changes from file 
+- Reuse encoder and decoder instances
 - Cache the key -> encoded key mapping in memory for key-value store
 - Use the key hash in key-value store index
 - Don't keep entire index in memory
-- Reuse encoder and decoder instances
 - Tests verify file contents
 - Test app dumps store contents
   - Value size
-- Keep data and index files open (e.g. use IO threads?)
-- Stream deltas to index and periodically compact
 - Protect from partially written index file
 - Test app benchmarks read and write - one value, many values, multiple threads
 - Multi-thread safety: threads that read/write separate values, threads read/write same values

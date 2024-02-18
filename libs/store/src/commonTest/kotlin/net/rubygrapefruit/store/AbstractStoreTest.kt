@@ -24,4 +24,9 @@ abstract class AbstractStoreTest : AbstractFileTest() {
         })
         return result
     }
+
+    sealed class StoreFile(val name: String) {
+        data object Index : StoreFile("index.bin")
+        data object Data : StoreFile("data.bin")
+    }
 }

@@ -10,25 +10,28 @@ import kotlin.test.fail
 
 class StoreTest : AbstractStoreTest() {
     @Test
-    fun `cannot open when index file has incorrect version`() {
-        withStore {
-            it.value<String>("value").set("ok")
-        }
+    fun `cannot open when store file has incorrect version`() {
+        val files = listOf(StoreFile.Index, StoreFile.Data)
 
-        val indexFile = testStore.file("index.bin")
-        assertTrue(indexFile.metadata().regularFile)
-        val index = indexFile.readBytes().get()
-        index[0] = 1
-        indexFile.writeBytes(index)
+        for (file in files) {
+            withStore {
+                it.value<String>("value").set("ok")
+            }
 
-        val dataFile = testStore.file("data.bin")
-        assertTrue(dataFile.metadata().regularFile)
+            val storeFile = testStore.file(file.name)
+            assertTrue(storeFile.metadata().regularFile)
 
-        try {
-            Store.open(testStore)
-            fail()
-        } catch (e: IllegalStateException) {
-            assertEquals("Unexpected version in file.", e.message)
+            storeFile.withContent {
+                // Overwrite the first byte
+                it.writeStream.write(byteArrayOf(1))
+            }
+
+            try {
+                Store.open(testStore)
+                fail()
+            } catch (e: IllegalStateException) {
+                assertEquals("Unexpected version in file.", e.message)
+            }
         }
     }
 

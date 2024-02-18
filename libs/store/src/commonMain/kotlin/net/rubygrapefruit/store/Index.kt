@@ -4,8 +4,6 @@ package net.rubygrapefruit.store
 
 import net.rubygrapefruit.file.FileContent
 import net.rubygrapefruit.file.RegularFile
-import net.rubygrapefruit.io.codec.Decoder
-import net.rubygrapefruit.io.codec.Encoder
 import net.rubygrapefruit.io.codec.SimpleCodec
 
 internal class Index(
@@ -13,19 +11,29 @@ internal class Index(
     private val codec: SimpleCodec
 ) : AutoCloseable {
     private val fileContent = index.openContent().successful()
-    private val currentIndex = fileContent.using { readIndex(it, codec) }
+    private val currentIndex = fileContent.using {
+        readIndex(it, codec)
+    }
 
     override fun close() {
         fileContent.close()
     }
 
     fun value(name: String): ValueStoreIndex {
-        val index = currentIndex.getOrPut(name) { DefaultValueStoreIndex(name) }
+        val index = currentIndex.getOrPut(name) {
+            val storeId = StoreId(currentIndex.size)
+            append(NewValueStore(storeId, name))
+            DefaultValueStoreIndex(name, storeId)
+        }
         return index.asValueStore()
     }
 
     fun keyValue(name: String): KeyValueStoreIndex {
-        val index = currentIndex.getOrPut(name) { DefaultKeyValueStoreIndex(name) }
+        val index = currentIndex.getOrPut(name) {
+            val storeId = StoreId(currentIndex.size)
+            append(NewKeyValueStore(storeId, name))
+            DefaultKeyValueStoreIndex(name, storeId)
+        }
         return index.asKeyValueStore()
     }
 
@@ -39,100 +47,76 @@ internal class Index(
         return currentIndex.filter { it.value.hasValue }
     }
 
-    private fun writeIndex() {
-        val entries = effectiveEntries()
+    private fun append(change: StoreChange) {
         fileContent.using { content ->
-            content.seek(0)
             val encoder = codec.encoder(content.writeStream)
-            encoder.fileHeader(codec)
-            encoder.int(entries.size)
-            for (indexEntry in entries.entries) {
-                encoder.string(indexEntry.key)
-                when (val value = indexEntry.value) {
-                    is DefaultValueStoreIndex -> {
-                        encoder.ubyte(1u)
-                        encoder.valueStoreIndex(value)
-                    }
-
-                    is DefaultKeyValueStoreIndex -> {
-                        encoder.ubyte(2u)
-                        encoder.keyValueStoreIndex(value)
-                    }
-                }
-            }
-        }
-    }
-
-    private fun Encoder.valueStoreIndex(value: DefaultValueStoreIndex) {
-        long(value.address!!.offset)
-    }
-
-    private fun Encoder.keyValueStoreIndex(value: DefaultKeyValueStoreIndex) {
-        int(value.entries.size)
-        for (valueEntry in value.entries.entries) {
-            string(valueEntry.key)
-            long(valueEntry.value.offset)
+            encoder.encode(change)
         }
     }
 
     private fun readIndex(content: FileContent, codec: SimpleCodec): MutableMap<String, IndexEntry> {
-        return if (content.length() == 0L) {
-            mutableMapOf()
-        } else {
-            content.seek(0)
-            val decoder = codec.decoder(content.readStream)
-            decoder.checkFileHeader(codec)
-            val count = decoder.int()
-            val result = LinkedHashMap<String, IndexEntry>(count)
-            for (i in 0 until count) {
-                val name = decoder.string()
-                val tag = decoder.ubyte()
-                when (tag) {
-                    1.toUByte() -> {
-                        result[name] = decoder.valueStoreIndex(name)
-                    }
+        val byId = mutableMapOf<StoreId, IndexEntry>()
+        val result = mutableMapOf<String, IndexEntry>()
 
-                    2.toUByte() -> {
-                        result[name] = decoder.keyValueStoreIndex(name)
-                    }
+        val length = content.length()
+        val decoder = codec.decoder(content.readStream)
 
-                    else -> throw IllegalArgumentException()
+        while (content.currentPosition != length) {
+            val change = decoder.decode()
+            when (change) {
+                is NewValueStore -> {
+                    val index = DefaultValueStoreIndex(change.name, change.store)
+                    byId[change.store] = index
+                    result[change.name] = index
                 }
+
+                is NewKeyValueStore -> {
+                    val index = DefaultKeyValueStoreIndex(change.name, change.store)
+                    byId[change.store] = index
+                    result[change.name] = index
+                }
+
+                is DiscardStore -> {
+                    val index = byId.getValue(change.store)
+                    index.doDiscard()
+                }
+
+                is SetValue -> {
+                    val index = byId.getValue(change.store)
+                    index.asValueStore().doSet(change.address)
+                }
+
+                is SetEntry -> {
+                    val index = byId.getValue(change.store)
+                    index.asKeyValueStore().doSet(change.key, change.address)
+                }
+
+                is RemoveEntry -> {
+                    val index = byId.getValue(change.store)
+                    index.asKeyValueStore().doRemove(change.key)
+                }
+
             }
-            result
         }
-    }
-
-    private fun Decoder.valueStoreIndex(name: String): DefaultValueStoreIndex {
-        val address = Address(long())
-        val index = DefaultValueStoreIndex(name, address)
-        return index
-    }
-
-    private fun Decoder.keyValueStoreIndex(name: String): DefaultKeyValueStoreIndex {
-        val count = int()
-        val entries = LinkedHashMap<String, Address>(count)
-        for (i in 0 until count) {
-            val key = string()
-            val address = Address(long())
-            entries[key] = address
-        }
-        val index = DefaultKeyValueStoreIndex(name, entries)
-        return index
+        return result
     }
 
     private sealed class IndexEntry : ContentVisitor.ValueInfo {
         abstract val hasValue: Boolean
 
-        abstract fun asValueStore(): ValueStoreIndex
+        abstract fun asValueStore(): DefaultValueStoreIndex
 
-        abstract fun asKeyValueStore(): KeyValueStoreIndex
+        abstract fun asKeyValueStore(): DefaultKeyValueStoreIndex
+
+        abstract fun doDiscard()
     }
 
     private inner class DefaultValueStoreIndex(
         private val name: String,
-        var address: Address? = null
+        private val storeId: StoreId,
     ) : IndexEntry(), ValueStoreIndex {
+        private var address: Address? = null
+
         override val hasValue: Boolean
             get() = address != null
 
@@ -146,11 +130,11 @@ internal class Index(
                 }
             }
 
-        override fun asValueStore(): ValueStoreIndex {
+        override fun asValueStore(): DefaultValueStoreIndex {
             return this
         }
 
-        override fun asKeyValueStore(): KeyValueStoreIndex {
+        override fun asKeyValueStore(): DefaultKeyValueStoreIndex {
             throw IllegalArgumentException("Cannot open value store '$name' as a key-value store.")
         }
 
@@ -159,20 +143,29 @@ internal class Index(
         }
 
         override fun set(address: Address) {
-            this.address = address
-            writeIndex()
+            doSet(address)
+            append(SetValue(storeId, address))
         }
 
         override fun discard() {
+            doDiscard()
+            append(DiscardStore(storeId))
+        }
+
+        override fun doDiscard() {
             this.address = null
-            writeIndex()
+        }
+
+        fun doSet(address: Address) {
+            this.address = address
         }
     }
 
     private inner class DefaultKeyValueStoreIndex(
         private val name: String,
-        val entries: MutableMap<String, Address> = mutableMapOf()
+        private val storeId: StoreId,
     ) : IndexEntry(), KeyValueStoreIndex {
+        private val entries = mutableMapOf<String, Address>()
 
         override val hasValue: Boolean
             get() = entries.isNotEmpty()
@@ -180,11 +173,11 @@ internal class Index(
         override val formatted: String
             get() = "${entries.size} entries"
 
-        override fun asValueStore(): ValueStoreIndex {
+        override fun asValueStore(): DefaultValueStoreIndex {
             throw IllegalArgumentException("Cannot open key-value store '$name' as a value store.")
         }
 
-        override fun asKeyValueStore(): KeyValueStoreIndex {
+        override fun asKeyValueStore(): DefaultKeyValueStoreIndex {
             return this
         }
 
@@ -193,18 +186,30 @@ internal class Index(
         }
 
         override fun set(key: String, value: Address) {
-            entries[key] = value
-            writeIndex()
+            doSet(key, value)
+            append(SetEntry(storeId, key, value))
         }
 
         override fun remove(key: String) {
-            entries.remove(key)
-            writeIndex()
+            doRemove(key)
+            append(RemoveEntry(storeId, key))
         }
 
         override fun discard() {
+            doDiscard()
+            append(DiscardStore(storeId))
+        }
+
+        override fun doDiscard() {
             entries.clear()
-            writeIndex()
+        }
+
+        fun doSet(key: String, address: Address) {
+            entries[key] = address
+        }
+
+        fun doRemove(key: String) {
+            entries.remove(key)
         }
     }
 }

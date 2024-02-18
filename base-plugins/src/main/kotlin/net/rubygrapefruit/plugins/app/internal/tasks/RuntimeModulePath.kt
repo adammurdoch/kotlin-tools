@@ -55,7 +55,7 @@ abstract class RuntimeModulePath : DefaultTask() {
     }
 
     private fun patchJarFile(file: File, dest: File, bytecodeReader: BytecodeReader, bytecodeWriter: BytecodeWriter, module: InferredModule) {
-        println("* patch ${file.name}")
+        info("* patch ${file.name}")
         file.inputStream().use { instr ->
             val zipInstr = ZipInputStream(instr)
             val packages = mutableSetOf<String>()
@@ -85,13 +85,13 @@ abstract class RuntimeModulePath : DefaultTask() {
                     zipOutstr.closeEntry()
                 }
                 zipOutstr.putNextEntry(ZipEntry("module-info.class"))
-                println("  * exports")
+                info("  * exports")
                 for (packageName in packages) {
-                    println("    * $packageName")
+                    info("    * $packageName")
                 }
-                println("  * requires")
+                info("  * requires")
                 for (requires in module.requires) {
-                    println("    * $requires")
+                    info("    * $requires")
                 }
                 bytecodeWriter.writeTo(zipOutstr) {
                     module(module.name, packages.toList(), module.requires, emptyList())
@@ -100,6 +100,10 @@ abstract class RuntimeModulePath : DefaultTask() {
                 zipOutstr.finish()
             }
         }
+    }
+
+    private fun info(message: String) {
+        logger.info(message)
     }
 
     private class CopyingInputStream(val inputStream: InputStream, val outputStream: OutputStream) : InputStream() {

@@ -1,5 +1,6 @@
 package net.rubygrapefruit.store
 
+import net.rubygrapefruit.file.RegularFile
 import net.rubygrapefruit.io.codec.Decoder
 import net.rubygrapefruit.io.codec.Encoder
 import net.rubygrapefruit.io.codec.SimpleCodec
@@ -9,13 +10,13 @@ internal fun Encoder.fileHeader(codec: SimpleCodec) {
     ushort(codec.version)
 }
 
-internal fun Decoder.checkFileHeader(codec: SimpleCodec) {
+internal fun Decoder.checkFileHeader(codec: SimpleCodec, file: RegularFile) {
     val value1 = ushort()
     if (value1 != version) {
-        throw IllegalStateException("Unexpected version in file.")
+        throw IllegalStateException("Unexpected file format version in file ${file.absolutePath}. Found $value1, expected $version")
     }
     val value2 = ushort()
     if (value2 != codec.version) {
-        throw IllegalStateException("Unexpected version in file.")
+        throw IllegalStateException("Unexpected codec version in file ${file.absolutePath}. Found $value1, expected ${codec.version}")
     }
 }

@@ -11,6 +11,7 @@ internal class DefaultKeyValueStore<K, V>(
     private val valueSerializer: KSerializer<V>
 ) : KeyValueStore<K, V> {
     private val index = index.keyValue(name)
+    // The map of key (as type K, rather than String) to address
     private val entries = readEntries()
 
     override fun get(key: K): V? {

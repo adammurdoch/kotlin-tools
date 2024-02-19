@@ -12,7 +12,7 @@ internal class Index(
 ) : AutoCloseable {
     private val fileContent = index.openContent().successful()
     private val currentIndex = fileContent.using {
-        readIndex(it, codec)
+        readIndex(it, codec, index)
     }
 
     override fun close() {
@@ -54,48 +54,53 @@ internal class Index(
         }
     }
 
-    private fun readIndex(content: FileContent, codec: SimpleCodec): MutableMap<String, IndexEntry> {
+    private fun readIndex(content: FileContent, codec: SimpleCodec, file: RegularFile): MutableMap<String, IndexEntry> {
         val byId = mutableMapOf<StoreId, IndexEntry>()
         val result = mutableMapOf<String, IndexEntry>()
 
         val length = content.length()
-        val decoder = codec.decoder(content.readStream)
+        if (length == 0L) {
+            val encoder = codec.encoder(content.writeStream)
+            encoder.fileHeader(codec)
+        } else {
+            val decoder = codec.decoder(content.readStream)
+            decoder.checkFileHeader(codec, file)
+            while (content.currentPosition != length) {
+                val change = decoder.decode()
+                when (change) {
+                    is NewValueStore -> {
+                        val index = DefaultValueStoreIndex(change.name, change.store)
+                        byId[change.store] = index
+                        result[change.name] = index
+                    }
 
-        while (content.currentPosition != length) {
-            val change = decoder.decode()
-            when (change) {
-                is NewValueStore -> {
-                    val index = DefaultValueStoreIndex(change.name, change.store)
-                    byId[change.store] = index
-                    result[change.name] = index
+                    is NewKeyValueStore -> {
+                        val index = DefaultKeyValueStoreIndex(change.name, change.store)
+                        byId[change.store] = index
+                        result[change.name] = index
+                    }
+
+                    is DiscardStore -> {
+                        val index = byId.getValue(change.store)
+                        index.doDiscard()
+                    }
+
+                    is SetValue -> {
+                        val index = byId.getValue(change.store)
+                        index.asValueStore().doSet(change.address)
+                    }
+
+                    is SetEntry -> {
+                        val index = byId.getValue(change.store)
+                        index.asKeyValueStore().doSet(change.key, change.address)
+                    }
+
+                    is RemoveEntry -> {
+                        val index = byId.getValue(change.store)
+                        index.asKeyValueStore().doRemove(change.key)
+                    }
+
                 }
-
-                is NewKeyValueStore -> {
-                    val index = DefaultKeyValueStoreIndex(change.name, change.store)
-                    byId[change.store] = index
-                    result[change.name] = index
-                }
-
-                is DiscardStore -> {
-                    val index = byId.getValue(change.store)
-                    index.doDiscard()
-                }
-
-                is SetValue -> {
-                    val index = byId.getValue(change.store)
-                    index.asValueStore().doSet(change.address)
-                }
-
-                is SetEntry -> {
-                    val index = byId.getValue(change.store)
-                    index.asKeyValueStore().doSet(change.key, change.address)
-                }
-
-                is RemoveEntry -> {
-                    val index = byId.getValue(change.store)
-                    index.asKeyValueStore().doRemove(change.key)
-                }
-
             }
         }
         return result

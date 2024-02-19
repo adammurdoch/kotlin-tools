@@ -19,7 +19,7 @@ internal class DataFile(
         readContent.using { content ->
             if (content.length() > 0) {
                 val decoder = codec.decoder(content.readStream)
-                decoder.checkFileHeader(codec)
+                decoder.checkFileHeader(codec, file)
             }
         }
         writeContent.using { content ->

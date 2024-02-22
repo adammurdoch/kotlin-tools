@@ -10,19 +10,25 @@ class ValueStoreTest : AbstractStoreTest() {
     fun `can read from empty store`() {
         withStore { store ->
             assertTrue(store.values().isEmpty())
+            assertEquals(0, store.indexUpdates())
 
             val value = store.value<String>("value")
             assertNull(value.get())
 
             // Not visible until it has been written to
             assertTrue(store.values().isEmpty())
+            assertEquals(1, store.indexUpdates())
         }
 
         withStore { store ->
             assertTrue(store.values().isEmpty())
+            assertEquals(1, store.indexUpdates())
+
             val value = store.value<String>("value")
             assertNull(value.get())
+
             assertTrue(store.values().isEmpty())
+            assertEquals(1, store.indexUpdates())
         }
     }
 
@@ -36,12 +42,18 @@ class ValueStoreTest : AbstractStoreTest() {
             assertEquals("value 1", value.get())
 
             assertEquals(listOf("value"), store.values())
+            assertEquals(2, store.indexUpdates())
         }
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
+            assertEquals(2, store.indexUpdates())
+
             val value = store.value<String>("value")
             assertEquals("value 1", value.get())
+
+            assertEquals(listOf("value"), store.values())
+            assertEquals(2, store.indexUpdates())
         }
     }
 

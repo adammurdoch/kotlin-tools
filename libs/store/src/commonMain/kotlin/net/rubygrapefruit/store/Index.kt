@@ -11,8 +11,15 @@ internal class Index(
     private val codec: SimpleCodec
 ) : AutoCloseable {
     private val fileContent = index.openContent().successful()
-    private val currentIndex = fileContent.using {
-        readIndex(it, codec, index)
+    private val currentEntries: MutableMap<String, IndexEntry>
+    private var updates: Int
+
+    init {
+        val content = fileContent.using {
+            readIndex(it, codec, index)
+        }
+        currentEntries = content.entries
+        updates = content.updates
     }
 
     override fun close() {
@@ -20,8 +27,8 @@ internal class Index(
     }
 
     fun value(name: String): ValueStoreIndex {
-        val index = currentIndex.getOrPut(name) {
-            val storeId = StoreId(currentIndex.size)
+        val index = currentEntries.getOrPut(name) {
+            val storeId = StoreId(currentEntries.size)
             append(NewValueStore(storeId, name))
             DefaultValueStoreIndex(name, storeId)
         }
@@ -29,8 +36,8 @@ internal class Index(
     }
 
     fun keyValue(name: String): KeyValueStoreIndex {
-        val index = currentIndex.getOrPut(name) {
-            val storeId = StoreId(currentIndex.size)
+        val index = currentEntries.getOrPut(name) {
+            val storeId = StoreId(currentEntries.size)
             append(NewKeyValueStore(storeId, name))
             DefaultKeyValueStoreIndex(name, storeId)
         }
@@ -38,25 +45,28 @@ internal class Index(
     }
 
     fun accept(visitor: ContentVisitor) {
+        visitor.index(updates)
         for (entry in effectiveEntries().entries.sortedBy { it.key }) {
             visitor.value(entry.key, entry.value)
         }
     }
 
     private fun effectiveEntries(): Map<String, IndexEntry> {
-        return currentIndex.filter { it.value.hasValue }
+        return currentEntries.filter { it.value.hasValue }
     }
 
     private fun append(change: StoreChange) {
+        updates++
         fileContent.using { content ->
             val encoder = codec.encoder(content.writeStream)
             encoder.encode(change)
         }
     }
 
-    private fun readIndex(content: FileContent, codec: SimpleCodec, file: RegularFile): MutableMap<String, IndexEntry> {
+    private fun readIndex(content: FileContent, codec: SimpleCodec, file: RegularFile): InitialContent {
         val byId = mutableMapOf<StoreId, IndexEntry>()
-        val result = mutableMapOf<String, IndexEntry>()
+        val entries = mutableMapOf<String, IndexEntry>()
+        var updates = 0
 
         val length = content.length()
         if (length == 0L) {
@@ -67,17 +77,18 @@ internal class Index(
             decoder.checkFileHeader(codec, file)
             while (content.currentPosition != length) {
                 val change = decoder.decode()
+                updates++
                 when (change) {
                     is NewValueStore -> {
                         val index = DefaultValueStoreIndex(change.name, change.store)
                         byId[change.store] = index
-                        result[change.name] = index
+                        entries[change.name] = index
                     }
 
                     is NewKeyValueStore -> {
                         val index = DefaultKeyValueStoreIndex(change.name, change.store)
                         byId[change.store] = index
-                        result[change.name] = index
+                        entries[change.name] = index
                     }
 
                     is DiscardStore -> {
@@ -103,7 +114,7 @@ internal class Index(
                 }
             }
         }
-        return result
+        return InitialContent(updates, entries)
     }
 
     private sealed class IndexEntry : ContentVisitor.ValueInfo {
@@ -217,4 +228,9 @@ internal class Index(
             entries.remove(key)
         }
     }
+
+    private class InitialContent(
+        val updates: Int,
+        val entries: MutableMap<String, IndexEntry>
+    )
 }

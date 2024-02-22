@@ -7,6 +7,9 @@
 - Reuse encoder and decoder instances
 - Cache the key -> encoded key mapping in memory for key-value store
 - Use the key hash in key-value store index
+  - md5 -> 128 bits 16 bytes 2 longs
+  - sha1 -> 160 bits, 20 bytes 2.5 longs
+  - sha2 -> 224, 256, 384, 512 bits, 28, 32, 48, 64 bytes
 - Don't keep entire index in memory
 - Tests verify file contents
 - Test app dumps store contents

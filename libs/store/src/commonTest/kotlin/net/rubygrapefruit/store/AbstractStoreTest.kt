@@ -4,6 +4,7 @@ package net.rubygrapefruit.store
 
 import net.rubygrapefruit.file.Directory
 import net.rubygrapefruit.file.fixtures.AbstractFileTest
+import kotlin.properties.Delegates
 
 abstract class AbstractStoreTest : AbstractFileTest() {
     val testStore: Directory
@@ -20,6 +21,16 @@ abstract class AbstractStoreTest : AbstractFileTest() {
         accept(object : ContentVisitor {
             override fun value(name: String, details: ContentVisitor.ValueInfo) {
                 result.add(name)
+            }
+        })
+        return result
+    }
+
+    fun Store.indexUpdates(): Int {
+        var result by Delegates.notNull<Int>()
+        accept(object : ContentVisitor {
+            override fun index(updates: Int) {
+                result = updates
             }
         })
         return result

@@ -87,7 +87,7 @@ class KeyValueStoreTest : AbstractStoreTest() {
     }
 
     @Test
-    fun `can write multiple entries`() {
+    fun `can read then write multiple entries`() {
         withStore { store ->
             val value = store.keyValue<String, Int>("value")
             assertNull(value.get("a"))
@@ -143,6 +143,88 @@ class KeyValueStoreTest : AbstractStoreTest() {
             val value = store.keyValue<String, Int>("value")
             assertEquals(11, value.get("a"))
             assertEquals(listOf("a" to 11, "b" to 44), value.entries())
+        }
+    }
+
+    @Test
+    fun `can update an entry in multiple sessions`() {
+        withStore { store ->
+            val value = store.keyValue<String, Int>("value")
+            value.set("a", 12)
+            value.set("b", 44)
+        }
+
+        withStore { store ->
+            assertEquals(listOf("value"), store.values())
+            assertEquals(3, store.indexChanges())
+
+            val value = store.keyValue<String, Int>("value")
+
+            value.set("a", 11)
+            assertEquals(11, value.get("a"))
+            assertEquals(listOf("a" to 11, "b" to 44), value.entries())
+
+            assertEquals(listOf("value"), store.values())
+            assertEquals(4, store.indexChanges())
+        }
+
+        withStore { store ->
+            assertEquals(listOf("value"), store.values())
+            assertEquals(4, store.indexChanges())
+
+            val value = store.keyValue<String, Int>("value")
+
+            value.set("a", 10)
+            assertEquals(10, value.get("a"))
+            assertEquals(listOf("a" to 10, "b" to 44), value.entries())
+
+            assertEquals(listOf("value"), store.values())
+            assertEquals(5, store.indexChanges())
+        }
+
+        withStore { store ->
+            assertEquals(listOf("value"), store.values())
+            assertEquals(5, store.indexChanges())
+
+            val value = store.keyValue<String, Int>("value")
+            assertEquals(10, value.get("a"))
+            assertEquals(listOf("a" to 10, "b" to 44), value.entries())
+        }
+    }
+
+    @Test
+    fun `can update an entry many times in same session`() {
+        withStore { store ->
+            val value = store.keyValue<String, Int>("value")
+            value.set("a", 12)
+            value.set("b", 44)
+        }
+
+        val count = 10
+        withStore { store ->
+            assertEquals(listOf("value"), store.values())
+            assertEquals(3, store.indexChanges())
+
+            val value = store.keyValue<String, Int>("value")
+
+            for (i in 1..count) {
+
+                value.set("a", 100 + i)
+                assertEquals(100 + i, value.get("a"))
+                assertEquals(listOf("a" to 100 + i, "b" to 44), value.entries())
+
+                assertEquals(listOf("value"), store.values())
+                assertEquals(i + 3, store.indexChanges())
+            }
+        }
+
+        withStore { store ->
+            assertEquals(listOf("value"), store.values())
+            assertEquals(count + 3, store.indexChanges())
+
+            val value = store.keyValue<String, Int>("value")
+            assertEquals(100 + count, value.get("a"))
+            assertEquals(listOf("a" to 100 + count, "b" to 44), value.entries())
         }
     }
 

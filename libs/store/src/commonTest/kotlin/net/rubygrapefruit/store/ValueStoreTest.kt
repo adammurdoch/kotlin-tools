@@ -175,7 +175,7 @@ class ValueStoreTest : AbstractStoreTest() {
     }
 
     @Test
-    fun `can update`() {
+    fun `can update value`() {
         withStore { store ->
             val value = store.value<String>("value")
             value.set("value 1")
@@ -202,7 +202,7 @@ class ValueStoreTest : AbstractStoreTest() {
     }
 
     @Test
-    fun `can update multiple times in same session`() {
+    fun `can update value multiple times in same session`() {
         withStore { store ->
             val value = store.value<String>("value")
             value.set("value 1")
@@ -230,7 +230,7 @@ class ValueStoreTest : AbstractStoreTest() {
     }
 
     @Test
-    fun `can update multiple times in different sessions`() {
+    fun `can update value in multiple sessions`() {
         withStore { store ->
             val value = store.value<String>("value")
             value.set("value 1")
@@ -266,6 +266,35 @@ class ValueStoreTest : AbstractStoreTest() {
 
             val value = store.value<String>("value")
             assertEquals("value 3", value.get())
+        }
+    }
+
+    @Test
+    fun `can update value many times in same session`() {
+        withStore { store ->
+            val value = store.value<String>("value")
+            value.set("initial value")
+        }
+
+        val count = 10
+        withStore { store ->
+            assertEquals(listOf("value"), store.values())
+            assertEquals(2, store.indexChanges())
+
+            val value = store.value<String>("value")
+
+            for (i in 1..count) {
+                value.set("value $i")
+                assertEquals(i + 2, store.indexChanges())
+            }
+        }
+
+        withStore { store ->
+            assertEquals(listOf("value"), store.values())
+            assertEquals(count + 2, store.indexChanges())
+
+            val value = store.value<String>("value")
+            assertEquals("value $count", value.get())
         }
     }
 

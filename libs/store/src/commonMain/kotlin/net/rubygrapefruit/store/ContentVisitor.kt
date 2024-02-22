@@ -1,7 +1,7 @@
 package net.rubygrapefruit.store
 
 interface ContentVisitor {
-    fun index(updates: Int) {}
+    fun index(changes: Int) {}
 
     fun value(name: String, details: ValueInfo) {}
 

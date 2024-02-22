@@ -10,25 +10,25 @@ class ValueStoreTest : AbstractStoreTest() {
     fun `can read from empty store`() {
         withStore { store ->
             assertTrue(store.values().isEmpty())
-            assertEquals(0, store.indexUpdates())
+            assertEquals(0, store.indexChanges())
 
             val value = store.value<String>("value")
             assertNull(value.get())
 
             // Not visible until it has been written to
             assertTrue(store.values().isEmpty())
-            assertEquals(1, store.indexUpdates())
+            assertEquals(1, store.indexChanges())
         }
 
         withStore { store ->
             assertTrue(store.values().isEmpty())
-            assertEquals(1, store.indexUpdates())
+            assertEquals(1, store.indexChanges())
 
             val value = store.value<String>("value")
             assertNull(value.get())
 
             assertTrue(store.values().isEmpty())
-            assertEquals(1, store.indexUpdates())
+            assertEquals(1, store.indexChanges())
         }
     }
 
@@ -42,18 +42,18 @@ class ValueStoreTest : AbstractStoreTest() {
             assertEquals("value 1", value.get())
 
             assertEquals(listOf("value"), store.values())
-            assertEquals(2, store.indexUpdates())
+            assertEquals(2, store.indexChanges())
         }
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(2, store.indexUpdates())
+            assertEquals(2, store.indexChanges())
 
             val value = store.value<String>("value")
             assertEquals("value 1", value.get())
 
             assertEquals(listOf("value"), store.values())
-            assertEquals(2, store.indexUpdates())
+            assertEquals(2, store.indexChanges())
         }
     }
 
@@ -66,12 +66,18 @@ class ValueStoreTest : AbstractStoreTest() {
             assertEquals("value 1", value.get())
 
             assertEquals(listOf("value"), store.values())
+            assertEquals(2, store.indexChanges())
         }
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
+            assertEquals(2, store.indexChanges())
+
             val value = store.value<String>("value")
             assertEquals("value 1", value.get())
+
+            assertEquals(listOf("value"), store.values())
+            assertEquals(2, store.indexChanges())
         }
     }
 
@@ -86,12 +92,17 @@ class ValueStoreTest : AbstractStoreTest() {
             assertNull(value.get())
 
             assertTrue(store.values().isEmpty())
+            assertEquals(3, store.indexChanges())
         }
         withStore { store ->
             assertTrue(store.values().isEmpty())
+            assertEquals(3, store.indexChanges())
+
             val value = store.value<String>("empty")
             assertNull(value.get())
+
             assertTrue(store.values().isEmpty())
+            assertEquals(3, store.indexChanges())
         }
     }
 
@@ -109,10 +120,13 @@ class ValueStoreTest : AbstractStoreTest() {
             value.set("value 2")
 
             assertEquals("value 2", value.get())
+
             assertEquals(listOf("value"), store.values())
+            assertEquals(4, store.indexChanges())
         }
         withStore { store ->
             assertEquals(listOf("value"), store.values())
+            assertEquals(4, store.indexChanges())
 
             val value = store.value<String>("value")
             assertEquals("value 2", value.get())
@@ -133,20 +147,27 @@ class ValueStoreTest : AbstractStoreTest() {
 
             value.discard()
             assertNull(value.get())
+
             assertTrue(store.values().isEmpty())
+            assertEquals(3, store.indexChanges())
         }
         withStore { store ->
             val value = store.value<String>("value")
             assertNull(value.get())
+
             assertTrue(store.values().isEmpty())
+            assertEquals(3, store.indexChanges())
 
             value.set("value 2")
 
             assertEquals("value 2", value.get())
+
             assertEquals(listOf("value"), store.values())
+            assertEquals(4, store.indexChanges())
         }
         withStore { store ->
             assertEquals(listOf("value"), store.values())
+            assertEquals(4, store.indexChanges())
 
             val value = store.value<String>("value")
             assertEquals("value 2", value.get())
@@ -162,14 +183,19 @@ class ValueStoreTest : AbstractStoreTest() {
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
+            assertEquals(2, store.indexChanges())
 
             val value = store.value<String>("value")
             assertEquals("value 1", value.get())
             value.set("value 2")
             assertEquals("value 2", value.get())
+
+            assertEquals(3, store.indexChanges())
         }
         withStore { store ->
             assertEquals(listOf("value"), store.values())
+            assertEquals(3, store.indexChanges())
+
             val value = store.value<String>("value")
             assertEquals("value 2", value.get())
         }
@@ -184,15 +210,20 @@ class ValueStoreTest : AbstractStoreTest() {
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
+            assertEquals(2, store.indexChanges())
 
             val value = store.value<String>("value")
             assertEquals("value 1", value.get())
             value.set("value 2")
             value.set("value 3")
             assertEquals("value 3", value.get())
+
+            assertEquals(4, store.indexChanges())
         }
         withStore { store ->
             assertEquals(listOf("value"), store.values())
+            assertEquals(4, store.indexChanges())
+
             val value = store.value<String>("value")
             assertEquals("value 3", value.get())
         }
@@ -207,24 +238,31 @@ class ValueStoreTest : AbstractStoreTest() {
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
+            assertEquals(2, store.indexChanges())
 
             val value = store.value<String>("value")
             assertEquals("value 1", value.get())
 
             value.set("value 2")
             assertEquals("value 2", value.get())
+
+            assertEquals(3, store.indexChanges())
         }
         withStore { store ->
             assertEquals(listOf("value"), store.values())
+            assertEquals(3, store.indexChanges())
 
             val value = store.value<String>("value")
             assertEquals("value 2", value.get())
 
             value.set("value 3")
             assertEquals("value 3", value.get())
+
+            assertEquals(4, store.indexChanges())
         }
         withStore { store ->
             assertEquals(listOf("value"), store.values())
+            assertEquals(4, store.indexChanges())
 
             val value = store.value<String>("value")
             assertEquals("value 3", value.get())
@@ -246,10 +284,13 @@ class ValueStoreTest : AbstractStoreTest() {
             assertEquals("value 2", value2.get())
 
             assertEquals(listOf("value 1", "value 2"), store.values())
+            assertEquals(4, store.indexChanges())
         }
 
         withStore { store ->
             assertEquals(listOf("value 1", "value 2"), store.values())
+            assertEquals(4, store.indexChanges())
+
             val value1 = store.value<String>("value 1")
             val value2 = store.value<String>("value 2")
             assertEquals("value 1", value1.get())
@@ -267,12 +308,14 @@ class ValueStoreTest : AbstractStoreTest() {
             assertEquals("value 1", value1.get())
 
             assertEquals(listOf("value 1"), store.values())
+            assertEquals(2, store.indexChanges())
         }
 
         withStore { store ->
             val value1 = store.value<String>("value 1")
             assertEquals("value 1", value1.get())
             assertEquals(listOf("value 1"), store.values())
+            assertEquals(2, store.indexChanges())
 
             val value2 = store.value<String>("value 2")
             assertNull(value2.get())
@@ -281,10 +324,13 @@ class ValueStoreTest : AbstractStoreTest() {
             assertEquals("value 2", value2.get())
 
             assertEquals(listOf("value 1", "value 2"), store.values())
+            assertEquals(4, store.indexChanges())
         }
 
         withStore { store ->
             assertEquals(listOf("value 1", "value 2"), store.values())
+            assertEquals(4, store.indexChanges())
+
             val value1 = store.value<String>("value 1")
             val value2 = store.value<String>("value 2")
             assertEquals("value 1", value1.get())

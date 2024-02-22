@@ -11,15 +11,15 @@ internal class Index(
     private val codec: SimpleCodec
 ) : AutoCloseable {
     private val fileContent = index.openContent().successful()
-    private val currentEntries: MutableMap<String, IndexEntry>
-    private var updates: Int
+    private val entries: MutableMap<String, IndexEntry>
+    private var changes: Int
 
     init {
         val content = fileContent.using {
             readIndex(it, codec, index)
         }
-        currentEntries = content.entries
-        updates = content.updates
+        entries = content.entries
+        changes = content.updates
     }
 
     override fun close() {
@@ -27,8 +27,8 @@ internal class Index(
     }
 
     fun value(name: String): ValueStoreIndex {
-        val index = currentEntries.getOrPut(name) {
-            val storeId = StoreId(currentEntries.size)
+        val index = entries.getOrPut(name) {
+            val storeId = StoreId(entries.size)
             append(NewValueStore(storeId, name))
             DefaultValueStoreIndex(name, storeId)
         }
@@ -36,8 +36,8 @@ internal class Index(
     }
 
     fun keyValue(name: String): KeyValueStoreIndex {
-        val index = currentEntries.getOrPut(name) {
-            val storeId = StoreId(currentEntries.size)
+        val index = entries.getOrPut(name) {
+            val storeId = StoreId(entries.size)
             append(NewKeyValueStore(storeId, name))
             DefaultKeyValueStoreIndex(name, storeId)
         }
@@ -45,18 +45,18 @@ internal class Index(
     }
 
     fun accept(visitor: ContentVisitor) {
-        visitor.index(updates)
+        visitor.index(changes)
         for (entry in effectiveEntries().entries.sortedBy { it.key }) {
             visitor.value(entry.key, entry.value)
         }
     }
 
     private fun effectiveEntries(): Map<String, IndexEntry> {
-        return currentEntries.filter { it.value.hasValue }
+        return entries.filter { it.value.hasValue }
     }
 
     private fun append(change: StoreChange) {
-        updates++
+        changes++
         fileContent.using { content ->
             val encoder = codec.encoder(content.writeStream)
             encoder.encode(change)

@@ -2,28 +2,25 @@
 
 package net.rubygrapefruit.store
 
-import net.rubygrapefruit.file.FileContent
 import net.rubygrapefruit.file.RegularFile
 import net.rubygrapefruit.io.codec.SimpleCodec
 
 internal class Index(
-    index: RegularFile,
-    private val codec: SimpleCodec
+    indexFile: RegularFile,
+    codec: SimpleCodec
 ) : AutoCloseable {
-    private val fileContent = index.openContent().successful()
+    private val index = IndexFile(indexFile, codec)
     private val entries: MutableMap<String, IndexEntry>
     private var changes: Int
 
     init {
-        val content = fileContent.using {
-            readIndex(it, codec)
-        }
+        val content = readIndex()
         entries = content.entries
         changes = content.updates
     }
 
     override fun close() {
-        fileContent.close()
+        index.close()
     }
 
     fun value(name: String): ValueStoreIndex {
@@ -57,21 +54,15 @@ internal class Index(
 
     private fun append(change: StoreChange) {
         changes++
-        fileContent.using { content ->
-            val encoder = codec.encoder(content.writeStream)
-            encoder.encode(change)
-        }
+        index.append(change)
     }
 
-    private fun readIndex(content: FileContent, codec: SimpleCodec): InitialContent {
+    private fun readIndex(): InitialContent {
         val byId = mutableMapOf<StoreId, IndexEntry>()
         val entries = mutableMapOf<String, IndexEntry>()
         var updates = 0
 
-        val length = content.length()
-        val decoder = codec.decoder(content.readStream)
-        while (content.currentPosition != length) {
-            val change = decoder.decode()
+        index.read { change ->
             updates++
             when (change) {
                 is NewValueStore -> {

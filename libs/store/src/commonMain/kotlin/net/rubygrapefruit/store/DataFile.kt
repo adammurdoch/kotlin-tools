@@ -34,7 +34,7 @@ internal class DataFile(
         }
     }
 
-    fun <T> write(value: T, serializer: SerializationStrategy<T>): Address {
+    fun <T> append(value: T, serializer: SerializationStrategy<T>): Address {
         return writeContent.using { content ->
             val pos = content.currentPosition
             val encoder = codec.encoder(content.writeStream)

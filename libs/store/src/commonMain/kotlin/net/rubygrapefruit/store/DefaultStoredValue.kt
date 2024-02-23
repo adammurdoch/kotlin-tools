@@ -24,7 +24,7 @@ internal class DefaultStoredValue<T>(
     }
 
     override fun set(value: T) {
-        val address = data.write(value, serializer)
+        val address = data.append(value, serializer)
         index.set(address)
     }
 }

@@ -24,7 +24,7 @@ internal class DefaultStoredMap<K, V>(
     }
 
     override fun set(key: K, value: V) {
-        val address = data.write(value, valueSerializer)
+        val address = data.append(value, valueSerializer)
         val encodedKey = Json.encodeToString(keySerializer, key)
         index.set(encodedKey, address)
         entries[key] = address

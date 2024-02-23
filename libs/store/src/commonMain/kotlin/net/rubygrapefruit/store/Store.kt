@@ -5,6 +5,7 @@ package net.rubygrapefruit.store
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.serializer
 import net.rubygrapefruit.file.Directory
+import net.rubygrapefruit.file.ElementType
 import net.rubygrapefruit.file.RegularFile
 import net.rubygrapefruit.file.regularFile
 import net.rubygrapefruit.io.codec.SimpleCodec
@@ -18,14 +19,13 @@ import net.rubygrapefruit.io.codec.SimpleCodec
  * - [StoredMap]: A mutable map with keys of type K and values of type T.
  */
 class Store private constructor(
+    directory: Directory,
     metadataFile: RegularFile,
-    indexFile: RegularFile,
-    dataFile: RegularFile
 ) : AutoCloseable {
     private val codec = SimpleCodec()
     private val metadata = MetadataFile(metadataFile, codec)
-    private val index = Index(indexFile, codec)
-    private val data = DataFile(dataFile, codec)
+    private val index = Index(directory.file("log_${metadata.currentGeneration}.bin"), codec)
+    private val data = DataFile(directory.file("data_${metadata.currentGeneration}.bin"), codec)
 
     companion object {
         /**
@@ -34,16 +34,17 @@ class Store private constructor(
         fun open(directory: Directory, discard: Boolean = false): Store {
             directory.createDirectories()
             val metadata = directory.file("store.bin")
-            val index = directory.file("index.bin")
-            val data = directory.file("data.bin")
             if (discard) {
                 metadata.delete()
-                index.delete()
-                data.delete()
+                for (entry in directory.listEntries().get()) {
+                    if (entry.type == ElementType.RegularFile) {
+                        entry.toFile().delete()
+                    }
+                }
             } else if (directory.listEntries().get().isNotEmpty() && !metadata.metadata().regularFile) {
                 unrecognizedFormat(directory)
             }
-            return Store(metadata, index, data)
+            return Store(directory, metadata)
         }
     }
 

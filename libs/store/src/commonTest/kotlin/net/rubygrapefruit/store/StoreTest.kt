@@ -11,31 +11,27 @@ import kotlin.test.fail
 class StoreTest : AbstractStoreTest() {
     @Test
     fun `cannot open when store file has incorrect version`() {
-        val files = listOf(StoreFile.Index, StoreFile.Data)
-
-        for (file in files) {
-            withStore {
-                it.value<String>("value").set("ok")
-            }
-
-            val storeFile = testStore.file(file.name)
-            assertTrue(storeFile.metadata().regularFile)
-
-            storeFile.withContent {
-                // Overwrite the first byte
-                it.writeStream.write(byteArrayOf(1))
-            }
-
-            try {
-                Store.open(testStore)
-                fail()
-            } catch (e: IllegalStateException) {
-                val message = e.message
-                assertTrue(message != null && message.startsWith("Unexpected file format version in file ${storeFile.absolutePath}."), "message: '$message'")
-            }
-
-            Store.open(testStore, discard = true)
+        withStore {
+            it.value<String>("value").set("ok")
         }
+
+        val storeFile = testStore.file(StoreFile.Metadata.name)
+        assertTrue(storeFile.metadata().regularFile)
+
+        storeFile.withContent {
+            // Overwrite the first byte
+            it.writeStream.write(byteArrayOf(1))
+        }
+
+        try {
+            Store.open(testStore)
+            fail()
+        } catch (e: IllegalStateException) {
+            val message = e.message
+            assertTrue(message != null && message.startsWith("Unexpected file format version in file ${storeFile.absolutePath}."), "message: '$message'")
+        }
+
+        Store.open(testStore, discard = true)
     }
 
     @Test

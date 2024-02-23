@@ -16,19 +16,8 @@ internal class DataFile(
     private val writeContent = file.openContent().successful()
 
     init {
-        readContent.using { content ->
-            if (content.length() > 0) {
-                val decoder = codec.decoder(content.readStream)
-                decoder.checkFileHeader(codec, file)
-            }
-        }
         writeContent.using { content ->
-            if (content.length() == 0L) {
-                val encoder = codec.encoder(content.writeStream)
-                encoder.fileHeader(codec)
-            } else {
-                content.seekToEnd()
-            }
+            content.seekToEnd()
         }
     }
 

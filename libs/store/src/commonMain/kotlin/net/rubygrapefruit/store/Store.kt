@@ -6,6 +6,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.serializer
 import net.rubygrapefruit.file.Directory
 import net.rubygrapefruit.file.RegularFile
+import net.rubygrapefruit.file.regularFile
 import net.rubygrapefruit.io.codec.SimpleCodec
 
 /**
@@ -17,10 +18,12 @@ import net.rubygrapefruit.io.codec.SimpleCodec
  * - [StoredMap]: A mutable map with keys of type K and values of type T.
  */
 class Store private constructor(
+    metadataFile: RegularFile,
     indexFile: RegularFile,
     dataFile: RegularFile
 ) : AutoCloseable {
     private val codec = SimpleCodec()
+    private val metadata = MetadataFile(metadataFile, codec)
     private val index = Index(indexFile, codec)
     private val data = DataFile(dataFile, codec)
 
@@ -30,13 +33,17 @@ class Store private constructor(
          */
         fun open(directory: Directory, discard: Boolean = false): Store {
             directory.createDirectories()
+            val metadata = directory.file("store.bin")
             val index = directory.file("index.bin")
             val data = directory.file("data.bin")
             if (discard) {
+                metadata.delete()
                 index.delete()
                 data.delete()
+            } else if (directory.listEntries().get().isNotEmpty() && !metadata.metadata().regularFile) {
+                unrecognizedFormat(directory)
             }
-            return Store(index, data)
+            return Store(metadata, index, data)
         }
     }
 

@@ -42,7 +42,7 @@ class StoreTest : AbstractStoreTest() {
     fun `can discard store contents on open`() {
         withStore { store ->
             store.value<Long>("long").set(123)
-            store.keyValue<Long, String>("longs").set(123, "value")
+            store.map<Long, String>("longs").set(123, "value")
         }
 
         Store.open(testStore, discard = true).use { store ->
@@ -57,7 +57,7 @@ class StoreTest : AbstractStoreTest() {
     @Test
     fun `cannot open key value store as a value store`() {
         withStore { store ->
-            store.keyValue<String, String>("value").set("a", "value 1")
+            store.map<String, String>("value").set("a", "value 1")
 
             try {
                 store.value<String>("value")
@@ -82,7 +82,7 @@ class StoreTest : AbstractStoreTest() {
             store.value<String>("value").set("value 1")
 
             try {
-                store.keyValue<String, String>("value")
+                store.map<String, String>("value")
                 fail()
             } catch (e: IllegalArgumentException) {
                 assertEquals("Cannot open value store 'value' as a key-value store.", e.message)
@@ -90,7 +90,7 @@ class StoreTest : AbstractStoreTest() {
         }
         withStore { store ->
             try {
-                store.keyValue<String, String>("value")
+                store.map<String, String>("value")
                 fail()
             } catch (e: IllegalArgumentException) {
                 assertEquals("Cannot open value store 'value' as a key-value store.", e.message)

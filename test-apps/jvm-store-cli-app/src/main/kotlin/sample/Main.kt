@@ -97,7 +97,7 @@ class BenchmarkOneKeyValueCommand : AbstractStoreCommand(name = "one-key-value",
     override fun run(store: Store) {
         println("Benchmarking with $entries entries and $iterations iterations")
         val source = ValueSource(iterations)
-        val value = store.keyValue<Int, String>("key-value")
+        val value = store.map<Int, String>("key-value")
         for (i in 0 until iterations) {
             for (e in 0 until entries) {
                 value.set(e, source.values[i])

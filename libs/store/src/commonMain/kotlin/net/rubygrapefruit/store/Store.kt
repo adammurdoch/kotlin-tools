@@ -13,8 +13,8 @@ import net.rubygrapefruit.io.codec.SimpleCodec
  *
  * A store can contain one or more of the following entries:
  *
- * - [ValueStore]: A mutable value of type T.
- * - [KeyValueStore]: A mutable map with keys of type K and values of type T.
+ * - [StoredValue]: A mutable value of type T.
+ * - [StoredMap]: A mutable map with keys of type K and values of type T.
  */
 class Store private constructor(
     indexFile: RegularFile,
@@ -41,31 +41,31 @@ class Store private constructor(
     }
 
     /**
-     * Opens the [ValueStore] with the given name and type, creating it if it does not exist.
+     * Opens the [StoredValue] with the given name and type, creating it if it does not exist.
      */
-    fun <T : Any> value(name: String, serializer: KSerializer<T>): ValueStore<T> {
-        return DefaultValueStore(name, index, data, serializer)
+    fun <T : Any> value(name: String, serializer: KSerializer<T>): StoredValue<T> {
+        return DefaultStoredValue(name, index, data, serializer)
     }
 
     /**
-     * Opens the [ValueStore] with the given name and type, creating it if it does not exist.
+     * Opens the [StoredValue] with the given name and type, creating it if it does not exist.
      */
-    inline fun <reified T : Any> value(name: String): ValueStore<T> {
+    inline fun <reified T : Any> value(name: String): StoredValue<T> {
         return value(name, serializer())
     }
 
     /**
-     * Opens the [KeyValueStore] with the given name and type, creating it if it does not exist.
+     * Opens the [StoredMap] with the given name and types, creating it if it does not exist.
      */
-    fun <K : Any, V : Any> keyValue(name: String, keySerializer: KSerializer<K>, valueSerializer: KSerializer<V>): KeyValueStore<K, V> {
-        return DefaultKeyValueStore(name, index, data, keySerializer, valueSerializer)
+    fun <K : Any, V : Any> map(name: String, keySerializer: KSerializer<K>, valueSerializer: KSerializer<V>): StoredMap<K, V> {
+        return DefaultStoredMap(name, index, data, keySerializer, valueSerializer)
     }
 
     /**
-     * Opens the [KeyValueStore] with the given name and type, creating it if it does not exist.
+     * Opens the [StoredMap] with the given name and types, creating it if it does not exist.
      */
-    inline fun <reified K : Any, reified V : Any> keyValue(name: String): KeyValueStore<K, V> {
-        return keyValue(name, serializer(), serializer())
+    inline fun <reified K : Any, reified V : Any> map(name: String): StoredMap<K, V> {
+        return map(name, serializer(), serializer())
     }
 
     /**

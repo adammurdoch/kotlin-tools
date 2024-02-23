@@ -5,7 +5,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class ValueStoreTest : AbstractStoreTest() {
+class StoredValueTest : AbstractStoreTest() {
     @Test
     fun `can read from empty store`() {
         withStore { store ->

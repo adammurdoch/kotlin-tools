@@ -1,6 +1,9 @@
 package net.rubygrapefruit.store
 
-interface KeyValueStore<K, V> {
+/**
+ * A mutable map with keys of type [K] and values of type [V].
+ */
+interface StoredMap<K, V> {
     /**
      * Returns the current value of the given key, if any.
      */

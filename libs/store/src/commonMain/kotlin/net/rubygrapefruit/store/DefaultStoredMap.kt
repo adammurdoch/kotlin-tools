@@ -3,13 +3,13 @@ package net.rubygrapefruit.store
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 
-internal class DefaultKeyValueStore<K, V>(
+internal class DefaultStoredMap<K, V>(
     name: String,
     index: Index,
     private val data: DataFile,
     private val keySerializer: KSerializer<K>,
     private val valueSerializer: KSerializer<V>
-) : KeyValueStore<K, V> {
+) : StoredMap<K, V> {
     private val index = index.keyValue(name)
     // The map of key (as type K, rather than String) to address
     private val entries = readEntries()

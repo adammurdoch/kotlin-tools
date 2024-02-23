@@ -1,6 +1,9 @@
 package net.rubygrapefruit.store
 
-interface ValueStore<T> {
+/**
+ * Represents a single mutable value of type [T].
+ */
+interface StoredValue<T> {
     /**
      * Returns the current value, if any.
      */

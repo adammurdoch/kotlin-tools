@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalStdlibApi::class)
-
 package net.rubygrapefruit.store
 
 import kotlinx.serialization.DeserializationStrategy
@@ -10,9 +8,9 @@ import net.rubygrapefruit.io.codec.SimpleCodec
 import kotlin.math.min
 
 internal class DataFile(
-    file: RegularFile,
+    private val file: RegularFile,
     private val codec: SimpleCodec
-) : AutoCloseable {
+) : StoreFile() {
     private val readContent = file.openContent().successful()
     private val writeContent = file.openContent().successful()
 
@@ -25,6 +23,11 @@ internal class DataFile(
     override fun close() {
         readContent.close()
         writeContent.close()
+    }
+
+    override fun closeAndDelete() {
+        close()
+        file.delete()
     }
 
     fun <T> read(block: Block, serializer: DeserializationStrategy<T>): T {

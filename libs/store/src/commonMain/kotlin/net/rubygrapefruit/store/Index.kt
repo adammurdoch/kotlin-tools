@@ -48,7 +48,7 @@ internal class Index(
     }
 
     fun accept(visitor: ContentVisitor) {
-        visitor.index(changes)
+        visitor.store(ContentVisitor.StoreInfo(changes, metadataFile.currentGeneration))
         for (entry in effectiveEntries().entries.sortedBy { it.key }) {
             visitor.value(entry.key, entry.value.visitorInfo)
         }
@@ -60,13 +60,11 @@ internal class Index(
 
     private fun doAppend(change: StoreChange) {
         if (changes < maxChanges || compacting) {
-            println("-> APPEND $change, CHANGES = $changes")
             changes++
             log.append(change)
         } else {
-            println("-> APPEND $change, COMPACTING")
             compacting = true
-            fileManager.discard(log)
+            val oldLog = log
             val oldData = data
             val generation = metadataFile.currentGeneration + 1
             log = fileManager.logFile(generation)
@@ -80,9 +78,9 @@ internal class Index(
                 index.replay(data)
             }
             metadataFile.updateGeneration(generation)
-            fileManager.discard(oldData)
+            fileManager.closeAndDelete(oldLog)
+            fileManager.closeAndDelete(oldData)
             compacting = false
-            println("-> FINISH COMPACTING")
         }
     }
 

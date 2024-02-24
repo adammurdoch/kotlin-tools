@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalStdlibApi::class)
-
 package net.rubygrapefruit.store
 
 import net.rubygrapefruit.file.RegularFile
@@ -8,7 +6,7 @@ import net.rubygrapefruit.io.codec.SimpleCodec
 internal class LogFile(
     private val file: RegularFile,
     private val codec: SimpleCodec
-) : AutoCloseable {
+) : StoreFile() {
     private val writeContent = file.openContent().successful()
 
     init {
@@ -19,6 +17,11 @@ internal class LogFile(
 
     override fun close() {
         writeContent.close()
+    }
+
+    override fun closeAndDelete() {
+        close()
+        file.delete()
     }
 
     fun append(change: StoreChange) {

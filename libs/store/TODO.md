@@ -1,9 +1,11 @@
 ## TODO
 
-- Periodically compact index
-- Periodically compact data file
+- Reset generation to 1 at some point before overflowing to negative value
+- Compact only once amount of garbage exceeds certain threshold
+- Fix case where total number of items is > max changes, will compact on first change after opening store
 - Don't create a new buffer for each block copied during compaction
 - Buffered writes
+- Background compaction
 - Don't keep checking the current position when reading index changes from file
   - Use a counter for the expected number of changes
 - Reuse encoder and decoder instances
@@ -22,7 +24,6 @@
   - Prevent concurrent updates of index
 - Multi-process safety
   - Write lock the files
-- Basic garbage collection
 - Atomic update
 - Concurrent reads
 - Optimistic concurrent updates

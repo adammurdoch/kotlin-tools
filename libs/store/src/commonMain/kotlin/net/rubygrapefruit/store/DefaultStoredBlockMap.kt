@@ -60,7 +60,6 @@ internal class DefaultStoredBlockMap(
         val oldEntries = LinkedHashMap(entries)
         for (entry in oldEntries) {
             val newBlock = data.copyFrom(this.data, entry.value)
-            println("-> COPY ${entry.key} BLOCK ${entry.value} TO $newBlock")
             set(entry.key, newBlock)
         }
         this.data = data

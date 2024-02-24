@@ -205,6 +205,7 @@ class StoredMapTest : AbstractStoreTest() {
         Store.open(testStore, maxChanges = 5).use { store ->
             assertEquals(listOf("value"), store.values())
             assertEquals(3, store.indexChanges())
+            assertEquals(1, store.generation())
 
             val value = store.map<String, Int>("value")
 
@@ -219,6 +220,7 @@ class StoredMapTest : AbstractStoreTest() {
 
             assertEquals(listOf("value"), store.values())
             assertEquals(5, store.indexChanges())
+            assertEquals(1, store.generation())
 
             for (i in 3..4) {
                 value.set("a", 100 + i)
@@ -227,17 +229,21 @@ class StoredMapTest : AbstractStoreTest() {
 
                 assertEquals(listOf("value"), store.values())
                 assertEquals(i, store.indexChanges())
+                assertEquals(2, store.generation())
             }
         }
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
             assertEquals(4, store.indexChanges())
+            assertEquals(2, store.generation())
 
             val value = store.map<String, Int>("value")
             assertEquals(104, value.get("a"))
             assertEquals(listOf("a" to 104, "b" to 44), value.entries())
         }
+
+        assertEquals(3, testStore.listEntries().get().size)
     }
 
     @Test

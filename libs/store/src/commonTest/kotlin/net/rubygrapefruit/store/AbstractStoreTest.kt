@@ -29,8 +29,18 @@ abstract class AbstractStoreTest : AbstractFileTest() {
     fun Store.indexChanges(): Int {
         var result by Delegates.notNull<Int>()
         accept(object : ContentVisitor {
-            override fun index(changes: Int) {
-                result = changes
+            override fun store(detail: ContentVisitor.StoreInfo) {
+                result = detail.changes
+            }
+        })
+        return result
+    }
+
+    fun Store.generation(): Int {
+        var result by Delegates.notNull<Int>()
+        accept(object : ContentVisitor {
+            override fun store(detail: ContentVisitor.StoreInfo) {
+                result = detail.generation
             }
         })
         return result

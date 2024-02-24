@@ -7,7 +7,7 @@ internal class MetadataFile(
     private val metadataFile: RegularFile,
     private val codec: SimpleCodec
 ) {
-    private var generation: Int = 0
+    private var generation: Int = 1
 
     val currentGeneration: Int
         get() = generation

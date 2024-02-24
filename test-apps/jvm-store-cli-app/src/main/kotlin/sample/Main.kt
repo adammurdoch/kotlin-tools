@@ -75,13 +75,13 @@ class BenchmarkManyValuesCommand : AbstractStoreCommand(name = "many-values", he
         println("Benchmarking with $values values and $iterations iterations")
         val source = ValueSource(iterations)
         for (v in 1..values) {
-            val value = store.value<String>("some value $v")
+            val value = store.value<String>("value $v")
             for (i in 0 until iterations) {
                 value.set(source.values[i])
             }
         }
         for (v in 1..values) {
-            val value = store.value<String>("some value $v")
+            val value = store.value<String>("value $v")
             for (i in 0 until iterations) {
                 val read = value.get()
                 require(read == source.values.last())
@@ -90,14 +90,14 @@ class BenchmarkManyValuesCommand : AbstractStoreCommand(name = "many-values", he
     }
 }
 
-class BenchmarkOneKeyValueCommand : AbstractStoreCommand(name = "one-key-value", help = "Run benchmark for a single key-value store") {
+class BenchmarkOneKeyValueCommand : AbstractStoreCommand(name = "one-map", help = "Run benchmark for a single map") {
     private val entries by option("--entries", help = "The number of entries").int().default(1500)
     private val iterations by option("--iterations", help = "The number of iterations").int().default(100)
 
     override fun run(store: Store) {
         println("Benchmarking with $entries entries and $iterations iterations")
         val source = ValueSource(iterations)
-        val value = store.map<Int, String>("key-value")
+        val value = store.map<Int, String>("map")
         for (i in 0 until iterations) {
             for (e in 0 until entries) {
                 value.set(e, source.values[i])

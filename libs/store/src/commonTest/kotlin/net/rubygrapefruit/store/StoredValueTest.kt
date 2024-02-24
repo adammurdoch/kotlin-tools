@@ -281,6 +281,7 @@ class StoredValueTest : AbstractStoreTest() {
         Store.open(testStore, maxChanges = 5).use { store ->
             assertEquals(listOf("value"), store.values())
             assertEquals(2, store.indexChanges())
+            assertEquals(1, store.generation())
 
             val value = store.value<String>("value")
 
@@ -291,11 +292,13 @@ class StoredValueTest : AbstractStoreTest() {
 
             assertEquals(listOf("value"), store.values())
             assertEquals(5, store.indexChanges())
+            assertEquals(1, store.generation())
 
             value.set("value 4")
 
             assertEquals(listOf("value"), store.values())
             assertEquals(2, store.indexChanges())
+            assertEquals(2, store.generation())
 
             for (i in 5..7) {
                 value.set("value $i")
@@ -304,20 +307,25 @@ class StoredValueTest : AbstractStoreTest() {
 
             assertEquals(listOf("value"), store.values())
             assertEquals(5, store.indexChanges())
+            assertEquals(2, store.generation())
 
             for (i in 8..10) {
                 value.set("value $i")
                 assertEquals(i - 6, store.indexChanges())
+                assertEquals(3, store.generation())
             }
         }
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
             assertEquals(4, store.indexChanges())
+            assertEquals(3, store.generation())
 
             val value = store.value<String>("value")
             assertEquals("value 10", value.get())
         }
+
+        assertEquals(3, testStore.listEntries().get().size)
     }
 
     @Test

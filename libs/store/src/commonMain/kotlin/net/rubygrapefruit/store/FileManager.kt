@@ -9,7 +9,7 @@ internal class FileManager(
     private val store: Directory,
     private val codec: SimpleCodec,
 ) : AutoCloseable {
-    private val files = mutableListOf<AutoCloseable>()
+    private val files = mutableListOf<StoreFile>()
 
     fun logFile(generation: Int): LogFile {
         val file = LogFile(store.file("log_${generation}.bin"), codec)
@@ -23,15 +23,19 @@ internal class FileManager(
         return file
     }
 
-    fun discard(file: AutoCloseable) {
+    fun closeAndDelete(file: StoreFile) {
         val removed = files.remove(file)
         require(removed)
-        file.close()
+        file.closeAndDelete()
     }
 
     override fun close() {
-        for (file in files) {
-            file.close()
+        try {
+            for (file in files) {
+                file.close()
+            }
+        } finally {
+            files.clear()
         }
     }
 }

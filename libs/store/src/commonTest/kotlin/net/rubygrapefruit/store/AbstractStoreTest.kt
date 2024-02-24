@@ -5,6 +5,7 @@ package net.rubygrapefruit.store
 import net.rubygrapefruit.file.Directory
 import net.rubygrapefruit.file.fixtures.AbstractFileTest
 import kotlin.properties.Delegates
+import kotlin.test.assertEquals
 
 abstract class AbstractStoreTest : AbstractFileTest() {
     val testStore: Directory
@@ -14,6 +15,8 @@ abstract class AbstractStoreTest : AbstractFileTest() {
         Store.open(testStore).use {
             action(it)
         }
+        // Should always be 3 files
+        assertEquals(3, testStore.listEntries().get().size)
     }
 
     fun Store.values(): List<String> {

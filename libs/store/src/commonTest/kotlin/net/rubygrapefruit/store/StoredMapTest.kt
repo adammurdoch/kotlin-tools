@@ -242,8 +242,6 @@ class StoredMapTest : AbstractStoreTest() {
             assertEquals(104, value.get("a"))
             assertEquals(listOf("a" to 104, "b" to 44), value.entries())
         }
-
-        assertEquals(3, testStore.listEntries().get().size)
     }
 
     @Test

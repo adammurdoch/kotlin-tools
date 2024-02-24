@@ -324,8 +324,54 @@ class StoredValueTest : AbstractStoreTest() {
             val value = store.value<String>("value")
             assertEquals("value 10", value.get())
         }
+    }
 
-        assertEquals(3, testStore.listEntries().get().size)
+    @Test
+    fun `can update value many times in different sessions`() {
+        withStore { store ->
+            val value = store.value<String>("value")
+            value.set("value 1")
+            value.set("value 2")
+            value.set("value 3")
+            value.set("value 4")
+        }
+
+        Store.open(testStore, maxChanges = 5).use { store ->
+            assertEquals(listOf("value"), store.values())
+            assertEquals(5, store.indexChanges())
+            assertEquals(1, store.generation())
+
+            val value = store.value<String>("value")
+            assertEquals("value 4", value.get())
+            value.set("value 5")
+            assertEquals("value 5", value.get())
+
+            assertEquals(2, store.indexChanges())
+            assertEquals(2, store.generation())
+        }
+
+        Store.open(testStore, maxChanges = 5).use { store ->
+            assertEquals(listOf("value"), store.values())
+            assertEquals(2, store.indexChanges())
+            assertEquals(2, store.generation())
+
+            val value = store.value<String>("value")
+            assertEquals("value 5", value.get())
+            value.set("value 6")
+            assertEquals("value 6", value.get())
+
+            assertEquals(3, store.indexChanges())
+            assertEquals(2, store.generation())
+        }
+
+        withStore { store ->
+            assertEquals(listOf("value"), store.values())
+            assertEquals(3, store.indexChanges())
+            assertEquals(2, store.generation())
+
+            val value = store.value<String>("value")
+            assertEquals("value 6", value.get())
+        }
     }
 
     @Test

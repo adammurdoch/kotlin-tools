@@ -13,7 +13,12 @@ internal class Index(
 ) : AutoCloseable {
     private val index = IndexFile(store.file("log_${metadataFile.currentGeneration}.bin"), codec)
     private val data = DataFile(store.file("data_${metadataFile.currentGeneration}.bin"), codec)
-    private val entries: MutableMap<String, IndexEntry>
+    private val changeLog = object : ChangeLog {
+        override fun append(change: StoreChange) {
+            doAppend(change)
+        }
+    }
+    private val entries: MutableMap<String, StoreIndex>
     private var changes: Int
 
     init {
@@ -30,8 +35,8 @@ internal class Index(
     fun value(name: String): ValueStoreIndex {
         val index = entries.getOrPut(name) {
             val storeId = StoreId(entries.size)
-            append(NewValueStore(storeId, name))
-            DefaultValueStoreIndex(name, storeId, data)
+            doAppend(NewValueStore(storeId, name))
+            DefaultValueStoreIndex(name, storeId, changeLog, data)
         }
         return index.asValueStore()
     }
@@ -39,8 +44,8 @@ internal class Index(
     fun keyValue(name: String): KeyValueStoreIndex {
         val index = entries.getOrPut(name) {
             val storeId = StoreId(entries.size)
-            append(NewKeyValueStore(storeId, name))
-            DefaultKeyValueStoreIndex(name, storeId, data)
+            doAppend(NewKeyValueStore(storeId, name))
+            DefaultKeyValueStoreIndex(name, storeId, changeLog, data)
         }
         return index.asKeyValueStore()
     }
@@ -48,35 +53,35 @@ internal class Index(
     fun accept(visitor: ContentVisitor) {
         visitor.index(changes)
         for (entry in effectiveEntries().entries.sortedBy { it.key }) {
-            visitor.value(entry.key, entry.value)
+            visitor.value(entry.key, entry.value.visitorInfo)
         }
     }
 
-    private fun effectiveEntries(): Map<String, IndexEntry> {
+    private fun effectiveEntries(): Map<String, StoreIndex> {
         return entries.filter { it.value.hasValue }
     }
 
-    private fun append(change: StoreChange) {
+    private fun doAppend(change: StoreChange) {
         changes++
         index.append(change)
     }
 
     private fun readIndex(): InitialContent {
-        val byId = mutableMapOf<StoreId, IndexEntry>()
-        val entries = mutableMapOf<String, IndexEntry>()
+        val byId = mutableMapOf<StoreId, StoreIndex>()
+        val entries = mutableMapOf<String, StoreIndex>()
         var updates = 0
 
         index.read { change ->
             updates++
             when (change) {
                 is NewValueStore -> {
-                    val index = DefaultValueStoreIndex(change.name, change.store, data)
+                    val index = DefaultValueStoreIndex(change.name, change.store, changeLog, data)
                     byId[change.store] = index
                     entries[change.name] = index
                 }
 
                 is NewKeyValueStore -> {
-                    val index = DefaultKeyValueStoreIndex(change.name, change.store, data)
+                    val index = DefaultKeyValueStoreIndex(change.name, change.store, changeLog, data)
                     byId[change.store] = index
                     entries[change.name] = index
                 }
@@ -105,25 +110,19 @@ internal class Index(
         return InitialContent(updates, entries)
     }
 
-    private sealed class IndexEntry : ContentVisitor.ValueInfo {
-        abstract val hasValue: Boolean
-
-        abstract fun asValueStore(): DefaultValueStoreIndex
-
-        abstract fun asKeyValueStore(): DefaultKeyValueStoreIndex
-
-        abstract fun doDiscard()
-    }
-
-    private inner class DefaultValueStoreIndex(
+    private class DefaultValueStoreIndex(
         private val name: String,
         private val storeId: StoreId,
+        private val changeLog: ChangeLog,
         override val data: DataFile
-    ) : IndexEntry(), ValueStoreIndex {
+    ) : ValueStoreIndex, ContentVisitor.ValueInfo {
         private var address: Address? = null
 
         override val hasValue: Boolean
             get() = address != null
+
+        override val visitorInfo: ContentVisitor.ValueInfo
+            get() = this
 
         override val formatted: String
             get() {
@@ -149,32 +148,36 @@ internal class Index(
 
         override fun set(address: Address) {
             doSet(address)
-            append(SetValue(storeId, address))
+            changeLog.append(SetValue(storeId, address))
         }
 
         override fun discard() {
             doDiscard()
-            append(DiscardStore(storeId))
+            changeLog.append(DiscardStore(storeId))
         }
 
         override fun doDiscard() {
             this.address = null
         }
 
-        fun doSet(address: Address) {
+        override fun doSet(address: Address) {
             this.address = address
         }
     }
 
-    private inner class DefaultKeyValueStoreIndex(
+    private class DefaultKeyValueStoreIndex(
         private val name: String,
         private val storeId: StoreId,
-        override val data: DataFile
-    ) : IndexEntry(), KeyValueStoreIndex {
+        private val changeLog: ChangeLog,
+        override val data: DataFile,
+    ) : KeyValueStoreIndex, ContentVisitor.ValueInfo {
         private val entries = mutableMapOf<String, Address>()
 
         override val hasValue: Boolean
             get() = entries.isNotEmpty()
+
+        override val visitorInfo: ContentVisitor.ValueInfo
+            get() = this
 
         override val formatted: String
             get() = "${entries.size} entries"
@@ -193,34 +196,34 @@ internal class Index(
 
         override fun set(key: String, value: Address) {
             doSet(key, value)
-            append(SetEntry(storeId, key, value))
+            changeLog.append(SetEntry(storeId, key, value))
         }
 
         override fun remove(key: String) {
             doRemove(key)
-            append(RemoveEntry(storeId, key))
+            changeLog.append(RemoveEntry(storeId, key))
         }
 
         override fun discard() {
             doDiscard()
-            append(DiscardStore(storeId))
+            changeLog.append(DiscardStore(storeId))
         }
 
         override fun doDiscard() {
             entries.clear()
         }
 
-        fun doSet(key: String, address: Address) {
+        override fun doSet(key: String, address: Address) {
             entries[key] = address
         }
 
-        fun doRemove(key: String) {
+        override fun doRemove(key: String) {
             entries.remove(key)
         }
     }
 
     private class InitialContent(
         val updates: Int,
-        val entries: MutableMap<String, IndexEntry>
+        val entries: MutableMap<String, StoreIndex>
     )
 }

@@ -59,7 +59,7 @@ class StoreTest : AbstractStoreTest() {
                 store.value<String>("value")
                 fail()
             } catch (e: IllegalArgumentException) {
-                assertEquals("Cannot open key-value store 'value' as a value store.", e.message)
+                assertEquals("Cannot open stored map 'value' as a stored value.", e.message)
             }
         }
         withStore { store ->
@@ -67,7 +67,7 @@ class StoreTest : AbstractStoreTest() {
                 store.value<String>("value")
                 fail()
             } catch (e: IllegalArgumentException) {
-                assertEquals("Cannot open key-value store 'value' as a value store.", e.message)
+                assertEquals("Cannot open stored map 'value' as a stored value.", e.message)
             }
         }
     }
@@ -81,7 +81,7 @@ class StoreTest : AbstractStoreTest() {
                 store.map<String, String>("value")
                 fail()
             } catch (e: IllegalArgumentException) {
-                assertEquals("Cannot open value store 'value' as a key-value store.", e.message)
+                assertEquals("Cannot open stored value 'value' as a stored map.", e.message)
             }
         }
         withStore { store ->
@@ -89,7 +89,7 @@ class StoreTest : AbstractStoreTest() {
                 store.map<String, String>("value")
                 fail()
             } catch (e: IllegalArgumentException) {
-                assertEquals("Cannot open value store 'value' as a key-value store.", e.message)
+                assertEquals("Cannot open stored value 'value' as a stored map.", e.message)
             }
         }
     }

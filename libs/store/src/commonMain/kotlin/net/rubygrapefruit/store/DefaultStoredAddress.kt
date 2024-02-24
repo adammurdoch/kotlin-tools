@@ -31,7 +31,7 @@ internal class DefaultStoredAddress(
     }
 
     override fun asKeyValueStore(): StoredAddressMapIndex {
-        throw IllegalArgumentException("Cannot open value store '$name' as a key-value store.")
+        throw IllegalArgumentException("Cannot open stored value '$name' as a stored map.")
     }
 
     override fun get(): Address? {

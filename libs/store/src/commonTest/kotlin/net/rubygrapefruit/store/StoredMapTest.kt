@@ -202,15 +202,13 @@ class StoredMapTest : AbstractStoreTest() {
             value.set("b", 44)
         }
 
-        val count = 10
         Store.open(testStore, maxChanges = 5).use { store ->
             assertEquals(listOf("value"), store.values())
             assertEquals(3, store.indexChanges())
 
             val value = store.map<String, Int>("value")
 
-            for (i in 1..count) {
-
+            for (i in 1..2) {
                 value.set("a", 100 + i)
                 assertEquals(100 + i, value.get("a"))
                 assertEquals(listOf("a" to 100 + i, "b" to 44), value.entries())
@@ -218,15 +216,27 @@ class StoredMapTest : AbstractStoreTest() {
                 assertEquals(listOf("value"), store.values())
                 assertEquals(i + 3, store.indexChanges())
             }
+
+            assertEquals(listOf("value"), store.values())
+            assertEquals(5, store.indexChanges())
+
+            for (i in 3..4) {
+                value.set("a", 100 + i)
+                assertEquals(100 + i, value.get("a"))
+                assertEquals(listOf("a" to 100 + i, "b" to 44), value.entries())
+
+                assertEquals(listOf("value"), store.values())
+                assertEquals(i, store.indexChanges())
+            }
         }
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(count + 3, store.indexChanges())
+            assertEquals(4, store.indexChanges())
 
             val value = store.map<String, Int>("value")
-            assertEquals(100 + count, value.get("a"))
-            assertEquals(listOf("a" to 100 + count, "b" to 44), value.entries())
+            assertEquals(104, value.get("a"))
+            assertEquals(listOf("a" to 104, "b" to 44), value.entries())
         }
     }
 

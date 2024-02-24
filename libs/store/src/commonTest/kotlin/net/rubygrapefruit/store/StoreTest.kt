@@ -51,6 +51,33 @@ class StoreTest : AbstractStoreTest() {
     }
 
     @Test
+    fun `can create many values`() {
+        withStore { store ->
+            for (i in 1..10) {
+                store.value<Long>("long $i").set(123)
+            }
+        }
+
+        Store.open(testStore, maxChanges = 5).use { store ->
+            assertEquals(10, store.values().size)
+            assertEquals(20, store.logEntries())
+            assertEquals(1, store.generation())
+
+            store.value<String>("string")
+
+            assertEquals(10, store.values().size)
+            assertEquals(21, store.logEntries())
+            assertEquals(2, store.generation())
+        }
+
+        withStore { store ->
+            assertEquals(10, store.values().size)
+            assertEquals(21, store.logEntries())
+            assertEquals(2, store.generation())
+        }
+    }
+
+    @Test
     fun `cannot open key value store as a value store`() {
         withStore { store ->
             store.map<String, String>("value").set("a", "value 1")

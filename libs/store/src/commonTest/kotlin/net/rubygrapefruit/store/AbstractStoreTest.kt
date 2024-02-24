@@ -29,7 +29,7 @@ abstract class AbstractStoreTest : AbstractFileTest() {
         return result
     }
 
-    fun Store.indexChanges(): Int {
+    fun Store.logEntries(): Int {
         var result by Delegates.notNull<Int>()
         accept(object : ContentVisitor {
             override fun store(detail: ContentVisitor.StoreInfo) {

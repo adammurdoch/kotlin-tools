@@ -12,15 +12,16 @@ internal class Index(
     private var changeLog = DefaultChangeLog()
     private var compacting = false
     private val entries: MutableMap<String, StoreIndex>
-    private var changes: Int
+    private var nonCompactedChanges: Int
 
     init {
         val content = readIndex()
         entries = content.entries
-        changes = content.updates
+        nonCompactedChanges = content.changes - metadataFile.compactedChanges
     }
 
     override fun close() {
+        metadataFile.updateNonCompactedChanges(nonCompactedChanges)
         log.close()
         data.close()
     }
@@ -42,7 +43,7 @@ internal class Index(
     }
 
     fun accept(visitor: ContentVisitor) {
-        visitor.store(ContentVisitor.StoreInfo(changes, metadataFile.currentGeneration))
+        visitor.store(ContentVisitor.StoreInfo(metadataFile.compactedChanges + nonCompactedChanges, metadataFile.currentGeneration))
         for (entry in effectiveEntries().entries.sortedBy { it.key }) {
             visitor.value(entry.key, entry.value.visitorInfo)
         }
@@ -53,8 +54,8 @@ internal class Index(
     }
 
     private fun doAppend(change: StoreChange) {
-        if (changes < maxChanges || compacting) {
-            changes++
+        if (nonCompactedChanges < maxChanges || compacting) {
+            nonCompactedChanges++
             log.append(change)
         } else {
             compacting = true
@@ -63,13 +64,14 @@ internal class Index(
             val generation = metadataFile.currentGeneration + 1
             log = fileManager.logFile(generation)
             data = fileManager.dataFile(generation)
-            changes = 0
+            nonCompactedChanges = 0
             for (index in entries.values) {
                 index.replay(changeLog, data)
             }
-            metadataFile.updateGeneration(generation)
+            metadataFile.updateGeneration(generation, nonCompactedChanges)
             fileManager.closeAndDelete(oldLog)
             fileManager.closeAndDelete(oldData)
+            nonCompactedChanges = 0
             compacting = false
         }
     }
@@ -119,8 +121,11 @@ internal class Index(
     }
 
     private inner class DefaultChangeLog : ChangeLog {
-        override fun batch(action: (ChangeLog) -> Unit) {
-            action(this)
+        override fun appendBatch(change: StoreChange) {
+            val oldValue = compacting
+            compacting = true
+            doAppend(change)
+            compacting = oldValue
         }
 
         override fun append(change: StoreChange) {
@@ -129,7 +134,7 @@ internal class Index(
     }
 
     private class InitialContent(
-        val updates: Int,
+        val changes: Int,
         val entries: MutableMap<String, StoreIndex>
     )
 }

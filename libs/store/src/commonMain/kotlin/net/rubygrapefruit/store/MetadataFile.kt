@@ -7,34 +7,44 @@ internal class MetadataFile(
     private val metadataFile: RegularFile,
     private val codec: SimpleCodec
 ) {
-    private var generation: Int = 1
+    private var metadata = Metadata(1, 0, 0)
 
     val currentGeneration: Int
-        get() = generation
+        get() = metadata.generation
+
+    val compactedChanges: Int
+        get() = metadata.compactedChanges
 
     init {
         metadataFile.withContent { content ->
             val length = content.length()
             if (length == 0L) {
-                storeGeneration()
+                storeMetadata()
             } else {
                 val decoder = codec.decoder(content.readStream)
                 decoder.checkFileHeader(codec, metadataFile)
-                generation = decoder.int()
+                metadata = Metadata(decoder.int(), decoder.int(), decoder.int())
             }
         }
     }
 
-    fun updateGeneration(newGeneration: Int) {
-        generation = newGeneration
-        storeGeneration()
+    fun updateGeneration(newGeneration: Int, compactedChanges: Int) {
+        metadata = Metadata(newGeneration, compactedChanges, 0)
+        storeMetadata()
     }
 
-    private fun storeGeneration() {
+    fun updateNonCompactedChanges(changes: Int) {
+        metadata = Metadata(metadata.generation, metadata.compactedChanges, changes)
+        storeMetadata()
+    }
+
+    private fun storeMetadata() {
         metadataFile.withContent { content ->
             val encoder = codec.encoder(content.writeStream)
             encoder.fileHeader(codec)
-            encoder.int(generation)
+            encoder.int(metadata.generation)
+            encoder.int(metadata.compactedChanges)
+            encoder.int(metadata.nonCompactedChanges)
         }
     }
 }

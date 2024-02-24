@@ -42,13 +42,11 @@ internal class DefaultStoredBlock(
 
     override fun set(block: Block) {
         doSet(block)
-        log.batch {
-            if (!registered) {
-                it.append(NewValueStore(storeId, name))
-                registered = true
-            }
-            it.append(SetValue(storeId, block))
+        if (!registered) {
+            log.appendBatch(NewValueStore(storeId, name))
+            registered = true
         }
+        log.append(SetValue(storeId, block))
     }
 
     override fun discard() {

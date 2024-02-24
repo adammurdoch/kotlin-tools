@@ -28,7 +28,7 @@ class StoreTest : AbstractStoreTest() {
             fail()
         } catch (e: IllegalStateException) {
             val message = e.message
-            assertTrue(message != null && message.startsWith("Unexpected file format version in file ${storeFile.absolutePath}."), "message: '$message'")
+            assertTrue(message != null && message.startsWith("Unexpected store version in file ${storeFile.absolutePath}."), "message: '$message'")
         }
 
         Store.open(testStore, discard = true)

@@ -32,13 +32,11 @@ internal class DefaultStoredBlockMap(
 
     override fun set(key: String, value: Block) {
         doSet(key, value)
-        log.batch {
-            if (!registered) {
-                it.append(NewKeyValueStore(storeId, name))
-                registered = true
-            }
-            it.append(SetEntry(storeId, key, value))
+        if (!registered) {
+            log.appendBatch(NewKeyValueStore(storeId, name))
+            registered = true
         }
+        log.append(SetEntry(storeId, key, value))
     }
 
     override fun remove(key: String) {

@@ -28,7 +28,7 @@ internal interface StoredBlockMapIndex : StoredBlockMap, StoreIndex {
 }
 
 internal interface ChangeLog {
-    fun batch(action: (ChangeLog) -> Unit)
+    fun appendBatch(change: StoreChange)
 
     fun append(change: StoreChange)
 }

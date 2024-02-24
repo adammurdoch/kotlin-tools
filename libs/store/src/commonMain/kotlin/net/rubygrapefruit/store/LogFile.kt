@@ -5,7 +5,7 @@ package net.rubygrapefruit.store
 import net.rubygrapefruit.file.RegularFile
 import net.rubygrapefruit.io.codec.SimpleCodec
 
-internal class IndexFile(
+internal class LogFile(
     private val file: RegularFile,
     private val codec: SimpleCodec
 ) : AutoCloseable {

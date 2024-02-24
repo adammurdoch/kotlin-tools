@@ -2,12 +2,12 @@
 
 package net.rubygrapefruit.store
 
-internal class DefaultValueStoreIndex(
+internal class DefaultStoredAddress(
     private val name: String,
     private val storeId: StoreId,
     private val changeLog: ChangeLog,
     override val data: DataFile
-) : ValueStoreIndex, ContentVisitor.ValueInfo {
+) : StoredAddressIndex, ContentVisitor.ValueInfo {
     private var address: Address? = null
 
     override val hasValue: Boolean
@@ -26,11 +26,11 @@ internal class DefaultValueStoreIndex(
             }
         }
 
-    override fun asValueStore(): ValueStoreIndex {
+    override fun asValueStore(): StoredAddressIndex {
         return this
     }
 
-    override fun asKeyValueStore(): KeyValueStoreIndex {
+    override fun asKeyValueStore(): StoredAddressMapIndex {
         throw IllegalArgumentException("Cannot open value store '$name' as a key-value store.")
     }
 

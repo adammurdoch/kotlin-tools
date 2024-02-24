@@ -11,7 +11,7 @@ internal class Index(
     codec: SimpleCodec,
     maxChanges: Int
 ) : AutoCloseable {
-    private val index = IndexFile(store.file("log_${metadataFile.currentGeneration}.bin"), codec)
+    private val log = LogFile(store.file("log_${metadataFile.currentGeneration}.bin"), codec)
     private val data = DataFile(store.file("data_${metadataFile.currentGeneration}.bin"), codec)
     private val changeLog = object : ChangeLog {
         override fun append(change: StoreChange) {
@@ -28,24 +28,24 @@ internal class Index(
     }
 
     override fun close() {
-        index.close()
+        log.close()
         data.close()
     }
 
-    fun value(name: String): ValueStoreIndex {
+    fun value(name: String): StoredAddress {
         val index = entries.getOrPut(name) {
             val storeId = StoreId(entries.size)
             doAppend(NewValueStore(storeId, name))
-            DefaultValueStoreIndex(name, storeId, changeLog, data)
+            DefaultStoredAddress(name, storeId, changeLog, data)
         }
         return index.asValueStore()
     }
 
-    fun keyValue(name: String): KeyValueStoreIndex {
+    fun map(name: String): StoredAddressMap {
         val index = entries.getOrPut(name) {
             val storeId = StoreId(entries.size)
             doAppend(NewKeyValueStore(storeId, name))
-            DefaultKeyValueStoreIndex(name, storeId, changeLog, data)
+            DefaultStoredAddressMap(name, storeId, changeLog, data)
         }
         return index.asKeyValueStore()
     }
@@ -63,7 +63,7 @@ internal class Index(
 
     private fun doAppend(change: StoreChange) {
         changes++
-        index.append(change)
+        log.append(change)
     }
 
     private fun readIndex(): InitialContent {
@@ -71,17 +71,17 @@ internal class Index(
         val entries = mutableMapOf<String, StoreIndex>()
         var updates = 0
 
-        index.read { change ->
+        log.read { change ->
             updates++
             when (change) {
                 is NewValueStore -> {
-                    val index = DefaultValueStoreIndex(change.name, change.store, changeLog, data)
+                    val index = DefaultStoredAddress(change.name, change.store, changeLog, data)
                     byId[change.store] = index
                     entries[change.name] = index
                 }
 
                 is NewKeyValueStore -> {
-                    val index = DefaultKeyValueStoreIndex(change.name, change.store, changeLog, data)
+                    val index = DefaultStoredAddressMap(change.name, change.store, changeLog, data)
                     byId[change.store] = index
                     entries[change.name] = index
                 }

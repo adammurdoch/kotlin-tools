@@ -9,7 +9,7 @@ internal class DefaultStoredMap<K, V>(
     private val keySerializer: KSerializer<K>,
     private val valueSerializer: KSerializer<V>
 ) : StoredMap<K, V> {
-    private val index = index.keyValue(name)
+    private val index = index.map(name)
     // The map of key (as type K, rather than String) to address
     private val entries = readEntries()
 

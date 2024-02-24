@@ -1,11 +1,11 @@
 package net.rubygrapefruit.store
 
-internal class DefaultKeyValueStoreIndex(
+internal class DefaultStoredAddressMap(
     private val name: String,
     private val storeId: StoreId,
     private val changeLog: ChangeLog,
     override val data: DataFile,
-) : KeyValueStoreIndex, ContentVisitor.ValueInfo {
+) : StoredAddressMapIndex, ContentVisitor.ValueInfo {
     private val entries = mutableMapOf<String, Address>()
 
     override val hasValue: Boolean
@@ -17,11 +17,11 @@ internal class DefaultKeyValueStoreIndex(
     override val formatted: String
         get() = "${entries.size} entries"
 
-    override fun asValueStore(): ValueStoreIndex {
+    override fun asValueStore(): StoredAddressIndex {
         throw IllegalArgumentException("Cannot open key-value store '$name' as a value store.")
     }
 
-    override fun asKeyValueStore(): KeyValueStoreIndex {
+    override fun asKeyValueStore(): StoredAddressMapIndex {
         return this
     }
 

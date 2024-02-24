@@ -3,10 +3,10 @@
 package net.rubygrapefruit.store
 
 internal class DefaultStoredBlock(
-    private val name: String,
-    private val storeId: StoreId,
+    override val name: String,
+    override val storeId: StoreId,
     private val changeLog: ChangeLog,
-    override val data: DataFile
+    override var data: DataFile
 ) : StoredBlockIndex, ContentVisitor.ValueInfo {
     private var block: Block? = null
 
@@ -55,5 +55,14 @@ internal class DefaultStoredBlock(
 
     override fun doSet(block: Block) {
         this.block = block
+    }
+
+    override fun replay(data: DataFile) {
+        val current = block
+        if (current != null) {
+            val copy = data.copyFrom(this.data, current)
+            set(copy)
+        }
+        this.data = data
     }
 }

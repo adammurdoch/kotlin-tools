@@ -25,7 +25,8 @@ class Store private constructor(
 ) : AutoCloseable {
     private val codec = SimpleCodec()
     private val metadata = MetadataFile(metadataFile, codec)
-    private val index = Index(directory, metadata, codec, maxChanges)
+    private val fileManager = FileManager(directory, codec)
+    private val index = Index(fileManager, metadata, maxChanges)
 
     companion object {
         /**
@@ -85,5 +86,6 @@ class Store private constructor(
 
     override fun close() {
         index.close()
+        fileManager.close()
     }
 }

@@ -2,8 +2,10 @@
 
 - Periodically compact index
 - Periodically compact data file
+- Don't create a new buffer for each block copied during compaction
 - Buffered writes
-- Don't keep checking the current position when reading index changes from file 
+- Don't keep checking the current position when reading index changes from file
+  - Use a counter for the expected number of changes
 - Reuse encoder and decoder instances
 - Cache the key -> encoded key mapping in memory for key-value store
 - Use the key hash in key-value store index
@@ -14,7 +16,7 @@
 - Tests verify file contents
 - Test app dumps store contents
   - Value size
-- Protect from partially written index file
+- Protect from partially written files
 - Test app benchmarks read and write - one value, many values, multiple threads
 - Multi-thread safety: threads that read/write separate values, threads read/write same values
   - Prevent concurrent updates of index

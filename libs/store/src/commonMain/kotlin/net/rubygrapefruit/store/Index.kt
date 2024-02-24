@@ -2,22 +2,19 @@
 
 package net.rubygrapefruit.store
 
-import net.rubygrapefruit.file.Directory
-import net.rubygrapefruit.io.codec.SimpleCodec
-
 internal class Index(
-    store: Directory,
-    metadataFile: MetadataFile,
-    codec: SimpleCodec,
-    maxChanges: Int
+    private val fileManager: FileManager,
+    private val metadataFile: MetadataFile,
+    private val maxChanges: Int
 ) : AutoCloseable {
-    private val log = LogFile(store.file("log_${metadataFile.currentGeneration}.bin"), codec)
-    private val data = DataFile(store.file("data_${metadataFile.currentGeneration}.bin"), codec)
+    private var log = fileManager.logFile(metadataFile.currentGeneration)
+    private var data = fileManager.dataFile(metadataFile.currentGeneration)
     private val changeLog = object : ChangeLog {
         override fun append(change: StoreChange) {
             doAppend(change)
         }
     }
+    private var compacting = false
     private val entries: MutableMap<String, StoreIndex>
     private var changes: Int
 
@@ -62,8 +59,31 @@ internal class Index(
     }
 
     private fun doAppend(change: StoreChange) {
-        changes++
-        log.append(change)
+        if (changes < maxChanges || compacting) {
+            println("-> APPEND $change, CHANGES = $changes")
+            changes++
+            log.append(change)
+        } else {
+            println("-> APPEND $change, COMPACTING")
+            compacting = true
+            fileManager.discard(log)
+            val oldData = data
+            val generation = metadataFile.currentGeneration + 1
+            log = fileManager.logFile(generation)
+            data = fileManager.dataFile(generation)
+            changes = 0
+            for (index in entries.values) {
+                when (index) {
+                    is StoredBlockIndex -> doAppend(NewValueStore(index.storeId, index.name))
+                    is StoredBlockMapIndex -> doAppend(NewKeyValueStore(index.storeId, index.name))
+                }
+                index.replay(data)
+            }
+            metadataFile.updateGeneration(generation)
+            fileManager.discard(oldData)
+            compacting = false
+            println("-> FINISH COMPACTING")
+        }
     }
 
     private fun readIndex(): InitialContent {

@@ -5,15 +5,15 @@ import net.rubygrapefruit.io.codec.Encoder
 
 internal sealed class StoreChange
 
-internal class NewValueStore(val store: StoreId, val name: String) : StoreChange()
-internal class NewKeyValueStore(val store: StoreId, val name: String) : StoreChange()
+internal data class NewValueStore(val store: StoreId, val name: String) : StoreChange()
+internal data class NewKeyValueStore(val store: StoreId, val name: String) : StoreChange()
 
-internal class DiscardStore(val store: StoreId) : StoreChange()
+internal data class DiscardStore(val store: StoreId) : StoreChange()
 
-internal class SetValue(val store: StoreId, val value: Block) : StoreChange()
+internal data class SetValue(val store: StoreId, val value: Block) : StoreChange()
 
-internal class SetEntry(val store: StoreId, val key: String, val value: Block) : StoreChange()
-internal class RemoveEntry(val store: StoreId, val key: String) : StoreChange()
+internal data class SetEntry(val store: StoreId, val key: String, val value: Block) : StoreChange()
+internal data class RemoveEntry(val store: StoreId, val key: String) : StoreChange()
 
 private fun Encoder.storeId(store: StoreId) {
     int(store.id)

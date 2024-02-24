@@ -1,6 +1,10 @@
 package net.rubygrapefruit.store
 
 internal sealed interface StoreIndex {
+    val name: String
+
+    val storeId: StoreId
+
     val hasValue: Boolean
 
     val visitorInfo: ContentVisitor.ValueInfo
@@ -10,6 +14,8 @@ internal sealed interface StoreIndex {
     fun asValueStore(): StoredBlockIndex
 
     fun asKeyValueStore(): StoredBlockMapIndex
+
+    fun replay(data: DataFile)
 }
 
 internal interface StoredBlockIndex : StoredBlock, StoreIndex {

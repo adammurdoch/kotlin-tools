@@ -1,10 +1,10 @@
 package net.rubygrapefruit.store
 
 internal class DefaultStoredBlockMap(
-    private val name: String,
-    private val storeId: StoreId,
+    override val name: String,
+    override val storeId: StoreId,
     private val changeLog: ChangeLog,
-    override val data: DataFile,
+    override var data: DataFile,
 ) : StoredBlockMapIndex, ContentVisitor.ValueInfo {
     private val entries = mutableMapOf<String, Block>()
 
@@ -54,5 +54,15 @@ internal class DefaultStoredBlockMap(
 
     override fun doRemove(key: String) {
         entries.remove(key)
+    }
+
+    override fun replay(data: DataFile) {
+        val oldEntries = LinkedHashMap(entries)
+        for (entry in oldEntries) {
+            val newBlock = data.copyFrom(this.data, entry.value)
+            println("-> COPY ${entry.key} BLOCK ${entry.value} TO $newBlock")
+            set(entry.key, newBlock)
+        }
+        this.data = data
     }
 }

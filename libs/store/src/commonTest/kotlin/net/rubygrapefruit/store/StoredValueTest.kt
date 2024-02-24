@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalStdlibApi::class)
+
 package net.rubygrapefruit.store
 
 import kotlin.test.Test
@@ -276,25 +278,45 @@ class StoredValueTest : AbstractStoreTest() {
             value.set("initial value")
         }
 
-        val count = 10
-        withStore { store ->
+        Store.open(testStore, maxChanges = 5).use { store ->
             assertEquals(listOf("value"), store.values())
             assertEquals(2, store.indexChanges())
 
             val value = store.value<String>("value")
 
-            for (i in 1..count) {
+            for (i in 1..3) {
                 value.set("value $i")
                 assertEquals(i + 2, store.indexChanges())
+            }
+
+            assertEquals(listOf("value"), store.values())
+            assertEquals(5, store.indexChanges())
+
+            value.set("value 4")
+
+            assertEquals(listOf("value"), store.values())
+            assertEquals(2, store.indexChanges())
+
+            for (i in 5..7) {
+                value.set("value $i")
+                assertEquals(i - 2, store.indexChanges())
+            }
+
+            assertEquals(listOf("value"), store.values())
+            assertEquals(5, store.indexChanges())
+
+            for (i in 8..10) {
+                value.set("value $i")
+                assertEquals(i - 6, store.indexChanges())
             }
         }
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(count + 2, store.indexChanges())
+            assertEquals(4, store.indexChanges())
 
             val value = store.value<String>("value")
-            assertEquals("value $count", value.get())
+            assertEquals("value 10", value.get())
         }
     }
 

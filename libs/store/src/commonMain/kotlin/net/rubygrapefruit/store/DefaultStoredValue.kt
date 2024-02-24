@@ -5,7 +5,6 @@ import kotlinx.serialization.KSerializer
 internal class DefaultStoredValue<T>(
     name: String,
     index: Index,
-    private val data: DataFile,
     private val serializer: KSerializer<T>
 ) : StoredValue<T> {
     private val index = index.value(name)
@@ -15,7 +14,7 @@ internal class DefaultStoredValue<T>(
         return if (address == null) {
             null
         } else {
-            data.read(address, serializer)
+            index.data.read(address, serializer)
         }
     }
 
@@ -24,7 +23,7 @@ internal class DefaultStoredValue<T>(
     }
 
     override fun set(value: T) {
-        val address = data.append(value, serializer)
+        val address = index.data.append(value, serializer)
         index.set(address)
     }
 }

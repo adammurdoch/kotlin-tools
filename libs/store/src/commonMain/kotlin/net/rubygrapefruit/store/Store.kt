@@ -21,17 +21,17 @@ import net.rubygrapefruit.io.codec.SimpleCodec
 class Store private constructor(
     directory: Directory,
     metadataFile: RegularFile,
+    maxChanges: Int,
 ) : AutoCloseable {
     private val codec = SimpleCodec()
     private val metadata = MetadataFile(metadataFile, codec)
-    private val index = Index(directory.file("log_${metadata.currentGeneration}.bin"), codec)
-    private val data = DataFile(directory.file("data_${metadata.currentGeneration}.bin"), codec)
+    private val index = Index(directory, metadata, codec, maxChanges)
 
     companion object {
         /**
          * Opens the store in the given directory.
          */
-        fun open(directory: Directory, discard: Boolean = false): Store {
+        fun open(directory: Directory, discard: Boolean = false, maxChanges: Int = 50000): Store {
             directory.createDirectories()
             val metadata = directory.file("store.bin")
             if (discard) {
@@ -44,7 +44,7 @@ class Store private constructor(
             } else if (directory.listEntries().get().isNotEmpty() && !metadata.metadata().regularFile) {
                 unrecognizedFormat(directory)
             }
-            return Store(directory, metadata)
+            return Store(directory, metadata, maxChanges)
         }
     }
 
@@ -52,7 +52,7 @@ class Store private constructor(
      * Opens the [StoredValue] with the given name and type, creating it if it does not exist.
      */
     fun <T : Any> value(name: String, serializer: KSerializer<T>): StoredValue<T> {
-        return DefaultStoredValue(name, index, data, serializer)
+        return DefaultStoredValue(name, index, serializer)
     }
 
     /**
@@ -66,7 +66,7 @@ class Store private constructor(
      * Opens the [StoredMap] with the given name and types, creating it if it does not exist.
      */
     fun <K : Any, V : Any> map(name: String, keySerializer: KSerializer<K>, valueSerializer: KSerializer<V>): StoredMap<K, V> {
-        return DefaultStoredMap(name, index, data, keySerializer, valueSerializer)
+        return DefaultStoredMap(name, index, keySerializer, valueSerializer)
     }
 
     /**
@@ -85,6 +85,5 @@ class Store private constructor(
 
     override fun close() {
         index.close()
-        data.close()
     }
 }

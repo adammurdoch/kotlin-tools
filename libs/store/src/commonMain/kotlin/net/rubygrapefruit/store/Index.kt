@@ -2,14 +2,17 @@
 
 package net.rubygrapefruit.store
 
-import net.rubygrapefruit.file.RegularFile
+import net.rubygrapefruit.file.Directory
 import net.rubygrapefruit.io.codec.SimpleCodec
 
 internal class Index(
-    indexFile: RegularFile,
-    codec: SimpleCodec
+    store: Directory,
+    metadataFile: MetadataFile,
+    codec: SimpleCodec,
+    maxChanges: Int
 ) : AutoCloseable {
-    private val index = IndexFile(indexFile, codec)
+    private val index = IndexFile(store.file("log_${metadataFile.currentGeneration}.bin"), codec)
+    private val data = DataFile(store.file("data_${metadataFile.currentGeneration}.bin"), codec)
     private val entries: MutableMap<String, IndexEntry>
     private var changes: Int
 
@@ -21,13 +24,14 @@ internal class Index(
 
     override fun close() {
         index.close()
+        data.close()
     }
 
     fun value(name: String): ValueStoreIndex {
         val index = entries.getOrPut(name) {
             val storeId = StoreId(entries.size)
             append(NewValueStore(storeId, name))
-            DefaultValueStoreIndex(name, storeId)
+            DefaultValueStoreIndex(name, storeId, data)
         }
         return index.asValueStore()
     }
@@ -36,7 +40,7 @@ internal class Index(
         val index = entries.getOrPut(name) {
             val storeId = StoreId(entries.size)
             append(NewKeyValueStore(storeId, name))
-            DefaultKeyValueStoreIndex(name, storeId)
+            DefaultKeyValueStoreIndex(name, storeId, data)
         }
         return index.asKeyValueStore()
     }
@@ -66,13 +70,13 @@ internal class Index(
             updates++
             when (change) {
                 is NewValueStore -> {
-                    val index = DefaultValueStoreIndex(change.name, change.store)
+                    val index = DefaultValueStoreIndex(change.name, change.store, data)
                     byId[change.store] = index
                     entries[change.name] = index
                 }
 
                 is NewKeyValueStore -> {
-                    val index = DefaultKeyValueStoreIndex(change.name, change.store)
+                    val index = DefaultKeyValueStoreIndex(change.name, change.store, data)
                     byId[change.store] = index
                     entries[change.name] = index
                 }
@@ -114,6 +118,7 @@ internal class Index(
     private inner class DefaultValueStoreIndex(
         private val name: String,
         private val storeId: StoreId,
+        override val data: DataFile
     ) : IndexEntry(), ValueStoreIndex {
         private var address: Address? = null
 
@@ -164,6 +169,7 @@ internal class Index(
     private inner class DefaultKeyValueStoreIndex(
         private val name: String,
         private val storeId: StoreId,
+        override val data: DataFile
     ) : IndexEntry(), KeyValueStoreIndex {
         private val entries = mutableMapOf<String, Address>()
 

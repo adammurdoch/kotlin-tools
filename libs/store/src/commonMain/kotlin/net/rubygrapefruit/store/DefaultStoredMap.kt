@@ -6,7 +6,6 @@ import kotlinx.serialization.json.Json
 internal class DefaultStoredMap<K, V>(
     name: String,
     index: Index,
-    private val data: DataFile,
     private val keySerializer: KSerializer<K>,
     private val valueSerializer: KSerializer<V>
 ) : StoredMap<K, V> {
@@ -19,12 +18,12 @@ internal class DefaultStoredMap<K, V>(
         return if (address == null) {
             null
         } else {
-            data.read(address, valueSerializer)
+            index.data.read(address, valueSerializer)
         }
     }
 
     override fun set(key: K, value: V) {
-        val address = data.append(value, valueSerializer)
+        val address = index.data.append(value, valueSerializer)
         val encodedKey = Json.encodeToString(keySerializer, key)
         index.set(encodedKey, address)
         entries[key] = address
@@ -44,7 +43,7 @@ internal class DefaultStoredMap<K, V>(
     override fun entries(): List<Pair<K, V>> {
         val result = ArrayList<Pair<K, V>>(entries.size)
         for (entry in entries) {
-            result.add(Pair(entry.key, data.read(entry.value, valueSerializer)))
+            result.add(Pair(entry.key, index.data.read(entry.value, valueSerializer)))
         }
         return result
     }

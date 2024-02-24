@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalStdlibApi::class)
+
 package net.rubygrapefruit.store
 
 import kotlin.test.Test
@@ -5,7 +7,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class KeyStoredValueTest : AbstractStoreTest() {
+class StoredMapTest : AbstractStoreTest() {
     @Test
     fun `can read from empty store`() {
         withStore { store ->
@@ -201,7 +203,7 @@ class KeyStoredValueTest : AbstractStoreTest() {
         }
 
         val count = 10
-        withStore { store ->
+        Store.open(testStore, maxChanges = 5).use { store ->
             assertEquals(listOf("value"), store.values())
             assertEquals(3, store.indexChanges())
 

@@ -7,17 +7,17 @@ internal sealed interface StoreIndex {
 
     fun doDiscard()
 
-    fun asValueStore(): StoredAddressIndex
+    fun asValueStore(): StoredBlockIndex
 
-    fun asKeyValueStore(): StoredAddressMapIndex
+    fun asKeyValueStore(): StoredBlockMapIndex
 }
 
-internal interface StoredAddressIndex : StoredAddress, StoreIndex {
-    fun doSet(address: Address)
+internal interface StoredBlockIndex : StoredBlock, StoreIndex {
+    fun doSet(block: Block)
 }
 
-internal interface StoredAddressMapIndex : StoredAddressMap, StoreIndex {
-    fun doSet(key: String, address: Address)
+internal interface StoredBlockMapIndex : StoredBlockMap, StoreIndex {
+    fun doSet(key: String, block: Block)
     fun doRemove(key: String)
 }
 

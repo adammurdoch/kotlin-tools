@@ -10,17 +10,18 @@ internal class NewKeyValueStore(val store: StoreId, val name: String) : StoreCha
 
 internal class DiscardStore(val store: StoreId) : StoreChange()
 
-internal class SetValue(val store: StoreId, val address: Address) : StoreChange()
+internal class SetValue(val store: StoreId, val value: Block) : StoreChange()
 
-internal class SetEntry(val store: StoreId, val key: String, val address: Address) : StoreChange()
+internal class SetEntry(val store: StoreId, val key: String, val value: Block) : StoreChange()
 internal class RemoveEntry(val store: StoreId, val key: String) : StoreChange()
 
 private fun Encoder.storeId(store: StoreId) {
     int(store.id)
 }
 
-private fun Encoder.address(address: Address) {
-    long(address.offset)
+private fun Encoder.block(block: Block) {
+    long(block.address.offset)
+    int(block.size.value)
 }
 
 private val newValueStoreTag = 1u.toUByte()
@@ -52,14 +53,14 @@ internal fun Encoder.encode(change: StoreChange) {
         is SetValue -> {
             ubyte(setValueTag)
             storeId(change.store)
-            address(change.address)
+            block(change.value)
         }
 
         is SetEntry -> {
             ubyte(setEntryTag)
             storeId(change.store)
             string(change.key)
-            address(change.address)
+            block(change.value)
         }
 
         is RemoveEntry -> {
@@ -74,8 +75,8 @@ private fun Decoder.storeId(): StoreId {
     return StoreId(int())
 }
 
-private fun Decoder.address(): Address {
-    return Address(long())
+private fun Decoder.block(): Block {
+    return Block(Address(long()), Size(int()))
 }
 
 internal fun Decoder.decode(): StoreChange {
@@ -100,15 +101,15 @@ internal fun Decoder.decode(): StoreChange {
 
         setValueTag -> {
             val storeId = storeId()
-            val address = address()
-            SetValue(storeId, address)
+            val value = block()
+            SetValue(storeId, value)
         }
 
         setEntryTag -> {
             val storeId = storeId()
             val key = string()
-            val address = address()
-            SetEntry(storeId, key, address)
+            val value = block()
+            SetEntry(storeId, key, value)
         }
 
         removeEntryTag -> {

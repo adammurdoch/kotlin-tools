@@ -26,20 +26,21 @@ internal class DataFile(
         writeContent.close()
     }
 
-    fun <T> read(address: Address, serializer: DeserializationStrategy<T>): T {
+    fun <T> read(block: Block, serializer: DeserializationStrategy<T>): T {
         return readContent.using { content ->
-            content.seek(address.offset)
+            content.seek(block.address.offset)
             val decoder = codec.decoder(content.readStream)
             Json.decodeFromString(serializer, decoder.string())
         }
     }
 
-    fun <T> append(value: T, serializer: SerializationStrategy<T>): Address {
+    fun <T> append(value: T, serializer: SerializationStrategy<T>): Block {
         return writeContent.using { content ->
             val pos = content.currentPosition
             val encoder = codec.encoder(content.writeStream)
             encoder.string(Json.encodeToString(serializer, value))
-            Address(pos)
+            val size = content.currentPosition - pos
+            Block(Address(pos), Size(size))
         }
     }
 }

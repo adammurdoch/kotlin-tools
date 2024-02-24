@@ -2,45 +2,46 @@
 
 package net.rubygrapefruit.store
 
-internal class DefaultStoredAddress(
+internal class DefaultStoredBlock(
     private val name: String,
     private val storeId: StoreId,
     private val changeLog: ChangeLog,
     override val data: DataFile
-) : StoredAddressIndex, ContentVisitor.ValueInfo {
-    private var address: Address? = null
+) : StoredBlockIndex, ContentVisitor.ValueInfo {
+    private var block: Block? = null
 
     override val hasValue: Boolean
-        get() = address != null
+        get() = block != null
 
     override val visitorInfo: ContentVisitor.ValueInfo
         get() = this
 
     override val formatted: String
         get() {
-            val current = address
+            val current = block
             return if (current == null) {
                 "no value"
             } else {
-                "0x" + current.offset.toHexString(HexFormat.UpperCase)
+                val address = current.address.offset.toHexString(HexFormat.UpperCase)
+                "0x$address (${current.size.value} bytes)"
             }
         }
 
-    override fun asValueStore(): StoredAddressIndex {
+    override fun asValueStore(): StoredBlockIndex {
         return this
     }
 
-    override fun asKeyValueStore(): StoredAddressMapIndex {
+    override fun asKeyValueStore(): StoredBlockMapIndex {
         throw IllegalArgumentException("Cannot open stored value '$name' as a stored map.")
     }
 
-    override fun get(): Address? {
-        return address
+    override fun get(): Block? {
+        return block
     }
 
-    override fun set(address: Address) {
-        doSet(address)
-        changeLog.append(SetValue(storeId, address))
+    override fun set(block: Block) {
+        doSet(block)
+        changeLog.append(SetValue(storeId, block))
     }
 
     override fun discard() {
@@ -49,10 +50,10 @@ internal class DefaultStoredAddress(
     }
 
     override fun doDiscard() {
-        this.address = null
+        this.block = null
     }
 
-    override fun doSet(address: Address) {
-        this.address = address
+    override fun doSet(block: Block) {
+        this.block = block
     }
 }

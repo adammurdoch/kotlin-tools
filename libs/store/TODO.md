@@ -26,6 +26,7 @@
 - Optimistic concurrent updates
 - Encoding uses type tags?
 - Encoding uses variable length encoding for string length
+- Use variable length encoding for block size, store id, etc
 - Use a more compact encoding than JSON, and stream to file rather than collecting in a string
 - Async write to file
 - Option for storing secrets, eg set permissions, encode

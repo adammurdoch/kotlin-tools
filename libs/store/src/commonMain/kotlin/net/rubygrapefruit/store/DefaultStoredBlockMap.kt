@@ -1,12 +1,12 @@
 package net.rubygrapefruit.store
 
-internal class DefaultStoredAddressMap(
+internal class DefaultStoredBlockMap(
     private val name: String,
     private val storeId: StoreId,
     private val changeLog: ChangeLog,
     override val data: DataFile,
-) : StoredAddressMapIndex, ContentVisitor.ValueInfo {
-    private val entries = mutableMapOf<String, Address>()
+) : StoredBlockMapIndex, ContentVisitor.ValueInfo {
+    private val entries = mutableMapOf<String, Block>()
 
     override val hasValue: Boolean
         get() = entries.isNotEmpty()
@@ -17,19 +17,19 @@ internal class DefaultStoredAddressMap(
     override val formatted: String
         get() = "${entries.size} entries"
 
-    override fun asValueStore(): StoredAddressIndex {
+    override fun asValueStore(): StoredBlockIndex {
         throw IllegalArgumentException("Cannot open stored map '$name' as a stored value.")
     }
 
-    override fun asKeyValueStore(): StoredAddressMapIndex {
+    override fun asKeyValueStore(): StoredBlockMapIndex {
         return this
     }
 
-    override fun get(): Map<String, Address> {
+    override fun get(): Map<String, Block> {
         return entries
     }
 
-    override fun set(key: String, value: Address) {
+    override fun set(key: String, value: Block) {
         doSet(key, value)
         changeLog.append(SetEntry(storeId, key, value))
     }
@@ -48,8 +48,8 @@ internal class DefaultStoredAddressMap(
         entries.clear()
     }
 
-    override fun doSet(key: String, address: Address) {
-        entries[key] = address
+    override fun doSet(key: String, block: Block) {
+        entries[key] = block
     }
 
     override fun doRemove(key: String) {

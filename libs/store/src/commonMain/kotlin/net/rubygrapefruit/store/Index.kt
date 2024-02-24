@@ -32,20 +32,20 @@ internal class Index(
         data.close()
     }
 
-    fun value(name: String): StoredAddress {
+    fun value(name: String): StoredBlock {
         val index = entries.getOrPut(name) {
             val storeId = StoreId(entries.size)
             doAppend(NewValueStore(storeId, name))
-            DefaultStoredAddress(name, storeId, changeLog, data)
+            DefaultStoredBlock(name, storeId, changeLog, data)
         }
         return index.asValueStore()
     }
 
-    fun map(name: String): StoredAddressMap {
+    fun map(name: String): StoredBlockMap {
         val index = entries.getOrPut(name) {
             val storeId = StoreId(entries.size)
             doAppend(NewKeyValueStore(storeId, name))
-            DefaultStoredAddressMap(name, storeId, changeLog, data)
+            DefaultStoredBlockMap(name, storeId, changeLog, data)
         }
         return index.asKeyValueStore()
     }
@@ -75,13 +75,13 @@ internal class Index(
             updates++
             when (change) {
                 is NewValueStore -> {
-                    val index = DefaultStoredAddress(change.name, change.store, changeLog, data)
+                    val index = DefaultStoredBlock(change.name, change.store, changeLog, data)
                     byId[change.store] = index
                     entries[change.name] = index
                 }
 
                 is NewKeyValueStore -> {
-                    val index = DefaultStoredAddressMap(change.name, change.store, changeLog, data)
+                    val index = DefaultStoredBlockMap(change.name, change.store, changeLog, data)
                     byId[change.store] = index
                     entries[change.name] = index
                 }
@@ -93,12 +93,12 @@ internal class Index(
 
                 is SetValue -> {
                     val index = byId.getValue(change.store)
-                    index.asValueStore().doSet(change.address)
+                    index.asValueStore().doSet(change.value)
                 }
 
                 is SetEntry -> {
                     val index = byId.getValue(change.store)
-                    index.asKeyValueStore().doSet(change.key, change.address)
+                    index.asKeyValueStore().doSet(change.key, change.value)
                 }
 
                 is RemoveEntry -> {

@@ -19,19 +19,19 @@ class StoredMapTest : AbstractStoreTest() {
 
             // Not visible until it has been written to
             assertTrue(store.values().isEmpty())
-            assertEquals(1, store.logEntries())
+            assertEquals(0, store.logEntries())
         }
 
         withStore { store ->
             assertTrue(store.values().isEmpty())
-            assertEquals(1, store.logEntries())
+            assertEquals(0, store.logEntries())
 
             val value = store.map<String, Int>("value")
             assertNull(value.get("a"))
             assertTrue(value.entries().isEmpty())
 
             assertTrue(store.values().isEmpty())
-            assertEquals(1, store.logEntries())
+            assertEquals(0, store.logEntries())
         }
     }
 
@@ -291,6 +291,67 @@ class StoredMapTest : AbstractStoreTest() {
     }
 
     @Test
+    fun `can remove an entry that does not exist`() {
+        withStore { store ->
+            val value = store.map<String, Int>("value")
+            value.set("a", 1)
+            value.set("b", 2)
+        }
+
+        withStore { store ->
+            val value = store.map<String, Int>("value")
+            assertEquals(3, store.logEntries())
+
+            value.remove("c")
+            assertNull(value.get("c"))
+            assertEquals(1, value.get("a"))
+            assertEquals(2, value.get("b"))
+            assertEquals(listOf("a" to 1, "b" to 2), value.entries())
+
+            assertEquals(listOf("value"), store.values())
+            assertEquals(4, store.logEntries())
+        }
+
+        withStore { store ->
+            assertEquals(listOf("value"), store.values())
+            assertEquals(4, store.logEntries())
+
+            val value = store.map<String, Int>("value")
+            assertEquals(2, value.entries().size)
+        }
+    }
+
+    @Test
+    fun `can remove an entry from an empty map`() {
+        withStore { store ->
+            store.map<String, Int>("value")
+        }
+
+        withStore { store ->
+            val value = store.map<String, Int>("value")
+            assertEquals(0, store.logEntries())
+
+            value.remove("c")
+            assertNull(value.get("c"))
+            assertTrue(value.entries().isEmpty())
+
+            assertTrue(store.values().isEmpty())
+            assertEquals(0, store.logEntries())
+        }
+
+        withStore { store ->
+            assertTrue(store.values().isEmpty())
+            assertEquals(0, store.logEntries())
+
+            val value = store.map<String, Int>("value")
+            assertTrue(value.entries().isEmpty())
+
+            assertTrue(store.values().isEmpty())
+            assertEquals(0, store.logEntries())
+        }
+    }
+
+    @Test
     fun `can remove an entry`() {
         withStore { store ->
             val value = store.map<String, Int>("value")
@@ -417,6 +478,29 @@ class StoredMapTest : AbstractStoreTest() {
             assertNull(value.get("a"))
             assertTrue(value.entries().isEmpty())
             assertTrue(store.values().isEmpty())
+        }
+    }
+
+    @Test
+    fun `can discard empty map`() {
+        withStore { store ->
+            val value = store.map<String, Int>("value")
+            value.discard()
+            assertTrue(value.entries().isEmpty())
+
+            assertTrue(store.values().isEmpty())
+            assertEquals(0, store.logEntries())
+        }
+
+        withStore { store ->
+            assertTrue(store.values().isEmpty())
+            assertEquals(0, store.logEntries())
+
+            val value = store.map<String, Int>("value")
+            assertTrue(value.entries().isEmpty())
+
+            assertTrue(store.values().isEmpty())
+            assertEquals(0, store.logEntries())
         }
     }
 

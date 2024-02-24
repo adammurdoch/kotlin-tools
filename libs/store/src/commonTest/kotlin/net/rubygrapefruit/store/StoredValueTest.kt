@@ -19,18 +19,18 @@ class StoredValueTest : AbstractStoreTest() {
 
             // Not visible until it has been written to
             assertTrue(store.values().isEmpty())
-            assertEquals(1, store.logEntries())
+            assertEquals(0, store.logEntries())
         }
 
         withStore { store ->
             assertTrue(store.values().isEmpty())
-            assertEquals(1, store.logEntries())
+            assertEquals(0, store.logEntries())
 
             val value = store.value<String>("value")
             assertNull(value.get())
 
             assertTrue(store.values().isEmpty())
-            assertEquals(1, store.logEntries())
+            assertEquals(0, store.logEntries())
         }
     }
 
@@ -105,6 +105,29 @@ class StoredValueTest : AbstractStoreTest() {
 
             assertTrue(store.values().isEmpty())
             assertEquals(3, store.logEntries())
+        }
+    }
+
+    @Test
+    fun `can discard value when no value`() {
+        withStore { store ->
+            val value = store.value<String>("empty")
+            value.discard()
+
+            assertNull(value.get())
+
+            assertTrue(store.values().isEmpty())
+            assertEquals(0, store.logEntries())
+        }
+        withStore { store ->
+            assertTrue(store.values().isEmpty())
+            assertEquals(0, store.logEntries())
+
+            val value = store.value<String>("empty")
+            assertNull(value.get())
+
+            assertTrue(store.values().isEmpty())
+            assertEquals(0, store.logEntries())
         }
     }
 

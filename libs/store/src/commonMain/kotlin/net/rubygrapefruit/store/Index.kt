@@ -9,11 +9,7 @@ internal class Index(
 ) : AutoCloseable {
     private var log = fileManager.logFile(metadataFile.currentGeneration)
     private var data = fileManager.dataFile(metadataFile.currentGeneration)
-    private val changeLog = object : ChangeLog {
-        override fun append(change: StoreChange) {
-            doAppend(change)
-        }
-    }
+    private var changeLog = DefaultChangeLog()
     private var compacting = false
     private val entries: MutableMap<String, StoreIndex>
     private var changes: Int
@@ -32,7 +28,6 @@ internal class Index(
     fun value(name: String): StoredBlock {
         val index = entries.getOrPut(name) {
             val storeId = StoreId(entries.size)
-            doAppend(NewValueStore(storeId, name))
             DefaultStoredBlock(name, storeId, changeLog, data)
         }
         return index.asValueStore()
@@ -41,7 +36,6 @@ internal class Index(
     fun map(name: String): StoredBlockMap {
         val index = entries.getOrPut(name) {
             val storeId = StoreId(entries.size)
-            doAppend(NewKeyValueStore(storeId, name))
             DefaultStoredBlockMap(name, storeId, changeLog, data)
         }
         return index.asKeyValueStore()
@@ -71,11 +65,7 @@ internal class Index(
             data = fileManager.dataFile(generation)
             changes = 0
             for (index in entries.values) {
-                when (index) {
-                    is StoredBlockIndex -> doAppend(NewValueStore(index.storeId, index.name))
-                    is StoredBlockMapIndex -> doAppend(NewKeyValueStore(index.storeId, index.name))
-                }
-                index.replay(data)
+                index.replay(changeLog, data)
             }
             metadataFile.updateGeneration(generation)
             fileManager.closeAndDelete(oldLog)
@@ -93,13 +83,13 @@ internal class Index(
             updates++
             when (change) {
                 is NewValueStore -> {
-                    val index = DefaultStoredBlock(change.name, change.store, changeLog, data)
+                    val index = DefaultStoredBlock(change.name, change.store, changeLog, data, true)
                     byId[change.store] = index
                     entries[change.name] = index
                 }
 
                 is NewKeyValueStore -> {
-                    val index = DefaultStoredBlockMap(change.name, change.store, changeLog, data)
+                    val index = DefaultStoredBlockMap(change.name, change.store, changeLog, data, true)
                     byId[change.store] = index
                     entries[change.name] = index
                 }
@@ -126,6 +116,16 @@ internal class Index(
             }
         }
         return InitialContent(updates, entries)
+    }
+
+    private inner class DefaultChangeLog : ChangeLog {
+        override fun batch(action: (ChangeLog) -> Unit) {
+            action(this)
+        }
+
+        override fun append(change: StoreChange) {
+            doAppend(change)
+        }
     }
 
     private class InitialContent(

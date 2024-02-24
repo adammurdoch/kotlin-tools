@@ -15,7 +15,7 @@ internal sealed interface StoreIndex {
 
     fun asKeyValueStore(): StoredBlockMapIndex
 
-    fun replay(data: DataFile)
+    fun replay(log: ChangeLog, data: DataFile)
 }
 
 internal interface StoredBlockIndex : StoredBlock, StoreIndex {
@@ -28,5 +28,7 @@ internal interface StoredBlockMapIndex : StoredBlockMap, StoreIndex {
 }
 
 internal interface ChangeLog {
+    fun batch(action: (ChangeLog) -> Unit)
+
     fun append(change: StoreChange)
 }

@@ -3,8 +3,9 @@ package net.rubygrapefruit.store
 internal class DefaultStoredBlockMap(
     override val name: String,
     override val storeId: StoreId,
-    private val changeLog: ChangeLog,
+    private var log: ChangeLog,
     override var data: DataFile,
+    private var registered: Boolean = false
 ) : StoredBlockMapIndex, ContentVisitor.ValueInfo {
     private val entries = mutableMapOf<String, Block>()
 
@@ -31,17 +32,27 @@ internal class DefaultStoredBlockMap(
 
     override fun set(key: String, value: Block) {
         doSet(key, value)
-        changeLog.append(SetEntry(storeId, key, value))
+        log.batch {
+            if (!registered) {
+                it.append(NewKeyValueStore(storeId, name))
+                registered = true
+            }
+            it.append(SetEntry(storeId, key, value))
+        }
     }
 
     override fun remove(key: String) {
         doRemove(key)
-        changeLog.append(RemoveEntry(storeId, key))
+        if (registered) {
+            log.append(RemoveEntry(storeId, key))
+        }
     }
 
     override fun discard() {
         doDiscard()
-        changeLog.append(DiscardStore(storeId))
+        if (registered) {
+            log.append(DiscardStore(storeId))
+        }
     }
 
     override fun doDiscard() {
@@ -56,12 +67,17 @@ internal class DefaultStoredBlockMap(
         entries.remove(key)
     }
 
-    override fun replay(data: DataFile) {
+    override fun replay(log: ChangeLog, data: DataFile) {
         val oldEntries = LinkedHashMap(entries)
-        for (entry in oldEntries) {
-            val newBlock = data.copyFrom(this.data, entry.value)
-            set(entry.key, newBlock)
-        }
+        val oldData = this.data
+        registered = false
+        this.log = log
         this.data = data
+        if (oldEntries.isNotEmpty()) {
+            for (entry in oldEntries) {
+                val newBlock = data.copyFrom(oldData, entry.value)
+                set(entry.key, newBlock)
+            }
+        }
     }
 }

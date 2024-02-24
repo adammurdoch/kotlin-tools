@@ -63,16 +63,16 @@ class StoreTest : AbstractStoreTest() {
             assertEquals(20, store.logEntries())
             assertEquals(1, store.generation())
 
-            store.value<String>("string")
+            store.value<String>("string").set("value")
 
-            assertEquals(10, store.values().size)
-            assertEquals(21, store.logEntries())
+            assertEquals(11, store.values().size)
+            assertEquals(22, store.logEntries())
             assertEquals(2, store.generation())
         }
 
         withStore { store ->
-            assertEquals(10, store.values().size)
-            assertEquals(21, store.logEntries())
+            assertEquals(11, store.values().size)
+            assertEquals(22, store.logEntries())
             assertEquals(2, store.generation())
         }
     }

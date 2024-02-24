@@ -5,8 +5,9 @@ package net.rubygrapefruit.store
 internal class DefaultStoredBlock(
     override val name: String,
     override val storeId: StoreId,
-    private val changeLog: ChangeLog,
-    override var data: DataFile
+    private var log: ChangeLog,
+    override var data: DataFile,
+    private var registered: Boolean = false
 ) : StoredBlockIndex, ContentVisitor.ValueInfo {
     private var block: Block? = null
 
@@ -41,12 +42,20 @@ internal class DefaultStoredBlock(
 
     override fun set(block: Block) {
         doSet(block)
-        changeLog.append(SetValue(storeId, block))
+        log.batch {
+            if (!registered) {
+                it.append(NewValueStore(storeId, name))
+                registered = true
+            }
+            it.append(SetValue(storeId, block))
+        }
     }
 
     override fun discard() {
         doDiscard()
-        changeLog.append(DiscardStore(storeId))
+        if (registered) {
+            log.append(DiscardStore(storeId))
+        }
     }
 
     override fun doDiscard() {
@@ -57,12 +66,15 @@ internal class DefaultStoredBlock(
         this.block = block
     }
 
-    override fun replay(data: DataFile) {
+    override fun replay(log: ChangeLog, data: DataFile) {
         val current = block
+        val oldData = this.data
+        registered = false
+        this.data = data
+        this.log = log
         if (current != null) {
-            val copy = data.copyFrom(this.data, current)
+            val copy = data.copyFrom(oldData, current)
             set(copy)
         }
-        this.data = data
     }
 }

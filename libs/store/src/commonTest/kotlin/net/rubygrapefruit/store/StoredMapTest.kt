@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalStdlibApi::class)
-
 package net.rubygrapefruit.store
 
 import kotlin.test.Test

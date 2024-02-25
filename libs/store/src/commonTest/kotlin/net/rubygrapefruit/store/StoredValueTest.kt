@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalStdlibApi::class)
-
 package net.rubygrapefruit.store
 
 import kotlin.test.Test
@@ -43,7 +41,7 @@ class StoredValueTest : AbstractStoreTest() {
     }
 
     @Test
-    fun `can read then write`() {
+    fun `can read then write value`() {
         withStore { store ->
             val value = store.value<String>("value")
             assertNull(value.get())
@@ -53,22 +51,42 @@ class StoredValueTest : AbstractStoreTest() {
 
             assertEquals(listOf("value"), store.values())
             assertEquals(2, store.changes())
+            assertEquals(2, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
         }
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
             assertEquals(2, store.changes())
+            assertEquals(2, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
 
             val value = store.value<String>("value")
             assertEquals("value 1", value.get())
 
             assertEquals(listOf("value"), store.values())
             assertEquals(2, store.changes())
+            assertEquals(2, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
+        }
+        withCompactedStore { store ->
+            assertEquals(listOf("value"), store.values())
+            assertEquals(2, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(2, store.generation())
+
+            val value = store.value<String>("value")
+            assertEquals("value 1", value.get())
+
+            assertEquals(listOf("value"), store.values())
+            assertEquals(2, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(2, store.generation())
         }
     }
 
     @Test
-    fun `can write then read`() {
+    fun `can write then read value`() {
         withStore { store ->
             val value = store.value<String>("value")
 
@@ -77,22 +95,42 @@ class StoredValueTest : AbstractStoreTest() {
 
             assertEquals(listOf("value"), store.values())
             assertEquals(2, store.changes())
+            assertEquals(2, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
         }
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
             assertEquals(2, store.changes())
+            assertEquals(2, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
 
             val value = store.value<String>("value")
             assertEquals("value 1", value.get())
 
             assertEquals(listOf("value"), store.values())
             assertEquals(2, store.changes())
+            assertEquals(2, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
+        }
+        withCompactedStore { store ->
+            assertEquals(listOf("value"), store.values())
+            assertEquals(2, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(2, store.generation())
+
+            val value = store.value<String>("value")
+            assertEquals("value 1", value.get())
+
+            assertEquals(listOf("value"), store.values())
+            assertEquals(2, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(2, store.generation())
         }
     }
 
     @Test
-    fun `can discard value`() {
+    fun `can write then discard value`() {
         withStore { store ->
             val value = store.value<String>("empty")
             value.set("value 1")
@@ -103,21 +141,42 @@ class StoredValueTest : AbstractStoreTest() {
 
             assertTrue(store.values().isEmpty())
             assertEquals(3, store.changes())
+            assertEquals(3, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
         }
+
         withStore { store ->
             assertTrue(store.values().isEmpty())
             assertEquals(3, store.changes())
+            assertEquals(3, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
 
             val value = store.value<String>("empty")
             assertNull(value.get())
 
             assertTrue(store.values().isEmpty())
             assertEquals(3, store.changes())
+            assertEquals(3, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
+        }
+        withCompactedStore { store ->
+            assertTrue(store.values().isEmpty())
+            assertEquals(0, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(2, store.generation())
+
+            val value = store.value<String>("empty")
+            assertNull(value.get())
+
+            assertTrue(store.values().isEmpty())
+            assertEquals(0, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(2, store.generation())
         }
     }
 
     @Test
-    fun `can discard value when no value`() {
+    fun `can discard value that has not been written`() {
         withStore { store ->
             val value = store.value<String>("empty")
             value.discard()
@@ -126,16 +185,23 @@ class StoredValueTest : AbstractStoreTest() {
 
             assertTrue(store.values().isEmpty())
             assertEquals(0, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
         }
+
         withStore { store ->
             assertTrue(store.values().isEmpty())
             assertEquals(0, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
 
             val value = store.value<String>("empty")
             assertNull(value.get())
 
             assertTrue(store.values().isEmpty())
             assertEquals(0, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
         }
     }
 
@@ -144,6 +210,10 @@ class StoredValueTest : AbstractStoreTest() {
         withStore { store ->
             val value = store.value<String>("value")
             value.set("value 1")
+        }
+
+        withStore { store ->
+            val value = store.value<String>("value")
             assertEquals("value 1", value.get())
 
             value.discard()
@@ -156,13 +226,29 @@ class StoredValueTest : AbstractStoreTest() {
 
             assertEquals(listOf("value"), store.values())
             assertEquals(4, store.changes())
+            assertEquals(4, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
         }
+
         withStore { store ->
             assertEquals(listOf("value"), store.values())
             assertEquals(4, store.changes())
+            assertEquals(4, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
 
             val value = store.value<String>("value")
             assertEquals("value 2", value.get())
+        }
+        withCompactedStore { store ->
+            assertEquals(listOf("value"), store.values())
+            assertEquals(2, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(2, store.generation())
+
+            val value = store.value<String>("value")
+            assertEquals("value 2", value.get())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(2, store.generation())
         }
     }
 
@@ -176,13 +262,14 @@ class StoredValueTest : AbstractStoreTest() {
         withStore { store ->
             val value = store.value<String>("value")
             assertEquals("value 1", value.get())
-            assertEquals(listOf("value"), store.values())
 
             value.discard()
             assertNull(value.get())
 
             assertTrue(store.values().isEmpty())
             assertEquals(3, store.changes())
+            assertEquals(3, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
         }
         withStore { store ->
             val value = store.value<String>("value")
@@ -190,6 +277,8 @@ class StoredValueTest : AbstractStoreTest() {
 
             assertTrue(store.values().isEmpty())
             assertEquals(3, store.changes())
+            assertEquals(3, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
 
             value.set("value 2")
 
@@ -197,10 +286,24 @@ class StoredValueTest : AbstractStoreTest() {
 
             assertEquals(listOf("value"), store.values())
             assertEquals(4, store.changes())
+            assertEquals(4, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
         }
+
         withStore { store ->
             assertEquals(listOf("value"), store.values())
             assertEquals(4, store.changes())
+            assertEquals(4, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
+
+            val value = store.value<String>("value")
+            assertEquals("value 2", value.get())
+        }
+        withCompactedStore { store ->
+            assertEquals(listOf("value"), store.values())
+            assertEquals(2, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(2, store.generation())
 
             val value = store.value<String>("value")
             assertEquals("value 2", value.get())
@@ -217,6 +320,8 @@ class StoredValueTest : AbstractStoreTest() {
         withStore { store ->
             assertEquals(listOf("value"), store.values())
             assertEquals(2, store.changes())
+            assertEquals(2, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
 
             val value = store.value<String>("value")
             assertEquals("value 1", value.get())
@@ -224,10 +329,24 @@ class StoredValueTest : AbstractStoreTest() {
             assertEquals("value 2", value.get())
 
             assertEquals(3, store.changes())
+            assertEquals(3, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
         }
+
         withStore { store ->
             assertEquals(listOf("value"), store.values())
             assertEquals(3, store.changes())
+            assertEquals(3, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
+
+            val value = store.value<String>("value")
+            assertEquals("value 2", value.get())
+        }
+        withCompactedStore { store ->
+            assertEquals(listOf("value"), store.values())
+            assertEquals(2, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(2, store.generation())
 
             val value = store.value<String>("value")
             assertEquals("value 2", value.get())
@@ -252,10 +371,24 @@ class StoredValueTest : AbstractStoreTest() {
             assertEquals("value 3", value.get())
 
             assertEquals(4, store.changes())
+            assertEquals(4, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
         }
+
         withStore { store ->
             assertEquals(listOf("value"), store.values())
             assertEquals(4, store.changes())
+            assertEquals(4, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
+
+            val value = store.value<String>("value")
+            assertEquals("value 3", value.get())
+        }
+        withCompactedStore { store ->
+            assertEquals(listOf("value"), store.values())
+            assertEquals(2, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(2, store.generation())
 
             val value = store.value<String>("value")
             assertEquals("value 3", value.get())
@@ -280,6 +413,8 @@ class StoredValueTest : AbstractStoreTest() {
             assertEquals("value 2", value.get())
 
             assertEquals(3, store.changes())
+            assertEquals(3, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
         }
         withStore { store ->
             assertEquals(listOf("value"), store.values())
@@ -292,10 +427,24 @@ class StoredValueTest : AbstractStoreTest() {
             assertEquals("value 3", value.get())
 
             assertEquals(4, store.changes())
+            assertEquals(4, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
         }
+
         withStore { store ->
             assertEquals(listOf("value"), store.values())
             assertEquals(4, store.changes())
+            assertEquals(4, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
+
+            val value = store.value<String>("value")
+            assertEquals("value 3", value.get())
+        }
+        withCompactedStore { store ->
+            assertEquals(listOf("value"), store.values())
+            assertEquals(2, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(2, store.generation())
 
             val value = store.value<String>("value")
             assertEquals("value 3", value.get())
@@ -430,11 +579,26 @@ class StoredValueTest : AbstractStoreTest() {
 
             assertEquals(listOf("value 1", "value 2"), store.values())
             assertEquals(4, store.changes())
+            assertEquals(4, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
         }
 
         withStore { store ->
             assertEquals(listOf("value 1", "value 2"), store.values())
             assertEquals(4, store.changes())
+            assertEquals(4, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
+
+            val value1 = store.value<String>("value 1")
+            val value2 = store.value<String>("value 2")
+            assertEquals("value 1", value1.get())
+            assertEquals("value 2", value2.get())
+        }
+        withCompactedStore { store ->
+            assertEquals(listOf("value 1", "value 2"), store.values())
+            assertEquals(4, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(2, store.generation())
 
             val value1 = store.value<String>("value 1")
             val value2 = store.value<String>("value 2")
@@ -454,6 +618,8 @@ class StoredValueTest : AbstractStoreTest() {
 
             assertEquals(listOf("value 1"), store.values())
             assertEquals(2, store.changes())
+            assertEquals(2, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
         }
 
         withStore { store ->
@@ -470,11 +636,26 @@ class StoredValueTest : AbstractStoreTest() {
 
             assertEquals(listOf("value 1", "value 2"), store.values())
             assertEquals(4, store.changes())
+            assertEquals(4, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
         }
 
         withStore { store ->
             assertEquals(listOf("value 1", "value 2"), store.values())
             assertEquals(4, store.changes())
+            assertEquals(4, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
+
+            val value1 = store.value<String>("value 1")
+            val value2 = store.value<String>("value 2")
+            assertEquals("value 1", value1.get())
+            assertEquals("value 2", value2.get())
+        }
+        withCompactedStore { store ->
+            assertEquals(listOf("value 1", "value 2"), store.values())
+            assertEquals(4, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(2, store.generation())
 
             val value1 = store.value<String>("value 1")
             val value2 = store.value<String>("value 2")

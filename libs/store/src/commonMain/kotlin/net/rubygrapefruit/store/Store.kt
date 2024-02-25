@@ -22,17 +22,22 @@ class Store private constructor(
     directory: Directory,
     metadataFile: RegularFile,
     maxChanges: Int,
+    compact: Boolean,
 ) : AutoCloseable {
     private val codec = SimpleCodec()
     private val metadata = MetadataFile(metadataFile, codec)
     private val fileManager = FileManager(directory, codec)
-    private val index = Index(fileManager, metadata, maxChanges)
+    private val index = Index(fileManager, metadata, maxChanges, compact)
 
     companion object {
         /**
          * Opens the store in the given directory.
+         *
+         * @param discard when `true`, delete the current content of the store
+         * @param maxChanges the number of changes to make before compacting
+         * @param compact compact the store content during opening
          */
-        fun open(directory: Directory, discard: Boolean = false, maxChanges: Int = 50000): Store {
+        fun open(directory: Directory, discard: Boolean = false, maxChanges: Int = 50000, compact: Boolean = false): Store {
             directory.createDirectories()
             val metadata = directory.file("store.bin")
             if (discard) {
@@ -45,7 +50,7 @@ class Store private constructor(
             } else if (directory.listEntries().get().isNotEmpty() && !metadata.metadata().regularFile) {
                 unrecognizedFormat(directory)
             }
-            return Store(directory, metadata, maxChanges)
+            return Store(directory, metadata, maxChanges, compact)
         }
     }
 

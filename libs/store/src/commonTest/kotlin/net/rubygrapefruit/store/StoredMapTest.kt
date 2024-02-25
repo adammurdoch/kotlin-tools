@@ -210,7 +210,7 @@ class StoredMapTest : AbstractStoreTest() {
             value.set("b", 44)
         }
 
-        Store.open(testStore, maxChanges = 5).use { store ->
+        withMaxChanges(5) { store ->
             assertEquals(listOf("value"), store.values())
             assertEquals(3, store.changes())
             assertEquals(1, store.generation())
@@ -263,7 +263,7 @@ class StoredMapTest : AbstractStoreTest() {
             value.set("e", 5)
         }
 
-        Store.open(testStore, maxChanges = 5).use { store ->
+        withMaxChanges(5) { store ->
             assertEquals(listOf("value"), store.values())
             assertEquals(6, store.changes())
             assertEquals(1, store.generation())

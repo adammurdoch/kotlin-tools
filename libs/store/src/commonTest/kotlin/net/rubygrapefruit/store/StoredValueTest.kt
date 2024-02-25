@@ -309,7 +309,7 @@ class StoredValueTest : AbstractStoreTest() {
             value.set("initial value")
         }
 
-        Store.open(testStore, maxChanges = 5).use { store ->
+        withMaxChanges(5) { store ->
             assertEquals(listOf("value"), store.values())
             assertEquals(2, store.changes())
             assertEquals(2, store.changesSinceCompaction())
@@ -376,7 +376,7 @@ class StoredValueTest : AbstractStoreTest() {
             value.set("value 4")
         }
 
-        Store.open(testStore, maxChanges = 5).use { store ->
+        withMaxChanges(5) { store ->
             assertEquals(listOf("value"), store.values())
             assertEquals(5, store.changes())
             assertEquals(1, store.generation())
@@ -390,7 +390,7 @@ class StoredValueTest : AbstractStoreTest() {
             assertEquals(2, store.generation())
         }
 
-        Store.open(testStore, maxChanges = 5).use { store ->
+        withMaxChanges(5) { store ->
             assertEquals(listOf("value"), store.values())
             assertEquals(2, store.changes())
             assertEquals(2, store.generation())

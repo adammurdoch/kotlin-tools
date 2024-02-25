@@ -5,7 +5,8 @@ package net.rubygrapefruit.store
 internal class Index(
     private val fileManager: FileManager,
     private val metadataFile: MetadataFile,
-    private val maxChanges: Int
+    private val maxChanges: Int,
+    compact: Boolean
 ) : AutoCloseable {
     private var log = fileManager.logFile(metadataFile.currentGeneration)
     private var data = fileManager.dataFile(metadataFile.currentGeneration)
@@ -18,6 +19,9 @@ internal class Index(
         val content = readIndex()
         entries = content.entries
         newChanges = content.changes - metadataFile.compactedChanges
+        if (compact && newChanges > 0) {
+            compactNow()
+        }
     }
 
     override fun close() {
@@ -58,22 +62,26 @@ internal class Index(
             newChanges++
             log.append(change)
         } else {
-            compacting = true
-            val oldLog = log
-            val oldData = data
-            val generation = metadataFile.currentGeneration + 1
-            log = fileManager.logFile(generation)
-            data = fileManager.dataFile(generation)
-            newChanges = 0
-            for (index in entries.values) {
-                index.replay(changeLog, data)
-            }
-            metadataFile.updateGeneration(generation, newChanges)
-            fileManager.closeAndDelete(oldLog)
-            fileManager.closeAndDelete(oldData)
-            newChanges = 0
-            compacting = false
+            compactNow()
         }
+    }
+
+    private fun compactNow() {
+        compacting = true
+        val oldLog = log
+        val oldData = data
+        val generation = metadataFile.currentGeneration + 1
+        log = fileManager.logFile(generation)
+        data = fileManager.dataFile(generation)
+        newChanges = 0
+        for (index in entries.values) {
+            index.replay(changeLog, data)
+        }
+        metadataFile.updateGeneration(generation, newChanges)
+        fileManager.closeAndDelete(oldLog)
+        fileManager.closeAndDelete(oldData)
+        newChanges = 0
+        compacting = false
     }
 
     private fun readIndex(): InitialContent {

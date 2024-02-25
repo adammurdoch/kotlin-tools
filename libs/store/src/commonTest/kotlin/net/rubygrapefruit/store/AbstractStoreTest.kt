@@ -15,6 +15,31 @@ abstract class AbstractStoreTest : AbstractFileTest() {
         Store.open(testStore).use {
             action(it)
         }
+        verifyAfterClose()
+    }
+
+    fun withMaxChanges(maxChanges: Int, action: (Store) -> Unit) {
+        Store.open(testStore, maxChanges = maxChanges).use {
+            action(it)
+        }
+        verifyAfterClose()
+    }
+
+    fun withCompactedStore(action: (Store) -> Unit) {
+        Store.open(testStore, compact = true).use {
+            action(it)
+        }
+        verifyAfterClose()
+    }
+
+    fun withDiscardedStore(action: (Store) -> Unit = {}) {
+        Store.open(testStore, discard = true).use {
+            action(it)
+        }
+        verifyAfterClose()
+    }
+
+    private fun verifyAfterClose() {
         // Should always be 3 files
         assertEquals(3, testStore.listEntries().get().size)
     }

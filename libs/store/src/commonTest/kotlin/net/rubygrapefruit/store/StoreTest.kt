@@ -47,22 +47,51 @@ class StoreTest : AbstractStoreTest() {
             assertTrue(message != null && message.startsWith("Unexpected store version in file ${storeFile.absolutePath}."), "message: '$message'")
         }
 
-        Store.open(testStore, discard = true)
+        withDiscardedStore()
     }
 
     @Test
-    fun `can discard store contents on open`() {
+    fun `can discard store content on open`() {
         withStore { store ->
             store.value<Long>("long").set(123)
             store.map<Long, String>("longs").set(123, "value")
         }
 
-        Store.open(testStore, discard = true).use { store ->
+        withDiscardedStore { store ->
             assertTrue(store.values().isEmpty())
         }
 
         withStore { store ->
             assertTrue(store.values().isEmpty())
+        }
+    }
+
+    @Test
+    fun `can compact store content on open`() {
+        withStore { store ->
+            val value = store.value<Int>("int")
+            val map = store.map<Int, String>("ints")
+            for (i in 1..10) {
+                value.set(i)
+                map.set(i, i.toString())
+            }
+
+            assertEquals(22, store.changes())
+            assertEquals(22, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
+        }
+
+        withCompactedStore { store ->
+            assertEquals(13, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(2, store.generation())
+        }
+
+        withCompactedStore { store ->
+            // Does not compact again
+            assertEquals(13, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(2, store.generation())
         }
     }
 
@@ -74,7 +103,7 @@ class StoreTest : AbstractStoreTest() {
             }
         }
 
-        Store.open(testStore, maxChanges = 5).use { store ->
+        withMaxChanges(5) { store ->
             assertEquals(10, store.values().size)
             assertEquals(20, store.changes())
             assertEquals(20, store.changesSinceCompaction())
@@ -98,7 +127,7 @@ class StoreTest : AbstractStoreTest() {
 
     @Test
     fun `can create many values without writing value`() {
-        Store.open(testStore, maxChanges = 5).use { store ->
+        withMaxChanges(5) { store ->
             for (i in 1..10) {
                 store.value<Long>("long $i")
             }

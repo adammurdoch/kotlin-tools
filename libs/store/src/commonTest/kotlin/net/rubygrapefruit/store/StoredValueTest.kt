@@ -323,29 +323,31 @@ class StoredValueTest : AbstractStoreTest() {
             assertEquals(2, store.logEntries())
             assertEquals(2, store.generation())
 
-            for (i in 5..7) {
+            // 5 changes since last compaction
+            for (i in 5..9) {
                 value.set("value $i")
                 assertEquals(i - 2, store.logEntries())
+                assertEquals(2, store.generation())
             }
 
             assertEquals(listOf("value"), store.values())
-            assertEquals(5, store.logEntries())
+            assertEquals(7, store.logEntries())
             assertEquals(2, store.generation())
 
-            for (i in 8..10) {
+            for (i in 10..11) {
                 value.set("value $i")
-                assertEquals(i - 6, store.logEntries())
+                assertEquals(i - 8, store.logEntries())
                 assertEquals(3, store.generation())
             }
         }
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(4, store.logEntries())
+            assertEquals(3, store.logEntries())
             assertEquals(3, store.generation())
 
             val value = store.value<String>("value")
-            assertEquals("value 10", value.get())
+            assertEquals("value 11", value.get())
         }
     }
 

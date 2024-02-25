@@ -12,16 +12,16 @@ internal class Index(
     private var changeLog = DefaultChangeLog()
     private var compacting = false
     private val entries: MutableMap<String, StoreIndex>
-    private var nonCompactedChanges: Int
+    private var newChanges: Int
 
     init {
         val content = readIndex()
         entries = content.entries
-        nonCompactedChanges = content.changes - metadataFile.compactedChanges
+        newChanges = content.changes - metadataFile.compactedChanges
     }
 
     override fun close() {
-        metadataFile.updateNonCompactedChanges(nonCompactedChanges)
+        metadataFile.updateNonCompactedChanges(newChanges)
         log.close()
         data.close()
     }
@@ -43,7 +43,7 @@ internal class Index(
     }
 
     fun accept(visitor: ContentVisitor) {
-        visitor.store(ContentVisitor.StoreInfo(metadataFile.compactedChanges + nonCompactedChanges, metadataFile.currentGeneration))
+        visitor.store(ContentVisitor.StoreInfo(metadataFile.compactedChanges + newChanges, metadataFile.currentGeneration))
         for (entry in effectiveEntries().entries.sortedBy { it.key }) {
             visitor.value(entry.key, entry.value.visitorInfo)
         }
@@ -54,8 +54,8 @@ internal class Index(
     }
 
     private fun doAppend(change: StoreChange) {
-        if (nonCompactedChanges < maxChanges || compacting) {
-            nonCompactedChanges++
+        if (newChanges < maxChanges || compacting) {
+            newChanges++
             log.append(change)
         } else {
             compacting = true
@@ -64,14 +64,14 @@ internal class Index(
             val generation = metadataFile.currentGeneration + 1
             log = fileManager.logFile(generation)
             data = fileManager.dataFile(generation)
-            nonCompactedChanges = 0
+            newChanges = 0
             for (index in entries.values) {
                 index.replay(changeLog, data)
             }
-            metadataFile.updateGeneration(generation, nonCompactedChanges)
+            metadataFile.updateGeneration(generation, newChanges)
             fileManager.closeAndDelete(oldLog)
             fileManager.closeAndDelete(oldData)
-            nonCompactedChanges = 0
+            newChanges = 0
             compacting = false
         }
     }

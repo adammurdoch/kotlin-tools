@@ -1,9 +1,20 @@
 ## TODO
 
+### Next
+
+- Test queries and mutations after compaction
+- Write-lock the files
+- Thread safety
+
+### Later
+
+- Values as byte streams
+- Multi-map
 - Reset generation to 1 at some point before overflowing to negative value
 - Compact only once amount of garbage exceeds certain threshold
+- Avoid copying large values on compaction
 - Don't create a new buffer for each block copied during compaction
-- Buffered writes
+- Buffered reads and writes
 - Background compaction
 - Don't keep checking the current position when reading index changes from file
   - Use a counter for the expected number of changes
@@ -22,8 +33,13 @@
 - Multi-thread safety: threads that read/write separate values, threads read/write same values
   - Prevent concurrent updates of index
 - Multi-process safety
-  - Write lock the files
+  - Write-lock the files
+  - Collaborative locking between processes
 - Atomic update
+- Iterator
+- Background update
+  - e.g. register a mutation for a given value and apply it before value is next read
+  - e.g. register a mutation for all values and apply before each is read
 - Concurrent reads
 - Optimistic concurrent updates
 - Encoding uses type tags?

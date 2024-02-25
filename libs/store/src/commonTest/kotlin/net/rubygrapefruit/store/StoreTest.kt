@@ -10,6 +10,22 @@ import kotlin.test.fail
 
 class StoreTest : AbstractStoreTest() {
     @Test
+    fun `can open empty store`() {
+        withStore { store ->
+            assertTrue(store.values().isEmpty())
+            assertEquals(0, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
+        }
+        withStore { store ->
+            assertTrue(store.values().isEmpty())
+            assertEquals(0, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
+        }
+    }
+
+    @Test
     fun `cannot open when store file has incorrect version`() {
         withStore {
             it.value<String>("value").set("ok")

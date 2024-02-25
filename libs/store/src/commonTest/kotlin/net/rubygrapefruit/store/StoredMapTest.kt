@@ -12,6 +12,8 @@ class StoredMapTest : AbstractStoreTest() {
     fun `can read from empty store`() {
         withStore { store ->
             assertTrue(store.values().isEmpty())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
 
             val value = store.map<String, Int>("value")
             assertNull(value.get("a"))
@@ -20,11 +22,15 @@ class StoredMapTest : AbstractStoreTest() {
             // Not visible until it has been written to
             assertTrue(store.values().isEmpty())
             assertEquals(0, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
         }
 
         withStore { store ->
             assertTrue(store.values().isEmpty())
             assertEquals(0, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
 
             val value = store.map<String, Int>("value")
             assertNull(value.get("a"))
@@ -32,6 +38,8 @@ class StoredMapTest : AbstractStoreTest() {
 
             assertTrue(store.values().isEmpty())
             assertEquals(0, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
         }
     }
 

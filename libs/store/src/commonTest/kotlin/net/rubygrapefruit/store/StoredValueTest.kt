@@ -13,6 +13,8 @@ class StoredValueTest : AbstractStoreTest() {
         withStore { store ->
             assertTrue(store.values().isEmpty())
             assertEquals(0, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
 
             val value = store.value<String>("value")
             assertNull(value.get())
@@ -20,17 +22,23 @@ class StoredValueTest : AbstractStoreTest() {
             // Not visible until it has been written to
             assertTrue(store.values().isEmpty())
             assertEquals(0, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
         }
 
         withStore { store ->
             assertTrue(store.values().isEmpty())
             assertEquals(0, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
 
             val value = store.value<String>("value")
             assertNull(value.get())
 
             assertTrue(store.values().isEmpty())
             assertEquals(0, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
         }
     }
 
@@ -295,7 +303,7 @@ class StoredValueTest : AbstractStoreTest() {
     }
 
     @Test
-    fun `can update value many times in same session`() {
+    fun `compacts store after updating value many times in same session`() {
         withStore { store ->
             val value = store.value<String>("value")
             value.set("initial value")
@@ -304,6 +312,7 @@ class StoredValueTest : AbstractStoreTest() {
         Store.open(testStore, maxChanges = 5).use { store ->
             assertEquals(listOf("value"), store.values())
             assertEquals(2, store.changes())
+            assertEquals(2, store.changesSinceCompaction())
             assertEquals(1, store.generation())
 
             val value = store.value<String>("value")
@@ -311,32 +320,37 @@ class StoredValueTest : AbstractStoreTest() {
             for (i in 1..3) {
                 value.set("value $i")
                 assertEquals(i + 2, store.changes())
+                assertEquals(store.changes(), store.changesSinceCompaction())
             }
 
             assertEquals(listOf("value"), store.values())
             assertEquals(5, store.changes())
+            assertEquals(5, store.changesSinceCompaction())
             assertEquals(1, store.generation())
 
             value.set("value 4")
 
             assertEquals(listOf("value"), store.values())
             assertEquals(2, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
             assertEquals(2, store.generation())
 
-            // 5 changes since last compaction
             for (i in 5..9) {
                 value.set("value $i")
                 assertEquals(i - 2, store.changes())
+                assertEquals(i - 4, store.changesSinceCompaction())
                 assertEquals(2, store.generation())
             }
 
             assertEquals(listOf("value"), store.values())
             assertEquals(7, store.changes())
+            assertEquals(5, store.changesSinceCompaction())
             assertEquals(2, store.generation())
 
             for (i in 10..11) {
                 value.set("value $i")
                 assertEquals(i - 8, store.changes())
+                assertEquals(i - 10, store.changesSinceCompaction())
                 assertEquals(3, store.generation())
             }
         }
@@ -344,6 +358,7 @@ class StoredValueTest : AbstractStoreTest() {
         withStore { store ->
             assertEquals(listOf("value"), store.values())
             assertEquals(3, store.changes())
+            assertEquals(1, store.changesSinceCompaction())
             assertEquals(3, store.generation())
 
             val value = store.value<String>("value")

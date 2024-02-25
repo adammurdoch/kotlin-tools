@@ -51,7 +51,7 @@ class StoreTest : AbstractStoreTest() {
     }
 
     @Test
-    fun `can create many values`() {
+    fun `compacts store after writing many values`() {
         withStore { store ->
             for (i in 1..10) {
                 store.value<Long>("long $i").set(123)
@@ -60,20 +60,42 @@ class StoreTest : AbstractStoreTest() {
 
         Store.open(testStore, maxChanges = 5).use { store ->
             assertEquals(10, store.values().size)
-            assertEquals(20, store.logEntries())
+            assertEquals(20, store.changes())
+            assertEquals(20, store.changesSinceCompaction())
             assertEquals(1, store.generation())
 
             store.value<String>("string").set("value")
 
             assertEquals(11, store.values().size)
-            assertEquals(22, store.logEntries())
+            assertEquals(22, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
             assertEquals(2, store.generation())
         }
 
         withStore { store ->
             assertEquals(11, store.values().size)
-            assertEquals(22, store.logEntries())
+            assertEquals(22, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
             assertEquals(2, store.generation())
+        }
+    }
+
+    @Test
+    fun `can create many values without writing value`() {
+        Store.open(testStore, maxChanges = 5).use { store ->
+            for (i in 1..10) {
+                store.value<Long>("long $i")
+            }
+
+            assertEquals(0, store.values().size)
+            assertEquals(0, store.changes())
+            assertEquals(1, store.generation())
+        }
+
+        withStore { store ->
+            assertEquals(0, store.values().size)
+            assertEquals(0, store.changes())
+            assertEquals(1, store.generation())
         }
     }
 

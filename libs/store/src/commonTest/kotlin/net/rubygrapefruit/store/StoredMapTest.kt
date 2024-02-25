@@ -19,19 +19,19 @@ class StoredMapTest : AbstractStoreTest() {
 
             // Not visible until it has been written to
             assertTrue(store.values().isEmpty())
-            assertEquals(0, store.logEntries())
+            assertEquals(0, store.changes())
         }
 
         withStore { store ->
             assertTrue(store.values().isEmpty())
-            assertEquals(0, store.logEntries())
+            assertEquals(0, store.changes())
 
             val value = store.map<String, Int>("value")
             assertNull(value.get("a"))
             assertTrue(value.entries().isEmpty())
 
             assertTrue(store.values().isEmpty())
-            assertEquals(0, store.logEntries())
+            assertEquals(0, store.changes())
         }
     }
 
@@ -46,19 +46,19 @@ class StoredMapTest : AbstractStoreTest() {
             assertEquals(listOf("a" to 12), value.entries())
 
             assertEquals(listOf("value"), store.values())
-            assertEquals(2, store.logEntries())
+            assertEquals(2, store.changes())
         }
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(2, store.logEntries())
+            assertEquals(2, store.changes())
 
             val value = store.map<String, Int>("value")
             assertEquals(12, value.get("a"))
             assertEquals(listOf("a" to 12), value.entries())
 
             assertEquals(listOf("value"), store.values())
-            assertEquals(2, store.logEntries())
+            assertEquals(2, store.changes())
         }
     }
 
@@ -72,19 +72,19 @@ class StoredMapTest : AbstractStoreTest() {
             assertEquals(listOf("a" to 12), value.entries())
 
             assertEquals(listOf("value"), store.values())
-            assertEquals(2, store.logEntries())
+            assertEquals(2, store.changes())
         }
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(2, store.logEntries())
+            assertEquals(2, store.changes())
 
             val value = store.map<String, Int>("value")
             assertEquals(12, value.get("a"))
             assertEquals(listOf("a" to 12), value.entries())
 
             assertEquals(listOf("value"), store.values())
-            assertEquals(2, store.logEntries())
+            assertEquals(2, store.changes())
         }
     }
 
@@ -102,12 +102,12 @@ class StoredMapTest : AbstractStoreTest() {
             assertEquals(listOf("a" to 1, "b" to 2), value.entries())
 
             assertEquals(listOf("value"), store.values())
-            assertEquals(3, store.logEntries())
+            assertEquals(3, store.changes())
         }
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(3, store.logEntries())
+            assertEquals(3, store.changes())
 
             val value = store.map<String, Int>("value")
             assertEquals(1, value.get("a"))
@@ -126,7 +126,7 @@ class StoredMapTest : AbstractStoreTest() {
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(3, store.logEntries())
+            assertEquals(3, store.changes())
 
             val value = store.map<String, Int>("value")
 
@@ -135,12 +135,12 @@ class StoredMapTest : AbstractStoreTest() {
             assertEquals(listOf("a" to 11, "b" to 44), value.entries())
 
             assertEquals(listOf("value"), store.values())
-            assertEquals(4, store.logEntries())
+            assertEquals(4, store.changes())
         }
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(4, store.logEntries())
+            assertEquals(4, store.changes())
 
             val value = store.map<String, Int>("value")
             assertEquals(11, value.get("a"))
@@ -158,7 +158,7 @@ class StoredMapTest : AbstractStoreTest() {
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(3, store.logEntries())
+            assertEquals(3, store.changes())
 
             val value = store.map<String, Int>("value")
 
@@ -167,12 +167,12 @@ class StoredMapTest : AbstractStoreTest() {
             assertEquals(listOf("a" to 11, "b" to 44), value.entries())
 
             assertEquals(listOf("value"), store.values())
-            assertEquals(4, store.logEntries())
+            assertEquals(4, store.changes())
         }
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(4, store.logEntries())
+            assertEquals(4, store.changes())
 
             val value = store.map<String, Int>("value")
 
@@ -181,12 +181,12 @@ class StoredMapTest : AbstractStoreTest() {
             assertEquals(listOf("a" to 10, "b" to 44), value.entries())
 
             assertEquals(listOf("value"), store.values())
-            assertEquals(5, store.logEntries())
+            assertEquals(5, store.changes())
         }
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(5, store.logEntries())
+            assertEquals(5, store.changes())
 
             val value = store.map<String, Int>("value")
             assertEquals(10, value.get("a"))
@@ -204,7 +204,7 @@ class StoredMapTest : AbstractStoreTest() {
 
         Store.open(testStore, maxChanges = 5).use { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(3, store.logEntries())
+            assertEquals(3, store.changes())
             assertEquals(1, store.generation())
 
             val value = store.map<String, Int>("value")
@@ -215,11 +215,11 @@ class StoredMapTest : AbstractStoreTest() {
                 assertEquals(listOf("a" to 100 + i, "b" to 44), value.entries())
 
                 assertEquals(listOf("value"), store.values())
-                assertEquals(i + 3, store.logEntries())
+                assertEquals(i + 3, store.changes())
             }
 
             assertEquals(listOf("value"), store.values())
-            assertEquals(5, store.logEntries())
+            assertEquals(5, store.changes())
             assertEquals(1, store.generation())
 
             for (i in 3..4) {
@@ -228,14 +228,14 @@ class StoredMapTest : AbstractStoreTest() {
                 assertEquals(listOf("a" to 100 + i, "b" to 44), value.entries())
 
                 assertEquals(listOf("value"), store.values())
-                assertEquals(i, store.logEntries())
+                assertEquals(i, store.changes())
                 assertEquals(2, store.generation())
             }
         }
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(4, store.logEntries())
+            assertEquals(4, store.changes())
             assertEquals(2, store.generation())
 
             val value = store.map<String, Int>("value")
@@ -257,7 +257,7 @@ class StoredMapTest : AbstractStoreTest() {
 
         Store.open(testStore, maxChanges = 5).use { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(6, store.logEntries())
+            assertEquals(6, store.changes())
             assertEquals(1, store.generation())
 
             val value = store.map<String, Int>("value")
@@ -267,7 +267,7 @@ class StoredMapTest : AbstractStoreTest() {
             assertEquals(5, value.entries().size)
 
             assertEquals(listOf("value"), store.values())
-            assertEquals(6, store.logEntries())
+            assertEquals(6, store.changes())
             assertEquals(2, store.generation())
 
             value.set("a", 101)
@@ -275,13 +275,13 @@ class StoredMapTest : AbstractStoreTest() {
             assertEquals(5, value.entries().size)
 
             assertEquals(listOf("value"), store.values())
-            assertEquals(7, store.logEntries())
+            assertEquals(7, store.changes())
             assertEquals(2, store.generation())
         }
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(7, store.logEntries())
+            assertEquals(7, store.changes())
             assertEquals(2, store.generation())
 
             val value = store.map<String, Int>("value")
@@ -300,7 +300,7 @@ class StoredMapTest : AbstractStoreTest() {
 
         withStore { store ->
             val value = store.map<String, Int>("value")
-            assertEquals(3, store.logEntries())
+            assertEquals(3, store.changes())
 
             value.remove("c")
             assertNull(value.get("c"))
@@ -309,12 +309,12 @@ class StoredMapTest : AbstractStoreTest() {
             assertEquals(listOf("a" to 1, "b" to 2), value.entries())
 
             assertEquals(listOf("value"), store.values())
-            assertEquals(4, store.logEntries())
+            assertEquals(4, store.changes())
         }
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(4, store.logEntries())
+            assertEquals(4, store.changes())
 
             val value = store.map<String, Int>("value")
             assertEquals(2, value.entries().size)
@@ -329,25 +329,25 @@ class StoredMapTest : AbstractStoreTest() {
 
         withStore { store ->
             val value = store.map<String, Int>("value")
-            assertEquals(0, store.logEntries())
+            assertEquals(0, store.changes())
 
             value.remove("c")
             assertNull(value.get("c"))
             assertTrue(value.entries().isEmpty())
 
             assertTrue(store.values().isEmpty())
-            assertEquals(0, store.logEntries())
+            assertEquals(0, store.changes())
         }
 
         withStore { store ->
             assertTrue(store.values().isEmpty())
-            assertEquals(0, store.logEntries())
+            assertEquals(0, store.changes())
 
             val value = store.map<String, Int>("value")
             assertTrue(value.entries().isEmpty())
 
             assertTrue(store.values().isEmpty())
-            assertEquals(0, store.logEntries())
+            assertEquals(0, store.changes())
         }
     }
 
@@ -361,7 +361,7 @@ class StoredMapTest : AbstractStoreTest() {
 
         withStore { store ->
             val value = store.map<String, Int>("value")
-            assertEquals(3, store.logEntries())
+            assertEquals(3, store.changes())
 
             value.remove("a")
             assertNull(value.get("a"))
@@ -369,7 +369,7 @@ class StoredMapTest : AbstractStoreTest() {
             assertEquals(listOf("b" to 2), value.entries())
 
             assertEquals(listOf("value"), store.values())
-            assertEquals(4, store.logEntries())
+            assertEquals(4, store.changes())
         }
 
         withStore { store ->
@@ -378,19 +378,19 @@ class StoredMapTest : AbstractStoreTest() {
             assertEquals(2, value.get("b"))
             assertEquals(listOf("b" to 2), value.entries())
             assertEquals(listOf("value"), store.values())
-            assertEquals(4, store.logEntries())
+            assertEquals(4, store.changes())
 
             value.remove("b")
             assertNull(value.get("a"))
             assertNull(value.get("b"))
             assertTrue(value.entries().isEmpty())
             assertTrue(store.values().isEmpty())
-            assertEquals(5, store.logEntries())
+            assertEquals(5, store.changes())
         }
 
         withStore { store ->
             assertTrue(store.values().isEmpty())
-            assertEquals(5, store.logEntries())
+            assertEquals(5, store.changes())
         }
     }
 
@@ -404,7 +404,7 @@ class StoredMapTest : AbstractStoreTest() {
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(3, store.logEntries())
+            assertEquals(3, store.changes())
 
             val value = store.map<String, Int>("value")
 
@@ -417,12 +417,12 @@ class StoredMapTest : AbstractStoreTest() {
             assertEquals(listOf("b" to 44, "a" to 11), value.entries())
 
             assertEquals(listOf("value"), store.values())
-            assertEquals(5, store.logEntries())
+            assertEquals(5, store.changes())
         }
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(5, store.logEntries())
+            assertEquals(5, store.changes())
 
             val value = store.map<String, Int>("value")
             assertEquals(11, value.get("a"))
@@ -444,11 +444,11 @@ class StoredMapTest : AbstractStoreTest() {
             assertNull(value.get("a"))
             assertTrue(value.entries().isEmpty())
             assertTrue(store.values().isEmpty())
-            assertEquals(5, store.logEntries())
+            assertEquals(5, store.changes())
         }
         withStore { store ->
             assertTrue(store.values().isEmpty())
-            assertEquals(5, store.logEntries())
+            assertEquals(5, store.changes())
 
             val value = store.map<String, Int>("value")
             assertNull(value.get("a"))
@@ -469,7 +469,7 @@ class StoredMapTest : AbstractStoreTest() {
             assertNull(value.get("a"))
             assertTrue(value.entries().isEmpty())
             assertTrue(store.values().isEmpty())
-            assertEquals(4, store.logEntries())
+            assertEquals(4, store.changes())
         }
         withStore { store ->
             assertTrue(store.values().isEmpty())
@@ -489,18 +489,18 @@ class StoredMapTest : AbstractStoreTest() {
             assertTrue(value.entries().isEmpty())
 
             assertTrue(store.values().isEmpty())
-            assertEquals(0, store.logEntries())
+            assertEquals(0, store.changes())
         }
 
         withStore { store ->
             assertTrue(store.values().isEmpty())
-            assertEquals(0, store.logEntries())
+            assertEquals(0, store.changes())
 
             val value = store.map<String, Int>("value")
             assertTrue(value.entries().isEmpty())
 
             assertTrue(store.values().isEmpty())
-            assertEquals(0, store.logEntries())
+            assertEquals(0, store.changes())
         }
     }
 
@@ -519,12 +519,12 @@ class StoredMapTest : AbstractStoreTest() {
             assertEquals("value 2", value2.get("a"))
 
             assertEquals(listOf("value 1", "value 2"), store.values())
-            assertEquals(4, store.logEntries())
+            assertEquals(4, store.changes())
         }
 
         withStore { store ->
             assertEquals(listOf("value 1", "value 2"), store.values())
-            assertEquals(4, store.logEntries())
+            assertEquals(4, store.changes())
 
             val value1 = store.map<String, Int>("value 1")
             val value2 = store.map<String, String>("value 2")

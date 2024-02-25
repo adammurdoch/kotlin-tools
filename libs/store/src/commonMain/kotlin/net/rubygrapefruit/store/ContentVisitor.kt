@@ -11,7 +11,7 @@ interface ContentVisitor {
      */
     fun value(name: String, details: ValueInfo) {}
 
-    class StoreInfo(val changes: Int, val generation: Int)
+    class StoreInfo(val totalChanges: Int, val generation: Int, val nonCompactedChanges: Int)
 
     interface ValueInfo {
         val formatted: String

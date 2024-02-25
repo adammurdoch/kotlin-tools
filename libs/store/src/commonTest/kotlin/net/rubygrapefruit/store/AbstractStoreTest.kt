@@ -29,21 +29,23 @@ abstract class AbstractStoreTest : AbstractFileTest() {
         return result
     }
 
-    fun Store.logEntries(): Int {
-        var result by Delegates.notNull<Int>()
-        accept(object : ContentVisitor {
-            override fun store(detail: ContentVisitor.StoreInfo) {
-                result = detail.changes
-            }
-        })
-        return result
+    fun Store.changes(): Int {
+        return storeInfo().totalChanges
+    }
+
+    fun Store.changesSinceCompaction(): Int {
+        return storeInfo().nonCompactedChanges
     }
 
     fun Store.generation(): Int {
-        var result by Delegates.notNull<Int>()
+        return storeInfo().generation
+    }
+
+    fun Store.storeInfo(): ContentVisitor.StoreInfo {
+        var result by Delegates.notNull<ContentVisitor.StoreInfo>()
         accept(object : ContentVisitor {
             override fun store(detail: ContentVisitor.StoreInfo) {
-                result = detail.generation
+                result = detail
             }
         })
         return result

@@ -2,7 +2,6 @@
 
 - Reset generation to 1 at some point before overflowing to negative value
 - Compact only once amount of garbage exceeds certain threshold
-- Fix case where total number of items is > max changes, will compact on first change after opening store
 - Don't create a new buffer for each block copied during compaction
 - Buffered writes
 - Background compaction

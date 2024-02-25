@@ -12,25 +12,25 @@ class StoredValueTest : AbstractStoreTest() {
     fun `can read from empty store`() {
         withStore { store ->
             assertTrue(store.values().isEmpty())
-            assertEquals(0, store.logEntries())
+            assertEquals(0, store.changes())
 
             val value = store.value<String>("value")
             assertNull(value.get())
 
             // Not visible until it has been written to
             assertTrue(store.values().isEmpty())
-            assertEquals(0, store.logEntries())
+            assertEquals(0, store.changes())
         }
 
         withStore { store ->
             assertTrue(store.values().isEmpty())
-            assertEquals(0, store.logEntries())
+            assertEquals(0, store.changes())
 
             val value = store.value<String>("value")
             assertNull(value.get())
 
             assertTrue(store.values().isEmpty())
-            assertEquals(0, store.logEntries())
+            assertEquals(0, store.changes())
         }
     }
 
@@ -44,18 +44,18 @@ class StoredValueTest : AbstractStoreTest() {
             assertEquals("value 1", value.get())
 
             assertEquals(listOf("value"), store.values())
-            assertEquals(2, store.logEntries())
+            assertEquals(2, store.changes())
         }
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(2, store.logEntries())
+            assertEquals(2, store.changes())
 
             val value = store.value<String>("value")
             assertEquals("value 1", value.get())
 
             assertEquals(listOf("value"), store.values())
-            assertEquals(2, store.logEntries())
+            assertEquals(2, store.changes())
         }
     }
 
@@ -68,18 +68,18 @@ class StoredValueTest : AbstractStoreTest() {
             assertEquals("value 1", value.get())
 
             assertEquals(listOf("value"), store.values())
-            assertEquals(2, store.logEntries())
+            assertEquals(2, store.changes())
         }
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(2, store.logEntries())
+            assertEquals(2, store.changes())
 
             val value = store.value<String>("value")
             assertEquals("value 1", value.get())
 
             assertEquals(listOf("value"), store.values())
-            assertEquals(2, store.logEntries())
+            assertEquals(2, store.changes())
         }
     }
 
@@ -94,17 +94,17 @@ class StoredValueTest : AbstractStoreTest() {
             assertNull(value.get())
 
             assertTrue(store.values().isEmpty())
-            assertEquals(3, store.logEntries())
+            assertEquals(3, store.changes())
         }
         withStore { store ->
             assertTrue(store.values().isEmpty())
-            assertEquals(3, store.logEntries())
+            assertEquals(3, store.changes())
 
             val value = store.value<String>("empty")
             assertNull(value.get())
 
             assertTrue(store.values().isEmpty())
-            assertEquals(3, store.logEntries())
+            assertEquals(3, store.changes())
         }
     }
 
@@ -117,17 +117,17 @@ class StoredValueTest : AbstractStoreTest() {
             assertNull(value.get())
 
             assertTrue(store.values().isEmpty())
-            assertEquals(0, store.logEntries())
+            assertEquals(0, store.changes())
         }
         withStore { store ->
             assertTrue(store.values().isEmpty())
-            assertEquals(0, store.logEntries())
+            assertEquals(0, store.changes())
 
             val value = store.value<String>("empty")
             assertNull(value.get())
 
             assertTrue(store.values().isEmpty())
-            assertEquals(0, store.logEntries())
+            assertEquals(0, store.changes())
         }
     }
 
@@ -147,11 +147,11 @@ class StoredValueTest : AbstractStoreTest() {
             assertEquals("value 2", value.get())
 
             assertEquals(listOf("value"), store.values())
-            assertEquals(4, store.logEntries())
+            assertEquals(4, store.changes())
         }
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(4, store.logEntries())
+            assertEquals(4, store.changes())
 
             val value = store.value<String>("value")
             assertEquals("value 2", value.get())
@@ -174,25 +174,25 @@ class StoredValueTest : AbstractStoreTest() {
             assertNull(value.get())
 
             assertTrue(store.values().isEmpty())
-            assertEquals(3, store.logEntries())
+            assertEquals(3, store.changes())
         }
         withStore { store ->
             val value = store.value<String>("value")
             assertNull(value.get())
 
             assertTrue(store.values().isEmpty())
-            assertEquals(3, store.logEntries())
+            assertEquals(3, store.changes())
 
             value.set("value 2")
 
             assertEquals("value 2", value.get())
 
             assertEquals(listOf("value"), store.values())
-            assertEquals(4, store.logEntries())
+            assertEquals(4, store.changes())
         }
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(4, store.logEntries())
+            assertEquals(4, store.changes())
 
             val value = store.value<String>("value")
             assertEquals("value 2", value.get())
@@ -208,18 +208,18 @@ class StoredValueTest : AbstractStoreTest() {
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(2, store.logEntries())
+            assertEquals(2, store.changes())
 
             val value = store.value<String>("value")
             assertEquals("value 1", value.get())
             value.set("value 2")
             assertEquals("value 2", value.get())
 
-            assertEquals(3, store.logEntries())
+            assertEquals(3, store.changes())
         }
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(3, store.logEntries())
+            assertEquals(3, store.changes())
 
             val value = store.value<String>("value")
             assertEquals("value 2", value.get())
@@ -235,7 +235,7 @@ class StoredValueTest : AbstractStoreTest() {
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(2, store.logEntries())
+            assertEquals(2, store.changes())
 
             val value = store.value<String>("value")
             assertEquals("value 1", value.get())
@@ -243,11 +243,11 @@ class StoredValueTest : AbstractStoreTest() {
             value.set("value 3")
             assertEquals("value 3", value.get())
 
-            assertEquals(4, store.logEntries())
+            assertEquals(4, store.changes())
         }
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(4, store.logEntries())
+            assertEquals(4, store.changes())
 
             val value = store.value<String>("value")
             assertEquals("value 3", value.get())
@@ -263,7 +263,7 @@ class StoredValueTest : AbstractStoreTest() {
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(2, store.logEntries())
+            assertEquals(2, store.changes())
 
             val value = store.value<String>("value")
             assertEquals("value 1", value.get())
@@ -271,11 +271,11 @@ class StoredValueTest : AbstractStoreTest() {
             value.set("value 2")
             assertEquals("value 2", value.get())
 
-            assertEquals(3, store.logEntries())
+            assertEquals(3, store.changes())
         }
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(3, store.logEntries())
+            assertEquals(3, store.changes())
 
             val value = store.value<String>("value")
             assertEquals("value 2", value.get())
@@ -283,11 +283,11 @@ class StoredValueTest : AbstractStoreTest() {
             value.set("value 3")
             assertEquals("value 3", value.get())
 
-            assertEquals(4, store.logEntries())
+            assertEquals(4, store.changes())
         }
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(4, store.logEntries())
+            assertEquals(4, store.changes())
 
             val value = store.value<String>("value")
             assertEquals("value 3", value.get())
@@ -303,47 +303,47 @@ class StoredValueTest : AbstractStoreTest() {
 
         Store.open(testStore, maxChanges = 5).use { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(2, store.logEntries())
+            assertEquals(2, store.changes())
             assertEquals(1, store.generation())
 
             val value = store.value<String>("value")
 
             for (i in 1..3) {
                 value.set("value $i")
-                assertEquals(i + 2, store.logEntries())
+                assertEquals(i + 2, store.changes())
             }
 
             assertEquals(listOf("value"), store.values())
-            assertEquals(5, store.logEntries())
+            assertEquals(5, store.changes())
             assertEquals(1, store.generation())
 
             value.set("value 4")
 
             assertEquals(listOf("value"), store.values())
-            assertEquals(2, store.logEntries())
+            assertEquals(2, store.changes())
             assertEquals(2, store.generation())
 
             // 5 changes since last compaction
             for (i in 5..9) {
                 value.set("value $i")
-                assertEquals(i - 2, store.logEntries())
+                assertEquals(i - 2, store.changes())
                 assertEquals(2, store.generation())
             }
 
             assertEquals(listOf("value"), store.values())
-            assertEquals(7, store.logEntries())
+            assertEquals(7, store.changes())
             assertEquals(2, store.generation())
 
             for (i in 10..11) {
                 value.set("value $i")
-                assertEquals(i - 8, store.logEntries())
+                assertEquals(i - 8, store.changes())
                 assertEquals(3, store.generation())
             }
         }
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(3, store.logEntries())
+            assertEquals(3, store.changes())
             assertEquals(3, store.generation())
 
             val value = store.value<String>("value")
@@ -363,7 +363,7 @@ class StoredValueTest : AbstractStoreTest() {
 
         Store.open(testStore, maxChanges = 5).use { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(5, store.logEntries())
+            assertEquals(5, store.changes())
             assertEquals(1, store.generation())
 
             val value = store.value<String>("value")
@@ -371,13 +371,13 @@ class StoredValueTest : AbstractStoreTest() {
             value.set("value 5")
             assertEquals("value 5", value.get())
 
-            assertEquals(2, store.logEntries())
+            assertEquals(2, store.changes())
             assertEquals(2, store.generation())
         }
 
         Store.open(testStore, maxChanges = 5).use { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(2, store.logEntries())
+            assertEquals(2, store.changes())
             assertEquals(2, store.generation())
 
             val value = store.value<String>("value")
@@ -385,13 +385,13 @@ class StoredValueTest : AbstractStoreTest() {
             value.set("value 6")
             assertEquals("value 6", value.get())
 
-            assertEquals(3, store.logEntries())
+            assertEquals(3, store.changes())
             assertEquals(2, store.generation())
         }
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
-            assertEquals(3, store.logEntries())
+            assertEquals(3, store.changes())
             assertEquals(2, store.generation())
 
             val value = store.value<String>("value")
@@ -414,12 +414,12 @@ class StoredValueTest : AbstractStoreTest() {
             assertEquals("value 2", value2.get())
 
             assertEquals(listOf("value 1", "value 2"), store.values())
-            assertEquals(4, store.logEntries())
+            assertEquals(4, store.changes())
         }
 
         withStore { store ->
             assertEquals(listOf("value 1", "value 2"), store.values())
-            assertEquals(4, store.logEntries())
+            assertEquals(4, store.changes())
 
             val value1 = store.value<String>("value 1")
             val value2 = store.value<String>("value 2")
@@ -438,14 +438,14 @@ class StoredValueTest : AbstractStoreTest() {
             assertEquals("value 1", value1.get())
 
             assertEquals(listOf("value 1"), store.values())
-            assertEquals(2, store.logEntries())
+            assertEquals(2, store.changes())
         }
 
         withStore { store ->
             val value1 = store.value<String>("value 1")
             assertEquals("value 1", value1.get())
             assertEquals(listOf("value 1"), store.values())
-            assertEquals(2, store.logEntries())
+            assertEquals(2, store.changes())
 
             val value2 = store.value<String>("value 2")
             assertNull(value2.get())
@@ -454,12 +454,12 @@ class StoredValueTest : AbstractStoreTest() {
             assertEquals("value 2", value2.get())
 
             assertEquals(listOf("value 1", "value 2"), store.values())
-            assertEquals(4, store.logEntries())
+            assertEquals(4, store.changes())
         }
 
         withStore { store ->
             assertEquals(listOf("value 1", "value 2"), store.values())
-            assertEquals(4, store.logEntries())
+            assertEquals(4, store.changes())
 
             val value1 = store.value<String>("value 1")
             val value2 = store.value<String>("value 2")

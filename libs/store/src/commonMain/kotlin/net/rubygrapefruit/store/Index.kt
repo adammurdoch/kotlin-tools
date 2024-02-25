@@ -43,7 +43,7 @@ internal class Index(
     }
 
     fun accept(visitor: ContentVisitor) {
-        visitor.store(ContentVisitor.StoreInfo(metadataFile.compactedChanges + newChanges, metadataFile.currentGeneration))
+        visitor.store(ContentVisitor.StoreInfo(metadataFile.compactedChanges + newChanges, metadataFile.currentGeneration, newChanges))
         for (entry in effectiveEntries().entries.sortedBy { it.key }) {
             visitor.value(entry.key, entry.value.visitorInfo)
         }

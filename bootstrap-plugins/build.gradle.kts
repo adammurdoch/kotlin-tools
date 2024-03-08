@@ -77,6 +77,7 @@ val generateResource = tasks.register("generate-version-resource") {
                 val serialization = Serialization
                 val coroutines = Coroutines
                 val dateTime = DateTime
+                val ksp = Ksp
                 val java = ${Constants.java}
                 val plugins = Plugins
             }

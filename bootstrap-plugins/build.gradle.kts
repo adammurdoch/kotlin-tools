@@ -1,13 +1,13 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm").version("1.9.21")
+    id("org.jetbrains.kotlin.jvm").version("1.9.23")
     id("java-gradle-plugin")
 }
 
 object Constants {
-    val kotlin = "1.9.21"
-    val serializationPlugin = "1.9.21"
-    val serializationLibrary = "1.6.0"
-    val coroutines = "1.7.3"
+    val kotlin = "1.9.23"
+    val serializationPlugin = "1.9.23"
+    val serializationLibrary = "1.6.3"
+    val coroutines = "1.8.0"
     val dateTime = "0.4.1"
     val java = 17
     val pluginsJava = 11

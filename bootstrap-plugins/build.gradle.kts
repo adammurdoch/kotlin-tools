@@ -9,6 +9,7 @@ object Constants {
     val serializationLibrary = "1.6.3"
     val coroutines = "1.8.0"
     val dateTime = "0.4.1"
+    val ksp = "1.9.23-1.0.19"
     val java = 17
     val pluginsJava = 11
 
@@ -114,6 +115,13 @@ val generateResource = tasks.register("generate-version-resource") {
             object DateTime {
                 val version = "${Constants.dateTime}"
                 val coordinates = "org.jetbrains.kotlinx:kotlinx-datetime:${Constants.dateTime}"
+            }
+
+            object Ksp {
+                val version = "${Constants.ksp}"
+                val coordinates = "com.google.devtools.ksp:symbol-processing-api:${Constants.ksp}"
+                val pluginCoordinates = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:${Constants.ksp}"
+                val pluginId = "com.google.devtools.ksp"
             }
         """.trimIndent())
     }

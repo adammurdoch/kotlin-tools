@@ -176,6 +176,56 @@ class StoredValueTest : AbstractStoreTest() {
     }
 
     @Test
+    fun `can discard value`() {
+        withStore { store ->
+            val value = store.value<String>("empty")
+            value.set("value 1")
+        }
+
+        withStore { store ->
+            val value = store.value<String>("empty")
+            assertEquals("value 1", value.get())
+
+            value.discard()
+            assertNull(value.get())
+
+            assertTrue(store.values().isEmpty())
+            assertEquals(3, store.changes())
+            assertEquals(3, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
+        }
+
+        withStore { store ->
+            assertTrue(store.values().isEmpty())
+            assertEquals(3, store.changes())
+            assertEquals(3, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
+
+            val value = store.value<String>("empty")
+            assertNull(value.get())
+
+            assertTrue(store.values().isEmpty())
+            assertEquals(3, store.changes())
+            assertEquals(3, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
+        }
+        withCompactedStore { store ->
+            assertTrue(store.values().isEmpty())
+            assertEquals(0, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(2, store.generation())
+
+            val value = store.value<String>("empty")
+            assertNull(value.get())
+
+            assertTrue(store.values().isEmpty())
+            assertEquals(0, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(2, store.generation())
+        }
+    }
+
+    @Test
     fun `can discard value that has not been written`() {
         withStore { store ->
             val value = store.value<String>("empty")
@@ -661,6 +711,71 @@ class StoredValueTest : AbstractStoreTest() {
             val value2 = store.value<String>("value 2")
             assertEquals("value 1", value1.get())
             assertEquals("value 2", value2.get())
+        }
+    }
+
+    @Test
+    fun `can write multiple values after compacting discarded values`() {
+        withStore { store ->
+            val value1 = store.value<String>("value 1")
+            value1.set("value 1")
+
+            val value2 = store.value<String>("value 2")
+            value2.set("value 1")
+
+            val value3 = store.value<String>("value 3")
+            value3.set("value 1")
+
+            value1.discard()
+            value3.discard()
+            value2.discard()
+
+            assertTrue(store.values().isEmpty())
+            assertEquals(9, store.changes())
+            assertEquals(9, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
+        }
+
+        withCompactedStore { store ->
+            assertTrue(store.values().isEmpty())
+            assertEquals(0, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(2, store.generation())
+
+            val value1 = store.value<String>("value 1")
+            val value2 = store.value<String>("value 2")
+            val value3 = store.value<String>("value 3")
+            assertNull(value1.get())
+            assertNull(value2.get())
+            assertNull(value3.get())
+        }
+
+        withStore { store ->
+            val value1 = store.value<String>("value 1")
+            value1.set("new value 1")
+            val value2 = store.value<String>("value 2")
+            value2.set("new value 2")
+
+            assertEquals("new value 1", value1.get())
+            assertEquals("new value 2", value2.get())
+
+            assertEquals(listOf("value 1", "value 2"), store.values())
+            assertEquals(4, store.changes())
+            assertEquals(4, store.changesSinceCompaction())
+            assertEquals(2, store.generation())
+        }
+
+        withStore { store ->
+            assertEquals(listOf("value 1", "value 2"), store.values())
+            assertEquals(4, store.changes())
+            assertEquals(4, store.changesSinceCompaction())
+            assertEquals(2, store.generation())
+        }
+        withCompactedStore { store ->
+            assertEquals(listOf("value 1", "value 2"), store.values())
+            assertEquals(4, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(3, store.generation())
         }
     }
 }

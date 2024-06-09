@@ -10,6 +10,7 @@ class StoredMapTest : AbstractStoreTest() {
     fun `can read from empty store`() {
         withStore { store ->
             assertTrue(store.values().isEmpty())
+            assertEquals(0, store.changes())
             assertEquals(0, store.changesSinceCompaction())
             assertEquals(1, store.generation())
 
@@ -42,7 +43,7 @@ class StoredMapTest : AbstractStoreTest() {
     }
 
     @Test
-    fun `can read then write`() {
+    fun `can read then write entry`() {
         withStore { store ->
             val value = store.map<String, Int>("value")
             assertNull(value.get("a"))
@@ -53,11 +54,15 @@ class StoredMapTest : AbstractStoreTest() {
 
             assertEquals(listOf("value"), store.values())
             assertEquals(2, store.changes())
+            assertEquals(2, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
         }
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
             assertEquals(2, store.changes())
+            assertEquals(2, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
 
             val value = store.map<String, Int>("value")
             assertEquals(12, value.get("a"))
@@ -65,11 +70,23 @@ class StoredMapTest : AbstractStoreTest() {
 
             assertEquals(listOf("value"), store.values())
             assertEquals(2, store.changes())
+            assertEquals(2, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
+        }
+        withCompactedStore { store ->
+            assertEquals(listOf("value"), store.values())
+            assertEquals(2, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(2, store.generation())
+
+            val value = store.map<String, Int>("value")
+            assertEquals(12, value.get("a"))
+            assertEquals(listOf("a" to 12), value.entries())
         }
     }
 
     @Test
-    fun `can write then read`() {
+    fun `can write then read entry`() {
         withStore { store ->
             val value = store.map<String, Int>("value")
 
@@ -79,11 +96,15 @@ class StoredMapTest : AbstractStoreTest() {
 
             assertEquals(listOf("value"), store.values())
             assertEquals(2, store.changes())
+            assertEquals(2, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
         }
 
         withStore { store ->
             assertEquals(listOf("value"), store.values())
             assertEquals(2, store.changes())
+            assertEquals(2, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
 
             val value = store.map<String, Int>("value")
             assertEquals(12, value.get("a"))
@@ -91,6 +112,18 @@ class StoredMapTest : AbstractStoreTest() {
 
             assertEquals(listOf("value"), store.values())
             assertEquals(2, store.changes())
+            assertEquals(2, store.changesSinceCompaction())
+            assertEquals(1, store.generation())
+        }
+        withCompactedStore { store ->
+            assertEquals(listOf("value"), store.values())
+            assertEquals(2, store.changes())
+            assertEquals(0, store.changesSinceCompaction())
+            assertEquals(2, store.generation())
+
+            val value = store.map<String, Int>("value")
+            assertEquals(12, value.get("a"))
+            assertEquals(listOf("a" to 12), value.entries())
         }
     }
 

@@ -48,12 +48,12 @@ abstract class NativeBinary : DefaultTask() {
 
             MacOsX64 -> {
                 val baseName = "graalvm-jdk-${jdkVersion}_macos-x64"
-                Args(URI("https://download.oracle.com/graalvm/${jdkVersion}/latest/${baseName}_bin.tar.gz"), baseName, "Contents/Home/bin")
+                Args(URI("https://download.oracle.com/graalvm/${jdkVersion}/latest/${baseName}_bin.tar.gz"), baseName, "Contents/Home/bin", binPrefix = listOf("arch", "-arch", "x86_64"))
             }
 
             MacOsArm64 -> {
                 val baseName = "graalvm-jdk-${jdkVersion}_macos-aarch64"
-                Args(URI("https://download.oracle.com/graalvm/${jdkVersion}/latest/${baseName}_bin.tar.gz"), baseName, "Contents/Home/bin")
+                Args(URI("https://download.oracle.com/graalvm/${jdkVersion}/latest/${baseName}_bin.tar.gz"), baseName, "Contents/Home/bin", binPrefix = listOf("arch", "-arch", "arm64"))
             }
 
             WindowsX64 -> {
@@ -71,14 +71,16 @@ abstract class NativeBinary : DefaultTask() {
 
         processOperations.exec { spec ->
             spec.commandLine(
-                nativeImage,
-                "-o", launcherFile.get().asFile.absolutePath,
-                "--no-fallback",
-                "--module-path", modulePath.asPath,
-                "--module", "${module.get()}/${mainClass.get()}"
+                args.binPrefix + listOf(
+                    nativeImage,
+                    "-o", launcherFile.get().asFile.absolutePath,
+                    "--no-fallback",
+                    "--module-path", modulePath.asPath,
+                    "--module", "${module.get()}/${mainClass.get()}"
+                )
             )
         }
     }
 
-    private class Args(val distribution: URI, val installName: String, val binDirPath: String, val extension: String = "")
+    private class Args(val distribution: URI, val installName: String, val binDirPath: String, val extension: String = "", val binPrefix: List<String> = emptyList())
 }

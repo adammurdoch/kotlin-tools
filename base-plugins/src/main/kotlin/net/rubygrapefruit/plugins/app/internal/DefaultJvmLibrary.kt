@@ -5,5 +5,6 @@ import org.gradle.api.Project
 import javax.inject.Inject
 
 abstract class DefaultJvmLibrary @Inject constructor(
-    project: Project
-) : DefaultJvmComponent(project), JvmLibrary
+    project: Project,
+    mainSourceSetName: String
+) : DefaultJvmComponent(project, mainSourceSetName), JvmLibrary

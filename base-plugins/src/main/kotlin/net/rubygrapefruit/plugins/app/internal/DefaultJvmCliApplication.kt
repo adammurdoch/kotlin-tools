@@ -12,7 +12,7 @@ abstract class DefaultJvmCliApplication @Inject constructor(
     providers: ProviderFactory,
     project: Project
 ) :
-    DefaultJvmComponent(project), MutableApplication, MutableJvmApplication, JvmApplication {
+    DefaultJvmComponent(project, "main"), MutableApplication, MutableJvmApplication, JvmApplication {
 
     final override val distributionContainer = DistributionContainer(project.tasks, objects, providers)
 

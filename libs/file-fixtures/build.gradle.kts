@@ -10,11 +10,13 @@ library {
     jvm {
         targetJavaVersion = Versions.plugins.java
         module.name = "net.rubygrapefruit.file_fixtures"
+        dependencies {
+            api(kotlin("test-junit"))
+        }
     }
     nativeDesktop()
     common {
         api(kotlin("test"))
-        api(kotlin("test-junit"))
         api(project(":file-io"))
     }
 }

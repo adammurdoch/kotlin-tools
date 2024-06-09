@@ -18,7 +18,7 @@ class JvmLibraryPlugin : Plugin<Project> {
             plugins.apply(LibraryBasePlugin::class.java)
             plugins.apply(JvmConventionsPlugin::class.java)
 
-            val lib = extensions.create(JvmLibrary::class.java, "library", DefaultJvmLibrary::class.java)
+            val lib = extensions.create(JvmLibrary::class.java, "library", DefaultJvmLibrary::class.java, "main")
             lib.module.name.convention(toModuleName(project.name))
             lib.targetJavaVersion.convention(Versions.java)
 

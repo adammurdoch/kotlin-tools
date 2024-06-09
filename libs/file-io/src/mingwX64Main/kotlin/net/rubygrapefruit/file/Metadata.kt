@@ -28,4 +28,4 @@ internal fun metadata(absolutePath: String): Result<ElementMetadata> {
     }
 }
 
-private inline fun toLong(high: DWORD, low: DWORD): Long = (high.convert<Long>() shl 32) or (low.convert())
+private fun toLong(high: DWORD, low: DWORD): Long = (high.convert<Long>() shl 32) or (low.convert())

@@ -9,7 +9,8 @@ plugins {
 }
 
 for (f in rootDir.listFiles()) {
-    if (f.isDirectory && f.name != ".gradle" && f.name != "build" && f.name != "gradle") {
+    val ignore = listOf(".gradle", ".kotlin", "gradle")
+    if (f.isDirectory && !ignore.contains(f.name)) {
         include(f.name)
     }
 }

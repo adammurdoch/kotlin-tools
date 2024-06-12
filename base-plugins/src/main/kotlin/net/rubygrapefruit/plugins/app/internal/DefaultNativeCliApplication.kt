@@ -1,5 +1,6 @@
 package net.rubygrapefruit.plugins.app.internal
 
+import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.NativeApplication
 import net.rubygrapefruit.plugins.app.NativeExecutable
 import net.rubygrapefruit.plugins.app.NativeMachine
@@ -14,7 +15,7 @@ import javax.inject.Inject
 
 abstract class DefaultNativeCliApplication @Inject constructor(
     private val componentRegistry: MultiPlatformComponentRegistry,
-    private val objects: ObjectFactory,
+    objects: ObjectFactory,
     providers: ProviderFactory,
     private val project: Project
 ) : MutableApplication, MutableNativeApplication, NativeApplication {
@@ -39,15 +40,15 @@ abstract class DefaultNativeCliApplication @Inject constructor(
 
     private fun KotlinNativeBinaryContainer.register(target: NativeMachine) {
         executable()
-        targets.add(target)
+        targets.add(target, listOf(BuildType.Debug, BuildType.Release))
     }
 
-    fun attachExecutable(machine: NativeMachine, binaryFile: Provider<RegularFile>) {
-        targets.attachExecutable(machine, binaryFile)
+    fun attachExecutable(machine: NativeMachine, buildType: BuildType, binaryFile: Provider<RegularFile>) {
+        targets.attachExecutable(machine, buildType, binaryFile)
     }
 
-    fun configureTarget(machine: NativeMachine, action: DefaultDistribution.() -> Unit) {
-        targets.configureTarget(machine, action)
+    fun configureTarget(machine: NativeMachine, buildType: BuildType, action: DefaultDistribution.() -> Unit) {
+        targets.configureTarget(machine, buildType, action)
     }
 
     override fun common(config: KotlinDependencyHandler.() -> Unit) {

@@ -1,5 +1,6 @@
 package net.rubygrapefruit.plugins.app.internal
 
+import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.NativeExecutable
 import net.rubygrapefruit.plugins.app.NativeMachine
 import org.gradle.api.file.RegularFile
@@ -20,32 +21,34 @@ class NativeTargetsContainer(
 
     val executables: Provider<List<NativeExecutable>> = providers.provider { machines.all.map { it.executable } }
 
-    val executable: Provider<NativeExecutable> = providers.provider { targetInfo(HostMachine.current.machine)?.executable }
+    val executable: Provider<NativeExecutable> = providers.provider { targetInfo(HostMachine.current.machine, BuildType.Debug)?.executable }
 
-    fun add(machine: NativeMachine, canBuildOnThisHost: Boolean = true) {
-        if (targetInfo(machine) == null) {
-            val executable = DefaultNativeExecutable(machine, HostMachine.current.canBuild(machine), objects)
-            val distribution = distributions.add(
-                machine.kotlinTarget,
-                machine == HostMachine.current.machine,
-                canBuildOnThisHost && HostMachine.current.canBuild(machine)
-            )
-            distribution.launcherFile.set(executable.outputBinary)
-            machines.add(TargetInfo(machine, executable, distribution))
+    fun add(machine: NativeMachine, buildTypes: List<BuildType>, canBuildOnThisHost: Boolean = true) {
+        for (buildType in buildTypes) {
+            if (targetInfo(machine, buildType) == null) {
+                val executable = DefaultNativeExecutable(machine, buildType, HostMachine.current.canBuild(machine), objects)
+                val distribution = distributions.add(
+                    machine.kotlinTarget + buildType.name,
+                    machine == HostMachine.current.machine && (buildType == BuildType.Debug || buildTypes.size == 1),
+                    canBuildOnThisHost && HostMachine.current.canBuild(machine)
+                )
+                distribution.launcherFile.set(executable.outputBinary)
+                machines.add(TargetInfo(machine, buildType, executable, distribution))
+            }
         }
     }
 
-    private fun targetInfo(machine: NativeMachine) = machines.all.find { it.machine == machine }
+    private fun targetInfo(machine: NativeMachine, buildType: BuildType) = machines.all.find { it.machine == machine && it.buildType == buildType }
 
-    fun attachExecutable(machine: NativeMachine, binaryFile: Provider<RegularFile>) {
-        val executable = targetInfo(machine)!!.executable
+    fun attachExecutable(machine: NativeMachine, buildType: BuildType, binaryFile: Provider<RegularFile>) {
+        val executable = targetInfo(machine, buildType)!!.executable
         if (HostMachine.current.canBuild(machine)) {
             executable.outputBinary.set(binaryFile)
         }
     }
 
-    fun configureTarget(machine: NativeMachine, action: DefaultDistribution.() -> Unit) {
-        action(targetInfo(machine)!!.distribution)
+    fun configureTarget(machine: NativeMachine, buildType: BuildType, action: DefaultDistribution.() -> Unit) {
+        action(targetInfo(machine, buildType)!!.distribution)
     }
 
     fun eachTarget(action: (NativeMachine, DefaultDistribution) -> Unit) {
@@ -54,12 +57,14 @@ class NativeTargetsContainer(
 
     private class TargetInfo(
         val machine: NativeMachine,
+        val buildType: BuildType,
         val executable: DefaultNativeExecutable,
         val distribution: DefaultDistribution
     )
 
     private class DefaultNativeExecutable(
         override val targetMachine: NativeMachine,
+        override val buildType: BuildType,
         override val canBuild: Boolean,
         objectFactory: ObjectFactory
     ) : NativeExecutable {

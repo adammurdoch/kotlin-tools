@@ -4,7 +4,7 @@ import org.gradle.api.provider.Provider
 
 interface NativeApplication : Application, MultiPlatformComponent {
     /**
-     * Adds the native desktops as a target, if not already.
+     * Adds the native desktops (macOS, Linux, Windows) as a target, if not already.
      */
     fun nativeDesktop()
 

@@ -1,12 +1,17 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
-import net.rubygrapefruit.plugins.app.internal.*
+import net.rubygrapefruit.plugins.app.BuildType
+import net.rubygrapefruit.plugins.app.internal.DefaultNativeUiApplication
+import net.rubygrapefruit.plugins.app.internal.applications
+import net.rubygrapefruit.plugins.app.internal.kotlin
+import net.rubygrapefruit.plugins.app.internal.multiplatformComponents
 import net.rubygrapefruit.plugins.app.internal.tasks.NativeLauncher
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.mpp.Executable
+import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 
 class NativeUiApplicationPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -27,9 +32,14 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                 }
 
                 multiplatformComponents.eachNativeTarget { machine, nativeTarget ->
-                    val executable = nativeTarget.binaries.withType(Executable::class.java).first()
-                    val binaryFile = layout.file(executable.linkTaskProvider.map { it.binary.outputFile })
-                    app.attachExecutable(machine, binaryFile)
+                    for (executable in nativeTarget.binaries.withType(Executable::class.java)) {
+                        val binaryFile = layout.file(executable.linkTaskProvider.map { it.binary.outputFile })
+                        val buildType = when (executable.buildType) {
+                            NativeBuildType.DEBUG -> BuildType.Debug
+                            NativeBuildType.RELEASE -> BuildType.Release
+                        }
+                        app.attachExecutable(machine, buildType, binaryFile)
+                    }
                 }
             }
 

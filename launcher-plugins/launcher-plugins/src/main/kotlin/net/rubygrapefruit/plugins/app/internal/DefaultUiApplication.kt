@@ -1,5 +1,6 @@
 package net.rubygrapefruit.plugins.app.internal
 
+import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.NativeMachine
 import net.rubygrapefruit.plugins.app.UiApplication
 import org.gradle.api.Project
@@ -21,8 +22,8 @@ abstract class DefaultUiApplication(
 
     val iconName: Provider<String> = capitalizedAppName.map { "$it.icns" }
 
-    fun attachExecutable(machine: NativeMachine, binaryFile: Provider<RegularFile>) {
-        targets.attachExecutable(machine, binaryFile)
+    fun attachExecutable(machine: NativeMachine, buildType: BuildType, binaryFile: Provider<RegularFile>) {
+        targets.attachExecutable(machine, buildType, binaryFile)
     }
 
     fun eachTarget(action: (NativeMachine, DefaultDistribution) -> Unit) {

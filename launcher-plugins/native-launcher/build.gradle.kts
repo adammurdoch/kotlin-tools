@@ -1,4 +1,5 @@
 import net.rubygrapefruit.plugins.app.Versions
+import net.rubygrapefruit.plugins.app.BuildType
 
 plugins {
     id("net.rubygrapefruit.native.base-cli-app")
@@ -11,7 +12,7 @@ application {
 }
 
 for (executable in application.executables.get()) {
-    if (executable.canBuild) {
+    if (executable.canBuild && executable.buildType == BuildType.Release) {
         configurations.create("outgoingNativeBinary${executable.targetMachine.name}") {
             attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named("native-binary-${executable.targetMachine.kotlinTarget}"))
             isCanBeResolved = false

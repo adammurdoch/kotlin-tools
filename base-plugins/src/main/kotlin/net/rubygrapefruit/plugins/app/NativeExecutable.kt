@@ -10,6 +10,11 @@ interface NativeExecutable {
     val targetMachine: NativeMachine
 
     /**
+     * The target build type for this executable
+     */
+    val buildType: BuildType
+
+    /**
      * Can this executable be built on the host machine?
      */
     val canBuild: Boolean

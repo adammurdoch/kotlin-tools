@@ -9,6 +9,10 @@ internal class DefaultArgument(private val name: String, private val host: Host,
         return value ?: throw IllegalStateException()
     }
 
+    override fun usage(): PositionalUsage {
+        return PositionalUsage("<$name>")
+    }
+
     override fun accept(args: List<String>): ParseResult {
         val candidate = args.first()
         return if (host.isOption(candidate)) {

@@ -19,6 +19,10 @@ internal abstract class AbstractOption<T>(protected val name: String, host: Host
         }
     }
 
+    override fun usage(): List<OptionUsage> {
+        return listOf(OptionUsage(flag))
+    }
+
     override fun accept(args: List<String>): ParseResult {
         val arg = args.first()
         if (arg != flag) {
@@ -33,7 +37,7 @@ internal abstract class AbstractOption<T>(protected val name: String, host: Host
         value = convert(args[1])
         set = true
 
-        return ParseResult(2, null)
+        return ParseResult.Two
     }
 
     protected abstract fun convert(arg: String?): T

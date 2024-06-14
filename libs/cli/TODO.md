@@ -1,5 +1,7 @@
-- `--help`
-- `help`
+- Don't define `--no-help` 
+- `--help` shows help string for flag, option, argument, action 
+- `--help` shows usage of sub-action? 
+- Show help for a sub-action
 - App name for help
 - usage message on parse error
   - Unknown option

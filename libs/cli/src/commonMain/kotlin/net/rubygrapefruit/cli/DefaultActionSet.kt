@@ -31,6 +31,10 @@ internal class DefaultActionSet(private val host: Host) : Positional(), Argument
         return ArgParseException("Action not provided", resolution = "Please specify an action to run.", actions = actionInfo)
     }
 
+    override fun usage(): PositionalUsage {
+        return PositionalUsage(actions.keys.joinToString(" | "))
+    }
+
     override fun getValue(thisRef: Any?, property: KProperty<*>): Action {
         return action ?: throw IllegalStateException()
     }

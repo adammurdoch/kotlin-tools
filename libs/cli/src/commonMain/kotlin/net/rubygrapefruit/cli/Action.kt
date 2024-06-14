@@ -149,6 +149,13 @@ open class Action {
         exit(0)
     }
 
+    internal fun usage(): ActionUsage {
+        return ActionUsage(
+            options.flatMap { it.usage() },
+            positional.map { it.usage() }
+        )
+    }
+
     internal fun replace(option: NonPositional, newOption: NonPositional) {
         options[options.indexOf(option)] = newOption
     }

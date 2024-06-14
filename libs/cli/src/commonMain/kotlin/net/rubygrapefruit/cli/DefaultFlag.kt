@@ -14,6 +14,10 @@ internal class DefaultFlag(name: String, host: Host, default: Boolean) : NonPosi
         return value
     }
 
+    override fun usage(): List<OptionUsage> {
+        return listOf(OptionUsage(enableFlag), OptionUsage(disableFlag))
+    }
+
     override fun accept(args: List<String>): ParseResult {
         val arg = args.first()
         return if (arg == enableFlag) {

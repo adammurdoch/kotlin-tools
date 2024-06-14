@@ -9,8 +9,9 @@ internal class DefaultArgument(private val name: String, default: String?) : Pos
         return value ?: throw IllegalStateException()
     }
 
-    override fun accept(arg: String) {
-        value = arg
+    override fun accept(args: List<String>): Int {
+        value = args.first()
+        return 1
     }
 
     override fun missing() {

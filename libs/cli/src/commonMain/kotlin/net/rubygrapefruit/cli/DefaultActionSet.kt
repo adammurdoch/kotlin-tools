@@ -10,15 +10,17 @@ internal class DefaultActionSet : PositionalArgument(), Argument<Action>, Action
         actions[name] = action
     }
 
-    override fun accept(arg: String) {
-        if (!actions.containsKey(arg)) {
-            throw ArgParseException("Unknown command '$arg'")
+    override fun accept(args: List<String>): Int {
+        val name = args.first()
+        if (!actions.containsKey(name)) {
+            throw ArgParseException("Unknown action '$name'")
         }
-        action = actions[arg]
+        action = actions[name]
+        return 1 + action!!.maybeParse(args.drop(1))
     }
 
     override fun missing() {
-        throw ArgParseException("Command not provided")
+        throw ArgParseException("Action not provided")
     }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): Action {

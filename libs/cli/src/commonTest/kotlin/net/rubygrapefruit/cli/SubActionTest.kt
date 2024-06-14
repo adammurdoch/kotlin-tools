@@ -1,9 +1,6 @@
 package net.rubygrapefruit.cli
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertSame
-import kotlin.test.fail
+import kotlin.test.*
 
 class SubActionTest {
     @Test
@@ -46,6 +43,31 @@ class SubActionTest {
     }
 
     @Test
+    fun `action can have sub action with configuration`() {
+        class Sub : Action() {
+            val flag by flag("f")
+            val a by argument("a")
+            val b by argument("b")
+        }
+
+        val sub = Sub()
+
+        class WithSub : Action() {
+            val sub by actions {
+                action("sub", sub)
+            }
+        }
+
+        val action = WithSub()
+        action.parse(listOf("sub", "--f", "1", "2"))
+
+        assertSame(sub, action.sub)
+        assertTrue(sub.flag)
+        assertEquals("1", sub.a)
+        assertEquals("2", sub.b)
+    }
+
+    @Test
     fun `fails when sub-action not provided`() {
         val sub = Action()
 
@@ -60,7 +82,7 @@ class SubActionTest {
             action.parse(emptyList())
             fail()
         } catch (e: ArgParseException) {
-            assertEquals("Command not provided", e.message)
+            assertEquals("Action not provided", e.message)
         }
     }
 
@@ -79,7 +101,7 @@ class SubActionTest {
             action.parse(listOf("thing"))
             fail()
         } catch (e: ArgParseException) {
-            assertEquals("Unknown command 'thing'", e.message)
+            assertEquals("Unknown action 'thing'", e.message)
         }
     }
 

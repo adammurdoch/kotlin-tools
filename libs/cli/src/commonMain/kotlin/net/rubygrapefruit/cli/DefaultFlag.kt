@@ -15,13 +15,11 @@ internal class DefaultFlag(name: String, default: Boolean) : Flag {
         return if (arg == enableFlag) {
             value = true
             true
+        } else if (arg == disableFlag) {
+            value = false
+            true
         } else {
-            if (arg == disableFlag) {
-                value = false
-                true
-            } else {
-                false
-            }
+            false
         }
     }
 }

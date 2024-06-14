@@ -1,0 +1,8 @@
+- string option
+- int option or argument
+- short options
+- repeated actions
+- zero or more arguments
+- nested actions
+- usage message
+- disallow duplicate flags, sub-actions

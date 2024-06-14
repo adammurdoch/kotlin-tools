@@ -42,12 +42,28 @@ open class Action {
      */
     @Throws(ArgParseException::class)
     fun parse(args: List<String>) {
+        val count = maybeParse(args)
+        if (count < args.size) {
+            val arg = args[count]
+            if (arg.startsWith("--")) {
+                throw ArgParseException("Unknown option: $arg")
+            } else {
+                throw ArgParseException("Unknown argument: $arg")
+            }
+        }
+    }
+
+    internal fun maybeParse(args: List<String>): Int {
         val pendingArgs = this.positional.toMutableList()
 
-        for (arg in args) {
+        var index = 0
+        while (index in args.indices) {
+            val arg = args[index]
+
             var matched = false
             for (option in options) {
                 if (option.accept(arg)) {
+                    index++
                     matched = true
                     break
                 }
@@ -55,20 +71,26 @@ open class Action {
             if (matched) {
                 continue
             }
+
             if (pendingArgs.isNotEmpty()) {
-                pendingArgs.removeFirst().accept(arg)
-            } else if (arg.startsWith("--")) {
-                throw ArgParseException("Unknown option: $arg")
-            } else {
-                throw ArgParseException("Unknown argument: $arg")
+                val count = pendingArgs.first().accept(args.subList(index, args.size))
+                pendingArgs.removeFirst()
+                index += count
+                continue
             }
+
+            return index
         }
 
         for (arg in pendingArgs) {
             arg.missing()
         }
+        return args.size
     }
 
+    /**
+     * Runs this action, using the given arguments to configure it.
+     */
     fun run(args: List<String>): Nothing {
         parse(args)
         run()

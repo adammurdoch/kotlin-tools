@@ -59,25 +59,26 @@ open class Action {
      * Configures this object from the given arguments.
      */
     @Throws(ArgParseException::class)
-    fun parse(args: List<String>): Action {
-        val help by flag("help", help = "Show usage message")
+    fun parse(args: List<String>) {
+        val result = parseAll(args)
+        if (result.failure != null) {
+            throw result.failure
+        }
+    }
+
+    internal fun parseAll(args: List<String>): ParseResult {
         val result = maybeParse(args)
         val count = result.count
-        if (count < args.size) {
+        if (result.failure == null && count < args.size) {
             val arg = args[count]
-            if (DefaultHost.isOption(arg)) {
-                throw ArgParseException("Unknown option: $arg")
+            val failure = if (DefaultHost.isOption(arg)) {
+                ArgParseException("Unknown option: $arg")
             } else {
-                throw ArgParseException("Unknown argument: $arg")
+                ArgParseException("Unknown argument: $arg")
             }
+            return ParseResult(count, failure)
         }
-        return if (help) {
-            HelpAction(this)
-        } else if (result.failure != null) {
-            throw result.failure
-        } else {
-            this
-        }
+        return result
     }
 
     internal fun maybeParse(args: List<String>): ParseResult {
@@ -125,30 +126,6 @@ open class Action {
         }
 
         return ParseResult(args.size, null)
-    }
-
-    /**
-     * Runs this action, using the given arguments to configure it.
-     */
-    fun run(args: Array<String>) {
-        run(args.toList())
-    }
-
-    /**
-     * Runs this action, using the given arguments to configure it.
-     */
-    fun run(args: List<String>) {
-        val action = try {
-            parse(args)
-        } catch (e: ArgParseException) {
-            for (line in e.formattedMessage.lines()) {
-                println(line)
-            }
-            exit(1)
-        }
-
-        action.run()
-        exit(0)
     }
 
     internal fun usage(): ActionUsage {

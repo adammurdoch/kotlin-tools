@@ -161,13 +161,13 @@ class SubActionTest : AbstractActionTest() {
 
     @Test
     fun `can run --help command without providing action`() {
-        class WithSub : Action() {
+        class WithSub : MainAction("cmd") {
             val sub by actions {
                 action("sub", Action())
             }
         }
 
-        val action = WithSub().parse(listOf("--help"))
+        val action = WithSub().actionFor(listOf("--help"))
         assertIs<HelpAction>(action)
     }
 }

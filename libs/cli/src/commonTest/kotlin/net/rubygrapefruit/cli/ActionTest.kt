@@ -21,9 +21,9 @@ class ActionTest : AbstractActionTest() {
 
     @Test
     fun `can run --help command`() {
-        class NoConfig : Action()
+        class NoConfig : MainAction("cmd")
 
-        val action = NoConfig().parse(listOf("--help"))
+        val action = NoConfig().actionFor(listOf("--help"))
         assertIs<HelpAction>(action)
     }
 }

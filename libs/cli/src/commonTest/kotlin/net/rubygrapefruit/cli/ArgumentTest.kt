@@ -83,11 +83,11 @@ class ArgumentTest : AbstractActionTest() {
 
     @Test
     fun `can run --help command without providing argument`() {
-        class Argument : Action() {
+        class Argument : MainAction("cmd") {
             val arg by argument("value")
         }
 
-        val action = Argument().parse(listOf("--help"))
+        val action = Argument().actionFor(listOf("--help"))
         assertIs<HelpAction>(action)
     }
 }

@@ -9,19 +9,21 @@ internal class DefaultArgument(private val name: String, private val host: Host,
         return value ?: throw IllegalStateException()
     }
 
-    override fun accept(args: List<String>): Int {
+    override fun accept(args: List<String>): ParseResult {
         val candidate = args.first()
         return if (host.isOption(candidate)) {
-            0
+            ParseResult.Nothing
         } else {
             value = candidate
-            1
+            ParseResult.One
         }
     }
 
-    override fun missing() {
-        if (value == null) {
-            throw ArgParseException("Argument '$name' not provided")
+    override fun missing(): ArgParseException? {
+        return if (value == null) {
+            ArgParseException("Argument '$name' not provided")
+        } else {
+            null
         }
     }
 }

@@ -59,8 +59,10 @@ open class Action {
      * Configures this object from the given arguments.
      */
     @Throws(ArgParseException::class)
-    fun parse(args: List<String>) {
-        val count = maybeParse(args)
+    fun parse(args: List<String>): Action {
+        val help by flag("help", help = "Show usage message")
+        val result = maybeParse(args)
+        val count = result.count
         if (count < args.size) {
             val arg = args[count]
             if (DefaultHost.isOption(arg)) {
@@ -69,9 +71,16 @@ open class Action {
                 throw ArgParseException("Unknown argument: $arg")
             }
         }
+        return if (help) {
+            HelpAction(this)
+        } else if (result.failure != null) {
+            throw result.failure
+        } else {
+            this
+        }
     }
 
-    internal fun maybeParse(args: List<String>): Int {
+    internal fun maybeParse(args: List<String>): ParseResult {
         val pendingArgs = this.positional.toMutableList()
 
         var index = 0
@@ -80,7 +89,11 @@ open class Action {
 
             var matched = false
             for (option in options) {
-                val count = option.accept(current)
+                val result = option.accept(current)
+                if (result.failure != null) {
+                    return result.advance(index)
+                }
+                val count = result.count
                 if (count > 0) {
                     index += count
                     matched = true
@@ -92,19 +105,26 @@ open class Action {
             }
 
             if (pendingArgs.isNotEmpty()) {
-                val count = pendingArgs.first().accept(current)
+                val result = pendingArgs.first().accept(current)
+                if (result.failure != null) {
+                    return result.advance(index)
+                }
                 pendingArgs.removeFirst()
-                index += count
+                index += result.count
                 continue
             }
 
-            return index
+            return ParseResult(index, null)
         }
 
         for (arg in pendingArgs) {
-            arg.missing()
+            val failure = arg.missing()
+            if (failure != null) {
+                return ParseResult(args.size, failure)
+            }
         }
-        return args.size
+
+        return ParseResult(args.size, null)
     }
 
     /**
@@ -118,14 +138,14 @@ open class Action {
      * Runs this action, using the given arguments to configure it.
      */
     fun run(args: List<String>) {
-        try {
+        val action = try {
             parse(args)
         } catch (e: ArgParseException) {
             println(e.formattedMessage)
             exit(1)
         }
 
-        run()
+        action.run()
         exit(0)
     }
 

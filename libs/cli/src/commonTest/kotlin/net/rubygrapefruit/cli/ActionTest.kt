@@ -1,6 +1,7 @@
 package net.rubygrapefruit.cli
 
 import kotlin.test.Test
+import kotlin.test.assertIs
 
 class ActionTest : AbstractActionTest() {
     @Test
@@ -16,5 +17,13 @@ class ActionTest : AbstractActionTest() {
 
         parseFails(NoConfig(), listOf("--flag"), "Unknown option: --flag")
         parseFails(NoConfig(), listOf("arg"), "Unknown argument: arg")
+    }
+
+    @Test
+    fun `can run --help command`() {
+        class NoConfig : Action()
+
+        val action = NoConfig().parse(listOf("--help"))
+        assertIs<HelpAction>(action)
     }
 }

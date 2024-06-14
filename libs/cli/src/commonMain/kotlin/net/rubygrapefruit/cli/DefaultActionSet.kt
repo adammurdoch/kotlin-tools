@@ -11,23 +11,24 @@ internal class DefaultActionSet(private val host: Host) : Positional(), Argument
         actions[name] = ActionDetails(action, help)
     }
 
-    override fun accept(args: List<String>): Int {
+    override fun accept(args: List<String>): ParseResult {
         val name = args.first()
         if (host.isOption(name)) {
-            return 0
+            return ParseResult.Nothing
         }
         if (!actions.containsKey(name)) {
-            throw ArgParseException("Unknown action: $name", actions = actionInfo)
+            return ParseResult(1, ArgParseException("Unknown action: $name", actions = actionInfo))
         }
         action = actions[name]!!.action
-        return 1 + action!!.maybeParse(args.drop(1))
+        val result = action!!.maybeParse(args.drop(1))
+        return ParseResult(1 + result.count, result.failure)
     }
 
     private val actionInfo
         get() = actions.map { SubActionInfo(it.key, it.value.help) }
 
-    override fun missing() {
-        throw ArgParseException("Action not provided", resolution = "Please specify an action to run.", actions = actionInfo)
+    override fun missing(): ArgParseException {
+        return ArgParseException("Action not provided", resolution = "Please specify an action to run.", actions = actionInfo)
     }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): Action {

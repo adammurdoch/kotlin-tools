@@ -7,20 +7,23 @@ internal class DefaultFlag(name: String, host: Host, default: Boolean) : NonPosi
     private val disableFlag = host.option("no-$name")
     private var value: Boolean = default
 
+    override val enableUsage: String
+        get() = enableFlag
+
     override operator fun getValue(thisRef: Any?, property: KProperty<*>): Boolean {
         return value
     }
 
-    override fun accept(args: List<String>): Int {
+    override fun accept(args: List<String>): ParseResult {
         val arg = args.first()
         return if (arg == enableFlag) {
             value = true
-            1
+            ParseResult.One
         } else if (arg == disableFlag) {
             value = false
-            1
+            ParseResult.One
         } else {
-            0
+            ParseResult.Nothing
         }
     }
 }

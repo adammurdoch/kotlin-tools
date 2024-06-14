@@ -19,21 +19,21 @@ internal abstract class AbstractOption<T>(protected val name: String, host: Host
         }
     }
 
-    override fun accept(args: List<String>): Int {
+    override fun accept(args: List<String>): ParseResult {
         val arg = args.first()
         if (arg != flag) {
-            return 0
-        }
-        if (value != null) {
-            throw ArgParseException("Option $flag already provided")
+            return ParseResult.Nothing
         }
         if (args.size == 1) {
-            throw ArgParseException("Value missing for option $flag")
+            return ParseResult(1, ArgParseException("Value missing for option $flag"))
+        }
+        if (value != null) {
+            return ParseResult(2, ArgParseException("Option $flag already provided"))
         }
         value = convert(args[1])
         set = true
 
-        return 2
+        return ParseResult(2, null)
     }
 
     protected abstract fun convert(arg: String?): T

@@ -158,4 +158,16 @@ class SubActionTest : AbstractActionTest() {
             assertEquals("--sub cannot be used as an action name", e.message)
         }
     }
+
+    @Test
+    fun `can run --help command without providing action`() {
+        class WithSub : Action() {
+            val sub by actions {
+                action("sub", Action())
+            }
+        }
+
+        val action = WithSub().parse(listOf("--help"))
+        assertIs<HelpAction>(action)
+    }
 }

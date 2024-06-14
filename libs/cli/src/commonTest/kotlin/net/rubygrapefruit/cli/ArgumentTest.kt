@@ -2,6 +2,7 @@ package net.rubygrapefruit.cli
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 
 class ArgumentTest : AbstractActionTest() {
     @Test
@@ -78,5 +79,15 @@ class ArgumentTest : AbstractActionTest() {
         }
 
         parseFails(Argument(), listOf("1", "2"), "Unknown argument: 2")
+    }
+
+    @Test
+    fun `can run --help command without providing argument`() {
+        class Argument : Action() {
+            val arg by argument("value")
+        }
+
+        val action = Argument().parse(listOf("--help"))
+        assertIs<HelpAction>(action)
     }
 }

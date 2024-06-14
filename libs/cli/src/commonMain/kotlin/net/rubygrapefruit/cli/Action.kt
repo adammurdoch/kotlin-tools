@@ -4,11 +4,23 @@ package net.rubygrapefruit.cli
  * An action that can be configured using command-line arguments.
  */
 open class Action {
-    private val options = mutableListOf<DefaultFlag>()
-    private val positional = mutableListOf<PositionalArgument>()
+    private val options = mutableListOf<NonPositional>()
+    private val positional = mutableListOf<Positional>()
 
     /**
-     * Defines a boolean flag with the given name.
+     * Defines a string option with the given name. Can use `--<name> <value>` to specify the value.
+     * The flag can appear anywhere in the command-line.
+     */
+    fun option(name: String): Option<String?> {
+        val option = DefaultOption(name)
+        options.add(option)
+        return option
+    }
+
+    /**
+     * Defines a boolean flag with the given name. Can use `--<name>` or `--no-<name>` to specify the value.
+     * Uses the default value if not present.
+     * The flag can appear anywhere in the command-line. It can be specified multiple times and last value is used.
      */
     fun flag(name: String, default: Boolean = false): Flag {
         val flag = DefaultFlag(name, default)
@@ -18,6 +30,8 @@ open class Action {
 
     /**
      * Defines an argument with the given name.
+     * The argument must appear at the current location on the command-line.
+     * Uses the default value if not present, and fails if the argument is not present and its default is null.
      */
     fun argument(name: String, default: String? = null): Argument<String> {
         val arg = DefaultArgument(name, default)
@@ -26,7 +40,9 @@ open class Action {
     }
 
     /**
-     * Defines a set of sub-actions.
+     * Defines a set of sub-actions. Can use `<name> <args>` to invoke the action.
+     * Only one sub-action can be invoked, and this must appear at the current location on the command-line.
+     * Fails if a sub-action is not present.
      */
     fun actions(builder: Actions.() -> Unit): Argument<Action> {
         val actions = DefaultActionSet()
@@ -58,12 +74,13 @@ open class Action {
 
         var index = 0
         while (index in args.indices) {
-            val arg = args[index]
+            val current = args.subList(index, args.size)
 
             var matched = false
             for (option in options) {
-                if (option.accept(arg)) {
-                    index++
+                val count = option.accept(current)
+                if (count > 0) {
+                    index += count
                     matched = true
                     break
                 }
@@ -73,7 +90,7 @@ open class Action {
             }
 
             if (pendingArgs.isNotEmpty()) {
-                val count = pendingArgs.first().accept(args.subList(index, args.size))
+                val count = pendingArgs.first().accept(current)
                 pendingArgs.removeFirst()
                 index += count
                 continue

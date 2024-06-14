@@ -2,7 +2,7 @@ package net.rubygrapefruit.cli
 
 import kotlin.reflect.KProperty
 
-internal class DefaultActionSet : PositionalArgument(), Argument<Action>, Action.Actions {
+internal class DefaultActionSet : Positional(), Argument<Action>, Action.Actions {
     private val actions = mutableMapOf<String, Action>()
     private var action: Action? = null
 

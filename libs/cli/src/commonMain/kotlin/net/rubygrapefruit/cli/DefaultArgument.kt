@@ -2,7 +2,7 @@ package net.rubygrapefruit.cli
 
 import kotlin.reflect.KProperty
 
-internal class DefaultArgument(private val name: String, default: String?) : PositionalArgument(), Argument<String> {
+internal class DefaultArgument(private val name: String, default: String?) : Positional(), Argument<String> {
     private var value: String? = default
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): String {

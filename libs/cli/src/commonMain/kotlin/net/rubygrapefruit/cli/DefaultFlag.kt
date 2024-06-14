@@ -2,7 +2,7 @@ package net.rubygrapefruit.cli
 
 import kotlin.reflect.KProperty
 
-internal class DefaultFlag(name: String, default: Boolean) : Flag {
+internal class DefaultFlag(name: String, default: Boolean) : NonPositional(), Flag {
     private val enableFlag = "--$name"
     private val disableFlag = "--no-$name"
     private var value: Boolean = default
@@ -11,15 +11,16 @@ internal class DefaultFlag(name: String, default: Boolean) : Flag {
         return value
     }
 
-    fun accept(arg: String): Boolean {
+    override fun accept(args: List<String>): Int {
+        val arg = args.first()
         return if (arg == enableFlag) {
             value = true
-            true
+            1
         } else if (arg == disableFlag) {
             value = false
-            true
+            1
         } else {
-            false
+            0
         }
     }
 }

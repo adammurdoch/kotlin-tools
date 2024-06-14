@@ -48,7 +48,7 @@ class IntOptionTest : AbstractActionTest() {
             val option by option("o").int()
         }
 
-        parseFails(IntOption(), listOf("--o"), "Argument missing for option --o")
+        parseFails(IntOption(), listOf("--o"), "Value missing for option --o")
     }
 
     @Test

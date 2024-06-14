@@ -77,7 +77,7 @@ class StringOptionTest : AbstractActionTest() {
             val option by option("o")
         }
 
-        parseFails(StringOption(), listOf("--o"), "Argument missing for option --o")
+        parseFails(StringOption(), listOf("--o"), "Value missing for option --o")
     }
 
     @Test

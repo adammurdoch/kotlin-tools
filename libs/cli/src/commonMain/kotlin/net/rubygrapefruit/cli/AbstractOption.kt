@@ -28,7 +28,7 @@ internal abstract class AbstractOption<T>(protected val name: String, host: Host
             throw ArgParseException("Option $flag already provided")
         }
         if (args.size == 1) {
-            throw ArgParseException("Argument missing for option $flag")
+            throw ArgParseException("Value missing for option $flag")
         }
         value = convert(args[1])
         set = true

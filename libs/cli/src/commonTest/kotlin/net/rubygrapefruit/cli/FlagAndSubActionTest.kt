@@ -4,7 +4,7 @@ import kotlin.test.Test
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
-class FlagAndSubActionTest {
+class FlagAndSubActionTest : AbstractActionTest() {
     @Test
     fun `flag can precede sub-action`() {
         val sub = Action()
@@ -16,11 +16,10 @@ class FlagAndSubActionTest {
             }
         }
 
-        val action = WithSub()
-        action.parse(listOf("--flag", "sub"))
-
-        assertTrue(action.flag)
-        assertSame(sub, action.sub)
+        parse(WithSub(), listOf("--flag", "sub")) { action ->
+            assertTrue(action.flag)
+            assertSame(sub, action.sub)
+        }
     }
 
     @Test
@@ -34,10 +33,9 @@ class FlagAndSubActionTest {
             }
         }
 
-        val action = WithSub()
-        action.parse(listOf("sub", "--flag"))
-
-        assertTrue(action.flag)
-        assertSame(sub, action.sub)
+        parse(WithSub(), listOf("sub", "--flag")) { action ->
+            assertTrue(action.flag)
+            assertSame(sub, action.sub)
+        }
     }
 }

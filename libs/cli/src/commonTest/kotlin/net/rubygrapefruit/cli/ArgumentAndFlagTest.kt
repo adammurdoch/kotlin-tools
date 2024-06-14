@@ -4,7 +4,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class ArgumentAndFlagTest {
+class ArgumentAndFlagTest : AbstractActionTest() {
     @Test
     fun `flag can appear before argument`() {
         class MixedAction : Action() {
@@ -12,11 +12,10 @@ class ArgumentAndFlagTest {
             val arg by argument("arg")
         }
 
-        val action = MixedAction()
-        action.parse(listOf("--flag", "abc"))
-
-        assertTrue(action.flag)
-        assertEquals("abc", action.arg)
+        parse(MixedAction(), listOf("--flag", "abc")) { action ->
+            assertTrue(action.flag)
+            assertEquals("abc", action.arg)
+        }
     }
 
     @Test
@@ -26,10 +25,9 @@ class ArgumentAndFlagTest {
             val arg by argument("arg")
         }
 
-        val action = MixedAction()
-        action.parse(listOf("abc", "--flag"))
-
-        assertTrue(action.flag)
-        assertEquals("abc", action.arg)
+        parse(MixedAction(), listOf("abc", "--flag")) { action ->
+            assertTrue(action.flag)
+            assertEquals("abc", action.arg)
+        }
     }
 }

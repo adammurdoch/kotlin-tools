@@ -3,19 +3,17 @@ package net.rubygrapefruit.cli
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
-import kotlin.test.fail
 
-class StringOptionTest {
+class StringOptionTest : AbstractActionTest() {
     @Test
     fun `can define string option`() {
         class StringOption : Action() {
             val option by option("o")
         }
 
-        val action = StringOption()
-        action.parse(listOf("--o", "123"))
-
-        assertEquals("123", action.option)
+        parse(StringOption(), listOf("--o", "123")) { action ->
+            assertEquals("123", action.option)
+        }
     }
 
     @Test
@@ -24,10 +22,9 @@ class StringOptionTest {
             val option by option("o")
         }
 
-        val action = StringOption()
-        action.parse(emptyList())
-
-        assertNull(action.option)
+        parse(StringOption(), emptyList()) { action ->
+            assertNull(action.option)
+        }
     }
 
     @Test
@@ -37,17 +34,25 @@ class StringOptionTest {
             val o2 by option("o2")
         }
 
-        val action = StringOption()
-        action.parse(listOf("--o1", "123"))
+        parse(StringOption(), emptyList()) { action ->
+            assertNull(action.o1)
+            assertNull(action.o2)
+        }
 
-        assertEquals("123", action.o1)
-        assertNull(action.o2)
+        parse(StringOption(), listOf("--o1", "123")) { action ->
+            assertEquals("123", action.o1)
+            assertNull(action.o2)
+        }
 
-        val action2 = StringOption()
-        action2.parse(listOf("--o2", "123"))
+        parse(StringOption(), listOf("--o2", "123")) { action ->
+            assertNull(action.o1)
+            assertEquals("123", action.o2)
+        }
 
-        assertNull(action2.o1)
-        assertEquals("123", action2.o2)
+        parse(StringOption(), listOf("--o2", "123", "--o1", "456")) { action ->
+            assertEquals("456", action.o1)
+            assertEquals("123", action.o2)
+        }
     }
 
     @Test
@@ -56,12 +61,6 @@ class StringOptionTest {
             val option by option("o")
         }
 
-        val action = StringOption()
-        try {
-            action.parse(listOf("--o"))
-            fail()
-        } catch (e: ArgParseException) {
-            assertEquals("Argument missing for option --o", e.message)
-        }
+        parseFails(StringOption(), listOf("--o"), "Argument missing for option --o")
     }
 }

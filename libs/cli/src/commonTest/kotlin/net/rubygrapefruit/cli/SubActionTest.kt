@@ -1,8 +1,11 @@
 package net.rubygrapefruit.cli
 
-import kotlin.test.*
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertSame
+import kotlin.test.assertTrue
 
-class SubActionTest {
+class SubActionTest : AbstractActionTest() {
     @Test
     fun `action can have sub action with no configuration`() {
         val sub = Action()
@@ -13,10 +16,9 @@ class SubActionTest {
             }
         }
 
-        val action = WithSub()
-        action.parse(listOf("sub"))
-
-        assertSame(sub, action.sub)
+        parse(WithSub(), listOf("sub")) { action ->
+            assertSame(sub, action.sub)
+        }
     }
 
     @Test
@@ -31,15 +33,12 @@ class SubActionTest {
             }
         }
 
-        val action = WithSub()
-        action.parse(listOf("s1"))
-
-        assertSame(s1, action.sub)
-
-        val action2 = WithSub()
-        action2.parse(listOf("s2"))
-
-        assertSame(s2, action2.sub)
+        parse(WithSub(), listOf("s1")) { action ->
+            assertSame(s1, action.sub)
+        }
+        parse(WithSub(), listOf("s2")) { action ->
+            assertSame(s2, action.sub)
+        }
     }
 
     @Test
@@ -58,13 +57,38 @@ class SubActionTest {
             }
         }
 
-        val action = WithSub()
-        action.parse(listOf("sub", "--f", "1", "2"))
+        parse(WithSub(), listOf("sub", "--f", "1", "2")) { action ->
+            assertSame(sub, action.sub)
+            assertTrue(sub.flag)
+            assertEquals("1", sub.a)
+            assertEquals("2", sub.b)
+        }
+    }
 
-        assertSame(sub, action.sub)
-        assertTrue(sub.flag)
-        assertEquals("1", sub.a)
-        assertEquals("2", sub.b)
+    @Test
+    fun `can chain sub-actions`() {
+        class Sub : Action() {
+            val a by argument("a")
+        }
+
+        val s1 = Sub()
+        val s2 = Sub()
+
+        class WithSub : Action() {
+            val s1 by actions {
+                action("s1", s1)
+            }
+            val s2 by actions {
+                action("s2", s2)
+            }
+        }
+
+        parse(WithSub(), listOf("s1", "1", "s2", "2")) { action ->
+            assertSame(s1, action.s1)
+            assertSame(s2, action.s2)
+            assertEquals("1", s1.a)
+            assertEquals("2", s2.a)
+        }
     }
 
     @Test
@@ -77,13 +101,7 @@ class SubActionTest {
             }
         }
 
-        val action = WithSub()
-        try {
-            action.parse(emptyList())
-            fail()
-        } catch (e: ArgParseException) {
-            assertEquals("Action not provided", e.message)
-        }
+        parseFails(WithSub(), emptyList(), "Action not provided")
     }
 
     @Test
@@ -96,13 +114,7 @@ class SubActionTest {
             }
         }
 
-        val action = WithSub()
-        try {
-            action.parse(listOf("thing"))
-            fail()
-        } catch (e: ArgParseException) {
-            assertEquals("Unknown action 'thing'", e.message)
-        }
+        parseFails(WithSub(), listOf("thing"), "Unknown action 'thing'")
     }
 
     @Test
@@ -115,12 +127,6 @@ class SubActionTest {
             }
         }
 
-        val action = WithSub()
-        try {
-            action.parse(listOf("sub", "123"))
-            fail()
-        } catch (e: ArgParseException) {
-            assertEquals("Unknown argument: 123", e.message)
-        }
+        parseFails(WithSub(), listOf("sub", "123"), "Unknown argument: 123")
     }
 }

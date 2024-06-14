@@ -2,19 +2,17 @@ package net.rubygrapefruit.cli
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.fail
 
-class ArgumentTest {
+class ArgumentTest : AbstractActionTest() {
     @Test
     fun `action can have argument`() {
         class Argument : Action() {
             val arg by argument("value")
         }
 
-        val action = Argument()
-        action.parse(listOf("abc"))
-
-        assertEquals("abc", action.arg)
+        parse(Argument(), listOf("abc")) { action ->
+            assertEquals("abc", action.arg)
+        }
     }
 
     @Test
@@ -24,11 +22,10 @@ class ArgumentTest {
             val a2 by argument("value")
         }
 
-        val action = Argument()
-        action.parse(listOf("abc", "def"))
-
-        assertEquals("abc", action.a1)
-        assertEquals("def", action.a2)
+        parse(Argument(), listOf("abc", "def")) { action ->
+            assertEquals("abc", action.a1)
+            assertEquals("def", action.a2)
+        }
     }
 
     @Test
@@ -37,10 +34,9 @@ class ArgumentTest {
             val arg by argument("value", default = "thing")
         }
 
-        val action = Argument()
-        action.parse(emptyList())
-
-        assertEquals("thing", action.arg)
+        parse(Argument(), emptyList()) { action ->
+            assertEquals("thing", action.arg)
+        }
     }
 
     @Test
@@ -49,13 +45,7 @@ class ArgumentTest {
             val arg by argument("value")
         }
 
-        val action = Argument()
-        try {
-            action.parse(emptyList())
-            fail()
-        } catch (e: ArgParseException) {
-            assertEquals("Argument 'value' not provided", e.message)
-        }
+        parseFails(Argument(), emptyList(), "Argument 'value' not provided")
     }
 
     @Test
@@ -65,13 +55,7 @@ class ArgumentTest {
             val a2 by argument("a2")
         }
 
-        val action = Argument()
-        try {
-            action.parse(listOf("abc"))
-            fail()
-        } catch (e: ArgParseException) {
-            assertEquals("Argument 'a2' not provided", e.message)
-        }
+        parseFails(Argument(), listOf("abc"), "Argument 'a2' not provided")
     }
 
     @Test
@@ -80,12 +64,6 @@ class ArgumentTest {
             val arg by argument("value")
         }
 
-        val action = Argument()
-        try {
-            action.parse(listOf("1", "2"))
-            fail()
-        } catch (e: ArgParseException) {
-            assertEquals("Unknown argument: 2", e.message)
-        }
+        parseFails(Argument(), listOf("1", "2"), "Unknown argument: 2")
     }
 }

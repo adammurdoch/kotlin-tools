@@ -6,7 +6,7 @@ import kotlin.test.assertEquals
 abstract class AbstractActionTest {
     fun <T : Action> parse(action: T, args: List<String>, verification: (T) -> Unit) {
         action.parse(args)
-        verification.invoke(action)
+        verification(action)
     }
 
     fun parseFails(action: Action, args: List<String>, message: String) {

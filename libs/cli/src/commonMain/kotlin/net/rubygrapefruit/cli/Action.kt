@@ -12,7 +12,7 @@ open class Action {
      * The flag can appear anywhere in the command-line.
      */
     fun option(name: String): NullableStringOption {
-        val option = DefaultNullableStringOption(name)
+        val option = DefaultNullableStringOption(name, this)
         options.add(option)
         return option
     }
@@ -112,6 +112,10 @@ open class Action {
         parse(args)
         run()
         exit(0)
+    }
+
+    internal fun replace(option: NonPositional, newOption: NonPositional) {
+        options.set(options.indexOf(option), newOption)
     }
 
     interface Actions {

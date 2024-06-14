@@ -15,3 +15,14 @@
 - file locations: dir, file, must exist
 - `--stacktrace`
 - `--completion zsh`
+
+
+Options
+
+- optional, null value
+- optional, default value
+- required
+- zero or more, empty list if absent
+- one or more
+
+- string, int, boolean

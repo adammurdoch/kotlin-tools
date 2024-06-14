@@ -1,3 +1,5 @@
+- `--help`
+- usage message and no stack trace on parse error
 - consistent API for defining default value for flag, arg and option 
 - int argument
 - short option names

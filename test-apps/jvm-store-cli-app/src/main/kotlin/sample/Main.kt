@@ -2,26 +2,25 @@
 
 package sample
 
-import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.core.subcommands
-import com.github.ajalt.clikt.parameters.arguments.argument
-import com.github.ajalt.clikt.parameters.options.default
-import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.types.int
+import net.rubygrapefruit.cli.Action
 import net.rubygrapefruit.file.fileSystem
 import net.rubygrapefruit.store.ContentVisitor
 import net.rubygrapefruit.store.Store
 
-class StoreApp : CliktCommand() {
-    init {
-        subcommands(ContentCommand(), BenchmarkOneValueCommand(), BenchmarkManyValuesCommand(), BenchmarkOneKeyValueCommand())
+class StoreApp : Action() {
+    private val command by actions {
+        action("content", ContentCommand(), help = "Dump content")
+        action("one-value", BenchmarkOneValueCommand(), help = "Run benchmark for a single value")
+        action("many-values", BenchmarkManyValuesCommand(), help = "Run benchmark for many values")
+        action("one-map", BenchmarkOneKeyValueCommand(), help = "Run benchmark for a single map")
     }
 
     override fun run() {
+        command.run()
     }
 }
 
-abstract class AbstractStoreCommand(name: String, help: String) : CliktCommand(name = name, help = help) {
+abstract class AbstractStoreCommand() : Action() {
     private val store by argument("store", help = "The store to use")
 
     override fun run() {
@@ -37,7 +36,7 @@ abstract class AbstractStoreCommand(name: String, help: String) : CliktCommand(n
     abstract fun run(store: Store)
 }
 
-class ContentCommand : AbstractStoreCommand(name = "content", help = "Dump content") {
+class ContentCommand : AbstractStoreCommand() {
     override val discard: Boolean
         get() = false
 
@@ -50,7 +49,7 @@ class ContentCommand : AbstractStoreCommand(name = "content", help = "Dump conte
     }
 }
 
-class BenchmarkOneValueCommand : AbstractStoreCommand(name = "one-value", help = "Run benchmark for a single value") {
+class BenchmarkOneValueCommand : AbstractStoreCommand() {
     private val iterations by option("--iterations", help = "The number of iterations").int().default(200000)
 
     override fun run(store: Store) {
@@ -67,7 +66,7 @@ class BenchmarkOneValueCommand : AbstractStoreCommand(name = "one-value", help =
     }
 }
 
-class BenchmarkManyValuesCommand : AbstractStoreCommand(name = "many-values", help = "Run benchmark for many values") {
+class BenchmarkManyValuesCommand : AbstractStoreCommand() {
     private val values by option("--values", help = "The number of values").int().default(1000)
     private val iterations by option("--iterations", help = "The number of iterations").int().default(200)
 
@@ -90,7 +89,7 @@ class BenchmarkManyValuesCommand : AbstractStoreCommand(name = "many-values", he
     }
 }
 
-class BenchmarkOneKeyValueCommand : AbstractStoreCommand(name = "one-map", help = "Run benchmark for a single map") {
+class BenchmarkOneKeyValueCommand : AbstractStoreCommand() {
     private val entries by option("--entries", help = "The number of entries").int().default(1500)
     private val iterations by option("--iterations", help = "The number of iterations").int().default(100)
 
@@ -116,4 +115,4 @@ private class ValueSource(count: Int) {
     val values: List<String> = (1..count).map { "value $it" }
 }
 
-fun main(args: Array<String>) = StoreApp().main(args)
+fun main(args: Array<String>) = StoreApp().run(args)

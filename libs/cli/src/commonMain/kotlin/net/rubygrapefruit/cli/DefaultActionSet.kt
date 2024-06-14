@@ -6,7 +6,7 @@ internal class DefaultActionSet : Positional(), Argument<Action>, Action.Actions
     private val actions = mutableMapOf<String, Action>()
     private var action: Action? = null
 
-    override fun action(name: String, action: Action) {
+    override fun action(name: String, action: Action, help: String?) {
         actions[name] = action
     }
 

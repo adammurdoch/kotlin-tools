@@ -11,7 +11,7 @@ open class Action {
      * Defines a string option with the given name. Can use `--<name> <value>` to specify the value.
      * The flag can appear anywhere in the command-line.
      */
-    fun option(name: String): NullableStringOption {
+    fun option(name: String, help: String? = null): NullableStringOption {
         val option = DefaultNullableStringOption(name, this)
         options.add(option)
         return option
@@ -33,7 +33,7 @@ open class Action {
      * The argument must appear at the current location on the command-line.
      * Uses the default value if not present, and fails if the argument is not present and its default is null.
      */
-    fun argument(name: String, default: String? = null): Argument<String> {
+    fun argument(name: String, default: String? = null, help: String? = null): Argument<String> {
         val arg = DefaultArgument(name, default)
         positional.add(arg)
         return arg
@@ -51,7 +51,7 @@ open class Action {
         return actions
     }
 
-    protected open fun run() {}
+    open fun run() {}
 
     /**
      * Configures this object from the given arguments.
@@ -108,7 +108,14 @@ open class Action {
     /**
      * Runs this action, using the given arguments to configure it.
      */
-    fun run(args: List<String>): Nothing {
+    fun run(args: Array<String>) {
+        run(args.toList())
+    }
+
+    /**
+     * Runs this action, using the given arguments to configure it.
+     */
+    fun run(args: List<String>) {
         parse(args)
         run()
         exit(0)
@@ -119,6 +126,6 @@ open class Action {
     }
 
     interface Actions {
-        fun action(name: String, action: Action)
+        fun action(name: String, action: Action, help: String? = null)
     }
 }

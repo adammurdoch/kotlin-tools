@@ -1,8 +1,8 @@
 package net.rubygrapefruit.cli
 
-internal class DefaultNullableIntOption(name: String, private val owner: Action) : AbstractOption<Int?>(name), NullableOption<Int> {
+internal class DefaultNullableIntOption(name: String, private val host: Host, private val owner: Action) : AbstractOption<Int?>(name, host), NullableOption<Int> {
     override fun default(value: Int): Option<Int> {
-        val option = DefaultIntOption(name, value)
+        val option = DefaultIntOption(name, host, value)
         owner.replace(this, option)
         return option
     }

@@ -1,6 +1,6 @@
 package net.rubygrapefruit.cli
 
-internal class DefaultIntOption(name: String, val default: Int) : AbstractOption<Int>(name), Option<Int> {
+internal class DefaultIntOption(name: String, host: Host, val default: Int) : AbstractOption<Int>(name, host), Option<Int> {
     override fun convert(arg: String?): Int {
         return if (arg == null) {
             default

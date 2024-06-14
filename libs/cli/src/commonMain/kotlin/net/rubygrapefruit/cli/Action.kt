@@ -12,7 +12,7 @@ open class Action {
      * The flag can appear anywhere in the command-line.
      */
     fun option(name: String, help: String? = null): NullableStringOption {
-        val option = DefaultNullableStringOption(name, this)
+        val option = DefaultNullableStringOption(name, DefaultHost, this)
         options.add(option)
         return option
     }
@@ -23,7 +23,7 @@ open class Action {
      * The flag can appear anywhere in the command-line. It can be specified multiple times and last value is used.
      */
     fun flag(name: String, default: Boolean = false): Flag {
-        val flag = DefaultFlag(name, default)
+        val flag = DefaultFlag(name, DefaultHost, default)
         options.add(flag)
         return flag
     }
@@ -34,7 +34,7 @@ open class Action {
      * Uses the default value if not present, and fails if the argument is not present and its default is null.
      */
     fun argument(name: String, default: String? = null, help: String? = null): Argument<String> {
-        val arg = DefaultArgument(name, Positional.DefaultHost, default)
+        val arg = DefaultArgument(name, DefaultHost, default)
         positional.add(arg)
         return arg
     }
@@ -45,7 +45,7 @@ open class Action {
      * Fails if a sub-action is not present.
      */
     fun actions(builder: Actions.() -> Unit): Argument<Action> {
-        val actions = DefaultActionSet(Positional.DefaultHost)
+        val actions = DefaultActionSet(DefaultHost)
         builder(actions)
         positional.add(actions)
         return actions
@@ -61,7 +61,7 @@ open class Action {
         val count = maybeParse(args)
         if (count < args.size) {
             val arg = args[count]
-            if (Positional.DefaultHost.isOption(arg)) {
+            if (DefaultHost.isOption(arg)) {
                 throw ArgParseException("Unknown option: $arg")
             } else {
                 throw ArgParseException("Unknown argument: $arg")

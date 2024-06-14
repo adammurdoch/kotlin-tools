@@ -2,8 +2,8 @@ package net.rubygrapefruit.cli
 
 import kotlin.reflect.KProperty
 
-internal abstract class AbstractOption<T>(protected val name: String) : NonPositional(), Option<T> {
-    protected val flag = "--$name"
+internal abstract class AbstractOption<T>(protected val name: String, host: Host) : NonPositional(), Option<T> {
+    protected val flag = host.option(name)
     private var set = false
     private var value: T? = null
 

@@ -5,7 +5,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.fail
 
-class ActionStringOptionTest {
+class StringOptionTest {
     @Test
     fun `can define string option`() {
         class StringOption : Action() {
@@ -28,6 +28,26 @@ class ActionStringOptionTest {
         action.parse(emptyList())
 
         assertNull(action.option)
+    }
+
+    @Test
+    fun `can define multiple string options`() {
+        class StringOption : Action() {
+            val o1 by option("o1")
+            val o2 by option("o2")
+        }
+
+        val action = StringOption()
+        action.parse(listOf("--o1", "123"))
+
+        assertEquals("123", action.o1)
+        assertNull(action.o2)
+
+        val action2 = StringOption()
+        action2.parse(listOf("--o2", "123"))
+
+        assertNull(action2.o1)
+        assertEquals("123", action2.o2)
     }
 
     @Test

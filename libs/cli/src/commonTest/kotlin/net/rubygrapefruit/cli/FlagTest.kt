@@ -2,17 +2,16 @@ package net.rubygrapefruit.cli
 
 import kotlin.test.*
 
-class ActionFlagTest {
+class FlagTest : AbstractActionTest() {
     @Test
     fun `can enable boolean option`() {
         class BooleanFlag : Action() {
             val flag by flag("flag")
         }
 
-        val action = BooleanFlag()
-        action.parse(listOf("--flag"))
-
-        assertTrue(action.flag)
+        parse(BooleanFlag(), listOf("--flag")) { action ->
+            assertTrue(action.flag)
+        }
     }
 
     @Test
@@ -21,10 +20,9 @@ class ActionFlagTest {
             val flag by flag("flag")
         }
 
-        val action = BooleanFlag()
-        action.parse(listOf("--no-flag"))
-
-        assertFalse(action.flag)
+        parse(BooleanFlag(), listOf("--no-flag")) { action ->
+            assertFalse(action.flag)
+        }
     }
 
     @Test
@@ -33,15 +31,13 @@ class ActionFlagTest {
             val flag by flag("flag")
         }
 
-        val action = BooleanFlag()
-        action.parse(listOf("--flag", "--no-flag"))
+        parse(BooleanFlag(), listOf("--flag", "--no-flag")) { action ->
+            assertFalse(action.flag)
+        }
 
-        assertFalse(action.flag)
-
-        val action2 = BooleanFlag()
-        action2.parse(listOf("--no-flag", "--flag"))
-
-        assertTrue(action2.flag)
+        parse(BooleanFlag(), listOf("--no-flag", "--flag")) { action ->
+            assertTrue(action.flag)
+        }
     }
 
     @Test
@@ -50,10 +46,9 @@ class ActionFlagTest {
             val flag by flag("flag")
         }
 
-        val action = BooleanFlag()
-        action.parse(emptyList())
-
-        assertFalse(action.flag)
+        parse(BooleanFlag(), emptyList()) { action ->
+            assertFalse(action.flag)
+        }
     }
 
     @Test
@@ -63,11 +58,10 @@ class ActionFlagTest {
             val f2 by flag("flag", default = false)
         }
 
-        val action = BooleanFlag()
-        action.parse(emptyList())
-
-        assertTrue(action.f1)
-        assertFalse(action.f2)
+        parse(BooleanFlag(), emptyList()) { action ->
+            assertTrue(action.f1)
+            assertFalse(action.f2)
+        }
     }
 
     @Test
@@ -77,10 +71,14 @@ class ActionFlagTest {
             val f2 by flag("f2")
         }
 
-        val action = BooleanFlag()
-        action.parse(listOf("--f1", "--f2"))
+        parse(BooleanFlag(), listOf("--f1", "--f2")) { action ->
+            assertTrue(action.f1)
+            assertTrue(action.f2)
+        }
 
-        assertTrue(action.f1)
-        assertTrue(action.f2)
+        parse(BooleanFlag(), listOf("--f2", "--f1")) { action ->
+            assertTrue(action.f1)
+            assertTrue(action.f2)
+        }
     }
 }

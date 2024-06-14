@@ -1,10 +1,8 @@
 package net.rubygrapefruit.cli
 
 import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.fail
 
-class ActionTest {
+class ActionTest : AbstractActionTest() {
     @Test
     fun `action can have no configuration`() {
         class NoConfig : Action()
@@ -16,18 +14,7 @@ class ActionTest {
     fun `fails when args provided for action with no configuration`() {
         class NoConfig : Action()
 
-        try {
-            NoConfig().parse(listOf("--flag"))
-            fail()
-        } catch (e: ArgParseException) {
-            assertEquals("Unknown option: --flag", e.message)
-        }
-
-        try {
-            NoConfig().parse(listOf("arg"))
-            fail()
-        } catch (e: ArgParseException) {
-            assertEquals("Unknown argument: arg", e.message)
-        }
+        parseFails(NoConfig(), listOf("--flag"), "Unknown option: --flag")
+        parseFails(NoConfig(), listOf("arg"), "Unknown argument: arg")
     }
 }

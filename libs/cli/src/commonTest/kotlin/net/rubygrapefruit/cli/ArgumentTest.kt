@@ -4,7 +4,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
 
-class ActionArgumentTest {
+class ArgumentTest {
     @Test
     fun `action can have argument`() {
         class Argument : Action() {

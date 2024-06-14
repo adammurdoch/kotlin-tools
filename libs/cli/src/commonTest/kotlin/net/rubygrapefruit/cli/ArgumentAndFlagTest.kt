@@ -4,7 +4,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class ActionArgumentAndFlagTest {
+class ArgumentAndFlagTest {
     @Test
     fun `flag can appear before argument`() {
         class MixedAction : Action() {

@@ -1,43 +1,43 @@
 package net.rubygrapefruit.cli
 
 import kotlin.test.Test
-import kotlin.test.assertEquals
 import kotlin.test.assertSame
+import kotlin.test.assertTrue
 
-class ActionArgumentAndSubActionTest {
+class FlagAndSubActionTest {
     @Test
-    fun `argument can precede sub-action`() {
+    fun `flag can precede sub-action`() {
         val sub = Action()
 
         class WithSub : Action() {
-            val arg by argument("value")
+            val flag by flag("flag")
             val sub by actions {
                 action("sub", sub)
             }
         }
 
         val action = WithSub()
-        action.parse(listOf("123", "sub"))
+        action.parse(listOf("--flag", "sub"))
 
-        assertEquals("123", action.arg)
+        assertTrue(action.flag)
         assertSame(sub, action.sub)
     }
 
     @Test
-    fun `argument can follow sub-action`() {
+    fun `flag can follow sub-action`() {
         val sub = Action()
 
         class WithSub : Action() {
+            val flag by flag("flag")
             val sub by actions {
                 action("sub", sub)
             }
-            val arg by argument("value")
         }
 
         val action = WithSub()
-        action.parse(listOf("sub", "123"))
+        action.parse(listOf("sub", "--flag"))
 
-        assertEquals("123", action.arg)
+        assertTrue(action.flag)
         assertSame(sub, action.sub)
     }
 }

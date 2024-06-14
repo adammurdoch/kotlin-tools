@@ -11,8 +11,8 @@ open class Action {
      * Defines a string option with the given name. Can use `--<name> <value>` to specify the value.
      * The flag can appear anywhere in the command-line.
      */
-    fun option(name: String): Option<String?> {
-        val option = DefaultOption(name)
+    fun option(name: String): NullableStringOption {
+        val option = DefaultNullableStringOption(name)
         options.add(option)
         return option
     }

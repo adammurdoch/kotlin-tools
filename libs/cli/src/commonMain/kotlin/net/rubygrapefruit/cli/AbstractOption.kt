@@ -2,12 +2,12 @@ package net.rubygrapefruit.cli
 
 import kotlin.reflect.KProperty
 
-internal class DefaultOption(name: String) : NonPositional(), Option<String?> {
+internal abstract class AbstractOption<T>(protected val name: String) : NonPositional(), Option<T> {
     private val flag = "--$name"
     private var value: String? = null
 
-    override operator fun getValue(thisRef: Any?, property: KProperty<*>): String? {
-        return value
+    override operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
+        return convert(value)
     }
 
     override fun accept(args: List<String>): Int {
@@ -21,4 +21,6 @@ internal class DefaultOption(name: String) : NonPositional(), Option<String?> {
         value = args[1]
         return 2
     }
+
+    protected abstract fun convert(arg: String?): T
 }

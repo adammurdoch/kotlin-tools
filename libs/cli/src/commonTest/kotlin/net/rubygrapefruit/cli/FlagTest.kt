@@ -1,6 +1,8 @@
 package net.rubygrapefruit.cli
 
-import kotlin.test.*
+import kotlin.test.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class FlagTest : AbstractActionTest() {
     @Test
@@ -54,13 +56,18 @@ class FlagTest : AbstractActionTest() {
     @Test
     fun `can provide default value for boolean option`() {
         class BooleanFlag : Action() {
-            val f1 by flag("flag", default = true)
-            val f2 by flag("flag", default = false)
+            val f1 by flag("f1", default = true)
+            val f2 by flag("f2", default = false)
         }
 
         parse(BooleanFlag(), emptyList()) { action ->
             assertTrue(action.f1)
             assertFalse(action.f2)
+        }
+
+        parse(BooleanFlag(), listOf("--no-f1", "--f2")) { action ->
+            assertFalse(action.f1)
+            assertTrue(action.f2)
         }
     }
 

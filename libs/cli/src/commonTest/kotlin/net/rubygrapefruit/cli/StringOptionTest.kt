@@ -28,6 +28,21 @@ class StringOptionTest : AbstractActionTest() {
     }
 
     @Test
+    fun `can provide default value for string option`() {
+        class StringOption : Action() {
+            val option by option("o").default("value")
+        }
+
+        parse(StringOption(), emptyList()) { action ->
+            assertEquals("value", action.option)
+        }
+
+        parse(StringOption(), listOf("--o", "123")) { action ->
+            assertEquals("123", action.option)
+        }
+    }
+
+    @Test
     fun `can define multiple string options`() {
         class StringOption : Action() {
             val o1 by option("o1")

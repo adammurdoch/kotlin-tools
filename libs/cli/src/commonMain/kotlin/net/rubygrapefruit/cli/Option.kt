@@ -8,3 +8,7 @@ import kotlin.reflect.KProperty
 sealed interface Option<T> {
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T
 }
+
+interface NullableStringOption : Option<String?> {
+    fun default(value: String): Option<String>
+}

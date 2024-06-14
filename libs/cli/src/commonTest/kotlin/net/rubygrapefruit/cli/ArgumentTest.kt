@@ -31,11 +31,15 @@ class ArgumentTest : AbstractActionTest() {
     @Test
     fun `can provide default value for argument`() {
         class Argument : Action() {
-            val arg by argument("value", default = "thing")
+            val arg by argument("value", default = "value")
         }
 
         parse(Argument(), emptyList()) { action ->
-            assertEquals("thing", action.arg)
+            assertEquals("value", action.arg)
+        }
+
+        parse(Argument(), listOf("123")) { action ->
+            assertEquals("123", action.arg)
         }
     }
 

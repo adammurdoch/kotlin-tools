@@ -3,6 +3,7 @@ package net.rubygrapefruit.cli
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.fail
 
 class StringOptionTest : AbstractActionTest() {
     @Test
@@ -86,5 +87,18 @@ class StringOptionTest : AbstractActionTest() {
         }
 
         parseFails(StringOption(), listOf("--o", "1", "--o", "2"), "Option --o already provided")
+    }
+
+    @Test
+    fun `name must not start with punctuation`() {
+        class StringOption : Action() {
+            val option by option("-o")
+        }
+        try {
+            StringOption()
+            fail()
+        } catch (e: IllegalArgumentException) {
+            assertEquals("-o cannot be used as an option name", e.message)
+        }
     }
 }

@@ -12,6 +12,7 @@ open class Action {
      * The flag can appear anywhere in the command-line.
      */
     fun option(name: String, help: String? = null): NullableStringOption {
+        DefaultHost.validate(name, "an option name")
         val option = DefaultNullableStringOption(name, DefaultHost, this)
         options.add(option)
         return option
@@ -23,6 +24,7 @@ open class Action {
      * The flag can appear anywhere in the command-line. It can be specified multiple times and last value is used.
      */
     fun flag(name: String, default: Boolean = false): Flag {
+        DefaultHost.validate(name, "a flag name")
         val flag = DefaultFlag(name, DefaultHost, default)
         options.add(flag)
         return flag

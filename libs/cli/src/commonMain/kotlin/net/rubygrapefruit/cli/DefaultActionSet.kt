@@ -7,6 +7,7 @@ internal class DefaultActionSet(private val host: Host) : Positional(), Argument
     private var action: Action? = null
 
     override fun action(name: String, action: Action, help: String?) {
+        host.validate(name, "an action name")
         actions[name] = ActionDetails(action, help)
     }
 

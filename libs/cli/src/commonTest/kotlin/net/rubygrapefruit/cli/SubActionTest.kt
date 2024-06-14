@@ -1,9 +1,6 @@
 package net.rubygrapefruit.cli
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertSame
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class SubActionTest : AbstractActionTest() {
     @Test
@@ -141,5 +138,20 @@ class SubActionTest : AbstractActionTest() {
         }
 
         parseFails(WithSub(), listOf("sub", "123"), "Unknown argument: 123")
+    }
+
+    @Test
+    fun `name must not start with punctuation`() {
+        class WithSub : Action() {
+            val sub by actions {
+                action("--sub", Action())
+            }
+        }
+        try {
+            WithSub()
+            fail()
+        } catch (e: IllegalArgumentException) {
+            assertEquals("--sub cannot be used as an action name", e.message)
+        }
     }
 }

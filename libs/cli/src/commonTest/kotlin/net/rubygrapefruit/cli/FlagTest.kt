@@ -1,8 +1,6 @@
 package net.rubygrapefruit.cli
 
-import kotlin.test.Test
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class FlagTest : AbstractActionTest() {
     @Test
@@ -86,6 +84,19 @@ class FlagTest : AbstractActionTest() {
         parse(BooleanFlag(), listOf("--f2", "--f1")) { action ->
             assertTrue(action.f1)
             assertTrue(action.f2)
+        }
+    }
+
+    @Test
+    fun `name must not start with punctuation`() {
+        class BooleanFlag : Action() {
+            val flag by flag("-f")
+        }
+        try {
+            BooleanFlag()
+            fail()
+        } catch (e: IllegalArgumentException) {
+            assertEquals("-f cannot be used as a flag name", e.message)
         }
     }
 }

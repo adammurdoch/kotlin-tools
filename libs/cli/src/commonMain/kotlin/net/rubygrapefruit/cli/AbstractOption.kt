@@ -7,6 +7,10 @@ internal abstract class AbstractOption<T>(protected val name: String) : NonPosit
     private var set = false
     private var value: T? = null
 
+    override fun toString(): String {
+        return "$name <value>"
+    }
+
     override operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
         return if (set) {
             value!!

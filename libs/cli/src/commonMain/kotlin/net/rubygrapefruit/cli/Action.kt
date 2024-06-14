@@ -61,7 +61,7 @@ open class Action {
         val count = maybeParse(args)
         if (count < args.size) {
             val arg = args[count]
-            if (arg.startsWith("--")) {
+            if (Positional.DefaultHost.isOption(arg)) {
                 throw ArgParseException("Unknown option: $arg")
             } else {
                 throw ArgParseException("Unknown argument: $arg")

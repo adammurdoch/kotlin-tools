@@ -32,4 +32,25 @@ class FlagAndSubActionTest : AbstractActionTest() {
             assertSame(sub, action.sub)
         }
     }
+
+    @Test
+    fun `sub-action can have flag`() {
+        class SubAction : Action() {
+            val flag by flag("flag")
+        }
+
+        class WithSub : Action() {
+            val sub by actions {
+                action("sub", SubAction())
+            }
+        }
+
+        parse(WithSub(), listOf("sub", "--flag")) { action ->
+            assertTrue((action.sub as SubAction).flag)
+        }
+
+        parse(WithSub(), listOf("sub")) { action ->
+            assertFalse((action.sub as SubAction).flag)
+        }
+    }
 }

@@ -7,8 +7,8 @@ internal class DefaultNullableStringOption(name: String, private val owner: Acti
         return option
     }
 
-    override fun int(): Option<Int?> {
-        val option = DefaultNullableIntOption(name)
+    override fun int(): NullableOption<Int> {
+        val option = DefaultNullableIntOption(name, owner)
         owner.replace(this, option)
         return option
     }

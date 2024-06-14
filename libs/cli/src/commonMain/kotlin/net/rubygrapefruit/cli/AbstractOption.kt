@@ -29,7 +29,6 @@ internal abstract class AbstractOption<T>(protected val name: String) : NonPosit
         value = convert(args[1])
         set = true
 
-        println("-> SET $flag TO $value")
         return 2
     }
 

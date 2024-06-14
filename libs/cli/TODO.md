@@ -1,17 +1,14 @@
-- string option
-- int option 
+- consistent API for defining default value for flag, arg and option 
 - int argument
-- default option value 
 - short option names
 - zero or more arguments
 - one or more arguments
 - zero or more options
-- repeated actions
 - nested actions
 - usage message
-- one of set of values, each with its own flag, last one wins
+- one of set of flags, last one wins
 - argument is one of a set
-- disallow duplicate flags, sub-actions
+- disallow conflicting flags, option and sub-action names
 - file locations: dir, file, must exist
 - `--stacktrace`
 - `--completion zsh`

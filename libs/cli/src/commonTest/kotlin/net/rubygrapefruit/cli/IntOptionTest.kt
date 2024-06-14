@@ -28,6 +28,21 @@ class IntOptionTest : AbstractActionTest() {
     }
 
     @Test
+    fun `can provide default value for int option`() {
+        class IntOption : Action() {
+            val option by option("o").int().default(45)
+        }
+
+        parse(IntOption(), emptyList()) { action ->
+            assertEquals(45, action.option)
+        }
+
+        parse(IntOption(), listOf("--o", "123")) { action ->
+            assertEquals(123, action.option)
+        }
+    }
+
+    @Test
     fun `fails when argument not provided`() {
         class IntOption : Action() {
             val option by option("o").int()

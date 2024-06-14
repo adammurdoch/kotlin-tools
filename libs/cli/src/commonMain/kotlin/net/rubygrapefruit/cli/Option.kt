@@ -10,13 +10,21 @@ sealed interface Option<T> {
 }
 
 /**
- * A string option that is not required.
+ * An option of type <T> that is not required.
  */
-interface NullableStringOption : Option<String?> {
+interface NullableOption<T : Any> : Option<T?> {
     /**
      * Returns the value to use with this option is missing.
      */
-    fun default(value: String): Option<String>
+    fun default(value: T): Option<T>
+}
 
-    fun int(): Option<Int?>
+/**
+ * A string option that is not required.
+ */
+interface NullableStringOption : NullableOption<String> {
+    /**
+     * Treat this option as an integer option.
+     */
+    fun int(): NullableOption<Int>
 }

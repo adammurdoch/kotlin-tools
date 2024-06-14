@@ -1,5 +1,6 @@
 - `--help`
 - `help`
+- App name for help
 - usage message on parse error
   - Unknown option
   - Unknown option for sub-command

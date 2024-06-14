@@ -23,7 +23,7 @@ open class Action {
      * Uses the default value if not present.
      * The flag can appear anywhere in the command-line. It can be specified multiple times and last value is used.
      */
-    fun flag(name: String, default: Boolean = false): Flag {
+    fun flag(name: String, default: Boolean = false, help: String? = null): Flag {
         DefaultHost.validate(name, "a flag name")
         val flag = DefaultFlag(name, DefaultHost, default)
         options.add(flag)

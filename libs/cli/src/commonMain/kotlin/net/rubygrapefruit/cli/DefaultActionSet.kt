@@ -25,14 +25,14 @@ internal class DefaultActionSet(private val host: Host) : Positional(), Argument
     }
 
     private val actionInfo
-        get() = actions.map { SubActionInfo(it.key, it.value.help) }
+        get() = actions.map { SubActionUsage(it.key, it.value.help) }
 
     override fun missing(): ArgParseException {
         return ArgParseException("Action not provided", resolution = "Please specify an action to run.", actions = actionInfo)
     }
 
     override fun usage(): PositionalUsage {
-        return PositionalUsage(actions.keys.joinToString(" | "))
+        return PositionalUsage("<action>", "action", null)
     }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): Action {

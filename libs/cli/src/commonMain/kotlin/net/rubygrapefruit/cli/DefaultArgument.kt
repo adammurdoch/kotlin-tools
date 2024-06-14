@@ -2,7 +2,7 @@ package net.rubygrapefruit.cli
 
 import kotlin.reflect.KProperty
 
-internal class DefaultArgument(private val name: String, private val host: Host, default: String?) : Positional(), Argument<String> {
+internal class DefaultArgument(private val name: String, private val help: String?, private val host: Host, default: String?) : Positional(), Argument<String> {
     private var value: String? = default
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): String {
@@ -10,7 +10,7 @@ internal class DefaultArgument(private val name: String, private val host: Host,
     }
 
     override fun usage(): PositionalUsage {
-        return PositionalUsage("<$name>")
+        return PositionalUsage("<$name>", name, help)
     }
 
     override fun accept(args: List<String>): ParseResult {

@@ -10,9 +10,9 @@ class ArgParseExceptionTest {
             "broken",
             "Please run something",
             listOf(
-                SubActionInfo("run", "run something"),
-                SubActionInfo("do-another-thing", "run something else"),
-                SubActionInfo("no-help", null)
+                SubActionUsage("run", "run something"),
+                SubActionUsage("do-another-thing", "run something else"),
+                SubActionUsage("no-help", null)
             )
         )
 

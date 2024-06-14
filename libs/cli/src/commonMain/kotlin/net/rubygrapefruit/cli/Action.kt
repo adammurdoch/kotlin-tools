@@ -13,7 +13,7 @@ open class Action {
      */
     fun option(name: String, help: String? = null): NullableStringOption {
         DefaultHost.validate(name, "an option name")
-        val option = DefaultNullableStringOption(name, DefaultHost, this)
+        val option = DefaultNullableStringOption(name, help, DefaultHost, this)
         options.add(option)
         return option
     }
@@ -25,7 +25,7 @@ open class Action {
      */
     fun flag(name: String, default: Boolean = false, help: String? = null): Flag {
         DefaultHost.validate(name, "a flag name")
-        val flag = DefaultFlag(name, DefaultHost, default)
+        val flag = DefaultFlag(name, help, DefaultHost, default)
         options.add(flag)
         return flag
     }
@@ -36,7 +36,7 @@ open class Action {
      * Uses the default value if not present, and fails if the argument is not present and its default is null.
      */
     fun argument(name: String, default: String? = null, help: String? = null): Argument<String> {
-        val arg = DefaultArgument(name, DefaultHost, default)
+        val arg = DefaultArgument(name, help, DefaultHost, default)
         positional.add(arg)
         return arg
     }
@@ -141,7 +141,9 @@ open class Action {
         val action = try {
             parse(args)
         } catch (e: ArgParseException) {
-            println(e.formattedMessage)
+            for (line in e.formattedMessage.lines()) {
+                println(line)
+            }
             exit(1)
         }
 

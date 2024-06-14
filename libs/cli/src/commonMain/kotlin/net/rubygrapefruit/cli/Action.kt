@@ -34,7 +34,7 @@ open class Action {
      * Uses the default value if not present, and fails if the argument is not present and its default is null.
      */
     fun argument(name: String, default: String? = null, help: String? = null): Argument<String> {
-        val arg = DefaultArgument(name, default)
+        val arg = DefaultArgument(name, Positional.DefaultHost, default)
         positional.add(arg)
         return arg
     }
@@ -45,7 +45,7 @@ open class Action {
      * Fails if a sub-action is not present.
      */
     fun actions(builder: Actions.() -> Unit): Argument<Action> {
-        val actions = DefaultActionSet()
+        val actions = DefaultActionSet(Positional.DefaultHost)
         builder(actions)
         positional.add(actions)
         return actions

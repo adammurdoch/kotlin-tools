@@ -13,6 +13,7 @@
 - disallow conflicting flags, option and sub-action names
 - file locations: dir, file, must exist
 - color output on terminal
+- fuzzy matching and/or suggestions
 - `--stacktrace`
 - `--completion zsh`
 

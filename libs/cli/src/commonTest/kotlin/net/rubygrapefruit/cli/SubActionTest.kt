@@ -114,11 +114,24 @@ class SubActionTest : AbstractActionTest() {
             }
         }
 
-        parseFails(WithSub(), listOf("thing"), "Unknown action 'thing'")
+        parseFails(WithSub(), listOf("thing"), "Unknown action: thing")
     }
 
     @Test
-    fun `fails when additional args provided`() {
+    fun `fails when unknown flag provided`() {
+        val sub = Action()
+
+        class WithSub : Action() {
+            val sub by actions {
+                action("sub", sub)
+            }
+        }
+
+        parseFails(WithSub(), listOf("--flag"), "Unknown option: --flag")
+    }
+
+    @Test
+    fun `fails when additional args provided after action`() {
         val sub = Action()
 
         class WithSub : Action() {

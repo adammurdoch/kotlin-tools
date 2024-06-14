@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalStdlibApi::class)
-
 package sample
 
 import net.rubygrapefruit.cli.Action

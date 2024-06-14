@@ -63,6 +63,15 @@ class ArgumentTest : AbstractActionTest() {
     }
 
     @Test
+    fun `fails when unknown flag provided`() {
+        class Argument : Action() {
+            val arg by argument("value")
+        }
+
+        parseFails(Argument(), listOf("--flag"), "Unknown option: --flag")
+    }
+
+    @Test
     fun `fails when additional argument provided`() {
         class Argument : Action() {
             val arg by argument("value")

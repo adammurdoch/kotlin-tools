@@ -78,4 +78,13 @@ class StringOptionTest : AbstractActionTest() {
 
         parseFails(StringOption(), listOf("--o"), "Argument missing for option --o")
     }
+
+    @Test
+    fun `fails when option is present multiple times`() {
+        class StringOption : Action() {
+            val option by option("o")
+        }
+
+        parseFails(StringOption(), listOf("--o", "1", "--o", "2"), "Option --o already provided")
+    }
 }

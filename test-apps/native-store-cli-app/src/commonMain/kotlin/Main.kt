@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalStdlibApi::class)
-
 import net.rubygrapefruit.cli.Action
 import net.rubygrapefruit.file.fileSystem
 import net.rubygrapefruit.store.ContentVisitor
@@ -48,7 +46,7 @@ class ContentCommand : AbstractStoreCommand() {
 }
 
 class BenchmarkOneValueCommand : AbstractStoreCommand() {
-    private val iterations by option("--iterations", help = "The number of iterations").int().default(200000)
+    private val iterations by option("iterations", help = "The number of iterations").int().default(200000)
 
     override fun run(store: Store) {
         println("Benchmarking with $iterations iterations")
@@ -65,8 +63,8 @@ class BenchmarkOneValueCommand : AbstractStoreCommand() {
 }
 
 class BenchmarkManyValuesCommand : AbstractStoreCommand() {
-    private val values by option("--values", help = "The number of values").int().default(1000)
-    private val iterations by option("--iterations", help = "The number of iterations").int().default(200)
+    private val values by option("values", help = "The number of values").int().default(1000)
+    private val iterations by option("iterations", help = "The number of iterations").int().default(200)
 
     override fun run(store: Store) {
         println("Benchmarking with $values values and $iterations iterations")
@@ -88,8 +86,8 @@ class BenchmarkManyValuesCommand : AbstractStoreCommand() {
 }
 
 class BenchmarkOneKeyValueCommand : AbstractStoreCommand() {
-    private val entries by option("--entries", help = "The number of entries").int().default(1500)
-    private val iterations by option("--iterations", help = "The number of iterations").int().default(100)
+    private val entries by option("entries", help = "The number of entries").int().default(1500)
+    private val iterations by option("iterations", help = "The number of iterations").int().default(100)
 
     override fun run(store: Store) {
         println("Benchmarking with $entries entries and $iterations iterations")

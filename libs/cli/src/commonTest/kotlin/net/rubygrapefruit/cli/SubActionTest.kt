@@ -90,28 +90,32 @@ class SubActionTest : AbstractActionTest() {
 
     @Test
     fun `fails when sub-action not provided`() {
-        val sub = Action()
-
         class WithSub : Action() {
             val sub by actions {
-                action("sub", sub)
+                action("s1", Action())
+                action("s2", Action())
             }
         }
 
-        parseFails(WithSub(), emptyList(), "Action not provided")
+        parseFails(WithSub(), emptyList()) { e ->
+            assertEquals("Action not provided", e.message)
+            assertEquals(2, e.actions.size)
+        }
     }
 
     @Test
     fun `fails when unknown sub-action provided`() {
-        val sub = Action()
-
         class WithSub : Action() {
             val sub by actions {
-                action("sub", sub)
+                action("s1", Action())
+                action("s2", Action())
             }
         }
 
-        parseFails(WithSub(), listOf("thing"), "Unknown action: thing")
+        parseFails(WithSub(), listOf("thing")) { e ->
+            assertEquals("Unknown action: thing", e.message)
+            assertEquals(2, e.actions.size)
+        }
     }
 
     @Test

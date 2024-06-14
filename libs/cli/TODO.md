@@ -1,6 +1,9 @@
 - `--help`
+- `help`
 - usage message on parse error
-  - Unknown sub-action
+  - Unknown option
+  - Unknown option for sub-command
+  - Argument not provided
 - consistent API for defining default value for flag, arg and option 
 - int argument
 - short option names

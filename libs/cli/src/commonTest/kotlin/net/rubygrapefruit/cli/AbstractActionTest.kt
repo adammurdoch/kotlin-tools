@@ -1,7 +1,7 @@
 package net.rubygrapefruit.cli
 
-import kotlin.test.fail
 import kotlin.test.assertEquals
+import kotlin.test.fail
 
 abstract class AbstractActionTest {
     fun <T : Action> parse(action: T, args: List<String>, verification: (T) -> Unit) {
@@ -10,11 +10,15 @@ abstract class AbstractActionTest {
     }
 
     fun parseFails(action: Action, args: List<String>, message: String) {
+        parseFails(action, args) { e -> assertEquals(message, e.message) }
+    }
+
+    fun parseFails(action: Action, args: List<String>, verification: (ArgParseException) -> Unit) {
         try {
             action.parse(args)
             fail()
         } catch (e: ArgParseException) {
-            assertEquals(message, e.message)
+            verification(e)
         }
     }
 }

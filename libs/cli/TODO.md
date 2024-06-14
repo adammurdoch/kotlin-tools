@@ -1,5 +1,6 @@
 - `--help`
-- usage message and no stack trace on parse error
+- usage message on parse error
+  - Unknown sub-action
 - consistent API for defining default value for flag, arg and option 
 - int argument
 - short option names
@@ -7,11 +8,11 @@
 - one or more arguments
 - zero or more options
 - nested actions
-- usage message
 - one of set of flags, last one wins
 - argument is one of a set
 - disallow conflicting flags, option and sub-action names
 - file locations: dir, file, must exist
+- color output on terminal
 - `--stacktrace`
 - `--completion zsh`
 

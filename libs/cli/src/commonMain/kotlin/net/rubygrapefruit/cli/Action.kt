@@ -116,13 +116,19 @@ open class Action {
      * Runs this action, using the given arguments to configure it.
      */
     fun run(args: List<String>) {
-        parse(args)
+        try {
+            parse(args)
+        } catch (e: ArgParseException) {
+            println(e.formattedMessage)
+            exit(1)
+        }
+
         run()
         exit(0)
     }
 
     internal fun replace(option: NonPositional, newOption: NonPositional) {
-        options.set(options.indexOf(option), newOption)
+        options[options.indexOf(option)] = newOption
     }
 
     interface Actions {

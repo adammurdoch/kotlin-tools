@@ -1,4 +1,10 @@
-- `--help` shows usage of actions? 
+- help for options, actions, parameters, etc
+- completion for positional parameters
+- fix completion for flags
+- fix completion for options with arg
+- fix completion for flags and options with multiple names
+- escape names for completion function, actions, help, etc
+- `--help` shows usage of actions 
 - Usage sorts options using name, rather than `--name` or `-n`
 - Usage message on parse error
   - Unknown option - show available options
@@ -18,4 +24,3 @@
 - File locations: dir, file, must exist
 - Color output on terminal
 - Fuzzy matching and/or suggestions
-- `--completion zsh`

@@ -32,8 +32,11 @@ internal class DefaultNullableChoice<T : Any>(private val host: Host, private va
 
     override fun choice(value: T, name: String, vararg names: String, help: String?) {
         val details = ChoiceDetails(value, help)
-        choices[host.option(name)] = details
-        names.iterator().forEach { choices[host.option(it)] = details }
+        val allNames = listOf(name) + names
+        allNames.iterator().forEach {
+            host.validate(it, "an option name")
+            choices[host.option(it)] = details
+        }
     }
 }
 

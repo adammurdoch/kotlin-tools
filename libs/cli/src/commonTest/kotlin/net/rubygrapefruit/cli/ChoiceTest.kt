@@ -3,6 +3,7 @@ package net.rubygrapefruit.cli
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.fail
 
 class ChoiceTest : AbstractActionTest() {
     @Test
@@ -138,6 +139,32 @@ class ChoiceTest : AbstractActionTest() {
         }
         parse(Choice(), listOf("-3", "-2", "-1")) { action ->
             assertEquals(1, action.selected)
+        }
+    }
+
+    @Test
+    fun `name must not start with punctuation`() {
+        class Broken1 : Action() {
+            val sub by oneOf {
+                choice(1, "--one")
+            }
+        }
+        try {
+            Broken1()
+            fail()
+        } catch (e: IllegalArgumentException) {
+            assertEquals("--one cannot be used as an option name", e.message)
+        }
+        class Broken2 : Action() {
+            val sub by oneOf {
+                choice(1, "one", "-1")
+            }
+        }
+        try {
+            Broken2()
+            fail()
+        } catch (e: IllegalArgumentException) {
+            assertEquals("-1 cannot be used as an option name", e.message)
         }
     }
 }

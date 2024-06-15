@@ -26,16 +26,16 @@ open class Action {
 
     /**
      * Defines a boolean flag with the given name. Can use `--<name>` or `--no-<name>` to specify the value.
+     * For single character names, use `-<name>` to specify the value.
      * Uses the default value if not present.
      * The flag can appear anywhere in the command-line. It can be specified multiple times and last value is used.
      */
-    fun flag(name: String, default: Boolean = false, help: String? = null): Flag {
-        DefaultHost.validate(name, "a flag name")
-        val flag = if (name.length == 1) {
-            DefaultBooleanOption(name, help, DefaultHost, default)
-        } else {
-            DefaultFlag(name, help, DefaultHost, default)
+    fun flag(name: String, vararg names: String, default: Boolean = false, help: String? = null): Flag {
+        val allNames = listOf(name) + names.toList()
+        for (name in allNames) {
+            DefaultHost.validate(name, "a flag name")
         }
+        val flag = DefaultFlag(allNames, help, DefaultHost, default)
         options.add(flag)
         return flag
     }

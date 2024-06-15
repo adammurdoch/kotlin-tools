@@ -53,6 +53,24 @@ class FlagTest : AbstractActionTest() {
     }
 
     @Test
+    fun `can define multiple names for flag`() {
+        class BooleanFlag : Action() {
+            val flag by flag("f", "flag")
+        }
+
+        parse(BooleanFlag(), listOf("--flag")) { action ->
+            assertTrue(action.flag)
+        }
+        parse(BooleanFlag(), listOf("-f")) { action ->
+            assertTrue(action.flag)
+        }
+
+        parse(BooleanFlag(), listOf("--no-flag")) { action ->
+            assertFalse(action.flag)
+        }
+    }
+
+    @Test
     fun `boolean option with long name can be present multiple times`() {
         class BooleanFlag : Action() {
             val flag by flag("flag")

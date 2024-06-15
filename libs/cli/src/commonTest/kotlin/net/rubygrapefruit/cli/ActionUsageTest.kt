@@ -67,9 +67,12 @@ class ActionUsageTest {
     @Test
     fun `formats action with multiple options`() {
         class Options : MainAction("cmd") {
-            val a1 by flag("thing", help = "some flag")
+            val f1 by flag("thing", help = "some flag")
+            val f2 by flag("t", help = "some short flag")
+            val f3 by flag("f", "flag", help = "some other flag")
             val a2 by option("some-option", help = "some other option")
             val a3 by option("none")
+            val a4 by option("o")
         }
 
         assertEquals(
@@ -79,8 +82,11 @@ class ActionUsageTest {
             Options:
               --help                Show usage message
               --thing, --no-thing   some flag
+              -t                    some short flag
+              -f, --flag, --no-flag some other flag
               --some-option <value> some other option
               --none <value>
+              -o <value>
 
             """.trimIndent(), Options().usage().formatted
         )

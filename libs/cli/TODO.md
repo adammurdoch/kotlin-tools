@@ -2,6 +2,7 @@
 - `--help` shows help string for flag, option, argument, action 
 - `--help` shows usage of actions? 
 - `--stacktrace`
+- Usage sorts flags and options for display
 - Show help for a sub-action
 - usage message on parse error
   - Unknown option
@@ -9,7 +10,7 @@
   - Argument not provided
 - consistent API for defining default value for flag, arg and option 
 - int argument
-- short and long names
+- short and long names for options
 - argument with one or more values
 - option with zero or more values
 - nested actions

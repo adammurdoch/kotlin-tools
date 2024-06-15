@@ -10,7 +10,7 @@ class ArgumentAndFlagTest : AbstractActionTest() {
     fun `can combine flag and argument`() {
         class MixedAction : Action() {
             val flag by flag("flag")
-            val arg by argument("arg")
+            val arg by parameter("arg")
         }
 
         parse(MixedAction(), listOf("--flag", "abc")) { action ->

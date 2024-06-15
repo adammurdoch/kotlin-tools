@@ -2,7 +2,7 @@ package net.rubygrapefruit.cli
 
 import kotlin.reflect.KProperty
 
-internal class DefaultArgument(private val name: String, private val help: String?, private val host: Host, default: String?) : Positional(), Argument<String> {
+internal class DefaultParameter(private val name: String, private val help: String?, private val host: Host, default: String?) : Positional(), Parameter<String> {
     private var value: String? = default
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): String {
@@ -25,7 +25,7 @@ internal class DefaultArgument(private val name: String, private val help: Strin
 
     override fun missing(): ArgParseException? {
         return if (value == null) {
-            ArgParseException("Argument '$name' not provided")
+            ArgParseException("Parameter '$name' not provided")
         } else {
             null
         }

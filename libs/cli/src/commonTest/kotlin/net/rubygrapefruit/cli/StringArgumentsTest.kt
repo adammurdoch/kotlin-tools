@@ -7,7 +7,7 @@ class StringArgumentsTest : AbstractActionTest() {
     @Test
     fun `action can have zero or more arguments`() {
         class Argument : Action() {
-            val arg by arguments("value")
+            val arg by parameters("value")
         }
 
         parse(Argument(), emptyList()) { action ->

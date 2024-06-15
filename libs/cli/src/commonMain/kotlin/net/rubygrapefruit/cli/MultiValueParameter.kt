@@ -2,7 +2,7 @@ package net.rubygrapefruit.cli
 
 import kotlin.reflect.KProperty
 
-internal class DefaultArguments(private val name: String, private val help: String?, private val host: Host) : Positional(), Argument<List<String>> {
+internal class MultiValueParameter(private val name: String, private val help: String?, private val host: Host) : Positional(), Parameter<List<String>> {
     private var values: List<String>? = null
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): List<String> {

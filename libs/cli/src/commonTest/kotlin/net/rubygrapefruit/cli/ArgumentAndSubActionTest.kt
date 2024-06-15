@@ -10,7 +10,7 @@ class ArgumentAndSubActionTest : AbstractActionTest() {
         val sub = Action()
 
         class WithSub : Action() {
-            val arg by argument("value")
+            val arg by parameter("value")
             val sub by actions {
                 action("sub", sub)
             }
@@ -30,7 +30,7 @@ class ArgumentAndSubActionTest : AbstractActionTest() {
             val sub by actions {
                 action("sub", sub)
             }
-            val arg by argument("value")
+            val arg by parameter("value")
         }
 
         parse(WithSub(), listOf("sub", "123")) { action ->

@@ -37,33 +37,33 @@ open class Action {
     }
 
     /**
-     * Defines an argument with the given name.
-     * The argument must appear at the current location on the command-line.
-     * Uses the default value if not present, and fails if the argument is not present and its default is null.
+     * Defines a parameter with the given name.
+     * The parameter must appear at the current location on the command-line.
+     * Uses the default value if the parameter is not present in the input, or fails if the parameter is not present and its default is null.
      */
-    fun argument(name: String, default: String? = null, help: String? = null): Argument<String> {
-        val arg = DefaultArgument(name, help, DefaultHost, default)
+    fun parameter(name: String, default: String? = null, help: String? = null): Parameter<String> {
+        val arg = DefaultParameter(name, help, DefaultHost, default)
         positional.add(arg)
         return arg
     }
 
     /**
-     * Defines a multi-value argument with the given name.
-     * The argument must appear at the current location on the command-line.
-     * Uses an empty list as the value if not present.
+     * Defines a multi-value parameter with the given name.
+     * The parameter must appear at the current location on the command-line.
+     * Uses an empty list if the parameter is not present in the input.
      */
-    fun arguments(name: String, help: String? = null): Argument<List<String>> {
-        val arg = DefaultArguments(name, help, DefaultHost)
+    fun parameters(name: String, help: String? = null): Parameter<List<String>> {
+        val arg = MultiValueParameter(name, help, DefaultHost)
         positional.add(arg)
         return arg
     }
 
     /**
-     * Defines a set of sub-actions. Can use `<name> <args>` to invoke the action.
-     * Only one sub-action can be invoked, and this must appear at the current location on the command-line.
-     * Fails if a sub-action is not present.
+     * Defines a set of actions. Can use `<name> <args>` to invoke the action.
+     * Only one action can be invoked, and this must appear at the current location on the command-line.
+     * Fails if an action is not present in the input.
      */
-    fun actions(builder: Actions.() -> Unit): Argument<Action> {
+    fun actions(builder: Actions.() -> Unit): Parameter<Action> {
         val actions = DefaultActionSet(DefaultHost)
         builder(actions)
         positional.add(actions)
@@ -91,7 +91,7 @@ open class Action {
             val failure = if (DefaultHost.isOption(arg)) {
                 ArgParseException("Unknown option: $arg")
             } else {
-                ArgParseException("Unknown argument: $arg")
+                ArgParseException("Unknown parameter: $arg")
             }
             return ParseResult(count, failure)
         }
@@ -99,7 +99,7 @@ open class Action {
     }
 
     internal fun maybeParse(args: List<String>): ParseResult {
-        val pendingArgs = this.positional.toMutableList()
+        val pending = this.positional.toMutableList()
 
         var index = 0
         while (index in args.indices) {
@@ -122,12 +122,12 @@ open class Action {
                 continue
             }
 
-            if (pendingArgs.isNotEmpty()) {
-                val result = pendingArgs.first().accept(current)
+            if (pending.isNotEmpty()) {
+                val result = pending.first().accept(current)
                 if (result.failure != null) {
                     return result.advance(index)
                 }
-                pendingArgs.removeFirst()
+                pending.removeFirst()
                 index += result.count
                 continue
             }
@@ -135,8 +135,8 @@ open class Action {
             return ParseResult(index, null)
         }
 
-        for (arg in pendingArgs) {
-            val failure = arg.missing()
+        for (positional in pending) {
+            val failure = positional.missing()
             if (failure != null) {
                 return ParseResult(args.size, failure)
             }

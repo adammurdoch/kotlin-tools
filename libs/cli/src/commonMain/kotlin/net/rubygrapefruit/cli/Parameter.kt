@@ -3,8 +3,8 @@ package net.rubygrapefruit.cli
 import kotlin.reflect.KProperty
 
 /**
- * An argument of type <T>.
+ * A parameter of type <T>.
  */
-sealed interface Argument<T> {
+sealed interface Parameter<T> {
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T
 }

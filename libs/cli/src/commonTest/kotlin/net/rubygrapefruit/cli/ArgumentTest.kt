@@ -8,7 +8,7 @@ class ArgumentTest : AbstractActionTest() {
     @Test
     fun `action can have argument`() {
         class Argument : Action() {
-            val arg by argument("value")
+            val arg by parameter("value")
         }
 
         parse(Argument(), listOf("abc")) { action ->
@@ -19,8 +19,8 @@ class ArgumentTest : AbstractActionTest() {
     @Test
     fun `action can have multiple arguments`() {
         class Argument : Action() {
-            val a1 by argument("value")
-            val a2 by argument("value")
+            val a1 by parameter("value")
+            val a2 by parameter("value")
         }
 
         parse(Argument(), listOf("abc", "def")) { action ->
@@ -32,7 +32,7 @@ class ArgumentTest : AbstractActionTest() {
     @Test
     fun `can provide default value for argument`() {
         class Argument : Action() {
-            val arg by argument("value", default = "value")
+            val arg by parameter("value", default = "value")
         }
 
         parse(Argument(), emptyList()) { action ->
@@ -47,26 +47,26 @@ class ArgumentTest : AbstractActionTest() {
     @Test
     fun `fails when argument not provided`() {
         class Argument : Action() {
-            val arg by argument("value")
+            val arg by parameter("value")
         }
 
-        parseFails(Argument(), emptyList(), "Argument 'value' not provided")
+        parseFails(Argument(), emptyList(), "Parameter 'value' not provided")
     }
 
     @Test
     fun `fails when some arguments provided but not all`() {
         class Argument : Action() {
-            val a1 by argument("a1")
-            val a2 by argument("a2")
+            val a1 by parameter("a1")
+            val a2 by parameter("a2")
         }
 
-        parseFails(Argument(), listOf("abc"), "Argument 'a2' not provided")
+        parseFails(Argument(), listOf("abc"), "Parameter 'a2' not provided")
     }
 
     @Test
     fun `fails when unknown flag provided`() {
         class Argument : Action() {
-            val arg by argument("value")
+            val arg by parameter("value")
         }
 
         parseFails(Argument(), listOf("--flag"), "Unknown option: --flag")
@@ -75,16 +75,16 @@ class ArgumentTest : AbstractActionTest() {
     @Test
     fun `fails when additional argument provided`() {
         class Argument : Action() {
-            val arg by argument("value")
+            val arg by parameter("value")
         }
 
-        parseFails(Argument(), listOf("1", "2"), "Unknown argument: 2")
+        parseFails(Argument(), listOf("1", "2"), "Unknown parameter: 2")
     }
 
     @Test
     fun `can run --help command without providing argument`() {
         class Argument : MainAction("cmd") {
-            val arg by argument("value")
+            val arg by parameter("value")
         }
 
         val action = Argument().actionFor(listOf("--help"))

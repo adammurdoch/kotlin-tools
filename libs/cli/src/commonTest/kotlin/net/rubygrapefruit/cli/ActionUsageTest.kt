@@ -22,9 +22,9 @@ class ActionUsageTest {
     @Test
     fun `formats action with multiple arguments`() {
         class Arguments : MainAction("cmd") {
-            val a1 by argument("a", help = "some argument")
-            val a2 by argument("another-argument", help = "some other argument")
-            val a3 by argument("no-help")
+            val a1 by parameter("a", help = "some argument")
+            val a2 by parameter("another-argument", help = "some other argument")
+            val a3 by parameter("no-help")
         }
 
         assertEquals(
@@ -45,8 +45,8 @@ class ActionUsageTest {
     @Test
     fun `formats action with arguments`() {
         class Arguments : MainAction("cmd") {
-            val a1 by argument("a", help = "some argument")
-            val a2 by arguments("arg", help = "some other argument")
+            val a1 by parameter("a", help = "some argument")
+            val a2 by parameters("arg", help = "some other argument")
         }
 
         assertEquals(

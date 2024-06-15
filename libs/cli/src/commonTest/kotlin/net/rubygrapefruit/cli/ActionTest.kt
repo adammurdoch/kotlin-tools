@@ -15,6 +15,6 @@ class ActionTest : AbstractActionTest() {
         class NoConfig : Action()
 
         parseFails(NoConfig(), listOf("--flag"), "Unknown option: --flag")
-        parseFails(NoConfig(), listOf("arg"), "Unknown argument: arg")
+        parseFails(NoConfig(), listOf("arg"), "Unknown parameter: arg")
     }
 }

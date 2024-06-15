@@ -42,8 +42,8 @@ class SubActionTest : AbstractActionTest() {
     fun `action can have sub action with configuration`() {
         class Sub : Action() {
             val flag by flag("f")
-            val a by argument("a")
-            val b by argument("b")
+            val a by parameter("a")
+            val b by parameter("b")
         }
 
         val sub = Sub()
@@ -65,7 +65,7 @@ class SubActionTest : AbstractActionTest() {
     @Test
     fun `can chain sub-actions`() {
         class Sub : Action() {
-            val a by argument("a")
+            val a by parameter("a")
         }
 
         val s1 = Sub()
@@ -141,7 +141,7 @@ class SubActionTest : AbstractActionTest() {
             }
         }
 
-        parseFails(WithSub(), listOf("sub", "123"), "Unknown argument: 123")
+        parseFails(WithSub(), listOf("sub", "123"), "Unknown parameter: 123")
     }
 
     @Test

@@ -21,7 +21,7 @@ internal class ActionUsage(
             builder.append("\n")
             val positionalWithHelp = positional.filter { it.help != null }
             if (positionalWithHelp.isNotEmpty()) {
-                builder.append("\nArguments:\n")
+                builder.append("\nParameters:\n")
                 builder.appendItems(positionalWithHelp)
                 builder.append("\n")
             }

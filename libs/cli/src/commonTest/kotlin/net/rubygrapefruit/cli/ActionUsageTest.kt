@@ -20,47 +20,47 @@ class ActionUsageTest {
     }
 
     @Test
-    fun `formats action with multiple arguments`() {
-        class Arguments : MainAction("cmd") {
-            val a1 by parameter("a", help = "some argument")
-            val a2 by parameter("another-argument", help = "some other argument")
+    fun `formats action with multiple parameters`() {
+        class Parameters : MainAction("cmd") {
+            val a1 by parameter("a", help = "some value")
+            val a2 by parameter("another-param", help = "some other value")
             val a3 by parameter("no-help")
         }
 
         assertEquals(
             """
-            Usage: cmd [options] <a> <another-argument> <no-help>
+            Usage: cmd [options] <a> <another-param> <no-help>
             
-            Arguments:
-              <a>                some argument
-              <another-argument> some other argument
+            Parameters:
+              <a>             some value
+              <another-param> some other value
 
             Options:
               --help Show usage message
             
-            """.trimIndent(), Arguments().usage().formatted
+            """.trimIndent(), Parameters().usage().formatted
         )
     }
 
     @Test
-    fun `formats action with arguments`() {
-        class Arguments : MainAction("cmd") {
-            val a1 by parameter("a", help = "some argument")
-            val a2 by parameters("arg", help = "some other argument")
+    fun `formats action with parameters`() {
+        class Parameters : MainAction("cmd") {
+            val a1 by parameter("a", help = "some value")
+            val a2 by parameters("param", help = "some other value")
         }
 
         assertEquals(
             """
-            Usage: cmd [options] <a> <arg>...
+            Usage: cmd [options] <a> <param>...
             
-            Arguments:
-              <a>   some argument
-              <arg> some other argument
+            Parameters:
+              <a>     some value
+              <param> some other value
 
             Options:
               --help Show usage message
             
-            """.trimIndent(), Arguments().usage().formatted
+            """.trimIndent(), Parameters().usage().formatted
         )
     }
 

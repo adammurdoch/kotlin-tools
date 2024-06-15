@@ -4,37 +4,37 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
 
-class ArgumentAndSubActionTest : AbstractActionTest() {
+class ParameterAndSubActionTest : AbstractActionTest() {
     @Test
-    fun `argument can precede sub-action`() {
+    fun `parameter can precede sub-action`() {
         val sub = Action()
 
         class WithSub : Action() {
-            val arg by parameter("value")
+            val param by parameter("value")
             val sub by actions {
                 action("sub", sub)
             }
         }
 
         parse(WithSub(), listOf("123", "sub")) { action ->
-            assertEquals("123", action.arg)
+            assertEquals("123", action.param)
             assertSame(sub, action.sub)
         }
     }
 
     @Test
-    fun `argument can follow sub-action`() {
+    fun `parameter can follow sub-action`() {
         val sub = Action()
 
         class WithSub : Action() {
             val sub by actions {
                 action("sub", sub)
             }
-            val arg by parameter("value")
+            val param by parameter("value")
         }
 
         parse(WithSub(), listOf("sub", "123")) { action ->
-            assertEquals("123", action.arg)
+            assertEquals("123", action.param)
             assertSame(sub, action.sub)
         }
     }

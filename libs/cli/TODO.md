@@ -10,7 +10,6 @@
   - Argument not provided
 - consistent API for defining default value for flag, arg and option 
 - int argument
-- short and long names for options
 - argument with one or more values
 - option with zero or more values
 - nested actions

@@ -1,18 +1,18 @@
 package net.rubygrapefruit.cli
 
 internal class DefaultNullableIntOption(
-    name: String,
+    names: List<String>,
     help: String?,
     private val host: Host,
     private val owner: Action
-) : AbstractOption<Int?>(name, help, host), NullableOption<Int> {
+) : AbstractOption<Int?>(names, help, host), NullableOption<Int> {
     override fun default(value: Int): Option<Int> {
-        val option = DefaultIntOption(name, help, host, value)
+        val option = DefaultIntOption(names, help, host, value)
         owner.replace(this, option)
         return option
     }
 
-    override fun convert(arg: String?): Int? {
+    override fun convert(flag: String, arg: String?): Int? {
         return if (arg == null) {
             null
         } else {

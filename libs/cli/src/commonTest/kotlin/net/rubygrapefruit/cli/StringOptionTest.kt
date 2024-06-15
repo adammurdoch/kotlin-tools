@@ -33,6 +33,20 @@ class StringOptionTest : AbstractActionTest() {
     }
 
     @Test
+    fun `can define string option with multiple names`() {
+        class StringOption : Action() {
+            val option by option("o", "opt")
+        }
+
+        parse(StringOption(), listOf("-o", "123")) { action ->
+            assertEquals("123", action.option)
+        }
+        parse(StringOption(), listOf("--opt", "123")) { action ->
+            assertEquals("123", action.option)
+        }
+    }
+
+    @Test
     fun `value is null when option not provided`() {
         class StringOption : Action() {
             val option by option("o")
@@ -101,7 +115,7 @@ class StringOptionTest : AbstractActionTest() {
             val option by option("o")
         }
 
-        parseFails(StringOption(), listOf("-o", "1", "-o", "2"), "Option -o already provided")
+        parseFails(StringOption(), listOf("-o", "1", "-o", "2"), "Value for option -o already provided")
     }
 
     @Test

@@ -14,27 +14,31 @@ open class Action {
     }
 
     /**
-     * Defines a string option with the given name. Can use `--<name> <value>` to specify the value.
-     * The flag can appear anywhere in the command-line.
+     * Defines a string option with the given names. Can use `--<name> <value>` to specify the value.
+     * For single character names, use `-<name> <value>` to specify the value.
+     *
+     * The option can appear anywhere in the command-line. It can only appear once.
      */
-    fun option(name: String, help: String? = null): NullableStringOption {
-        DefaultHost.validate(name, "an option name")
-        val option = DefaultNullableStringOption(name, help, DefaultHost, this)
+    fun option(name: String, vararg names: String, help: String? = null): NullableStringOption {
+        val allNames = listOf(name) + names.toList()
+        allNames.forEach { DefaultHost.validate(it, "an option name")}
+
+        val option = DefaultNullableStringOption(allNames, help, DefaultHost, this)
         options.add(option)
         return option
     }
 
     /**
-     * Defines a boolean flag with the given name. Can use `--<name>` or `--no-<name>` to specify the value.
+     * Defines a boolean flag with the given names. Can use `--<name>` or `--no-<name>` to specify the value.
      * For single character names, use `-<name>` to specify the value.
-     * Uses the default value if not present.
+     *
      * The flag can appear anywhere in the command-line. It can be specified multiple times and last value is used.
+     * Uses the default value if not present.
      */
     fun flag(name: String, vararg names: String, default: Boolean = false, help: String? = null): Flag {
         val allNames = listOf(name) + names.toList()
-        for (name in allNames) {
-            DefaultHost.validate(name, "a flag name")
-        }
+        allNames.forEach { DefaultHost.validate(it, "a flag name")}
+
         val flag = DefaultFlag(allNames, help, DefaultHost, default)
         options.add(flag)
         return flag
@@ -42,6 +46,7 @@ open class Action {
 
     /**
      * Defines a parameter with the given name.
+     *
      * The parameter must appear at the current location on the command-line.
      * Uses the default value if the parameter is not present in the input, or fails if the parameter is not present and its default is null.
      */
@@ -53,6 +58,7 @@ open class Action {
 
     /**
      * Defines a multi-value parameter with the given name.
+     *
      * The parameter must appear at the current location on the command-line.
      * Uses an empty list if the parameter is not present in the input.
      */
@@ -64,6 +70,7 @@ open class Action {
 
     /**
      * Defines a set of actions. Can use `<name> <args>` to invoke the action.
+     *
      * Only one action can be invoked, and this must appear at the current location on the command-line.
      * Fails if an action is not present in the input.
      */

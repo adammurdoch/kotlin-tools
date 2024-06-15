@@ -46,19 +46,16 @@ class SubActionTest : AbstractActionTest() {
             val b by parameter("b")
         }
 
-        val sub = Sub()
-
         class WithSub : Action() {
             val sub by actions {
-                action(sub, "sub")
+                action(Sub(), "sub")
             }
         }
 
         parse(WithSub(), listOf("sub", "-f", "1", "2")) { action ->
-            assertSame(sub, action.sub)
-            assertTrue(sub.flag)
-            assertEquals("1", sub.a)
-            assertEquals("2", sub.b)
+            assertTrue(action.sub.flag)
+            assertEquals("1", action.sub.a)
+            assertEquals("2", action.sub.b)
         }
     }
 
@@ -129,6 +126,8 @@ class SubActionTest : AbstractActionTest() {
         }
 
         parseFails(WithSub(), listOf("--flag"), "Unknown option: --flag")
+        parseFails(WithSub(), listOf("--flag", "sub"), "Unknown option: --flag")
+        parseFails(WithSub(), listOf("sub", "--flag"), "Unknown option: --flag")
     }
 
     @Test

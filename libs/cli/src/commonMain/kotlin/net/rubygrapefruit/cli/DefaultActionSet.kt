@@ -2,14 +2,14 @@ package net.rubygrapefruit.cli
 
 import kotlin.reflect.KProperty
 
-internal class DefaultActionSet(private val host: Host) : Positional(), Parameter<Action>, Action.Actions {
-    private val actions = mutableMapOf<String, ActionDetails>()
-    private var action: Action? = null
+internal class DefaultActionSet<T: Action>(private val host: Host) : Positional(), Parameter<T>, Action.Actions<T> {
+    private val actions = mutableMapOf<String, ActionDetails<T>>()
+    private var action: T? = null
 
     private val actionInfo
         get() = actions.map { SubActionUsage(it.key, it.value.help) }
 
-    override fun action(action: Action, name: String, help: String?) {
+    override fun action(action: T, name: String, help: String?) {
         host.validate(name, "an action name")
         actions[name] = ActionDetails(action, help)
     }
@@ -35,9 +35,9 @@ internal class DefaultActionSet(private val host: Host) : Positional(), Paramete
         return PositionalUsage("<action>", "<action>", null, actionInfo)
     }
 
-    override fun getValue(thisRef: Any?, property: KProperty<*>): Action {
+    override fun getValue(thisRef: Any?, property: KProperty<*>): T {
         return action ?: throw IllegalStateException()
     }
 
-    private class ActionDetails(val action: Action, val help: String?)
+    private class ActionDetails<T: Action>(val action: T, val help: String?)
 }

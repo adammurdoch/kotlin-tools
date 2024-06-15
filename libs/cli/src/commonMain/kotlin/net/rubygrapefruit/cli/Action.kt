@@ -84,8 +84,8 @@ open class Action {
      * Only one action can be invoked, and this must appear at the current location on the command-line.
      * Fails if an action is not present in the input.
      */
-    fun actions(builder: Actions.() -> Unit): Parameter<Action> {
-        val actions = DefaultActionSet(DefaultHost)
+    fun <T: Action> actions(builder: Actions<T>.() -> Unit): Parameter<T> {
+        val actions = DefaultActionSet<T>(DefaultHost)
         builder(actions)
         positional.add(actions)
         return actions
@@ -178,8 +178,8 @@ open class Action {
         options[options.indexOf(option)] = newOption
     }
 
-    interface Actions {
-        fun action(action: Action, name: String, help: String? = null)
+    interface Actions<T: Action> {
+        fun action(action: T, name: String, help: String? = null)
     }
 
     interface Choices<T> {

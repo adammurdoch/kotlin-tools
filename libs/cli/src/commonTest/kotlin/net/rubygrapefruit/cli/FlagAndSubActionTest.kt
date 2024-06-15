@@ -46,11 +46,11 @@ class FlagAndSubActionTest : AbstractActionTest() {
         }
 
         parse(WithSub(), listOf("sub", "--flag")) { action ->
-            assertTrue((action.sub as SubAction).flag)
+            assertTrue(action.sub.flag)
         }
 
         parse(WithSub(), listOf("sub")) { action ->
-            assertFalse((action.sub as SubAction).flag)
+            assertFalse(action.sub.flag)
         }
     }
 }

@@ -22,18 +22,18 @@ class ActionUsageTest {
     @Test
     fun `formats action with multiple parameters`() {
         class Parameters : MainAction("cmd") {
-            val a1 by parameter("a", help = "some value")
-            val a2 by parameter("another-param", help = "some other value")
-            val a3 by parameter("no-help")
+            val p1 by parameter("z", help = "some value")
+            val p2 by parameter("another-param", help = "some other value")
+            val p3 by parameter("no-help")
         }
 
         assertEquals(
             """
-            Usage: cmd [options] <a> <another-param> <no-help>
+            Usage: cmd [options] <z> <another-param> <no-help>
             
             Parameters:
-              <a>             some value
               <another-param> some other value
+              <z>             some value
 
             Options:
               --help Show usage message
@@ -79,8 +79,8 @@ class ActionUsageTest {
             Options:
               --help                Show usage message
               --thing, --no-thing   some flag
-              -t                    some short flag
               -f, --flag, --no-flag some other flag
+              -t                    some short flag
 
             """.trimIndent(), Options().usage().formatted
         )
@@ -101,10 +101,74 @@ class ActionUsageTest {
             
             Options:
               --help                              Show usage message
-              --some-option <value>               some other option
-              -s <value>, --second-option <value> second option
               --none <value>
+              --some-option <value>               some other option
               -o <value>                          single character
+              -s <value>, --second-option <value> second option
+
+            """.trimIndent(), Options().usage().formatted
+        )
+    }
+
+    @Test
+    fun `formats action with multiple choices`() {
+        class Options : MainAction("cmd") {
+            val c1 by oneOf {
+                choice(1, "1", help = "select 1")
+                choice(2, "two")
+                choice(12, "12", help = "select 12")
+            }
+            val c2 by oneOf {
+                choice("a", "a", help = "select a")
+                choice("b", "long")
+                choice("c", "other", help = "select c")
+            }
+        }
+
+        assertEquals(
+            """
+            Usage: cmd [options]
+            
+            Options:
+              --12    select 12
+              --help  Show usage message
+              --long
+              --other select c
+              --two
+              -1      select 1
+              -a      select a
+
+            """.trimIndent(), Options().usage().formatted
+        )
+    }
+
+    @Test
+    fun `formats action with multiple actions`() {
+        class Options : MainAction("cmd") {
+            val a1 by actions {
+                action("z", Action(), help = "run action z")
+                action("action-two", Action())
+                action("a2", Action(), help = "run action a2")
+            }
+            val a2 by actions {
+                action("z2", Action(), help = "run action z2")
+                action("action-three", Action())
+            }
+        }
+
+        assertEquals(
+            """
+            Usage: cmd [options] <action> <action>
+
+            Actions:
+              a2           run action a2
+              action-three
+              action-two
+              z            run action z
+              z2           run action z2
+
+            Options:
+              --help Show usage message
 
             """.trimIndent(), Options().usage().formatted
         )

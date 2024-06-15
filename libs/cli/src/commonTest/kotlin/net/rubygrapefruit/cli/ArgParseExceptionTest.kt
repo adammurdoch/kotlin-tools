@@ -20,10 +20,9 @@ class ArgParseExceptionTest {
             Please run something
             
             Available actions:
-              run              run something
               do-another-thing run something else
               no-help
-
+              run              run something
         """.trimIndent(), exception.formattedMessage)
     }
 }

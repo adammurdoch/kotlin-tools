@@ -1,8 +1,10 @@
+- consistent pattern for adding items for actions and oneOf
 - `--help` shows actions
 - `--help` shows help string for flag, option, argument, action 
 - `--help` shows usage of actions? 
 - `--stacktrace`
 - Usage sorts flags and options for display
+- Usage sorts options using name, rather than `--name` or `-n`
 - Show help for a sub-action
 - usage message on parse error
   - Unknown option
@@ -19,7 +21,7 @@
 - nested actions
 - one of set of flags, last one wins
 - argument is one of a set
-- disallow conflicting flags, option and action names
+- disallow conflicting flags, option and action names, choice flags
 - disallow any positional args after `arguments()`
 - file locations: dir, file, must exist
 - color output on terminal

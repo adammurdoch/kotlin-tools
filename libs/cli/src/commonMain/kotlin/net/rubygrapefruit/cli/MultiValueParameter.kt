@@ -10,7 +10,7 @@ internal class MultiValueParameter(private val name: String, private val help: S
     }
 
     override fun usage(): PositionalUsage {
-        return PositionalUsage("<$name>...", "<$name>", help)
+        return PositionalUsage("<$name>...", "<$name>", help, emptyList())
     }
 
     override fun accept(args: List<String>): ParseResult {

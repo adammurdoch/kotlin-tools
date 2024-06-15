@@ -3,17 +3,17 @@ package net.rubygrapefruit.cli
 import kotlin.reflect.KProperty
 
 internal class DefaultChoice<T>(private val host: Host) : NonPositional(), Option<T?>, Action.Choices<T> {
-    private val choices = mutableMapOf<String, T>()
+    private val choices = mutableMapOf<String, ChoiceDetails<T>>()
     private var value: T? = null
 
     override fun usage(): List<OptionUsage> {
-        return choices.map { OptionUsage(it.key, null) }
+        return choices.map { OptionUsage(it.key, it.value.help) }
     }
 
     override fun accept(args: List<String>): ParseResult {
         val result = choices[args[0]]
         return if (result != null) {
-            value = result
+            value = result.value
             ParseResult.One
         } else {
             ParseResult.Nothing
@@ -25,6 +25,8 @@ internal class DefaultChoice<T>(private val host: Host) : NonPositional(), Optio
     }
 
     override fun choice(value: T, name: String, vararg names: String, help: String?) {
-        choices[host.option(name)] = value
+        choices[host.option(name)] = ChoiceDetails(value, help)
     }
+
+    private class ChoiceDetails<T>(val value: T, val help: String?)
 }

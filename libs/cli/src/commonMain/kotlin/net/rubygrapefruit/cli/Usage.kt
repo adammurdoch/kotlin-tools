@@ -19,17 +19,11 @@ internal class ActionUsage(
                 builder.append(" ${positional.usage}")
             }
             builder.append("\n")
-            val positionalWithHelp = positional.filter { it.help != null }
-            if (positionalWithHelp.isNotEmpty()) {
-                builder.append("\nParameters:\n")
-                builder.appendItems(positionalWithHelp)
-                builder.append("\n")
-            }
-            if (options.isNotEmpty()) {
-                builder.append("\nOptions:\n")
-                builder.appendItems(options)
-                builder.append("\n")
-            }
+            val parameters = positional.filter { it.actions.isEmpty() && it.help != null }
+            val actions = positional.filter { it.actions.isNotEmpty() }.flatMap { it.actions }
+            builder.appendItems("Parameters", parameters)
+            builder.appendItems("Actions", actions)
+            builder.appendItems("Options", options)
             return builder.toString()
         }
 }
@@ -49,7 +43,13 @@ internal class OptionUsage(
 internal class PositionalUsage(
     val usage: String,
     override val display: String,
-    help: String?
+    help: String?,
+    val actions: List<SubActionUsage>
 ) : ItemUsage(help) {
-    constructor(usage: String, help: String?) : this(usage, usage, help)
+    constructor(usage: String, help: String?) : this(usage, usage, help, emptyList())
+}
+
+internal class SubActionUsage(val name: String, help: String?) : ItemUsage(help) {
+    override val display: String
+        get() = name
 }

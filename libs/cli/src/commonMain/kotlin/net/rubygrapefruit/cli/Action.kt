@@ -128,8 +128,9 @@ open class Action {
         return ParseResult(args.size, null)
     }
 
-    internal fun usage(): ActionUsage {
+    internal open fun usage(): ActionUsage {
         return ActionUsage(
+            null,
             options.flatMap { it.usage() },
             positional.map { it.usage() }
         )

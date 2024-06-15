@@ -32,7 +32,7 @@ internal class DefaultActionSet(private val host: Host) : Positional(), Argument
     }
 
     override fun usage(): PositionalUsage {
-        return PositionalUsage("<action>", "action", null)
+        return PositionalUsage("<action>", null)
     }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): Action {

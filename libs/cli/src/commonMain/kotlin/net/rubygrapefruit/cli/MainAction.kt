@@ -3,6 +3,11 @@ package net.rubygrapefruit.cli
 open class MainAction(private val name: String) : Action() {
     private val help by flag("help", help = "Show usage message")
 
+    override fun usage(): ActionUsage {
+        val usage = super.usage()
+        return ActionUsage(name, usage.options, usage.positional)
+    }
+
     /**
      * Runs this action, using the given arguments to configure it.
      */

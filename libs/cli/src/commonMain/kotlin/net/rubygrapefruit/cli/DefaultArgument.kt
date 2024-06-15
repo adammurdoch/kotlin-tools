@@ -10,7 +10,7 @@ internal class DefaultArgument(private val name: String, private val help: Strin
     }
 
     override fun usage(): PositionalUsage {
-        return PositionalUsage("<$name>", name, help)
+        return PositionalUsage("<$name>", help)
     }
 
     override fun accept(args: List<String>): ParseResult {

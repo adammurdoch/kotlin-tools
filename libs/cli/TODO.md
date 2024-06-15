@@ -1,4 +1,3 @@
-- choice allows default
 - validate choice flags
 - `--stacktrace`
 - `--help` shows help string for flag, option, argument, action 

@@ -52,7 +52,7 @@ class ChoiceTest : AbstractActionTest() {
     }
 
     @Test
-    fun `can give choice multiple names`() {
+    fun `can define multiple names for choice item`() {
         class Choice : Action() {
             val selected by oneOf {
                 choice(1, "1", "one")
@@ -70,6 +70,25 @@ class ChoiceTest : AbstractActionTest() {
 
         parseFails(Choice(), listOf("-one"), "Unknown option: -one")
         parseFails(Choice(), listOf("--1"), "Unknown option: --1")
+    }
+
+    @Test
+    fun `can provide default value for choice`() {
+        class Choice : Action() {
+            val selected by oneOf {
+                choice(1, "1")
+                choice(2, "2")
+                choice(3, "3")
+            }.default(2)
+        }
+
+        parse(Choice(), emptyList()) { action ->
+            assertEquals(2, action.selected)
+        }
+
+        parse(Choice(), listOf("-3")) { action ->
+            assertEquals(3, action.selected)
+        }
     }
 
     @Test

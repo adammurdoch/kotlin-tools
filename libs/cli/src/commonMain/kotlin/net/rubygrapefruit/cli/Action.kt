@@ -47,8 +47,8 @@ open class Action {
     /**
      * Defines a set of values that can be selected using flags.
      */
-    fun <T> oneOf(builder: Choices<T>.() -> Unit): Option<T?> {
-        val choice = DefaultChoice<T>(DefaultHost)
+    fun <T : Any> oneOf(builder: Choices<T>.() -> Unit): NullableOption<T> {
+        val choice = DefaultNullableChoice<T>(DefaultHost, this)
         builder(choice)
         options.add(choice)
         return choice
@@ -84,7 +84,7 @@ open class Action {
      * Only one action can be invoked, and this must appear at the current location on the command-line.
      * Fails if an action is not present in the input.
      */
-    fun <T: Action> actions(builder: Actions<T>.() -> Unit): Parameter<T> {
+    fun <T : Action> actions(builder: Actions<T>.() -> Unit): Parameter<T> {
         val actions = DefaultActionSet<T>(DefaultHost)
         builder(actions)
         positional.add(actions)
@@ -178,7 +178,7 @@ open class Action {
         options[options.indexOf(option)] = newOption
     }
 
-    interface Actions<T: Action> {
+    interface Actions<T : Action> {
         fun action(action: T, name: String, help: String? = null)
     }
 

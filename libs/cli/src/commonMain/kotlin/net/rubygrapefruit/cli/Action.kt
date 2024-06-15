@@ -7,6 +7,12 @@ open class Action {
     private val options = mutableListOf<NonPositional>()
     private val positional = mutableListOf<Positional>()
 
+    internal fun booleanOption(name: String, help: String? = null): Flag {
+        val flag = DefaultBooleanOption(name, help, DefaultHost, false)
+        options.add(flag)
+        return flag
+    }
+
     /**
      * Defines a string option with the given name. Can use `--<name> <value>` to specify the value.
      * The flag can appear anywhere in the command-line.

@@ -13,7 +13,7 @@ class ActionUsageTest {
             Usage: cmd [options]
             
             Options:
-              --help/--no-help Show usage message
+              --help Show usage message
             
         """.trimIndent(), NoConfig().usage().formatted
         )
@@ -36,7 +36,7 @@ class ActionUsageTest {
               <another-argument> some other argument
 
             Options:
-              --help/--no-help Show usage message
+              --help Show usage message
             
             """.trimIndent(), Arguments().usage().formatted
         )
@@ -55,7 +55,7 @@ class ActionUsageTest {
             Usage: cmd [options]
             
             Options:
-              --help/--no-help      Show usage message
+              --help                Show usage message
               --thing/--no-thing    some flag
               --some-option <value> some other option
               --none <value>

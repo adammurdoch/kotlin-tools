@@ -1,7 +1,7 @@
 package net.rubygrapefruit.cli
 
 open class MainAction(private val name: String) : Action() {
-    private val help by flag("help", help = "Show usage message")
+    private val help by booleanOption("help", help = "Show usage message")
 
     override fun usage(): ActionUsage {
         val usage = super.usage()

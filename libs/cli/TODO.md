@@ -1,8 +1,7 @@
-- Don't define `--no-help`
-- App name for help
 - `--help` shows actions
 - `--help` shows help string for flag, option, argument, action 
-- `--help` shows usage of sub-action? 
+- `--help` shows usage of actions? 
+- `--stacktrace`
 - Show help for a sub-action
 - usage message on parse error
   - Unknown option
@@ -21,7 +20,6 @@
 - file locations: dir, file, must exist
 - color output on terminal
 - fuzzy matching and/or suggestions
-- `--stacktrace`
 - `--completion zsh`
 
 

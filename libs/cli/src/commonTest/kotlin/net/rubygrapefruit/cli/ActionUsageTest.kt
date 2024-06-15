@@ -78,7 +78,7 @@ class ActionUsageTest {
             
             Options:
               --help                Show usage message
-              --thing/--no-thing    some flag
+              --thing, --no-thing   some flag
               --some-option <value> some other option
               --none <value>
 

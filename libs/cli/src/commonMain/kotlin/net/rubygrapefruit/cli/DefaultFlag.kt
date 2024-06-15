@@ -15,7 +15,7 @@ internal class DefaultFlag(name: String, private val help: String?, host: Host, 
     }
 
     override fun usage(): List<OptionUsage> {
-        return listOf(OptionUsage("$enableFlag/$disableFlag", help))
+        return listOf(OptionUsage("$enableFlag, $disableFlag", help))
     }
 
     override fun accept(args: List<String>): ParseResult {

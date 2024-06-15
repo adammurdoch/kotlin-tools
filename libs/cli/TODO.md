@@ -17,6 +17,7 @@
 - one of set of flags, last one wins
 - argument is one of a set
 - disallow conflicting flags, option and sub-action names
+- disallow any positional args after `arguments()`
 - file locations: dir, file, must exist
 - color output on terminal
 - fuzzy matching and/or suggestions

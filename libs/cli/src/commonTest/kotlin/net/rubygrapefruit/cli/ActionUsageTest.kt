@@ -20,7 +20,7 @@ class ActionUsageTest {
     }
 
     @Test
-    fun `formats action with arguments`() {
+    fun `formats action with multiple arguments`() {
         class Arguments : MainAction("cmd") {
             val a1 by argument("a", help = "some argument")
             val a2 by argument("another-argument", help = "some other argument")
@@ -43,7 +43,29 @@ class ActionUsageTest {
     }
 
     @Test
-    fun `formats action with options`() {
+    fun `formats action with arguments`() {
+        class Arguments : MainAction("cmd") {
+            val a1 by argument("a", help = "some argument")
+            val a2 by arguments("arg", help = "some other argument")
+        }
+
+        assertEquals(
+            """
+            Usage: cmd [options] <a> <arg>...
+            
+            Arguments:
+              <a>   some argument
+              <arg> some other argument
+
+            Options:
+              --help Show usage message
+            
+            """.trimIndent(), Arguments().usage().formatted
+        )
+    }
+
+    @Test
+    fun `formats action with multiple options`() {
         class Options : MainAction("cmd") {
             val a1 by flag("thing", help = "some flag")
             val a2 by option("some-option", help = "some other option")

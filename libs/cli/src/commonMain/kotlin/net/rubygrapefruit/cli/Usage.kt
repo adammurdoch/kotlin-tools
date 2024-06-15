@@ -48,8 +48,8 @@ internal class OptionUsage(
 
 internal class PositionalUsage(
     val usage: String,
+    override val display: String,
     help: String?
 ) : ItemUsage(help) {
-    override val display: String
-        get() = usage
+    constructor(usage: String, help: String?) : this(usage, usage, help)
 }

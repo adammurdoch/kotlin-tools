@@ -48,6 +48,17 @@ open class Action {
     }
 
     /**
+     * Defines a multi-value argument with the given name.
+     * The argument must appear at the current location on the command-line.
+     * Uses an empty list as the value if not present.
+     */
+    fun arguments(name: String, help: String? = null): Argument<List<String>> {
+        val arg = DefaultArguments(name, help, DefaultHost)
+        positional.add(arg)
+        return arg
+    }
+
+    /**
      * Defines a set of sub-actions. Can use `<name> <args>` to invoke the action.
      * Only one sub-action can be invoked, and this must appear at the current location on the command-line.
      * Fails if a sub-action is not present.

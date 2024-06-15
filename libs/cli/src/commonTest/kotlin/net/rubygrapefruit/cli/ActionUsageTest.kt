@@ -13,6 +13,7 @@ class ActionUsageTest {
             Usage: cmd [options]
             
             Options:
+              --completion        Generate ZSH completion script
               --help              Show usage message
               --stack, --no-stack Show stack trace on failure
             
@@ -37,6 +38,7 @@ class ActionUsageTest {
               <z>             some value
 
             Options:
+              --completion        Generate ZSH completion script
               --help              Show usage message
               --stack, --no-stack Show stack trace on failure
             
@@ -60,6 +62,7 @@ class ActionUsageTest {
               <param> some other value
 
             Options:
+              --completion        Generate ZSH completion script
               --help              Show usage message
               --stack, --no-stack Show stack trace on failure
             
@@ -80,6 +83,7 @@ class ActionUsageTest {
             Usage: cmd [options]
             
             Options:
+              --completion          Generate ZSH completion script
               --help                Show usage message
               --stack, --no-stack   Show stack trace on failure
               --thing, --no-thing   some flag
@@ -104,6 +108,7 @@ class ActionUsageTest {
             Usage: cmd [options]
             
             Options:
+              --completion                        Generate ZSH completion script
               --help                              Show usage message
               --none <value>
               --some-option <value>               some other option
@@ -136,6 +141,7 @@ class ActionUsageTest {
             
             Options:
               --12                select 12
+              --completion        Generate ZSH completion script
               --help              Show usage message
               --long
               --other             select c
@@ -174,6 +180,7 @@ class ActionUsageTest {
               z2           run action z2
 
             Options:
+              --completion        Generate ZSH completion script
               --help              Show usage message
               --stack, --no-stack Show stack trace on failure
 

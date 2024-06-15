@@ -5,6 +5,7 @@ package net.rubygrapefruit.cli
  */
 open class MainAction(private val name: String) : Action() {
     private val help by simpleFlag("help", help = "Show usage message")
+    private val completion by simpleFlag("completion", help = "Generate ZSH completion script")
     private val stackTrace by flag("stack", help = "Show stack trace on failure")
 
     override fun usage(): ActionUsage {
@@ -49,6 +50,8 @@ open class MainAction(private val name: String) : Action() {
         val result = parseAll(args)
         return if (help) {
             HelpAction(this)
+        } else if (completion) {
+            CompletionAction(this)
         } else if (result.failure != null) {
             throw result.failure
         } else {

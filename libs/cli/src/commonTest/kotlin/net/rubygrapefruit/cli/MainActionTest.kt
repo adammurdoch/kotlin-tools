@@ -11,4 +11,12 @@ class MainActionTest : AbstractActionTest() {
         val action = NoConfig().actionFor(listOf("--help"))
         assertIs<HelpAction>(action)
     }
+
+    @Test
+    fun `can run --completion command`() {
+        class NoConfig : MainAction("cmd")
+
+        val action = NoConfig().actionFor(listOf("--completion"))
+        assertIs<CompletionAction>(action)
+    }
 }

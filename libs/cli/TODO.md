@@ -12,6 +12,7 @@
 - Argument with one or more values
 - Argument and option with zero or more values
 - Argument is one of a set
+- Validate names do not contain spaces
 - Disallow conflicting flags, option and action names, choice flags
 - Disallow any positional args after `arguments()`
 - File locations: dir, file, must exist

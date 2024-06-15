@@ -20,7 +20,7 @@ internal class ActionUsage(
             }
             builder.append("\n")
             val parameters = positional.filter { it.actions.isEmpty() && it.help != null }
-            val actions = positional.filter { it.actions.isNotEmpty() }.flatMap { it.actions }
+            val actions = positional.flatMap { it.actions }
             builder.appendItems("Parameters", parameters)
             builder.appendItems("Actions", actions)
             builder.appendItems("Options", options)

@@ -7,14 +7,29 @@ import kotlin.test.fail
 
 class StringOptionTest : AbstractActionTest() {
     @Test
-    fun `can define string option`() {
+    fun `can define string option with long name`() {
+        class StringOption : Action() {
+            val option by option("opt")
+        }
+
+        parse(StringOption(), listOf("--opt", "123")) { action ->
+            assertEquals("123", action.option)
+        }
+
+        parseFails(StringOption(), listOf("-opt", "123"), "Unknown option: -opt")
+    }
+
+    @Test
+    fun `can define string option with short name`() {
         class StringOption : Action() {
             val option by option("o")
         }
 
-        parse(StringOption(), listOf("--o", "123")) { action ->
+        parse(StringOption(), listOf("-o", "123")) { action ->
             assertEquals("123", action.option)
         }
+
+        parseFails(StringOption(), listOf("--o", "123"), "Unknown option: --o")
     }
 
     @Test
@@ -31,14 +46,14 @@ class StringOptionTest : AbstractActionTest() {
     @Test
     fun `can provide default value for string option`() {
         class StringOption : Action() {
-            val option by option("o").default("value")
+            val option by option("opt").default("value")
         }
 
         parse(StringOption(), emptyList()) { action ->
             assertEquals("value", action.option)
         }
 
-        parse(StringOption(), listOf("--o", "123")) { action ->
+        parse(StringOption(), listOf("--opt", "123")) { action ->
             assertEquals("123", action.option)
         }
     }
@@ -77,7 +92,7 @@ class StringOptionTest : AbstractActionTest() {
             val option by option("o")
         }
 
-        parseFails(StringOption(), listOf("--o"), "Value missing for option --o")
+        parseFails(StringOption(), listOf("-o"), "Value missing for option -o")
     }
 
     @Test
@@ -86,7 +101,7 @@ class StringOptionTest : AbstractActionTest() {
             val option by option("o")
         }
 
-        parseFails(StringOption(), listOf("--o", "1", "--o", "2"), "Option --o already provided")
+        parseFails(StringOption(), listOf("-o", "1", "-o", "2"), "Option -o already provided")
     }
 
     @Test

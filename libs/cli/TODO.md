@@ -9,26 +9,15 @@
   - Argument not provided
 - consistent API for defining default value for flag, arg and option 
 - int argument
-- short option names
-- one or more arguments
-- zero or more options
+- short and long names
+- argument with one or more values
+- option with zero or more values
 - nested actions
 - one of set of flags, last one wins
 - argument is one of a set
-- disallow conflicting flags, option and sub-action names
+- disallow conflicting flags, option and action names
 - disallow any positional args after `arguments()`
 - file locations: dir, file, must exist
 - color output on terminal
 - fuzzy matching and/or suggestions
 - `--completion zsh`
-
-
-Options
-
-- optional, null value
-- optional, default value
-- required
-- zero or more, empty list if absent
-- one or more
-
-- string, int, boolean

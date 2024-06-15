@@ -31,7 +31,11 @@ open class Action {
      */
     fun flag(name: String, default: Boolean = false, help: String? = null): Flag {
         DefaultHost.validate(name, "a flag name")
-        val flag = DefaultFlag(name, help, DefaultHost, default)
+        val flag = if (name.length == 1) {
+            DefaultBooleanOption(name, help, DefaultHost, default)
+        } else {
+            DefaultFlag(name, help, DefaultHost, default)
+        }
         options.add(flag)
         return flag
     }

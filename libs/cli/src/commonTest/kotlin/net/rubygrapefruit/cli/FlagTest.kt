@@ -4,7 +4,7 @@ import kotlin.test.*
 
 class FlagTest : AbstractActionTest() {
     @Test
-    fun `can enable boolean option`() {
+    fun `can enable boolean option with long name`() {
         class BooleanFlag : Action() {
             val flag by flag("flag")
         }
@@ -12,10 +12,12 @@ class FlagTest : AbstractActionTest() {
         parse(BooleanFlag(), listOf("--flag")) { action ->
             assertTrue(action.flag)
         }
+
+        parseFails(BooleanFlag(), listOf("-flag"), "Unknown option: -flag")
     }
 
     @Test
-    fun `can disable boolean option`() {
+    fun `can disable boolean option with long name`() {
         class BooleanFlag : Action() {
             val flag by flag("flag")
         }
@@ -23,10 +25,57 @@ class FlagTest : AbstractActionTest() {
         parse(BooleanFlag(), listOf("--no-flag")) { action ->
             assertFalse(action.flag)
         }
+
+        parseFails(BooleanFlag(), listOf("-no-flag"), "Unknown option: -no-flag")
     }
 
     @Test
-    fun `can override boolean option`() {
+    fun `can enable boolean option with short name`() {
+        class BooleanFlag : Action() {
+            val flag by flag("f")
+        }
+
+        parse(BooleanFlag(), listOf("-f")) { action ->
+            assertTrue(action.flag)
+        }
+
+        parseFails(BooleanFlag(), listOf("--f"), "Unknown option: --f")
+    }
+
+    @Test
+    fun `cannot disable boolean option with short name`() {
+        class BooleanFlag : Action() {
+            val flag by flag("f")
+        }
+
+        parseFails(BooleanFlag(), listOf("--no-f"), "Unknown option: --no-f")
+        parseFails(BooleanFlag(), listOf("-no-f"), "Unknown option: -no-f")
+    }
+
+    @Test
+    fun `boolean option with long name can be present multiple times`() {
+        class BooleanFlag : Action() {
+            val flag by flag("flag")
+        }
+
+        parse(BooleanFlag(), listOf("--flag", "--flag")) { action ->
+            assertTrue(action.flag)
+        }
+    }
+
+    @Test
+    fun `boolean option with show name can be present multiple times`() {
+        class BooleanFlag : Action() {
+            val flag by flag("f")
+        }
+
+        parse(BooleanFlag(), listOf("-f", "-f")) { action ->
+            assertTrue(action.flag)
+        }
+    }
+
+    @Test
+    fun `can override boolean option with long name`() {
         class BooleanFlag : Action() {
             val flag by flag("flag")
         }
@@ -43,10 +92,12 @@ class FlagTest : AbstractActionTest() {
     @Test
     fun `flag defaults to false`() {
         class BooleanFlag : Action() {
+            val f by flag("f")
             val flag by flag("flag")
         }
 
         parse(BooleanFlag(), emptyList()) { action ->
+            assertFalse(action.f)
             assertFalse(action.flag)
         }
     }
@@ -70,7 +121,7 @@ class FlagTest : AbstractActionTest() {
     }
 
     @Test
-    fun `can enable multiple boolean options`() {
+    fun `can enable multiple boolean options in any order`() {
         class BooleanFlag : Action() {
             val f1 by flag("f1")
             val f2 by flag("f2")

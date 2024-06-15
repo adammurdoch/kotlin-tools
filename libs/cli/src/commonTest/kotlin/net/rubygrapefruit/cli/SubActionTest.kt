@@ -54,7 +54,7 @@ class SubActionTest : AbstractActionTest() {
             }
         }
 
-        parse(WithSub(), listOf("sub", "--f", "1", "2")) { action ->
+        parse(WithSub(), listOf("sub", "-f", "1", "2")) { action ->
             assertSame(sub, action.sub)
             assertTrue(sub.flag)
             assertEquals("1", sub.a)

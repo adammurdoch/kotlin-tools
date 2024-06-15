@@ -17,12 +17,12 @@ class StringOptionAndSubActionTest : AbstractActionTest() {
             }
         }
 
-        parse(WithSub(), listOf("--o", "123", "sub")) { action ->
+        parse(WithSub(), listOf("-o", "123", "sub")) { action ->
             assertEquals("123", action.option)
             assertSame(sub, action.sub)
         }
 
-        parse(WithSub(), listOf("sub", "--o", "123")) { action ->
+        parse(WithSub(), listOf("sub", "-o", "123")) { action ->
             assertEquals("123", action.option)
             assertSame(sub, action.sub)
         }
@@ -45,7 +45,7 @@ class StringOptionAndSubActionTest : AbstractActionTest() {
             }
         }
 
-        parse(WithSub(), listOf("sub", "--o", "123")) { action ->
+        parse(WithSub(), listOf("sub", "-o", "123")) { action ->
             assertEquals("123", (action.sub as SubAction).option)
         }
 

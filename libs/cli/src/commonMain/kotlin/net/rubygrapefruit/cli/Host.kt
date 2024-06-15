@@ -17,7 +17,11 @@ internal object DefaultHost : Host {
     }
 
     override fun option(name: String): String {
-        return "--$name"
+        return if (name.length == 1) {
+            "-$name"
+        } else {
+            "--$name"
+        }
     }
 
     override fun isOption(flag: String): Boolean {

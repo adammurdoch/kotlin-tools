@@ -21,7 +21,7 @@ open class Action {
      */
     fun option(name: String, vararg names: String, help: String? = null): NullableStringOption {
         val allNames = listOf(name) + names.toList()
-        allNames.forEach { DefaultHost.validate(it, "an option name")}
+        allNames.forEach { DefaultHost.validate(it, "an option name") }
 
         val option = DefaultNullableStringOption(allNames, help, DefaultHost, this)
         options.add(option)
@@ -37,11 +37,21 @@ open class Action {
      */
     fun flag(name: String, vararg names: String, default: Boolean = false, help: String? = null): Flag {
         val allNames = listOf(name) + names.toList()
-        allNames.forEach { DefaultHost.validate(it, "a flag name")}
+        allNames.forEach { DefaultHost.validate(it, "a flag name") }
 
         val flag = DefaultFlag(allNames, help, DefaultHost, default)
         options.add(flag)
         return flag
+    }
+
+    /**
+     * Defines a set of values that can be selected using flags.
+     */
+    fun <T> oneOf(builder: Choices<T>.() -> Unit): Option<T?> {
+        val choice = DefaultChoice<T>(DefaultHost)
+        builder(choice)
+        options.add(choice)
+        return choice
     }
 
     /**
@@ -170,5 +180,9 @@ open class Action {
 
     interface Actions {
         fun action(name: String, action: Action, help: String? = null)
+    }
+
+    interface Choices<T> {
+        fun choice(value: T, name: String, vararg names: String, help: String? = null)
     }
 }

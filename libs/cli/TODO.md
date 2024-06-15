@@ -8,6 +8,10 @@
   - Unknown option
   - Unknown option for sub-command
   - Argument not provided
+- choice allows default
+- choice allows multiple names
+- validate choice flags
+- help for choice options
 - consistent API for defining default value for flag, arg and option 
 - int argument
 - argument with one or more values

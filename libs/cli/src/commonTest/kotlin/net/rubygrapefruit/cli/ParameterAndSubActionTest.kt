@@ -12,7 +12,7 @@ class ParameterAndSubActionTest : AbstractActionTest() {
         class WithSub : Action() {
             val param by parameter("value")
             val sub by actions {
-                action("sub", sub)
+                action(sub, "sub")
             }
         }
 
@@ -28,7 +28,7 @@ class ParameterAndSubActionTest : AbstractActionTest() {
 
         class WithSub : Action() {
             val sub by actions {
-                action("sub", sub)
+                action(sub, "sub")
             }
             val param by parameter("value")
         }

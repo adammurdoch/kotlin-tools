@@ -9,7 +9,7 @@ internal class DefaultActionSet(private val host: Host) : Positional(), Paramete
     private val actionInfo
         get() = actions.map { SubActionUsage(it.key, it.value.help) }
 
-    override fun action(name: String, action: Action, help: String?) {
+    override fun action(action: Action, name: String, help: String?) {
         host.validate(name, "an action name")
         actions[name] = ActionDetails(action, help)
     }

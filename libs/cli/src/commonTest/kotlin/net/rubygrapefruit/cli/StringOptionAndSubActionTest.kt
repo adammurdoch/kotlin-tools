@@ -13,7 +13,7 @@ class StringOptionAndSubActionTest : AbstractActionTest() {
         class WithSub : Action() {
             val option by option("o")
             val sub by actions {
-                action("sub", sub)
+                action(sub, "sub")
             }
         }
 
@@ -41,7 +41,7 @@ class StringOptionAndSubActionTest : AbstractActionTest() {
 
         class WithSub : Action() {
             val sub by actions {
-                action("sub", SubAction())
+                action(SubAction(), "sub")
             }
         }
 

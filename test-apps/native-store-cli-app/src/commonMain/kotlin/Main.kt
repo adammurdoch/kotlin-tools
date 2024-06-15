@@ -6,10 +6,10 @@ import net.rubygrapefruit.store.Store
 
 class StoreApp : MainAction("jvm-store-cli-app") {
     private val command by actions {
-        action("content", ContentCommand(), help = "Dump content")
-        action("one-value", BenchmarkOneValueCommand(), help = "Run benchmark for a single value")
-        action("many-values", BenchmarkManyValuesCommand(), help = "Run benchmark for many values")
-        action("one-map", BenchmarkOneKeyValueCommand(), help = "Run benchmark for a single map")
+        action(ContentCommand(), "content", help = "Dump content")
+        action(BenchmarkOneValueCommand(), "one-value", help = "Run benchmark for a single value")
+        action(BenchmarkManyValuesCommand(), "many-values", help = "Run benchmark for many values")
+        action(BenchmarkOneKeyValueCommand(), "one-map", help = "Run benchmark for a single map")
     }
 
     override fun run() {

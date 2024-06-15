@@ -13,7 +13,7 @@ class FlagAndSubActionTest : AbstractActionTest() {
         class WithSub : Action() {
             val flag by flag("flag")
             val sub by actions {
-                action("sub", sub)
+                action(sub, "sub")
             }
         }
 
@@ -41,7 +41,7 @@ class FlagAndSubActionTest : AbstractActionTest() {
 
         class WithSub : Action() {
             val sub by actions {
-                action("sub", SubAction())
+                action(SubAction(), "sub")
             }
         }
 

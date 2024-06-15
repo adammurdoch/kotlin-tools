@@ -146,13 +146,13 @@ class ActionUsageTest {
     fun `formats action with multiple actions`() {
         class Options : MainAction("cmd") {
             val a1 by actions {
-                action("z", Action(), help = "run action z")
-                action("action-two", Action())
-                action("a2", Action(), help = "run action a2")
+                action(Action(), "z", help = "run action z")
+                action(Action(), "action-two")
+                action(Action(), "a2", help = "run action a2")
             }
             val a2 by actions {
-                action("z2", Action(), help = "run action z2")
-                action("action-three", Action())
+                action(Action(), "z2", help = "run action z2")
+                action(Action(), "action-three")
             }
         }
 

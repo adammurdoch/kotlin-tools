@@ -7,8 +7,8 @@ open class Action {
     private val options = mutableListOf<NonPositional>()
     private val positional = mutableListOf<Positional>()
 
-    internal fun booleanOption(name: String, help: String? = null): Flag {
-        val flag = DefaultBooleanOption(name, help, DefaultHost, false)
+    internal fun simpleFlag(name: String, help: String? = null): Flag {
+        val flag = DefaultFlag(listOf(name), false, help, DefaultHost, false)
         options.add(flag)
         return flag
     }
@@ -39,7 +39,7 @@ open class Action {
         val allNames = listOf(name) + names.toList()
         allNames.forEach { DefaultHost.validate(it, "a flag name") }
 
-        val flag = DefaultFlag(allNames, help, DefaultHost, default)
+        val flag = DefaultFlag(allNames, true, help, DefaultHost, default)
         options.add(flag)
         return flag
     }
@@ -179,7 +179,7 @@ open class Action {
     }
 
     interface Actions {
-        fun action(name: String, action: Action, help: String? = null)
+        fun action(action: Action, name: String, help: String? = null)
     }
 
     interface Choices<T> {

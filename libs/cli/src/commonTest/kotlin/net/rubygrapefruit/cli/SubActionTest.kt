@@ -9,7 +9,7 @@ class SubActionTest : AbstractActionTest() {
 
         class WithSub : Action() {
             val sub by actions {
-                action("sub", sub)
+                action(sub, "sub")
             }
         }
 
@@ -25,8 +25,8 @@ class SubActionTest : AbstractActionTest() {
 
         class WithSub : Action() {
             val sub by actions {
-                action("s1", s1)
-                action("s2", s2)
+                action(s1, "s1")
+                action(s2, "s2")
             }
         }
 
@@ -50,7 +50,7 @@ class SubActionTest : AbstractActionTest() {
 
         class WithSub : Action() {
             val sub by actions {
-                action("sub", sub)
+                action(sub, "sub")
             }
         }
 
@@ -73,10 +73,10 @@ class SubActionTest : AbstractActionTest() {
 
         class WithSub : Action() {
             val s1 by actions {
-                action("s1", s1)
+                action(s1, "s1")
             }
             val s2 by actions {
-                action("s2", s2)
+                action(s2, "s2")
             }
         }
 
@@ -92,8 +92,8 @@ class SubActionTest : AbstractActionTest() {
     fun `fails when sub-action not provided`() {
         class WithSub : Action() {
             val sub by actions {
-                action("s1", Action())
-                action("s2", Action())
+                action(Action(), "s1")
+                action(Action(), "s2")
             }
         }
 
@@ -107,8 +107,8 @@ class SubActionTest : AbstractActionTest() {
     fun `fails when unknown sub-action provided`() {
         class WithSub : Action() {
             val sub by actions {
-                action("s1", Action())
-                action("s2", Action())
+                action(Action(), "s1")
+                action(Action(), "s2")
             }
         }
 
@@ -124,7 +124,7 @@ class SubActionTest : AbstractActionTest() {
 
         class WithSub : Action() {
             val sub by actions {
-                action("sub", sub)
+                action(sub, "sub")
             }
         }
 
@@ -137,7 +137,7 @@ class SubActionTest : AbstractActionTest() {
 
         class WithSub : Action() {
             val sub by actions {
-                action("sub", sub)
+                action(sub, "sub")
             }
         }
 
@@ -148,7 +148,7 @@ class SubActionTest : AbstractActionTest() {
     fun `name must not start with punctuation`() {
         class WithSub : Action() {
             val sub by actions {
-                action("--sub", Action())
+                action(Action(), "--sub")
             }
         }
         try {
@@ -163,7 +163,7 @@ class SubActionTest : AbstractActionTest() {
     fun `can run --help command without providing action`() {
         class WithSub : MainAction("cmd") {
             val sub by actions {
-                action("sub", Action())
+                action(Action(), "sub")
             }
         }
 

@@ -2,9 +2,15 @@ package net.rubygrapefruit.cli
 
 import kotlin.reflect.KProperty
 
-internal class DefaultFlag(names: List<String>, private val help: String?, host: Host, default: Boolean) : NonPositional(), Flag {
+internal class DefaultFlag(
+    names: List<String>,
+    disableOptions: Boolean,
+    private val help: String?,
+    host: Host,
+    default: Boolean
+) : NonPositional(), Flag {
     private val enableFlags = names.map { host.option(it) }
-    private val disableFlags = names.mapNotNull { if (it.length == 1) null else host.option("no-$it") }
+    private val disableFlags = if (disableOptions) names.mapNotNull { if (it.length == 1) null else host.option("no-$it") } else emptyList()
     private var value: Boolean = default
 
     override val enableUsage: String

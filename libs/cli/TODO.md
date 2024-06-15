@@ -1,29 +1,27 @@
 - consistent pattern for adding items for actions and oneOf
-- `--help` shows actions
-- `--help` shows help string for flag, option, argument, action 
-- `--help` shows usage of actions? 
-- `--stacktrace`
-- Usage sorts flags and options for display
-- Usage sorts options using name, rather than `--name` or `-n`
-- Show help for a sub-action
-- usage message on parse error
-  - Unknown option
-  - Unknown option for sub-command
-  - Argument not provided
 - choice allows default
 - choice allows multiple names
 - validate choice flags
-- help for choice options
-- consistent API for defining default value for flag, arg and option 
-- int argument
-- argument with one or more values
-- option with zero or more values
-- nested actions
-- one of set of flags, last one wins
-- argument is one of a set
-- disallow conflicting flags, option and action names, choice flags
-- disallow any positional args after `arguments()`
-- file locations: dir, file, must exist
-- color output on terminal
-- fuzzy matching and/or suggestions
+- `--stacktrace`
+- `--help` shows help string for flag, option, argument, action 
+- `--help` shows usage of actions? 
+- Usage sorts options using name, rather than `--name` or `-n`
+- Usage message on parse error
+  - Unknown option
+  - Unknown option for sub-command
+  - Argument not provided
+  - Too many arguments
+  - Option value badly formed
+  - Option value missing
+- Consistent API for defining default value for flag, arg and option 
+- Int argument
+- Argument with one or more values
+- Argument and ption with zero or more values
+- Nested actions
+- Argument is one of a set
+- Disallow conflicting flags, option and action names, choice flags
+- Disallow any positional args after `arguments()`
+- File locations: dir, file, must exist
+- Color output on terminal
+- Fuzzy matching and/or suggestions
 - `--completion zsh`

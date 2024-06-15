@@ -13,7 +13,8 @@ class ActionUsageTest {
             Usage: cmd [options]
             
             Options:
-              --help Show usage message
+              --help              Show usage message
+              --stack, --no-stack Show stack trace on failure
             
         """.trimIndent(), NoConfig().usage().formatted
         )
@@ -36,7 +37,8 @@ class ActionUsageTest {
               <z>             some value
 
             Options:
-              --help Show usage message
+              --help              Show usage message
+              --stack, --no-stack Show stack trace on failure
             
             """.trimIndent(), Parameters().usage().formatted
         )
@@ -58,7 +60,8 @@ class ActionUsageTest {
               <param> some other value
 
             Options:
-              --help Show usage message
+              --help              Show usage message
+              --stack, --no-stack Show stack trace on failure
             
             """.trimIndent(), Parameters().usage().formatted
         )
@@ -78,6 +81,7 @@ class ActionUsageTest {
             
             Options:
               --help                Show usage message
+              --stack, --no-stack   Show stack trace on failure
               --thing, --no-thing   some flag
               -f, --flag, --no-flag some other flag
               -t                    some short flag
@@ -103,6 +107,7 @@ class ActionUsageTest {
               --help                              Show usage message
               --none <value>
               --some-option <value>               some other option
+              --stack, --no-stack                 Show stack trace on failure
               -o <value>                          single character
               -s <value>, --second-option <value> second option
 
@@ -130,13 +135,14 @@ class ActionUsageTest {
             Usage: cmd [options]
             
             Options:
-              --12    select 12
-              --help  Show usage message
+              --12                select 12
+              --help              Show usage message
               --long
-              --other select c
+              --other             select c
+              --stack, --no-stack Show stack trace on failure
               --two
-              -1      select 1
-              -a      select a
+              -1                  select 1
+              -a                  select a
 
             """.trimIndent(), Options().usage().formatted
         )
@@ -168,7 +174,8 @@ class ActionUsageTest {
               z2           run action z2
 
             Options:
-              --help Show usage message
+              --help              Show usage message
+              --stack, --no-stack Show stack trace on failure
 
             """.trimIndent(), Options().usage().formatted
         )

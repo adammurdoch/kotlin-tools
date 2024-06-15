@@ -1,11 +1,8 @@
-- validate choice flags
-- `--stacktrace`
-- `--help` shows help string for flag, option, argument, action 
 - `--help` shows usage of actions? 
 - Usage sorts options using name, rather than `--name` or `-n`
 - Usage message on parse error
-  - Unknown option
-  - Unknown option for sub-command
+  - Unknown option - show available options
+  - Unknown option for sub-command - show available options
   - Argument not provided
   - Too many arguments
   - Option value badly formed
@@ -13,8 +10,7 @@
 - Consistent API for defining default value for flag, arg and option 
 - Int argument
 - Argument with one or more values
-- Argument and ption with zero or more values
-- Nested actions
+- Argument and option with zero or more values
 - Argument is one of a set
 - Disallow conflicting flags, option and action names, choice flags
 - Disallow any positional args after `arguments()`

@@ -1,7 +1,11 @@
 package net.rubygrapefruit.cli
 
+/**
+ * An [Action] that can be used as the main action for a CLI application.
+ */
 open class MainAction(private val name: String) : Action() {
     private val help by simpleFlag("help", help = "Show usage message")
+    private val stackTrace by flag("stack", help = "Show stack trace on failure")
 
     override fun usage(): ActionUsage {
         val usage = super.usage()
@@ -9,14 +13,14 @@ open class MainAction(private val name: String) : Action() {
     }
 
     /**
-     * Runs this action, using the given arguments to configure it.
+     * Runs this action, using the given arguments to configure it. Does not return
      */
     fun run(args: Array<String>) {
         run(args.toList())
     }
 
     /**
-     * Runs this action, using the given arguments to configure it.
+     * Runs this action, using the given arguments to configure it. Does not return
      */
     fun run(args: List<String>) {
         val action = try {
@@ -28,8 +32,17 @@ open class MainAction(private val name: String) : Action() {
             exit(1)
         }
 
-        action.run()
-        exit(0)
+        try {
+            action.run()
+            exit(0)
+        } catch (t: Throwable) {
+            if (stackTrace) {
+                t.printStackTrace()
+            } else {
+                println(t.message)
+            }
+            exit(1)
+        }
     }
 
     internal fun actionFor(args: List<String>): Action {

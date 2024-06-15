@@ -60,7 +60,7 @@ class SubActionTest : AbstractActionTest() {
     }
 
     @Test
-    fun `can chain sub-actions`() {
+    fun `can chain sub-actions with configuration`() {
         class Sub : Action() {
             val a by parameter("a")
         }
@@ -82,6 +82,29 @@ class SubActionTest : AbstractActionTest() {
             assertSame(s2, action.s2)
             assertEquals("1", s1.a)
             assertEquals("2", s2.a)
+        }
+    }
+
+    @Test
+    fun `can nest sub-actions`() {
+        class Nested : Action() {
+            val a by parameter("a")
+        }
+
+        class Sub : Action() {
+            val nested by actions {
+                action(Nested(), "nested")
+            }
+        }
+
+        class WithSub : Action() {
+            val s1 by actions {
+                action(Sub(), "sub")
+            }
+        }
+
+        parse(WithSub(), listOf("sub", "nested", "arg")) { action ->
+            assertEquals("arg", action.s1.nested.a)
         }
     }
 

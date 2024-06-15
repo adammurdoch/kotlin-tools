@@ -1,6 +1,4 @@
-- consistent pattern for adding items for actions and oneOf
 - choice allows default
-- choice allows multiple names
 - validate choice flags
 - `--stacktrace`
 - `--help` shows help string for flag, option, argument, action 

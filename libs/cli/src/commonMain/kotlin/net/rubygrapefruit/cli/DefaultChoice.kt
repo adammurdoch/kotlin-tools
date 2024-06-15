@@ -25,7 +25,9 @@ internal class DefaultChoice<T>(private val host: Host) : NonPositional(), Optio
     }
 
     override fun choice(value: T, name: String, vararg names: String, help: String?) {
-        choices[host.option(name)] = ChoiceDetails(value, help)
+        val details = ChoiceDetails(value, help)
+        choices[host.option(name)] = details
+        names.iterator().forEach { choices[host.option(it)] = details }
     }
 
     private class ChoiceDetails<T>(val value: T, val help: String?)

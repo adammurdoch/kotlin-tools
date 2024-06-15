@@ -1,42 +1,42 @@
 package net.rubygrapefruit.cli
 
 import kotlin.test.Test
-import kotlin.test.assertFalse
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertSame
-import kotlin.test.assertTrue
 
-class FlagAndSubActionTest : AbstractActionTest() {
+class StringOptionAndActionTest : AbstractActionTest() {
     @Test
-    fun `can combine flag and sub-action`() {
+    fun `can combine option and action`() {
         val sub = Action()
 
         class WithSub : Action() {
-            val flag by flag("flag")
+            val option by option("o")
             val sub by actions {
                 action(sub, "sub")
             }
         }
 
-        parse(WithSub(), listOf("--flag", "sub")) { action ->
-            assertTrue(action.flag)
+        parse(WithSub(), listOf("-o", "123", "sub")) { action ->
+            assertEquals("123", action.option)
             assertSame(sub, action.sub)
         }
 
-        parse(WithSub(), listOf("sub", "--flag")) { action ->
-            assertTrue(action.flag)
+        parse(WithSub(), listOf("sub", "-o", "123")) { action ->
+            assertEquals("123", action.option)
             assertSame(sub, action.sub)
         }
 
         parse(WithSub(), listOf("sub")) { action ->
-            assertFalse(action.flag)
+            assertNull(action.option)
             assertSame(sub, action.sub)
         }
     }
 
     @Test
-    fun `sub-action can have flag`() {
+    fun `action can have option`() {
         class SubAction : Action() {
-            val flag by flag("flag")
+            val option by option("o")
         }
 
         class WithSub : Action() {
@@ -45,12 +45,12 @@ class FlagAndSubActionTest : AbstractActionTest() {
             }
         }
 
-        parse(WithSub(), listOf("sub", "--flag")) { action ->
-            assertTrue(action.sub.flag)
+        parse(WithSub(), listOf("sub", "-o", "123")) { action ->
+            assertEquals("123", (action.sub as SubAction).option)
         }
 
         parse(WithSub(), listOf("sub")) { action ->
-            assertFalse(action.sub.flag)
+            assertNull((action.sub as SubAction).option)
         }
     }
 }

@@ -2,11 +2,23 @@ package net.rubygrapefruit.cli
 
 import kotlin.reflect.KProperty
 
-internal class MultiValueParameter(private val name: String, private val help: String?, private val host: Host) : Positional(), Parameter<List<String>> {
+internal class MultiValueParameter(
+    private val name: String,
+    private val help: String?,
+    private val host: Host,
+    private val owner: Action,
+    private val default: List<String>
+) : Positional(), Parameter<List<String>> {
     private var values: List<String>? = null
 
+    override fun whenAbsent(default: List<String>): Parameter<List<String>> {
+        val parameter = MultiValueParameter(name, help, host, owner, default)
+        owner.replace(this, parameter)
+        return parameter
+    }
+
     override fun getValue(thisRef: Any?, property: KProperty<*>): List<String> {
-        return values ?: emptyList()
+        return values ?: default
     }
 
     override fun usage(): PositionalUsage {

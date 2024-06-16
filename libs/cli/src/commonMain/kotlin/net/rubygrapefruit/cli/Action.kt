@@ -18,6 +18,9 @@ open class Action {
      * For single character names, use `-<name> <value>` to specify the value.
      *
      * The option can appear anywhere in the command-line. It can only appear once.
+     * Has value `null` when the option is not present in the input. Use [NullableOption.whenAbsent] to use a different default.
+     *
+     * Use [NullableStringOption.int] to convert the value to an `int`
      */
     fun option(name: String, vararg names: String, help: String? = null): NullableStringOption {
         val allNames = listOf(name) + names.toList()
@@ -32,8 +35,8 @@ open class Action {
      * Defines a boolean flag with the given names. Can use `--<name>` or `--no-<name>` to specify the value.
      * For single character names, use `-<name>` to specify the value.
      *
-     * The flag can appear anywhere in the command-line. It can be specified multiple times and last value is used.
-     * Uses the default value if not present.
+     * The flag can appear anywhere in the command-line. It can be specified multiple times and the last value is used.
+     * Has value `false` when the flag is not present in the input. Use [Flag.whenAbsent] to use a different default.
      */
     fun flag(name: String, vararg names: String, help: String? = null): Flag {
         val allNames = listOf(name) + names.toList()
@@ -46,22 +49,26 @@ open class Action {
 
     /**
      * Defines a set of values that can be selected using flags.
+     *
+     * The flags can appear anywhere in the input. They can be specified multiple times and the last value is used.
+     * Has value `null` then none of the flags is present in the input. Use [NullableOption.whenAbsent] to use a different default.
      */
     fun <T : Any> oneOf(builder: Choices<T>.() -> Unit): NullableOption<T> {
-        val choice = DefaultNullableChoice<T>(DefaultHost, this)
-        builder(choice)
-        options.add(choice)
-        return choice
+        val choices = DefaultChoices<T>(DefaultHost)
+        builder(choices)
+        val option = DefaultNullableChoice<T>(choices.choices, this)
+        options.add(option)
+        return option
     }
 
     /**
      * Defines a parameter with the given name.
      *
-     * The parameter must appear at the current location on the command-line.
-     * Uses the default value if the parameter is not present in the input, or fails if the parameter is not present and its default is null.
+     * The parameter must appear at a specific location in the input.
+     * Fails if the parameter is not present. Use [Parameter.whenAbsent] to allow the parameter to be missing.
      */
-    fun parameter(name: String, default: String? = null, help: String? = null): Parameter<String> {
-        val arg = DefaultParameter(name, help, DefaultHost, default)
+    fun parameter(name: String, help: String? = null): Parameter<String> {
+        val arg = DefaultParameter(name, help, DefaultHost, this, null)
         positional.add(arg)
         return arg
     }
@@ -69,26 +76,27 @@ open class Action {
     /**
      * Defines a multi-value parameter with the given name.
      *
-     * The parameter must appear at the current location on the command-line.
-     * Uses an empty list if the parameter is not present in the input.
+     * The parameter must appear at a specific location in the input.
+     * Uses an empty list if the parameter is not present in the input. Use [Parameter.whenAbsent] to use a different default.
      */
     fun parameters(name: String, help: String? = null): Parameter<List<String>> {
-        val arg = MultiValueParameter(name, help, DefaultHost)
+        val arg = MultiValueParameter(name, help, DefaultHost, this, emptyList())
         positional.add(arg)
         return arg
     }
 
     /**
-     * Defines a set of actions. Can use `<name> <args>` to invoke the action.
+     * Defines a set of actions. Use `<name> <action-args>` to invoke the action.
      *
-     * Only one action can be invoked, and this must appear at the current location on the command-line.
-     * Fails if an action is not present in the input.
+     * Only one action can be invoked, and this must appear at a specific location in the input.
+     * Fails if an action is not present in the input. Use [Parameter.whenAbsent] to use a different default.
      */
     fun <T : Action> actions(builder: Actions<T>.() -> Unit): Parameter<T> {
-        val actions = DefaultActionSet<T>(DefaultHost)
+        val actions = DefaultActions<T>(DefaultHost)
         builder(actions)
-        positional.add(actions)
-        return actions
+        val parameter = DefaultActionSet<T>(actions.actions, DefaultHost, this, null)
+        positional.add(parameter)
+        return parameter
     }
 
     open fun run() {}
@@ -179,6 +187,10 @@ open class Action {
 
     internal fun replace(option: NonPositional, newOption: NonPositional) {
         options[options.indexOf(option)] = newOption
+    }
+
+    internal fun replace(param: Positional, newParam: Positional) {
+        positional[positional.indexOf(param)] = newParam
     }
 
     interface Actions<T : Action> {

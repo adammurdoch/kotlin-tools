@@ -24,3 +24,24 @@
 - File locations: dir, file, must exist
 - Color output on terminal
 - Fuzzy matching and/or suggestions
+
+`compinit` - initialise completion
+`compdef <fun> <name>` - use function to complete command or context (e.g. for shell syntax completion) with given name
+- completion context, contains
+  - first field is `completion` 
+  - completer function that controls completion
+  - command or context
+  - argument number being completed
+  - tag (type of value being completed)
+- pressing ^x h shows context and tags at current position
+- completion process
+  - creates blank context, progressively fills it in
+  - for sub-commands, can apparently change the "command" field in the context to a new name to do completion for the sub-command
+  - use styles to match against the context
+- standard tags
+  - `arguments`, `options`
+  - `commands` - can be used for subcommands?
+  - `files`, `directories`
+- utility functions
+  - wrappers around `compadd` built-in (https://zsh.sourceforge.io/Doc/Release/Completion-Widgets.html#Completion-Widgets) 
+  - `_arguments`

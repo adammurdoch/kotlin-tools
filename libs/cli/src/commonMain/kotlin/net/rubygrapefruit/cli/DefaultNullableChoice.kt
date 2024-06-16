@@ -2,8 +2,10 @@ package net.rubygrapefruit.cli
 
 import kotlin.reflect.KProperty
 
-internal class DefaultNullableChoice<T : Any>(private val host: Host, private val owner: Action) : NonPositional(), NullableOption<T>, Action.Choices<T> {
-    private val choices = mutableMapOf<String, ChoiceDetails<T>>()
+internal class DefaultNullableChoice<T : Any>(
+    private val choices: Map<String, ChoiceDetails<T>>,
+    private val owner: Action
+) : NonPositional(), NullableOption<T> {
     private var value: T? = null
 
     override fun usage(): List<OptionUsage> {
@@ -29,15 +31,4 @@ internal class DefaultNullableChoice<T : Any>(private val host: Host, private va
     override fun getValue(thisRef: Any?, property: KProperty<*>): T? {
         return value
     }
-
-    override fun choice(value: T, name: String, vararg names: String, help: String?) {
-        val details = ChoiceDetails(value, help)
-        val allNames = listOf(name) + names
-        allNames.iterator().forEach {
-            host.validate(it, "an option name")
-            choices[host.option(it)] = details
-        }
-    }
 }
-
-class ChoiceDetails<T>(val value: T, val help: String?)

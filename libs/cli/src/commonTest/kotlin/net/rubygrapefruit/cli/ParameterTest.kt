@@ -3,6 +3,7 @@ package net.rubygrapefruit.cli
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.test.assertNull
 
 class ParameterTest : AbstractActionTest() {
     @Test
@@ -30,9 +31,18 @@ class ParameterTest : AbstractActionTest() {
     }
 
     @Test
+    fun `fails when parameter not provided`() {
+        class Parameter : Action() {
+            val param by parameter("value")
+        }
+
+        parseFails(Parameter(), emptyList(), "Parameter 'value' not provided")
+    }
+
+    @Test
     fun `can provide default value for parameter`() {
         class Parameter : Action() {
-            val param by parameter("value", default = "value")
+            val param by parameter("value").whenAbsent("value")
         }
 
         parse(Parameter(), emptyList()) { action ->
@@ -45,15 +55,6 @@ class ParameterTest : AbstractActionTest() {
     }
 
     @Test
-    fun `fails when parameter not provided`() {
-        class Parameter : Action() {
-            val param by parameter("value")
-        }
-
-        parseFails(Parameter(), emptyList(), "Parameter 'value' not provided")
-    }
-
-    @Test
     fun `fails when some parameters provided but not all`() {
         class Parameter : Action() {
             val p1 by parameter("a1")
@@ -61,6 +62,29 @@ class ParameterTest : AbstractActionTest() {
         }
 
         parseFails(Parameter(), listOf("abc"), "Parameter 'a2' not provided")
+    }
+
+    @Test
+    fun `can provide default value for parameters`() {
+        class Parameter : Action() {
+            val p1 by parameter("p1").whenAbsent("p1")
+            val p2 by parameter("p2").whenAbsent("p2")
+        }
+
+        parse(Parameter(), emptyList()) { action ->
+            assertEquals("p1", action.p1)
+            assertEquals("p2", action.p2)
+        }
+
+        parse(Parameter(), listOf("123")) { action ->
+            assertEquals("123", action.p1)
+            assertEquals("p2", action.p2)
+        }
+
+        parse(Parameter(), listOf("123", "abc")) { action ->
+            assertEquals("123", action.p1)
+            assertEquals("abc", action.p2)
+        }
     }
 
     @Test

@@ -21,7 +21,13 @@ internal class DefaultFlag(
     }
 
     override fun usage(): List<OptionUsage> {
-        return listOf(OptionUsage((enableFlags + disableFlags).joinToString(", "), help))
+        return listOf(
+            OptionUsage(
+                (enableFlags + disableFlags).joinToString(", "),
+                help,
+                enableFlags.map { SingleOptionUsage(it, help) } + disableFlags.map { SingleOptionUsage(it, null) }
+            )
+        )
     }
 
     override fun accept(args: List<String>): ParseResult {

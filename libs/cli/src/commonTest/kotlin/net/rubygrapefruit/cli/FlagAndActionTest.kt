@@ -1,13 +1,10 @@
 package net.rubygrapefruit.cli
 
-import kotlin.test.Test
-import kotlin.test.assertFalse
-import kotlin.test.assertSame
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class FlagAndActionTest : AbstractActionTest() {
     @Test
-    fun `can combine flag and action`() {
+    fun `can combine flag and nested action`() {
         val sub = Action()
 
         class WithSub : Action() {
@@ -34,7 +31,41 @@ class FlagAndActionTest : AbstractActionTest() {
     }
 
     @Test
-    fun `action can have flag`() {
+    fun `can combine flag and nested action with configuration`() {
+        class Sub : Action() {
+            val param by parameter("param")
+        }
+
+        class WithSub : Action() {
+            val flag by flag("flag")
+            val sub by actions {
+                action(Sub(), "sub")
+            }
+        }
+
+        parse(WithSub(), listOf("--flag", "sub", "arg")) { action ->
+            assertTrue(action.flag)
+            assertEquals("arg", action.sub.param)
+        }
+
+        parse(WithSub(), listOf("sub", "arg", "--flag")) { action ->
+            assertTrue(action.flag)
+            assertEquals("arg", action.sub.param)
+        }
+
+        parse(WithSub(), listOf("sub", "--flag", "arg")) { action ->
+            assertTrue(action.flag)
+            assertEquals("arg", action.sub.param)
+        }
+
+        parse(WithSub(), listOf("sub", "arg")) { action ->
+            assertFalse(action.flag)
+            assertEquals("arg", action.sub.param)
+        }
+    }
+
+    @Test
+    fun `nested action can have flag`() {
         class SubAction : Action() {
             val flag by flag("flag")
         }
@@ -52,5 +83,22 @@ class FlagAndActionTest : AbstractActionTest() {
         parse(WithSub(), listOf("sub")) { action ->
             assertFalse(action.sub.flag)
         }
+    }
+
+    @Test
+    fun `fails when nested action parameter is missing`() {
+        class Sub : Action() {
+            val param by parameter("param")
+        }
+
+        class WithSub : Action() {
+            val flag by flag("flag")
+            val sub by actions {
+                action(Sub(), "sub")
+            }
+        }
+
+        parseFails(WithSub(), listOf("sub", "--flag"), "Parameter 'param' not provided")
+        parseFails(WithSub(), listOf("--flag", "sub"), "Parameter 'param' not provided")
     }
 }

@@ -19,15 +19,20 @@ internal class CompletionAction(val action: MainAction) : Action() {
         print("  _arguments")
         for (index in usage.positional.indices) {
             for (option in usage.options) {
-                println(" \\")
-                print("    '${option.usage}")
-                if (option.help != null) {
-                    print("[${option.help}]")
+                for (item in option.items) {
+                    println(" \\")
+                    print("    '${item.usage}")
+                    if (item.help != null) {
+                        print("[${item.help}]")
+                    }
+                    print("'")
                 }
-                print("'")
             }
             val positional = usage.positional[index]
-            if (positional.actions.isNotEmpty()) {
+            if (positional.actions.isEmpty()) {
+                println(" \\")
+                print("    '${index + 1}::Parameter:( )'")
+            } else {
                 println(" \\")
                 print("    '${index + 1}::Action:(${positional.actions.joinToString(" ") { it.name }})'")
             }

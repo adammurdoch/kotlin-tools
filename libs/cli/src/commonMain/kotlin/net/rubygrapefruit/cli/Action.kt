@@ -148,6 +148,9 @@ open class Action {
                 if (result.failure != null) {
                     return result.advance(index)
                 }
+                if (result.count == 0) {
+                    break
+                }
                 pending.removeFirst()
                 index += result.count
                 continue

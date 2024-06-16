@@ -86,7 +86,7 @@ class SubActionTest : AbstractActionTest() {
     }
 
     @Test
-    fun `can nest sub-actions`() {
+    fun `can nest actions`() {
         class Nested : Action() {
             val a by parameter("a")
         }

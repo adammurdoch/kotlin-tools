@@ -7,7 +7,7 @@ import kotlin.test.assertSame
 
 class StringOptionAndActionTest : AbstractActionTest() {
     @Test
-    fun `can combine option and action`() {
+    fun `can combine option and nested action`() {
         val sub = Action()
 
         class WithSub : Action() {
@@ -34,7 +34,7 @@ class StringOptionAndActionTest : AbstractActionTest() {
     }
 
     @Test
-    fun `action can have option`() {
+    fun `nested action can have option`() {
         class SubAction : Action() {
             val option by option("o")
         }

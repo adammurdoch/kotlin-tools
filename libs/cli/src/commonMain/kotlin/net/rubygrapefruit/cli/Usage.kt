@@ -32,13 +32,13 @@ internal sealed class ItemUsage(val help: String?) {
     abstract val display: String
 }
 
+internal class SingleOptionUsage(val usage: String, val help: String?)
+
 internal class OptionUsage(
-    val usage: String,
-    help: String?
-) : ItemUsage(help) {
-    override val display: String
-        get() = usage
-}
+    override val display: String,
+    help: String?,
+    val items: List<SingleOptionUsage>
+) : ItemUsage(help)
 
 internal class PositionalUsage(
     val usage: String,

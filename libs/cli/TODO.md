@@ -1,9 +1,9 @@
-- help for options, actions, parameters, etc
-- completion for positional parameters
-- fix completion for flags
-- fix completion for options with arg
-- fix completion for flags and options with multiple names
-- escape names for completion function, actions, help, etc
+- Help for options, actions, parameters, etc
+- Completion for positional parameters
+- Fix completion for options with arg
+- Completion for action parameters and options
+- Optional parameter, eg <choice>? <choice>? 
+- Escape names for completion function, actions, help, etc
 - `--help` shows usage of actions 
 - Usage sorts options using name, rather than `--name` or `-n`
 - Usage message on parse error
@@ -16,7 +16,7 @@
 - Consistent API for defining default value for flag, arg and option 
 - Int argument
 - Argument with one or more values
-- Argument and option with zero or more values
+- Option with zero or more values
 - Argument is one of a set
 - Validate names do not contain spaces
 - Disallow conflicting flags, option and action names, choice flags

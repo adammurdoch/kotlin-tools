@@ -14,9 +14,9 @@ sealed interface Option<T> {
  */
 interface NullableOption<T : Any> : Option<T?> {
     /**
-     * Returns the value to use with this option is missing.
+     * Returns an option that uses the given default value when this option is not present in the input.
      */
-    fun default(value: T): Option<T>
+    fun whenAbsent(default: T): Option<T>
 }
 
 /**
@@ -24,7 +24,7 @@ interface NullableOption<T : Any> : Option<T?> {
  */
 interface NullableStringOption : NullableOption<String> {
     /**
-     * Treat this option as an integer option.
+     * Returns an option that expects an integer value.
      */
     fun int(): NullableOption<Int>
 }

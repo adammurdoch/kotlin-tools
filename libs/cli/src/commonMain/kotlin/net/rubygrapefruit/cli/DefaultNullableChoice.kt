@@ -10,8 +10,8 @@ internal class DefaultNullableChoice<T : Any>(private val host: Host, private va
         return choices.map { OptionUsage(it.key, it.value.help, listOf(SingleOptionUsage(it.key, it.value.help))) }
     }
 
-    override fun default(value: T): Option<T> {
-        val choice = DefaultChoice(choices, value)
+    override fun whenAbsent(default: T): Option<T> {
+        val choice = DefaultChoice(choices, default)
         owner.replace(this, choice)
         return choice
     }

@@ -6,8 +6,8 @@ internal class DefaultNullableStringOption(
     private val host: Host,
     private val owner: Action
 ) : AbstractOption<String?>(names, help, host), NullableStringOption {
-    override fun default(value: String): Option<String> {
-        val option = DefaultStringOption(names, help, host, value)
+    override fun whenAbsent(default: String): Option<String> {
+        val option = DefaultStringOption(names, help, host, default)
         owner.replace(this, option)
         return option
     }

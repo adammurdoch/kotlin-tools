@@ -60,7 +60,7 @@ class StringOptionTest : AbstractActionTest() {
     @Test
     fun `can provide default value for string option`() {
         class StringOption : Action() {
-            val option by option("opt").default("value")
+            val option by option("opt").whenAbsent("value")
         }
 
         parse(StringOption(), emptyList()) { action ->

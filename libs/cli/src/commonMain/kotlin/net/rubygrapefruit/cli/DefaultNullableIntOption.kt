@@ -6,7 +6,7 @@ internal class DefaultNullableIntOption(
     private val host: Host,
     private val owner: Action
 ) : AbstractOption<Int?>(names, help, host), NullableOption<Int> {
-    override fun default(value: Int): Option<Int> {
+    override fun whenAbsent(value: Int): Option<Int> {
         val option = DefaultIntOption(names, help, host, value)
         owner.replace(this, option)
         return option

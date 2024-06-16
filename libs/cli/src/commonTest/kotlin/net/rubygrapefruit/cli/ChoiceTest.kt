@@ -80,7 +80,7 @@ class ChoiceTest : AbstractActionTest() {
                 choice(1, "1")
                 choice(2, "2")
                 choice(3, "3")
-            }.default(2)
+            }.whenAbsent(2)
         }
 
         parse(Choice(), emptyList()) { action ->

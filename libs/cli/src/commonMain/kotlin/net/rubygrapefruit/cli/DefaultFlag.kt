@@ -2,22 +2,35 @@ package net.rubygrapefruit.cli
 
 import kotlin.reflect.KProperty
 
-internal class DefaultFlag(
-    names: List<String>,
-    disableOptions: Boolean,
+internal class DefaultFlag private constructor(
+    private val enableFlags: List<String>,
+    private val disableFlags: List<String>,
     private val help: String?,
-    host: Host,
-    default: Boolean
+    default: Boolean,
+    private val owner: Action
 ) : NonPositional(), Flag {
-    private val enableFlags = names.map { host.option(it) }
-    private val disableFlags = if (disableOptions) names.mapNotNull { if (it.length == 1) null else host.option("no-$it") } else emptyList()
     private var value: Boolean = default
 
     override val enableUsage: String
         get() = enableFlags.first()
 
+    constructor(names: List<String>, disableOptions: Boolean, help: String?, host: Host, default: Boolean, owner: Action) :
+            this(
+                names.map { host.option(it) },
+                if (disableOptions) names.mapNotNull { if (it.length == 1) null else host.option("no-$it") } else emptyList(),
+                help,
+                default,
+                owner
+            )
+
     override operator fun getValue(thisRef: Any?, property: KProperty<*>): Boolean {
         return value
+    }
+
+    override fun whenAbsent(default: Boolean): Flag {
+        val flag = DefaultFlag(enableFlags, disableFlags, help, default, owner)
+        owner.replace(this, flag)
+        return flag
     }
 
     override fun usage(): List<OptionUsage> {

@@ -123,8 +123,8 @@ class FlagTest : AbstractActionTest() {
     @Test
     fun `can provide default value for boolean option`() {
         class BooleanFlag : Action() {
-            val f1 by flag("f1", default = true)
-            val f2 by flag("f2", default = false)
+            val f1 by flag("f1").whenAbsent(true)
+            val f2 by flag("f2").whenAbsent(false)
         }
 
         parse(BooleanFlag(), emptyList()) { action ->

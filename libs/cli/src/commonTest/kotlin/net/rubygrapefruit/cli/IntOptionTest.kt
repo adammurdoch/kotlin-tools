@@ -45,7 +45,7 @@ class IntOptionTest : AbstractActionTest() {
     @Test
     fun `can provide default value for int option`() {
         class IntOption : Action() {
-            val option by option("opt").int().default(45)
+            val option by option("opt").int().whenAbsent(45)
         }
 
         parse(IntOption(), emptyList()) { action ->

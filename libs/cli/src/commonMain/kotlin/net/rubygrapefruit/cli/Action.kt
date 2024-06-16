@@ -8,7 +8,7 @@ open class Action {
     private val positional = mutableListOf<Positional>()
 
     internal fun simpleFlag(name: String, help: String? = null): Flag {
-        val flag = DefaultFlag(listOf(name), false, help, DefaultHost, false)
+        val flag = DefaultFlag(listOf(name), false, help, DefaultHost, false, this)
         options.add(flag)
         return flag
     }
@@ -35,11 +35,11 @@ open class Action {
      * The flag can appear anywhere in the command-line. It can be specified multiple times and last value is used.
      * Uses the default value if not present.
      */
-    fun flag(name: String, vararg names: String, default: Boolean = false, help: String? = null): Flag {
+    fun flag(name: String, vararg names: String, help: String? = null): Flag {
         val allNames = listOf(name) + names.toList()
         allNames.forEach { DefaultHost.validate(it, "a flag name") }
 
-        val flag = DefaultFlag(allNames, true, help, DefaultHost, default)
+        val flag = DefaultFlag(allNames, true, help, DefaultHost, false, this)
         options.add(flag)
         return flag
     }

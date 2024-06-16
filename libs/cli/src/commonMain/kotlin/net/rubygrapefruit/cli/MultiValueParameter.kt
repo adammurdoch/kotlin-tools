@@ -14,15 +14,16 @@ internal class MultiValueParameter(private val name: String, private val help: S
     }
 
     override fun accept(args: List<String>, context: ParseContext): ParseResult {
+        val current = values ?: emptyList()
         for (index in args.indices) {
             val arg = args[index]
             if (host.isOption(arg)) {
-                values = args.subList(0, index)
-                return ParseResult(index, null, true)
+                values = current + args.subList(0, index)
+                return ParseResult(index, null, false)
             }
         }
-        values = args.toList()
-        return ParseResult(args.size, null, true)
+        values = current + args.toList()
+        return ParseResult(args.size, null, false)
     }
 
     override fun missing(): ArgParseException? {

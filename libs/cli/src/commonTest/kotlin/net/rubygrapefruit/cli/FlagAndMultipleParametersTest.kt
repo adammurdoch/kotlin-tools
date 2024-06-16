@@ -2,6 +2,7 @@ package net.rubygrapefruit.cli
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class FlagAndMultipleParametersTest : AbstractActionTest() {
@@ -18,7 +19,7 @@ class FlagAndMultipleParametersTest : AbstractActionTest() {
         }
         parse(WithParams(), listOf("a", "--f1", "b", "--no-f1", "c")) { action ->
             assertEquals(listOf("a", "b", "c"), action.params)
-            assertTrue(action.flag)
+            assertFalse(action.flag)
         }
         parse(WithParams(), listOf("--f1")) { action ->
             assertEquals(emptyList(), action.params)

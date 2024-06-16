@@ -13,7 +13,7 @@ internal class DefaultParameter(private val name: String, private val help: Stri
         return PositionalUsage("<$name>", help)
     }
 
-    override fun accept(args: List<String>): ParseResult {
+    override fun accept(args: List<String>, context: ParseContext): ParseResult {
         val candidate = args.first()
         return if (host.isOption(candidate)) {
             ParseResult.Nothing

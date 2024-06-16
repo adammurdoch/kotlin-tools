@@ -64,12 +64,14 @@ class ParameterTest : AbstractActionTest() {
     }
 
     @Test
-    fun `fails when unknown flag provided`() {
+    fun `fails when unknown flag provided instead of parameter`() {
         class Parameter : Action() {
             val param by parameter("value")
         }
 
         parseFails(Parameter(), listOf("--flag"), "Unknown option: --flag")
+        parseFails(Parameter(), listOf("--flag", "arg"), "Unknown option: --flag")
+        parseFails(Parameter(), listOf("arg", "--flag"), "Unknown option: --flag")
     }
 
     @Test

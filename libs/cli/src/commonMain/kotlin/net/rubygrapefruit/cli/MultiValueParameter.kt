@@ -13,16 +13,16 @@ internal class MultiValueParameter(private val name: String, private val help: S
         return PositionalUsage("<$name>...", "<$name>", help, emptyList())
     }
 
-    override fun accept(args: List<String>): ParseResult {
+    override fun accept(args: List<String>, context: ParseContext): ParseResult {
         for (index in args.indices) {
             val arg = args[index]
             if (host.isOption(arg)) {
                 values = args.subList(0, index)
-                return ParseResult(index, null)
+                return ParseResult(index, null, true)
             }
         }
         values = args.toList()
-        return ParseResult(args.size, null)
+        return ParseResult(args.size, null, true)
     }
 
     override fun missing(): ArgParseException? {

@@ -14,17 +14,17 @@ internal class DefaultActionSet<T: Action>(private val host: Host) : Positional(
         actions[name] = ActionDetails(action, help)
     }
 
-    override fun accept(args: List<String>): ParseResult {
+    override fun accept(args: List<String>, context: ParseContext): ParseResult {
         val name = args.first()
         if (host.isOption(name)) {
             return ParseResult.Nothing
         }
         if (!actions.containsKey(name)) {
-            return ParseResult(1, ArgParseException("Unknown action: $name", actions = actionInfo))
+            return ParseResult(1, ArgParseException("Unknown action: $name", actions = actionInfo), true)
         }
         action = actions[name]!!.action
-        val result = action!!.maybeParse(args.drop(1))
-        return ParseResult(1 + result.count, result.failure)
+        val result = action!!.maybeParse(args.drop(1), context)
+        return ParseResult(1 + result.count, result.failure, result.finished)
     }
 
     override fun missing(): ArgParseException {

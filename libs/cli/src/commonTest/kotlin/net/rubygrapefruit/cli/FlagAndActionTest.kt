@@ -86,7 +86,47 @@ class FlagAndActionTest : AbstractActionTest() {
     }
 
     @Test
-    fun `fails when nested action parameter is missing`() {
+    fun `action and nested action with configuration can have flags`() {
+        class SubAction : Action() {
+            val flag by flag("inner")
+            val param by parameter("param")
+        }
+
+        class WithSub : Action() {
+            val flag by flag("outer")
+            val sub by actions {
+                action(SubAction(), "sub")
+            }
+        }
+
+        parse(WithSub(), listOf("sub", "--inner", "arg")) { action ->
+            assertFalse(action.flag)
+            assertTrue(action.sub.flag)
+        }
+
+        parse(WithSub(), listOf("sub", "--outer", "arg")) { action ->
+            assertTrue(action.flag)
+            assertFalse(action.sub.flag)
+        }
+
+        parse(WithSub(), listOf("sub", "--inner", "--outer", "arg")) { action ->
+            assertTrue(action.flag)
+            assertTrue(action.sub.flag)
+        }
+
+        parse(WithSub(), listOf("sub", "--outer", "arg", "--inner")) { action ->
+            assertTrue(action.flag)
+            assertTrue(action.sub.flag)
+        }
+
+        parse(WithSub(), listOf("sub", "arg")) { action ->
+            assertFalse(action.flag)
+            assertFalse(action.sub.flag)
+        }
+    }
+
+    @Test
+    fun `fails when flag follows nested action with parameter missing`() {
         class Sub : Action() {
             val param by parameter("param")
         }

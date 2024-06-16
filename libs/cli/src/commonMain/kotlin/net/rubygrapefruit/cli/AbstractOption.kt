@@ -2,7 +2,7 @@ package net.rubygrapefruit.cli
 
 import kotlin.reflect.KProperty
 
-internal abstract class AbstractOption<T>(protected val names: List<String>, protected val help: String?, host: Host) : NonPositional(), Option<T> {
+internal abstract class AbstractOption<T>(protected val names: List<String>, protected val help: String?, private val host: Host) : NonPositional(), Option<T> {
     private val flags = names.map { host.option(it) }
     private var set = false
     private var value: T? = null
@@ -28,11 +28,11 @@ internal abstract class AbstractOption<T>(protected val names: List<String>, pro
         if (!flags.contains(arg)) {
             return ParseResult.Nothing
         }
-        if (args.size == 1) {
-            return ParseResult(1, ArgParseException("Value missing for option $arg"))
+        if (args.size == 1 || host.isOption(args[1])) {
+            return ParseResult(1, ArgParseException("Value missing for option $arg"), true)
         }
         if (value != null) {
-            return ParseResult(2, ArgParseException("Value for option $arg already provided"))
+            return ParseResult(2, ArgParseException("Value for option $arg already provided"), true)
         }
         value = convert(arg, args[1])
         set = true

@@ -110,6 +110,18 @@ class StringOptionTest : AbstractActionTest() {
     }
 
     @Test
+
+    fun `fails when unknown flag provided instead of argument`() {
+        class StringOption : Action() {
+            val option by option("o")
+        }
+
+        parseFails(StringOption(), listOf("-o", "--flag"), "Value missing for option -o")
+        parseFails(StringOption(), listOf("--flag", "-o", "arg"), "Unknown option: --flag")
+        parseFails(StringOption(), listOf("-o", "arg", "--flag"), "Unknown option: --flag")
+    }
+
+    @Test
     fun `fails when option is present multiple times`() {
         class StringOption : Action() {
             val option by option("o")

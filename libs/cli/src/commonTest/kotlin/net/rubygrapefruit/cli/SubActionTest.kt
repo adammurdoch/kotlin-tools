@@ -139,7 +139,7 @@ class SubActionTest : AbstractActionTest() {
     }
 
     @Test
-    fun `fails when unknown flag provided`() {
+    fun `fails when unknown flag provided instead of action name`() {
         val sub = Action()
 
         class WithSub : Action() {

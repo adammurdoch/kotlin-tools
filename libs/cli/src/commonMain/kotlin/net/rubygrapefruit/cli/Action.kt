@@ -105,7 +105,7 @@ open class Action {
     }
 
     internal fun parseAll(args: List<String>): ParseResult {
-        val result = maybeParse(args)
+        val result = maybeParse(args, RootContext)
         val count = result.count
         if (result.failure == null && count < args.size) {
             val arg = args[count]
@@ -114,20 +114,21 @@ open class Action {
             } else {
                 ArgParseException("Unknown parameter: $arg")
             }
-            return ParseResult(count, failure)
+            return ParseResult(count, failure, true)
         }
         return result
     }
 
-    internal fun maybeParse(args: List<String>): ParseResult {
+    internal fun maybeParse(args: List<String>, parent: ParseContext): ParseResult {
         val pending = this.positional.toMutableList()
+        val context = parent.withOptions(options)
 
         var index = 0
         while (index in args.indices) {
             val current = args.subList(index, args.size)
 
             var matched = false
-            for (option in options) {
+            for (option in context.options) {
                 val result = option.accept(current)
                 if (result.failure != null) {
                     return result.advance(index)
@@ -144,29 +145,28 @@ open class Action {
             }
 
             if (pending.isNotEmpty()) {
-                val result = pending.first().accept(current)
+                val result = pending.first().accept(current, context)
                 if (result.failure != null) {
                     return result.advance(index)
                 }
-                if (result.count == 0) {
-                    break
+                if (result.finished) {
+                    pending.removeFirst()
                 }
-                pending.removeFirst()
                 index += result.count
                 continue
             }
 
-            return ParseResult(index, null)
+            return ParseResult(index, null, true)
         }
 
         for (positional in pending) {
             val failure = positional.missing()
             if (failure != null) {
-                return ParseResult(args.size, failure)
+                return ParseResult(args.size, failure, true)
             }
         }
 
-        return ParseResult(args.size, null)
+        return ParseResult(args.size, null, true)
     }
 
     internal open fun usage(): ActionUsage {

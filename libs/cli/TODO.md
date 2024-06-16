@@ -13,14 +13,14 @@
   - Too many arguments
   - Option value badly formed
   - Option value missing
-- Consistent API for defining default value for flag, arg and option 
+- Consistent API for defining default value for flag, parameter and option 
 - Int argument
 - Argument with one or more values
 - Option with zero or more values
 - Argument is one of a set
 - Validate names do not contain spaces
 - Disallow conflicting flags, option and action names, choice flags
-- Disallow any positional args after `arguments()`
+- Disallow any positional parameters after `arguments()`
 - File locations: dir, file, must exist
 - Color output on terminal
 - Fuzzy matching and/or suggestions

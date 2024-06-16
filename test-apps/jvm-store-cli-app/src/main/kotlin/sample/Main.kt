@@ -45,7 +45,6 @@ class ContentCommand : AbstractStoreCommand() {
                 println("- '$name' ${details.formatted}")
             }
         })
-        throw RuntimeException("broken!")
     }
 }
 

@@ -3,7 +3,7 @@ package net.rubygrapefruit.cli
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class MultipleParametersTest : AbstractActionTest() {
+class ListParameterTest : AbstractActionTest() {
     @Test
     fun `action can have parameter with list value`() {
         class Parameter : Action() {
@@ -30,6 +30,22 @@ class MultipleParametersTest : AbstractActionTest() {
         parse(Parameter(), emptyList()) { action ->
             assertEquals(listOf("abc"), action.param)
         }
+        parse(Parameter(), listOf("abc")) { action ->
+            assertEquals(listOf("abc"), action.param)
+        }
+        parse(Parameter(), listOf("a", "b", "c")) { action ->
+            assertEquals(listOf("a", "b", "c"), action.param)
+        }
+    }
+
+    @Test
+    fun `can require at least one argument`() {
+        class Parameter : Action() {
+            val param by parameters("value").required()
+        }
+
+        parseFails(Parameter(), emptyList(), "Parameter 'value' not provided")
+
         parse(Parameter(), listOf("abc")) { action ->
             assertEquals(listOf("abc"), action.param)
         }

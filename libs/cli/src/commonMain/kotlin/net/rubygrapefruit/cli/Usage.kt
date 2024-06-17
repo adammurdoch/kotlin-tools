@@ -44,6 +44,9 @@ internal class OptionUsage(
 ) : ItemUsage(help)
 
 internal class PositionalUsage(
+    /**
+     * The usage for this item, shown in the action usage summary.
+     */
     val usage: String,
     override val display: String,
     help: String?,
@@ -52,7 +55,7 @@ internal class PositionalUsage(
     constructor(usage: String, help: String?) : this(usage, usage, help, emptyList())
 }
 
-internal class SubActionUsage(val name: String, help: String?) : ItemUsage(help) {
+internal class SubActionUsage(val name: String, help: String?, val action: ActionUsage) : ItemUsage(help) {
     override val display: String
         get() = name
 }

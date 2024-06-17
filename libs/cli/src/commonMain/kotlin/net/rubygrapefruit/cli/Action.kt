@@ -79,8 +79,8 @@ open class Action {
      * The parameter must appear at a specific location in the input.
      * Uses an empty list if the parameter is not present in the input. Use [Parameter.whenAbsent] to use a different default.
      */
-    fun parameters(name: String, help: String? = null): Parameter<List<String>> {
-        val arg = MultiValueParameter(name, help, DefaultHost, this, emptyList())
+    fun parameters(name: String, help: String? = null): ListParameter<String> {
+        val arg = MultiValueParameter(name, help, DefaultHost, this, emptyList(), false)
         positional.add(arg)
         return arg
     }
@@ -192,8 +192,9 @@ open class Action {
         options[options.indexOf(option)] = newOption
     }
 
-    internal fun replace(param: Positional, newParam: Positional) {
+    internal fun <T : Positional> replace(param: Positional, newParam: T): T {
         positional[positional.indexOf(param)] = newParam
+        return newParam
     }
 
     interface Actions<T : Action> {

@@ -7,14 +7,24 @@ internal class MultiValueParameter(
     private val help: String?,
     private val host: Host,
     private val owner: Action,
-    private val default: List<String>
-) : Positional(), Parameter<List<String>> {
+    private val default: List<String>,
+    private val required: Boolean,
+) : Positional(), ListParameter<String> {
     private var values: List<String>? = null
 
+    private val current
+        get() = values ?: emptyList()
+
     override fun whenAbsent(default: List<String>): Parameter<List<String>> {
-        val parameter = MultiValueParameter(name, help, host, owner, default)
-        owner.replace(this, parameter)
-        return parameter
+        return owner.replace(this, MultiValueParameter(name, help, host, owner, default, required))
+    }
+
+    override fun required(): Parameter<List<String>> {
+        return if (required) {
+            this
+        } else {
+            owner.replace(this, MultiValueParameter(name, help, host, owner, default, true))
+        }
     }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): List<String> {
@@ -26,7 +36,6 @@ internal class MultiValueParameter(
     }
 
     override fun accept(args: List<String>, context: ParseContext): ParseResult {
-        val current = values ?: emptyList()
         for (index in args.indices) {
             val arg = args[index]
             if (host.isOption(arg)) {
@@ -39,6 +48,10 @@ internal class MultiValueParameter(
     }
 
     override fun missing(): ArgParseException? {
-        return null
+        return if (required && current.isEmpty()) {
+            ArgParseException("Parameter '$name' not provided")
+        } else {
+            null
+        }
     }
 }

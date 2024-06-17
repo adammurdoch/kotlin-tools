@@ -13,3 +13,13 @@ sealed interface Parameter<T> {
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T
 }
+
+/**
+ * A parameter of type List<T>.
+ */
+interface ListParameter<T : Any> : Parameter<List<T>> {
+    /**
+     * Returns a parameter that requires at least one argument.
+     */
+    fun required(): Parameter<List<T>>
+}

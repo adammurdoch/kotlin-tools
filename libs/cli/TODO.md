@@ -1,3 +1,6 @@
+- Argument with one or more values
+- Argument is one of a set
+- Argument is file path
 - Help for options, actions, parameters, etc
 - Completion for positional parameters
 - Fix completion for options with arg
@@ -13,10 +16,9 @@
   - Too many arguments
   - Option value badly formed
   - Option value missing
+- Convenience for string or enum choice 
 - Int argument
-- Argument with one or more values
 - Option with zero or more values
-- Argument is one of a set
 - Validate names do not contain spaces
 - Disallow conflicting flags, option and action names, choice flags
 - Disallow any positional parameters after `arguments()`

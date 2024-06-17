@@ -11,7 +11,7 @@ internal class DefaultActionSet<T : Action>(
     private var action: T? = null
 
     private val actionInfo
-        get() = actions.map { SubActionUsage(it.key, it.value.help) }
+        get() = actions.map { SubActionUsage(it.key, it.value.help, it.value.value.usage()) }
 
     override fun whenAbsent(default: T): Parameter<T> {
         val actions = DefaultActionSet(actions, host, owner, default)

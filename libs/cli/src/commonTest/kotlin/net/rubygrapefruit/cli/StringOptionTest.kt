@@ -110,7 +110,6 @@ class StringOptionTest : AbstractActionTest() {
     }
 
     @Test
-
     fun `fails when unknown flag provided instead of argument`() {
         class StringOption : Action() {
             val option by option("o")

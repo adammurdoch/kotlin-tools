@@ -160,8 +160,11 @@ open class Action {
                 if (result.finished) {
                     pending.removeFirst()
                 }
-                index += result.count
-                continue
+                if (result.count > 0) {
+                    index += result.count
+                    continue
+                }
+                // Could not match anything
             }
 
             return ParseResult(index, null, true)

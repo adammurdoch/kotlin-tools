@@ -18,24 +18,24 @@ internal class CompletionAction(val action: MainAction) : Action() {
             """.trimIndent()
         )
         print("  _arguments -C")
-        for (index in usage.positional.indices) {
-            for (option in usage.options) {
-                for (item in option.items) {
-                    println(" \\")
-                    if (item.aliases.size == 1) {
-                        print("    '${item.aliases.first()}")
-                        if (item.help != null) {
-                            print("[${item.help}]")
-                        }
-                        print("'")
-                    } else {
-                        print("    {${item.aliases.joinToString(",")}}")
-                        if (item.help != null) {
-                            print("'[${item.help}]'")
-                        }
+        for (option in usage.options) {
+            for (item in option.items) {
+                println(" \\")
+                if (item.aliases.size == 1) {
+                    print("    '${item.aliases.first()}")
+                    if (item.help != null) {
+                        print("[${item.help}]")
+                    }
+                    print("'")
+                } else {
+                    print("    {${item.aliases.joinToString(",")}}")
+                    if (item.help != null) {
+                        print("'[${item.help}]'")
                     }
                 }
             }
+        }
+        for (index in usage.positional.indices) {
             val positional = usage.positional[index]
             if (positional.actions.isEmpty()) {
                 println(" \\")

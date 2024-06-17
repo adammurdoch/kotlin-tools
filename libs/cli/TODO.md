@@ -1,4 +1,3 @@
-- Argument with one or more values
 - Argument is one of a set
 - Argument is file path
 - Help for options, actions, parameters, etc
@@ -16,6 +15,7 @@
   - Too many arguments
   - Option value badly formed
   - Option value missing
+- Handle required list parameter with default value - disallow? succeed if absent and default provided?
 - Convenience for string or enum choice 
 - Int argument
 - Option with zero or more values

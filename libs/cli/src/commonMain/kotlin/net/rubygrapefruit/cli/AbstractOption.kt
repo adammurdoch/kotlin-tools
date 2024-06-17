@@ -20,7 +20,8 @@ internal abstract class AbstractOption<T>(protected val names: List<String>, pro
     }
 
     override fun usage(): List<OptionUsage> {
-        return listOf(OptionUsage(flags.joinToString(", ") { "$it <value>" }, help, flags.map { SingleOptionUsage(it, help) }))
+        val usage = SingleOptionUsage(flags.joinToString(", ") { "$it <value>" }, help, flags)
+        return listOf(OptionUsage(usage.usage, help, listOf(usage)))
     }
 
     override fun accept(args: List<String>): ParseResult {

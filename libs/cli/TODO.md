@@ -13,7 +13,6 @@
   - Too many arguments
   - Option value badly formed
   - Option value missing
-- Consistent API for defining default value for flag, parameter and option 
 - Int argument
 - Argument with one or more values
 - Option with zero or more values

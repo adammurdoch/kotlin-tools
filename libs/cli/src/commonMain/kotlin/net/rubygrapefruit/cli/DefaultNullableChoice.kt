@@ -9,7 +9,7 @@ internal class DefaultNullableChoice<T : Any>(
     private var value: T? = null
 
     override fun usage(): List<OptionUsage> {
-        return choices.map { OptionUsage(it.key, it.value.help, listOf(SingleOptionUsage(it.key, it.value.help))) }
+        return choices.map { OptionUsage(it.key, it.value.help, listOf(SingleOptionUsage(it.key, it.value.help, listOf(it.key)))) }
     }
 
     override fun whenAbsent(default: T): Option<T> {

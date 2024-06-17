@@ -29,10 +29,13 @@ internal class ActionUsage(
 }
 
 internal sealed class ItemUsage(val help: String?) {
+    /**
+     * A display name for this item, used when listing items in a table.
+     */
     abstract val display: String
 }
 
-internal class SingleOptionUsage(val usage: String, val help: String?)
+internal class SingleOptionUsage(val usage: String, val help: String?, val aliases: List<String>)
 
 internal class OptionUsage(
     override val display: String,

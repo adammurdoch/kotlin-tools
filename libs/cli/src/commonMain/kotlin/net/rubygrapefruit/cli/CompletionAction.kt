@@ -22,11 +22,18 @@ internal class CompletionAction(val action: MainAction) : Action() {
             for (option in usage.options) {
                 for (item in option.items) {
                     println(" \\")
-                    print("    '${item.usage}")
-                    if (item.help != null) {
-                        print("[${item.help}]")
+                    if (item.aliases.size == 1) {
+                        print("    '${item.aliases.first()}")
+                        if (item.help != null) {
+                            print("[${item.help}]")
+                        }
+                        print("'")
+                    } else {
+                        print("    {${item.aliases.joinToString(",")}}")
+                        if (item.help != null) {
+                            print("'[${item.help}]'")
+                        }
                     }
-                    print("'")
                 }
             }
             val positional = usage.positional[index]
@@ -50,9 +57,10 @@ internal class CompletionAction(val action: MainAction) : Action() {
             }
         }
         println()
-        println("""
+        println(
+            """
             }
-
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 }

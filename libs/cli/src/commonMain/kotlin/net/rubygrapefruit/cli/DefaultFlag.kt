@@ -34,12 +34,11 @@ internal class DefaultFlag private constructor(
     }
 
     override fun usage(): List<OptionUsage> {
+        val enableUsage = listOf(SingleOptionUsage(enableFlags.joinToString(", "), help, enableFlags))
+        val disableUsage = if (disableFlags.isNotEmpty()) listOf(SingleOptionUsage(disableFlags.joinToString(", "), null, disableFlags)) else emptyList()
+        val usage = (enableFlags + disableFlags).joinToString(", ")
         return listOf(
-            OptionUsage(
-                (enableFlags + disableFlags).joinToString(", "),
-                help,
-                enableFlags.map { SingleOptionUsage(it, help) } + disableFlags.map { SingleOptionUsage(it, null) }
-            )
+            OptionUsage(usage, help, enableUsage + disableUsage)
         )
     }
 

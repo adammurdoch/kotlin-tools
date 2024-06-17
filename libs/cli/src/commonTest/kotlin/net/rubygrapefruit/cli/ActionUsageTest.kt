@@ -47,7 +47,7 @@ class ActionUsageTest {
     }
 
     @Test
-    fun `formats action with parameters`() {
+    fun `formats action with multi-value parameter`() {
         class Parameters : MainAction("cmd") {
             val a1 by parameter("a", help = "some value")
             val a2 by parameters("param", help = "some other value")

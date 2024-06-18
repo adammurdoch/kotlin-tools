@@ -17,15 +17,15 @@ class IntParameterTest : AbstractActionTest() {
 
     @Test
     fun `fails when argument is not an integer`() {
-        class IntOption : Action() {
+        class Parameter : Action() {
             val param by parameter("value").int()
         }
 
-        parseFails(IntOption(), listOf("abc"), "Value for parameter 'value' is not an integer: abc")
+        parseFails(Parameter(), listOf("abc"), "Value for parameter 'value' is not an integer: abc")
     }
 
     @Test
-    fun `fails when parameter not provided`() {
+    fun `fails when argument not provided`() {
         class Parameter : Action() {
             val param by parameter("value").int()
         }

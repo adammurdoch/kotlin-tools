@@ -14,4 +14,13 @@ class FilePathParameterTest : AbstractActionTest() {
             assertEquals(FilePath("a/b"), action.param)
         }
     }
+
+    @Test
+    fun `fails when argument not provided`() {
+        class Parameter : Action() {
+            val param by parameter("value").path()
+        }
+
+        parseFails(Parameter(), emptyList(), "Parameter 'value' not provided")
+    }
 }

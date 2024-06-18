@@ -10,4 +10,8 @@ internal class DefaultNullableStringOption(
     override fun int(): NullableOption<Int> {
         return owner.replace(this, DefaultNullableOption(names, help, host, owner, IntConverter))
     }
+
+    override fun path(): NullableOption<FilePath> {
+        return owner.replace(this, DefaultNullableOption(names, help, host, owner, FilePathConverter))
+    }
 }

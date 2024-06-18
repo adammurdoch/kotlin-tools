@@ -1,10 +1,11 @@
 - Parameter is one of a set
-- Parameter is file path
 - Parameter is zero or more file paths
 - Help for options, actions, parameters, etc
-- Completion for positional parameters
-- Fix completion for options with arg
-- Completion for action parameters and options
+- Completion
+  - File positional parameters
+  - Multi-value positional parameters
+  - Options with parameter, file and non-file
+  - Action parameters and options
 - Optional parameter, eg <choice>? <choice>? 
 - Escape names for completion function, actions, help, etc
 - `--help` shows usage of actions 

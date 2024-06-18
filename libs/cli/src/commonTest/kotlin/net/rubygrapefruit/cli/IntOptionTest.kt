@@ -7,71 +7,71 @@ import kotlin.test.assertNull
 class IntOptionTest : AbstractActionTest() {
     @Test
     fun `can define int option with long name`() {
-        class IntOption : Action() {
+        class Option : Action() {
             val option by option("opt").int()
         }
 
-        parse(IntOption(), listOf("--opt", "123")) { action ->
+        parse(Option(), listOf("--opt", "123")) { action ->
             assertEquals(123, action.option)
         }
 
-        parseFails(IntOption(), listOf("-opt"), "Unknown option: -opt")
+        parseFails(Option(), listOf("-opt"), "Unknown option: -opt")
     }
 
     @Test
     fun `can define int option with short name`() {
-        class IntOption : Action() {
+        class Option : Action() {
             val option by option("o").int()
         }
 
-        parse(IntOption(), listOf("-o", "123")) { action ->
+        parse(Option(), listOf("-o", "123")) { action ->
             assertEquals(123, action.option)
         }
 
-        parseFails(IntOption(), listOf("--o"), "Unknown option: --o")
+        parseFails(Option(), listOf("--o"), "Unknown option: --o")
     }
 
     @Test
     fun `value is null when option not provided`() {
-        class IntOption : Action() {
+        class Option : Action() {
             val option by option("opt").int()
         }
 
-        parse(IntOption(), emptyList()) { action ->
+        parse(Option(), emptyList()) { action ->
             assertNull(action.option)
         }
     }
 
     @Test
     fun `can provide default value for int option`() {
-        class IntOption : Action() {
+        class Option : Action() {
             val option by option("opt").int().whenAbsent(45)
         }
 
-        parse(IntOption(), emptyList()) { action ->
+        parse(Option(), emptyList()) { action ->
             assertEquals(45, action.option)
         }
 
-        parse(IntOption(), listOf("--opt", "123")) { action ->
+        parse(Option(), listOf("--opt", "123")) { action ->
             assertEquals(123, action.option)
         }
     }
 
     @Test
     fun `fails when argument not provided`() {
-        class IntOption : Action() {
+        class Option : Action() {
             val option by option("o").int()
         }
 
-        parseFails(IntOption(), listOf("-o"), "Value missing for option -o")
+        parseFails(Option(), listOf("-o"), "Value missing for option -o")
     }
 
     @Test
     fun `fails when argument is not an integer`() {
-        class IntOption : Action() {
+        class Option : Action() {
             val option by option("o").int()
         }
 
-        parseFails(IntOption(), listOf("-o", "abc"), "Argument for option -o is not an integer: abc")
+        parseFails(Option(), listOf("-o", "abc"), "Value for option -o is not an integer: abc")
     }
 }

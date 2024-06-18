@@ -15,7 +15,7 @@ internal abstract class AbstractOption<T>(protected val names: List<String>, pro
         return if (set) {
             value!!
         } else {
-            convert(flags.first(), null)
+            convert(flags.first(), null).getOrThrow()
         }
     }
 
@@ -35,11 +35,14 @@ internal abstract class AbstractOption<T>(protected val names: List<String>, pro
         if (value != null) {
             return ParseResult(2, ArgParseException("Value for option $arg already provided"), true)
         }
-        value = convert(arg, args[1])
+        val result = convert(arg, args[1])
+        if (result.isFailure) {
+            return ParseResult(2, result.exceptionOrNull() as ArgParseException, true)
+        }
+        value = result.getOrThrow()
         set = true
-
         return ParseResult.Two
     }
 
-    protected abstract fun convert(flag: String, arg: String?): T
+    protected abstract fun convert(flag: String, arg: String?): Result<T>
 }

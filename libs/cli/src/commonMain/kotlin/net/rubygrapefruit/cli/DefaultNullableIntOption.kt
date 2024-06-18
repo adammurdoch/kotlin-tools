@@ -7,16 +7,16 @@ internal class DefaultNullableIntOption(
     private val owner: Action
 ) : AbstractOption<Int?>(names, help, host), NullableOption<Int> {
     override fun whenAbsent(default: Int): Option<Int> {
-        val option = DefaultIntOption(names, help, host, default)
+        val option = DefaultOption(names, help, default, host, IntConverter)
         owner.replace(this, option)
         return option
     }
 
-    override fun convert(flag: String, arg: String?): Int? {
+    override fun convert(flag: String, arg: String?): Result<Int?> {
         return if (arg == null) {
-            null
+            Result.success(null)
         } else {
-            arg.toIntOrNull() ?: throw ArgParseException("Argument for option $flag is not an integer: $arg")
+            IntConverter.convert("option $flag", arg)
         }
     }
 }

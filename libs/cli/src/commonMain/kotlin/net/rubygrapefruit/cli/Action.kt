@@ -132,14 +132,15 @@ open class Action {
         val context = parent.withOptions(options)
 
         var index = 0
+        var failure: ArgParseException? = null
         while (index in args.indices) {
             val current = args.subList(index, args.size)
 
             var matched = false
             for (option in context.options) {
                 val result = option.accept(current)
-                if (result.failure != null) {
-                    return result.advance(index)
+                if (result.failure != null && failure == null) {
+                    failure = result.failure
                 }
                 val count = result.count
                 if (count > 0) {
@@ -167,17 +168,19 @@ open class Action {
                 // Could not match anything
             }
 
-            return ParseResult(index, null, true)
+            return ParseResult(index, failure, true)
         }
 
-        for (positional in pending) {
-            val failure = positional.missing()
-            if (failure != null) {
-                return ParseResult(args.size, failure, true)
+        if (failure == null) {
+            for (positional in pending) {
+                val missing = positional.missing()
+                if (missing != null && failure == null) {
+                    failure = missing
+                }
             }
         }
 
-        return ParseResult(args.size, null, true)
+        return ParseResult(args.size, failure, true)
     }
 
     internal open fun usage(): ActionUsage {

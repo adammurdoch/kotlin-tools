@@ -1,6 +1,6 @@
 package net.rubygrapefruit.cli
 
-internal class ParseResult(val count: Int, val failure: ArgParseException?, val finished: Boolean) {
+internal data class ParseResult(val count: Int, val failure: ArgParseException?, val finished: Boolean) {
     companion object {
         internal val Nothing = ParseResult(0, null, true)
         internal val One = ParseResult(1, null, true)

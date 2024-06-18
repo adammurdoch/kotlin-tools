@@ -10,6 +10,7 @@
 - `--help` shows usage of actions 
 - Usage sorts options using name, rather than `--name` or `-n`
 - Usage message on parse error
+  - Suggest `--help` 
   - Unknown option - show available options
   - Unknown option for sub-command - show available options
   - Argument not provided
@@ -18,7 +19,6 @@
   - Option value missing
 - Handle required list parameter with default value - disallow? succeed if absent and default provided?
 - Convenience for string or enum choice 
-- Int parameter
 - Option with zero or more values
 - Validate names do not contain spaces
 - Disallow conflicting flags, option and action names, choice flags

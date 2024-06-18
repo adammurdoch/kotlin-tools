@@ -23,6 +23,10 @@ internal class DefaultFlag private constructor(
                 owner
             )
 
+    override fun toString(): String {
+        return enableFlags.first()
+    }
+
     override operator fun getValue(thisRef: Any?, property: KProperty<*>): Boolean {
         return value
     }

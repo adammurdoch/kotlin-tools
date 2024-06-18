@@ -94,7 +94,7 @@ open class Action {
     fun <T : Action> actions(builder: Actions<T>.() -> Unit): Parameter<T> {
         val actions = DefaultActions<T>(DefaultHost)
         builder(actions)
-        val parameter = DefaultActionSet<T>(actions.actions, DefaultHost, this, null)
+        val parameter = DefaultActionParameter<T>(actions.actions, DefaultHost, this, null)
         positional.add(parameter)
         return parameter
     }

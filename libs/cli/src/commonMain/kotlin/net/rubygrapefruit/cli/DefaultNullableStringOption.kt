@@ -5,20 +5,11 @@ internal class DefaultNullableStringOption(
     help: String?,
     private val host: Host,
     private val owner: Action
-) : AbstractOption<String?>(names, help, host), NullableStringOption {
-    override fun whenAbsent(default: String): Option<String> {
-        val option = DefaultOption(names, help, default, host, NoOpConverter)
-        owner.replace(this, option)
-        return option
-    }
+) : DefaultNullableOption<String>(names, help, host, owner, NoOpConverter), NullableStringOption {
 
     override fun int(): NullableOption<Int> {
-        val option = DefaultNullableIntOption(names, help, host, owner)
+        val option = DefaultNullableOption(names, help, host, owner, IntConverter)
         owner.replace(this, option)
         return option
-    }
-
-    override fun convert(flag: String, arg: String?): Result<String?> {
-        return Result.success(arg)
     }
 }

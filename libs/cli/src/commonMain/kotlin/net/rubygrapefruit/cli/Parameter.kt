@@ -19,6 +19,7 @@ sealed interface Parameter<T> {
  */
 interface StringParameter<T> : Parameter<T> {
     fun int(): Parameter<Int>
+    fun path(): Parameter<FilePath>
 }
 
 /**

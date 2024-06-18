@@ -32,9 +32,7 @@ internal class DefaultFlag private constructor(
     }
 
     override fun whenAbsent(default: Boolean): Flag {
-        val flag = DefaultFlag(enableFlags, disableFlags, help, default, owner)
-        owner.replace(this, flag)
-        return flag
+        return owner.replace(this, DefaultFlag(enableFlags, disableFlags, help, default, owner))
     }
 
     override fun usage(): List<OptionUsage> {

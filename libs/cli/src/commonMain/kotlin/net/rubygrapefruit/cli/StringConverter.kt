@@ -15,6 +15,12 @@ internal object IntConverter : StringConverter<Int> {
     }
 }
 
+internal object FilePathConverter : StringConverter<FilePath> {
+    override fun convert(displayName: String, value: String): Result<FilePath> {
+        return Result.success(FilePath(value))
+    }
+}
+
 internal object NoOpConverter : StringConverter<String> {
     override fun convert(displayName: String, value: String): Result<String> {
         return Result.success(value)

@@ -13,9 +13,7 @@ internal class DefaultNullableChoice<T : Any>(
     }
 
     override fun whenAbsent(default: T): Option<T> {
-        val choice = DefaultChoice(choices, default)
-        owner.replace(this, choice)
-        return choice
+        return owner.replace(this, DefaultChoice(choices, default))
     }
 
     override fun accept(args: List<String>): ParseResult {

@@ -13,9 +13,7 @@ internal open class DefaultParameter<T : Any>(
     private var value: T? = null
 
     override fun whenAbsent(default: T): Parameter<T> {
-        val parameter = DefaultParameter(name, help, default, host, owner, converter)
-        owner.replace(this, parameter)
-        return parameter
+        return owner.replace(this, DefaultParameter(name, help, default, host, owner, converter))
     }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T {

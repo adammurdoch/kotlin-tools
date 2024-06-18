@@ -8,9 +8,7 @@ internal open class DefaultNullableOption<T : Any>(
     private val converter: StringConverter<T>,
 ) : AbstractOption<T?>(names, help, host), NullableOption<T> {
     override fun whenAbsent(default: T): Option<T> {
-        val option = DefaultOption(names, help, default, host, converter)
-        owner.replace(this, option)
-        return option
+        return owner.replace(this, DefaultOption(names, help, default, host, converter))
     }
 
     override fun convert(flag: String, arg: String?): Result<T?> {

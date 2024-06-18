@@ -8,8 +8,6 @@ internal class DefaultNullableStringOption(
 ) : DefaultNullableOption<String>(names, help, host, owner, NoOpConverter), NullableStringOption {
 
     override fun int(): NullableOption<Int> {
-        val option = DefaultNullableOption(names, help, host, owner, IntConverter)
-        owner.replace(this, option)
-        return option
+        return owner.replace(this, DefaultNullableOption(names, help, host, owner, IntConverter))
     }
 }

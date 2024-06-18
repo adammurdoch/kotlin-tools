@@ -1,3 +1,3 @@
 package net.rubygrapefruit.cli
 
-class FilePath(val path: String)
+data class FilePath(val path: String)

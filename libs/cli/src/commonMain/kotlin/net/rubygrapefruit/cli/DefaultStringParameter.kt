@@ -10,4 +10,8 @@ internal class DefaultStringParameter(
     override fun int(): Parameter<Int> {
         return owner.replace(this, DefaultParameter(name, help, null, host, owner, IntConverter))
     }
+
+    override fun path(): Parameter<FilePath> {
+        return owner.replace(this, DefaultParameter(name, help, null, host, owner, FilePathConverter))
+    }
 }

@@ -14,9 +14,7 @@ internal class DefaultActionParameter<T : Action>(
         get() = actions.map { SubActionUsage(it.key, it.value.help, it.value.value.usage()) }
 
     override fun whenAbsent(default: T): Parameter<T> {
-        val actions = DefaultActionParameter(actions, host, owner, default)
-        owner.replace(this, actions)
-        return actions
+        return owner.replace(this, DefaultActionParameter(this.actions, host, owner, default))
     }
 
     override fun accept(args: List<String>, context: ParseContext): ParseResult {

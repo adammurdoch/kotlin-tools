@@ -3,9 +3,8 @@ package net.rubygrapefruit.cli
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
-import kotlin.test.assertNull
 
-class ParameterTest : AbstractActionTest() {
+class StringParameterTest : AbstractActionTest() {
     @Test
     fun `action can have parameter`() {
         class Parameter : Action() {

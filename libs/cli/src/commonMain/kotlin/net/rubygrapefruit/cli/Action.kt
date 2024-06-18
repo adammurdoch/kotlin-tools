@@ -67,8 +67,8 @@ open class Action {
      * The parameter must appear at a specific location in the input.
      * Fails if the parameter is not present. Use [Parameter.whenAbsent] to allow the parameter to be missing.
      */
-    fun parameter(name: String, help: String? = null): Parameter<String> {
-        val arg = DefaultParameter(name, help, DefaultHost, this, null)
+    fun parameter(name: String, help: String? = null): StringParameter<String> {
+        val arg = DefaultStringParameter(name, help, null, DefaultHost, this)
         positional.add(arg)
         return arg
     }
@@ -188,8 +188,9 @@ open class Action {
         )
     }
 
-    internal fun replace(option: NonPositional, newOption: NonPositional) {
+    internal fun <T : NonPositional> replace(option: NonPositional, newOption: T): T {
         options[options.indexOf(option)] = newOption
+        return newOption
     }
 
     internal fun <T : Positional> replace(param: Positional, newParam: T): T {

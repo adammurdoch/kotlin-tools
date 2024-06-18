@@ -2,22 +2,23 @@ package net.rubygrapefruit.cli
 
 import kotlin.reflect.KProperty
 
-internal class DefaultParameter(
-    private val name: String,
-    private val help: String?,
-    private val host: Host,
-    private val owner: Action,
-    private val default: String?
-) : Positional(), Parameter<String> {
-    private var value: String? = null
+internal open class DefaultParameter<T : Any>(
+    protected val name: String,
+    protected val help: String?,
+    protected val default: T?,
+    protected val host: Host,
+    protected val owner: Action,
+    private val converter: StringConverter<T>
+) : Positional(), Parameter<T> {
+    private var value: T? = null
 
-    override fun whenAbsent(default: String): Parameter<String> {
-        val parameter = DefaultParameter(name, help, host, owner, default)
+    override fun whenAbsent(default: T): Parameter<T> {
+        val parameter = DefaultParameter(name, help, default, host, owner, converter)
         owner.replace(this, parameter)
         return parameter
     }
 
-    override fun getValue(thisRef: Any?, property: KProperty<*>): String {
+    override fun getValue(thisRef: Any?, property: KProperty<*>): T {
         return (value ?: default) ?: throw IllegalStateException()
     }
 
@@ -30,8 +31,13 @@ internal class DefaultParameter(
         return if (host.isOption(candidate)) {
             ParseResult.Nothing
         } else {
-            value = candidate
-            ParseResult.One
+            val result = converter.convert("parameter '$name'", candidate)
+            if (result.isSuccess) {
+                value = result.getOrThrow()
+                ParseResult.One
+            } else {
+                ParseResult(1, result.exceptionOrNull() as ArgParseException, true)
+            }
         }
     }
 

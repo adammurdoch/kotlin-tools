@@ -15,6 +15,13 @@ sealed interface Parameter<T> {
 }
 
 /**
+ * A string parameter.
+ */
+interface StringParameter<T> : Parameter<T> {
+    fun int(): Parameter<Int>
+}
+
+/**
  * A parameter of type List<T>.
  */
 interface ListParameter<T : Any> : Parameter<List<T>> {

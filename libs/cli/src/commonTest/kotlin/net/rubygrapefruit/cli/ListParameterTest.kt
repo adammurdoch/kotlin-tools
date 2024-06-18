@@ -56,12 +56,12 @@ class ListParameterTest : AbstractActionTest() {
 
     @Test
     fun `fails when unknown flag provided instead of argument`() {
-        class StringOption : Action() {
+        class Parameter : Action() {
             val param by parameters("value")
         }
 
-        parseFails(StringOption(), listOf("--flag"), "Unknown option: --flag")
-        parseFails(StringOption(), listOf("arg", "--flag"), "Unknown option: --flag")
-        parseFails(StringOption(), listOf("--flag", "arg"), "Unknown option: --flag")
+        parseFails(Parameter(), listOf("--flag"), "Unknown option: --flag")
+        parseFails(Parameter(), listOf("arg", "--flag"), "Unknown option: --flag")
+        parseFails(Parameter(), listOf("--flag", "arg"), "Unknown option: --flag")
     }
 }

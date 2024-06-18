@@ -212,4 +212,21 @@ class SubActionTest : AbstractActionTest() {
         val action = WithSub().actionFor(listOf("--help"))
         assertIs<HelpAction>(action)
     }
+
+    @Test
+    fun `can run --help command without providing action parameters`() {
+        class Sub : Action() {
+            val p1 by parameter("p1")
+            val p2 by parameter("p2")
+        }
+
+        class WithSub : MainAction("cmd") {
+            val sub by actions {
+                action(Sub(), "sub")
+            }
+        }
+
+        val action = WithSub().actionFor(listOf("sub", "a1", "--help"))
+        assertIs<HelpAction>(action)
+    }
 }

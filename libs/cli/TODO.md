@@ -1,5 +1,6 @@
-- Argument is one of a set
-- Argument is file path
+- Parameter is one of a set
+- Parameter is file path
+- Parameter is zero or more file paths
 - Help for options, actions, parameters, etc
 - Completion for positional parameters
 - Fix completion for options with arg
@@ -17,7 +18,7 @@
   - Option value missing
 - Handle required list parameter with default value - disallow? succeed if absent and default provided?
 - Convenience for string or enum choice 
-- Int argument
+- Int parameter
 - Option with zero or more values
 - Validate names do not contain spaces
 - Disallow conflicting flags, option and action names, choice flags

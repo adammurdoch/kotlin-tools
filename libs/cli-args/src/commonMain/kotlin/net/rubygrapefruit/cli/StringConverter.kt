@@ -47,3 +47,14 @@ internal class ChoiceConverter<T>(val choices: Map<String, ChoiceDetails<T>>) : 
         }
     }
 }
+
+internal class MappingConverter<T>(val converter: (String) -> T?) : StringConverter<T> {
+    override fun convert(displayName: String, value: String): Result<T> {
+        val result = converter(value)
+        return if (result == null) {
+            Result.failure(ArgParseException("Unknown value for $displayName: $value"))
+        } else {
+            Result.success(result)
+        }
+    }
+}

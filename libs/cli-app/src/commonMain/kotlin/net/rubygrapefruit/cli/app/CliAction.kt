@@ -22,20 +22,22 @@ open class CliAction(val name: String) : Action() {
      * Runs this action, using the given arguments to configure it. Does not return
      */
     fun run(args: List<String>) {
-        val action = try {
-            actionFor(args)
-        } catch (e: ArgParseException) {
-            for (line in e.formattedMessage.lines()) {
-                println(line)
-            }
-            exit(1)
-        }
-
+        var parsed = false
         try {
+            val action = try {
+                actionFor(args)
+            } catch (e: ArgParseException) {
+                for (line in e.formattedMessage.lines()) {
+                    println(line)
+                }
+                exit(1)
+            }
+            parsed = true
+
             action.run()
             exit(0)
         } catch (t: Throwable) {
-            if (stackTrace) {
+            if (!parsed || stackTrace) {
                 t.printStackTrace()
             } else {
                 println(t.message)

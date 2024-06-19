@@ -38,10 +38,18 @@ open class Action {
     }
 
     /**
+     * Allows configuration values of type [T] to be added to this action.
+     * Uses the provided function to convert from string values to [T]
+     */
+    fun <T : Any> type(converter: (String) -> T?): ConfigurationBuilder<T> {
+        return DefaultConfigurationBuilder(this, DefaultHost, MappingConverter(converter))
+    }
+
+    /**
      * Allows configuration values of type [FilePath] to be added to this action.
      */
     fun path(): ConfigurationBuilder<FilePath> {
-        return DefaultConfigurationBuilder(this, DefaultHost, FilePathConverter)
+        return type { FilePath(it) }
     }
 
     /**

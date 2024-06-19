@@ -150,11 +150,12 @@ class StringOptionTest : AbstractActionTest() {
 
     @Test
     fun `can run --help command without providing argument`() {
-        class Option : MainAction("cmd") {
+        class Option : TestMainAction("cmd") {
             val param by option("value")
         }
 
-        val action = Option().actionFor(listOf("--value", "--help"))
-        assertIs<HelpAction>(action)
+        parseRecovers(Option(), listOf("--value", "--help")) { action ->
+            assertTrue(action.help)
+        }
     }
 }

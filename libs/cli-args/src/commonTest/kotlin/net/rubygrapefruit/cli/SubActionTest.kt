@@ -203,14 +203,15 @@ class SubActionTest : AbstractActionTest() {
 
     @Test
     fun `can run --help command without providing action`() {
-        class WithSub : MainAction("cmd") {
+        class WithSub : TestMainAction("cmd") {
             val sub by actions {
                 action(Action(), "sub")
             }
         }
 
-        val action = WithSub().actionFor(listOf("--help"))
-        assertIs<HelpAction>(action)
+        parseRecovers(WithSub(), listOf("--help")) { action ->
+            assertTrue(action.help)
+        }
     }
 
     @Test
@@ -220,13 +221,20 @@ class SubActionTest : AbstractActionTest() {
             val p2 by parameter("p2")
         }
 
-        class WithSub : MainAction("cmd") {
+        class WithSub : TestMainAction("cmd") {
             val sub by actions {
                 action(Sub(), "sub")
             }
         }
 
-        val action = WithSub().actionFor(listOf("sub", "a1", "--help"))
-        assertIs<HelpAction>(action)
+        parseRecovers(WithSub(), listOf("sub", "--help")) { action ->
+            assertTrue(action.help)
+        }
+        parseRecovers(WithSub(), listOf("sub", "a1", "--help")) { action ->
+            assertTrue(action.help)
+        }
+        parseRecovers(WithSub(), listOf("--help", "sub", "a1")) { action ->
+            assertTrue(action.help)
+        }
     }
 }

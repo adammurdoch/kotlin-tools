@@ -13,6 +13,6 @@ library {
         implementation(kotlin("test"))
     }
     common {
-        implementation(project(":cli-args"))
+        api(project(":cli-args"))
     }
 }

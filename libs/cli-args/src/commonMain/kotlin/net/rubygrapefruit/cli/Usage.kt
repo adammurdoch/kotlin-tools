@@ -1,6 +1,6 @@
 package net.rubygrapefruit.cli
 
-internal class ActionUsage(
+class ActionUsage(
     val appName: String?,
     val options: List<OptionUsage>,
     val positional: List<PositionalUsage>
@@ -28,22 +28,22 @@ internal class ActionUsage(
         }
 }
 
-internal sealed class ItemUsage(val help: String?) {
+sealed class ItemUsage(val help: String?) {
     /**
      * A display name for this item, used when listing items in a table.
      */
     abstract val display: String
 }
 
-internal class SingleOptionUsage(val usage: String, val help: String?, val aliases: List<String>)
+class SingleOptionUsage(val usage: String, val help: String?, val aliases: List<String>)
 
-internal class OptionUsage(
+class OptionUsage(
     override val display: String,
     help: String?,
     val items: List<SingleOptionUsage>
 ) : ItemUsage(help)
 
-internal sealed class PositionalUsage(
+sealed class PositionalUsage(
     /**
      * The usage for this item, shown in the containing action's usage summary.
      */
@@ -53,7 +53,7 @@ internal sealed class PositionalUsage(
 ) : ItemUsage(help) {
 }
 
-internal class ParameterUsage(
+class ParameterUsage(
     usage: String,
     display: String,
     help: String?,
@@ -62,14 +62,14 @@ internal class ParameterUsage(
     constructor(usage: String, help: String?, path: Boolean) : this(usage, usage, help, path)
 }
 
-internal class ActionParameterUsage(
+class ActionParameterUsage(
     usage: String,
     display: String,
     help: String?,
     val actions: List<SubActionUsage>
 ) : PositionalUsage(usage, display, help)
 
-internal class SubActionUsage(val name: String, help: String?, val action: ActionUsage) : ItemUsage(help) {
+class SubActionUsage(val name: String, help: String?, val action: ActionUsage) : ItemUsage(help) {
     override val display: String
         get() = name
 }

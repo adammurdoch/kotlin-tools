@@ -1,3 +1,7 @@
+- Move usage generation to cli-app
+- Clean up API for `simpleFlag()`
+- Clean up API for `parseAll()` and hide `ParseResult`
+- Clean up usage types.
 - `--help` should group long and short choice flags
 - Option value is one of a set
 - List of int or choice from a set

@@ -7,7 +7,7 @@ open class Action {
     private val options = mutableListOf<NonPositional>()
     private val positional = mutableListOf<Positional>()
 
-    internal fun simpleFlag(name: String, help: String? = null): Flag {
+    protected fun simpleFlag(name: String, help: String? = null): Flag {
         val flag = DefaultFlag(listOf(name), false, help, DefaultHost, false, this)
         options.add(flag)
         return flag
@@ -112,7 +112,7 @@ open class Action {
         }
     }
 
-    internal fun parseAll(args: List<String>): ParseResult {
+    fun parseAll(args: List<String>): ParseResult {
         return maybeParse(args, RootContext, stopOnFailure = false)
     }
 
@@ -184,7 +184,7 @@ open class Action {
         return ParseResult(index, failure, true)
     }
 
-    internal open fun usage(): ActionUsage {
+    open fun usage(): ActionUsage {
         return ActionUsage(
             null,
             options.flatMap { it.usage() },

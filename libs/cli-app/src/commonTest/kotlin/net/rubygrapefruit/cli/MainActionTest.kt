@@ -3,7 +3,7 @@ package net.rubygrapefruit.cli
 import kotlin.test.Test
 import kotlin.test.assertIs
 
-class MainActionTest : AbstractActionTest() {
+class MainActionTest {
     @Test
     fun `can run --help command`() {
         class NoConfig : MainAction("cmd")

@@ -2,7 +2,7 @@ package net.rubygrapefruit.cli
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertIs
+import kotlin.test.assertTrue
 
 class StringParameterTest : AbstractActionTest() {
     @Test
@@ -108,11 +108,12 @@ class StringParameterTest : AbstractActionTest() {
 
     @Test
     fun `can run --help command without providing parameter`() {
-        class Parameter : MainAction("cmd") {
+        class Parameter : TestMainAction("cmd") {
             val param by parameter("value")
         }
 
-        val action = Parameter().actionFor(listOf("--help"))
-        assertIs<HelpAction>(action)
+        parseRecovers(Parameter(), listOf("--help")) { action ->
+            assertTrue(action.help)
+        }
     }
 }

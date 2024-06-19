@@ -6,16 +6,14 @@ import kotlin.test.assertEquals
 class ActionUsageTest {
     @Test
     fun `formats action with no configuration`() {
-        class NoConfig : MainAction("cmd")
+        class NoConfig : TestMainAction("cmd")
 
         assertEquals(
             """
             Usage: cmd [options]
             
             Options:
-              --completion        Generate ZSH completion script
-              --help              Show usage message
-              --stack, --no-stack Show stack trace on failure
+              --help, --no-help help message
             
         """.trimIndent(), NoConfig().usage().formatted
         )
@@ -23,7 +21,7 @@ class ActionUsageTest {
 
     @Test
     fun `formats action with multiple parameters`() {
-        class Parameters : MainAction("cmd") {
+        class Parameters : TestMainAction("cmd") {
             val p1 by parameter("z", help = "some value")
             val p2 by parameter("another-param", help = "some other value")
             val p3 by parameter("no-help")
@@ -38,9 +36,7 @@ class ActionUsageTest {
               <z>             some value
 
             Options:
-              --completion        Generate ZSH completion script
-              --help              Show usage message
-              --stack, --no-stack Show stack trace on failure
+              --help, --no-help help message
             
             """.trimIndent(), Parameters().usage().formatted
         )
@@ -48,7 +44,7 @@ class ActionUsageTest {
 
     @Test
     fun `formats action with multi-value parameter`() {
-        class Parameters : MainAction("cmd") {
+        class Parameters : TestMainAction("cmd") {
             val a1 by parameter("a", help = "some value")
             val a2 by parameters("param", help = "some other value")
         }
@@ -62,9 +58,7 @@ class ActionUsageTest {
               <param> some other value
 
             Options:
-              --completion        Generate ZSH completion script
-              --help              Show usage message
-              --stack, --no-stack Show stack trace on failure
+              --help, --no-help help message
             
             """.trimIndent(), Parameters().usage().formatted
         )
@@ -72,7 +66,7 @@ class ActionUsageTest {
 
     @Test
     fun `formats action with multiple flags`() {
-        class Options : MainAction("cmd") {
+        class Options : TestMainAction("cmd") {
             val f1 by flag("thing", help = "some flag")
             val f2 by flag("t", help = "some short flag")
             val f3 by flag("f", "flag", help = "some other flag")
@@ -83,9 +77,7 @@ class ActionUsageTest {
             Usage: cmd [options]
             
             Options:
-              --completion          Generate ZSH completion script
-              --help                Show usage message
-              --stack, --no-stack   Show stack trace on failure
+              --help, --no-help     help message
               --thing, --no-thing   some flag
               -f, --flag, --no-flag some other flag
               -t                    some short flag
@@ -96,7 +88,7 @@ class ActionUsageTest {
 
     @Test
     fun `formats action with multiple options`() {
-        class Options : MainAction("cmd") {
+        class Options : TestMainAction("cmd") {
             val a1 by option("some-option", help = "some other option")
             val a2 by option("s", "second-option", help = "second option")
             val a3 by option("none")
@@ -108,11 +100,9 @@ class ActionUsageTest {
             Usage: cmd [options]
             
             Options:
-              --completion                        Generate ZSH completion script
-              --help                              Show usage message
+              --help, --no-help                   help message
               --none <value>
               --some-option <value>               some other option
-              --stack, --no-stack                 Show stack trace on failure
               -o <value>                          single character
               -s <value>, --second-option <value> second option
 
@@ -122,7 +112,7 @@ class ActionUsageTest {
 
     @Test
     fun `formats action with multiple choices`() {
-        class Options : MainAction("cmd") {
+        class Options : TestMainAction("cmd") {
             val c1 by oneOf {
                 choice(1, "1", help = "select 1")
                 choice(2, "two")
@@ -140,15 +130,13 @@ class ActionUsageTest {
             Usage: cmd [options]
             
             Options:
-              --12                select 12
-              --completion        Generate ZSH completion script
-              --help              Show usage message
+              --12              select 12
+              --help, --no-help help message
               --long
-              --other             select c
-              --stack, --no-stack Show stack trace on failure
+              --other           select c
               --two
-              -1                  select 1
-              -a                  select a
+              -1                select 1
+              -a                select a
 
             """.trimIndent(), Options().usage().formatted
         )
@@ -156,7 +144,7 @@ class ActionUsageTest {
 
     @Test
     fun `formats action with multiple actions`() {
-        class Options : MainAction("cmd") {
+        class Options : TestMainAction("cmd") {
             val a1 by actions {
                 action(Action(), "z", help = "run action z")
                 action(Action(), "action-two")
@@ -180,9 +168,7 @@ class ActionUsageTest {
               z2           run action z2
 
             Options:
-              --completion        Generate ZSH completion script
-              --help              Show usage message
-              --stack, --no-stack Show stack trace on failure
+              --help, --no-help help message
 
             """.trimIndent(), Options().usage().formatted
         )

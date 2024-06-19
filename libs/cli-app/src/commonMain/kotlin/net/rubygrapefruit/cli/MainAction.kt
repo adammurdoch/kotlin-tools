@@ -3,15 +3,10 @@ package net.rubygrapefruit.cli
 /**
  * An [Action] that can be used as the main action for a CLI application.
  */
-open class MainAction(private val name: String) : Action() {
+open class MainAction(val name: String) : Action() {
     private val help by simpleFlag("help", help = "Show usage message")
     private val completion by simpleFlag("completion", help = "Generate ZSH completion script")
     private val stackTrace by flag("stack", help = "Show stack trace on failure")
-
-    override fun usage(): ActionUsage {
-        val usage = super.usage()
-        return ActionUsage(name, usage.options, usage.positional)
-    }
 
     /**
      * Runs this action, using the given arguments to configure it. Does not return
@@ -53,7 +48,7 @@ open class MainAction(private val name: String) : Action() {
         } else if (completion) {
             CompletionAction(this)
         } else if (result.failure != null) {
-            throw result.failure
+            throw result.failure as Throwable
         } else {
             this
         }

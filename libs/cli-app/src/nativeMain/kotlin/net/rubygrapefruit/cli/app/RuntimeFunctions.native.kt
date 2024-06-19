@@ -1,4 +1,4 @@
-package net.rubygrapefruit.cli
+package net.rubygrapefruit.cli.app
 
 import kotlin.system.exitProcess
 

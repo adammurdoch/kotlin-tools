@@ -1,4 +1,7 @@
-package net.rubygrapefruit.cli
+package net.rubygrapefruit.cli.app
+
+import net.rubygrapefruit.cli.Action
+import net.rubygrapefruit.cli.ArgParseException
 
 /**
  * An [Action] that can be used as the main action for a CLI application.

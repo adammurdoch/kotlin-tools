@@ -1,5 +1,5 @@
 import net.rubygrapefruit.cli.Action
-import net.rubygrapefruit.cli.MainAction
+import net.rubygrapefruit.cli.app.MainAction
 import net.rubygrapefruit.file.fileSystem
 import net.rubygrapefruit.store.ContentVisitor
 import net.rubygrapefruit.store.Store

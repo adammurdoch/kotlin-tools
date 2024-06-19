@@ -6,7 +6,7 @@ group = "net.rubygrapefruit.libs"
 
 library {
     jvm {
-        module.name = "net.rubygrapefruit.cli"
+        module.name = "net.rubygrapefruit.cli-args"
     }
     nativeDesktop()
     test {

@@ -1,4 +1,6 @@
-package net.rubygrapefruit.cli
+package net.rubygrapefruit.cli.app
+
+import net.rubygrapefruit.cli.Action
 
 internal class HelpAction(val action: MainAction) : Action() {
     override fun run() {

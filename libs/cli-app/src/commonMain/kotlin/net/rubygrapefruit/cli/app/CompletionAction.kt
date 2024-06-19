@@ -1,4 +1,9 @@
-package net.rubygrapefruit.cli
+package net.rubygrapefruit.cli.app
+
+import net.rubygrapefruit.cli.Action
+import net.rubygrapefruit.cli.ActionParameterUsage
+import net.rubygrapefruit.cli.OptionUsage
+import net.rubygrapefruit.cli.ParameterUsage
 
 internal class CompletionAction(val action: MainAction) : Action() {
     override fun run() {

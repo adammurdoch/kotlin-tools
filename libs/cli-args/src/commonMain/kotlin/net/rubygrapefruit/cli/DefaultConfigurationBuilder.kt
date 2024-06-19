@@ -9,4 +9,8 @@ internal class DefaultConfigurationBuilder<T : Any>(
         names.forEach { host.validate(it, "an option name") }
         return owner.add(DefaultNullableOption(names, help, host, owner, converter))
     }
+
+    override fun parameter(name: String, help: String?): Parameter<T> {
+        return owner.add(DefaultParameter(name, help, null, host, owner, converter))
+    }
 }

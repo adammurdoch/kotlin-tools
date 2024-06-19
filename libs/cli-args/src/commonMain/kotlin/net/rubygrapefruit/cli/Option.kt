@@ -18,10 +18,3 @@ interface NullableOption<T : Any> : Option<T?> {
      */
     fun whenAbsent(default: T): Option<T>
 }
-
-/**
- * A string option that is not required.
- */
-interface NullableStringOption : NullableOption<String> {
-
-}

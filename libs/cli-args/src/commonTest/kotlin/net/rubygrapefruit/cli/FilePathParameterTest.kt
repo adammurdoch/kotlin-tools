@@ -7,7 +7,7 @@ class FilePathParameterTest : AbstractActionTest() {
     @Test
     fun `action can have file path parameter`() {
         class Parameter : Action() {
-            val param by parameter("value").path()
+            val param by path().parameter("value")
         }
 
         parse(Parameter(), listOf("a/b")) { action ->
@@ -18,7 +18,7 @@ class FilePathParameterTest : AbstractActionTest() {
     @Test
     fun `fails when argument not provided`() {
         class Parameter : Action() {
-            val param by parameter("value").path()
+            val param by path().parameter("value")
         }
 
         parseFails(Parameter(), emptyList(), "Parameter 'value' not provided")

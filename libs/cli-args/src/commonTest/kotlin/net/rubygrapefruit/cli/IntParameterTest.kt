@@ -7,7 +7,7 @@ class IntParameterTest : AbstractActionTest() {
     @Test
     fun `action can have int parameter`() {
         class Parameter : Action() {
-            val param by parameter("value").int()
+            val param by int().parameter("value")
         }
 
         parse(Parameter(), listOf("123")) { action ->
@@ -18,7 +18,7 @@ class IntParameterTest : AbstractActionTest() {
     @Test
     fun `fails when argument is not an integer`() {
         class Parameter : Action() {
-            val param by parameter("value").int()
+            val param by int().parameter("value")
         }
 
         parseFails(Parameter(), listOf("abc"), "Value for parameter 'value' is not an integer: abc")
@@ -27,7 +27,7 @@ class IntParameterTest : AbstractActionTest() {
     @Test
     fun `fails when argument not provided`() {
         class Parameter : Action() {
-            val param by parameter("value").int()
+            val param by int().parameter("value")
         }
 
         parseFails(Parameter(), emptyList(), "Parameter 'value' not provided")
@@ -36,7 +36,7 @@ class IntParameterTest : AbstractActionTest() {
     @Test
     fun `can provide default value for parameter`() {
         class Parameter : Action() {
-            val param by parameter("value").int().whenAbsent(12)
+            val param by int().parameter("value").whenAbsent(12)
         }
 
         parse(Parameter(), emptyList()) { action ->

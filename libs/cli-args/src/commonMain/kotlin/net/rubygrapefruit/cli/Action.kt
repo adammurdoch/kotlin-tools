@@ -44,11 +44,7 @@ open class Action {
     }
 
     /**
-     * Defines a string option with the given names. Can use `--<name> <value>` to specify the value.
-     * For single character names, use `-<name> <value>` to specify the value.
-     *
-     * The option can appear anywhere in the command-line. It can only appear once.
-     * Has value `null` when the option is not present in the input. Use [NullableOption.whenAbsent] to use a different default.
+     * Defines a string option with the given names. See [ConfigurationBuilder.option] for more details.
      */
     fun option(name: String, vararg names: String, help: String? = null): NullableOption<String> {
         return string().option(name, *names, help = help)
@@ -218,6 +214,11 @@ open class Action {
     internal fun <T : NonPositional> add(option: T): T {
         options.add(option)
         return option
+    }
+
+    internal fun <T : Positional> add(param: T): T {
+        positional.add(param)
+        return param
     }
 
     internal fun <T : NonPositional> replace(option: NonPositional, newOption: T): T {

@@ -8,7 +8,7 @@ class FilePathOptionTest : AbstractActionTest() {
     @Test
     fun `can define path option with long name`() {
         class Option : Action() {
-            val option by option("opt").path()
+            val option by path().option("opt")
         }
 
         parse(Option(), listOf("--opt", "a/b")) { action ->
@@ -21,7 +21,7 @@ class FilePathOptionTest : AbstractActionTest() {
     @Test
     fun `can define path option with short name`() {
         class Option : Action() {
-            val option by option("o").path()
+            val option by path().option("o")
         }
 
         parse(Option(), listOf("-o", "..")) { action ->
@@ -34,7 +34,7 @@ class FilePathOptionTest : AbstractActionTest() {
     @Test
     fun `value is null when option not provided`() {
         class Option : Action() {
-            val option by option("opt").path()
+            val option by path().option("opt")
         }
 
         parse(Option(), emptyList()) { action ->
@@ -45,7 +45,7 @@ class FilePathOptionTest : AbstractActionTest() {
     @Test
     fun `fails when argument not provided`() {
         class Option : Action() {
-            val option by option("o").path()
+            val option by path().option("o")
         }
 
         parseFails(Option(), listOf("-o"), "Value missing for option -o")

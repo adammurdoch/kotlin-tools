@@ -23,13 +23,5 @@ interface NullableOption<T : Any> : Option<T?> {
  * A string option that is not required.
  */
 interface NullableStringOption : NullableOption<String> {
-    /**
-     * Returns an option that expects an integer value.
-     */
-    fun int(): NullableOption<Int>
 
-    /**
-     * Returns an option that expects a file path value.
-     */
-    fun path(): NullableOption<FilePath>
 }

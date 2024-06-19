@@ -38,6 +38,7 @@
 - Color output on terminal
 - Fuzzy matching and/or suggestions
 
+```
 string().option("f") -> (-f <value>)? nullable
 int().option("f") -> (-f <value>)? nullable
 path().option("f") -> (-f <value>)? nullable
@@ -68,6 +69,7 @@ string().parameter().whenAbsent("v") -> (<value>) not-null
 
 string().list().parameter() -> <value>*, not-null
 string().list().parameter().required() -> <value>+, not-null
+```
 
 `compinit` - initialise completion
 `compdef <fun> <name>` - use function to complete command or context (e.g. for shell syntax completion) with given name

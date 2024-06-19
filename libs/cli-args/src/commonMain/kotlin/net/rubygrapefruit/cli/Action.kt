@@ -14,21 +14,35 @@ open class Action {
     }
 
     /**
+     * Allows configuration values of type [String] to be added to this action.
+     */
+    fun string(): ConfigurationBuilder<String> {
+        return DefaultConfigurationBuilder(this, DefaultHost, NoOpConverter)
+    }
+
+    /**
+     * Allows configuration values of type [Int] to be added to this action.
+     */
+    fun int(): ConfigurationBuilder<Int> {
+        return DefaultConfigurationBuilder(this, DefaultHost, IntConverter)
+    }
+
+    /**
+     * Allows configuration values of type [FilePath] to be added to this action.
+     */
+    fun path(): ConfigurationBuilder<FilePath> {
+        return DefaultConfigurationBuilder(this, DefaultHost, FilePathConverter)
+    }
+
+    /**
      * Defines a string option with the given names. Can use `--<name> <value>` to specify the value.
      * For single character names, use `-<name> <value>` to specify the value.
      *
      * The option can appear anywhere in the command-line. It can only appear once.
      * Has value `null` when the option is not present in the input. Use [NullableOption.whenAbsent] to use a different default.
-     *
-     * Use [NullableStringOption.int] to convert the value to an `int`
      */
-    fun option(name: String, vararg names: String, help: String? = null): NullableStringOption {
-        val allNames = listOf(name) + names.toList()
-        allNames.forEach { DefaultHost.validate(it, "an option name") }
-
-        val option = DefaultNullableStringOption(allNames, help, DefaultHost, this)
-        options.add(option)
-        return option
+    fun option(name: String, vararg names: String, help: String? = null): NullableOption<String> {
+        return string().option(name, *names, help = help)
     }
 
     /**
@@ -190,6 +204,11 @@ open class Action {
             options.flatMap { it.usage() },
             positional.map { it.usage() }
         )
+    }
+
+    internal fun <T : NonPositional> add(option: T): T {
+        options.add(option)
+        return option
     }
 
     internal fun <T : NonPositional> replace(option: NonPositional, newOption: T): T {

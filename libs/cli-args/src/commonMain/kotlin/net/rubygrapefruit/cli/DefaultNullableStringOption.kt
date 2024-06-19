@@ -7,11 +7,4 @@ internal class DefaultNullableStringOption(
     private val owner: Action
 ) : DefaultNullableOption<String>(names, help, host, owner, NoOpConverter), NullableStringOption {
 
-    override fun int(): NullableOption<Int> {
-        return owner.replace(this, DefaultNullableOption(names, help, host, owner, IntConverter))
-    }
-
-    override fun path(): NullableOption<FilePath> {
-        return owner.replace(this, DefaultNullableOption(names, help, host, owner, FilePathConverter))
-    }
 }

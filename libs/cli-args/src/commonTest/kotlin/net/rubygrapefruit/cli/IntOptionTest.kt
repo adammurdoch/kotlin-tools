@@ -8,7 +8,7 @@ class IntOptionTest : AbstractActionTest() {
     @Test
     fun `can define int option with long name`() {
         class Option : Action() {
-            val option by option("opt").int()
+            val option by int().option("opt")
         }
 
         parse(Option(), listOf("--opt", "123")) { action ->
@@ -21,7 +21,7 @@ class IntOptionTest : AbstractActionTest() {
     @Test
     fun `can define int option with short name`() {
         class Option : Action() {
-            val option by option("o").int()
+            val option by int().option("o")
         }
 
         parse(Option(), listOf("-o", "123")) { action ->
@@ -34,7 +34,7 @@ class IntOptionTest : AbstractActionTest() {
     @Test
     fun `value is null when option not provided`() {
         class Option : Action() {
-            val option by option("opt").int()
+            val option by int().option("opt")
         }
 
         parse(Option(), emptyList()) { action ->
@@ -45,7 +45,7 @@ class IntOptionTest : AbstractActionTest() {
     @Test
     fun `can provide default value for int option`() {
         class Option : Action() {
-            val option by option("opt").int().whenAbsent(45)
+            val option by int().option("opt").whenAbsent(45)
         }
 
         parse(Option(), emptyList()) { action ->
@@ -60,7 +60,7 @@ class IntOptionTest : AbstractActionTest() {
     @Test
     fun `fails when argument not provided`() {
         class Option : Action() {
-            val option by option("o").int()
+            val option by int().option("o")
         }
 
         parseFails(Option(), listOf("-o"), "Value missing for option -o")
@@ -69,7 +69,7 @@ class IntOptionTest : AbstractActionTest() {
     @Test
     fun `fails when argument is not an integer`() {
         class Option : Action() {
-            val option by option("o").int()
+            val option by int().option("o")
         }
 
         parseFails(Option(), listOf("-o", "abc"), "Value for option -o is not an integer: abc")

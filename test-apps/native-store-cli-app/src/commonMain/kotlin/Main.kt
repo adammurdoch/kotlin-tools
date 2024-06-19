@@ -1,4 +1,4 @@
-import net.rubygrapefruit.cli.Action
+import net.rubygrapefruit.cli.app.CliAction
 import net.rubygrapefruit.cli.app.CliApp
 import net.rubygrapefruit.file.fileSystem
 import net.rubygrapefruit.store.ContentVisitor
@@ -17,11 +17,11 @@ class StoreApp : CliApp("jvm-store-cli-app") {
     }
 }
 
-abstract class AbstractStoreCommand : Action() {
+abstract class AbstractStoreCommand : CliAction() {
     private val store by path().parameter("store", help = "The store to use")
 
     override fun run() {
-        val dir = fileSystem.currentDirectory.dir(store.path)
+        val dir = fileSystem.currentDirectory.dir(store.absolutePath)
         Store.open(dir, discard = discard).use {
             run(it)
         }

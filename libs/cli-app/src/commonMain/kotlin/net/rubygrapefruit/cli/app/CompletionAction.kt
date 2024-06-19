@@ -8,15 +8,13 @@ import net.rubygrapefruit.cli.ParameterUsage
 internal class CompletionAction(val action: CliApp) : Action() {
     override fun run() {
         val usage = action.usage()
-        if (usage.appName == null) {
-            return
-        }
+        val appName = action.name
 
-        val functionName = usage.appName + "_complete"
+        val functionName = appName + "_complete"
         println()
         println(
             """
-            compdef $functionName ${usage.appName}
+            compdef $functionName $appName
 
             function $functionName() {
                 local context state state_descr line

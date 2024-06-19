@@ -1,4 +1,5 @@
 - Fix completion of path parameters
+- Directory type, must exist as directory, with completion. Use in test app
 - Move usage generation to cli-app
 - Clean up usage types.
 - custom type option, list parameter
@@ -25,9 +26,7 @@
     - Option value badly formed
     - Parameter value badly formed
     - Option value missing
-- Handle required list parameter with default value - disallow? succeed if absent and default provided?
-- parameter().whenAbsent().int() -> what should happen to the default? currently is discarded
-- Validate names do not contain spaces
+- Handle required list parameter with default value - disallow? succeed if absent and default provided?- Validate names do not contain spaces
 - Validate at least one action or choice is defined
 - Validate choices do not contain spaces
 - Validate choices are not options

@@ -210,7 +210,7 @@ open class Action {
 
     sealed class Result
     data object Success : Result()
-    class Failure(val failure: ArgParseException) : Result()
+    data class Failure(val failure: ArgParseException) : Result()
 
     interface Actions<T : Action> {
         fun action(action: T, name: String, help: String? = null)

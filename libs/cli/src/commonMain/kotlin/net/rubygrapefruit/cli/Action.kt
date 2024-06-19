@@ -113,38 +113,26 @@ open class Action {
     }
 
     internal fun parseAll(args: List<String>): ParseResult {
-        val result = maybeParse(args, RootContext)
-        val count = result.count
-        if (result.failure == null && count < args.size) {
-            val arg = args[count]
-            val failure = if (DefaultHost.isOption(arg)) {
-                ArgParseException("Unknown option: $arg")
-            } else {
-                ArgParseException("Unknown parameter: $arg")
-            }
-            return ParseResult(count, failure, true)
-        }
-        return result
+        return maybeParse(args, RootContext, stopOnFailure = false)
     }
 
-    internal fun maybeParse(args: List<String>, parent: ParseContext): ParseResult {
+    internal fun maybeParse(args: List<String>, parent: ParseContext, stopOnFailure: Boolean): ParseResult {
         val pending = this.positional.toMutableList()
         val context = parent.withOptions(options)
 
         var index = 0
         var failure: ArgParseException? = null
-        while (index in args.indices) {
+        while (index in args.indices && (!stopOnFailure || failure == null)) {
             val current = args.subList(index, args.size)
 
             var matched = false
             for (option in context.options) {
                 val result = option.accept(current)
-                if (result.failure != null && failure == null) {
-                    failure = result.failure
-                }
-                val count = result.count
-                if (count > 0) {
-                    index += count
+                if (result.count > 0) {
+                    if (result.failure != null && failure == null) {
+                        failure = result.failure
+                    }
+                    index += result.count
                     matched = true
                     break
                 }
@@ -155,20 +143,33 @@ open class Action {
 
             if (pending.isNotEmpty()) {
                 val result = pending.first().accept(current, context)
-                if (result.failure != null) {
-                    return result.advance(index)
-                }
-                if (result.finished) {
-                    pending.removeFirst()
-                }
                 if (result.count > 0) {
+                    if (result.failure != null && failure == null) {
+                        failure = result.failure
+                    }
+                    if (result.finished) {
+                        pending.removeFirst()
+                    }
                     index += result.count
                     continue
                 }
-                // Could not match anything
             }
 
-            return ParseResult(index, failure, true)
+            // Did not match anything
+
+            if (stopOnFailure) {
+                // This is fine
+                break
+            }
+            if (failure == null) {
+                val arg = current.first()
+                failure = if (DefaultHost.isOption(arg)) {
+                    ArgParseException("Unknown option: $arg")
+                } else {
+                    ArgParseException("Unknown parameter: $arg")
+                }
+            }
+            index++
         }
 
         if (failure == null) {
@@ -180,7 +181,7 @@ open class Action {
             }
         }
 
-        return ParseResult(args.size, failure, true)
+        return ParseResult(index, failure, true)
     }
 
     internal open fun usage(): ActionUsage {

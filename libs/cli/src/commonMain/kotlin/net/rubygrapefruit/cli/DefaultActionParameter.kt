@@ -26,7 +26,7 @@ internal class DefaultActionParameter<T : Action>(
             return ParseResult(1, ArgParseException("Unknown action: $name", actions = actionInfo), true)
         }
         action = actions.getValue(name).value
-        val result = action!!.maybeParse(args.drop(1), context)
+        val result = action!!.maybeParse(args.drop(1), context, stopOnFailure = true)
         return ParseResult(1 + result.count, result.failure, result.finished)
     }
 

@@ -1,8 +1,8 @@
 package net.rubygrapefruit.cli
 
-internal class DefaultConfigurationBuilder<T : Any>(
-    private val owner: Action,
-    private val host: Host,
+internal open class DefaultConfigurationBuilder<T : Any>(
+    protected val owner: Action,
+    protected val host: Host,
     private val converter: StringConverter<T>
 ) : ConfigurationBuilder<T> {
     override fun option(names: List<String>, help: String?): NullableOption<T> {

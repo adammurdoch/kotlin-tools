@@ -44,3 +44,14 @@ interface ConfigurationBuilder<T : Any> {
      */
     fun parameters(name: String, help: String? = null): ListParameter<T>
 }
+
+interface MappingConfigurationBuilder<T : Any> : ConfigurationBuilder<T> {
+    /**
+     * Defines a set of flags to select one of the values.
+     *
+     * The flags can appear anywhere in the input. They can be specified multiple times and the last value is used.
+     * Has value `null` then none of the flags is present in the input. Use [NullableOption.whenAbsent] to use a different default.
+     *
+     */
+    fun flags(): NullableOption<T>
+}

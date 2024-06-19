@@ -27,7 +27,7 @@ internal object NoOpConverter : StringConverter<String> {
     }
 }
 
-internal class ChoiceConverter<T>(private val choices: Map<String, ChoiceDetails<T>>) : StringConverter<T> {
+internal class ChoiceConverter<T>(val choices: Map<String, ChoiceDetails<T>>) : StringConverter<T> {
     override fun convert(displayName: String, value: String): Result<T> {
         val item = choices[value]
         return if (item == null) {

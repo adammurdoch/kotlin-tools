@@ -30,10 +30,10 @@ open class Action {
     /**
      * Allows configuration values of type [T] to be added to this action.
      */
-    fun <T : Any> oneOf(builder: Choices<T>.() -> Unit): ConfigurationBuilder<T> {
+    fun <T : Any> oneOf(builder: Choices<T>.() -> Unit): MappingConfigurationBuilder<T> {
         val choices = DefaultChoices<T>(DefaultHost)
         builder(choices)
-        return DefaultConfigurationBuilder(this, DefaultHost, ChoiceConverter(choices.choices))
+        return DefaultMappingConfigurationBuilder(this, DefaultHost, ChoiceConverter(choices.choices))
     }
 
     /**
@@ -64,20 +64,6 @@ open class Action {
         val flag = DefaultFlag(allNames, true, help, DefaultHost, false, this)
         options.add(flag)
         return flag
-    }
-
-    /**
-     * Defines a set of values that can be selected using flags.
-     *
-     * The flags can appear anywhere in the input. They can be specified multiple times and the last value is used.
-     * Has value `null` then none of the flags is present in the input. Use [NullableOption.whenAbsent] to use a different default.
-     */
-    fun <T : Any> oneOfFlag(builder: Choices<T>.() -> Unit): NullableOption<T> {
-        val choices = DefaultChoices<T>(DefaultHost)
-        builder(choices)
-        val option = DefaultNullableChoice(choices.choices.mapKeys { DefaultHost.option(it.key) }, this)
-        options.add(option)
-        return option
     }
 
     /**

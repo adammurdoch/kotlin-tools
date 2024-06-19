@@ -53,6 +53,16 @@ class FlagTest : AbstractActionTest() {
     }
 
     @Test
+    fun `can opt to have no disable option`() {
+        class BooleanFlag : Action() {
+            val flag by boolean().flag("flag", disableOption = false)
+        }
+
+        parseFails(BooleanFlag(), listOf("--no-flag"), "Unknown option: --no-flag")
+        parseFails(BooleanFlag(), listOf("-no-flag"), "Unknown option: -no-flag")
+    }
+
+    @Test
     fun `can define multiple names for flag`() {
         class BooleanFlag : Action() {
             val flag by flag("f", "flag")
@@ -117,24 +127,6 @@ class FlagTest : AbstractActionTest() {
         parse(BooleanFlag(), emptyList()) { action ->
             assertFalse(action.f)
             assertFalse(action.flag)
-        }
-    }
-
-    @Test
-    fun `can provide default value for boolean option`() {
-        class BooleanFlag : Action() {
-            val f1 by flag("f1").whenAbsent(true)
-            val f2 by flag("f2").whenAbsent(false)
-        }
-
-        parse(BooleanFlag(), emptyList()) { action ->
-            assertTrue(action.f1)
-            assertFalse(action.f2)
-        }
-
-        parse(BooleanFlag(), listOf("--no-f1", "--f2")) { action ->
-            assertFalse(action.f1)
-            assertTrue(action.f2)
         }
     }
 

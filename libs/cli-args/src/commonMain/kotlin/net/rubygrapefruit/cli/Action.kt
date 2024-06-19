@@ -7,12 +7,6 @@ open class Action {
     private val options = mutableListOf<NonPositional>()
     private val positional = mutableListOf<Positional>()
 
-    protected fun simpleFlag(name: String, help: String? = null): Flag {
-        val flag = DefaultFlag(listOf(name), false, help, DefaultHost, false, this)
-        options.add(flag)
-        return flag
-    }
-
     /**
      * Allows configuration values of type [String] to be added to this action.
      */

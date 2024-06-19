@@ -56,13 +56,13 @@ interface MappingConfigurationBuilder<T : Any> : ConfigurationBuilder<T> {
     fun flags(): NullableOption<T>
 }
 
-interface BooleanConfigurationBuilder: ConfigurationBuilder<Boolean> {
+interface BooleanConfigurationBuilder : ConfigurationBuilder<Boolean> {
     /**
      * Defines a boolean flag with the given names. Can use `--<name>` or `--no-<name>` to specify the value.
      * For single character names, use `-<name>` to specify the value.
      *
      * The flag can appear anywhere in the command-line. It can be specified multiple times and the last value is used.
-     * Has value `false` when the flag is not present in the input. Use [Flag.whenAbsent] to use a different default.
+     * Has value `false` when the flag is not present in the input.
      */
-    fun flag(name: String, vararg names: String, help: String? = null): Flag
+    fun flag(name: String, vararg names: String, help: String? = null, disableOption: Boolean = true): Flag
 }

@@ -7,8 +7,8 @@ import net.rubygrapefruit.cli.ArgParseException
  * An [Action] that can be used as the main action for a CLI application.
  */
 open class CliAction(val name: String) : Action() {
-    private val help by simpleFlag("help", help = "Show usage message")
-    private val completion by simpleFlag("completion", help = "Generate ZSH completion script")
+    private val help by boolean().flag("help", help = "Show usage message", disableOption = false)
+    private val completion by boolean().flag("completion", help = "Generate ZSH completion script", disableOption = false)
     private val stackTrace by flag("stack", help = "Show stack trace on failure")
 
     /**

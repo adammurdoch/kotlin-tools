@@ -6,21 +6,19 @@ internal class DefaultFlag private constructor(
     private val enableFlags: List<String>,
     private val disableFlags: List<String>,
     private val help: String?,
-    default: Boolean,
-    private val owner: Action
+    default: Boolean
 ) : NonPositional(), Flag {
     private var value: Boolean = default
 
     override val enableUsage: String
         get() = enableFlags.first()
 
-    constructor(names: List<String>, disableOptions: Boolean, help: String?, host: Host, default: Boolean, owner: Action) :
+    constructor(names: List<String>, disableOptions: Boolean, help: String?, host: Host, default: Boolean) :
             this(
                 names.map { host.option(it) },
                 if (disableOptions) names.mapNotNull { if (it.length == 1) null else host.option("no-$it") } else emptyList(),
                 help,
-                default,
-                owner
+                default
             )
 
     override fun toString(): String {
@@ -29,10 +27,6 @@ internal class DefaultFlag private constructor(
 
     override operator fun getValue(thisRef: Any?, property: KProperty<*>): Boolean {
         return value
-    }
-
-    override fun whenAbsent(default: Boolean): Flag {
-        return owner.replace(this, DefaultFlag(enableFlags, disableFlags, help, default, owner))
     }
 
     override fun usage(): List<OptionUsage> {

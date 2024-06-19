@@ -1,8 +1,8 @@
 - Move usage generation to cli-app
-- Clean up API for `simpleFlag()`
 - Clean up API for `parseAll()` and hide `ParseResult`
 - Clean up usage types.
 - `--help` should group long and short choice flags
+- Model `--help` and `--completion` as actions
 - Help for options, actions, parameters, etc
 - Completion
     - Choice positional parameters and options

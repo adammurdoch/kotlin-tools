@@ -30,8 +30,8 @@ open class Action {
     /**
      * Allows configuration values of type [Boolean] to be added to this action.
      */
-    fun boolean(): ConfigurationBuilder<Boolean> {
-        return DefaultConfigurationBuilder(this, DefaultHost, BooleanConverter)
+    fun boolean(): BooleanConfigurationBuilder {
+        return DefaultBooleanConfigurationBuilder(this, DefaultHost)
     }
 
     /**
@@ -58,30 +58,21 @@ open class Action {
     }
 
     /**
-     * Defines a boolean flag with the given names. Can use `--<name>` or `--no-<name>` to specify the value.
-     * For single character names, use `-<name>` to specify the value.
-     *
-     * The flag can appear anywhere in the command-line. It can be specified multiple times and the last value is used.
-     * Has value `false` when the flag is not present in the input. Use [Flag.whenAbsent] to use a different default.
+     * Defines a boolean flag with the given names. See [BooleanConfigurationBuilder.flag] for more details.
      */
     fun flag(name: String, vararg names: String, help: String? = null): Flag {
-        val allNames = listOf(name) + names.toList()
-        allNames.forEach { DefaultHost.validate(it, "a flag name") }
-
-        val flag = DefaultFlag(allNames, true, help, DefaultHost, false, this)
-        options.add(flag)
-        return flag
+        return boolean().flag(name, *names, help = help)
     }
 
     /**
-     * Defines a parameter with the given name. See [ConfigurationBuilder.parameter] for more details.
+     * Defines a string parameter with the given name. See [ConfigurationBuilder.parameter] for more details.
      */
     fun parameter(name: String, help: String? = null): Parameter<String> {
         return string().parameter(name, help = help)
     }
 
     /**
-     * Defines a multi-value parameter with the given name. See [ConfigurationBuilder.parameters] for more details.
+     * Defines a multi-value string parameter with the given name. See [ConfigurationBuilder.parameters] for more details.
      */
     fun parameters(name: String, help: String? = null): ListParameter<String> {
         return string().parameters(name, help = help)

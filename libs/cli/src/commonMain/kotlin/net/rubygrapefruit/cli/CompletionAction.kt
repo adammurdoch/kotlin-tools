@@ -41,12 +41,8 @@ internal class CompletionAction(val action: MainAction) : Action() {
             when (positional) {
                 is ParameterUsage -> {
                     println(" \\")
-                    print("    '${index + 1}::Parameter:'")
-                    if (positional.path) {
-                        print("_files")
-                    } else {
-                        print("( )")
-                    }
+                    print("    ")
+                    parameter(index, positional)
                 }
 
                 is ActionParameterUsage -> {
@@ -57,9 +53,22 @@ internal class CompletionAction(val action: MainAction) : Action() {
                     println("  case \$line[1] in")
                     for (nested in positional.actions) {
                         println("    ${nested.name})")
+                        print("      _arguments")
                         for (nestedIndex in nested.action.positional.indices) {
-                            println("      _arguments '${nestedIndex + 1}::Param:( )'")
+                            val nestedPositional = nested.action.positional[nestedIndex]
+                            when (nestedPositional) {
+                                is ParameterUsage -> {
+                                    println(" \\")
+                                    print("        ")
+                                    parameter(nestedIndex, nestedPositional)
+                                }
+
+                                is ActionParameterUsage -> {
+                                    break
+                                }
+                            }
                         }
+                        println()
                         println("    ;;")
                     }
                     println("  esac")
@@ -74,5 +83,15 @@ internal class CompletionAction(val action: MainAction) : Action() {
             }
         """.trimIndent()
         )
+    }
+
+    private fun parameter(index: Int, parameter: ParameterUsage) {
+        print("'${index + 1}::Parameter:")
+        if (parameter.path) {
+            print("_files")
+        } else {
+            print("( )")
+        }
+        print("'")
     }
 }

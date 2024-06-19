@@ -13,6 +13,22 @@ class MainActionTest : AbstractActionTest() {
     }
 
     @Test
+    fun `can run --help command when unknown option is used`() {
+        class NoConfig : MainAction("cmd")
+
+        val action = NoConfig().actionFor(listOf("-o", "--help"))
+        assertIs<HelpAction>(action)
+    }
+
+    @Test
+    fun `can run --help command when unknown parameter is used`() {
+        class NoConfig : MainAction("cmd")
+
+        val action = NoConfig().actionFor(listOf("arg", "--help"))
+        assertIs<HelpAction>(action)
+    }
+
+    @Test
     fun `can run --completion command`() {
         class NoConfig : MainAction("cmd")
 

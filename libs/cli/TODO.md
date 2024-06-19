@@ -1,5 +1,4 @@
 - Parameter is one of a set
-- Parameter is zero or more file paths
 - Help for options, actions, parameters, etc
 - Completion
   - File positional parameters

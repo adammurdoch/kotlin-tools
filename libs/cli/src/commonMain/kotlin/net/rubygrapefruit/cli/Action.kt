@@ -79,8 +79,8 @@ open class Action {
      * The parameter must appear at a specific location in the input.
      * Uses an empty list if the parameter is not present in the input. Use [Parameter.whenAbsent] to use a different default.
      */
-    fun parameters(name: String, help: String? = null): ListParameter<String> {
-        val arg = MultiValueParameter(name, help, DefaultHost, this, emptyList(), false)
+    fun parameters(name: String, help: String? = null): StringListParameter {
+        val arg = DefaultStringListParameter(name, help, DefaultHost, this, emptyList(), false)
         positional.add(arg)
         return arg
     }

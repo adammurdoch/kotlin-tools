@@ -5,7 +5,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class FlagAndMultipleParametersTest : AbstractActionTest() {
+class FlagAndListParametersTest : AbstractActionTest() {
     @Test
     fun `can interleave flags and arguments`() {
         class WithParams : Action() {

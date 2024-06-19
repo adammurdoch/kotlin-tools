@@ -3,7 +3,7 @@ package net.rubygrapefruit.cli
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class ListParameterTest : AbstractActionTest() {
+class StringListParameterTest : AbstractActionTest() {
     @Test
     fun `action can have parameter with list value`() {
         class Parameter : Action() {

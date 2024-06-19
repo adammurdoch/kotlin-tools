@@ -15,12 +15,6 @@ sealed interface Parameter<T : Any> {
 }
 
 /**
- * A string parameter.
- */
-interface StringParameter : Parameter<String> {
-}
-
-/**
  * A parameter of type List<T>.
  */
 interface ListParameter<T : Any> : Parameter<List<T>> {
@@ -28,8 +22,4 @@ interface ListParameter<T : Any> : Parameter<List<T>> {
      * Returns a parameter that requires at least one argument.
      */
     fun required(): Parameter<List<T>>
-}
-
-interface StringListParameter : ListParameter<String> {
-    fun path(): ListParameter<FilePath>
 }

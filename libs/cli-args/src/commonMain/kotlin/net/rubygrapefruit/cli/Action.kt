@@ -81,27 +81,17 @@ open class Action {
     }
 
     /**
-     * Defines a parameter with the given name.
-     *
-     * The parameter must appear at a specific location in the input.
-     * Fails if the parameter is not present. Use [Parameter.whenAbsent] to allow the parameter to be missing.
+     * Defines a parameter with the given name. See [ConfigurationBuilder.parameter] for more details.
      */
-    fun parameter(name: String, help: String? = null): StringParameter {
-        val arg = DefaultStringParameter(name, help, null, DefaultHost, this)
-        positional.add(arg)
-        return arg
+    fun parameter(name: String, help: String? = null): Parameter<String> {
+        return string().parameter(name, help = help)
     }
 
     /**
-     * Defines a multi-value parameter with the given name.
-     *
-     * The parameter must appear at a specific location in the input.
-     * Uses an empty list if the parameter is not present in the input. Use [Parameter.whenAbsent] to use a different default.
+     * Defines a multi-value parameter with the given name. See [ConfigurationBuilder.parameters] for more details.
      */
-    fun parameters(name: String, help: String? = null): StringListParameter {
-        val arg = DefaultStringListParameter(name, help, DefaultHost, this, emptyList(), false)
-        positional.add(arg)
-        return arg
+    fun parameters(name: String, help: String? = null): ListParameter<String> {
+        return string().parameters(name, help = help)
     }
 
     /**

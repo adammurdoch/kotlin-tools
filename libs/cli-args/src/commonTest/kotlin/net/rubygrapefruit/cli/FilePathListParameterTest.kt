@@ -7,7 +7,7 @@ class FilePathListParameterTest : AbstractActionTest() {
     @Test
     fun `action can have parameter with list value`() {
         class Parameter : Action() {
-            val param by parameters("value").path()
+            val param by path().parameters("value")
         }
 
         parse(Parameter(), emptyList()) { action ->

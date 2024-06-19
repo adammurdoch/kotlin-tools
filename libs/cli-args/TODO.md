@@ -38,6 +38,37 @@
 - Color output on terminal
 - Fuzzy matching and/or suggestions
 
+string().option("f") -> (-f <value>)? nullable
+int().option("f") -> (-f <value>)? nullable
+path().option("f") -> (-f <value>)? nullable
+boolean().option("f") -> (-f)? nullable
+oneOf { }.option("f) -> (-f <value>)? nullable
+custom().option("f") -> (-f <value>)? nullable
+
+string().option("f").whenAbsent("v") -> (-f <value>)? not-null
+
+convenience:
+option("f") -> string().option("f")
+option("f).whenAbsent("v")
+
+oneOf { }.flags() -> flag, no flag
+boolean().flag("flag") -> flag, no flag
+
+convenience:
+flag("flag") -> boolean.flag("flag")
+
+string().parameter() -> <value> not-null
+int().parameter() -> <value> not-null
+path().parameter() -> <value> not-null
+boolean().parameter() -> <value> not-null
+oneOf { }.parameter() -> <value> not-null
+custom().parameter() -> <value> not-null
+
+string().parameter().whenAbsent("v") -> (<value>) not-null
+
+string().list().parameter() -> <value>*, not-null
+string().list().parameter().required() -> <value>+, not-null
+
 `compinit` - initialise completion
 `compdef <fun> <name>` - use function to complete command or context (e.g. for shell syntax completion) with given name
 - completion context, contains

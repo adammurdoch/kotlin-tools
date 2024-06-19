@@ -1,6 +1,6 @@
 package net.rubygrapefruit.cli
 
-open class TestMainAction(val name: String): Action() {
+open class TestApp(private val name: String) : Action() {
     val help by flag("help", help = "help message")
 
     override fun usage(): ActionUsage {

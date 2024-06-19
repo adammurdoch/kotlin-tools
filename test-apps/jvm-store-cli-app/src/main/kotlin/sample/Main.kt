@@ -1,12 +1,12 @@
 package sample
 
 import net.rubygrapefruit.cli.Action
-import net.rubygrapefruit.cli.app.MainAction
+import net.rubygrapefruit.cli.app.CliAction
 import net.rubygrapefruit.file.fileSystem
 import net.rubygrapefruit.store.ContentVisitor
 import net.rubygrapefruit.store.Store
 
-class StoreApp : MainAction("jvm-store-cli-app") {
+class StoreApp : CliAction("jvm-store-cli-app") {
     private val command by actions {
         action(ContentCommand(), "content", help = "Dump content")
         action(BenchmarkOneValueCommand(), "one-value", help = "Run benchmark for a single value")

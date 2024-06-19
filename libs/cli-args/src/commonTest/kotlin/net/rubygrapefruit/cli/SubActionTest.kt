@@ -203,7 +203,7 @@ class SubActionTest : AbstractActionTest() {
 
     @Test
     fun `can run --help command without providing action`() {
-        class WithSub : TestMainAction("cmd") {
+        class WithSub : TestApp("cmd") {
             val sub by actions {
                 action(Action(), "sub")
             }
@@ -221,7 +221,7 @@ class SubActionTest : AbstractActionTest() {
             val p2 by parameter("p2")
         }
 
-        class WithSub : TestMainAction("cmd") {
+        class WithSub : TestApp("cmd") {
             val sub by actions {
                 action(Sub(), "sub")
             }

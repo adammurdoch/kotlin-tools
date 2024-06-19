@@ -108,7 +108,7 @@ class StringParameterTest : AbstractActionTest() {
 
     @Test
     fun `can run --help command without providing parameter`() {
-        class Parameter : TestMainAction("cmd") {
+        class Parameter : TestApp("cmd") {
             val param by parameter("value")
         }
 

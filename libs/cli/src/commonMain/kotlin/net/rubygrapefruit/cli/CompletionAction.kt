@@ -19,23 +19,7 @@ internal class CompletionAction(val action: MainAction) : Action() {
             """.trimIndent()
         )
         print("  _arguments -C")
-        for (option in usage.options) {
-            for (item in option.items) {
-                println(" \\")
-                if (item.aliases.size == 1) {
-                    print("    '${item.aliases.first()}")
-                    if (item.help != null) {
-                        print("[${item.help}]")
-                    }
-                    print("'")
-                } else {
-                    print("    {${item.aliases.joinToString(",")}}")
-                    if (item.help != null) {
-                        print("'[${item.help}]'")
-                    }
-                }
-            }
-        }
+        options(usage.options, "    ")
         for (index in usage.positional.indices) {
             val positional = usage.positional[index]
             when (positional) {
@@ -54,6 +38,7 @@ internal class CompletionAction(val action: MainAction) : Action() {
                     for (nested in positional.actions) {
                         println("    ${nested.name})")
                         print("      _arguments")
+                        options(nested.action.options, "        ")
                         for (nestedIndex in nested.action.positional.indices) {
                             val nestedPositional = nested.action.positional[nestedIndex]
                             when (nestedPositional) {
@@ -83,6 +68,27 @@ internal class CompletionAction(val action: MainAction) : Action() {
             }
         """.trimIndent()
         )
+    }
+
+    private fun options(options: List<OptionUsage>, indent: String) {
+        for (option in options) {
+            for (item in option.items) {
+                println(" \\")
+                print(indent)
+                if (item.aliases.size == 1) {
+                    print("'${item.aliases.first()}")
+                    if (item.help != null) {
+                        print("[${item.help}]")
+                    }
+                    print("'")
+                } else {
+                    print("{${item.aliases.joinToString(",")}}")
+                    if (item.help != null) {
+                        print("'[${item.help}]'")
+                    }
+                }
+            }
+        }
     }
 
     private fun parameter(index: Int, parameter: ParameterUsage) {

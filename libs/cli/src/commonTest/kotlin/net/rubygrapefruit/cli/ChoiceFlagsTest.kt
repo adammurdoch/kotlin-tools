@@ -5,7 +5,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.fail
 
-class ChoiceTest : AbstractActionTest() {
+class ChoiceFlagsTest : AbstractActionTest() {
     @Test
     fun `can choose one of several values using options with long names`() {
         class Choice : Action() {

@@ -26,3 +26,14 @@ internal object NoOpConverter : StringConverter<String> {
         return Result.success(value)
     }
 }
+
+internal class ChoiceConverter<T>(private val choices: Map<String, ChoiceDetails<T>>) : StringConverter<T> {
+    override fun convert(displayName: String, value: String): Result<T> {
+        val item = choices[value]
+        return if (item == null) {
+            Result.failure(ArgParseException("Unknown value for $displayName: $value"))
+        } else {
+            Result.success(item.value)
+        }
+    }
+}

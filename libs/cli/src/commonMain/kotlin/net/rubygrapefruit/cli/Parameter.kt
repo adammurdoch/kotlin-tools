@@ -17,9 +17,10 @@ sealed interface Parameter<T : Any> {
 /**
  * A string parameter.
  */
-interface StringParameter<T : Any> : Parameter<T> {
+interface StringParameter : Parameter<String> {
     fun int(): Parameter<Int>
     fun path(): Parameter<FilePath>
+    fun <T : Any> oneOf(builder: Action.Choices<T>.() -> Unit): Parameter<T>
 }
 
 /**

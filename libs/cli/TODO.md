@@ -1,10 +1,11 @@
 - Parameter is one of a set
 - Help for options, actions, parameters, etc
 - Completion
-  - File positional parameters
+  - Choice positional parameters
   - Multi-value positional parameters
   - Options with parameter, file and non-file
-  - Action parameters and options
+  - Action options
+  - Global options inside action
 - Optional parameter, eg <choice>? <choice>? 
 - Escape names for completion function, actions, help, etc
 - `--help` shows usage of actions 
@@ -18,9 +19,12 @@
   - Option value badly formed
   - Option value missing
 - Handle required list parameter with default value - disallow? succeed if absent and default provided?
-- Convenience for string or enum choice 
+- parameter().whenAbsent().int() -> what should happen to the default? currently is discarded
 - Option with zero or more values
 - Validate names do not contain spaces
+- Validate at least one action or choice is provided
+- Validate choices do not contain spaces
+- Validate choices are not options
 - Disallow conflicting flags, option and action names, choice flags
 - Disallow any positional parameters after `arguments()`
 - File locations: dir, file, must exist

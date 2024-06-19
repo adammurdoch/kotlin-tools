@@ -56,7 +56,7 @@ open class Action {
     fun <T : Any> oneOf(builder: Choices<T>.() -> Unit): NullableOption<T> {
         val choices = DefaultChoices<T>(DefaultHost)
         builder(choices)
-        val option = DefaultNullableChoice<T>(choices.choices, this)
+        val option = DefaultNullableChoice(choices.choices.mapKeys { DefaultHost.option(it.key) }, this)
         options.add(option)
         return option
     }
@@ -67,7 +67,7 @@ open class Action {
      * The parameter must appear at a specific location in the input.
      * Fails if the parameter is not present. Use [Parameter.whenAbsent] to allow the parameter to be missing.
      */
-    fun parameter(name: String, help: String? = null): StringParameter<String> {
+    fun parameter(name: String, help: String? = null): StringParameter {
         val arg = DefaultStringParameter(name, help, null, DefaultHost, this)
         positional.add(arg)
         return arg
@@ -94,7 +94,7 @@ open class Action {
     fun <T : Action> actions(builder: Actions<T>.() -> Unit): Parameter<T> {
         val actions = DefaultActions<T>(DefaultHost)
         builder(actions)
-        val parameter = DefaultActionParameter<T>(actions.actions, DefaultHost, this, null)
+        val parameter = DefaultActionParameter(actions.actions, DefaultHost, this, null)
         positional.add(parameter)
         return parameter
     }

@@ -1,4 +1,7 @@
-- Parameter is one of a set
+- `--help` should group long and short choice flags
+- Option value is one of a set
+- List of int or choice from a set
+- Split out `MainAction` to separate project, rename
 - Help for options, actions, parameters, etc
 - Completion
   - Choice positional parameters
@@ -22,7 +25,7 @@
 - parameter().whenAbsent().int() -> what should happen to the default? currently is discarded
 - Option with zero or more values
 - Validate names do not contain spaces
-- Validate at least one action or choice is provided
+- Validate at least one action or choice is defined
 - Validate choices do not contain spaces
 - Validate choices are not options
 - Disallow conflicting flags, option and action names, choice flags

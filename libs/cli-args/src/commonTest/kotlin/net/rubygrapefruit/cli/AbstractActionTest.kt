@@ -1,7 +1,7 @@
 package net.rubygrapefruit.cli
 
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
+import kotlin.test.assertIs
 import kotlin.test.fail
 
 abstract class AbstractActionTest {
@@ -24,8 +24,8 @@ abstract class AbstractActionTest {
     }
 
     fun <T : Action> parseRecovers(action: T, args: List<String>, verification: (T) -> Unit) {
-        val result = action.parseAll(args)
-        assertNotNull(result.failure)
+        val result = action.maybeParse(args)
+        assertIs<Action.Failure>(result)
         verification(action)
     }
 }

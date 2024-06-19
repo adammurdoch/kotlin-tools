@@ -89,18 +89,26 @@ open class Action {
     open fun run() {}
 
     /**
-     * Configures this object from the given arguments.
+     * Configures this object from the given arguments, throwing an [ArgParseException] when the arguments could not be parsed.
      */
     @Throws(ArgParseException::class)
     fun parse(args: List<String>) {
-        val result = parseAll(args)
-        if (result.failure != null) {
+        val result = maybeParse(args)
+        if (result is Failure) {
             throw result.failure
         }
     }
 
-    fun parseAll(args: List<String>): ParseResult {
-        return maybeParse(args, RootContext, stopOnFailure = false)
+    /**
+     * Configures this object from the given arguments.
+     */
+    fun maybeParse(args: List<String>): Result {
+        val result = maybeParse(args, RootContext, stopOnFailure = false)
+        return if (result.failure == null) {
+            Success
+        } else {
+            Failure(result.failure)
+        }
     }
 
     internal fun maybeParse(args: List<String>, parent: ParseContext, stopOnFailure: Boolean): ParseResult {
@@ -198,6 +206,10 @@ open class Action {
         positional[positional.indexOf(param)] = newParam
         return newParam
     }
+
+    sealed class Result
+    data object Success : Result()
+    class Failure(val failure: ArgParseException) : Result()
 
     interface Actions<T : Action> {
         fun action(action: T, name: String, help: String? = null)

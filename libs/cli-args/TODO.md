@@ -1,5 +1,4 @@
 - Move usage generation to cli-app
-- Clean up API for `parseAll()` and hide `ParseResult`
 - Clean up usage types.
 - `--help` should group long and short choice flags
 - Model `--help` and `--completion` as actions

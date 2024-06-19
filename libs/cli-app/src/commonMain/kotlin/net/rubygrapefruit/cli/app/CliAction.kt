@@ -45,13 +45,13 @@ open class CliAction(val name: String) : Action() {
     }
 
     internal fun actionFor(args: List<String>): Action {
-        val result = parseAll(args)
+        val result = maybeParse(args)
         return if (help) {
             HelpAction(this)
         } else if (completion) {
             CompletionAction(this)
-        } else if (result.failure != null) {
-            throw result.failure as Throwable
+        } else if (result is Failure) {
+            throw result.failure
         } else {
             this
         }

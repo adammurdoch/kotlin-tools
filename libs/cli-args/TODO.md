@@ -1,3 +1,4 @@
+- Fix completion of path parameters
 - Move usage generation to cli-app
 - Clean up usage types.
 - custom type option, list parameter

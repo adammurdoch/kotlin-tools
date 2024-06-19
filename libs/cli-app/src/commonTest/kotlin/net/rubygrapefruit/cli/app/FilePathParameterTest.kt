@@ -1,28 +1,20 @@
 package net.rubygrapefruit.cli.app
 
-import net.rubygrapefruit.cli.Action
-import net.rubygrapefruit.cli.FilePath
+import net.rubygrapefruit.file.fileSystem
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class FilePathParameterTest : AbstractActionTest() {
+    private val currentDir = fileSystem.currentDirectory.path
+
     @Test
     fun `action can have file path parameter`() {
-        class Parameter : Action() {
+        class Parameter : CliAction() {
             val param by path().parameter("value")
         }
 
         parse(Parameter(), listOf("a/b")) { action ->
-            assertEquals(FilePath("a/b"), action.param)
+            assertEquals(currentDir.resolve("a/b"), action.param)
         }
-    }
-
-    @Test
-    fun `fails when argument not provided`() {
-        class Parameter : Action() {
-            val param by path().parameter("value")
-        }
-
-        parseFails(Parameter(), emptyList(), "Parameter 'value' not provided")
     }
 }

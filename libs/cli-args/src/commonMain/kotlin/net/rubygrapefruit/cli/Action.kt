@@ -46,13 +46,6 @@ open class Action {
     }
 
     /**
-     * Allows configuration values of type [FilePath] to be added to this action.
-     */
-    fun path(): ConfigurationBuilder<FilePath> {
-        return type { FilePath(it) }
-    }
-
-    /**
      * Defines a string option with the given names. See [ConfigurationBuilder.option] for more details.
      */
     fun option(name: String, vararg names: String, help: String? = null): NullableOption<String> {

@@ -1,6 +1,6 @@
 package net.rubygrapefruit.file
 
-internal class WinPath(override val absolutePath: String) : ElementPath {
+internal data class WinPath(override val absolutePath: String) : ElementPath {
     init {
         require(isAbsolute(absolutePath)) { "'$absolutePath' is not absolute" }
     }

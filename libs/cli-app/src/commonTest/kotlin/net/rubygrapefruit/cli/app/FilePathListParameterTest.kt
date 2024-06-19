@@ -1,14 +1,15 @@
 package net.rubygrapefruit.cli.app
 
-import net.rubygrapefruit.cli.Action
-import net.rubygrapefruit.cli.FilePath
+import net.rubygrapefruit.file.fileSystem
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class FilePathListParameterTest : AbstractActionTest() {
+    private val currentDir = fileSystem.currentDirectory.path
+
     @Test
     fun `action can have parameter with list value`() {
-        class Parameter : Action() {
+        class Parameter : CliAction() {
             val param by path().parameters("value")
         }
 
@@ -16,10 +17,10 @@ class FilePathListParameterTest : AbstractActionTest() {
             assertEquals(emptyList(), action.param)
         }
         parse(Parameter(), listOf("abc")) { action ->
-            assertEquals(listOf(FilePath("abc")), action.param)
+            assertEquals(listOf(currentDir.resolve("abc")), action.param)
         }
         parse(Parameter(), listOf("a", "b", "c")) { action ->
-            assertEquals(listOf(FilePath("a"), FilePath("b"), FilePath("c")), action.param)
+            assertEquals(listOf(currentDir.resolve("a"), currentDir.resolve("b"), currentDir.resolve("c")), action.param)
         }
     }
 }

@@ -1,6 +1,6 @@
 package net.rubygrapefruit.file
 
-internal class AbsolutePath(override val absolutePath: String) : ElementPath {
+internal data class AbsolutePath(override val absolutePath: String) : ElementPath {
     init {
         require(absolutePath.startsWith("/"))
     }

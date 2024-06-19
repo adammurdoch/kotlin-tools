@@ -4,7 +4,7 @@ import java.nio.file.Path
 import kotlin.io.path.name
 import kotlin.io.path.pathString
 
-internal class JvmElementPath(val delegate: Path) : ElementPath {
+internal data class JvmElementPath(val delegate: Path) : ElementPath {
     override fun toString(): String {
         return absolutePath
     }

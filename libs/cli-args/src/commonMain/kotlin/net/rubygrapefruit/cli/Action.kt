@@ -28,6 +28,15 @@ open class Action {
     }
 
     /**
+     * Allows configuration values of type [T] to be added to this action.
+     */
+    fun <T : Any> oneOf(builder: Choices<T>.() -> Unit): ConfigurationBuilder<T> {
+        val choices = DefaultChoices<T>(DefaultHost)
+        builder(choices)
+        return DefaultConfigurationBuilder(this, DefaultHost, ChoiceConverter(choices.choices))
+    }
+
+    /**
      * Allows configuration values of type [FilePath] to be added to this action.
      */
     fun path(): ConfigurationBuilder<FilePath> {
@@ -67,7 +76,7 @@ open class Action {
      * The flags can appear anywhere in the input. They can be specified multiple times and the last value is used.
      * Has value `null` then none of the flags is present in the input. Use [NullableOption.whenAbsent] to use a different default.
      */
-    fun <T : Any> oneOf(builder: Choices<T>.() -> Unit): NullableOption<T> {
+    fun <T : Any> oneOfFlag(builder: Choices<T>.() -> Unit): NullableOption<T> {
         val choices = DefaultChoices<T>(DefaultHost)
         builder(choices)
         val option = DefaultNullableChoice(choices.choices.mapKeys { DefaultHost.option(it.key) }, this)

@@ -113,12 +113,12 @@ class ActionUsageTest {
     @Test
     fun `formats action with multiple choices`() {
         class Options : TestApp("cmd") {
-            val c1 by oneOf {
+            val c1 by oneOfFlag {
                 choice(1, "1", help = "select 1")
                 choice(2, "two")
                 choice(12, "12", help = "select 12")
             }
-            val c2 by oneOf {
+            val c2 by oneOfFlag {
                 choice("a", "a", help = "select a")
                 choice("b", "long")
                 choice("c", "other", help = "select c")

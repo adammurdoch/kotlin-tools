@@ -9,7 +9,7 @@ class ChoiceFlagsTest : AbstractActionTest() {
     @Test
     fun `can choose one of several values using options with long names`() {
         class Choice : Action() {
-            val selected by oneOf {
+            val selected by oneOfFlag {
                 choice(1, "one")
                 choice(2, "two")
                 choice(3, "three")
@@ -32,7 +32,7 @@ class ChoiceFlagsTest : AbstractActionTest() {
     @Test
     fun `can choose one of several values using options with short names`() {
         class Choice : Action() {
-            val selected by oneOf {
+            val selected by oneOfFlag {
                 choice(1, "1")
                 choice(2, "2")
                 choice(3, "3")
@@ -55,7 +55,7 @@ class ChoiceFlagsTest : AbstractActionTest() {
     @Test
     fun `can define multiple names for choice item`() {
         class Choice : Action() {
-            val selected by oneOf {
+            val selected by oneOfFlag {
                 choice(1, "1", "one")
                 choice(2, "two")
                 choice(3, "three")
@@ -76,7 +76,7 @@ class ChoiceFlagsTest : AbstractActionTest() {
     @Test
     fun `can provide default value for choice`() {
         class Choice : Action() {
-            val selected by oneOf {
+            val selected by oneOfFlag {
                 choice(1, "1")
                 choice(2, "2")
                 choice(3, "3")
@@ -95,7 +95,7 @@ class ChoiceFlagsTest : AbstractActionTest() {
     @Test
     fun `value is null when flags are not present`() {
         class Choice : Action() {
-            val selected by oneOf {
+            val selected by oneOfFlag {
                 choice(1, "1")
                 choice(2, "2")
                 choice(3, "3")
@@ -110,7 +110,7 @@ class ChoiceFlagsTest : AbstractActionTest() {
     @Test
     fun `flag can appear multiple times`() {
         class Choice : Action() {
-            val selected by oneOf {
+            val selected by oneOfFlag {
                 choice(1, "1", "one")
                 choice(2, "2")
                 choice(3, "3")
@@ -124,7 +124,7 @@ class ChoiceFlagsTest : AbstractActionTest() {
     @Test
     fun `can override value with multiple flags`() {
         class Choice : Action() {
-            val selected by oneOf {
+            val selected by oneOfFlag {
                 choice(1, "1")
                 choice(2, "2", "two")
                 choice(3, "3")
@@ -145,7 +145,7 @@ class ChoiceFlagsTest : AbstractActionTest() {
     @Test
     fun `name must not start with punctuation`() {
         class Broken1 : Action() {
-            val sub by oneOf {
+            val sub by oneOfFlag {
                 choice(1, "--one")
             }
         }
@@ -156,7 +156,7 @@ class ChoiceFlagsTest : AbstractActionTest() {
             assertEquals("--one cannot be used as an option name", e.message)
         }
         class Broken2 : Action() {
-            val sub by oneOf {
+            val sub by oneOfFlag {
                 choice(1, "one", "-1")
             }
         }

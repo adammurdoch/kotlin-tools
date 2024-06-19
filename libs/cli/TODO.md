@@ -27,9 +27,6 @@
 - Color output on terminal
 - Fuzzy matching and/or suggestions
 
-- when top level, keep going to end --unknown unknown --help
-- when nested, stop once cannot match something cmd --unknown --help
-
 `compinit` - initialise completion
 `compdef <fun> <name>` - use function to complete command or context (e.g. for shell syntax completion) with given name
 - completion context, contains

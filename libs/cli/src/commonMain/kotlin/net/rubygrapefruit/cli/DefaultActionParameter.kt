@@ -39,7 +39,7 @@ internal class DefaultActionParameter<T : Action>(
     }
 
     override fun usage(): PositionalUsage {
-        return PositionalUsage("<action>", "<action>", null, actionInfo)
+        return ActionParameterUsage("<action>", "<action>", null, actionInfo)
     }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T {

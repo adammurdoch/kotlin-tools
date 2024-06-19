@@ -14,7 +14,8 @@ internal class CompletionAction(val action: MainAction) : Action() {
             compdef $functionName ${usage.appName}
 
             function $functionName() {
-              local line                
+                local context state state_descr line
+                typeset -A opt_args
             """.trimIndent()
         )
         print("  _arguments -C")
@@ -37,23 +38,34 @@ internal class CompletionAction(val action: MainAction) : Action() {
         }
         for (index in usage.positional.indices) {
             val positional = usage.positional[index]
-            if (positional.actions.isEmpty()) {
-                println(" \\")
-                print("    '${index + 1}::Parameter:( )'")
-            } else {
-                println(" \\")
-                println("    '${index + 1}::Action:(${positional.actions.joinToString(" ") { it.name }})' \\")
-                println("    '*::arg:->args'")
-
-                println("  case \$line[1] in")
-                for (nested in positional.actions) {
-                    println("    ${nested.name})")
-                    println("      _arguments '1::Param:(one two)'")
-                    println("    ;;")
+            when (positional) {
+                is ParameterUsage -> {
+                    println(" \\")
+                    print("    '${index + 1}::Parameter:'")
+                    if (positional.path) {
+                        print("_files")
+                    } else {
+                        print("( )")
+                    }
                 }
-                println("  esac")
 
-                break
+                is ActionParameterUsage -> {
+                    println(" \\")
+                    println("    '${index + 1}::Action:(${positional.actions.joinToString(" ") { it.name }})' \\")
+                    println("    '*::arg:->args'")
+
+                    println("  case \$line[1] in")
+                    for (nested in positional.actions) {
+                        println("    ${nested.name})")
+                        for (nestedIndex in nested.action.positional.indices) {
+                            println("      _arguments '${nestedIndex + 1}::Param:( )'")
+                        }
+                        println("    ;;")
+                    }
+                    println("  esac")
+
+                    break
+                }
             }
         }
         println()

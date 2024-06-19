@@ -20,10 +20,10 @@ class StoreApp : MainAction("jvm-store-cli-app") {
 }
 
 abstract class AbstractStoreCommand() : Action() {
-    private val store by parameter("store", help = "The store to use")
+    private val store by parameter("store", help = "The store to use").path()
 
     override fun run() {
-        val dir = fileSystem.currentDirectory.dir(store)
+        val dir = fileSystem.currentDirectory.dir(store.path)
         Store.open(dir, discard = discard).use {
             run(it)
         }

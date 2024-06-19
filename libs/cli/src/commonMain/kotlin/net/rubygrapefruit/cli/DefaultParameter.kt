@@ -21,7 +21,7 @@ internal open class DefaultParameter<T : Any>(
     }
 
     override fun usage(): PositionalUsage {
-        return PositionalUsage("<$name>", help)
+        return ParameterUsage("<$name>", help, converter == FilePathConverter)
     }
 
     override fun accept(args: List<String>, context: ParseContext): ParseResult {

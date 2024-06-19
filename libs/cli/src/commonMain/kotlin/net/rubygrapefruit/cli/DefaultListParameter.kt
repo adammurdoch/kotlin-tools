@@ -30,7 +30,7 @@ internal open class DefaultListParameter<T : Any>(
     }
 
     override fun usage(): PositionalUsage {
-        return PositionalUsage("<$name>...", "<$name>", help, emptyList())
+        return ParameterUsage("<$name>...", "<$name>", help, converter == FilePathConverter)
     }
 
     override fun accept(args: List<String>, context: ParseContext): ParseResult {

@@ -8,23 +8,25 @@
 - Split out `MainAction` to separate project, rename
 - Help for options, actions, parameters, etc
 - Completion
-  - Choice positional parameters
-  - Multi-value positional parameters
-  - Options with parameter, file and non-file
-  - Action options
-  - Global options inside action
-- Optional parameter, eg <choice>? <choice>? 
+    - Choice positional parameters and options
+    - Boolean positional parameters and options
+    - Multi-value positional parameters
+    - Options with parameter, file and non-file
+    - Action options
+    - Global options inside action
+- Optional parameter, eg <choice>? <choice>?
 - Escape names for completion function, actions, help, etc
-- `--help` shows usage of actions 
+- `--help` shows usage of actions
 - Usage sorts options using name, rather than `--name` or `-n`
 - Usage message on parse error
-  - Suggest `--help` 
-  - Unknown option - show available options
-  - Unknown option for sub-command - show available options
-  - Argument not provided
-  - Too many arguments
-  - Option value badly formed
-  - Option value missing
+    - Suggest `--help`
+    - Unknown option - show available options
+    - Unknown option for sub-command - show available options
+    - Argument not provided
+    - Too many arguments
+    - Option value badly formed
+    - Parameter value badly formed
+    - Option value missing
 - Handle required list parameter with default value - disallow? succeed if absent and default provided?
 - parameter().whenAbsent().int() -> what should happen to the default? currently is discarded
 - Option with zero or more values
@@ -73,21 +75,22 @@ string().list().parameter().required() -> <value>+, not-null
 
 `compinit` - initialise completion
 `compdef <fun> <name>` - use function to complete command or context (e.g. for shell syntax completion) with given name
+
 - completion context, contains
-  - first field is `completion` 
-  - completer function that controls completion
-  - command or context
-  - argument number being completed
-  - tag (type of value being completed)
+    - first field is `completion`
+    - completer function that controls completion
+    - command or context
+    - argument number being completed
+    - tag (type of value being completed)
 - pressing ^x h shows context and tags at current position
 - completion process
-  - creates blank context, progressively fills it in
-  - for sub-commands, can apparently change the "command" field in the context to a new name to do completion for the sub-command
-  - use styles to match against the context
+    - creates blank context, progressively fills it in
+    - for sub-commands, can apparently change the "command" field in the context to a new name to do completion for the sub-command
+    - use styles to match against the context
 - standard tags
-  - `arguments`, `options`
-  - `commands` - can be used for subcommands?
-  - `files`, `directories`
+    - `arguments`, `options`
+    - `commands` - can be used for subcommands?
+    - `files`, `directories`
 - utility functions
-  - wrappers around `compadd` built-in (https://zsh.sourceforge.io/Doc/Release/Completion-Widgets.html#Completion-Widgets) 
-  - `_arguments`
+    - wrappers around `compadd` built-in (https://zsh.sourceforge.io/Doc/Release/Completion-Widgets.html#Completion-Widgets)
+    - `_arguments`

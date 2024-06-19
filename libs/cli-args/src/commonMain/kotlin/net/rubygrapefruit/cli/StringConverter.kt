@@ -15,6 +15,16 @@ internal object IntConverter : StringConverter<Int> {
     }
 }
 
+internal object BooleanConverter : StringConverter<Boolean> {
+    override fun convert(displayName: String, value: String): Result<Boolean> {
+        return when (value) {
+            "yes" -> Result.success(true)
+            "no" -> Result.success(false)
+            else -> Result.failure(ArgParseException("Unknown value for $displayName: $value"))
+        }
+    }
+}
+
 internal object FilePathConverter : StringConverter<FilePath> {
     override fun convert(displayName: String, value: String): Result<FilePath> {
         return Result.success(FilePath(value))

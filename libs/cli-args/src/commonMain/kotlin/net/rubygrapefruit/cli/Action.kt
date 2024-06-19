@@ -28,6 +28,13 @@ open class Action {
     }
 
     /**
+     * Allows configuration values of type [Boolean] to be added to this action.
+     */
+    fun boolean(): ConfigurationBuilder<Boolean> {
+        return DefaultConfigurationBuilder(this, DefaultHost, BooleanConverter)
+    }
+
+    /**
      * Allows configuration values of type [T] to be added to this action.
      */
     fun <T : Any> oneOf(builder: Choices<T>.() -> Unit): MappingConfigurationBuilder<T> {

@@ -9,3 +9,4 @@ Adds support for:
 - ZSH command-line completion
 - Process exit code on success or failure
 - Show or hide stack traces on failure
+- File and directory parameters

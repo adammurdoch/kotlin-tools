@@ -1,5 +1,7 @@
-package net.rubygrapefruit.cli
+package net.rubygrapefruit.cli.app
 
+import net.rubygrapefruit.cli.Action
+import net.rubygrapefruit.cli.FilePath
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -24,8 +26,8 @@ class FilePathOptionTest : AbstractActionTest() {
             val option by path().option("o")
         }
 
-        parse(Option(), listOf("-o", "..")) { action ->
-            assertEquals(FilePath(".."), action.option)
+        parse(Option(), listOf("-o", "")) { action ->
+            assertEquals(FilePath(""), action.option)
         }
 
         parseFails(Option(), listOf("--o"), "Unknown option: --o")

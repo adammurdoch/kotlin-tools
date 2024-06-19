@@ -11,8 +11,10 @@ library {
     nativeDesktop()
     test {
         implementation(kotlin("test"))
+        implementation(project(":file-fixtures"))
     }
     common {
+        api(project(":file-io"))
         api(project(":cli-args"))
     }
 }

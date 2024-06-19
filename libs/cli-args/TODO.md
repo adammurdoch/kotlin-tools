@@ -1,5 +1,6 @@
 - Move usage generation to cli-app
 - Clean up usage types.
+- custom type option, list parameter
 - `--help` should group long and short choice flags
 - Model `--help` and `--completion` as actions
 - Help for options, actions, parameters, etc

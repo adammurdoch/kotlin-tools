@@ -5,7 +5,7 @@ import net.rubygrapefruit.cli.ActionParameterUsage
 import net.rubygrapefruit.cli.OptionUsage
 import net.rubygrapefruit.cli.ParameterUsage
 
-internal class CompletionAction(val action: CliAction) : Action() {
+internal class CompletionAction(val action: CliApp) : Action() {
     override fun run() {
         val usage = action.usage()
         if (usage.appName == null) {

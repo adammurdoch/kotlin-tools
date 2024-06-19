@@ -1,5 +1,7 @@
-package net.rubygrapefruit.cli
+package net.rubygrapefruit.cli.app
 
+import net.rubygrapefruit.cli.Action
+import net.rubygrapefruit.cli.FilePath
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

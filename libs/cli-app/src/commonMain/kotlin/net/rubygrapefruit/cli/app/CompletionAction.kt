@@ -107,10 +107,11 @@ internal class CompletionAction(val action: CliApp) : Action() {
     }
 
     private fun parameter(index: Int, parameter: ParameterUsage) {
+        print("'")
         if (parameter.multiple) {
-            print("*::Parameter:")
+            print("*:Parameter:")
         } else {
-            print("'${index + 1}::Parameter:")
+            print("${index + 1}:Parameter:")
         }
         if (parameter.type == ElementPath::class || parameter.type == Directory::class) {
             print("_files")

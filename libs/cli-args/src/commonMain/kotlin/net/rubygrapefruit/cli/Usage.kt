@@ -1,5 +1,7 @@
 package net.rubygrapefruit.cli
 
+import kotlin.reflect.KClass
+
 class ActionUsage(
     val appName: String?,
     val options: List<OptionUsage>,
@@ -57,9 +59,9 @@ class ParameterUsage(
     usage: String,
     display: String,
     help: String?,
-    val path: Boolean
+    val type: KClass<*>
 ) : PositionalUsage(usage, display, help) {
-    constructor(usage: String, help: String?, path: Boolean) : this(usage, usage, help, path)
+    constructor(usage: String, help: String?, type: KClass<*>) : this(usage, usage, help, type)
 }
 
 class ActionParameterUsage(

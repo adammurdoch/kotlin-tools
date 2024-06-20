@@ -4,6 +4,7 @@ import net.rubygrapefruit.cli.Action
 import net.rubygrapefruit.cli.ActionParameterUsage
 import net.rubygrapefruit.cli.OptionUsage
 import net.rubygrapefruit.cli.ParameterUsage
+import net.rubygrapefruit.file.ElementPath
 
 internal class CompletionAction(val action: CliApp) : Action() {
     override fun run() {
@@ -96,7 +97,7 @@ internal class CompletionAction(val action: CliApp) : Action() {
 
     private fun parameter(index: Int, parameter: ParameterUsage) {
         print("'${index + 1}::Parameter:")
-        if (parameter.path) {
+        if (parameter.type == ElementPath::class) {
             print("_files")
         } else {
             print("( )")

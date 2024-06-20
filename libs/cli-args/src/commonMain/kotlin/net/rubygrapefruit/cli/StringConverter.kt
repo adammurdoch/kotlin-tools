@@ -3,7 +3,7 @@ package net.rubygrapefruit.cli
 import kotlin.reflect.KClass
 
 internal interface StringConverter<T : Any> {
-    val type: KClass<T>?
+    val type: KClass<T>
     fun convert(displayName: String, value: String): Result<T>
 }
 

@@ -29,7 +29,7 @@ class DirectoryParameterTest : AbstractActionTest() {
             val param by dir().parameter("value")
         }
 
-        parseFails(Parameter(), listOf(file.absolutePath), "Unknown value for parameter 'value': $file")
+        parseFails(Parameter(), listOf(file.absolutePath), "Value for parameter 'value' is not a directory: $file")
     }
 
     @Test
@@ -42,6 +42,6 @@ class DirectoryParameterTest : AbstractActionTest() {
             val param by dir().parameter("value")
         }
 
-        parseFails(Parameter(), listOf(file.absolutePath), "Unknown value for parameter 'value': $file")
+        parseFails(Parameter(), listOf(file.absolutePath), "Value for parameter 'value' is not a directory: $file")
     }
 }

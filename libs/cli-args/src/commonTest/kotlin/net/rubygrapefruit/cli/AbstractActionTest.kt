@@ -25,7 +25,7 @@ abstract class AbstractActionTest {
 
     fun <T : Action> parseRecovers(action: T, args: List<String>, verification: (T) -> Unit) {
         val result = action.maybeParse(args)
-        assertIs<Action.Failure>(result)
+        assertIs<Action.Result.Failure>(result)
         verification(action)
     }
 }

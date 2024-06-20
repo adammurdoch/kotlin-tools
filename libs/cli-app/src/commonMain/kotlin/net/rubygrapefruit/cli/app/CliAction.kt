@@ -12,7 +12,7 @@ open class CliAction : Action() {
      * Allows configuration values of type [ElementPath] to be added to this action.
      */
     fun path(): ConfigurationBuilder<ElementPath> {
-        return type { path -> fileSystem.currentDirectory.path.resolve(path) }
+        return type { path -> ConversionResult.Success(fileSystem.currentDirectory.path.resolve(path)) }
     }
 
     /**
@@ -24,9 +24,9 @@ open class CliAction : Action() {
         return type { path ->
             val dir = fileSystem.currentDirectory.dir(path)
             if (dir.metadata().directory) {
-                dir
+                ConversionResult.Success(dir)
             } else {
-                null
+                ConversionResult.Failure("is not a directory")
             }
         }
     }

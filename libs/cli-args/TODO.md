@@ -1,4 +1,3 @@
-- Directory type, must exist as directory, with completion. Use in test app
 - Improve failure message when directory does not exist or is not directory
 - Move usage generation to cli-app
 - Clean up usage types.

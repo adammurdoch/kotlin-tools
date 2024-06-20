@@ -52,7 +52,7 @@ open class CliApp(val name: String) : CliAction() {
             HelpAction(this)
         } else if (completion) {
             CompletionAction(this)
-        } else if (result is Failure) {
+        } else if (result is Result.Failure) {
             throw result.failure
         } else {
             this

@@ -50,7 +50,7 @@ open class Action {
      * Allows configuration values of type [T] to be added to this action.
      * Uses the provided function to convert from string values to [T]
      */
-    fun <T : Any> type(type: KClass<T>, converter: (String) -> T?): ConfigurationBuilder<T> {
+    fun <T : Any> type(type: KClass<T>, converter: (String) -> ConversionResult<T>): ConfigurationBuilder<T> {
         return DefaultConfigurationBuilder(this, DefaultHost, MappingConverter(type, converter))
     }
 
@@ -58,7 +58,7 @@ open class Action {
      * Allows configuration values of type [T] to be added to this action.
      * Uses the provided function to convert from string values to [T]
      */
-    inline fun <reified T : Any> type(noinline converter: (String) -> T?): ConfigurationBuilder<T> {
+    inline fun <reified T : Any> type(noinline converter: (String) -> ConversionResult<T>): ConfigurationBuilder<T> {
         return type(T::class, converter)
     }
 
@@ -112,7 +112,7 @@ open class Action {
     @Throws(ArgParseException::class)
     fun parse(args: List<String>) {
         val result = maybeParse(args)
-        if (result is Failure) {
+        if (result is Result.Failure) {
             throw result.failure
         }
     }
@@ -123,9 +123,9 @@ open class Action {
     fun maybeParse(args: List<String>): Result {
         val result = maybeParse(args, RootContext, stopOnFailure = false)
         return if (result.failure == null) {
-            Success
+            Result.Success
         } else {
-            Failure(result.failure)
+            Result.Failure(result.failure)
         }
     }
 
@@ -225,9 +225,15 @@ open class Action {
         return newParam
     }
 
-    sealed class Result
-    data object Success : Result()
-    data class Failure(val failure: ArgParseException) : Result()
+    sealed class Result {
+        data object Success : Result()
+        data class Failure(val failure: ArgParseException) : Result()
+    }
+
+    sealed class ConversionResult<out T> {
+        data class Success<T>(val value: T) : ConversionResult<T>()
+        data class Failure<T>(val problem: String) : ConversionResult<T>()
+    }
 
     interface Actions<T : Action> {
         fun action(action: T, name: String, help: String? = null)

@@ -32,6 +32,9 @@ internal class CompletionAction(val action: CliApp) : Action() {
                     println(" \\")
                     print("    ")
                     parameter(index, positional)
+                    if (positional.multiple) {
+                        break
+                    }
                 }
 
                 is ActionParameterUsage -> {
@@ -51,6 +54,9 @@ internal class CompletionAction(val action: CliApp) : Action() {
                                     println(" \\")
                                     print("        ")
                                     parameter(nestedIndex, nestedPositional)
+                                    if (nestedPositional.multiple) {
+                                        break
+                                    }
                                 }
 
                                 is ActionParameterUsage -> {
@@ -85,19 +91,27 @@ internal class CompletionAction(val action: CliApp) : Action() {
                     if (item.help != null) {
                         print("[${item.help}]")
                     }
-                    print("'")
                 } else {
                     print("{${item.aliases.joinToString(",")}}")
+                    print("'")
                     if (item.help != null) {
-                        print("'[${item.help}]'")
+                        print("[${item.help}]")
                     }
                 }
+                if (option.type != null) {
+                    print(":Argument:( )")
+                }
+                print("'")
             }
         }
     }
 
     private fun parameter(index: Int, parameter: ParameterUsage) {
-        print("'${index + 1}::Parameter:")
+        if (parameter.multiple) {
+            print("*::Parameter:")
+        } else {
+            print("'${index + 1}::Parameter:")
+        }
         if (parameter.type == ElementPath::class || parameter.type == Directory::class) {
             print("_files")
         } else {

@@ -1,5 +1,7 @@
 package net.rubygrapefruit.cli
 
+import kotlin.reflect.KClass
+
 internal open class DefaultNullableOption<T : Any>(
     names: List<String>,
     help: String?,
@@ -7,9 +9,13 @@ internal open class DefaultNullableOption<T : Any>(
     private val owner: Action,
     private val converter: StringConverter<T>,
 ) : AbstractOption<T?>(names, help, host), NullableOption<T> {
+
     override fun whenAbsent(default: T): Option<T> {
         return owner.replace(this, DefaultOption(names, help, default, host, converter))
     }
+
+    override val type: KClass<*>
+        get() = converter.type
 
     override fun convert(flag: String, arg: String?): Result<T?> {
         return if (arg == null) {

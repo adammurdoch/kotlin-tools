@@ -6,7 +6,7 @@ internal class DefaultChoice<T : Any>(private val choices: Map<String, ChoiceDet
     private var value: T? = null
 
     override fun usage(): List<OptionUsage> {
-        return choices.map { OptionUsage(it.key, it.value.help, listOf(SingleOptionUsage(it.key, it.value.help, listOf(it.key)))) }
+        return choices.map { OptionUsage(it.key, it.value.help, null, listOf(SingleOptionUsage(it.key, it.value.help, listOf(it.key)))) }
     }
 
     override fun accept(args: List<String>): ParseResult {

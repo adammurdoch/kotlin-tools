@@ -34,7 +34,7 @@ internal class DefaultFlag private constructor(
         val disableUsage = if (disableFlags.isNotEmpty()) listOf(SingleOptionUsage(disableFlags.joinToString(", "), null, disableFlags)) else emptyList()
         val usage = (enableFlags + disableFlags).joinToString(", ")
         return listOf(
-            OptionUsage(usage, help, enableUsage + disableUsage)
+            OptionUsage(usage, help, null, enableUsage + disableUsage)
         )
     }
 

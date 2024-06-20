@@ -42,6 +42,10 @@ class SingleOptionUsage(val usage: String, val help: String?, val aliases: List<
 class OptionUsage(
     override val display: String,
     help: String?,
+    /**
+     * The argument type.
+     */
+    val type: KClass<*>?,
     val items: List<SingleOptionUsage>
 ) : ItemUsage(help)
 
@@ -52,16 +56,16 @@ sealed class PositionalUsage(
     val usage: String,
     override val display: String,
     help: String?,
-) : ItemUsage(help) {
-}
+) : ItemUsage(help)
 
 class ParameterUsage(
     usage: String,
     display: String,
     help: String?,
-    val type: KClass<*>
+    val type: KClass<*>,
+    val multiple: Boolean
 ) : PositionalUsage(usage, display, help) {
-    constructor(usage: String, help: String?, type: KClass<*>) : this(usage, usage, help, type)
+    constructor(usage: String, help: String?, type: KClass<*>) : this(usage, usage, help, type, false)
 }
 
 class ActionParameterUsage(

@@ -19,8 +19,8 @@ internal class CompletionAction(val action: CliApp) : Action() {
             compdef $functionName $appName
 
             function $functionName() {
-                local context state state_descr line
-                typeset -A opt_args
+              local context state state_descr line
+              typeset -A opt_args
             """.trimIndent()
         )
         print("  _arguments -C")

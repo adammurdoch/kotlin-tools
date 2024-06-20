@@ -1,5 +1,7 @@
 package net.rubygrapefruit.cli
 
+import kotlin.reflect.KClass
+
 /**
  * An action that can be configured using command-line arguments.
  */
@@ -31,18 +33,33 @@ open class Action {
     /**
      * Allows configuration values of type [T] to be added to this action.
      */
-    fun <T : Any> oneOf(builder: Choices<T>.() -> Unit): MappingConfigurationBuilder<T> {
+    fun <T : Any> oneOf(type: KClass<T>, builder: Choices<T>.() -> Unit): MappingConfigurationBuilder<T> {
         val choices = DefaultChoices<T>(DefaultHost)
         builder(choices)
-        return DefaultMappingConfigurationBuilder(this, DefaultHost, ChoiceConverter(choices.choices))
+        return DefaultMappingConfigurationBuilder(this, DefaultHost, ChoiceConverter(type, choices.choices))
+    }
+
+    /**
+     * Allows configuration values of type [T] to be added to this action.
+     */
+    inline fun <reified T : Any> oneOf(noinline builder: Choices<T>.() -> Unit): MappingConfigurationBuilder<T> {
+        return oneOf(T::class, builder)
     }
 
     /**
      * Allows configuration values of type [T] to be added to this action.
      * Uses the provided function to convert from string values to [T]
      */
-    fun <T : Any> type(converter: (String) -> T?): ConfigurationBuilder<T> {
-        return DefaultConfigurationBuilder(this, DefaultHost, MappingConverter(converter))
+    fun <T : Any> type(type: KClass<T>, converter: (String) -> T?): ConfigurationBuilder<T> {
+        return DefaultConfigurationBuilder(this, DefaultHost, MappingConverter(type, converter))
+    }
+
+    /**
+     * Allows configuration values of type [T] to be added to this action.
+     * Uses the provided function to convert from string values to [T]
+     */
+    inline fun <reified T : Any> type(noinline converter: (String) -> T?): ConfigurationBuilder<T> {
+        return type(T::class, converter)
     }
 
     /**

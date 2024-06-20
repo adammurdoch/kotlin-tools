@@ -1,10 +1,16 @@
 package net.rubygrapefruit.cli
 
-internal interface StringConverter<T> {
+import kotlin.reflect.KClass
+
+internal interface StringConverter<T : Any> {
+    val type: KClass<T>?
     fun convert(displayName: String, value: String): Result<T>
 }
 
 internal object IntConverter : StringConverter<Int> {
+    override val type: KClass<Int>
+        get() = Int::class
+
     override fun convert(displayName: String, value: String): Result<Int> {
         val converted = value.toIntOrNull()
         return if (converted == null) {
@@ -16,6 +22,9 @@ internal object IntConverter : StringConverter<Int> {
 }
 
 internal object BooleanConverter : StringConverter<Boolean> {
+    override val type: KClass<Boolean>
+        get() = Boolean::class
+
     override fun convert(displayName: String, value: String): Result<Boolean> {
         return when (value) {
             "yes" -> Result.success(true)
@@ -26,12 +35,15 @@ internal object BooleanConverter : StringConverter<Boolean> {
 }
 
 internal object NoOpConverter : StringConverter<String> {
+    override val type: KClass<String>
+        get() = String::class
+
     override fun convert(displayName: String, value: String): Result<String> {
         return Result.success(value)
     }
 }
 
-internal class ChoiceConverter<T>(val choices: Map<String, ChoiceDetails<T>>) : StringConverter<T> {
+internal class ChoiceConverter<T : Any>(override val type: KClass<T>, val choices: Map<String, ChoiceDetails<T>>) : StringConverter<T> {
     override fun convert(displayName: String, value: String): Result<T> {
         val item = choices[value]
         return if (item == null) {
@@ -42,7 +54,7 @@ internal class ChoiceConverter<T>(val choices: Map<String, ChoiceDetails<T>>) : 
     }
 }
 
-internal class MappingConverter<T>(val converter: (String) -> T?) : StringConverter<T> {
+internal class MappingConverter<T : Any>(override val type: KClass<T>, val converter: (String) -> T?) : StringConverter<T> {
     override fun convert(displayName: String, value: String): Result<T> {
         val result = converter(value)
         return if (result == null) {

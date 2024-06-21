@@ -1,6 +1,6 @@
 # CLI Application library
 
-A small framework to help implement a CLI application, for JVM, macOS, Linux and Windows. 
+A small framework to help implement a CLI application, for JVM 11+, macOS, Linux and Windows. 
 
 Adds support for:
 

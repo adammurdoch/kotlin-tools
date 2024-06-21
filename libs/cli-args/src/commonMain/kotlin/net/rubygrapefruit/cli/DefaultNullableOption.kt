@@ -1,27 +1,20 @@
 package net.rubygrapefruit.cli
 
-import kotlin.reflect.KClass
+import kotlin.reflect.KProperty
 
-internal open class DefaultNullableOption<T : Any>(
+internal class DefaultNullableOption<T : Any>(
     names: List<String>,
     help: String?,
     private val host: Host,
     private val owner: Action,
-    private val converter: StringConverter<T>,
-) : AbstractOption<T?>(names, help, host), NullableOption<T> {
+    converter: StringConverter<T>,
+) : AbstractOption<T>(names, help, host, converter), NullableOption<T> {
 
     override fun whenAbsent(default: T): Option<T> {
         return owner.replace(this, DefaultOption(names, help, default, host, converter))
     }
 
-    override val type: KClass<*>
-        get() = converter.type
-
-    override fun convert(flag: String, arg: String?): Result<T?> {
-        return if (arg == null) {
-            Result.success(null)
-        } else {
-            converter.convert("option $flag", arg)
-        }
+    override fun getValue(thisRef: Any?, property: KProperty<*>): T? {
+        return value
     }
 }

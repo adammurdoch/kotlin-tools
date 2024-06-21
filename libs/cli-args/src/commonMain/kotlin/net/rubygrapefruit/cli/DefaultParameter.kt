@@ -2,7 +2,7 @@ package net.rubygrapefruit.cli
 
 import kotlin.reflect.KProperty
 
-internal open class DefaultParameter<T : Any>(
+internal class DefaultParameter<T : Any>(
     name: String,
     help: String?,
     host: Host,

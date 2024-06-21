@@ -3,7 +3,7 @@ package net.rubygrapefruit.cli
 internal abstract class AbstractParameter<T : Any>(
     protected val name: String,
     protected val help: String?,
-    protected val canBeMissing: Boolean,
+    private val canBeMissing: Boolean,
     protected val host: Host,
     private val converter: StringConverter<T>
 ) : Positional() {

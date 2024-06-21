@@ -2,7 +2,7 @@ package net.rubygrapefruit.cli
 
 import kotlin.reflect.KProperty
 
-internal open class OptionalParameter<T : Any>(
+internal class OptionalParameter<T : Any>(
     name: String,
     help: String?,
     private val default: T,

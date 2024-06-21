@@ -2,7 +2,7 @@ package net.rubygrapefruit.cli
 
 import kotlin.reflect.KProperty
 
-internal open class NullableParameter<T : Any>(
+internal class NullableParameter<T : Any>(
     name: String,
     help: String?,
     host: Host,

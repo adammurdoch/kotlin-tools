@@ -20,18 +20,28 @@ class FilesFixture {
         builder(DirFixture(testDir))
     }
 
+    /**
+     * Creates a file.
+     */
     fun file(name: String, content: String = "test"): RegularFile {
         val file = testDir.file(name)
+        file.parent?.createDirectories()
         file.writeText(content)
         return file
     }
 
+    /**
+     * Creates a symlink.
+     */
     fun symlink(name: String, target: String): SymLink {
         val symLink = testDir.symLink(name)
         symLink.writeSymLink(target)
         return symLink
     }
 
+    /**
+     * Creates a directory.
+     */
     fun dir(name: String, builder: DirFixture.() -> Unit = {}): Directory {
         val dir = testDir.dir(name)
         dir.createDirectories()

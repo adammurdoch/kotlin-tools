@@ -1,18 +1,15 @@
-- Improve failure message when directory does not exist or is not directory
+- Optional parameter, eg <choice>? <choice>?
 - Move usage generation to cli-app
 - Clean up usage types.
-- custom type option, list parameter
+- Custom type option, list parameter
 - `--help` should group long and short choice flags
 - Model `--help` and `--completion` as actions
 - Help for options, actions, parameters, etc
 - Completion
     - Choice positional parameters and options
     - Boolean positional parameters and options
-    - Multi-value positional parameters
     - Options with parameter, file and non-file
     - Action options
-    - Global options inside action
-- Optional parameter, eg <choice>? <choice>?
 - Escape names for completion function, actions, help, etc
 - `--help` shows usage of actions
 - Usage sorts options using name, rather than `--name` or `-n`
@@ -25,12 +22,13 @@
     - Option value badly formed
     - Parameter value badly formed
     - Option value missing
-- Handle required list parameter with default value - disallow? succeed if absent and default provided?- Validate names do not contain spaces
+- Handle required list parameter with default value - disallow? succeed if absent and default provided?
+- Validate names do not contain spaces
 - Validate at least one action or choice is defined
 - Validate choices do not contain spaces
 - Validate choices are not options
 - Disallow conflicting flags, option and action names, choice flags
-- Disallow any positional parameters after `arguments()`
+- Disallow any positional parameters after list parameter
 - File locations: dir, file, must exist
 - Color output on terminal
 - Fuzzy matching and/or suggestions

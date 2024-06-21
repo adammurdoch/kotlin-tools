@@ -18,7 +18,13 @@ class CustomTypeParameterTest : AbstractActionTest() {
     @Test
     fun `fails when argument cannot be converted`() {
         class Parameter : Action() {
-            val param by type { if (it.length <= 1) ConversionResult.Failure("is too short") else ConversionResult.Success(it) }.parameter("value")
+            val param by type {
+                if (it.length <= 1) {
+                    ConversionResult.Failure("is too short")
+                } else {
+                    ConversionResult.Success(it)
+                }
+            }.parameter("value")
         }
 
         parseFails(Parameter(), listOf("a"), "Value for parameter 'value' is too short: a")

@@ -14,7 +14,7 @@ internal open class DefaultConfigurationBuilder<T : Any>(
         return owner.add(DefaultParameter(name, help, null, host, owner, converter))
     }
 
-    override fun parameters(name: String, help: String?): ListParameter<T> {
-        return owner.add(DefaultListParameter(name, help, host, owner, emptyList(), false, converter))
+    override fun parameters(name: String, help: String?, acceptOptions: Boolean): ListParameter<T> {
+        return owner.add(DefaultListParameter(name, help, host, owner, emptyList(), false, acceptOptions, converter))
     }
 }

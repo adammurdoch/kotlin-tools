@@ -2,6 +2,8 @@ package net.rubygrapefruit.cli
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class StringListParameterTest : AbstractActionTest() {
     @Test
@@ -63,5 +65,25 @@ class StringListParameterTest : AbstractActionTest() {
         parseFails(Parameter(), listOf("--flag"), "Unknown option: --flag")
         parseFails(Parameter(), listOf("arg", "--flag"), "Unknown option: --flag")
         parseFails(Parameter(), listOf("--flag", "arg"), "Unknown option: --flag")
+    }
+
+    @Test
+    fun `can consume remaining args`() {
+        class Parameter : Action() {
+            val param by string().parameters("value", acceptOptions = true)
+            val flag by flag("flag")
+        }
+
+        parse(Parameter(), listOf("--flag")) { action ->
+            assertEquals(emptyList(), action.param)
+            assertTrue(action.flag)
+        }
+        parse(Parameter(), listOf("--other")) { action ->
+            assertEquals(listOf("--other"), action.param)
+        }
+        parse(Parameter(), listOf("a", "--flag", "b", "--other")) { action ->
+            assertEquals(listOf("a", "--flag", "b", "--other"), action.param)
+            assertFalse(action.flag)
+        }
     }
 }

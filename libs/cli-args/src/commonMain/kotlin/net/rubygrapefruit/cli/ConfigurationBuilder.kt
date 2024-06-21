@@ -41,8 +41,10 @@ interface ConfigurationBuilder<T : Any> {
      *
      * The parameter must appear at a specific location in the input.
      * Uses an empty list if the parameter is not present in the input. Use [Parameter.whenAbsent] to use a different default.
+     *
+     * @param acceptOptions When `false`, does not include any options in the value. When `true`, the remainder of the input is used as the value
      */
-    fun parameters(name: String, help: String? = null): ListParameter<T>
+    fun parameters(name: String, help: String? = null, acceptOptions: Boolean = false): ListParameter<T>
 }
 
 interface MappingConfigurationBuilder<T : Any> : ConfigurationBuilder<T> {

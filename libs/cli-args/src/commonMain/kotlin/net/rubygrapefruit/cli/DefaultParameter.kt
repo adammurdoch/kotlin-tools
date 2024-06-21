@@ -33,6 +33,8 @@ internal open class DefaultParameter<T : Any>(
             if (result.isSuccess) {
                 value = result.getOrThrow()
                 ParseResult.One
+            } else if (default != null) {
+                ParseResult(0, null, true)
             } else {
                 ParseResult(1, result.exceptionOrNull() as ArgParseException, true)
             }

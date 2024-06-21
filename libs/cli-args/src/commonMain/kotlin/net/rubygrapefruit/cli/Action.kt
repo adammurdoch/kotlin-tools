@@ -165,6 +165,9 @@ open class Action {
                     }
                     index += result.count
                     continue
+                } else if (result.finished) {
+                    pending.removeFirst()
+                    continue
                 }
             }
 

@@ -1,4 +1,3 @@
-- Allow action to consume remainder of line eg `tool run <cmd>...`
 - Optional parameter, eg <choice>? <choice>?
 - Move usage generation to cli-app
 - Clean up usage types.

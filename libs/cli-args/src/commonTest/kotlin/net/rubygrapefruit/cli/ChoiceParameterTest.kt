@@ -62,4 +62,35 @@ class ChoiceParameterTest : AbstractActionTest() {
             assertEquals(2, action.param)
         }
     }
+
+    @Test
+    fun `can chain optional choices`() {
+        class Parameter : Action() {
+            val p1 by oneOf {
+                choice(1, "one")
+                choice(2, "2")
+            }.parameter("value").whenAbsent(3)
+            val p2 by oneOf {
+                choice(1, "1st")
+                choice(2, "2nd")
+            }.parameter("value").whenAbsent(3)
+        }
+
+        parse(Parameter(), emptyList()) { action ->
+            assertEquals(3, action.p1)
+            assertEquals(3, action.p2)
+        }
+        parse(Parameter(), listOf("one")) { action ->
+            assertEquals(1, action.p1)
+            assertEquals(3, action.p2)
+        }
+        parse(Parameter(), listOf("2nd")) { action ->
+            assertEquals(3, action.p1)
+            assertEquals(2, action.p2)
+        }
+        parse(Parameter(), listOf("one", "2nd")) { action ->
+            assertEquals(1, action.p1)
+            assertEquals(2, action.p2)
+        }
+    }
 }

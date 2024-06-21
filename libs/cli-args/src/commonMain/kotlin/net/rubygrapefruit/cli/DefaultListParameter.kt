@@ -31,7 +31,7 @@ internal open class DefaultListParameter<T : Any>(
     }
 
     override fun usage(): PositionalUsage {
-        return ParameterUsage("<$name>...", "<$name>", help, converter.type, if (required) Cardinality.OneOrMore else Cardinality.ZeroOrMore)
+        return ParameterUsage("<$name>...", "<$name>", help, converter.type, if (required) Cardinality.OneOrMore else Cardinality.ZeroOrMore, converter.candidateValues)
     }
 
     override fun accept(args: List<String>, context: ParseContext): ParseResult {

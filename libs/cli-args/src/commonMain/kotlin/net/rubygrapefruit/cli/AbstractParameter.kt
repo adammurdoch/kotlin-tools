@@ -10,7 +10,7 @@ internal abstract class AbstractParameter<T : Any>(
     protected var value: T? = null
 
     protected fun usage(cardinality: Cardinality): PositionalUsage {
-        return ParameterUsage("<$name>", "<$name>", help, converter.type, cardinality)
+        return ParameterUsage("<$name>", "<$name>", help, converter.type, cardinality, converter.candidateValues)
     }
 
     override fun accept(args: List<String>, context: ParseContext): ParseResult {

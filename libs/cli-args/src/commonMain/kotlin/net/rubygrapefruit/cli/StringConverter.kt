@@ -4,6 +4,13 @@ import kotlin.reflect.KClass
 
 internal interface StringConverter<T : Any> {
     val type: KClass<T>
+
+    /**
+     * Empty if this converter cannot list the candidates.
+     */
+    val candidateValues: List<String>
+        get() = emptyList()
+
     fun convert(displayName: String, value: String): Result<T>
 }
 
@@ -25,6 +32,9 @@ internal object BooleanConverter : StringConverter<Boolean> {
     override val type: KClass<Boolean>
         get() = Boolean::class
 
+    override val candidateValues: List<String>
+        get() = listOf("yes", "no")
+
     override fun convert(displayName: String, value: String): Result<Boolean> {
         return when (value) {
             "yes" -> Result.success(true)
@@ -44,6 +54,9 @@ internal object NoOpConverter : StringConverter<String> {
 }
 
 internal class ChoiceConverter<T : Any>(override val type: KClass<T>, val choices: Map<String, ChoiceDetails<T>>) : StringConverter<T> {
+    override val candidateValues: List<String>
+        get() = choices.keys.toList()
+
     override fun convert(displayName: String, value: String): Result<T> {
         val item = choices[value]
         return if (item == null) {

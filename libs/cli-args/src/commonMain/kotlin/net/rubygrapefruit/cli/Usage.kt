@@ -70,7 +70,8 @@ class ParameterUsage(
     display: String,
     help: String?,
     val type: KClass<*>,
-    val cardinality: Cardinality
+    val cardinality: Cardinality,
+    val values: List<String> = emptyList()
 ) : PositionalUsage(usage, display, help) {
     val multiple: Boolean
         get() = cardinality == Cardinality.ZeroOrMore || cardinality == Cardinality.OneOrMore

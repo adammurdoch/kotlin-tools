@@ -4,6 +4,7 @@ import net.rubygrapefruit.cli.*
 import net.rubygrapefruit.file.Directory
 import net.rubygrapefruit.file.ElementPath
 import net.rubygrapefruit.file.RegularFile
+import kotlin.reflect.KClass
 
 internal class CompletionAction(val action: CliApp) : Action() {
     override fun run() {
@@ -97,7 +98,8 @@ internal class CompletionAction(val action: CliApp) : Action() {
                     }
                 }
                 if (option.type != null) {
-                    print(":Argument:( )")
+                    print(":Argument:")
+                    valueType(option.type, emptyList())
                 }
                 print("'")
             }
@@ -111,11 +113,20 @@ internal class CompletionAction(val action: CliApp) : Action() {
             is Cardinality.Required -> print("${index + 1}:Parameter:")
             is Cardinality.ZeroOrMore, is Cardinality.OneOrMore -> print("*:Parameter:")
         }
-        if (parameter.type == ElementPath::class || parameter.type == Directory::class || parameter.type == RegularFile::class) {
+        valueType(parameter.type, parameter.values)
+        print("'")
+    }
+
+    private fun valueType(type: KClass<*>?, candidates: List<String>) {
+        if (type.fileType) {
             print("_files")
+        } else if (candidates.isNotEmpty()) {
+            print("(${candidates.joinToString(" ")})")
         } else {
             print("( )")
         }
-        print("'")
     }
 }
+
+private val KClass<*>?.fileType: Boolean
+    get() = this == ElementPath::class || this == Directory::class || this == RegularFile::class

@@ -1,4 +1,4 @@
-- Optional parameter, eg <choice>? <choice>?
+- Nullable parameter
 - Move usage generation to cli-app
 - Clean up usage types.
 - Custom type option, list parameter

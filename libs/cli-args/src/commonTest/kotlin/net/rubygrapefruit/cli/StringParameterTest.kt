@@ -2,6 +2,7 @@ package net.rubygrapefruit.cli
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class StringParameterTest : AbstractActionTest() {
@@ -46,6 +47,21 @@ class StringParameterTest : AbstractActionTest() {
 
         parse(Parameter(), emptyList()) { action ->
             assertEquals("value", action.param)
+        }
+
+        parse(Parameter(), listOf("123")) { action ->
+            assertEquals("123", action.param)
+        }
+    }
+
+    @Test
+    fun `action can have optional parameter`() {
+        class Parameter : Action() {
+            val param by parameter("value").optional()
+        }
+
+        parse(Parameter(), emptyList()) { action ->
+            assertNull(action.param)
         }
 
         parse(Parameter(), listOf("123")) { action ->

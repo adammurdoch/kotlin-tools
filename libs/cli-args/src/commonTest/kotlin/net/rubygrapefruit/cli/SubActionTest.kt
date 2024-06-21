@@ -144,6 +144,25 @@ class SubActionTest : AbstractActionTest() {
     }
 
     @Test
+    fun `can define optional actions`() {
+        val s1 = Action()
+
+        class WithSub : Action() {
+            val sub by actions {
+                action(s1, "s1")
+                action(Action(), "s2")
+            }.optional()
+        }
+
+        parse(WithSub(), emptyList()) { action ->
+            assertNull(action.sub)
+        }
+        parse(WithSub(), listOf("s1")) { action ->
+            assertSame(s1, action.sub)
+        }
+    }
+
+    @Test
     fun `fails when unknown sub-action provided`() {
         class WithSub : Action() {
             val sub by actions {

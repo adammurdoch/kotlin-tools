@@ -79,7 +79,7 @@ open class Action {
     /**
      * Defines a string parameter with the given name. See [ConfigurationBuilder.parameter] for more details.
      */
-    fun parameter(name: String, help: String? = null): Parameter<String> {
+    fun parameter(name: String, help: String? = null): RequiredParameter<String> {
         return string().parameter(name, help = help)
     }
 
@@ -94,12 +94,12 @@ open class Action {
      * Defines a set of actions. Use `<name> <action-args>` to invoke the action.
      *
      * Only one action can be invoked, and this must appear at a specific location in the input.
-     * Fails if an action is not present in the input. Use [Parameter.whenAbsent] to use a different default.
+     * Fails if an action is not present in the input. Use [RequiredParameter.whenAbsent] to use a different default or [RequiredParameter.optional] to use a `null` value.
      */
-    fun <T : Action> actions(builder: Actions<T>.() -> Unit): Parameter<T> {
+    fun <T : Action> actions(builder: Actions<T>.() -> Unit): RequiredParameter<T> {
         val actions = DefaultActions<T>(DefaultHost)
         builder(actions)
-        val parameter = DefaultActionParameter(actions.actions, DefaultHost, this, null)
+        val parameter = DefaultActionParameter(actions.actions, DefaultHost, this)
         positional.add(parameter)
         return parameter
     }

@@ -10,8 +10,8 @@ internal open class DefaultConfigurationBuilder<T : Any>(
         return owner.add(DefaultNullableOption(names, help, host, owner, converter))
     }
 
-    override fun parameter(name: String, help: String?): Parameter<T> {
-        return owner.add(DefaultParameter(name, help, null, host, owner, converter))
+    override fun parameter(name: String, help: String?): RequiredParameter<T> {
+        return owner.add(DefaultParameter(name, help, host, owner, converter))
     }
 
     override fun parameters(name: String, help: String?, acceptOptions: Boolean): ListParameter<T> {

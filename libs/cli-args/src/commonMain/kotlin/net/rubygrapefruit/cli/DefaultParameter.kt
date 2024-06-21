@@ -3,49 +3,26 @@ package net.rubygrapefruit.cli
 import kotlin.reflect.KProperty
 
 internal open class DefaultParameter<T : Any>(
-    protected val name: String,
-    protected val help: String?,
-    protected val default: T?,
-    protected val host: Host,
-    protected val owner: Action,
+    name: String,
+    help: String?,
+    host: Host,
+    private val owner: Action,
     private val converter: StringConverter<T>
-) : Positional(), Parameter<T> {
-    private var value: T? = null
+) : AbstractParameter<T>(name, help, false, host, converter), RequiredParameter<T> {
 
     override fun whenAbsent(default: T): Parameter<T> {
-        return owner.replace(this, DefaultParameter(name, help, default, host, owner, converter))
+        return owner.replace(this, OptionalParameter(name, help, default, host, converter))
+    }
+
+    override fun optional(): Parameter<T?> {
+        return owner.replace(this, NullableParameter(name, help, host, converter))
     }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        return (value ?: default) ?: throw IllegalStateException()
-    }
-
-    override fun usage(): PositionalUsage {
-        return ParameterUsage("<$name>", help, converter.type)
-    }
-
-    override fun accept(args: List<String>, context: ParseContext): ParseResult {
-        val candidate = args.first()
-        return if (host.isOption(candidate)) {
-            ParseResult.Nothing
-        } else {
-            val result = converter.convert("parameter '$name'", candidate)
-            if (result.isSuccess) {
-                value = result.getOrThrow()
-                ParseResult.One
-            } else if (default != null) {
-                ParseResult(0, null, true)
-            } else {
-                ParseResult(1, result.exceptionOrNull() as ArgParseException, true)
-            }
-        }
+        return value ?: throw IllegalStateException()
     }
 
     override fun missing(): ArgParseException? {
-        return if (default == null) {
-            ArgParseException("Parameter '$name' not provided")
-        } else {
-            null
-        }
+        return ArgParseException("Parameter '$name' not provided")
     }
 }

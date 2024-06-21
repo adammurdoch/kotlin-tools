@@ -34,7 +34,7 @@ interface ConfigurationBuilder<T : Any> {
      * The parameter must appear at a specific location in the input.
      * Fails if the parameter is not present. Use [Parameter.whenAbsent] to allow the parameter to be missing.
      */
-    fun parameter(name: String, help: String? = null): Parameter<T>
+    fun parameter(name: String, help: String? = null): RequiredParameter<T>
 
     /**
      * Defines a multi-value parameter with the given name and type `List<T>`.

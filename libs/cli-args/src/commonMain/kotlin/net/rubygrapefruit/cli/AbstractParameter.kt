@@ -9,8 +9,8 @@ internal abstract class AbstractParameter<T : Any>(
 ) : Positional() {
     protected var value: T? = null
 
-    override fun usage(): PositionalUsage {
-        return ParameterUsage("<$name>", help, converter.type)
+    protected fun usage(cardinality: Cardinality): PositionalUsage {
+        return ParameterUsage("<$name>", "<$name>", help, converter.type, cardinality)
     }
 
     override fun accept(args: List<String>, context: ParseContext): ParseResult {

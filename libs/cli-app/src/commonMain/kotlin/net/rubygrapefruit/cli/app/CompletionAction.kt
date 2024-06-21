@@ -1,11 +1,9 @@
 package net.rubygrapefruit.cli.app
 
-import net.rubygrapefruit.cli.Action
-import net.rubygrapefruit.cli.ActionParameterUsage
-import net.rubygrapefruit.cli.OptionUsage
-import net.rubygrapefruit.cli.ParameterUsage
+import net.rubygrapefruit.cli.*
 import net.rubygrapefruit.file.Directory
 import net.rubygrapefruit.file.ElementPath
+import net.rubygrapefruit.file.RegularFile
 
 internal class CompletionAction(val action: CliApp) : Action() {
     override fun run() {
@@ -83,7 +81,7 @@ internal class CompletionAction(val action: CliApp) : Action() {
 
     private fun options(options: List<OptionUsage>, indent: String) {
         for (option in options) {
-            for (item in option.items) {
+            for (item in option.usages) {
                 println(" \\")
                 print(indent)
                 if (item.aliases.size == 1) {
@@ -108,12 +106,12 @@ internal class CompletionAction(val action: CliApp) : Action() {
 
     private fun parameter(index: Int, parameter: ParameterUsage) {
         print("'")
-        if (parameter.multiple) {
-            print("*:Parameter:")
-        } else {
-            print("${index + 1}:Parameter:")
+        when (parameter.cardinality) {
+            is Cardinality.Optional -> print("${index + 1}::Parameter:")
+            is Cardinality.Required -> print("${index + 1}:Parameter:")
+            is Cardinality.ZeroOrMore, is Cardinality.OneOrMore -> print("*:Parameter:")
         }
-        if (parameter.type == ElementPath::class || parameter.type == Directory::class) {
+        if (parameter.type == ElementPath::class || parameter.type == Directory::class || parameter.type == RegularFile::class) {
             print("_files")
         } else {
             print("( )")

@@ -14,6 +14,10 @@ internal class OptionalParameter<T : Any>(
         return value ?: default
     }
 
+    override fun usage(): PositionalUsage {
+        return usage(Cardinality.Optional)
+    }
+
     override fun missing(): ArgParseException? {
         return null
     }

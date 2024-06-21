@@ -5,6 +5,7 @@
 - `--help` should group long and short choice flags
 - Model `--help` and `--completion` as actions
 - Help for options, actions, parameters, etc
+- Help should indicate parameter is optional
 - Completion
     - Choice positional parameters and options
     - Boolean positional parameters and options

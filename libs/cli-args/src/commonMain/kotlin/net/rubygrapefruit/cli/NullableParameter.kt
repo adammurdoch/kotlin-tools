@@ -13,6 +13,10 @@ internal class NullableParameter<T : Any>(
         return value
     }
 
+    override fun usage(): PositionalUsage {
+        return usage(Cardinality.Optional)
+    }
+
     override fun missing(): ArgParseException? {
         return null
     }

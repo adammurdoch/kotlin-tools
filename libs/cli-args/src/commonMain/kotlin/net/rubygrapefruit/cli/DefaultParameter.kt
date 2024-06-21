@@ -22,7 +22,11 @@ internal class DefaultParameter<T : Any>(
         return value ?: throw IllegalStateException()
     }
 
-    override fun missing(): ArgParseException? {
+    override fun usage(): PositionalUsage {
+        return usage(Cardinality.Required)
+    }
+
+    override fun missing(): ArgParseException {
         return ArgParseException("Parameter '$name' not provided")
     }
 }

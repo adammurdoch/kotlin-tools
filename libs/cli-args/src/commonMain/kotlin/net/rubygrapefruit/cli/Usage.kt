@@ -46,8 +46,15 @@ class OptionUsage(
      * The argument type.
      */
     val type: KClass<*>?,
-    val items: List<SingleOptionUsage>
+    val usages: List<SingleOptionUsage>
 ) : ItemUsage(help)
+
+sealed class Cardinality {
+    data object Optional : Cardinality()
+    data object Required : Cardinality()
+    data object ZeroOrMore : Cardinality()
+    data object OneOrMore : Cardinality()
+}
 
 sealed class PositionalUsage(
     /**
@@ -63,9 +70,10 @@ class ParameterUsage(
     display: String,
     help: String?,
     val type: KClass<*>,
-    val multiple: Boolean
+    val cardinality: Cardinality
 ) : PositionalUsage(usage, display, help) {
-    constructor(usage: String, help: String?, type: KClass<*>) : this(usage, usage, help, type, false)
+    val multiple: Boolean
+        get() = cardinality == Cardinality.ZeroOrMore || cardinality == Cardinality.OneOrMore
 }
 
 class ActionParameterUsage(

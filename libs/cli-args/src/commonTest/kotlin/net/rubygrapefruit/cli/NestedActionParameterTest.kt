@@ -2,7 +2,7 @@ package net.rubygrapefruit.cli
 
 import kotlin.test.*
 
-class NestedActionTest : AbstractActionTest() {
+class NestedActionParameterTest : AbstractActionTest() {
     @Test
     fun `action can have nested action with no configuration`() {
         val sub = Action()
@@ -19,7 +19,7 @@ class NestedActionTest : AbstractActionTest() {
     }
 
     @Test
-    fun `action can have multiple nested actions with no configuration`() {
+    fun `action can have nested actions with no configuration`() {
         val s1 = Action()
         val s2 = Action()
 
@@ -60,6 +60,35 @@ class NestedActionTest : AbstractActionTest() {
     }
 
     @Test
+    fun `action can have nested actions with configuration`() {
+        class Sub1 : Action() {
+            val a by parameter("a")
+        }
+
+        class Sub2 : Action() {
+            val f by flag("flag")
+        }
+
+        class WithSub : Action() {
+            val sub by actions {
+                action(Sub1(), "s1")
+                action(Sub2(), "s2")
+            }
+        }
+
+        parse(WithSub(), listOf("s1", "arg")) { action ->
+            val sub = action.sub
+            assertIs<Sub1>(sub)
+            assertEquals("arg", sub.a)
+        }
+        parse(WithSub(), listOf("s2", "--flag")) { action ->
+            val sub = action.sub
+            assertIs<Sub2>(sub)
+            assertTrue(sub.f)
+        }
+    }
+
+    @Test
     fun `action can have multiple nested actions with configuration`() {
         class Sub : Action() {
             val a by parameter("a")
@@ -87,24 +116,24 @@ class NestedActionTest : AbstractActionTest() {
 
     @Test
     fun `can nest actions multiple levels`() {
-        class Nested : Action() {
+        class Sub1 : Action() {
             val a by parameter("a")
         }
 
-        class Sub : Action() {
-            val nested by actions {
-                action(Nested(), "nested")
+        class Sub2 : Action() {
+            val action by actions {
+                action(Sub1(), "nested")
             }
         }
 
         class WithSub : Action() {
-            val s1 by actions {
-                action(Sub(), "sub")
+            val action by actions {
+                action(Sub2(), "sub")
             }
         }
 
         parse(WithSub(), listOf("sub", "nested", "arg")) { action ->
-            assertEquals("arg", action.s1.nested.a)
+            assertEquals("arg", action.action.action.a)
         }
     }
 

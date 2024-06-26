@@ -1,4 +1,5 @@
-- Options have gone missing from help and completion 
+- Options have gone missing from help and completion
+- Help should not sort parameters by name
 - Nullable parameter - tests
 - Move usage generation to cli-app
 - Clean up usage types.

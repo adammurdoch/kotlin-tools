@@ -10,7 +10,7 @@ class ActionUsageTest {
 
         assertEquals(
             """
-            Usage: cmd [options]
+            [options]
             
             Options:
               --help, --no-help help message
@@ -29,7 +29,7 @@ class ActionUsageTest {
 
         assertEquals(
             """
-            Usage: cmd [options] <z> <another-param> <no-help>
+            [options] <z> <another-param> <no-help>
             
             Parameters:
               <another-param> some other value
@@ -51,7 +51,7 @@ class ActionUsageTest {
 
         assertEquals(
             """
-            Usage: cmd [options] <a> <param>...
+            [options] <a> <param>...
             
             Parameters:
               <a>     some value
@@ -74,7 +74,7 @@ class ActionUsageTest {
 
         assertEquals(
             """
-            Usage: cmd [options]
+            [options]
             
             Options:
               --help, --no-help     help message
@@ -97,7 +97,7 @@ class ActionUsageTest {
 
         assertEquals(
             """
-            Usage: cmd [options]
+            [options]
             
             Options:
               --help, --no-help                   help message
@@ -127,7 +127,7 @@ class ActionUsageTest {
 
         assertEquals(
             """
-            Usage: cmd [options]
+            [options]
             
             Options:
               --12              select 12
@@ -158,7 +158,7 @@ class ActionUsageTest {
 
         assertEquals(
             """
-            Usage: cmd [options] <action> <action>
+            [options] <action> <action>
 
             Actions:
               a2           run action a2

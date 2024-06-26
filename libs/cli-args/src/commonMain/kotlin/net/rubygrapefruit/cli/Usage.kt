@@ -10,15 +10,14 @@ class ActionUsage(
     val formatted: String
         get() {
             val builder = StringBuilder()
-            builder.append("Usage: ")
-            if (appName != null) {
-                builder.append(appName)
-            }
             if (options.isNotEmpty()) {
-                builder.append(" [options]")
+                builder.append("[options]")
             }
             for (positional in positional) {
-                builder.append(" ${positional.usage}")
+                if (builder.isNotEmpty()) {
+                    builder.append(" ")
+                }
+                builder.append(positional.usage)
             }
             builder.append("\n")
             val parameters = positional.filterIsInstance<ParameterUsage>().filter { it.help != null }

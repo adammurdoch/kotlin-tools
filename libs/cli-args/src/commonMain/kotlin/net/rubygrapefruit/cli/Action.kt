@@ -104,6 +104,9 @@ open class Action {
         return parameter
     }
 
+    /**
+     * Runs this action.
+     */
     open fun run() {}
 
     /**

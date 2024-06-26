@@ -19,7 +19,7 @@ interface RequiredParameter<T : Any> : Parameter<T> {
     fun whenAbsent(default: T): Parameter<T>
 
     /**
-     * Returns a parameter that has `null` value when this parameter is not present in the inoput.
+     * Returns a parameter that has `null` value when this parameter is not present in the input.
      */
     fun optional(): Parameter<T?>
 }

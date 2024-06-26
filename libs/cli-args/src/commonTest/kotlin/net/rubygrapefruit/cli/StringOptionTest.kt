@@ -107,14 +107,27 @@ class StringOptionTest : AbstractActionTest() {
     }
 
     @Test
-    fun `fails when unknown flag provided instead of argument`() {
+    fun `fails when flag provided instead of argument`() {
+        class Option : Action() {
+            val option by option("o")
+            val other by flag("f", "flag")
+        }
+
+        parseFails(Option(), listOf("-o", "-f"), "Value missing for option -o")
+        parseFails(Option(), listOf("-o", "--flag"), "Value missing for option -o")
+        parseFails(Option(), listOf("-o", "-u"), "Value missing for option -o")
+        parseFails(Option(), listOf("-o", "--unknown"), "Value missing for option -o")
+    }
+
+    @Test
+    fun `reports unknown flag used with option`() {
         class Option : Action() {
             val option by option("o")
         }
 
-        parseFails(Option(), listOf("-o", "--flag"), "Value missing for option -o")
         parseFails(Option(), listOf("--flag", "-o", "arg"), "Unknown option: --flag")
         parseFails(Option(), listOf("-o", "arg", "--flag"), "Unknown option: --flag")
+        parseFails(Option(), listOf("-o", "--flag", "arg"), "Value missing for option -o")
     }
 
     @Test
@@ -127,7 +140,7 @@ class StringOptionTest : AbstractActionTest() {
     }
 
     @Test
-    fun `name must not start with punctuation`() {
+    fun `option name must not start with punctuation`() {
         class Broken1 : Action() {
             val option by option("-o")
         }

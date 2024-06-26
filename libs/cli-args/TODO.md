@@ -1,4 +1,4 @@
-- Nullable parameter
+- Nullable parameter - tests
 - Move usage generation to cli-app
 - Clean up usage types.
 - Custom type option, list parameter
@@ -7,9 +7,13 @@
 - Help for options, actions, parameters, etc
 - Help should indicate parameter is optional
 - Completion
-    - Choice positional parameters and options
+    - Include help message for each choice completion option
+    - Include help message for each action completion option
+    - Merge choice options for optional parameter with choice options for next parameter
+    - Choice options
     - Boolean positional parameters and options
     - Options with parameter, file and non-file
+    - Directory options and parameters
     - Action options
 - Escape names for completion function, actions, help, etc
 - `--help` shows usage of actions

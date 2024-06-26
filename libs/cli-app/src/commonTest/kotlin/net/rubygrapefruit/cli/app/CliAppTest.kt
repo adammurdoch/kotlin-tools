@@ -5,7 +5,15 @@ import kotlin.test.assertIs
 
 class CliAppTest {
     @Test
-    fun `can run --help command`() {
+    fun `can run action`() {
+        class NoConfig : CliApp("cmd")
+
+        val action = NoConfig().actionFor(emptyList())
+        assertIs<NoConfig>(action)
+    }
+
+    @Test
+    fun `can run --help action`() {
         class NoConfig : CliApp("cmd")
 
         val action = NoConfig().actionFor(listOf("--help"))
@@ -13,7 +21,7 @@ class CliAppTest {
     }
 
     @Test
-    fun `can run --help command when unknown option is used`() {
+    fun `can run --help action when unknown option is used`() {
         class NoConfig : CliApp("cmd")
 
         val action = NoConfig().actionFor(listOf("-o", "--help"))
@@ -21,7 +29,7 @@ class CliAppTest {
     }
 
     @Test
-    fun `can run --help command when unknown parameter is used`() {
+    fun `can run --help action when unknown parameter is used`() {
         class NoConfig : CliApp("cmd")
 
         val action = NoConfig().actionFor(listOf("arg", "--help"))
@@ -29,7 +37,7 @@ class CliAppTest {
     }
 
     @Test
-    fun `can run --completion command`() {
+    fun `can run --completion action`() {
         class NoConfig : CliApp("cmd")
 
         val action = NoConfig().actionFor(listOf("--completion"))

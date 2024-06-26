@@ -1,3 +1,4 @@
+- Options have gone missing from help and completion 
 - Nullable parameter - tests
 - Move usage generation to cli-app
 - Clean up usage types.

@@ -7,9 +7,6 @@ import net.rubygrapefruit.cli.ArgParseException
  * An [Action] that can be used as the main action for a CLI application.
  */
 open class CliApp(val name: String) : CliAction() {
-    private val help by boolean().flag("help", help = "Show usage message", disableOption = false)
-    private val completion by boolean().flag("completion", help = "Generate ZSH completion script", disableOption = false)
-    private val stackTrace by flag("stack", help = "Show stack trace on failure")
 
     /**
      * Runs this action, using the given arguments to configure it. Does not return
@@ -23,9 +20,10 @@ open class CliApp(val name: String) : CliAction() {
      */
     fun run(args: List<String>) {
         var parsed = false
+        val main = MainAction(this)
         try {
             val action = try {
-                actionFor(args)
+                main.actionFor(args)
             } catch (e: ArgParseException) {
                 for (line in e.formattedMessage.lines()) {
                     println(line)
@@ -37,7 +35,7 @@ open class CliApp(val name: String) : CliAction() {
             action.run()
             exit(0)
         } catch (t: Throwable) {
-            if (!parsed || stackTrace) {
+            if (!parsed || main.stackTrace) {
                 t.printStackTrace()
             } else {
                 println(t.message)
@@ -47,15 +45,26 @@ open class CliApp(val name: String) : CliAction() {
     }
 
     internal fun actionFor(args: List<String>): Action {
-        val result = maybeParse(args)
-        return if (help) {
-            HelpAction(this)
-        } else if (completion) {
-            CompletionAction(this)
-        } else if (result is Result.Failure) {
-            throw result.failure
-        } else {
-            this
+        return MainAction(this).actionFor(args)
+    }
+
+    private class MainAction(val app: CliApp) : Action() {
+        val help by boolean().flag("help", help = "Show usage message", disableOption = false)
+        val stackTrace by flag("stack", help = "Show stack trace on failure")
+        val action by actions {
+            option(CompletionAction(app), "completion", help = "Generate ZSH completion script")
+            action(app)
+        }
+
+        fun actionFor(args: List<String>): Action {
+            val result = maybeParse(args)
+            return if (help) {
+                HelpAction(app)
+            } else if (result is Result.Failure) {
+                throw result.failure
+            } else {
+                action
+            }
         }
     }
 }

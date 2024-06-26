@@ -6,7 +6,7 @@ import kotlin.test.assertEquals
 class ArgParseExceptionTest {
     @Test
     fun `formats available actions`() {
-        val action = ActionUsage(null, emptyList(), emptyList())
+        val action = ActionUsage(emptyList(), emptyList())
         val exception = ArgParseException(
             "broken",
             "Please run something",

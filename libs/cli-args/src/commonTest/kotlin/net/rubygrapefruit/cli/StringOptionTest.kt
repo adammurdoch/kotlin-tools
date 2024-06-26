@@ -163,7 +163,7 @@ class StringOptionTest : AbstractActionTest() {
 
     @Test
     fun `can run --help command without providing argument`() {
-        class Option : TestApp("cmd") {
+        class Option : TestApp() {
             val param by option("value")
         }
 

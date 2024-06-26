@@ -3,7 +3,6 @@ package net.rubygrapefruit.cli
 import kotlin.reflect.KClass
 
 class ActionUsage(
-    val appName: String?,
     val options: List<OptionUsage>,
     val positional: List<PositionalUsage>
 ) {

@@ -205,7 +205,6 @@ open class Action {
 
     open fun usage(): ActionUsage {
         return ActionUsage(
-            null,
             options.flatMap { it.usage() },
             positional.map { it.usage() }
         )

@@ -250,7 +250,7 @@ class NestedActionParameterTest : AbstractActionTest() {
 
     @Test
     fun `can run --help command without providing action`() {
-        class WithSub : TestApp("cmd") {
+        class WithSub : TestApp() {
             val sub by actions {
                 action(Action(), "sub")
             }
@@ -268,7 +268,7 @@ class NestedActionParameterTest : AbstractActionTest() {
             val p2 by parameter("p2")
         }
 
-        class WithSub : TestApp("cmd") {
+        class WithSub : TestApp() {
             val sub by actions {
                 action(Sub(), "sub")
             }

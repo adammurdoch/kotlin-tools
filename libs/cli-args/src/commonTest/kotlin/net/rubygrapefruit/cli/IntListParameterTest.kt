@@ -34,7 +34,7 @@ class IntListParameterTest : AbstractActionTest() {
 
     @Test
     fun `can run --help command when argument is not an integer`() {
-        class Option : TestApp("cmd") {
+        class Option : TestApp() {
             val param by int().parameters("value")
         }
 

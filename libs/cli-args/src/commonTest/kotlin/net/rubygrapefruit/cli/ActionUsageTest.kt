@@ -6,7 +6,7 @@ import kotlin.test.assertEquals
 class ActionUsageTest {
     @Test
     fun `formats action with no configuration`() {
-        class NoConfig : TestApp("cmd")
+        class NoConfig : TestApp()
 
         assertEquals(
             """
@@ -21,7 +21,7 @@ class ActionUsageTest {
 
     @Test
     fun `formats action with multiple parameters`() {
-        class Parameters : TestApp("cmd") {
+        class Parameters : TestApp() {
             val p1 by parameter("z", help = "some value")
             val p2 by parameter("another-param", help = "some other value")
             val p3 by parameter("no-help")
@@ -44,7 +44,7 @@ class ActionUsageTest {
 
     @Test
     fun `formats action with multi-value parameter`() {
-        class Parameters : TestApp("cmd") {
+        class Parameters : TestApp() {
             val a1 by parameter("a", help = "some value")
             val a2 by parameters("param", help = "some other value")
         }
@@ -66,7 +66,7 @@ class ActionUsageTest {
 
     @Test
     fun `formats action with multiple flags`() {
-        class Options : TestApp("cmd") {
+        class Options : TestApp() {
             val f1 by flag("thing", help = "some flag")
             val f2 by flag("t", help = "some short flag")
             val f3 by flag("f", "flag", help = "some other flag")
@@ -88,7 +88,7 @@ class ActionUsageTest {
 
     @Test
     fun `formats action with multiple options`() {
-        class Options : TestApp("cmd") {
+        class Options : TestApp() {
             val a1 by option("some-option", help = "some other option")
             val a2 by option("s", "second-option", help = "second option")
             val a3 by option("none")
@@ -112,7 +112,7 @@ class ActionUsageTest {
 
     @Test
     fun `formats action with multiple choices`() {
-        class Options : TestApp("cmd") {
+        class Options : TestApp() {
             val c1 by oneOf {
                 choice(1, "1", help = "select 1")
                 choice(2, "two")
@@ -144,7 +144,7 @@ class ActionUsageTest {
 
     @Test
     fun `formats action with multiple actions`() {
-        class Options : TestApp("cmd") {
+        class Options : TestApp() {
             val a1 by actions {
                 action(Action(), "z", help = "run action z")
                 action(Action(), "action-two")

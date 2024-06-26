@@ -31,7 +31,6 @@
 - Validate names do not contain spaces
 - Validate at least one action or choice is defined
 - Validate choices do not contain spaces
-- Validate choices are not options
 - Disallow conflicting flags, option and action names, choice flags
 - Disallow any positional parameters after list parameter
 - File locations: dir, file, must exist

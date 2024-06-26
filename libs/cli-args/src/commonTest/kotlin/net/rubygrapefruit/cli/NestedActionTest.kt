@@ -2,9 +2,9 @@ package net.rubygrapefruit.cli
 
 import kotlin.test.*
 
-class SubActionTest : AbstractActionTest() {
+class NestedActionTest : AbstractActionTest() {
     @Test
-    fun `action can have sub action with no configuration`() {
+    fun `action can have nested action with no configuration`() {
         val sub = Action()
 
         class WithSub : Action() {
@@ -19,7 +19,7 @@ class SubActionTest : AbstractActionTest() {
     }
 
     @Test
-    fun `action can have multiple sub actions with no configuration`() {
+    fun `action can have multiple nested actions with no configuration`() {
         val s1 = Action()
         val s2 = Action()
 
@@ -39,7 +39,7 @@ class SubActionTest : AbstractActionTest() {
     }
 
     @Test
-    fun `action can have sub action with configuration`() {
+    fun `action can have nested action with configuration`() {
         class Sub : Action() {
             val flag by flag("f")
             val a by parameter("a")
@@ -60,7 +60,7 @@ class SubActionTest : AbstractActionTest() {
     }
 
     @Test
-    fun `can chain sub-actions with configuration`() {
+    fun `action can have multiple nested actions with configuration`() {
         class Sub : Action() {
             val a by parameter("a")
         }
@@ -86,7 +86,7 @@ class SubActionTest : AbstractActionTest() {
     }
 
     @Test
-    fun `can nest actions`() {
+    fun `can nest actions multiple levels`() {
         class Nested : Action() {
             val a by parameter("a")
         }
@@ -109,7 +109,7 @@ class SubActionTest : AbstractActionTest() {
     }
 
     @Test
-    fun `fails when sub-action not provided`() {
+    fun `fails when nested action not provided`() {
         class WithSub : Action() {
             val sub by actions {
                 action(Action(), "s1")
@@ -144,7 +144,7 @@ class SubActionTest : AbstractActionTest() {
     }
 
     @Test
-    fun `can define optional actions`() {
+    fun `can define optional nested actions`() {
         val s1 = Action()
 
         class WithSub : Action() {
@@ -163,7 +163,7 @@ class SubActionTest : AbstractActionTest() {
     }
 
     @Test
-    fun `fails when unknown sub-action provided`() {
+    fun `fails when unknown nested action provided`() {
         class WithSub : Action() {
             val sub by actions {
                 action(Action(), "s1")
@@ -193,7 +193,7 @@ class SubActionTest : AbstractActionTest() {
     }
 
     @Test
-    fun `fails when additional args provided after action`() {
+    fun `fails when additional args provided after nested action`() {
         val sub = Action()
 
         class WithSub : Action() {

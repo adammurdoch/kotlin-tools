@@ -1,9 +1,6 @@
 package net.rubygrapefruit.cli
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class StringListParameterTest : AbstractActionTest() {
     @Test
@@ -57,7 +54,7 @@ class StringListParameterTest : AbstractActionTest() {
     }
 
     @Test
-    fun `fails when unknown flag provided instead of argument`() {
+    fun `fails when unknown flag provided with arguments`() {
         class Parameter : Action() {
             val param by parameters("value")
         }
@@ -65,6 +62,20 @@ class StringListParameterTest : AbstractActionTest() {
         parseFails(Parameter(), listOf("--flag"), "Unknown option: --flag")
         parseFails(Parameter(), listOf("arg", "--flag"), "Unknown option: --flag")
         parseFails(Parameter(), listOf("--flag", "arg"), "Unknown option: --flag")
+        parseFails(Parameter(), listOf("arg", "--flag", "arg"), "Unknown option: --flag")
+    }
+
+    @Test
+    fun `fails when flag provided instead of required argument`() {
+        class Parameter : Action() {
+            val param by parameters("value").required()
+            val flag by flag("f", "flag")
+        }
+
+        parseFails(Parameter(), listOf("-f"), "Parameter 'value' not provided")
+        parseFails(Parameter(), listOf("--flag"), "Parameter 'value' not provided")
+        parseFails(Parameter(), listOf("-u"), "Unknown option: -u")
+        parseFails(Parameter(), listOf("--unknown"), "Unknown option: --unknown")
     }
 
     @Test
@@ -84,6 +95,28 @@ class StringListParameterTest : AbstractActionTest() {
         parse(Parameter(), listOf("a", "--flag", "b", "--other")) { action ->
             assertEquals(listOf("a", "--flag", "b", "--other"), action.param)
             assertFalse(action.flag)
+        }
+    }
+
+    @Test
+    fun `parameter name must not start with punctuation`() {
+        class Broken1 : Action() {
+            val param by parameters("-p")
+        }
+        try {
+            Broken1()
+            fail()
+        } catch (e: IllegalArgumentException) {
+            assertEquals("-p cannot be used as a parameter name", e.message)
+        }
+        class Broken2 : Action() {
+            val param by parameters("--param")
+        }
+        try {
+            Broken2()
+            fail()
+        } catch (e: IllegalArgumentException) {
+            assertEquals("--param cannot be used as a parameter name", e.message)
         }
     }
 }

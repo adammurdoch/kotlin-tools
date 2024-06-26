@@ -8,7 +8,7 @@ internal class OptionalActionParameter<T : Action>(
     private val default: T
 ) : AbstractActionParameter<T>(actions, host), Parameter<T> {
 
-    override fun missing(): ArgParseException? {
+    override fun whenMissing(): ArgParseException? {
         return null
     }
 

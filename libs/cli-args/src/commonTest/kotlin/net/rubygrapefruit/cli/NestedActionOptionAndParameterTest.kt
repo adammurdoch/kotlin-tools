@@ -92,5 +92,7 @@ class NestedActionOptionAndParameterTest : AbstractActionTest() {
             assertSame(sub, action.sub)
             assertEquals("arg", sub.parameter)
         }
+
+        parseFails(WithSub(), emptyList(), "Parameter 'param' not provided")
     }
 }

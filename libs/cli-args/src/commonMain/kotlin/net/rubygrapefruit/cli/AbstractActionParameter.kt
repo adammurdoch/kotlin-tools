@@ -35,4 +35,15 @@ internal abstract class AbstractActionParameter<T : Action>(
     override fun usage(): PositionalUsage {
         return ActionParameterUsage("<action>", "<action>", null, actionInfo)
     }
+
+    override fun missing(): ArgParseException? {
+        if (actions.default != null) {
+            this.action = actions.default.value
+            return actions.default.value.maybeParse(emptyList(), RootContext, stopOnFailure = true).failure
+        } else {
+            return whenMissing()
+        }
+    }
+
+    abstract fun whenMissing(): ArgParseException?
 }

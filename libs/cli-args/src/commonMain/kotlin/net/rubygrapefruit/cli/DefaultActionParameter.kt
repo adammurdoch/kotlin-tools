@@ -16,7 +16,7 @@ internal class DefaultActionParameter<T : Action>(
         return owner.replace(this, NullableActionParameter(actions, host))
     }
 
-    override fun missing(): ArgParseException {
+    override fun whenMissing(): ArgParseException {
         return ArgParseException("Action not provided", resolution = "Please specify an action to run.", actions = actionInfo)
     }
 

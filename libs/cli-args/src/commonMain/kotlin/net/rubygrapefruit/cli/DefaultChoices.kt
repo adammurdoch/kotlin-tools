@@ -9,7 +9,7 @@ internal class DefaultChoices<T>(
         val details = ChoiceDetails(value, help)
         val allNames = listOf(name) + names
         allNames.iterator().forEach {
-            host.validate(it, "an option name")
+            host.validate(it, "a choice name")
             choices[it] = details
         }
     }

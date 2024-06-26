@@ -2,6 +2,7 @@ package net.rubygrapefruit.cli
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.fail
 
 class ChoiceOptionTest : AbstractActionTest() {
     @Test
@@ -54,4 +55,19 @@ class ChoiceOptionTest : AbstractActionTest() {
         parseFails(Option(), listOf("-o", "abc"), "Unknown value for option -o: abc")
     }
 
+    @Test
+    fun `name must not start with punctuation`() {
+        class Option : Action() {
+            val option by oneOf {
+                choice(1, "1")
+                choice(2, "--two")
+            }.option("o")
+        }
+        try {
+            Option()
+            fail()
+        } catch (e: IllegalArgumentException) {
+            assertEquals("--two cannot be used as a choice name", e.message)
+        }
+    }
 }

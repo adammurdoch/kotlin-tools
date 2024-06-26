@@ -153,7 +153,7 @@ class ChoiceFlagsTest : AbstractActionTest() {
             Broken1()
             fail()
         } catch (e: IllegalArgumentException) {
-            assertEquals("--one cannot be used as an option name", e.message)
+            assertEquals("--one cannot be used as a choice name", e.message)
         }
         class Broken2 : Action() {
             val sub by oneOf {
@@ -164,7 +164,7 @@ class ChoiceFlagsTest : AbstractActionTest() {
             Broken2()
             fail()
         } catch (e: IllegalArgumentException) {
-            assertEquals("-1 cannot be used as an option name", e.message)
+            assertEquals("-1 cannot be used as a choice name", e.message)
         }
     }
 }

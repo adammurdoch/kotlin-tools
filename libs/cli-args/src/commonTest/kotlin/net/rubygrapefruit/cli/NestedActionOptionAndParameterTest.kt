@@ -1,6 +1,7 @@
 package net.rubygrapefruit.cli
 
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertSame
 
 class NestedActionOptionAndParameterTest : AbstractActionTest() {
@@ -36,5 +37,60 @@ class NestedActionOptionAndParameterTest : AbstractActionTest() {
         parseFails(WithSub(), listOf("--sub", "sub"), "Unknown parameter: sub")
         parseFails(WithSub(), listOf("sub", "--sub"), "Unknown option: --sub")
         parseFails(WithSub(), listOf("sub", "sub"), "Unknown parameter: sub")
+    }
+
+    @Test
+    fun `can define unnamed action to use when none provided`() {
+        val s1 = Action()
+        val s2 = Action()
+        val sub = Action()
+
+        class WithSub : Action() {
+            val sub by actions {
+                option(s1, "sub")
+                action(s2, "sub")
+                action(sub)
+            }
+        }
+
+        parse(WithSub(), listOf("--sub")) { action ->
+            assertSame(s1, action.sub)
+        }
+        parse(WithSub(), listOf("sub")) { action ->
+            assertSame(s2, action.sub)
+        }
+        parse(WithSub(), emptyList()) { action ->
+            assertSame(sub, action.sub)
+        }
+    }
+
+    @Test
+    fun `can define unnamed action with configuration`() {
+        class Sub : Action() {
+            val parameter by parameter("param")
+        }
+
+        val s1 = Action()
+        val s2 = Action()
+        val sub = Sub()
+
+        class WithSub : Action() {
+            val sub by actions {
+                option(s1, "sub")
+                action(s2, "sub")
+                action(sub)
+            }
+        }
+
+        parse(WithSub(), listOf("--sub")) { action ->
+            assertSame(s1, action.sub)
+        }
+        parse(WithSub(), listOf("sub")) { action ->
+            assertSame(s2, action.sub)
+        }
+        parse(WithSub(), listOf("arg")) { action ->
+            assertSame(sub, action.sub)
+            assertEquals("arg", sub.parameter)
+        }
     }
 }

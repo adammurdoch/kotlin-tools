@@ -99,7 +99,7 @@ open class Action {
     fun <T : Action> actions(builder: Actions<T>.() -> Unit): RequiredParameter<T> {
         val actions = DefaultActions<T>(DefaultHost)
         builder(actions)
-        val parameter = DefaultActionParameter(actions.options, actions.parameters, DefaultHost, this)
+        val parameter = DefaultActionParameter(actions.build(), DefaultHost, this)
         positional.add(parameter)
         return parameter
     }
@@ -243,11 +243,19 @@ open class Action {
 
     interface Actions<T : Action> {
         /**
-         * Adds a named action.
+         * Adds an action selected using a name argument.
          */
         fun action(action: T, name: String, help: String? = null)
 
+        /**
+         * Adds an action selected using an option.
+         */
         fun option(action: T, name: String, help: String? = null)
+
+        /**
+         * Adds an action selected as a default.
+         */
+        fun action(action: T)
     }
 
     interface Choices<T> {

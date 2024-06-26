@@ -3,10 +3,9 @@ package net.rubygrapefruit.cli
 import kotlin.reflect.KProperty
 
 internal class NullableActionParameter<T : Action>(
-    options: Map<String, ChoiceDetails<T>>,
-    parameters: Map<String, ChoiceDetails<T>>,
+    actions: ActionSet<T>,
     host: Host
-) : AbstractActionParameter<T>(options, parameters, host), Parameter<T?> {
+) : AbstractActionParameter<T>(actions, host), Parameter<T?> {
 
     override fun missing(): ArgParseException? {
         return null

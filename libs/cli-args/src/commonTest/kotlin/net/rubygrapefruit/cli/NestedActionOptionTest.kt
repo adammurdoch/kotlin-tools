@@ -1,7 +1,6 @@
 package net.rubygrapefruit.cli
 
-import kotlin.test.Test
-import kotlin.test.assertSame
+import kotlin.test.*
 
 class NestedActionOptionTest : AbstractActionTest() {
     @Test
@@ -53,6 +52,39 @@ class NestedActionOptionTest : AbstractActionTest() {
         }
         parse(WithSub(), listOf("--s2")) { action ->
             assertSame(s2, action.sub)
+        }
+    }
+
+    @Test
+    fun `action can have nested actions with configuration`() {
+        class Sub1 : Action() {
+            val param by parameter("param")
+            val flag by flag("flag")
+        }
+
+        class Sub2 : Action() {
+            val p1 by parameter("p1")
+            val p2 by parameter("p2")
+        }
+
+        class WithSub : Action() {
+            val sub by actions {
+                option(Sub1(), "s1")
+                option(Sub2(), "s2")
+            }
+        }
+
+        parse(WithSub(), listOf("--s1", "arg", "--flag")) { action ->
+            val sub = action.sub
+            assertIs<Sub1>(sub)
+            assertEquals("arg", sub.param)
+            assertTrue(sub.flag)
+        }
+        parse(WithSub(), listOf("--s2", "arg1", "arg2")) { action ->
+            val sub = action.sub
+            assertIs<Sub2>(sub)
+            assertEquals("arg1", sub.p1)
+            assertEquals("arg2", sub.p2)
         }
     }
 

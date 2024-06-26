@@ -3,18 +3,17 @@ package net.rubygrapefruit.cli
 import kotlin.reflect.KProperty
 
 internal class DefaultActionParameter<T : Action>(
-    options: Map<String, ChoiceDetails<T>>,
-    parameters: Map<String, ChoiceDetails<T>>,
+    actions: ActionSet<T>,
     host: Host,
     private val owner: Action
-) : AbstractActionParameter<T>(options, parameters, host), RequiredParameter<T> {
+) : AbstractActionParameter<T>(actions, host), RequiredParameter<T> {
 
     override fun whenAbsent(default: T): Parameter<T> {
-        return owner.replace(this, OptionalActionParameter(options, parameters, host, default))
+        return owner.replace(this, OptionalActionParameter(actions, host, default))
     }
 
     override fun optional(): Parameter<T?> {
-        return owner.replace(this, NullableActionParameter(options, parameters, host))
+        return owner.replace(this, NullableActionParameter(actions, host))
     }
 
     override fun missing(): ArgParseException {

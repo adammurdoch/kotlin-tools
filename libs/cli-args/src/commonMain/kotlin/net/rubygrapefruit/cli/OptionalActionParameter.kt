@@ -3,10 +3,11 @@ package net.rubygrapefruit.cli
 import kotlin.reflect.KProperty
 
 internal class OptionalActionParameter<T : Action>(
-    actions: Map<String, ChoiceDetails<T>>,
+    options: Map<String, ChoiceDetails<T>>,
+    parameters: Map<String, ChoiceDetails<T>>,
     host: Host,
     private val default: T
-) : AbstractActionParameter<T>(actions, host), Parameter<T> {
+) : AbstractActionParameter<T>(options, parameters, host), Parameter<T> {
 
     override fun missing(): ArgParseException? {
         return null

@@ -138,7 +138,7 @@ class NestedActionParameterTest : AbstractActionTest() {
     }
 
     @Test
-    fun `fails when nested action not provided`() {
+    fun `fails when exactly one nested action not provided`() {
         class WithSub : Action() {
             val sub by actions {
                 action(Action(), "s1")
@@ -150,6 +150,7 @@ class NestedActionParameterTest : AbstractActionTest() {
             assertEquals("Action not provided", e.message)
             assertEquals(2, e.actions.size)
         }
+        parseFails(WithSub(), listOf("s1", "s2"), "Unknown parameter: s2")
     }
 
     @Test
@@ -192,7 +193,7 @@ class NestedActionParameterTest : AbstractActionTest() {
     }
 
     @Test
-    fun `fails when unknown nested action provided`() {
+    fun `fails when unknown action name provided`() {
         class WithSub : Action() {
             val sub by actions {
                 action(Action(), "s1")
@@ -223,11 +224,9 @@ class NestedActionParameterTest : AbstractActionTest() {
 
     @Test
     fun `fails when additional args provided after nested action`() {
-        val sub = Action()
-
         class WithSub : Action() {
             val sub by actions {
-                action(sub, "sub")
+                action(Action(), "sub")
             }
         }
 

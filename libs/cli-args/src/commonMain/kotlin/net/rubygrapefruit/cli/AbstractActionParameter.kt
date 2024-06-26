@@ -1,24 +1,32 @@
 package net.rubygrapefruit.cli
 
 internal abstract class AbstractActionParameter<T : Action>(
-    protected val actions: Map<String, ChoiceDetails<T>>,
+    protected val options: Map<String, ChoiceDetails<T>>,
+    protected val parameters: Map<String, ChoiceDetails<T>>,
     protected val host: Host
 ) : Positional() {
     protected var action: T? = null
 
     protected val actionInfo
-        get() = actions.map { SubActionUsage(it.key, it.value.help, it.value.value.usage()) }
+        get() = parameters.map { SubActionUsage(it.key, it.value.help, it.value.value.usage()) }
 
     override fun accept(args: List<String>, context: ParseContext): ParseResult {
         val name = args.first()
-        if (host.isOption(name)) {
-            return ParseResult.Nothing
+        val action = if (host.isOption(name)) {
+            val option = options[name]
+            if (option == null) {
+                return ParseResult.Nothing
+            }
+            option.value
+        } else {
+            val parameter = parameters[name]
+            if (parameter==null) {
+                return ParseResult(1, ArgParseException("Unknown action: $name", actions = actionInfo), true)
+            }
+            parameter.value
         }
-        if (!actions.containsKey(name)) {
-            return ParseResult(1, ArgParseException("Unknown action: $name", actions = actionInfo), true)
-        }
-        action = actions.getValue(name).value
-        val result = action!!.maybeParse(args.drop(1), context, stopOnFailure = true)
+        this.action = action
+        val result = action.maybeParse(args.drop(1), context, stopOnFailure = true)
         return ParseResult(1 + result.count, result.failure, result.finished)
     }
 

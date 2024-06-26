@@ -27,6 +27,7 @@
     - Option value badly formed
     - Parameter value badly formed
     - Option value missing
+    - Multiple actions specified, eg multiple args, multiple options, etc.
 - Handle required list parameter with default value - disallow? succeed if absent and default provided?
 - Validate names do not contain spaces
 - Validate at least one action or choice is defined

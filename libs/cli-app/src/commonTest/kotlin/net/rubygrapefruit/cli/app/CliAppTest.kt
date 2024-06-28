@@ -1,6 +1,7 @@
 package net.rubygrapefruit.cli.app
 
 import kotlin.test.Test
+import kotlin.test.assertContains
 import kotlin.test.assertIs
 
 class CliAppTest {
@@ -18,6 +19,9 @@ class CliAppTest {
 
         val action = NoConfig().actionFor(listOf("--help"))
         assertIs<HelpAction>(action)
+        assertContains(action.formatted, "--help")
+        assertContains(action.formatted, "--stack")
+        assertContains(action.formatted, "--completion")
     }
 
     @Test

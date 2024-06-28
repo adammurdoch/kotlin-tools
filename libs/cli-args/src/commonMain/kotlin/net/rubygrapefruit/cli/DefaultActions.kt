@@ -10,8 +10,8 @@ internal class DefaultActions<T : Action>(private val host: Host) : Action.Actio
         parameters[name] = ChoiceDetails(action, help)
     }
 
-    override fun action(action: T) {
-        default = ChoiceDetails(action, null)
+    override fun action(action: T, help: String?) {
+        default = ChoiceDetails(action, help)
     }
 
     override fun option(action: T, name: String, help: String?) {

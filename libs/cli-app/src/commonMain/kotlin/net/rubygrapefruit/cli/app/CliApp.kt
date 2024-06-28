@@ -52,14 +52,14 @@ open class CliApp(val name: String) : CliAction() {
         val help by boolean().flag("help", help = "Show usage message", disableOption = false)
         val stackTrace by flag("stack", help = "Show stack trace on failure")
         val action by actions {
-            option(CompletionAction(app), "completion", help = "Generate ZSH completion script")
+            option(CompletionAction(app.name, this@MainAction), "completion", help = "Generate ZSH completion script")
             action(app)
         }
 
         fun actionFor(args: List<String>): Action {
             val result = maybeParse(args)
             return if (help) {
-                HelpAction(app)
+                HelpAction(app.name, this)
             } else if (result is Result.Failure) {
                 throw result.failure
             } else {

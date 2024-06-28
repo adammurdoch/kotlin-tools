@@ -20,12 +20,26 @@ class ActionUsage(
             }
             builder.append("\n")
             val parameters = positional.filterIsInstance<ParameterUsage>().filter { it.help != null }
-            val actions = positional.filterIsInstance<ActionParameterUsage>().flatMap { it.actions }
+            val actionParameters = positional.filterIsInstance<ActionParameterUsage>()
+            val actions = actionParameters.flatMap { action -> action.actions() }
             builder.appendItems("Parameters", parameters)
             builder.appendItems("Actions", actions)
             builder.appendItems("Options", options)
             return builder.toString()
         }
+
+    private fun ActionParameterUsage.actions(): List<SubActionUsage> {
+        return options + named + if (default != null) default.action.actions() else emptyList()
+    }
+
+    private fun ActionUsage.actions(): List<SubActionUsage> {
+        val first = positional.firstOrNull()
+        return if (first is ActionParameterUsage) {
+            first.actions()
+        } else {
+            emptyList()
+        }
+    }
 }
 
 sealed class ItemUsage(val help: String?) {
@@ -79,7 +93,9 @@ class ActionParameterUsage(
     usage: String,
     display: String,
     help: String?,
-    val actions: List<SubActionUsage>
+    val options: List<SubActionUsage>,
+    val named: List<SubActionUsage>,
+    val default: SubActionUsage?
 ) : PositionalUsage(usage, display, help)
 
 class SubActionUsage(val name: String, help: String?, val action: ActionUsage) : ItemUsage(help) {

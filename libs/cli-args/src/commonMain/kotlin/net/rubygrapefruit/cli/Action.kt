@@ -254,7 +254,7 @@ open class Action {
         /**
          * Adds an action selected as a default.
          */
-        fun action(action: T)
+        fun action(action: T, help: String? = null)
     }
 
     interface Choices<T> {

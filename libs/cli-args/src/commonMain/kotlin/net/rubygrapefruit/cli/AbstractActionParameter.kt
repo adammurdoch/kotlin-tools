@@ -33,7 +33,9 @@ internal abstract class AbstractActionParameter<T : Action>(
     }
 
     override fun usage(): PositionalUsage {
-        return ActionParameterUsage("<action>", "<action>", null, actionInfo)
+        val optionInfo = actions.options.map { SubActionUsage(it.key, it.value.help, it.value.value.usage()) }
+        val defaultInfo = actions.default?.let { SubActionUsage("default", null, it.value.usage()) }
+        return ActionParameterUsage("<action>", "<action>", null, optionInfo, actionInfo, defaultInfo)
     }
 
     override fun missing(): ArgParseException? {

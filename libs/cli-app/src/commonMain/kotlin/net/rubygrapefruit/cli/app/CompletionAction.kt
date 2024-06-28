@@ -6,10 +6,13 @@ import net.rubygrapefruit.file.ElementPath
 import net.rubygrapefruit.file.RegularFile
 import kotlin.reflect.KClass
 
-internal class CompletionAction(val action: CliApp) : Action() {
+internal class CompletionAction(
+    private val name: String,
+    private val action: Action
+) : Action() {
     override fun run() {
         val usage = action.usage()
-        val appName = action.name
+        val appName = name
 
         val functionName = appName + "_complete"
         println()
@@ -38,11 +41,11 @@ internal class CompletionAction(val action: CliApp) : Action() {
 
                 is ActionParameterUsage -> {
                     println(" \\")
-                    println("    '${index + 1}::Action:(${positional.actions.joinToString(" ") { it.name }})' \\")
+                    println("    '${index + 1}::Action:(${positional.named.joinToString(" ") { it.name }})' \\")
                     println("    '*::arg:->args'")
 
                     println("  case \$line[1] in")
-                    for (nested in positional.actions) {
+                    for (nested in positional.named) {
                         println("    ${nested.name})")
                         print("      _arguments")
                         options(nested.action.options, "        ")

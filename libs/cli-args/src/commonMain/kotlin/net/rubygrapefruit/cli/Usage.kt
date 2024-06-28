@@ -8,23 +8,43 @@ class ActionUsage(
 ) {
     val formatted: String
         get() {
+            val first = positional.firstOrNull()
+            val effective = when (first) {
+                null, is ParameterUsage -> this
+                is ActionParameterUsage -> {
+                    val additionalOptions =
+                        first.options.filter { it.name.startsWith("-") }.map { OptionUsage(it.name, it.help, null, listOf(SingleOptionUsage(it.name, it.help, emptyList()))) }
+                    if (additionalOptions.size == first.options.size) {
+                        // replace first positional with its default if it only uses options
+                        if (first.default != null) {
+                            ActionUsage(options + additionalOptions + first.default.action.options, first.default.action.positional + positional.drop(1))
+                        } else {
+                            ActionUsage(options + additionalOptions, positional.drop(1))
+                        }
+                    } else {
+                        ActionUsage(options + additionalOptions, positional)
+                    }
+                }
+            }
+
+
             val builder = StringBuilder()
-            if (options.isNotEmpty()) {
+            if (effective.options.isNotEmpty()) {
                 builder.append("[options]")
             }
-            for (positional in positional) {
+            for (positional in effective.positional) {
                 if (builder.isNotEmpty()) {
                     builder.append(" ")
                 }
                 builder.append(positional.usage)
             }
             builder.append("\n")
-            val parameters = positional.filterIsInstance<ParameterUsage>().filter { it.help != null }
-            val actionParameters = positional.filterIsInstance<ActionParameterUsage>()
-            val actions = actionParameters.flatMap { action -> action.actions() }
+            val parameters = effective.positional.filterIsInstance<ParameterUsage>().filter { it.help != null }
+            val actionParameters = effective.positional.filterIsInstance<ActionParameterUsage>()
+            val actions = actionParameters.flatMap { action -> action.actions() }.filter { !it.name.startsWith("-") }
             builder.appendItems("Parameters", parameters)
             builder.appendItems("Actions", actions)
-            builder.appendItems("Options", options)
+            builder.appendItems("Options", effective.options)
             return builder.toString()
         }
 

@@ -11,7 +11,7 @@ internal class CompletionAction(
     private val action: Action
 ) : Action() {
     override fun run() {
-        val usage = action.usage()
+        val usage = action.usage().effective()
         val appName = name
 
         val functionName = appName + "_complete"

@@ -161,11 +161,9 @@ class ActionUsageTest {
             [options] <action> <action>
 
             Actions:
-              a2           run action a2
-              action-three
+              a2         run action a2
               action-two
-              z            run action z
-              z2           run action z2
+              z          run action z
 
             Options:
               --help, --no-help help message

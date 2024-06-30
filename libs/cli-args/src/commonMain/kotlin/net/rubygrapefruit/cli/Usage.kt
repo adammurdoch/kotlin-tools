@@ -6,45 +6,55 @@ class ActionUsage(
     val options: List<OptionUsage>,
     val positional: List<PositionalUsage>
 ) {
-    val formatted: String
-        get() {
-            val first = positional.firstOrNull()
-            val effective = when (first) {
-                null, is ParameterUsage -> this
-                is ActionParameterUsage -> {
-                    val additionalOptions =
-                        first.options.filter { it.name.startsWith("-") }.map { OptionUsage(it.name, it.help, null, listOf(SingleOptionUsage(it.name, it.help, emptyList()))) }
-                    if (additionalOptions.size == first.options.size) {
-                        // replace first positional with its default if it only uses options
-                        if (first.default != null) {
-                            ActionUsage(options + additionalOptions + first.default.action.options, first.default.action.positional + positional.drop(1))
-                        } else {
-                            ActionUsage(options + additionalOptions, positional.drop(1))
-                        }
+    /**
+     * Simplifies this usage by inlining nested action sets, etc.
+     */
+    fun effective(): ActionUsage {
+        val first = positional.firstOrNull()
+        return when (first) {
+            null, is ParameterUsage -> this
+            is ActionParameterUsage -> {
+                val additionalOptions = first.options.map { OptionUsage(it.name, it.help, null, listOf(SingleOptionUsage(it.name, it.help, listOf(it.name)))) }
+                val allOptions = options + additionalOptions
+                if (first.named.isEmpty()) {
+                    if (first.default != null) {
+                        // replace action parameter with its default
+                        ActionUsage(allOptions + first.default.action.options, first.default.action.positional + positional.drop(1))
                     } else {
-                        ActionUsage(options + additionalOptions, positional)
+                        // discard action parameter
+                        ActionUsage(allOptions, positional.drop(1))
                     }
+                } else {
+                    // discard options from action parameter
+                    ActionUsage(allOptions, listOf(first.dropOptions()) + positional.drop(1))
                 }
             }
+        }
+    }
 
-
+    val formatted: String
+        get() {
             val builder = StringBuilder()
-            if (effective.options.isNotEmpty()) {
+            if (options.isNotEmpty()) {
                 builder.append("[options]")
             }
-            for (positional in effective.positional) {
+            for (positional in positional) {
                 if (builder.isNotEmpty()) {
                     builder.append(" ")
                 }
                 builder.append(positional.usage)
             }
             builder.append("\n")
-            val parameters = effective.positional.filterIsInstance<ParameterUsage>().filter { it.help != null }
-            val actionParameters = effective.positional.filterIsInstance<ActionParameterUsage>()
-            val actions = actionParameters.flatMap { action -> action.actions() }.filter { !it.name.startsWith("-") }
+            val parameters = positional.filterIsInstance<ParameterUsage>().filter { it.help != null }
+            val first = positional.firstOrNull()
+            val actions = if (first is ActionParameterUsage) {
+                first.named
+            } else {
+                emptyList()
+            }
             builder.appendItems("Parameters", parameters)
             builder.appendItems("Actions", actions)
-            builder.appendItems("Options", effective.options)
+            builder.appendItems("Options", options)
             return builder.toString()
         }
 
@@ -116,7 +126,12 @@ class ActionParameterUsage(
     val options: List<SubActionUsage>,
     val named: List<SubActionUsage>,
     val default: SubActionUsage?
-) : PositionalUsage(usage, display, help)
+) : PositionalUsage(usage, display, help) {
+
+    fun dropOptions(): ActionParameterUsage {
+        return ActionParameterUsage(usage, display, help, emptyList(), named, default)
+    }
+}
 
 class SubActionUsage(val name: String, help: String?, val action: ActionUsage) : ItemUsage(help) {
     override val display: String

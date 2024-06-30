@@ -8,7 +8,7 @@ internal class HelpAction(
 ) : Action() {
     internal val formatted: String
         get() {
-            val usage = action.usage()
+            val usage = action.usage().effective()
             val builder = StringBuilder()
             builder.append("Usage: ")
             builder.append(name)

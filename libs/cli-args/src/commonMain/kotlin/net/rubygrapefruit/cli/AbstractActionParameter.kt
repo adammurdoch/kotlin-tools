@@ -10,26 +10,35 @@ internal abstract class AbstractActionParameter<T : Action>(
         get() = actions.named.map { NamedNestedActionUsage(it.key, it.value.help, it.value.value.usage()) }
 
     override fun accept(args: List<String>, context: ParseContext): ParseResult {
-        val name = args.first()
-        val action = if (host.isOption(name)) {
-            val option = actions.options[name]
-            if (option == null) {
-                return ParseResult.Nothing
-            }
-            option.value
-        } else if (actions.named.containsKey(name)) {
-            val parameter = actions.named.getValue(name)
-            parameter.value
-        } else if (actions.default != null) {
+        val action = locateActionByFirstArg(args)
+        if (action != null) {
+            this.action = action.value
+            val result = action.value.maybeParse(args.drop(1), context, stopOnFailure = true)
+            return ParseResult(1 + result.count, result.failure, result.finished)
+        }
+        if (actions.default != null) {
             this.action = actions.default.value
             val result = actions.default.value.maybeParse(args, context, stopOnFailure = true)
             return result
+        }
+
+        val name = args.first()
+        if (host.isOption(name)) {
+            return ParseResult.Nothing
         } else {
             return ParseResult(1, ArgParseException("Unknown action: $name", actions = actionInfo), true)
         }
-        this.action = action
-        val result = action.maybeParse(args.drop(1), context, stopOnFailure = true)
-        return ParseResult(1 + result.count, result.failure, result.finished)
+    }
+
+    private fun locateActionByFirstArg(args: List<String>): ChoiceDetails<T>? {
+        val name = args.firstOrNull()
+        if (name == null) {
+            return null
+        }
+        if (host.isOption(name)) {
+            return actions.options[name]
+        }
+        return actions.named[name]
     }
 
     override fun usage(): PositionalUsage {

@@ -1,8 +1,6 @@
 package net.rubygrapefruit.cli
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertSame
+import kotlin.test.*
 
 class NestedActionOptionAndParameterTest : AbstractActionTest() {
     @Test
@@ -67,6 +65,7 @@ class NestedActionOptionAndParameterTest : AbstractActionTest() {
     @Test
     fun `can define unnamed action with configuration`() {
         class Sub : Action() {
+            val flag by flag("flag")
             val parameter by parameter("param")
         }
 
@@ -91,8 +90,15 @@ class NestedActionOptionAndParameterTest : AbstractActionTest() {
         parse(WithSub(), listOf("arg")) { action ->
             assertSame(sub, action.sub)
             assertEquals("arg", sub.parameter)
+            assertFalse(sub.flag)
+        }
+        parse(WithSub(), listOf("--flag", "arg")) { action ->
+            assertSame(sub, action.sub)
+            assertEquals("arg", sub.parameter)
+            assertTrue(sub.flag)
         }
 
         parseFails(WithSub(), emptyList(), "Parameter 'param' not provided")
+        parseFails(WithSub(), listOf("--flag"), "Parameter 'param' not provided")
     }
 }

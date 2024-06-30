@@ -15,11 +15,11 @@ class ActionUsage(
             null, is ParameterUsage -> this
             is ActionParameterUsage -> {
                 val additionalOptions = first.options.map { OptionUsage(it.name, it.help, null, listOf(SingleOptionUsage(it.name, it.help, listOf(it.name)))) }
-                val allOptions = options + additionalOptions
+                val allOptions = options + additionalOptions + if (first.default != null) first.default.action.options else emptyList()
                 if (first.named.isEmpty()) {
                     if (first.default != null) {
                         // replace action parameter with its default
-                        ActionUsage(allOptions + first.default.action.options, first.default.action.positional + positional.drop(1))
+                        ActionUsage(allOptions, first.default.action.positional + positional.drop(1))
                     } else {
                         // discard action parameter
                         ActionUsage(allOptions, positional.drop(1))
@@ -48,7 +48,7 @@ class ActionUsage(
             val parameters = positional.filterIsInstance<ParameterUsage>().filter { it.help != null }
             val first = positional.firstOrNull()
             val actions = if (first is ActionParameterUsage) {
-                first.named
+                first.actions
             } else {
                 emptyList()
             }
@@ -58,11 +58,11 @@ class ActionUsage(
             return builder.toString()
         }
 
-    private fun ActionParameterUsage.actions(): List<SubActionUsage> {
+    private fun ActionParameterUsage.actions(): List<NamedNestedActionUsage> {
         return options + named + if (default != null) default.action.actions() else emptyList()
     }
 
-    private fun ActionUsage.actions(): List<SubActionUsage> {
+    private fun ActionUsage.actions(): List<NamedNestedActionUsage> {
         val first = positional.firstOrNull()
         return if (first is ActionParameterUsage) {
             first.actions()
@@ -123,17 +123,27 @@ class ActionParameterUsage(
     usage: String,
     display: String,
     help: String?,
-    val options: List<SubActionUsage>,
-    val named: List<SubActionUsage>,
-    val default: SubActionUsage?
+    val options: List<NamedNestedActionUsage>,
+    val named: List<NamedNestedActionUsage>,
+    val default: DefaultNestedActionUsage?
 ) : PositionalUsage(usage, display, help) {
 
     fun dropOptions(): ActionParameterUsage {
         return ActionParameterUsage(usage, display, help, emptyList(), named, default)
     }
+
+    val actions: List<NestedActionUsage>
+        get() = options + named + if (default != null) listOf(default) else emptyList()
 }
 
-class SubActionUsage(val name: String, help: String?, val action: ActionUsage) : ItemUsage(help) {
+sealed class NestedActionUsage(help: String?, val action: ActionUsage) : ItemUsage(help)
+
+class NamedNestedActionUsage(val name: String, help: String?, action: ActionUsage) : NestedActionUsage(help, action) {
     override val display: String
         get() = name
+}
+
+class DefaultNestedActionUsage(help: String?, action: ActionUsage) : NestedActionUsage(help, action) {
+    override val display: String
+        get() = action.positional.joinToString(" ") { it.usage }
 }

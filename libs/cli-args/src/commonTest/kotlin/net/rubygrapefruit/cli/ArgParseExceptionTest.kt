@@ -11,9 +11,9 @@ class ArgParseExceptionTest {
             "broken",
             "Please run something",
             listOf(
-                SubActionUsage("run", "run something", action),
-                SubActionUsage("do-another-thing", "run something else", action),
-                SubActionUsage("no-help", null, action)
+                NamedNestedActionUsage("run", "run something", action),
+                NamedNestedActionUsage("do-another-thing", "run something else", action),
+                NamedNestedActionUsage("no-help", null, action)
             )
         )
 

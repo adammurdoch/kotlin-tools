@@ -7,7 +7,7 @@ internal abstract class AbstractActionParameter<T : Action>(
     protected var action: T? = null
 
     protected val actionInfo
-        get() = actions.named.map { SubActionUsage(it.key, it.value.help, it.value.value.usage()) }
+        get() = actions.named.map { NamedNestedActionUsage(it.key, it.value.help, it.value.value.usage()) }
 
     override fun accept(args: List<String>, context: ParseContext): ParseResult {
         val name = args.first()
@@ -33,8 +33,8 @@ internal abstract class AbstractActionParameter<T : Action>(
     }
 
     override fun usage(): PositionalUsage {
-        val optionInfo = actions.options.map { SubActionUsage(it.key, it.value.help, it.value.value.usage()) }
-        val defaultInfo = actions.default?.let { SubActionUsage("default", null, it.value.usage()) }
+        val optionInfo = actions.options.map { NamedNestedActionUsage(it.key, it.value.help, it.value.value.usage()) }
+        val defaultInfo = actions.default?.let { DefaultNestedActionUsage(it.help, it.value.usage()) }
         return ActionParameterUsage("<action>", "<action>", null, optionInfo, actionInfo, defaultInfo)
     }
 

@@ -115,15 +115,15 @@ class HelpActionTest : AbstractActionTest() {
             """
             Usage: cmd [options] <action>
             
-            Options:
-              --option <value> some option
-              
             Actions:
+              <param>    run main action
               a2         run action a2
               action-two
               z          run action z
-              <param>    run main action
             
+            Options:
+              --option <value> some option
+
             """.trimIndent(), help.formatted
         )
     }

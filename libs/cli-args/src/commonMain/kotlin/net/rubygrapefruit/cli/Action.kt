@@ -101,9 +101,7 @@ open class Action {
         builder(actions)
         val parameter = DefaultActionParameter(actions.build(), DefaultHost, this)
         positional.add(parameter)
-        if (parameter.nonPositional != null) {
-            options.add(parameter.nonPositional)
-        }
+        options.addAll(parameter.nonPositional)
         return parameter
     }
 

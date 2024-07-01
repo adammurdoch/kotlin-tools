@@ -18,7 +18,7 @@ internal abstract class AbstractOption<T : Any>(
         return listOf(OptionUsage(usage.usage, help, converter.type, listOf(usage)))
     }
 
-    override fun accept(args: List<String>): ParseResult {
+    override fun accept(args: List<String>, context: ParseContext): ParseResult {
         val arg = args.first()
         if (!flags.contains(arg)) {
             return ParseResult.Nothing

@@ -9,7 +9,7 @@ internal abstract class AbstractChoice<T : Any>(
         return choices.map { OptionUsage(it.key, it.value.help, null, listOf(SingleOptionUsage(it.key, it.value.help, listOf(it.key)))) }
     }
 
-    override fun accept(args: List<String>): ParseResult {
+    override fun accept(args: List<String>, context: ParseContext): ParseResult {
         val result = choices[args[0]]
         return if (result != null) {
             value = result.value

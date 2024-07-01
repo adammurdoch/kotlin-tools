@@ -9,7 +9,32 @@ internal abstract class AbstractActionParameter<T : Action>(
     protected val actionInfo
         get() = actions.named.map { NamedNestedActionUsage(it.key, it.value.help, it.value.value.usage()) }
 
+    val nonPositional: NonPositional? = if (actions.options.any { it.value.allowAnywhere }) object : NonPositional() {
+        override fun usage(): List<OptionUsage> {
+            return emptyList()
+        }
+
+        override fun accept(args: List<String>, context: ParseContext): ParseResult {
+            val name = args.firstOrNull()
+            return if (name == null) {
+                ParseResult.Nothing
+            } else {
+                val option = actions.options[name]
+                if (option != null && option.allowAnywhere) {
+                    action = option.value
+                    val result = option.value.maybeParse(args.drop(1), context, stopOnFailure = true)
+                    return ParseResult(1 + result.count, result.failure, result.finished)
+                } else {
+                    ParseResult.Nothing
+                }
+            }
+        }
+    } else null
+
     override fun accept(args: List<String>, context: ParseContext): ParseResult {
+        if (action != null) {
+            return ParseResult.Nothing
+        }
         val name = args.firstOrNull()
         val action = locateActionByFirstArg(name)
         if (action != null) {

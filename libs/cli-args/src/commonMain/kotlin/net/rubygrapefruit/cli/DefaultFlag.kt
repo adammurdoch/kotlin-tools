@@ -38,7 +38,7 @@ internal class DefaultFlag private constructor(
         )
     }
 
-    override fun accept(args: List<String>): ParseResult {
+    override fun accept(args: List<String>, context: ParseContext): ParseResult {
         val arg = args.first()
         return if (enableFlags.contains(arg)) {
             value = true

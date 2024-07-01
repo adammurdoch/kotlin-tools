@@ -101,6 +101,9 @@ open class Action {
         builder(actions)
         val parameter = DefaultActionParameter(actions.build(), DefaultHost, this)
         positional.add(parameter)
+        if (parameter.nonPositional != null) {
+            options.add(parameter.nonPositional)
+        }
         return parameter
     }
 
@@ -143,7 +146,7 @@ open class Action {
 
             var matched = false
             for (option in context.options) {
-                val result = option.accept(current)
+                val result = option.accept(current, context)
                 if (result.count > 0) {
                     if (result.failure != null && failure == null) {
                         failure = result.failure

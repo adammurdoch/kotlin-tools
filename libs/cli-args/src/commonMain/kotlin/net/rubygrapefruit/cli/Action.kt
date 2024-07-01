@@ -249,7 +249,7 @@ open class Action {
         /**
          * Adds an action selected using an option.
          */
-        fun option(action: T, name: String, help: String? = null)
+        fun option(action: T, name: String, help: String? = null, allowAnywhere: Boolean = false)
 
         /**
          * Adds an action selected as a default.

@@ -10,7 +10,8 @@ internal abstract class AbstractActionParameter<T : Action>(
         get() = actions.named.map { NamedNestedActionUsage(it.key, it.value.help, it.value.value.usage()) }
 
     override fun accept(args: List<String>, context: ParseContext): ParseResult {
-        val action = locateActionByFirstArg(args)
+        val name = args.firstOrNull()
+        val action = locateActionByFirstArg(name)
         if (action != null) {
             this.action = action.value
             val result = action.value.maybeParse(args.drop(1), context, stopOnFailure = true)
@@ -22,16 +23,14 @@ internal abstract class AbstractActionParameter<T : Action>(
             return result
         }
 
-        val name = args.first()
-        if (host.isOption(name)) {
+        if (name == null || host.isOption(name)) {
             return ParseResult.Nothing
         } else {
             return ParseResult(1, ArgParseException("Unknown action: $name", actions = actionInfo), true)
         }
     }
 
-    private fun locateActionByFirstArg(args: List<String>): ChoiceDetails<T>? {
-        val name = args.firstOrNull()
+    private fun locateActionByFirstArg(name: String?): ActionDetails<T>? {
         if (name == null) {
             return null
         }

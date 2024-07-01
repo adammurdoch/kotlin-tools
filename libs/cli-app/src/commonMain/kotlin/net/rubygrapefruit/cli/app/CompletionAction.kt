@@ -25,7 +25,10 @@ internal class CompletionAction(
               typeset -A opt_args
             """.trimIndent()
         )
-        print("  _arguments -C")
+        print("  _arguments")
+        if (usage.positional.any { it is ActionParameterUsage }) {
+            print(" -C")
+        }
         options(usage.options, "    ")
         for (index in usage.positional.indices) {
             val positional = usage.positional[index]
@@ -70,17 +73,12 @@ internal class CompletionAction(
                         println("    ;;")
                     }
                     println("  esac")
-
                     break
                 }
             }
         }
         println()
-        println(
-            """
-            }
-        """.trimIndent()
-        )
+        println("}")
     }
 
     private fun options(options: List<OptionUsage>, indent: String) {

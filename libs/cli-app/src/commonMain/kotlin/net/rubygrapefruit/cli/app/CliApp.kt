@@ -49,17 +49,17 @@ open class CliApp(val name: String) : CliAction() {
     }
 
     private class MainAction(val app: CliApp) : Action() {
-        val help by boolean().flag("help", help = "Show usage message", disableOption = false)
         val stackTrace by flag("stack", help = "Show stack trace on failure")
         val action by actions {
+            option(HelpAction(app.name, this@MainAction), "help", help = "Show usage message", allowAnywhere = true)
             option(CompletionAction(app.name, this@MainAction), "completion", help = "Generate ZSH completion script")
             action(app)
         }
 
         fun actionFor(args: List<String>): Action {
             val result = maybeParse(args)
-            return if (help) {
-                HelpAction(app.name, this)
+            return if (action is HelpAction) {
+                action
             } else if (result is Result.Failure) {
                 throw result.failure
             } else {

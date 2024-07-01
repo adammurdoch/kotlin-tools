@@ -6,7 +6,7 @@ internal sealed interface ParseContext {
     fun withOptions(options: List<NonPositional>): ParseContext
 }
 
-internal object RootContext : ParseContext {
+internal data object RootContext : ParseContext {
     override val options: List<NonPositional>
         get() = emptyList()
 

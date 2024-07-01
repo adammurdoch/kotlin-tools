@@ -18,7 +18,7 @@ internal class OptionalParameter<T : Any>(
         return usage(Cardinality.Optional)
     }
 
-    override fun missing(): ArgParseException? {
+    override fun finished(): ArgParseException? {
         return null
     }
 }

@@ -49,3 +49,4 @@
 - Async write to file
 - Option for storing secrets, eg set permissions, encode
 - Optionally discard on incompatible version
+- fsync for durability

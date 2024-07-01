@@ -193,7 +193,7 @@ open class Action {
 
         if (failure == null) {
             for (positional in pending) {
-                val missing = positional.missing()
+                val missing = positional.finished()
                 if (missing != null && failure == null) {
                     failure = missing
                 }

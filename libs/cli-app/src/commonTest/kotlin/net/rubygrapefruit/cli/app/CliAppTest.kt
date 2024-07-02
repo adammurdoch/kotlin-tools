@@ -28,16 +28,22 @@ class CliAppTest {
     fun `can run --help action when unknown option is used`() {
         class NoConfig : CliApp("cmd")
 
-        val action = NoConfig().actionFor(listOf("-o", "--help"))
-        assertIs<HelpAction>(action)
+        val action1 = NoConfig().actionFor(listOf("-o", "--help"))
+        assertIs<HelpAction>(action1)
+
+        val action2 = NoConfig().actionFor(listOf("--help", "--o"))
+        assertIs<HelpAction>(action2)
     }
 
     @Test
     fun `can run --help action when unknown parameter is used`() {
         class NoConfig : CliApp("cmd")
 
-        val action = NoConfig().actionFor(listOf("arg", "--help"))
-        assertIs<HelpAction>(action)
+        val action1 = NoConfig().actionFor(listOf("arg", "--help"))
+        assertIs<HelpAction>(action1)
+
+        val action2 = NoConfig().actionFor(listOf("--help", "arg"))
+        assertIs<HelpAction>(action2)
     }
 
     @Test

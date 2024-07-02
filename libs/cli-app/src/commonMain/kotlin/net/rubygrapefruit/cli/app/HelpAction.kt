@@ -6,8 +6,13 @@ internal class HelpAction(
     private val name: String,
     private val action: Action
 ) : Action() {
+    private val actionName by parameter("action").optional()
+
     internal val formatted: String
         get() {
+            if (actionName != null) {
+                return "usage for '$actionName'"
+            }
             val usage = action.usage().effective()
             val builder = StringBuilder()
             builder.append("Usage: ")

@@ -12,18 +12,16 @@ internal abstract class AbstractActionParameter<T : Action>(
     val nonPositional: List<NonPositional> = actions.options.filter { it.value.allowAnywhere }.map { AllowAnywhereOption(it.key, it.value) }
 
     override fun accept(args: List<String>, context: ParseContext): ParseResult {
+        if (this.action != null) {
+            return ParseResult(0, null, true)
+        }
+
         val name = args.firstOrNull()
         val action = locateActionByFirstArg(name)
         if (action != null) {
-            if (!action.allowAnywhere && this.action != null) {
-                return ParseResult(0, null, true)
-            }
             this.action = action.value
             val result = action.value.maybeParse(args.drop(1), context, stopOnFailure = true)
             return ParseResult(1 + result.count, result.failure, result.finished)
-        }
-        if (this.action != null) {
-            return ParseResult(0, null, true)
         }
         if (actions.default != null) {
             this.action = actions.default.value

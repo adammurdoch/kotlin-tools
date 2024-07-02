@@ -130,11 +130,11 @@ class NestedActionOptionTest : AbstractActionTest() {
         parseRecovers(WithSub(), listOf("--s1", "--s2", "arg1", "arg2")) { action ->
             assertIs<Sub1>(action.sub)
         }
-        parseRecovers(WithSub(), listOf("--s2", "arg1", "arg2", "--s1")) { action ->
+        parse(WithSub(), listOf("--s2", "arg1", "arg2", "--s1")) { action ->
             assertIs<Sub1>(action.sub)
         }
 
-        // Missing
+        // Missing arguments
         parseRecovers(WithSub(), listOf("--s1", "--s2")) { action ->
             assertIs<Sub1>(action.sub)
         }
@@ -143,10 +143,10 @@ class NestedActionOptionTest : AbstractActionTest() {
         }
 
         // Interleaved
-        parseRecovers(WithSub(), listOf("--s2", "--s1", "arg1", "arg2")) { action ->
+        parse(WithSub(), listOf("--s2", "--s1", "arg1", "arg2")) { action ->
             assertIs<Sub1>(action.sub)
         }
-        parseRecovers(WithSub(), listOf("--s2", "arg1", "--s1", "arg2")) { action ->
+        parse(WithSub(), listOf("--s2", "arg1", "--s1", "arg2")) { action ->
             assertIs<Sub1>(action.sub)
         }
 

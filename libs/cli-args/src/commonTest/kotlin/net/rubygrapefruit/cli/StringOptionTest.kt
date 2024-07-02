@@ -167,7 +167,7 @@ class StringOptionTest : AbstractActionTest() {
             val param by option("value")
         }
 
-        parseRecovers(TestApp(Option()), listOf("--value", "--help")) { action ->
+        parse(TestApp(Option()), listOf("--value", "--help")) { action ->
             assertIs<HelpAction>(action.selected)
         }
     }

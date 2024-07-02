@@ -30,7 +30,7 @@ class ChoiceParameterTest : AbstractActionTest() {
             }.parameter("value")
         }
 
-        parseFails(Parameter(), listOf("abc"), "Unknown value for parameter 'value': abc")
+        parseFails(::Parameter, listOf("abc"), "Unknown value for parameter 'value': abc")
     }
 
     @Test
@@ -42,7 +42,7 @@ class ChoiceParameterTest : AbstractActionTest() {
             }.parameter("value")
         }
 
-        parseFails(Parameter(), emptyList(), "Parameter 'value' not provided")
+        parseFails(::Parameter, emptyList(), "Parameter 'value' not provided")
     }
 
     @Test

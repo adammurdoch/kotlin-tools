@@ -118,12 +118,12 @@ class StringOptionTest : AbstractActionTest() {
 
         parseFails(::Option, listOf("-o", "-f"), "Value missing for option -o")
         parseFails(::Option, listOf("-o", "--flag"), "Value missing for option -o")
-        parseFails(::Option, listOf("-o", "-u"), "Value missing for option -o")
-        parseFails(::Option, listOf("-o", "--unknown"), "Value missing for option -o")
+        parseFails(::Option, listOf("-o", "-u"), "Unknown option: -u")
+        parseFails(::Option, listOf("-o", "--unknown"), "Unknown option: --unknown")
     }
 
     @Test
-    fun `reports unknown flag used with option`() {
+    fun `fails when unknown flag used with option`() {
         class Option : Action() {
             val option by option("o")
         }

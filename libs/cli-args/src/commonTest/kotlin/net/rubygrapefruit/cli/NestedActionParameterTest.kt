@@ -208,7 +208,24 @@ class NestedActionParameterTest : AbstractActionTest() {
     }
 
     @Test
-    fun `fails when unknown flag provided instead of action name`() {
+    fun `fails when flag provided instead of action name`() {
+        val sub = Action()
+
+        class WithSub : Action() {
+            val sub by actions {
+                action(sub, "sub")
+            }
+            val flag by flag("flag", "f")
+        }
+
+        parseFails(::WithSub, listOf("--flag"), "Action not provided")
+        parseFails(::WithSub, listOf("-f"), "Action not provided")
+        parseFails(::WithSub, listOf("--unknown"), "Unknown option: --unknown")
+        parseFails(::WithSub, listOf("-u"), "Unknown option: -u")
+    }
+
+    @Test
+    fun `fails when unknown flag used with action name`() {
         val sub = Action()
 
         class WithSub : Action() {
@@ -217,7 +234,6 @@ class NestedActionParameterTest : AbstractActionTest() {
             }
         }
 
-        parseFails(::WithSub, listOf("--flag"), "Unknown option: --flag")
         parseFails(::WithSub, listOf("--flag", "sub"), "Unknown option: --flag")
         parseFails(::WithSub, listOf("sub", "--flag"), "Unknown option: --flag")
     }

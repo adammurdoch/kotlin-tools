@@ -27,7 +27,7 @@ class CustomTypeParameterTest : AbstractActionTest() {
             }.parameter("value")
         }
 
-        parseFails(Parameter(), listOf("a"), "Value for parameter 'value' is too short: a")
+        parseFails(::Parameter, listOf("a"), "Value for parameter 'value' is too short: a")
         parse(Parameter(), listOf("abc")) { action ->
             assertEquals("abc", action.param)
         }

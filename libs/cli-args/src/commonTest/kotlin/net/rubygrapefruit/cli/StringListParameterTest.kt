@@ -43,7 +43,7 @@ class StringListParameterTest : AbstractActionTest() {
             val param by parameters("value").required()
         }
 
-        parseFails(Parameter(), emptyList(), "Parameter 'value' not provided")
+        parseFails(::Parameter, emptyList(), "Parameter 'value' not provided")
 
         parse(Parameter(), listOf("abc")) { action ->
             assertEquals(listOf("abc"), action.param)
@@ -59,10 +59,10 @@ class StringListParameterTest : AbstractActionTest() {
             val param by parameters("value")
         }
 
-        parseFails(Parameter(), listOf("--flag"), "Unknown option: --flag")
-        parseFails(Parameter(), listOf("arg", "--flag"), "Unknown option: --flag")
-        parseFails(Parameter(), listOf("--flag", "arg"), "Unknown option: --flag")
-        parseFails(Parameter(), listOf("arg", "--flag", "arg"), "Unknown option: --flag")
+        parseFails(::Parameter, listOf("--flag"), "Unknown option: --flag")
+        parseFails(::Parameter, listOf("arg", "--flag"), "Unknown option: --flag")
+        parseFails(::Parameter, listOf("--flag", "arg"), "Unknown option: --flag")
+        parseFails(::Parameter, listOf("arg", "--flag", "arg"), "Unknown option: --flag")
     }
 
     @Test
@@ -72,10 +72,10 @@ class StringListParameterTest : AbstractActionTest() {
             val flag by flag("f", "flag")
         }
 
-        parseFails(Parameter(), listOf("-f"), "Parameter 'value' not provided")
-        parseFails(Parameter(), listOf("--flag"), "Parameter 'value' not provided")
-        parseFails(Parameter(), listOf("-u"), "Unknown option: -u")
-        parseFails(Parameter(), listOf("--unknown"), "Unknown option: --unknown")
+        parseFails(::Parameter, listOf("-f"), "Parameter 'value' not provided")
+        parseFails(::Parameter, listOf("--flag"), "Parameter 'value' not provided")
+        parseFails(::Parameter, listOf("-u"), "Unknown option: -u")
+        parseFails(::Parameter, listOf("--unknown"), "Unknown option: --unknown")
     }
 
     @Test

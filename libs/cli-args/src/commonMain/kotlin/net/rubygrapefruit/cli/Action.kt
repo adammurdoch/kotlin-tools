@@ -204,7 +204,23 @@ open class Action {
 
         val arg = args.getOrNull(original.count)
         val failure = when {
-            arg != null && host.isOption(arg) -> ArgParseException("Unknown option: $arg")
+            arg != null && host.isOption(arg) -> {
+                var matched = false
+                val current = args.subList(original.count, args.size)
+                for (option in options) {
+                    val result = option.accept(current, RootContext)
+                    if (result.count > 0 || result.finished) {
+                        matched = true
+                        break
+                    }
+                }
+                if (matched && original.failure != null) {
+                    original.failure
+                } else {
+                    ArgParseException("Unknown option: $arg")
+                }
+            }
+
             original.failure != null -> original.failure
             else -> ArgParseException("Unknown parameter: $arg")
         }

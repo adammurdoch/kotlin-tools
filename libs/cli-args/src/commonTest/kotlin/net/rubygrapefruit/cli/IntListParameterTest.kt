@@ -27,8 +27,8 @@ class IntListParameterTest : AbstractActionTest() {
             val param by int().parameters("value")
         }
 
-        parseFails(Parameter(), listOf("abc"), "Value for parameter 'value' is not an integer: abc")
-        parseFails(Parameter(), listOf("1", "abc"), "Value for parameter 'value' is not an integer: abc")
+        parseFails(::Parameter, listOf("abc"), "Value for parameter 'value' is not an integer: abc")
+        parseFails(::Parameter, listOf("1", "abc"), "Value for parameter 'value' is not an integer: abc")
     }
 
     @Test

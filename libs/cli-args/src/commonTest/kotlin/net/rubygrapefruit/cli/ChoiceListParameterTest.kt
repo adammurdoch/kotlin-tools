@@ -33,7 +33,7 @@ class ChoiceListParameterTest : AbstractActionTest() {
             }.parameters("value")
         }
 
-        parseFails(Parameter(), listOf("3"), "Unknown value for parameter 'value': 3")
-        parseFails(Parameter(), listOf("1", "3"), "Unknown value for parameter 'value': 3")
+        parseFails(::Parameter, listOf("3"), "Unknown value for parameter 'value': 3")
+        parseFails(::Parameter, listOf("1", "3"), "Unknown value for parameter 'value': 3")
     }
 }

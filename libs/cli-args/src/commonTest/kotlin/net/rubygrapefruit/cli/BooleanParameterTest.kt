@@ -25,6 +25,6 @@ class BooleanParameterTest : AbstractActionTest() {
             val param by boolean().parameter("value")
         }
 
-        parseFails(Parameter(), listOf("abc"), "Unknown value for parameter 'value': abc")
+        parseFails(::Parameter, listOf("abc"), "Unknown value for parameter 'value': abc")
     }
 }

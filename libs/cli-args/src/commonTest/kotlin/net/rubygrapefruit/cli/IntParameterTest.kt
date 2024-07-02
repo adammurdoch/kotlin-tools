@@ -21,7 +21,7 @@ class IntParameterTest : AbstractActionTest() {
             val param by int().parameter("value")
         }
 
-        parseFails(Parameter(), listOf("abc"), "Value for parameter 'value' is not an integer: abc")
+        parseFails(::Parameter, listOf("abc"), "Value for parameter 'value' is not an integer: abc")
     }
 
     @Test
@@ -30,7 +30,7 @@ class IntParameterTest : AbstractActionTest() {
             val param by int().parameter("value")
         }
 
-        parseFails(Parameter(), emptyList(), "Parameter 'value' not provided")
+        parseFails(::Parameter, emptyList(), "Parameter 'value' not provided")
     }
 
     @Test

@@ -146,11 +146,11 @@ class NestedActionParameterTest : AbstractActionTest() {
             }
         }
 
-        parseFails(WithSub(), emptyList()) { e ->
+        parseFails(::WithSub, emptyList()) { e ->
             assertEquals("Action not provided", e.message)
             assertEquals(2, e.actions.size)
         }
-        parseFails(WithSub(), listOf("s1", "s2"), "Unknown parameter: s2")
+        parseFails(::WithSub, listOf("s1", "s2"), "Unknown parameter: s2")
     }
 
     @Test
@@ -201,7 +201,7 @@ class NestedActionParameterTest : AbstractActionTest() {
             }
         }
 
-        parseFails(WithSub(), listOf("thing")) { e ->
+        parseFails(::WithSub, listOf("thing")) { e ->
             assertEquals("Unknown action: thing", e.message)
             assertEquals(2, e.actions.size)
         }
@@ -217,9 +217,9 @@ class NestedActionParameterTest : AbstractActionTest() {
             }
         }
 
-        parseFails(WithSub(), listOf("--flag"), "Unknown option: --flag")
-        parseFails(WithSub(), listOf("--flag", "sub"), "Unknown option: --flag")
-        parseFails(WithSub(), listOf("sub", "--flag"), "Unknown option: --flag")
+        parseFails(::WithSub, listOf("--flag"), "Unknown option: --flag")
+        parseFails(::WithSub, listOf("--flag", "sub"), "Unknown option: --flag")
+        parseFails(::WithSub, listOf("sub", "--flag"), "Unknown option: --flag")
     }
 
     @Test
@@ -230,7 +230,7 @@ class NestedActionParameterTest : AbstractActionTest() {
             }
         }
 
-        parseFails(WithSub(), listOf("sub", "123"), "Unknown parameter: 123")
+        parseFails(::WithSub, listOf("sub", "123"), "Unknown parameter: 123")
     }
 
     @Test
@@ -249,20 +249,7 @@ class NestedActionParameterTest : AbstractActionTest() {
     }
 
     @Test
-    fun `can run --help command without providing action`() {
-        class WithSub : Action() {
-            val sub by actions {
-                action(Action(), "sub")
-            }
-        }
-
-        parse(TestApp(WithSub()), listOf("--help")) { action ->
-            assertIs<HelpAction>(action.selected)
-        }
-    }
-
-    @Test
-    fun `can run --help command without providing action parameters`() {
+    fun `fails when nested action parameters not provided`() {
         class Sub : Action() {
             val p1 by parameter("p1")
             val p2 by parameter("p2")
@@ -274,14 +261,7 @@ class NestedActionParameterTest : AbstractActionTest() {
             }
         }
 
-        parse(TestApp(WithSub()), listOf("sub", "--help")) { action ->
-            assertIs<HelpAction>(action.selected)
-        }
-        parse(TestApp(WithSub()), listOf("sub", "a1", "--help")) { action ->
-            assertIs<HelpAction>(action.selected)
-        }
-        parse(TestApp(WithSub()), listOf("--help", "sub", "a1")) { action ->
-            assertIs<HelpAction>(action.selected)
-        }
+        parseFails(::WithSub, listOf("sub"), "Parameter 'p1' not provided")
+        parseFails(::WithSub, listOf("sub", "a1"), "Parameter 'p2' not provided")
     }
 }

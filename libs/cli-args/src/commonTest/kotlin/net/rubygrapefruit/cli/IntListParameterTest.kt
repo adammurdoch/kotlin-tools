@@ -2,7 +2,6 @@ package net.rubygrapefruit.cli
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertIs
 
 class IntListParameterTest : AbstractActionTest() {
     @Test
@@ -38,8 +37,6 @@ class IntListParameterTest : AbstractActionTest() {
             val param by int().parameters("value")
         }
 
-        parse(TestApp(Option()), listOf("abc", "--help")) { action ->
-            assertIs<HelpAction>(action.selected)
-        }
+        parseHelp(::Option, listOf("abc"))
     }
 }

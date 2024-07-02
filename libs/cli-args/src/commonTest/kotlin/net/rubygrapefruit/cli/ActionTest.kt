@@ -14,7 +14,7 @@ class ActionTest : AbstractActionTest() {
     fun `fails when args provided for action with no configuration`() {
         class NoConfig : Action()
 
-        parseFails(NoConfig(), listOf("--flag"), "Unknown option: --flag")
-        parseFails(NoConfig(), listOf("arg"), "Unknown parameter: arg")
+        parseFails(::NoConfig, listOf("--flag"), "Unknown option: --flag")
+        parseFails(::NoConfig, listOf("arg"), "Unknown parameter: arg")
     }
 }

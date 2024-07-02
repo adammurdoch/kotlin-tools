@@ -1,6 +1,9 @@
 package net.rubygrapefruit.cli
 
-import kotlin.test.*
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
+import kotlin.test.fail
 
 class StringOptionTest : AbstractActionTest() {
     @Test
@@ -13,7 +16,7 @@ class StringOptionTest : AbstractActionTest() {
             assertEquals("123", action.option)
         }
 
-        parseFails(Option(), listOf("-opt", "123"), "Unknown option: -opt")
+        parseFails(::Option, listOf("-opt", "123"), "Unknown option: -opt")
     }
 
     @Test
@@ -26,7 +29,7 @@ class StringOptionTest : AbstractActionTest() {
             assertEquals("123", action.option)
         }
 
-        parseFails(Option(), listOf("--o", "123"), "Unknown option: --o")
+        parseFails(::Option, listOf("--o", "123"), "Unknown option: --o")
     }
 
     @Test
@@ -103,7 +106,7 @@ class StringOptionTest : AbstractActionTest() {
             val option by option("o")
         }
 
-        parseFails(Option(), listOf("-o"), "Value missing for option -o")
+        parseFails(::Option, listOf("-o"), "Value missing for option -o")
     }
 
     @Test
@@ -113,10 +116,10 @@ class StringOptionTest : AbstractActionTest() {
             val other by flag("f", "flag")
         }
 
-        parseFails(Option(), listOf("-o", "-f"), "Value missing for option -o")
-        parseFails(Option(), listOf("-o", "--flag"), "Value missing for option -o")
-        parseFails(Option(), listOf("-o", "-u"), "Value missing for option -o")
-        parseFails(Option(), listOf("-o", "--unknown"), "Value missing for option -o")
+        parseFails(::Option, listOf("-o", "-f"), "Value missing for option -o")
+        parseFails(::Option, listOf("-o", "--flag"), "Value missing for option -o")
+        parseFails(::Option, listOf("-o", "-u"), "Value missing for option -o")
+        parseFails(::Option, listOf("-o", "--unknown"), "Value missing for option -o")
     }
 
     @Test
@@ -125,9 +128,9 @@ class StringOptionTest : AbstractActionTest() {
             val option by option("o")
         }
 
-        parseFails(Option(), listOf("--flag", "-o", "arg"), "Unknown option: --flag")
-        parseFails(Option(), listOf("-o", "arg", "--flag"), "Unknown option: --flag")
-        parseFails(Option(), listOf("-o", "--flag", "arg"), "Value missing for option -o")
+        parseFails(::Option, listOf("--flag", "-o", "arg"), "Unknown option: --flag")
+        parseFails(::Option, listOf("-o", "arg", "--flag"), "Unknown option: --flag")
+        parseFails(::Option, listOf("-o", "--flag", "arg"), "Value missing for option -o")
     }
 
     @Test
@@ -136,7 +139,7 @@ class StringOptionTest : AbstractActionTest() {
             val option by option("o")
         }
 
-        parseFails(Option(), listOf("-o", "1", "-o", "2"), "Value for option -o already provided")
+        parseFails(::Option, listOf("-o", "1", "-o", "2"), "Value for option -o already provided")
     }
 
     @Test
@@ -158,17 +161,6 @@ class StringOptionTest : AbstractActionTest() {
             fail()
         } catch (e: IllegalArgumentException) {
             assertEquals("--option cannot be used as an option name", e.message)
-        }
-    }
-
-    @Test
-    fun `can run --help command without providing argument`() {
-        class Option : Action() {
-            val param by option("value")
-        }
-
-        parse(TestApp(Option()), listOf("--value", "--help")) { action ->
-            assertIs<HelpAction>(action.selected)
         }
     }
 }

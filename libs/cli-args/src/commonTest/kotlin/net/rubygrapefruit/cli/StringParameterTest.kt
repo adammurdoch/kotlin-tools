@@ -1,6 +1,9 @@
 package net.rubygrapefruit.cli
 
-import kotlin.test.*
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
+import kotlin.test.fail
 
 class StringParameterTest : AbstractActionTest() {
     @Test
@@ -33,7 +36,7 @@ class StringParameterTest : AbstractActionTest() {
             val param by parameter("value")
         }
 
-        parseFails(Parameter(), emptyList(), "Parameter 'value' not provided")
+        parseFails(::Parameter, emptyList(), "Parameter 'value' not provided")
     }
 
     @Test
@@ -43,7 +46,7 @@ class StringParameterTest : AbstractActionTest() {
             val p2 by parameter("a2")
         }
 
-        parseFails(Parameter(), listOf("abc"), "Parameter 'a2' not provided")
+        parseFails(::Parameter, listOf("abc"), "Parameter 'a2' not provided")
     }
 
     @Test
@@ -129,10 +132,10 @@ class StringParameterTest : AbstractActionTest() {
             val flag by flag("f", "flag")
         }
 
-        parseFails(Parameter(), listOf("--flag"), "Parameter 'value' not provided")
-        parseFails(Parameter(), listOf("-f"), "Parameter 'value' not provided")
-        parseFails(Parameter(), listOf("--unknown"), "Unknown option: --unknown")
-        parseFails(Parameter(), listOf("-u"), "Unknown option: -u")
+        parseFails(::Parameter, listOf("--flag"), "Parameter 'value' not provided")
+        parseFails(::Parameter, listOf("-f"), "Parameter 'value' not provided")
+        parseFails(::Parameter, listOf("--unknown"), "Unknown option: --unknown")
+        parseFails(::Parameter, listOf("-u"), "Unknown option: -u")
     }
 
     @Test
@@ -141,8 +144,8 @@ class StringParameterTest : AbstractActionTest() {
             val param by parameter("value")
         }
 
-        parseFails(Parameter(), listOf("arg", "--flag"), "Unknown option: --flag")
-        parseFails(Parameter(), listOf("--flag", "arg"), "Unknown option: --flag")
+        parseFails(::Parameter, listOf("arg", "--flag"), "Unknown option: --flag")
+        parseFails(::Parameter, listOf("--flag", "arg"), "Unknown option: --flag")
     }
 
     @Test
@@ -151,7 +154,7 @@ class StringParameterTest : AbstractActionTest() {
             val param by parameter("value")
         }
 
-        parseFails(Parameter(), listOf("1", "2"), "Unknown parameter: 2")
+        parseFails(::Parameter, listOf("1", "2"), "Unknown parameter: 2")
     }
 
     @Test
@@ -174,17 +177,6 @@ class StringParameterTest : AbstractActionTest() {
             fail()
         } catch (e: IllegalArgumentException) {
             assertEquals("--param cannot be used as a parameter name", e.message)
-        }
-    }
-
-    @Test
-    fun `can run --help command without providing parameter`() {
-        class Parameter : Action() {
-            val param by parameter("value")
-        }
-
-        parse(TestApp(Parameter()), listOf("--help")) { action ->
-            assertIs<HelpAction>(action.selected)
         }
     }
 }

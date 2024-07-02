@@ -89,12 +89,37 @@ class StringListParameterTest : AbstractActionTest() {
             assertEquals(emptyList(), action.param)
             assertTrue(action.flag)
         }
+        parse(Parameter(), listOf("--flag", "a")) { action ->
+            assertEquals(listOf("a"), action.param)
+            assertTrue(action.flag)
+        }
         parse(Parameter(), listOf("--other")) { action ->
             assertEquals(listOf("--other"), action.param)
+            assertFalse(action.flag)
         }
         parse(Parameter(), listOf("a", "--flag", "b", "--other")) { action ->
             assertEquals(listOf("a", "--flag", "b", "--other"), action.param)
             assertFalse(action.flag)
+        }
+        parse(Parameter(), listOf("--flag", "a", "--flag", "b", "--other")) { action ->
+            assertEquals(listOf("a", "--flag", "b", "--other"), action.param)
+            assertTrue(action.flag)
+        }
+    }
+
+    @Test
+    fun `can consume remaining args including --help`() {
+        class Parameter : Action() {
+            val param by string().parameters("value", acceptOptions = true)
+        }
+
+        parse(TestApp(Parameter()), listOf("--help")) { action ->
+            assertIs<HelpAction>(action.selected)
+        }
+        parse(TestApp(Parameter()), listOf("a", "--help")) { action ->
+            val selected = action.selected
+            assertIs<Parameter>(selected)
+            assertEquals(listOf("a", "--help"), selected.param)
         }
     }
 

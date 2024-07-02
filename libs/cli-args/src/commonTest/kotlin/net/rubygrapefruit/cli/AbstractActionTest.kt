@@ -10,21 +10,8 @@ abstract class AbstractActionTest {
         verification(action)
     }
 
-    fun parseFails(action: Action, args: List<String>, message: String) {
-        parseFails(action, args) { e -> assertEquals(message, e.message) }
-    }
-
     fun parseFails(factory: () -> Action, args: List<String>, message: String) {
         parseFails(factory, args) { e -> assertEquals(message, e.message) }
-    }
-
-    fun parseFails(action: Action, args: List<String>, verification: (ArgParseException) -> Unit) {
-        try {
-            action.parse(args)
-            fail()
-        } catch (e: ArgParseException) {
-            verification(e)
-        }
     }
 
     fun parseFails(factory: () -> Action, args: List<String>, verification: (ArgParseException) -> Unit) {

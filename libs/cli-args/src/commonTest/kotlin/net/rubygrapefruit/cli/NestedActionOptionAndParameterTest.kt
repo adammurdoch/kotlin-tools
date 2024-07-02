@@ -32,9 +32,9 @@ class NestedActionOptionAndParameterTest : AbstractActionTest() {
             }
         }
 
-        parseFails(WithSub(), listOf("--sub", "sub"), "Unknown parameter: sub")
-        parseFails(WithSub(), listOf("sub", "--sub"), "Unknown option: --sub")
-        parseFails(WithSub(), listOf("sub", "sub"), "Unknown parameter: sub")
+        parseFails(::WithSub, listOf("--sub", "sub"), "Unknown parameter: sub")
+        parseFails(::WithSub, listOf("sub", "--sub"), "Unknown option: --sub")
+        parseFails(::WithSub, listOf("sub", "sub"), "Unknown parameter: sub")
     }
 
     @Test
@@ -98,7 +98,7 @@ class NestedActionOptionAndParameterTest : AbstractActionTest() {
             assertTrue(sub.flag)
         }
 
-        parseFails(WithSub(), emptyList(), "Parameter 'param' not provided")
-        parseFails(WithSub(), listOf("--flag"), "Parameter 'param' not provided")
+        parseFails(::WithSub, emptyList(), "Parameter 'param' not provided")
+        parseFails(::WithSub, listOf("--flag"), "Parameter 'param' not provided")
     }
 }

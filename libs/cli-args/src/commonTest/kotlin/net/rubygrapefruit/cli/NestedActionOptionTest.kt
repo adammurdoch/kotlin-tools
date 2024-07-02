@@ -16,7 +16,7 @@ class NestedActionOptionTest : AbstractActionTest() {
         parse(WithSub(), listOf("--sub")) { action ->
             assertSame(sub, action.sub)
         }
-        parseFails(WithSub(), listOf("-sub"), "Unknown option: -sub")
+        parseFails(::WithSub, listOf("-sub"), "Unknown option: -sub")
     }
 
     @Test
@@ -32,7 +32,7 @@ class NestedActionOptionTest : AbstractActionTest() {
         parse(WithSub(), listOf("-s")) { action ->
             assertSame(sub, action.sub)
         }
-        parseFails(WithSub(), listOf("--s"), "Unknown option: --s")
+        parseFails(::WithSub, listOf("--s"), "Unknown option: --s")
     }
 
     @Test
@@ -100,8 +100,8 @@ class NestedActionOptionTest : AbstractActionTest() {
             }
         }
 
-        parseFails(WithSub(), emptyList(), "Action not provided")
-        parseFails(WithSub(), listOf("--s2", "--s1"), "Unknown option: --s1")
+        parseFails(::WithSub, emptyList(), "Action not provided")
+        parseFails(::WithSub, listOf("--s2", "--s1"), "Unknown option: --s1")
     }
 
     @Test

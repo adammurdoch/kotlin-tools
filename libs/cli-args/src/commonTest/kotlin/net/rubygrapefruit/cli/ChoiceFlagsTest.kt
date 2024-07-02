@@ -26,7 +26,7 @@ class ChoiceFlagsTest : AbstractActionTest() {
             assertEquals(3, action.selected)
         }
 
-        parseFails(Choice(), listOf("-one"), "Unknown option: -one")
+        parseFails(::Choice, listOf("-one"), "Unknown option: -one")
     }
 
     @Test
@@ -49,7 +49,7 @@ class ChoiceFlagsTest : AbstractActionTest() {
             assertEquals(3, action.selected)
         }
 
-        parseFails(Choice(), listOf("--1"), "Unknown option: --1")
+        parseFails(::Choice, listOf("--1"), "Unknown option: --1")
     }
 
     @Test
@@ -69,8 +69,8 @@ class ChoiceFlagsTest : AbstractActionTest() {
             assertEquals(1, action.selected)
         }
 
-        parseFails(Choice(), listOf("-one"), "Unknown option: -one")
-        parseFails(Choice(), listOf("--1"), "Unknown option: --1")
+        parseFails(::Choice, listOf("-one"), "Unknown option: -one")
+        parseFails(::Choice, listOf("--1"), "Unknown option: --1")
     }
 
     @Test

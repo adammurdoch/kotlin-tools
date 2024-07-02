@@ -138,7 +138,7 @@ class FlagAndActionTest : AbstractActionTest() {
             }
         }
 
-        parseFails(WithSub(), listOf("sub", "--flag"), "Parameter 'param' not provided")
-        parseFails(WithSub(), listOf("--flag", "sub"), "Parameter 'param' not provided")
+        parseFails(::WithSub, listOf("sub", "--flag"), "Parameter 'param' not provided")
+        parseFails(::WithSub, listOf("--flag", "sub"), "Parameter 'param' not provided")
     }
 }

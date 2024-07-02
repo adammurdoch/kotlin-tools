@@ -66,6 +66,11 @@ internal abstract class AbstractActionParameter<T : Action>(
     abstract fun whenMissing(): ArgParseException?
 
     private inner class AllowAnywhereOption(val name: String, val option: ActionDetails<T>) : NonPositional() {
+
+        override fun toString(): String {
+            return name
+        }
+
         override fun usage(): List<OptionUsage> {
             return emptyList()
         }
@@ -75,8 +80,9 @@ internal abstract class AbstractActionParameter<T : Action>(
         }
 
         override fun maybeRecover(args: List<String>, context: ParseContext): ParseResult {
-            val name = args.firstOrNull()
-            return if (name == this.name) {
+            return if (action == option.value) {
+                ParseResult(0, null, true)
+            } else if (args.firstOrNull() == this.name) {
                 action = option.value
                 val result = option.value.maybeParse(args.drop(1), context)
                 ParseResult(1 + result.count, result.failure, result.finished)

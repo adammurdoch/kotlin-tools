@@ -146,7 +146,7 @@ open class Action {
                 var matched = false
                 for (option in context.options) {
                     val result = option.maybeRecover(current, context)
-                    if (result.count > 0 && result.failure == null) {
+                    if ((result.count > 0 || result.finished) && result.failure == null) {
                         failure = null
                         index += result.count
                         matched = true
@@ -154,9 +154,13 @@ open class Action {
                     }
                 }
                 if (!matched) {
+                    // Skip this argument and attempt to recover on next argument
                     index++
+                    continue
+                } else {
+                    // Don't attempt to keep parsing
+                    break
                 }
-                continue
             }
 
             var matched = false

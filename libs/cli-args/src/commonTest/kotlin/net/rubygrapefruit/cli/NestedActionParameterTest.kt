@@ -274,13 +274,13 @@ class NestedActionParameterTest : AbstractActionTest() {
             }
         }
 
-        parseRecovers(TestApp(WithSub()), listOf("sub", "--help")) { action ->
+        parse(TestApp(WithSub()), listOf("sub", "--help")) { action ->
             assertIs<HelpAction>(action.selected)
         }
-        parseRecovers(TestApp(WithSub()), listOf("sub", "a1", "--help")) { action ->
+        parse(TestApp(WithSub()), listOf("sub", "a1", "--help")) { action ->
             assertIs<HelpAction>(action.selected)
         }
-        parseRecovers(TestApp(WithSub()), listOf("--help", "sub", "a1")) { action ->
+        parse(TestApp(WithSub()), listOf("--help", "sub", "a1")) { action ->
             assertIs<HelpAction>(action.selected)
         }
     }

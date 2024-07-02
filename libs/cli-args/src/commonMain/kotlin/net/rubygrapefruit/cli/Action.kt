@@ -160,10 +160,11 @@ open class Action {
             if (pending.isNotEmpty()) {
                 val positional = pending.first()
                 val result = positional.accept(current, context)
-                if (!positional.canAcceptMore()) {
+                val finished = !positional.canAcceptMore()
+                if (finished) {
                     pending.removeFirst()
                 }
-                if (result.count > 0 || result.failure != null) {
+                if (result.count > 0 || result.failure != null || finished) {
                     if (result.failure != null) {
                         failure = result.failure
                     }

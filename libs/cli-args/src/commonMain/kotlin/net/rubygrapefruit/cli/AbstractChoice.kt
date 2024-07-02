@@ -14,7 +14,7 @@ internal abstract class AbstractChoice<T : Any>(
     }
 
     override fun accept(args: List<String>, context: ParseContext): ParseResult {
-        val result = choices[args[0]]
+        val result = choices[args.first()]
         return if (result != null) {
             value = result.value
             ParseResult.One

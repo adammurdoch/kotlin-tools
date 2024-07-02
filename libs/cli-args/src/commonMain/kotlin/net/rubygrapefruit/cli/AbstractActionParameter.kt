@@ -16,7 +16,7 @@ internal abstract class AbstractActionParameter<T : Action>(
             return ParseResult.Nothing
         }
 
-        val name = args.firstOrNull()
+        val name = args.first()
         val action = locateActionByFirstArg(name)
         if (action != null) {
             this.action = action.value
@@ -28,7 +28,7 @@ internal abstract class AbstractActionParameter<T : Action>(
             return actions.default.value.maybeParse(args, context)
         }
 
-        if (name == null || host.isOption(name)) {
+        if (host.isOption(name)) {
             return ParseResult.Nothing
         } else {
             return ParseResult(1, ArgParseException("Unknown action: $name", actions = actionInfo))

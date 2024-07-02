@@ -38,7 +38,7 @@ class IntListParameterTest : AbstractActionTest() {
             val param by int().parameters("value")
         }
 
-        parseRecovers(TestApp(Option()), listOf("abc", "--help")) { action ->
+        parse(TestApp(Option()), listOf("abc", "--help")) { action ->
             assertIs<HelpAction>(action.selected)
         }
     }

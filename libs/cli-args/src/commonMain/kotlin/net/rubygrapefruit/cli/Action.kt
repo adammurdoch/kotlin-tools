@@ -162,7 +162,7 @@ open class Action {
             for (option in context.options) {
                 val result = option.accept(current, context)
                 if (result.count > 0) {
-                    if (result.failure != null && failure == null) {
+                    if (result.failure != null) {
                         failure = result.failure
                     }
                     index += result.count
@@ -176,17 +176,14 @@ open class Action {
 
             if (pending.isNotEmpty()) {
                 val result = pending.first().accept(current, context)
-                if (result.count > 0) {
-                    if (result.failure != null && failure == null) {
+                if (result.count > 0 || result.failure != null || result.finished) {
+                    if (result.failure != null) {
                         failure = result.failure
                     }
                     if (result.finished) {
                         pending.removeFirst()
                     }
                     index += result.count
-                    continue
-                } else if (result.finished) {
-                    pending.removeFirst()
                     continue
                 }
             }

@@ -15,7 +15,7 @@ class IntOptionTest : AbstractActionTest() {
             assertEquals(123, action.option)
         }
 
-        parseFails(Option(), listOf("-opt"), "Unknown option: -opt")
+        parseFails(::Option, listOf("-opt"), "Unknown option: -opt")
     }
 
     @Test
@@ -28,7 +28,7 @@ class IntOptionTest : AbstractActionTest() {
             assertEquals(123, action.option)
         }
 
-        parseFails(Option(), listOf("--o"), "Unknown option: --o")
+        parseFails(::Option, listOf("--o"), "Unknown option: --o")
     }
 
     @Test
@@ -63,7 +63,7 @@ class IntOptionTest : AbstractActionTest() {
             val option by int().option("o")
         }
 
-        parseFails(Option(), listOf("-o"), "Value missing for option -o")
+        parseFails(::Option, listOf("-o"), "Value missing for option -o")
     }
 
     @Test
@@ -72,6 +72,6 @@ class IntOptionTest : AbstractActionTest() {
             val option by int().option("o")
         }
 
-        parseFails(Option(), listOf("-o", "abc"), "Value for option -o is not an integer: abc")
+        parseFails(::Option, listOf("-o", "abc"), "Value for option -o is not an integer: abc")
     }
 }

@@ -14,7 +14,7 @@ class CustomTypeOptionTest : AbstractActionTest() {
             assertEquals("ABC", action.option)
         }
 
-        parseFails(Option(), listOf("-opt"), "Unknown option: -opt")
+        parseFails(::Option, listOf("-opt"), "Unknown option: -opt")
     }
 
     @Test
@@ -29,7 +29,7 @@ class CustomTypeOptionTest : AbstractActionTest() {
             }.option("o")
         }
 
-        parseFails(Option(), listOf("-o", "a"), "Value for option -o is too short: a")
+        parseFails(::Option, listOf("-o", "a"), "Value for option -o is too short: a")
         parse(Option(), listOf("-o", "abc")) { action ->
             assertEquals("abc", action.option)
         }

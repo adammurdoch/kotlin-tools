@@ -21,7 +21,7 @@ class ChoiceOptionTest : AbstractActionTest() {
             assertEquals(2, action.option)
         }
 
-        parseFails(Option(), listOf("-opt"), "Unknown option: -opt")
+        parseFails(::Option, listOf("-opt"), "Unknown option: -opt")
     }
 
     @Test
@@ -40,7 +40,7 @@ class ChoiceOptionTest : AbstractActionTest() {
             assertEquals(2, action.option)
         }
 
-        parseFails(Option(), listOf("--o"), "Unknown option: --o")
+        parseFails(::Option, listOf("--o"), "Unknown option: --o")
     }
 
     @Test
@@ -52,7 +52,7 @@ class ChoiceOptionTest : AbstractActionTest() {
             }.option("o")
         }
 
-        parseFails(Option(), listOf("-o", "abc"), "Unknown value for option -o: abc")
+        parseFails(::Option, listOf("-o", "abc"), "Unknown value for option -o: abc")
     }
 
     @Test

@@ -18,7 +18,7 @@ class BooleanOptionTest : AbstractActionTest() {
             assertEquals(false, action.option)
         }
 
-        parseFails(Option(), listOf("-opt"), "Unknown option: -opt")
+        parseFails(::Option, listOf("-opt"), "Unknown option: -opt")
     }
 
     @Test
@@ -34,7 +34,7 @@ class BooleanOptionTest : AbstractActionTest() {
             assertEquals(false, action.option)
         }
 
-        parseFails(Option(), listOf("--o"), "Unknown option: --o")
+        parseFails(::Option, listOf("--o"), "Unknown option: --o")
     }
 
     @Test
@@ -54,6 +54,6 @@ class BooleanOptionTest : AbstractActionTest() {
             val option by boolean().option("o")
         }
 
-        parseFails(Option(), listOf("-o", "true"), "Unknown value for option -o: true")
+        parseFails(::Option, listOf("-o", "true"), "Unknown value for option -o: true")
     }
 }

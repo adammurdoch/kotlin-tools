@@ -126,10 +126,10 @@ open class Action {
      */
     fun maybeParse(args: List<String>): Result {
         val result = maybeParse(args, RootContext)
-        return if (result.failure == null) {
-            Result.Success
+        return if (result.count != args.size || result.failure != null) {
+            attemptToRecover(args, result, DefaultHost)
         } else {
-            Result.Failure(result.failure)
+            Result.Success
         }
     }
 
@@ -139,34 +139,12 @@ open class Action {
 
         var index = 0
         var failure: ArgParseException? = null
-        while (index in args.indices) {
+        while (index in args.indices && failure == null) {
             val current = args.subList(index, args.size)
-
-            if (failure != null) {
-                var matched = false
-                for (option in context.options) {
-                    val result = option.maybeRecover(current, context)
-                    if ((result.count > 0 || result.finished) && result.failure == null) {
-                        failure = null
-                        index += result.count
-                        matched = true
-                        break
-                    }
-                }
-                if (!matched) {
-                    // Skip this argument and attempt to recover on next argument
-                    index++
-                    continue
-                } else {
-                    // Don't attempt to keep parsing
-                    break
-                }
-            }
-
             var matched = false
             for (option in context.options) {
                 val result = option.accept(current, context)
-                if (result.count > 0) {
+                if (result.count > 0 || result.failure != null) {
                     if (result.failure != null) {
                         failure = result.failure
                     }
@@ -194,15 +172,7 @@ open class Action {
             }
 
             // Did not match anything
-
-            if (failure == null) {
-                val arg = current.first()
-                failure = if (DefaultHost.isOption(arg)) {
-                    ArgParseException("Unknown option: $arg")
-                } else {
-                    ArgParseException("Unknown parameter: $arg")
-                }
-            }
+            break
         }
 
         if (failure == null) {
@@ -215,6 +185,30 @@ open class Action {
         }
 
         return ParseResult(index, failure, true)
+    }
+
+    private fun attemptToRecover(args: List<String>, original: ParseResult, host: Host): Result {
+        var index = original.count
+        while (index in args.indices) {
+            val current = args.subList(index, args.size)
+            for (option in options) {
+                val result = option.maybeRecover(current, RootContext)
+                if ((result.count > 0 || result.finished) && result.failure == null) {
+                    // Don't attempt to keep parsing
+                    return Result.Success
+                }
+            }
+            // Skip this argument and attempt to recover on next argument
+            index++
+        }
+
+        val arg = args.getOrNull(original.count)
+        val failure = when {
+            arg != null && host.isOption(arg) -> ArgParseException("Unknown option: $arg")
+            original.failure != null -> original.failure
+            else -> ArgParseException("Unknown parameter: $arg")
+        }
+        return Result.Failure(failure)
     }
 
     open fun usage(): ActionUsage {

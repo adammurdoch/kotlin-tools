@@ -130,7 +130,7 @@ class StringOptionTest : AbstractActionTest() {
 
         parseFails(::Option, listOf("--flag", "-o", "arg"), "Unknown option: --flag")
         parseFails(::Option, listOf("-o", "arg", "--flag"), "Unknown option: --flag")
-        parseFails(::Option, listOf("-o", "--flag", "arg"), "Value missing for option -o")
+        parseFails(::Option, listOf("-o", "--flag", "arg"), "Unknown option: --flag")
     }
 
     @Test

@@ -158,13 +158,14 @@ open class Action {
             }
 
             if (pending.isNotEmpty()) {
-                val result = pending.first().accept(current, context)
-                if (result.count > 0 || result.failure != null || result.finished) {
+                val positional = pending.first()
+                val result = positional.accept(current, context)
+                if (!positional.canAcceptMore()) {
+                    pending.removeFirst()
+                }
+                if (result.count > 0 || result.failure != null) {
                     if (result.failure != null) {
                         failure = result.failure
-                    }
-                    if (result.finished) {
-                        pending.removeFirst()
                     }
                     index += result.count
                     continue
@@ -184,7 +185,7 @@ open class Action {
             }
         }
 
-        return ParseResult(index, failure, true)
+        return ParseResult(index, failure)
     }
 
     private fun attemptToRecover(args: List<String>, original: ParseResult, host: Host): Result {
@@ -193,7 +194,7 @@ open class Action {
             val current = args.subList(index, args.size)
             for (option in options) {
                 val result = option.maybeRecover(current, RootContext)
-                if ((result.count > 0 || result.finished) && result.failure == null) {
+                if (result) {
                     // Don't attempt to keep parsing
                     return Result.Success
                 }
@@ -206,10 +207,9 @@ open class Action {
         val failure = when {
             arg != null && host.isOption(arg) -> {
                 var matched = false
-                val current = args.subList(original.count, args.size)
                 for (option in options) {
-                    val result = option.accept(current, RootContext)
-                    if (result.count > 0 || result.finished) {
+                    val result = option.accepts(arg)
+                    if (result) {
                         matched = true
                         break
                     }

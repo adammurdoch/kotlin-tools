@@ -13,7 +13,7 @@ internal abstract class AbstractActionParameter<T : Action>(
 
     override fun accept(args: List<String>, context: ParseContext): ParseResult {
         if (this.action != null) {
-            return ParseResult(0, null, true)
+            return ParseResult.Nothing
         }
 
         val name = args.firstOrNull()
@@ -21,7 +21,7 @@ internal abstract class AbstractActionParameter<T : Action>(
         if (action != null) {
             this.action = action.value
             val result = action.value.maybeParse(args.drop(1), context)
-            return ParseResult(1 + result.count, result.failure, result.finished)
+            return ParseResult(1 + result.count, result.failure)
         }
         if (actions.default != null) {
             this.action = actions.default.value
@@ -31,7 +31,7 @@ internal abstract class AbstractActionParameter<T : Action>(
         if (name == null || host.isOption(name)) {
             return ParseResult.Nothing
         } else {
-            return ParseResult(1, ArgParseException("Unknown action: $name", actions = actionInfo), true)
+            return ParseResult(1, ArgParseException("Unknown action: $name", actions = actionInfo))
         }
     }
 
@@ -43,6 +43,10 @@ internal abstract class AbstractActionParameter<T : Action>(
             return actions.options[name]
         }
         return actions.named[name]
+    }
+
+    override fun canAcceptMore(): Boolean {
+        return action == null
     }
 
     override fun usage(): PositionalUsage {
@@ -65,7 +69,7 @@ internal abstract class AbstractActionParameter<T : Action>(
 
     abstract fun whenMissing(): ArgParseException?
 
-    private inner class AllowAnywhereOption(val name: String, val option: ActionDetails<T>) : NonPositional() {
+    private inner class AllowAnywhereOption(val name: String, val option: ActionDetails<T>) : NonPositional {
 
         override fun toString(): String {
             return name
@@ -75,19 +79,23 @@ internal abstract class AbstractActionParameter<T : Action>(
             return emptyList()
         }
 
+        override fun accepts(arg: String): Boolean {
+            return arg == name
+        }
+
         override fun accept(args: List<String>, context: ParseContext): ParseResult {
             return ParseResult.Nothing
         }
 
-        override fun maybeRecover(args: List<String>, context: ParseContext): ParseResult {
+        override fun maybeRecover(args: List<String>, context: ParseContext): Boolean {
             return if (action == option.value) {
-                ParseResult(0, null, true)
+                true
             } else if (args.firstOrNull() == this.name) {
                 action = option.value
                 val result = option.value.maybeParse(args.drop(1), context)
-                ParseResult(1 + result.count, result.failure, result.finished)
+                result.failure == null
             } else {
-                ParseResult.Nothing
+                false
             }
         }
     }

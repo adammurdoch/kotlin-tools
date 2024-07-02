@@ -7,6 +7,7 @@ internal abstract class AbstractParameter<T : Any>(
     protected val host: Host,
     private val converter: StringConverter<T>
 ) : Positional() {
+    private var set = false
     protected var value: T? = null
 
     protected fun usage(cardinality: Cardinality): PositionalUsage {
@@ -20,13 +21,19 @@ internal abstract class AbstractParameter<T : Any>(
         } else {
             val result = converter.convert("parameter '$name'", candidate)
             if (result.isSuccess) {
+                set = true
                 value = result.getOrThrow()
                 ParseResult.One
             } else if (canBeMissing) {
-                ParseResult(0, null, true)
+                set = true
+                ParseResult.Nothing
             } else {
-                ParseResult(0, result.exceptionOrNull() as ArgParseException, true)
+                ParseResult(0, result.exceptionOrNull() as ArgParseException)
             }
         }
+    }
+
+    override fun canAcceptMore(): Boolean {
+        return !set
     }
 }

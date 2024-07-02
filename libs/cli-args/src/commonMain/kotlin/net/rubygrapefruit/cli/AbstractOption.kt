@@ -5,7 +5,7 @@ internal abstract class AbstractOption<T : Any>(
     protected val help: String?,
     private val host: Host,
     protected val converter: StringConverter<T>
-) : NonPositional() {
+) : NonPositional {
     private val flags = names.map { host.option(it) }
     protected var value: T? = null
 
@@ -18,20 +18,24 @@ internal abstract class AbstractOption<T : Any>(
         return listOf(OptionUsage(usage.usage, help, converter.type, listOf(usage)))
     }
 
+    override fun accepts(arg: String): Boolean {
+        return flags.contains(arg)
+    }
+
     override fun accept(args: List<String>, context: ParseContext): ParseResult {
         val arg = args.first()
         if (!flags.contains(arg)) {
             return ParseResult.Nothing
         }
         if (args.size == 1 || host.isOption(args[1])) {
-            return ParseResult(1, ArgParseException("Value missing for option $arg"), true)
+            return ParseResult(1, ArgParseException("Value missing for option $arg"))
         }
         if (value != null) {
-            return ParseResult(1, ArgParseException("Value for option $arg already provided"), true)
+            return ParseResult(1, ArgParseException("Value for option $arg already provided"))
         }
         val result = converter.convert("option $arg", args[1])
         if (result.isFailure) {
-            return ParseResult(1, result.exceptionOrNull() as ArgParseException, true)
+            return ParseResult(1, result.exceptionOrNull() as ArgParseException)
         }
         value = result.getOrThrow()
         return ParseResult.Two

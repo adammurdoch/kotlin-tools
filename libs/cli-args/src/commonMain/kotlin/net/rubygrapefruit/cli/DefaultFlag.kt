@@ -7,7 +7,7 @@ internal class DefaultFlag private constructor(
     private val disableFlags: List<String>,
     private val help: String?,
     default: Boolean
-) : NonPositional(), Flag {
+) : NonPositional, Flag {
     private var value: Boolean = default
 
     override val enableUsage: String
@@ -36,6 +36,10 @@ internal class DefaultFlag private constructor(
         return listOf(
             OptionUsage(usage, help, null, enableUsage + disableUsage)
         )
+    }
+
+    override fun accepts(arg: String): Boolean {
+        return enableFlags.contains(arg) || disableFlags.contains(arg)
     }
 
     override fun accept(args: List<String>, context: ParseContext): ParseResult {

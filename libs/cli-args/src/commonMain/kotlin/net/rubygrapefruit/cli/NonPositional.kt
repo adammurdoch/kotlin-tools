@@ -1,17 +1,24 @@
 package net.rubygrapefruit.cli
 
-internal abstract class NonPositional {
-    abstract fun usage(): List<OptionUsage>
+internal interface NonPositional {
+    fun usage(): List<OptionUsage>
+
+    /**
+     * Does this non-positional accept the given arg as its first argument?
+     */
+    fun accepts(arg: String): Boolean
 
     /**
      * Attempt to parse the given arguments, returning number of arguments consumed.
+     *
+     * @param args Is never empty.
      */
-    abstract fun accept(args: List<String>, context: ParseContext): ParseResult
+    fun accept(args: List<String>, context: ParseContext): ParseResult
 
     /**
      * Attempt to continue parsing following a parse failure.
      */
-    open fun maybeRecover(args: List<String>, context: ParseContext): ParseResult {
-        return ParseResult.Nothing
+    fun maybeRecover(args: List<String>, context: ParseContext): Boolean {
+        return false
     }
 }

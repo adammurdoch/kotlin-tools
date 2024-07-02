@@ -165,6 +165,7 @@ class StringParameterTest : AbstractActionTest() {
         } catch (e: IllegalArgumentException) {
             assertEquals("-p cannot be used as a parameter name", e.message)
         }
+
         class Broken2 : Action() {
             val param by parameter("--param")
         }
@@ -178,12 +179,12 @@ class StringParameterTest : AbstractActionTest() {
 
     @Test
     fun `can run --help command without providing parameter`() {
-        class Parameter : TestApp() {
+        class Parameter : Action() {
             val param by parameter("value")
         }
 
-        parseRecovers(Parameter(), listOf("--help")) { action ->
-            assertTrue(action.help)
+        parse(TestApp(Parameter()), listOf("--help")) { action ->
+            assertIs<HelpAction>(action.selected)
         }
     }
 }

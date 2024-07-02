@@ -250,14 +250,14 @@ class NestedActionParameterTest : AbstractActionTest() {
 
     @Test
     fun `can run --help command without providing action`() {
-        class WithSub : TestApp() {
+        class WithSub : Action() {
             val sub by actions {
                 action(Action(), "sub")
             }
         }
 
-        parseRecovers(WithSub(), listOf("--help")) { action ->
-            assertTrue(action.help)
+        parse(TestApp(WithSub()), listOf("--help")) { action ->
+            assertIs<HelpAction>(action.selected)
         }
     }
 
@@ -268,20 +268,20 @@ class NestedActionParameterTest : AbstractActionTest() {
             val p2 by parameter("p2")
         }
 
-        class WithSub : TestApp() {
+        class WithSub : Action() {
             val sub by actions {
                 action(Sub(), "sub")
             }
         }
 
-        parseRecovers(WithSub(), listOf("sub", "--help")) { action ->
-            assertTrue(action.help)
+        parseRecovers(TestApp(WithSub()), listOf("sub", "--help")) { action ->
+            assertIs<HelpAction>(action.selected)
         }
-        parseRecovers(WithSub(), listOf("sub", "a1", "--help")) { action ->
-            assertTrue(action.help)
+        parseRecovers(TestApp(WithSub()), listOf("sub", "a1", "--help")) { action ->
+            assertIs<HelpAction>(action.selected)
         }
-        parseRecovers(WithSub(), listOf("--help", "sub", "a1")) { action ->
-            assertTrue(action.help)
+        parseRecovers(TestApp(WithSub()), listOf("--help", "sub", "a1")) { action ->
+            assertIs<HelpAction>(action.selected)
         }
     }
 }

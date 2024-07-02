@@ -1,10 +1,10 @@
 package net.rubygrapefruit.cli
 
-open class TestApp : Action() {
-    val help by flag("help", help = "help message")
-
-    override fun usage(): ActionUsage {
-        val usage = super.usage()
-        return ActionUsage(usage.options, usage.positional)
+open class TestApp(val action: Action) : Action() {
+    val selected by actions {
+        option(HelpAction(), "help", allowAnywhere = true)
+        action(action)
     }
 }
+
+class HelpAction : Action()

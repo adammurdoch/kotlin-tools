@@ -27,11 +27,11 @@ internal abstract class AbstractOption<T : Any>(
             return ParseResult(1, ArgParseException("Value missing for option $arg"), true)
         }
         if (value != null) {
-            return ParseResult(2, ArgParseException("Value for option $arg already provided"), true)
+            return ParseResult(1, ArgParseException("Value for option $arg already provided"), true)
         }
         val result = converter.convert("option $arg", args[1])
         if (result.isFailure) {
-            return ParseResult(2, result.exceptionOrNull() as ArgParseException, true)
+            return ParseResult(1, result.exceptionOrNull() as ArgParseException, true)
         }
         value = result.getOrThrow()
         return ParseResult.Two

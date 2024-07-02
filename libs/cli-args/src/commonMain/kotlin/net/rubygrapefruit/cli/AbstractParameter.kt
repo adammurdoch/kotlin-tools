@@ -25,7 +25,7 @@ internal abstract class AbstractParameter<T : Any>(
             } else if (canBeMissing) {
                 ParseResult(0, null, true)
             } else {
-                ParseResult(1, result.exceptionOrNull() as ArgParseException, true)
+                ParseResult(0, result.exceptionOrNull() as ArgParseException, true)
             }
         }
     }

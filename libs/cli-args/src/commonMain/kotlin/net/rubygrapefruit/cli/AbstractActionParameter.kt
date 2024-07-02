@@ -20,12 +20,12 @@ internal abstract class AbstractActionParameter<T : Action>(
         val action = locateActionByFirstArg(name)
         if (action != null) {
             this.action = action.value
-            val result = action.value.maybeParse(args.drop(1), context, stopOnFailure = true)
+            val result = action.value.maybeParse(args.drop(1), context)
             return ParseResult(1 + result.count, result.failure, result.finished)
         }
         if (actions.default != null) {
             this.action = actions.default.value
-            return actions.default.value.maybeParse(args, context, stopOnFailure = true)
+            return actions.default.value.maybeParse(args, context)
         }
 
         if (name == null || host.isOption(name)) {
@@ -56,7 +56,7 @@ internal abstract class AbstractActionParameter<T : Action>(
             action != null -> null
             actions.default != null -> {
                 action = actions.default.value
-                return actions.default.value.maybeParse(emptyList(), RootContext, stopOnFailure = true).failure
+                return actions.default.value.maybeParse(emptyList(), RootContext).failure
             }
 
             else -> return whenMissing()
@@ -71,10 +71,14 @@ internal abstract class AbstractActionParameter<T : Action>(
         }
 
         override fun accept(args: List<String>, context: ParseContext): ParseResult {
+            return ParseResult.Nothing
+        }
+
+        override fun maybeRecover(args: List<String>, context: ParseContext): ParseResult {
             val name = args.firstOrNull()
             return if (name == this.name) {
                 action = option.value
-                val result = option.value.maybeParse(args.drop(1), context, stopOnFailure = true)
+                val result = option.value.maybeParse(args.drop(1), context)
                 ParseResult(1 + result.count, result.failure, result.finished)
             } else {
                 ParseResult.Nothing

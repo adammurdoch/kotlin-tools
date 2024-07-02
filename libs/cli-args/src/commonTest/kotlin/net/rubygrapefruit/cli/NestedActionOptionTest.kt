@@ -127,7 +127,7 @@ class NestedActionOptionTest : AbstractActionTest() {
             assertIs<Sub1>(action.sub)
         }
 
-        parseRecovers(WithSub(), listOf("--s1", "--s2", "arg1", "arg2")) { action ->
+        parse(WithSub(), listOf("--s1", "--s2", "arg1", "arg2")) { action ->
             assertIs<Sub1>(action.sub)
         }
         parse(WithSub(), listOf("--s2", "arg1", "arg2", "--s1")) { action ->
@@ -135,10 +135,10 @@ class NestedActionOptionTest : AbstractActionTest() {
         }
 
         // Missing arguments
-        parseRecovers(WithSub(), listOf("--s1", "--s2")) { action ->
+        parse(WithSub(), listOf("--s1", "--s2")) { action ->
             assertIs<Sub1>(action.sub)
         }
-        parseRecovers(WithSub(), listOf("--s2", "--s1")) { action ->
+        parse(WithSub(), listOf("--s2", "--s1")) { action ->
             assertIs<Sub1>(action.sub)
         }
 
@@ -151,24 +151,24 @@ class NestedActionOptionTest : AbstractActionTest() {
         }
 
         // Unknown option
-        parseRecovers(WithSub(), listOf("--s1", "--unknown", "--s2", "arg1", "arg2")) { action ->
+        parse(WithSub(), listOf("--s1", "--unknown", "--s2", "arg1", "arg2")) { action ->
             assertIs<Sub1>(action.sub)
         }
-        parseRecovers(WithSub(), listOf("--s1", "--unknown")) { action ->
+        parse(WithSub(), listOf("--s1", "--unknown")) { action ->
             assertIs<Sub1>(action.sub)
         }
-        parseRecovers(WithSub(), listOf("--unknown", "--s1")) { action ->
+        parse(WithSub(), listOf("--unknown", "--s1")) { action ->
             assertIs<Sub1>(action.sub)
         }
 
         // Unknown argument
-        parseRecovers(WithSub(), listOf("--s1", "unknown", "--s2", "arg1", "arg2")) { action ->
+        parse(WithSub(), listOf("--s1", "unknown", "--s2", "arg1", "arg2")) { action ->
             assertIs<Sub1>(action.sub)
         }
-        parseRecovers(WithSub(), listOf("--s1", "unknown")) { action ->
+        parse(WithSub(), listOf("--s1", "unknown")) { action ->
             assertIs<Sub1>(action.sub)
         }
-        parseRecovers(WithSub(), listOf("unknown", "--s1")) { action ->
+        parse(WithSub(), listOf("unknown", "--s1")) { action ->
             assertIs<Sub1>(action.sub)
         }
     }

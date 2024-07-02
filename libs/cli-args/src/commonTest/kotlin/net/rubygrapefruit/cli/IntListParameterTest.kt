@@ -2,7 +2,7 @@ package net.rubygrapefruit.cli
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
+import kotlin.test.assertIs
 
 class IntListParameterTest : AbstractActionTest() {
     @Test
@@ -34,12 +34,12 @@ class IntListParameterTest : AbstractActionTest() {
 
     @Test
     fun `can run --help command when argument is not an integer`() {
-        class Option : TestApp() {
+        class Option : Action() {
             val param by int().parameters("value")
         }
 
-        parseRecovers(Option(), listOf("abc", "--help")) { action ->
-            assertTrue(action.help)
+        parseRecovers(TestApp(Option()), listOf("abc", "--help")) { action ->
+            assertIs<HelpAction>(action.selected)
         }
     }
 }

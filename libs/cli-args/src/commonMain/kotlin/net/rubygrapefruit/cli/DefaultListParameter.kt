@@ -42,7 +42,7 @@ internal open class DefaultListParameter<T : Any>(
             }
             val converted = converter.convert("parameter '$name'", arg)
             if (converted.isFailure) {
-                return ParseResult(index + 1, converted.exceptionOrNull() as ArgParseException, false)
+                return ParseResult(index, converted.exceptionOrNull() as ArgParseException, false)
             }
             values.add(converted.getOrThrow())
         }

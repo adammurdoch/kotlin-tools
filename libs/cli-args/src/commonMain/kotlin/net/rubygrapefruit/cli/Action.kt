@@ -125,7 +125,7 @@ open class Action {
      * Configures this object from the given arguments.
      */
     fun maybeParse(args: List<String>): Result {
-        val result = maybeParse(args, RootContext, stopOnFailure = false)
+        val result = maybeParse(args, RootContext)
         return if (result.failure == null) {
             Result.Success
         } else {
@@ -133,14 +133,30 @@ open class Action {
         }
     }
 
-    internal fun maybeParse(args: List<String>, parent: ParseContext, stopOnFailure: Boolean): ParseResult {
+    internal fun maybeParse(args: List<String>, parent: ParseContext): ParseResult {
         val pending = this.positional.toMutableList()
         val context = parent.withOptions(options)
 
         var index = 0
         var failure: ArgParseException? = null
-        while (index in args.indices && (!stopOnFailure || failure == null)) {
+        while (index in args.indices) {
             val current = args.subList(index, args.size)
+
+            if (failure != null) {
+                var matched = false
+                for (option in context.options) {
+                    val result = option.maybeRecover(current, context)
+                    if (result.count > 0 && result.failure != null) {
+                        failure = null
+                        index += result.count
+                        matched = true
+                        break
+                    }
+                }
+                if (!matched) {
+                    break
+                }
+            }
 
             var matched = false
             for (option in context.options) {
@@ -177,10 +193,6 @@ open class Action {
 
             // Did not match anything
 
-            if (stopOnFailure) {
-                // This is fine
-                break
-            }
             if (failure == null) {
                 val arg = current.first()
                 failure = if (DefaultHost.isOption(arg)) {
@@ -189,7 +201,6 @@ open class Action {
                     ArgParseException("Unknown parameter: $arg")
                 }
             }
-            index++
         }
 
         if (failure == null) {

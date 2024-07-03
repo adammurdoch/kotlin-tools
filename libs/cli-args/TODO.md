@@ -4,10 +4,14 @@
 - Move usage generation to cli-app
 - Clean up usage types.
 - Custom type option, list parameter
-- `--help` should group long and short choice flags
-- Model `--help` and `--completion` as actions
-- Help for options, actions, parameters, etc
-- Help should indicate parameter is optional
+- Help
+    - Don't allow `--help <action>` if there are no nested actions 
+    - Show options for action
+    - Show path to action in usage for action, eg `usage: cmd [options] action1 ...`
+    - `help` nested action
+    - Group long and short choice flags and/or sort by name
+    - Help for options, actions, parameters, etc
+    - Help should indicate parameter is optional
 - Completion
     - Include help message for each choice completion option
     - Include help message for each action completion option
@@ -18,8 +22,6 @@
     - Directory options and parameters
     - Action options
 - Escape names for completion function, actions, help, etc
-- `--help` shows usage of actions
-- Usage sorts options using name, rather than `--name` or `-n`
 - Usage message on parse error
     - Suggest `--help`
     - Unknown option - show available options

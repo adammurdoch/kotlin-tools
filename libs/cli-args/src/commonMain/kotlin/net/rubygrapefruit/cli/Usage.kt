@@ -2,21 +2,25 @@ package net.rubygrapefruit.cli
 
 import kotlin.reflect.KClass
 
-class ActionUsage(
+data class ActionUsage(
     val options: List<OptionUsage>,
     val positional: List<PositionalUsage>
 ) {
     /**
-     * Simplifies this usage by inlining the first action set.
+     * Simplifies this usage by inlining the first action set and replacing its option actions with options on this action.
      */
     fun effective(): ActionUsage {
         val firstPositional = positional.firstOrNull()
         return when (firstPositional) {
             null, is ParameterUsage -> this
             is ActionParameterUsage -> {
-                val effective = firstPositional.effective()
+                // Replace option actions from first positional with options on this action
+                // If there are no named actions in first positional, can replace it with its default
+                val effective = firstPositional.inlineActions()
                 val firstPositionalOptions = effective.options.map { OptionUsage(it.name, it.help, null, listOf(SingleOptionUsage(it.name, it.help, listOf(it.name)))) }
-                val allOptions = options + firstPositionalOptions
+                val allOptions = options + firstPositionalOptions + if (effective.default != null) {
+                    effective.default.action.options
+                } else emptyList()
                 if (effective.named.isEmpty()) {
                     if (effective.default != null) {
                         // replace action parameter with its default
@@ -31,6 +35,10 @@ class ActionUsage(
                 }
             }
         }
+    }
+
+    fun inlineActions(): ActionUsage {
+        return ActionUsage(options, positional.map { if (it is ActionParameterUsage) it.inlineActions() else it })
     }
 
     val formatted: String
@@ -78,6 +86,10 @@ sealed class ItemUsage(val help: String?) {
      * A display name for this item, used when listing items in a table.
      */
     abstract val display: String
+
+    override fun toString(): String {
+        return display
+    }
 }
 
 class SingleOptionUsage(val usage: String, val help: String?, val aliases: List<String>)
@@ -129,16 +141,26 @@ class ActionParameterUsage(
     val default: DefaultNestedActionUsage?
 ) : PositionalUsage(usage, display, help) {
 
+    override fun toString(): String {
+        return "ActionParameterUsage($options, $named, $default)"
+    }
+
     fun dropOptions(): ActionParameterUsage {
         return ActionParameterUsage(usage, display, help, emptyList(), named, default)
     }
 
-    fun effective(): ActionParameterUsage {
-        return if (default != null) {
-            ActionParameterUsage(usage, display, help, options, named, default.effective())
-        } else {
-            this
+    /**
+     * Simplifies this action set by inlining nested actions from the default action, if any.
+     */
+    fun inlineActions(): ActionParameterUsage {
+        if (default != null) {
+            val inlinedDefault = default.inlineActions()
+            val firstPositional = inlinedDefault.action.positional.firstOrNull()
+            if (firstPositional is ActionParameterUsage) {
+                return ActionParameterUsage(usage, display, help, options + firstPositional.options, named + firstPositional.named, null)
+            }
         }
+        return this
     }
 
     val actions: List<NestedActionUsage>
@@ -156,7 +178,7 @@ class DefaultNestedActionUsage(help: String?, action: ActionUsage) : NestedActio
     override val display: String
         get() = action.positional.joinToString(" ") { it.usage }
 
-    fun effective(): DefaultNestedActionUsage {
-        return DefaultNestedActionUsage(help, action.effective())
+    fun inlineActions(): DefaultNestedActionUsage {
+        return DefaultNestedActionUsage(help, action.inlineActions())
     }
 }

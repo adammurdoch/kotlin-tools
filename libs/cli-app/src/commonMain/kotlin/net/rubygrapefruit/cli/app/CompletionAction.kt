@@ -80,6 +80,7 @@ internal class CompletionAction(
                     }
                 }
             }
+            builder.append("\n")
             builder.append("}\n")
             return builder.toString()
         }

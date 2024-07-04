@@ -69,7 +69,11 @@ internal class ChoiceConverter<T : Any>(override val type: KClass<T>, val choice
 
 internal class MappingConverter<T : Any>(override val type: KClass<T>, val converter: (String) -> Action.ConversionResult<T>) : StringConverter<T> {
     override fun convert(displayName: String, value: String): Result<T> {
-        val result = converter(value)
+        val result = try {
+            converter(value)
+        } catch (e: Throwable) {
+            throw ArgParseException("Could not convert value for $displayName: $value", cause = e)
+        }
         return when (result) {
             is Action.ConversionResult.Failure -> Result.failure(ArgParseException("Value for $displayName ${result.problem}: $value"))
             is Action.ConversionResult.Success -> Result.success(result.value)

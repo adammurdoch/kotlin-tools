@@ -149,9 +149,49 @@ class StringParameterTest : AbstractActionTest() {
     }
 
     @Test
+    fun `reports unknown flag used with parameter with default value`() {
+        class Parameter : Action() {
+            val param by parameter("value").whenAbsent("value")
+        }
+
+        parseFails(::Parameter, listOf("arg", "--flag"), "Unknown option: --flag")
+        parseFails(::Parameter, listOf("--flag", "arg"), "Unknown option: --flag")
+        parseFails(::Parameter, listOf("--flag"), "Unknown option: --flag")
+    }
+
+    @Test
+    fun `reports unknown flag used with optional parameter`() {
+        class Parameter : Action() {
+            val param by parameter("value").optional()
+        }
+
+        parseFails(::Parameter, listOf("arg", "--flag"), "Unknown option: --flag")
+        parseFails(::Parameter, listOf("--flag", "arg"), "Unknown option: --flag")
+        parseFails(::Parameter, listOf("--flag"), "Unknown option: --flag")
+    }
+
+    @Test
     fun `fails when additional parameter provided`() {
         class Parameter : Action() {
             val param by parameter("value")
+        }
+
+        parseFails(::Parameter, listOf("1", "2"), "Unknown parameter: 2")
+    }
+
+    @Test
+    fun `fails when additional parameter provided for parameter with default value`() {
+        class Parameter : Action() {
+            val param by parameter("value").whenAbsent("value")
+        }
+
+        parseFails(::Parameter, listOf("1", "2"), "Unknown parameter: 2")
+    }
+
+    @Test
+    fun `fails when additional parameter provided for optional parameter`() {
+        class Parameter : Action() {
+            val param by parameter("value").optional()
         }
 
         parseFails(::Parameter, listOf("1", "2"), "Unknown parameter: 2")

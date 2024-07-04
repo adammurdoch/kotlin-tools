@@ -25,20 +25,21 @@ internal class CompletionAction(
             function $functionName() {
               local context state state_descr line
               typeset -A opt_args
+
             """.trimIndent()
             )
             builder.append("  _arguments")
             if (usage.positional.any { it is ActionParameterUsage }) {
                 builder.append(" -C")
             }
-            options(usage.options, "    ")
+            builder.options(usage.options, "    ")
             for (index in usage.positional.indices) {
                 val positional = usage.positional[index]
                 when (positional) {
                     is ParameterUsage -> {
                         builder.append(" \\\n")
                         builder.append("    ")
-                        parameter(index, positional)
+                        builder.parameter(index, positional)
                         if (positional.multiple) {
                             break
                         }
@@ -53,14 +54,14 @@ internal class CompletionAction(
                         for (nested in positional.named) {
                             builder.append("    ${nested.name})\n")
                             builder.append("      _arguments")
-                            options(nested.action.options, "        ")
+                            builder.options(nested.action.options, "        ")
                             for (nestedIndex in nested.action.positional.indices) {
                                 val nestedPositional = nested.action.positional[nestedIndex]
                                 when (nestedPositional) {
                                     is ParameterUsage -> {
                                         builder.append(" \\\n")
                                         builder.append("        ")
-                                        parameter(nestedIndex, nestedPositional)
+                                        builder.parameter(nestedIndex, nestedPositional)
                                         if (nestedPositional.multiple) {
                                             break
                                         }
@@ -89,50 +90,50 @@ internal class CompletionAction(
         }
     }
 
-    private fun options(options: List<OptionUsage>, indent: String) {
+    private fun StringBuilder.options(options: List<OptionUsage>, indent: String) {
         for (option in options) {
             for (item in option.usages) {
-                println(" \\")
-                print(indent)
+                append(" \\\n")
+                append(indent)
+                append("'")
                 if (item.aliases.size == 1) {
-                    print("'${item.aliases.first()}")
+                    append(item.aliases.first())
                     if (item.help != null) {
-                        print("[${item.help}]")
+                        append("[${item.help}]")
                     }
                 } else {
-                    print("{${item.aliases.joinToString(",")}}")
-                    print("'")
+                    append("{${item.aliases.joinToString(",")}}")
                     if (item.help != null) {
-                        print("[${item.help}]")
+                        append("[${item.help}]")
                     }
                 }
                 if (option.type != null) {
-                    print(":Argument:")
+                    append(":Argument:")
                     valueType(option.type, emptyList())
                 }
-                print("'")
+                append("'")
             }
         }
     }
 
-    private fun parameter(index: Int, parameter: ParameterUsage) {
-        print("'")
+    private fun StringBuilder.parameter(index: Int, parameter: ParameterUsage) {
+        append("'")
         when (parameter.cardinality) {
-            is Cardinality.Optional -> print("${index + 1}::Parameter:")
-            is Cardinality.Required -> print("${index + 1}:Parameter:")
-            is Cardinality.ZeroOrMore, is Cardinality.OneOrMore -> print("*:Parameter:")
+            is Cardinality.Optional -> append("${index + 1}::Parameter:")
+            is Cardinality.Required -> append("${index + 1}:Parameter:")
+            is Cardinality.ZeroOrMore, is Cardinality.OneOrMore -> append("*:Parameter:")
         }
         valueType(parameter.type, parameter.values)
-        print("'")
+        append("'")
     }
 
-    private fun valueType(type: KClass<*>?, candidates: List<String>) {
+    private fun StringBuilder.valueType(type: KClass<*>?, candidates: List<String>) {
         if (type.fileType) {
-            print("_files")
+            append("_files")
         } else if (candidates.isNotEmpty()) {
-            print("(${candidates.joinToString(" ")})")
+            append("(${candidates.joinToString(" ")})")
         } else {
-            print("( )")
+            append("( )")
         }
     }
 }

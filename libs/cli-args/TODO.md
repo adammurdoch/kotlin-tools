@@ -1,8 +1,5 @@
-- Options have gone missing from help and completion
-- Nullable parameter - tests
 - Move usage generation to cli-app
 - Clean up usage types.
-- Custom type option, list parameter
 - Help
     - Don't allow `--help <action>` if there are no nested actions
     - Use choice for action parameter to `help <action>`

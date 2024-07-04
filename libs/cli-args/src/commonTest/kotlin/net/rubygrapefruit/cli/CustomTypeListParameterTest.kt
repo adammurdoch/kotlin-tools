@@ -5,15 +5,15 @@ import kotlin.test.assertEquals
 import kotlin.test.assertSame
 import kotlin.test.fail
 
-class CustomTypeParameterTest : AbstractActionTest() {
+class CustomTypeListParameterTest : AbstractActionTest() {
     @Test
     fun `action can have typed parameter`() {
         class Parameter : Action() {
-            val param by type { ConversionResult.Success(it.uppercase()) }.parameter("value")
+            val param by type { ConversionResult.Success(it.uppercase()) }.parameters("value")
         }
 
-        parse(Parameter(), listOf("abc")) { action ->
-            assertEquals("ABC", action.param)
+        parse(Parameter(), listOf("abc", "def")) { action ->
+            assertEquals(listOf("ABC", "DEF"), action.param)
         }
     }
 
@@ -26,12 +26,17 @@ class CustomTypeParameterTest : AbstractActionTest() {
                 } else {
                     ConversionResult.Success(it)
                 }
-            }.parameter("value")
+            }.parameters("value")
         }
 
         parseFails(::Parameter, listOf("a"), "Value for parameter 'value' is too short: a")
+        parseFails(::Parameter, listOf("abc", "d"), "Value for parameter 'value' is too short: d")
+
+        parse(Parameter(), emptyList()) { action ->
+            assertEquals(emptyList(), action.param)
+        }
         parse(Parameter(), listOf("abc")) { action ->
-            assertEquals("abc", action.param)
+            assertEquals(listOf("abc"), action.param)
         }
     }
 
@@ -42,7 +47,7 @@ class CustomTypeParameterTest : AbstractActionTest() {
         class Parameter : Action() {
             val param by type<Long> {
                 throw failure
-            }.parameter("value")
+            }.parameters("value")
         }
 
         try {

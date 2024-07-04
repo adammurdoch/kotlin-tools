@@ -7,26 +7,27 @@ class ActionUsage(
     val positional: List<PositionalUsage>
 ) {
     /**
-     * Simplifies this usage by inlining nested action sets, etc.
+     * Simplifies this usage by inlining the first action set.
      */
     fun effective(): ActionUsage {
-        val first = positional.firstOrNull()
-        return when (first) {
+        val firstPositional = positional.firstOrNull()
+        return when (firstPositional) {
             null, is ParameterUsage -> this
             is ActionParameterUsage -> {
-                val additionalOptions = first.options.map { OptionUsage(it.name, it.help, null, listOf(SingleOptionUsage(it.name, it.help, listOf(it.name)))) }
-                val allOptions = options + additionalOptions + if (first.default != null) first.default.action.options else emptyList()
-                if (first.named.isEmpty()) {
-                    if (first.default != null) {
+                val effective = firstPositional.effective()
+                val firstPositionalOptions = effective.options.map { OptionUsage(it.name, it.help, null, listOf(SingleOptionUsage(it.name, it.help, listOf(it.name)))) }
+                val allOptions = options + firstPositionalOptions
+                if (effective.named.isEmpty()) {
+                    if (effective.default != null) {
                         // replace action parameter with its default
-                        ActionUsage(allOptions, first.default.action.positional + positional.drop(1))
+                        ActionUsage(allOptions, effective.default.action.positional + positional.drop(1))
                     } else {
                         // discard action parameter
                         ActionUsage(allOptions, positional.drop(1))
                     }
                 } else {
                     // discard options from action parameter
-                    ActionUsage(allOptions, listOf(first.dropOptions()) + positional.drop(1))
+                    ActionUsage(allOptions, listOf(effective.dropOptions()) + positional.drop(1))
                 }
             }
         }
@@ -132,6 +133,14 @@ class ActionParameterUsage(
         return ActionParameterUsage(usage, display, help, emptyList(), named, default)
     }
 
+    fun effective(): ActionParameterUsage {
+        return if (default != null) {
+            ActionParameterUsage(usage, display, help, options, named, default.effective())
+        } else {
+            this
+        }
+    }
+
     val actions: List<NestedActionUsage>
         get() = options + named + if (default != null) listOf(default) else emptyList()
 }
@@ -146,4 +155,8 @@ class NamedNestedActionUsage(val name: String, help: String?, action: ActionUsag
 class DefaultNestedActionUsage(help: String?, action: ActionUsage) : NestedActionUsage(help, action) {
     override val display: String
         get() = action.positional.joinToString(" ") { it.usage }
+
+    fun effective(): DefaultNestedActionUsage {
+        return DefaultNestedActionUsage(help, action.effective())
+    }
 }

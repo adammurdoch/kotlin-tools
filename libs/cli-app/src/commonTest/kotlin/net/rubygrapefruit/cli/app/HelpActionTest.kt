@@ -129,6 +129,42 @@ class HelpActionTest : AbstractActionTest() {
     }
 
     @Test
+    fun `generates help output for app with nested actions referenced by name and default action with nested actions`() {
+        class Sub : Action() {
+            val action by actions {
+                action(Action(), "z2", help = "run action z2")
+                action(Action(), "a", help = "run action a")
+            }
+        }
+
+        class App : Action() {
+            val action by actions {
+                action(Action(), "z", help = "run action z")
+                action(Action(), "action-two")
+                action(Action(), "a2", help = "run action a2")
+                action(Sub(), help = "run main action")
+            }
+        }
+
+        val app = App()
+        val help = HelpAction("cmd", app)
+
+        assertEquals(
+            """
+            Usage: cmd <action>
+            
+            Actions:
+              a          run action a
+              a2         run action a2
+              action-two
+              z          run action z
+              z2         run action z2
+
+            """.trimIndent(), help.formatted
+        )
+    }
+
+    @Test
     fun `generates help output for app with nested actions referenced as options`() {
         class App : Action() {
             val action by actions {

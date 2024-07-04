@@ -41,6 +41,60 @@ class HelpActionTest : AbstractActionTest() {
     }
 
     @Test
+    fun `generates help output for app with multiple flags`() {
+        class App : Action() {
+            val f1 by flag("some-flag", help = "some other flag")
+            val f2 by flag("f", "flag", help = "a flag")
+            val f3 by flag("none")
+            val f4 by flag("o", help = "single character")
+        }
+
+        val app = App()
+        val help = HelpAction("cmd", app)
+
+        assertEquals(
+            """
+            Usage: cmd [options]
+            
+            Options:
+              --none, --no-none
+              --some-flag, --no-some-flag some other flag
+              -f, --flag, --no-flag       a flag
+              -o                          single character
+            
+            """.trimIndent(), help.formatted
+        )
+    }
+
+    @Test
+    fun `generates help output for app with choice options`() {
+        class App : Action() {
+            val o1 by oneOf {
+                choice(1, "one", help = "select 1")
+                choice(2, "2", help = "select 2")
+                choice(3, "three", "3", help = "select 3")
+                choice(4, "none")
+            }.flags()
+        }
+
+        val app = App()
+        val help = HelpAction("cmd", app)
+
+        assertEquals(
+            """
+            Usage: cmd [options]
+            
+            Options:
+              --none
+              --one       select 1
+              --three, -3 select 3
+              -2          select 2
+            
+            """.trimIndent(), help.formatted
+        )
+    }
+
+    @Test
     fun `generates help output for app with multiple options`() {
         class App : Action() {
             val a1 by option("some-option", help = "some other option")

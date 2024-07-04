@@ -10,75 +10,83 @@ internal class CompletionAction(
     private val name: String,
     private val action: Action
 ) : Action() {
-    override fun run() {
-        val usage = action.usage().effective()
-        val appName = name
+    val formatted: String
+        get() {
+            val builder = StringBuilder()
+            val usage = action.usage().effective()
+            val appName = name
 
-        val functionName = appName + "_complete"
-        println()
-        println(
-            """
+            val functionName = appName + "_complete"
+            builder.append("\n")
+            builder.append(
+                """
             compdef $functionName $appName
 
             function $functionName() {
               local context state state_descr line
               typeset -A opt_args
             """.trimIndent()
-        )
-        print("  _arguments")
-        if (usage.positional.any { it is ActionParameterUsage }) {
-            print(" -C")
-        }
-        options(usage.options, "    ")
-        for (index in usage.positional.indices) {
-            val positional = usage.positional[index]
-            when (positional) {
-                is ParameterUsage -> {
-                    println(" \\")
-                    print("    ")
-                    parameter(index, positional)
-                    if (positional.multiple) {
-                        break
+            )
+            builder.append("  _arguments")
+            if (usage.positional.any { it is ActionParameterUsage }) {
+                builder.append(" -C")
+            }
+            options(usage.options, "    ")
+            for (index in usage.positional.indices) {
+                val positional = usage.positional[index]
+                when (positional) {
+                    is ParameterUsage -> {
+                        builder.append(" \\\n")
+                        builder.append("    ")
+                        parameter(index, positional)
+                        if (positional.multiple) {
+                            break
+                        }
                     }
-                }
 
-                is ActionParameterUsage -> {
-                    println(" \\")
-                    println("    '${index + 1}::Action:(${positional.named.joinToString(" ") { it.name }})' \\")
-                    println("    '*::arg:->args'")
+                    is ActionParameterUsage -> {
+                        builder.append(" \\\n")
+                        builder.append("    '${index + 1}::Action:(${positional.named.joinToString(" ") { it.name }})' \\\n")
+                        builder.append("    '*::arg:->args'\n")
 
-                    println("  case \$line[1] in")
-                    for (nested in positional.named) {
-                        println("    ${nested.name})")
-                        print("      _arguments")
-                        options(nested.action.options, "        ")
-                        for (nestedIndex in nested.action.positional.indices) {
-                            val nestedPositional = nested.action.positional[nestedIndex]
-                            when (nestedPositional) {
-                                is ParameterUsage -> {
-                                    println(" \\")
-                                    print("        ")
-                                    parameter(nestedIndex, nestedPositional)
-                                    if (nestedPositional.multiple) {
+                        builder.append("  case \$line[1] in\n")
+                        for (nested in positional.named) {
+                            builder.append("    ${nested.name})\n")
+                            builder.append("      _arguments")
+                            options(nested.action.options, "        ")
+                            for (nestedIndex in nested.action.positional.indices) {
+                                val nestedPositional = nested.action.positional[nestedIndex]
+                                when (nestedPositional) {
+                                    is ParameterUsage -> {
+                                        builder.append(" \\\n")
+                                        builder.append("        ")
+                                        parameter(nestedIndex, nestedPositional)
+                                        if (nestedPositional.multiple) {
+                                            break
+                                        }
+                                    }
+
+                                    is ActionParameterUsage -> {
                                         break
                                     }
                                 }
-
-                                is ActionParameterUsage -> {
-                                    break
-                                }
                             }
+                            builder.append("\n")
+                            builder.append("    ;;\n")
                         }
-                        println()
-                        println("    ;;")
+                        builder.append("  esac\n")
+                        break
                     }
-                    println("  esac")
-                    break
                 }
             }
+            builder.append("}\n")
+            return builder.toString()
         }
-        println()
-        println("}")
+
+    override fun run() {
+        for (line in formatted.lines()) {
+            println(line)
+        }
     }
 
     private fun options(options: List<OptionUsage>, indent: String) {

@@ -3,7 +3,7 @@ package net.rubygrapefruit.cli
 import kotlin.reflect.KProperty
 
 internal class DefaultNullableChoice<T : Any>(
-    private val choices: Map<String, ChoiceDetails<T>>,
+    private val choices: List<ChoiceDetails<T>>,
     private val owner: Action
 ) : AbstractChoice<T>(choices), NullableOption<T> {
 

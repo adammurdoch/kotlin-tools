@@ -36,7 +36,8 @@ open class Action {
     fun <T : Any> oneOf(type: KClass<T>, builder: Choices<T>.() -> Unit): MappingConfigurationBuilder<T> {
         val choices = DefaultChoices<T>(DefaultHost)
         builder(choices)
-        return DefaultMappingConfigurationBuilder(this, DefaultHost, ChoiceConverter(type, choices.choices))
+        val choicesByName = choices.choices.flatMap { it.names.map { name -> name to it } }.toMap()
+        return DefaultMappingConfigurationBuilder(this, DefaultHost, ChoiceConverter(type, choicesByName), choices.choices)
     }
 
     /**

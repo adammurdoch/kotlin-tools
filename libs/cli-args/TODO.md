@@ -1,5 +1,4 @@
 - Options have gone missing from help and completion
-- Help should not sort parameters by name
 - Nullable parameter - tests
 - Move usage generation to cli-app
 - Clean up usage types.
@@ -10,9 +9,11 @@
     - Show options for action
     - Show path to action in usage for action, eg `usage: cmd [options] action1 ...`
     - `help` nested action
-    - Group long and short choice flags and/or sort by name
+    - Group long and short choice flags
+    - Sort short options first?
     - Help for options, actions, parameters, etc
     - Help should indicate parameter is optional
+    - Help for nested actions with nested actions
 - Completion
     - Include help message for each choice completion option
     - Include help message for each action completion option
@@ -42,25 +43,3 @@
 - File locations: dir, file, must exist
 - Color output on terminal
 - Fuzzy matching and/or suggestions
-
-`compinit` - initialise completion
-`compdef <fun> <name>` - use function to complete command or context (e.g. for shell syntax completion) with given name
-
-- completion context, contains
-    - first field is `completion`
-    - completer function that controls completion
-    - command or context
-    - argument number being completed
-    - tag (type of value being completed)
-- pressing ^x h shows context and tags at current position
-- completion process
-    - creates blank context, progressively fills it in
-    - for sub-commands, can apparently change the "command" field in the context to a new name to do completion for the sub-command
-    - use styles to match against the context
-- standard tags
-    - `arguments`, `options`
-    - `commands` - can be used for subcommands?
-    - `files`, `directories`
-- utility functions
-    - wrappers around `compadd` built-in (https://zsh.sourceforge.io/Doc/Release/Completion-Widgets.html#Completion-Widgets)
-    - `_arguments`

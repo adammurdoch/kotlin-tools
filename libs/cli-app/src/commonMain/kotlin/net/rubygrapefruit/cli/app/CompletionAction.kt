@@ -96,14 +96,14 @@ internal class CompletionAction(
             for (item in option.usages) {
                 append(" \\\n")
                 append(indent)
-                append("'")
                 if (item.aliases.size == 1) {
+                    append("'")
                     append(item.aliases.first())
                     if (item.help != null) {
                         append("[${item.help}]")
                     }
                 } else {
-                    append("{${item.aliases.joinToString(",")}}")
+                    append("{${item.aliases.joinToString(",")}}'")
                     if (item.help != null) {
                         append("[${item.help}]")
                     }

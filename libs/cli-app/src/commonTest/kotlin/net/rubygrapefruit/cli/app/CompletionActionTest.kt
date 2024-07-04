@@ -22,8 +22,8 @@ class CompletionActionTest : AbstractActionTest() {
 
         val action = CompletionAction("cmd", App())
 
-        assertContains(action.formatted, "--some-option[some other option]:Argument:( )")
-        assertContains(action.formatted, "{-s,--second-option}[second option]:Argument:( )")
-        assertContains(action.formatted, "--none:Argument:( )")
+        assertContains(action.formatted, "'--some-option[some other option]:Argument:( )'")
+        assertContains(action.formatted, "{-s,--second-option}'[second option]:Argument:( )'")
+        assertContains(action.formatted, "'--none:Argument:( )'")
     }
 }

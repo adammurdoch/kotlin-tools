@@ -1,3 +1,5 @@
+- Fix error message when multiple actions are provided, either as names or options or combined with default
+- Completion for nested actions
 - Move usage generation to cli-app
 - Clean up usage types.
 - Help
@@ -33,7 +35,7 @@
     - Multiple actions specified, eg multiple args, multiple options, etc.
 - Handle required list parameter with default value - disallow? succeed if absent and default provided?
 - Validate names do not contain spaces
-- Validate at least one action or choice is defined
+- Validate at least one action or choice is defined, if no default
 - Validate choices do not contain spaces
 - Disallow conflicting flags, option and action names, choice flags
 - Disallow any positional parameters after list parameter

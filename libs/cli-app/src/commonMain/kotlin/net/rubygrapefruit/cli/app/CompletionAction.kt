@@ -28,59 +28,7 @@ internal class CompletionAction(
 
             """.trimIndent()
             )
-            builder.append("  _arguments")
-            if (usage.positional.any { it is ActionParameterUsage }) {
-                builder.append(" -C")
-            }
-            builder.options(usage.options, "    ")
-            for (index in usage.positional.indices) {
-                val positional = usage.positional[index]
-                when (positional) {
-                    is ParameterUsage -> {
-                        builder.append(" \\\n")
-                        builder.append("    ")
-                        builder.parameter(index, positional)
-                        if (positional.multiple) {
-                            break
-                        }
-                    }
-
-                    is ActionParameterUsage -> {
-                        builder.append(" \\\n")
-                        builder.append("    '${index + 1}::Action:(${positional.named.joinToString(" ") { it.name }})' \\\n")
-                        builder.append("    '*::arg:->args'\n")
-
-                        builder.append("  case \$line[1] in\n")
-                        for (nested in positional.named) {
-                            builder.append("    ${nested.name})\n")
-                            builder.append("      _arguments")
-                            builder.options(nested.action.options, "        ")
-                            for (nestedIndex in nested.action.positional.indices) {
-                                val nestedPositional = nested.action.positional[nestedIndex]
-                                when (nestedPositional) {
-                                    is ParameterUsage -> {
-                                        builder.append(" \\\n")
-                                        builder.append("        ")
-                                        builder.parameter(nestedIndex, nestedPositional)
-                                        if (nestedPositional.multiple) {
-                                            break
-                                        }
-                                    }
-
-                                    is ActionParameterUsage -> {
-                                        break
-                                    }
-                                }
-                            }
-                            builder.append("\n")
-                            builder.append("    ;;\n")
-                        }
-                        builder.append("  esac\n")
-                        break
-                    }
-                }
-            }
-            builder.append("\n")
+            builder.completion(usage, "  ")
             builder.append("}\n")
             return builder.toString()
         }
@@ -88,6 +36,56 @@ internal class CompletionAction(
     override fun run() {
         for (line in formatted.lines()) {
             println(line)
+        }
+    }
+
+    private fun StringBuilder.completion(action: ActionUsage, indent: String) {
+        if (action.positional.isEmpty() && action.options.isEmpty()) {
+            return
+        }
+        append(indent)
+        append("_arguments")
+        if (action.positional.any { it is ActionParameterUsage }) {
+            append(" -C")
+        }
+        val nestedIndent = "$indent  "
+        options(action.options, nestedIndent)
+        for (index in action.positional.indices) {
+            val positional = action.positional[index]
+            when (positional) {
+                is ParameterUsage -> {
+                    append(" \\\n")
+                    append(nestedIndent)
+                    parameter(index, positional)
+                    if (positional.multiple) {
+                        break
+                    }
+                }
+
+                is ActionParameterUsage -> {
+                    append(" \\\n")
+                    append(nestedIndent)
+                    append("'${index + 1}::Action:(${positional.named.joinToString(" ") { it.name }})' \\\n")
+                    append(nestedIndent)
+                    append("'*::arg:->args'\n")
+
+                    append(indent)
+                    append("case \$line[1] in\n")
+                    val caseIndent = "$nestedIndent  "
+                    for (nested in positional.named) {
+                        append(nestedIndent)
+                        append("${nested.name})\n")
+                        completion(nested.action, caseIndent)
+                        append(caseIndent)
+                        append(";;\n")
+                    }
+                    append(indent)
+                    append("esac\n")
+                }
+            }
+            if (!endsWith("\n")) {
+                append("\n")
+            }
         }
     }
 

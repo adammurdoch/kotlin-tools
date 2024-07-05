@@ -81,11 +81,12 @@ internal class CompletionAction(
                     }
                     append(indent)
                     append("esac\n")
+                    break
                 }
             }
-            if (!endsWith("\n")) {
-                append("\n")
-            }
+        }
+        if (!endsWith("\n")) {
+            append("\n")
         }
     }
 

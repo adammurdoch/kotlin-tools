@@ -37,8 +37,54 @@ class HelpActionTest : AbstractActionTest() {
             Usage: cmd <z> <another-param> <no-help>
             
             Parameters:
-              <another-param> some other value
               <z>             some value
+              <another-param> some other value
+            
+            """.trimIndent(), formatter.text
+        )
+    }
+
+    @Test
+    fun `generates help output for app with list parameter`() {
+        class App : Action() {
+            val p1 by parameter("param", help = "some value")
+            val p2 by parameters("another-param", help = "some other value")
+        }
+
+        val app = App()
+        val help = HelpAction("cmd", app, formatter)
+        help.run()
+
+        assertEquals(
+            """
+            Usage: cmd <param> <another-param>...
+            
+            Parameters:
+              <param>         some value
+              <another-param> some other value
+            
+            """.trimIndent(), formatter.text
+        )
+    }
+
+    @Test
+    fun `generates help output for app with optional parameter`() {
+        class App : Action() {
+            val p1 by parameter("param", help = "some value").optional()
+            val p2 by parameter("another-param", help = "some other value").optional()
+        }
+
+        val app = App()
+        val help = HelpAction("cmd", app, formatter)
+        help.run()
+
+        assertEquals(
+            """
+            Usage: cmd <param>? <another-param>?
+            
+            Parameters:
+              <param>         some value
+              <another-param> some other value
             
             """.trimIndent(), formatter.text
         )

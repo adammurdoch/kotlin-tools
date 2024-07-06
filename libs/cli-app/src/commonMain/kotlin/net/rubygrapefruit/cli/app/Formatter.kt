@@ -21,6 +21,28 @@ internal abstract class Formatter {
         atStartOfLine = true
     }
 
+    fun <T> table(title: String, items: List<T>, row: (T) -> Pair<String, String?>) {
+        if (items.isNotEmpty()) {
+            newLine()
+            text("$title:")
+            newLine()
+            val width = items.maxOf { row(it).first.length }
+            for (item in items) {
+                val cells = row(item)
+                text("  ")
+                val second = cells.second
+                if (second != null) {
+                    text(cells.first.padEnd(width))
+                    text(" ")
+                    text(second)
+                } else {
+                    text(cells.first)
+                }
+                newLine()
+            }
+        }
+    }
+
     protected abstract fun text(value: String)
 }
 

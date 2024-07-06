@@ -19,9 +19,13 @@ class CliAppTest {
 
         val action = NoConfig().actionFor(listOf("--help"))
         assertIs<HelpAction>(action)
-        assertContains(action.formatted, "--help")
-        assertContains(action.formatted, "--stack")
-        assertContains(action.formatted, "--completion")
+
+        val formatter = BufferingFormatter()
+        action.run(formatter)
+
+        assertContains(formatter.text, "--help")
+        assertContains(formatter.text, "--stack")
+        assertContains(formatter.text, "--completion")
     }
 
     @Test

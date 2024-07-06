@@ -4,13 +4,15 @@ import net.rubygrapefruit.cli.Action
 
 internal open class HelpAction(
     private val name: String,
-    private val action: Action
+    private val action: Action,
+    private val formatter: Formatter
 ) : AbstractHelpAction() {
 
-    override val formatted: String
-        get() {
-            val builder = StringBuilder()
-            builder.appendUsage(name, action)
-            return builder.toString()
-        }
+    override fun run() {
+        run(formatter)
+    }
+
+    internal fun run(formatter: Formatter) {
+        formatter.appendUsage(name, action)
+    }
 }

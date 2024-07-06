@@ -54,10 +54,10 @@ open class CliApp(val name: String) : CliAction() {
         val action by actions {
             val positional = app.usage().effective().positional.firstOrNull()
             if (positional is ActionParameterUsage) {
-                option(NestedActionHelpAction(app.name, this@MainAction), "help", help = "Show usage message", allowAnywhere = true)
-                action(NestedActionHelpAction(app.name, this@MainAction), "help", help = "Show usage message")
+                option(NestedActionHelpAction(app.name, this@MainAction, LoggingFormatter), "help", help = "Show usage message", allowAnywhere = true)
+                action(NestedActionHelpAction(app.name, this@MainAction, LoggingFormatter), "help", help = "Show usage message")
             } else {
-                option(HelpAction(app.name, this@MainAction), "help", help = "Show usage message", allowAnywhere = true)
+                option(HelpAction(app.name, this@MainAction, LoggingFormatter), "help", help = "Show usage message", allowAnywhere = true)
             }
 
             option(CompletionAction(app.name, this@MainAction, LoggingFormatter), "completion", help = "Generate ZSH completion script")

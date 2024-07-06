@@ -5,15 +5,18 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class HelpActionTest : AbstractActionTest() {
+    private val formatter = BufferingFormatter()
+
     @Test
     fun `generates help output for app with no configuration`() {
-        val help = HelpAction("cmd", Action())
+        val help = HelpAction("cmd", Action(), formatter)
+        help.run()
 
         assertEquals(
             """
             Usage: cmd
 
-        """.trimIndent(), help.formatted
+        """.trimIndent(), formatter.text
         )
     }
 
@@ -26,7 +29,8 @@ class HelpActionTest : AbstractActionTest() {
         }
 
         val app = App()
-        val help = HelpAction("cmd", app)
+        val help = HelpAction("cmd", app, formatter)
+        help.run()
 
         assertEquals(
             """
@@ -36,7 +40,7 @@ class HelpActionTest : AbstractActionTest() {
               <another-param> some other value
               <z>             some value
             
-            """.trimIndent(), help.formatted
+            """.trimIndent(), formatter.text
         )
     }
 
@@ -50,7 +54,8 @@ class HelpActionTest : AbstractActionTest() {
         }
 
         val app = App()
-        val help = HelpAction("cmd", app)
+        val help = HelpAction("cmd", app, formatter)
+        help.run()
 
         assertEquals(
             """
@@ -62,7 +67,7 @@ class HelpActionTest : AbstractActionTest() {
               -f, --flag, --no-flag       a flag
               -o                          single character
             
-            """.trimIndent(), help.formatted
+            """.trimIndent(), formatter.text
         )
     }
 
@@ -78,7 +83,8 @@ class HelpActionTest : AbstractActionTest() {
         }
 
         val app = App()
-        val help = HelpAction("cmd", app)
+        val help = HelpAction("cmd", app, formatter)
+        help.run()
 
         assertEquals(
             """
@@ -90,7 +96,7 @@ class HelpActionTest : AbstractActionTest() {
               --three, -3 select 3
               -2          select 2
             
-            """.trimIndent(), help.formatted
+            """.trimIndent(), formatter.text
         )
     }
 
@@ -104,7 +110,8 @@ class HelpActionTest : AbstractActionTest() {
         }
 
         val app = App()
-        val help = HelpAction("cmd", app)
+        val help = HelpAction("cmd", app, formatter)
+        help.run()
 
         assertEquals(
             """
@@ -116,7 +123,7 @@ class HelpActionTest : AbstractActionTest() {
               -o <value>                          single character
               -s <value>, --second-option <value> second option
             
-            """.trimIndent(), help.formatted
+            """.trimIndent(), formatter.text
         )
     }
 
@@ -131,7 +138,8 @@ class HelpActionTest : AbstractActionTest() {
         }
 
         val app = App()
-        val help = HelpAction("cmd", app)
+        val help = HelpAction("cmd", app, formatter)
+        help.run()
 
         assertEquals(
             """
@@ -142,7 +150,7 @@ class HelpActionTest : AbstractActionTest() {
               action-two
               z          run action z
             
-            """.trimIndent(), help.formatted
+            """.trimIndent(), formatter.text
         )
     }
 
@@ -163,7 +171,8 @@ class HelpActionTest : AbstractActionTest() {
         }
 
         val app = App()
-        val help = HelpAction("cmd", app)
+        val help = HelpAction("cmd", app, formatter)
+        help.run()
 
         assertEquals(
             """
@@ -178,7 +187,7 @@ class HelpActionTest : AbstractActionTest() {
             Options:
               --option <value> some option
 
-            """.trimIndent(), help.formatted
+            """.trimIndent(), formatter.text
         )
     }
 
@@ -201,7 +210,8 @@ class HelpActionTest : AbstractActionTest() {
         }
 
         val app = App()
-        val help = HelpAction("cmd", app)
+        val help = HelpAction("cmd", app, formatter)
+        help.run()
 
         assertEquals(
             """
@@ -214,7 +224,7 @@ class HelpActionTest : AbstractActionTest() {
               z          run action z
               z2         run action z2
 
-            """.trimIndent(), help.formatted
+            """.trimIndent(), formatter.text
         )
     }
 
@@ -229,7 +239,8 @@ class HelpActionTest : AbstractActionTest() {
         }
 
         val app = App()
-        val help = HelpAction("cmd", app)
+        val help = HelpAction("cmd", app, formatter)
+        help.run()
 
         assertEquals(
             """
@@ -240,7 +251,7 @@ class HelpActionTest : AbstractActionTest() {
               --action-two
               -z           run action z
             
-            """.trimIndent(), help.formatted
+            """.trimIndent(), formatter.text
         )
     }
 
@@ -260,7 +271,8 @@ class HelpActionTest : AbstractActionTest() {
         }
 
         val app = App()
-        val help = HelpAction("cmd", app)
+        val help = HelpAction("cmd", app, formatter)
+        help.run()
 
         assertEquals(
             """
@@ -274,7 +286,7 @@ class HelpActionTest : AbstractActionTest() {
               --option <value> some option
               -z               run action z
             
-            """.trimIndent(), help.formatted
+            """.trimIndent(), formatter.text
         )
     }
 }

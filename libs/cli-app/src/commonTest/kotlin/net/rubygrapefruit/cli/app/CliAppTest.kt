@@ -1,7 +1,9 @@
 package net.rubygrapefruit.cli.app
 
+import net.rubygrapefruit.cli.Action
 import kotlin.test.Test
 import kotlin.test.assertContains
+import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
 class CliAppTest {
@@ -57,5 +59,28 @@ class CliAppTest {
 
         val action = NoConfig().actionFor(listOf("--completion"), formatter)
         assertIs<CompletionAction>(action)
+    }
+
+    @Test
+    fun `reports unknown action`() {
+        class Nested : CliApp("cmd") {
+            val action by actions {
+                action(Action(), "one")
+                action(Action(), "two")
+            }
+        }
+
+        Nested().run(listOf("unknown"), formatter)
+
+        assertEquals(
+            """
+            Unknown action: unknown
+            
+            Available actions:
+              one
+              two
+
+        """.trimIndent(), formatter.text
+        )
     }
 }

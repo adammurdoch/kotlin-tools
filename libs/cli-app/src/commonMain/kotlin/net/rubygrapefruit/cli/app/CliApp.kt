@@ -20,28 +20,37 @@ open class CliApp(val name: String) : CliAction() {
      * Runs this action, using the given arguments to configure it. Does not return
      */
     fun run(args: List<String>) {
+        val result = run(args, LoggingFormatter)
+        if (result) {
+            exit(0)
+        } else {
+            exit(1)
+        }
+    }
+
+    internal fun run(args: List<String>, formatter: Formatter): Boolean {
         var parsed = false
-        val main = MainAction(this, LoggingFormatter)
+        val main = MainAction(this, formatter)
         try {
             val action = try {
                 main.actionFor(args)
             } catch (e: ArgParseException) {
-                for (line in e.formattedMessage.lines()) {
-                    println(line)
-                }
-                exit(1)
+                formatter.append(e.formattedMessage)
+                formatter.maybeNewLine()
+                return false
             }
             parsed = true
 
             action.run()
-            exit(0)
+            return true
         } catch (t: Throwable) {
             if (!parsed || main.stackTrace) {
                 t.printStackTrace()
             } else {
-                println(t.message)
+                formatter.append(t.message)
+                formatter.maybeNewLine()
             }
-            exit(1)
+            return false
         }
     }
 

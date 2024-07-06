@@ -1,7 +1,7 @@
 - Fix error message when multiple actions are provided, either as names or options or combined with default
 - Completion for nested actions
 - Move usage generation to cli-app
-- Clean up usage types.
+- Clean up usage types
 - Help
     - Don't allow `--help <action>` if there are no nested actions
     - Use choice for action parameter to `help <action>`

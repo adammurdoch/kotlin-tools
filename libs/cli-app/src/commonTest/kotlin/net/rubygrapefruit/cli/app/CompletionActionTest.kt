@@ -5,11 +5,14 @@ import kotlin.test.Test
 import kotlin.test.assertContains
 
 class CompletionActionTest : AbstractActionTest() {
+    private val formatter = BufferingFormatter()
+
     @Test
     fun `generates completion script for app with no configuration`() {
-        val action = CompletionAction("cmd", Action())
+        val action = CompletionAction("cmd", Action(), formatter)
+        action.run()
 
-        assertContains(action.formatted, "compdef cmd_complete cmd")
+        assertContains(formatter.text, "compdef cmd_complete cmd")
     }
 
     @Test
@@ -20,10 +23,11 @@ class CompletionActionTest : AbstractActionTest() {
             val a3 by option("none")
         }
 
-        val action = CompletionAction("cmd", App())
+        val action = CompletionAction("cmd", App(), formatter)
+        action.run()
 
-        assertContains(action.formatted, "'--some-option[some other option]:Argument:( )'")
-        assertContains(action.formatted, "{-s,--second-option}'[second option]:Argument:( )'")
-        assertContains(action.formatted, "'--none:Argument:( )'")
+        assertContains(formatter.text, "'--some-option[some other option]:Argument:( )'")
+        assertContains(formatter.text, "{-s,--second-option}'[second option]:Argument:( )'")
+        assertContains(formatter.text, "'--none:Argument:( )'")
     }
 }

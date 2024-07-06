@@ -8,38 +8,35 @@ import kotlin.reflect.KClass
 
 internal class CompletionAction(
     private val name: String,
-    private val action: Action
+    private val action: Action,
+    private val formatter: Formatter
 ) : Action() {
-    val formatted: String
-        get() {
-            val builder = StringBuilder()
-            val usage = action.usage().effective()
-            val appName = name
-
-            val functionName = appName + "_complete"
-            builder.append("\n")
-            builder.append(
-                """
-            compdef $functionName $appName
-
-            function $functionName() {
-              local context state state_descr line
-              typeset -A opt_args
-
-            """.trimIndent()
-            )
-            builder.completion(usage, "  ")
-            builder.append("}\n")
-            return builder.toString()
-        }
 
     override fun run() {
-        for (line in formatted.lines()) {
-            println(line)
+        val usage = action.usage().effective()
+        val appName = name
+
+        formatter.run {
+            val functionName = appName + "_complete"
+
+            newLine()
+            append(
+                """
+                compdef $functionName $appName
+    
+                function $functionName() {
+                  local context state state_descr line
+                  typeset -A opt_args
+    
+                """.trimIndent()
+            )
+            completion(usage, "  ")
+            append("}")
+            newLine()
         }
     }
 
-    private fun StringBuilder.completion(action: ActionUsage, indent: String) {
+    private fun Formatter.completion(action: ActionUsage, indent: String) {
         if (action.positional.isEmpty() && action.options.isEmpty()) {
             return
         }
@@ -85,12 +82,10 @@ internal class CompletionAction(
                 }
             }
         }
-        if (!endsWith("\n")) {
-            append("\n")
-        }
+        maybeNewLine()
     }
 
-    private fun StringBuilder.options(options: List<OptionUsage>, indent: String) {
+    private fun Formatter.options(options: List<OptionUsage>, indent: String) {
         for (option in options) {
             for (item in option.usages) {
                 append(" \\\n")
@@ -116,7 +111,7 @@ internal class CompletionAction(
         }
     }
 
-    private fun StringBuilder.parameter(index: Int, parameter: ParameterUsage) {
+    private fun Formatter.parameter(index: Int, parameter: ParameterUsage) {
         append("'")
         when (parameter.cardinality) {
             is Cardinality.Optional -> append("${index + 1}::Parameter:")
@@ -127,7 +122,7 @@ internal class CompletionAction(
         append("'")
     }
 
-    private fun StringBuilder.valueType(type: KClass<*>?, candidates: List<String>) {
+    private fun Formatter.valueType(type: KClass<*>?, candidates: List<String>) {
         if (type.fileType) {
             append("_files")
         } else if (candidates.isNotEmpty()) {

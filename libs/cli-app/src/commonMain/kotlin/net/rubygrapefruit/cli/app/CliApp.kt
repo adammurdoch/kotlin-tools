@@ -60,7 +60,7 @@ open class CliApp(val name: String) : CliAction() {
                 option(HelpAction(app.name, this@MainAction), "help", help = "Show usage message", allowAnywhere = true)
             }
 
-            option(CompletionAction(app.name, this@MainAction), "completion", help = "Generate ZSH completion script")
+            option(CompletionAction(app.name, this@MainAction, LoggingFormatter), "completion", help = "Generate ZSH completion script")
             action(app)
         }
 

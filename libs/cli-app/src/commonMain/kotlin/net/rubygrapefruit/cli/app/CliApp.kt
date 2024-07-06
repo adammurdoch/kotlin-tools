@@ -21,7 +21,7 @@ open class CliApp(val name: String) : CliAction() {
      */
     fun run(args: List<String>) {
         var parsed = false
-        val main = MainAction(this)
+        val main = MainAction(this, LoggingFormatter)
         try {
             val action = try {
                 main.actionFor(args)
@@ -45,22 +45,22 @@ open class CliApp(val name: String) : CliAction() {
         }
     }
 
-    internal fun actionFor(args: List<String>): Action {
-        return MainAction(this).actionFor(args)
+    internal fun actionFor(args: List<String>, formatter: Formatter): Action {
+        return MainAction(this, formatter).actionFor(args)
     }
 
-    private class MainAction(val app: CliApp) : Action() {
+    private class MainAction(val app: CliApp, formatter: Formatter) : Action() {
         val stackTrace by flag("stack", help = "Show stack trace on failure")
         val action by actions {
             val positional = app.usage().effective().positional.firstOrNull()
             if (positional is ActionParameterUsage) {
-                option(NestedActionHelpAction(app.name, this@MainAction, LoggingFormatter), "help", help = "Show usage message", allowAnywhere = true)
-                action(NestedActionHelpAction(app.name, this@MainAction, LoggingFormatter), "help", help = "Show usage message")
+                option(NestedActionHelpAction(app.name, this@MainAction, formatter), "help", help = "Show usage message", allowAnywhere = true)
+                action(NestedActionHelpAction(app.name, this@MainAction, formatter), "help", help = "Show usage message")
             } else {
-                option(HelpAction(app.name, this@MainAction, LoggingFormatter), "help", help = "Show usage message", allowAnywhere = true)
+                option(HelpAction(app.name, this@MainAction, formatter), "help", help = "Show usage message", allowAnywhere = true)
             }
 
-            option(CompletionAction(app.name, this@MainAction, LoggingFormatter), "completion", help = "Generate ZSH completion script")
+            option(CompletionAction(app.name, this@MainAction, formatter), "completion", help = "Generate ZSH completion script")
             action(app)
         }
 

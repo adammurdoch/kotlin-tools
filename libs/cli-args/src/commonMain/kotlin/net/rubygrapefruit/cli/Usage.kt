@@ -41,32 +41,6 @@ data class ActionUsage(
         return ActionUsage(options, positional.map { if (it is ActionParameterUsage) it.inlineActions() else it })
     }
 
-    val formatted: String
-        get() {
-            val builder = StringBuilder()
-            if (options.isNotEmpty()) {
-                builder.append("[options]")
-            }
-            for (positional in positional) {
-                if (builder.isNotEmpty()) {
-                    builder.append(" ")
-                }
-                builder.append(positional.usage)
-            }
-            builder.append("\n")
-            val parameters = positional.filterIsInstance<ParameterUsage>().filter { it.help != null }
-            val first = positional.firstOrNull()
-            val actions = if (first is ActionParameterUsage) {
-                first.actions
-            } else {
-                emptyList()
-            }
-            builder.appendItems("Parameters", parameters)
-            builder.appendItems("Actions", actions)
-            builder.appendItems("Options", options)
-            return builder.toString()
-        }
-
     private fun ActionParameterUsage.actions(): List<NamedNestedActionUsage> {
         return options + named + if (default != null) default.action.actions() else emptyList()
     }

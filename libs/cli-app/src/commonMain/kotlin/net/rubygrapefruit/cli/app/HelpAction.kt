@@ -9,10 +9,6 @@ internal open class HelpAction(
 ) : AbstractHelpAction() {
 
     override fun run() {
-        run(formatter)
-    }
-
-    internal fun run(formatter: Formatter) {
         formatter.appendUsage(name, action)
     }
 }

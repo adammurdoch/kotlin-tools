@@ -5,11 +5,13 @@ import kotlin.test.assertContains
 import kotlin.test.assertIs
 
 class CliAppTest {
+    private val formatter = BufferingFormatter()
+
     @Test
     fun `can run action`() {
         class NoConfig : CliApp("cmd")
 
-        val action = NoConfig().actionFor(emptyList())
+        val action = NoConfig().actionFor(emptyList(), formatter)
         assertIs<NoConfig>(action)
     }
 
@@ -17,11 +19,10 @@ class CliAppTest {
     fun `can run --help action`() {
         class NoConfig : CliApp("cmd")
 
-        val action = NoConfig().actionFor(listOf("--help"))
+        val action = NoConfig().actionFor(listOf("--help"), formatter)
         assertIs<HelpAction>(action)
 
-        val formatter = BufferingFormatter()
-        action.run(formatter)
+        action.run()
 
         assertContains(formatter.text, "--help")
         assertContains(formatter.text, "--stack")
@@ -32,10 +33,10 @@ class CliAppTest {
     fun `can run --help action when unknown option is used`() {
         class NoConfig : CliApp("cmd")
 
-        val action1 = NoConfig().actionFor(listOf("-o", "--help"))
+        val action1 = NoConfig().actionFor(listOf("-o", "--help"), formatter)
         assertIs<HelpAction>(action1)
 
-        val action2 = NoConfig().actionFor(listOf("--help", "--o"))
+        val action2 = NoConfig().actionFor(listOf("--help", "--o"), formatter)
         assertIs<HelpAction>(action2)
     }
 
@@ -43,10 +44,10 @@ class CliAppTest {
     fun `can run --help action when unknown parameter is used`() {
         class NoConfig : CliApp("cmd")
 
-        val action1 = NoConfig().actionFor(listOf("arg", "--help"))
+        val action1 = NoConfig().actionFor(listOf("arg", "--help"), formatter)
         assertIs<HelpAction>(action1)
 
-        val action2 = NoConfig().actionFor(listOf("--help", "arg"))
+        val action2 = NoConfig().actionFor(listOf("--help", "arg"), formatter)
         assertIs<HelpAction>(action2)
     }
 
@@ -54,7 +55,7 @@ class CliAppTest {
     fun `can run --completion action`() {
         class NoConfig : CliApp("cmd")
 
-        val action = NoConfig().actionFor(listOf("--completion"))
+        val action = NoConfig().actionFor(listOf("--completion"), formatter)
         assertIs<CompletionAction>(action)
     }
 }

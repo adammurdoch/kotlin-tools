@@ -13,16 +13,20 @@ internal fun Formatter.appendUsage(name: String, action: ActionUsage) {
     val usage = action.effective()
     appendUsageSummary(name, usage)
 
-    val parameters = usage.positional.filterIsInstance<ParameterUsage>().filter { it.help != null }
     val first = usage.positional.firstOrNull()
     val actions = if (first is ActionParameterUsage) {
         first.actions
     } else {
         emptyList()
     }
-    table("Parameters", parameters) { Pair(it.display, it.help) }
+    appendParameters(usage)
     table("Actions", actions.sortedBy { it.display }) { Pair(it.display, it.help) }
     table("Options", usage.options.sortedBy { it.display }) { Pair(it.display, it.help) }
+}
+
+internal fun Formatter.appendParameters(usage: ActionUsage) {
+    val parameters = usage.positional.filterIsInstance<ParameterUsage>().filter { it.help != null }
+    table("Parameters", parameters) { Pair(it.display, it.help) }
 }
 
 internal fun Formatter.appendUsageSummary(name: String, usage: ActionUsage) {

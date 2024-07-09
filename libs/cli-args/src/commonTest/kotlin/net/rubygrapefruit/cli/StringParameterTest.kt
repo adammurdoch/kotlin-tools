@@ -1,9 +1,6 @@
 package net.rubygrapefruit.cli
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNull
-import kotlin.test.fail
+import kotlin.test.*
 
 class StringParameterTest : AbstractActionTest() {
     @Test
@@ -36,7 +33,10 @@ class StringParameterTest : AbstractActionTest() {
             val param by parameter("value")
         }
 
-        parseFails(::Parameter, emptyList(), "Parameter 'value' not provided")
+        parseFails(::Parameter, emptyList()) { e ->
+            assertIs<PositionalParseException>(e)
+            assertEquals("Parameter 'value' not provided", e.message)
+        }
     }
 
     @Test

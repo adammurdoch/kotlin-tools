@@ -27,6 +27,6 @@ internal class DefaultParameter<T : Any>(
     }
 
     override fun finished(): ArgParseException {
-        return ArgParseException("Parameter '$name' not provided")
+        return PositionalParseException("Parameter '$name' not provided", resolution = "Please provide a value for parameter '$name'.")
     }
 }

@@ -18,7 +18,7 @@ internal class DefaultActionParameter<T : Action>(
 
     override fun whenMissing(): ArgParseException? {
         return if (action == null) {
-            ArgParseException("Action not provided", resolution = "Please specify an action to run.", actions = actionInfo)
+            PositionalParseException("Action not provided", resolution = "Please specify an action to run.", actions = actionInfo)
         } else {
             null
         }

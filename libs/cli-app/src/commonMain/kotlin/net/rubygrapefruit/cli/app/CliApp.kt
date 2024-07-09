@@ -1,8 +1,8 @@
 package net.rubygrapefruit.cli.app
 
 import net.rubygrapefruit.cli.Action
-import net.rubygrapefruit.cli.ActionUsage
 import net.rubygrapefruit.cli.ArgParseException
+import net.rubygrapefruit.cli.PositionalParseException
 
 /**
  * An [Action] that can be used as the main action for a CLI application.
@@ -35,15 +35,7 @@ open class CliApp(val name: String) : CliAction() {
             val action = try {
                 main.actionFor(args)
             } catch (e: ArgParseException) {
-                formatter.run {
-                    append(e.resolution ?: e.message)
-                    maybeNewLine()
-                    if (e.actions.isNotEmpty()) {
-                        newLine()
-                        appendUsageSummary(name, main.usage().effective().dropOptions())
-                        table("Available actions", e.actions) { Pair(it.name, it.help) }
-                    }
-                }
+                reportParseFailure(formatter, e, main)
                 return false
             }
             parsed = true
@@ -58,6 +50,23 @@ open class CliApp(val name: String) : CliAction() {
                 formatter.maybeNewLine()
             }
             return false
+        }
+    }
+
+    private fun reportParseFailure(formatter: Formatter, e: ArgParseException, main: MainAction) {
+        formatter.run {
+            if (e is PositionalParseException) {
+                append(e.resolution)
+                maybeNewLine()
+                newLine()
+                val usage = main.usage().effective().dropOptions()
+                appendUsageSummary(name, usage)
+                appendParameters(usage)
+                table("Available actions", e.actions) { Pair(it.name, it.help) }
+            } else {
+                append(e.message)
+                maybeNewLine()
+            }
         }
     }
 

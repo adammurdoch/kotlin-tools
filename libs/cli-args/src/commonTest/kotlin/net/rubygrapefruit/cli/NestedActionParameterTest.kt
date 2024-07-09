@@ -147,6 +147,7 @@ class NestedActionParameterTest : AbstractActionTest() {
         }
 
         parseFails(::WithSub, emptyList()) { e ->
+            assertIs<PositionalParseException>(e)
             assertEquals("Action not provided", e.message)
             assertEquals(2, e.actions.size)
         }
@@ -202,6 +203,7 @@ class NestedActionParameterTest : AbstractActionTest() {
         }
 
         parseFails(::WithSub, listOf("thing")) { e ->
+            assertIs<PositionalParseException>(e)
             assertEquals("Unknown action: thing", e.message)
             assertEquals(2, e.actions.size)
         }

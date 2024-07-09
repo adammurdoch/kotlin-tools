@@ -7,7 +7,7 @@ internal open class NestedActionHelpAction(
     private val name: String,
     private val action: Action,
     private val formatter: Formatter
-) : AbstractHelpAction() {
+) : Action() {
     private val actionName by parameter("action").optional()
 
     override fun run() {
@@ -21,7 +21,7 @@ internal open class NestedActionHelpAction(
             if (nestedAction != null) {
                 formatter.appendUsage(nestedAction.name, nestedAction.action)
             } else {
-                formatter.append("Unknown action: $actionName")
+                throw RuntimeException("Unknown action: $actionName")
             }
         } else {
             formatter.appendUsage(name, action)

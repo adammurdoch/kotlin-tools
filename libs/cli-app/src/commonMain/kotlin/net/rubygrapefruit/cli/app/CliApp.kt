@@ -1,6 +1,7 @@
 package net.rubygrapefruit.cli.app
 
 import net.rubygrapefruit.cli.Action
+import net.rubygrapefruit.cli.ActionUsage
 import net.rubygrapefruit.cli.ArgParseException
 
 /**
@@ -37,7 +38,11 @@ open class CliApp(val name: String) : CliAction() {
                 formatter.run {
                     append(e.resolution ?: e.message)
                     maybeNewLine()
-                    table("Available actions", e.actions) { Pair(it.name, it.help) }
+                    if (e.actions.isNotEmpty()) {
+                        newLine()
+                        appendUsageSummary(name, main.usage().effective().dropOptions())
+                        table("Available actions", e.actions) { Pair(it.name, it.help) }
+                    }
                 }
                 return false
             }

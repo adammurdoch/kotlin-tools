@@ -62,11 +62,11 @@ class CliAppTest {
     }
 
     @Test
-    fun `reports unknown action`() {
+    fun `reports unknown action for first positional`() {
         class Nested : CliApp("cmd") {
             val action by actions {
                 action(Action(), "one")
-                action(Action(), "two")
+                action(Action(), "two", help = "run action two")
             }
         }
 
@@ -76,9 +76,88 @@ class CliAppTest {
             """
             Unknown action: unknown
             
+            Usage: cmd <action>
+            
             Available actions:
               one
-              two
+              two run action two
+
+        """.trimIndent(), formatter.text
+        )
+    }
+
+    @Test
+    fun `reports unknown action for subsequent positional`() {
+        class Nested : CliApp("cmd") {
+            val param by parameter("param")
+            val action by actions {
+                action(Action(), "one")
+                action(Action(), "two", help = "run action two")
+            }
+        }
+
+        Nested().run(listOf("arg", "unknown"), formatter)
+
+        assertEquals(
+            """
+            Unknown action: unknown
+            
+            Usage: cmd <param> <action>
+            
+            Available actions:
+              one
+              two run action two
+
+        """.trimIndent(), formatter.text
+        )
+    }
+
+    @Test
+    fun `reports missing action for first positional`() {
+        class Nested : CliApp("cmd") {
+            val action by actions {
+                action(Action(), "one")
+                action(Action(), "two", help = "run action two")
+            }
+        }
+
+        Nested().run(emptyList(), formatter)
+
+        assertEquals(
+            """
+            Please specify an action to run.
+            
+            Usage: cmd <action>
+            
+            Available actions:
+              one
+              two run action two
+
+        """.trimIndent(), formatter.text
+        )
+    }
+
+    @Test
+    fun `reports missing action for subsequent positional`() {
+        class Nested : CliApp("cmd") {
+            val param by parameter("param")
+            val action by actions {
+                action(Action(), "one")
+                action(Action(), "two", help = "run action two")
+            }
+        }
+
+        Nested().run(listOf("arg"), formatter)
+
+        assertEquals(
+            """
+            Please specify an action to run.
+            
+            Usage: cmd <param> <action>
+            
+            Available actions:
+              one
+              two run action two
 
         """.trimIndent(), formatter.text
         )

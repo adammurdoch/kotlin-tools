@@ -53,6 +53,10 @@ data class ActionUsage(
             emptyList()
         }
     }
+
+    fun dropOptions(): ActionUsage {
+        return ActionUsage(emptyList(), positional)
+    }
 }
 
 sealed class ItemUsage(val help: String?) {

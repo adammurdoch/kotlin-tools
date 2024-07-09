@@ -6,7 +6,7 @@ internal open class HelpAction(
     private val name: String,
     private val action: Action,
     private val formatter: Formatter
-) : AbstractHelpAction() {
+) : Action() {
 
     override fun run() {
         formatter.appendUsage(name, action)

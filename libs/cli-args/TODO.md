@@ -1,6 +1,6 @@
 - Fix error message when multiple actions are provided, either as names or options or combined with default
+- Merge `NestedActionHelpAction` into `HelpAction`
 - Completion for nested actions
-- Move usage generation to cli-app
 - Clean up usage types
 - Help
     - Don't allow `--help <action>` if there are no nested actions

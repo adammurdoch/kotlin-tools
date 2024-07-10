@@ -1,9 +1,6 @@
 package net.rubygrapefruit.cli.app
 
-import net.rubygrapefruit.cli.Action
-import net.rubygrapefruit.cli.ActionParameterUsage
-import net.rubygrapefruit.cli.ActionUsage
-import net.rubygrapefruit.cli.ParameterUsage
+import net.rubygrapefruit.cli.*
 
 internal fun Formatter.appendUsage(name: String, action: Action) {
     appendUsage(name, action.usage())
@@ -29,14 +26,21 @@ internal fun Formatter.appendParameters(usage: ActionUsage) {
     table("Parameters", parameters) { Pair(it.display, it.help) }
 }
 
-internal fun Formatter.appendUsageSummary(name: String, usage: ActionUsage) {
-    append("Usage: ")
-    append(name)
+internal fun Formatter.appendUsageSummary(name: String, action: ActionUsage) {
+    appendUsageSummary(PrefixedActionUsage(listOf(LiteralUsage(name, null)), action))
+}
 
-    if (usage.options.isNotEmpty()) {
+internal fun Formatter.appendUsageSummary(usage: PrefixedActionUsage) {
+    append("Usage:")
+    for (positional in usage.prefix) {
+        append(" ")
+        append(positional.usage)
+    }
+
+    if (usage.action.options.isNotEmpty()) {
         append(" [options]")
     }
-    for (positional in usage.positional) {
+    for (positional in usage.action.positional) {
         append(" ")
         append(positional.usage)
     }

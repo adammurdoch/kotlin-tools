@@ -20,7 +20,7 @@ internal class NullableParameter<T : Any>(
         return usage(Cardinality.Optional)
     }
 
-    override fun finished(): ArgParseException? {
+    override fun finished(context: ParseContext): ArgParseException? {
         return null
     }
 }

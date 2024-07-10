@@ -55,12 +55,12 @@ internal abstract class AbstractActionParameter<T : Action>(
         return ActionParameterUsage("<action>", "<action>", null, optionInfo, actionInfo, defaultInfo)
     }
 
-    override fun finished(): ArgParseException? {
+    override fun finished(context: ParseContext): ArgParseException? {
         return when {
             action != null -> null
             actions.default != null -> {
                 action = actions.default.value
-                return actions.default.value.maybeParse(emptyList(), RootContext).failure
+                return actions.default.value.maybeParse(emptyList(), context).failure
             }
 
             else -> return whenMissing()

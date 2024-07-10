@@ -12,7 +12,7 @@ data class ActionUsage(
     fun effective(): ActionUsage {
         val firstPositional = positional.firstOrNull()
         return when (firstPositional) {
-            null, is ParameterUsage -> this
+            null, is ParameterUsage, is LiteralUsage -> this
             is ActionParameterUsage -> {
                 // Replace option actions from first positional with options on this action
                 // If there are no named actions in first positional, can replace it with its default
@@ -57,7 +57,9 @@ data class ActionUsage(
     }
 }
 
-class SingleOptionUsage(val usage: String, val help: String?, val aliases: List<String>)
+class PrefixedActionUsage(val prefix: List<PositionalUsage>, val action: ActionUsage)
+
+class SingleOptionUsage(val usage: String, val help: String?, val names: List<String>)
 
 sealed class NonPositionalUsage(
     val usage: String,
@@ -100,6 +102,8 @@ sealed class PositionalUsage(
     val display: String,
     val help: String?,
 )
+
+class LiteralUsage(val name: String, help: String?) : PositionalUsage(name, name, help)
 
 class ParameterUsage(
     usage: String,

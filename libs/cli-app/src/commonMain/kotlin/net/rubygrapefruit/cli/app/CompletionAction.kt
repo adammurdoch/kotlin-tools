@@ -49,20 +49,22 @@ internal class CompletionAction(
         options(action.options, nestedIndent)
         for (index in action.positional.indices) {
             val positional = action.positional[index]
+            append(" \\\n")
+            append(nestedIndent)
             when (positional) {
                 is ParameterUsage -> {
-                    append(" \\\n")
-                    append(nestedIndent)
                     parameter(index, positional)
                     if (positional.cardinality.multiple) {
                         break
                     }
                 }
 
+                is LiteralUsage -> {
+                    append("'${index + 1}:Literal:(${positional.name})")
+                }
+
                 is ActionParameterUsage -> {
-                    append(" \\\n")
-                    append(nestedIndent)
-                    append("'${index + 1}::Action:(${positional.named.joinToString(" ") { it.name }})' \\\n")
+                    append("'${index + 1}:Action:(${positional.named.joinToString(" ") { it.name }})' \\\n")
                     append(nestedIndent)
                     append("'*::arg:->args'\n")
 
@@ -90,14 +92,14 @@ internal class CompletionAction(
             for (item in option.choices) {
                 append(" \\\n")
                 append(indent)
-                if (item.aliases.size == 1) {
+                if (item.names.size == 1) {
                     append("'")
-                    append(item.aliases.first())
+                    append(item.names.first())
                     if (item.help != null) {
                         append("[${item.help}]")
                     }
                 } else {
-                    append("{${item.aliases.joinToString(",")}}'")
+                    append("{${item.names.joinToString(",")}}'")
                     if (item.help != null) {
                         append("[${item.help}]")
                     }

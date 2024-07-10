@@ -18,5 +18,5 @@ internal sealed class Positional {
     /**
      * Called when parsing is finished and [accept] will not be called again. Allows a specific exception to be generated.
      */
-    abstract fun finished(): ArgParseException?
+    abstract fun finished(context: ParseContext): ArgParseException?
 }

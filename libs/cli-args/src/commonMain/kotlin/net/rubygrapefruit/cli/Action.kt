@@ -180,7 +180,7 @@ open class Action {
 
         if (failure == null) {
             for (positional in pending) {
-                val missing = positional.finished()
+                val missing = positional.finished(context)
                 if (missing != null && failure == null) {
                     failure = missing
                 }

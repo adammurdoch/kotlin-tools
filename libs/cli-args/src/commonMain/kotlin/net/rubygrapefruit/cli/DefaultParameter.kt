@@ -26,7 +26,7 @@ internal class DefaultParameter<T : Any>(
         return usage(Cardinality.Required)
     }
 
-    override fun finished(): ArgParseException {
+    override fun finished(context: ParseContext): ArgParseException {
         return PositionalParseException("Parameter '$name' not provided", resolution = "Please provide a value for parameter '$name'.")
     }
 }

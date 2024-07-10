@@ -76,16 +76,12 @@ class FlagUsage(usage: String, help: String?, choices: List<SingleOptionUsage>) 
             return FlagUsage(name, help, listOf(SingleOptionUsage(name, help, listOf(name))))
         }
     }
-
 }
 
 class OptionUsage(
     usage: String,
     help: String?,
-    /**
-     * The argument type, if known.
-     */
-    val type: KClass<*>?,
+    val type: KClass<*>,
     choices: List<SingleOptionUsage>
 ) : NonPositionalUsage(usage, help, choices)
 

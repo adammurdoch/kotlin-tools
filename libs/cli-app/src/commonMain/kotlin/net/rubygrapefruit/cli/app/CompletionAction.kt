@@ -102,7 +102,7 @@ internal class CompletionAction(
                         append("[${item.help}]")
                     }
                 }
-                if (option is OptionUsage && option.type != null) {
+                if (option is OptionUsage) {
                     append(":Argument:")
                     valueType(option.type, emptyList())
                 }

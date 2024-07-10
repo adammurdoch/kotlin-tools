@@ -9,14 +9,13 @@ class CliAppErrorReportingTest {
 
     @Test
     fun `reports missing parameter for first positional`() {
-        class Nested : CliApp("cmd") {
+        class App : CliApp("cmd") {
             val param by parameter("param", help = "parameter 1")
             val param2 by parameter("param2", help = "parameter 2")
             val param3 by parameter("no-help")
         }
 
-        Nested().run(emptyList(), formatter)
-
+        App().run(emptyList(), formatter)
         assertEquals(
             """
             Please provide a value for parameter 'param'.
@@ -25,6 +24,65 @@ class CliAppErrorReportingTest {
             
             Parameters:
               <param>  parameter 1
+              <param2> parameter 2
+
+        """.trimIndent(), formatter.text
+        )
+    }
+
+    @Test
+    fun `reports missing parameter for first positional of nested action`() {
+        class Sub : Action() {
+            val param by parameter("param2", help = "parameter 2")
+        }
+
+        class App : CliApp("cmd") {
+            val param by parameter("param1", help = "parameter 1")
+            val action by actions {
+                action(Sub(), "action")
+            }
+        }
+
+        App().run(listOf("arg1", "action"), formatter)
+
+        assertEquals(
+            """
+            Please provide a value for parameter 'param2'.
+            
+            Usage: cmd <param1> action <param2>
+            
+            Parameters:
+              <param1> parameter 1
+              <param2> parameter 2
+
+        """.trimIndent(), formatter.text
+        )
+    }
+
+    @Test
+    fun `reports missing parameter for first positional of default nested action`() {
+        class Sub : Action() {
+            val param by parameter("param2", help = "parameter 2")
+        }
+
+        class App : CliApp("cmd") {
+            val param by parameter("param1", help = "parameter 1")
+            val action by actions {
+                action(Sub(), "action")
+                action(Sub())
+            }
+        }
+
+        App().run(listOf("arg1"), formatter)
+
+        assertEquals(
+            """
+            Please provide a value for parameter 'param2'.
+            
+            Usage: cmd <param1> <param2>
+            
+            Parameters:
+              <param1> parameter 1
               <param2> parameter 2
 
         """.trimIndent(), formatter.text

@@ -54,7 +54,7 @@ internal class CompletionAction(
                     append(" \\\n")
                     append(nestedIndent)
                     parameter(index, positional)
-                    if (positional.multiple) {
+                    if (positional.cardinality.multiple) {
                         break
                     }
                 }
@@ -87,7 +87,7 @@ internal class CompletionAction(
 
     private fun Formatter.options(options: List<OptionUsage>, indent: String) {
         for (option in options) {
-            for (item in option.usages) {
+            for (item in option.choices) {
                 append(" \\\n")
                 append(indent)
                 if (item.aliases.size == 1) {

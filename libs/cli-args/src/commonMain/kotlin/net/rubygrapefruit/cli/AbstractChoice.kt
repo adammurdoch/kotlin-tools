@@ -6,9 +6,7 @@ internal abstract class AbstractChoice<T : Any>(
     protected var value: T? = null
 
     override fun usage(): List<OptionUsage> {
-        return choices.map { choice ->
-            val usage = choice.names.joinToString(", ")
-            OptionUsage(usage, choice.help, null, listOf(SingleOptionUsage(usage, choice.help, choice.names)))}
+        return choices.map { OptionUsage.of(it.names, it.help) }
     }
 
     override fun accepts(arg: String): Boolean {

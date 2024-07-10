@@ -21,7 +21,7 @@ internal fun Formatter.appendUsage(name: String, action: ActionUsage) {
     }
     appendParameters(usage)
     table("Actions", actions.sortedBy { it.display }) { Pair(it.display, it.help) }
-    table("Options", usage.options.sortedBy { it.display }) { Pair(it.display, it.help) }
+    table("Options", usage.options.sortedBy { it.usage }) { Pair(it.usage, it.help) }
 }
 
 internal fun Formatter.appendParameters(usage: ActionUsage) {

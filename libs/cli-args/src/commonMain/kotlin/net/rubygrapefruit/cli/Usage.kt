@@ -17,10 +17,8 @@ data class ActionUsage(
                 // Replace option actions from first positional with options on this action
                 // If there are no named actions in first positional, can replace it with its default
                 val effective = firstPositional.inlineActions()
-                val firstPositionalOptions = effective.options.map { OptionUsage(it.name, it.help, null, listOf(SingleOptionUsage(it.name, it.help, listOf(it.name)))) }
-                val allOptions = options + firstPositionalOptions + if (effective.default != null) {
-                    effective.default.action.options
-                } else emptyList()
+                val firstPositionalOptions = effective.options.map { OptionUsage.of(it.name, it.help) }
+                val allOptions = options + firstPositionalOptions + if (effective.default != null) effective.default.action.options else emptyList()
                 if (effective.named.isEmpty()) {
                     if (effective.default != null) {
                         // replace action parameter with its default
@@ -59,34 +57,34 @@ data class ActionUsage(
     }
 }
 
-sealed class ItemUsage(val help: String?) {
-    /**
-     * A display name for this item, used when listing items in a table.
-     */
-    abstract val display: String
-
-    override fun toString(): String {
-        return display
-    }
-}
-
 class SingleOptionUsage(val usage: String, val help: String?, val aliases: List<String>)
 
 class OptionUsage(
-    override val display: String,
-    help: String?,
+    val usage: String,
+    val help: String?,
     /**
-     * The argument type.
+     * The argument type, if known.
      */
     val type: KClass<*>?,
-    val usages: List<SingleOptionUsage>
-) : ItemUsage(help)
+    val choices: List<SingleOptionUsage>
+) {
+    companion object {
+        fun of(names: List<String>, help: String?): OptionUsage {
+            val usage = names.joinToString(", ")
+            return OptionUsage(usage, help, null, listOf(SingleOptionUsage(usage, help, names)))
+        }
 
-sealed class Cardinality {
-    data object Optional : Cardinality()
-    data object Required : Cardinality()
-    data object ZeroOrMore : Cardinality()
-    data object OneOrMore : Cardinality()
+        fun of(name: String, help: String?): OptionUsage {
+            return OptionUsage(name, help, null, listOf(SingleOptionUsage(name, help, listOf(name))))
+        }
+    }
+}
+
+sealed class Cardinality(val multiple: Boolean) {
+    data object Optional : Cardinality(false)
+    data object Required : Cardinality(false)
+    data object ZeroOrMore : Cardinality(true)
+    data object OneOrMore : Cardinality(true)
 }
 
 sealed class PositionalUsage(
@@ -94,9 +92,9 @@ sealed class PositionalUsage(
      * The usage for this item, shown in the containing action's usage summary.
      */
     val usage: String,
-    override val display: String,
-    help: String?,
-) : ItemUsage(help)
+    val display: String,
+    val help: String?,
+)
 
 class ParameterUsage(
     usage: String,
@@ -105,10 +103,7 @@ class ParameterUsage(
     val type: KClass<*>,
     val cardinality: Cardinality,
     val values: List<String> = emptyList()
-) : PositionalUsage(usage, display, help) {
-    val multiple: Boolean
-        get() = cardinality == Cardinality.ZeroOrMore || cardinality == Cardinality.OneOrMore
-}
+) : PositionalUsage(usage, display, help)
 
 class ActionParameterUsage(
     usage: String,
@@ -145,7 +140,9 @@ class ActionParameterUsage(
         get() = options + named + if (default != null) listOf(default) else emptyList()
 }
 
-sealed class NestedActionUsage(help: String?, val action: ActionUsage) : ItemUsage(help)
+sealed class NestedActionUsage(val help: String?, val action: ActionUsage) {
+    abstract val display: String
+}
 
 class NamedNestedActionUsage(val name: String, help: String?, action: ActionUsage) : NestedActionUsage(help, action) {
     override val display: String

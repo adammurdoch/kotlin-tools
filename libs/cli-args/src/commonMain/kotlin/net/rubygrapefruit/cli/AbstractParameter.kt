@@ -6,7 +6,7 @@ internal abstract class AbstractParameter<T : Any>(
     private val canBeMissing: Boolean,
     protected val host: Host,
     private val converter: StringConverter<T>
-) : Positional() {
+) : Positional {
     private var set = false
     protected var value: T? = null
 

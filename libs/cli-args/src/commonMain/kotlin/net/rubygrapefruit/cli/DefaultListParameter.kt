@@ -11,7 +11,7 @@ internal open class DefaultListParameter<T : Any>(
     private val required: Boolean,
     private val acceptOptions: Boolean,
     private val converter: StringConverter<T>
-) : Positional(), ListParameter<T> {
+) : Positional, ListParameter<T> {
     private val values = mutableListOf<T>()
 
     override fun whenAbsent(default: List<T>): Parameter<List<T>> {

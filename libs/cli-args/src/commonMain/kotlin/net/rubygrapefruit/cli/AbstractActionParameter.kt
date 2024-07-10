@@ -3,7 +3,7 @@ package net.rubygrapefruit.cli
 internal abstract class AbstractActionParameter<T : Action>(
     protected val actions: ActionSet<T>,
     protected val host: Host
-) : Positional() {
+) : Positional {
     protected var action: T? = null
 
     protected val actionInfo

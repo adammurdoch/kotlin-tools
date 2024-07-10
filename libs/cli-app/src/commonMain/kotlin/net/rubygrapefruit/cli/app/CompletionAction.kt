@@ -85,7 +85,7 @@ internal class CompletionAction(
         maybeNewLine()
     }
 
-    private fun Formatter.options(options: List<OptionUsage>, indent: String) {
+    private fun Formatter.options(options: List<NonPositionalUsage>, indent: String) {
         for (option in options) {
             for (item in option.choices) {
                 append(" \\\n")
@@ -102,7 +102,7 @@ internal class CompletionAction(
                         append("[${item.help}]")
                     }
                 }
-                if (option.type != null) {
+                if (option is OptionUsage && option.type != null) {
                     append(":Argument:")
                     valueType(option.type, emptyList())
                 }

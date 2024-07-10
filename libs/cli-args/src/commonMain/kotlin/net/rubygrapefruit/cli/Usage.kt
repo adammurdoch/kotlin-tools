@@ -3,7 +3,7 @@ package net.rubygrapefruit.cli
 import kotlin.reflect.KClass
 
 data class ActionUsage(
-    val options: List<OptionUsage>,
+    val options: List<NonPositionalUsage>,
     val positional: List<PositionalUsage>
 ) {
     /**
@@ -17,7 +17,7 @@ data class ActionUsage(
                 // Replace option actions from first positional with options on this action
                 // If there are no named actions in first positional, can replace it with its default
                 val effective = firstPositional.inlineActions()
-                val firstPositionalOptions = effective.options.map { OptionUsage.of(it.name, it.help) }
+                val firstPositionalOptions = effective.options.map { FlagUsage.of(it.name, it.help) }
                 val allOptions = options + firstPositionalOptions + if (effective.default != null) effective.default.action.options else emptyList()
                 if (effective.named.isEmpty()) {
                     if (effective.default != null) {
@@ -59,26 +59,35 @@ data class ActionUsage(
 
 class SingleOptionUsage(val usage: String, val help: String?, val aliases: List<String>)
 
-class OptionUsage(
+sealed class NonPositionalUsage(
     val usage: String,
     val help: String?,
+    val choices: List<SingleOptionUsage>
+)
+
+class FlagUsage(usage: String, help: String?, choices: List<SingleOptionUsage>) : NonPositionalUsage(usage, help, choices) {
+    companion object {
+        fun of(names: List<String>, help: String?): FlagUsage {
+            val usage = names.joinToString(", ")
+            return FlagUsage(usage, help, listOf(SingleOptionUsage(usage, help, names)))
+        }
+
+        fun of(name: String, help: String?): FlagUsage {
+            return FlagUsage(name, help, listOf(SingleOptionUsage(name, help, listOf(name))))
+        }
+    }
+
+}
+
+class OptionUsage(
+    usage: String,
+    help: String?,
     /**
      * The argument type, if known.
      */
     val type: KClass<*>?,
-    val choices: List<SingleOptionUsage>
-) {
-    companion object {
-        fun of(names: List<String>, help: String?): OptionUsage {
-            val usage = names.joinToString(", ")
-            return OptionUsage(usage, help, null, listOf(SingleOptionUsage(usage, help, names)))
-        }
-
-        fun of(name: String, help: String?): OptionUsage {
-            return OptionUsage(name, help, null, listOf(SingleOptionUsage(name, help, listOf(name))))
-        }
-    }
-}
+    choices: List<SingleOptionUsage>
+) : NonPositionalUsage(usage, help, choices)
 
 sealed class Cardinality(val multiple: Boolean) {
     data object Optional : Cardinality(false)

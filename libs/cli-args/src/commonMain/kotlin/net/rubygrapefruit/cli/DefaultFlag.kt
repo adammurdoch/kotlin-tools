@@ -29,13 +29,11 @@ internal class DefaultFlag private constructor(
         return value
     }
 
-    override fun usage(): List<OptionUsage> {
+    override fun usage(): List<FlagUsage> {
         val enableUsage = listOf(SingleOptionUsage(enableFlags.joinToString(", "), help, enableFlags))
         val disableUsage = if (disableFlags.isNotEmpty()) listOf(SingleOptionUsage(disableFlags.joinToString(", "), null, disableFlags)) else emptyList()
         val usage = (enableFlags + disableFlags).joinToString(", ")
-        return listOf(
-            OptionUsage(usage, help, null, enableUsage + disableUsage)
-        )
+        return listOf(FlagUsage(usage, help, enableUsage + disableUsage))
     }
 
     override fun accepts(arg: String): Boolean {

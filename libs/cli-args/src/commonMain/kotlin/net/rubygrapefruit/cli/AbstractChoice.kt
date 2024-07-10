@@ -5,8 +5,8 @@ internal abstract class AbstractChoice<T : Any>(
 ) : NonPositional {
     protected var value: T? = null
 
-    override fun usage(): List<OptionUsage> {
-        return choices.map { OptionUsage.of(it.names, it.help) }
+    override fun usage(): List<FlagUsage> {
+        return choices.map { FlagUsage.of(it.names, it.help) }
     }
 
     override fun accepts(arg: String): Boolean {

@@ -1,7 +1,7 @@
 package net.rubygrapefruit.cli
 
 internal interface NonPositional {
-    fun usage(): List<OptionUsage>
+    fun usage(): List<NonPositionalUsage>
 
     /**
      * Does this non-positional accept the given arg as its first argument?

@@ -33,7 +33,7 @@ internal abstract class AbstractActionParameter<T : Action>(
         if (host.isOption(name)) {
             return ParseResult.Nothing
         } else {
-            return ParseResult(1, PositionalParseException("Unknown action: $name", positional = context.positional.map { it.usage() }, actions = actionInfo))
+            return ParseResult(1, PositionalParseException("Unknown action: $name", positional = context.positional, actions = actionInfo))
         }
     }
 

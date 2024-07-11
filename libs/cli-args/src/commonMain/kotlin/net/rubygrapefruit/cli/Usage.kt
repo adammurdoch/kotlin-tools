@@ -51,10 +51,6 @@ data class ActionUsage(
             emptyList()
         }
     }
-
-    fun dropOptions(): ActionUsage {
-        return ActionUsage(emptyList(), positional)
-    }
 }
 
 class PrefixedActionUsage(val prefix: List<PositionalUsage>, val action: ActionUsage)

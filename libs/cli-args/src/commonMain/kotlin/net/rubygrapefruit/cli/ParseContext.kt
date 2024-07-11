@@ -1,7 +1,7 @@
 package net.rubygrapefruit.cli
 
 internal sealed interface ParseContext {
-    val positional: List<HasPositionalUsage>
+    val positional: List<PositionalUsage>
 
     val options: List<NonPositional>
 
@@ -11,16 +11,19 @@ internal sealed interface ParseContext {
 }
 
 internal class DefaultContext(
-    override val positional: List<HasPositionalUsage>,
+    private val items: List<HasPositionalUsage>,
     override val options: List<NonPositional>
 ) : ParseContext {
+    override val positional: List<PositionalUsage>
+        get() = items.map { it.usage() }
+
     override fun withOptions(options: List<NonPositional>): ParseContext {
-        return DefaultContext(positional, this.options + options)
+        return DefaultContext(items, this.options + options)
     }
 
     override fun replace(positional: Positional, replacement: List<HasPositionalUsage>): ParseContext {
-        val index = this.positional.indexOf(positional)
-        val newPositional = this.positional.toMutableList()
+        val index = items.indexOf(positional)
+        val newPositional = items.toMutableList()
         newPositional.removeAt(index)
         newPositional.addAll(index, replacement)
         return DefaultContext(newPositional, options)

@@ -18,7 +18,7 @@ internal class DefaultActionParameter<T : Action>(
 
     override fun whenMissing(context: ParseContext): ArgParseException? {
         return if (action == null) {
-            PositionalParseException("Action not provided", resolution = "Please specify an action to run.", positional = context.positional.map { it.usage() }, actions = actionInfo)
+            PositionalParseException("Action not provided", resolution = "Please specify an action to run.", positional = context.positional, actions = actionInfo)
         } else {
             null
         }

@@ -96,12 +96,12 @@ internal class CompletionAction(
                     append("'")
                     append(item.names.first())
                     if (item.help != null) {
-                        append("[${item.help}]")
+                        quoted("[${item.help}]")
                     }
                 } else {
                     append("{${item.names.joinToString(",")}}'")
                     if (item.help != null) {
-                        append("[${item.help}]")
+                        quoted("[${item.help}]")
                     }
                 }
                 if (option is OptionUsage) {
@@ -132,6 +132,10 @@ internal class CompletionAction(
         } else {
             append("( )")
         }
+    }
+
+    private fun Formatter.quoted(text: String) {
+        append(text.replace("'", """'"'"'"""))
     }
 }
 

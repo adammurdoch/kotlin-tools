@@ -33,7 +33,7 @@ internal abstract class AbstractActionParameter<T : Action>(
         if (host.isOption(name)) {
             return ParseResult.Nothing
         } else {
-            return ParseResult(1, PositionalParseException("Unknown action: $name", actions = actionInfo))
+            return ParseResult(1, PositionalParseException("Unknown action: $name", positional = context.positional.map { it.usage() }, actions = actionInfo))
         }
     }
 
@@ -66,11 +66,11 @@ internal abstract class AbstractActionParameter<T : Action>(
                 return actions.default.value.maybeParse(emptyList(), nestedContext).failure
             }
 
-            else -> return whenMissing()
+            else -> return whenMissing(context)
         }
     }
 
-    abstract fun whenMissing(): ArgParseException?
+    abstract fun whenMissing(context: ParseContext): ArgParseException?
 
     private inner class AllowAnywhereOption(val name: String, val option: ActionDetails<T>) : NonPositional {
 

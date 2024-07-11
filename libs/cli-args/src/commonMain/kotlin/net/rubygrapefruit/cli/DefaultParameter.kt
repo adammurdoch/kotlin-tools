@@ -27,6 +27,6 @@ internal class DefaultParameter<T : Any>(
     }
 
     override fun finished(context: ParseContext): ArgParseException {
-        return PositionalParseException("Parameter '$name' not provided", resolution = "Please provide a value for parameter '$name'.")
+        return PositionalParseException("Parameter '$name' not provided", resolution = "Please provide a value for parameter '$name'.", positional = context.positional.map { it.usage() })
     }
 }

@@ -1,6 +1,7 @@
 package net.rubygrapefruit.cli.app
 
 import net.rubygrapefruit.cli.Action
+import net.rubygrapefruit.cli.ActionUsage
 import net.rubygrapefruit.cli.ArgParseException
 import net.rubygrapefruit.cli.PositionalParseException
 
@@ -59,7 +60,7 @@ open class CliApp(val name: String) : CliAction() {
                 append(e.resolution)
                 maybeNewLine()
                 newLine()
-                val usage = main.usage().effective().dropOptions()
+                val usage = ActionUsage(emptyList(), e.positional)
                 appendUsageSummary(name, usage)
                 appendParameters(usage)
                 table("Available actions", e.actions) { Pair(it.name, it.help) }

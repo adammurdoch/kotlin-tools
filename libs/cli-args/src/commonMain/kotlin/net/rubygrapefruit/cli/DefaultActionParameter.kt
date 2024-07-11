@@ -16,9 +16,9 @@ internal class DefaultActionParameter<T : Action>(
         return owner.replace(this, NullableActionParameter(actions, host))
     }
 
-    override fun whenMissing(): ArgParseException? {
+    override fun whenMissing(context: ParseContext): ArgParseException? {
         return if (action == null) {
-            PositionalParseException("Action not provided", resolution = "Please specify an action to run.", actions = actionInfo)
+            PositionalParseException("Action not provided", resolution = "Please specify an action to run.", positional = context.positional.map { it.usage() }, actions = actionInfo)
         } else {
             null
         }

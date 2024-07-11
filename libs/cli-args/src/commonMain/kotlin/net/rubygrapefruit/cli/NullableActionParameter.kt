@@ -7,7 +7,7 @@ internal class NullableActionParameter<T : Action>(
     host: Host
 ) : AbstractActionParameter<T>(actions, host), Parameter<T?> {
 
-    override fun whenMissing(): ArgParseException? {
+    override fun whenMissing(context: ParseContext): ArgParseException? {
         return null
     }
 

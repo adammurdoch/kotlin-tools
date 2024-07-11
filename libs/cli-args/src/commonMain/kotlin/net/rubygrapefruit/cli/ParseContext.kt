@@ -1,30 +1,28 @@
 package net.rubygrapefruit.cli
 
 internal sealed interface ParseContext {
-    val prefix: List<PositionalUsage>
+    val positional: List<Positional>
 
     val options: List<NonPositional>
 
     fun withOptions(options: List<NonPositional>): ParseContext
+
+    fun replace(positional: Positional, replacement: List<Positional>): ParseContext
 }
 
-internal data object RootContext : ParseContext {
-    override val prefix: List<PositionalUsage>
-        get() = emptyList()
-
+internal class DefaultContext(
+    override val positional: List<Positional>,
     override val options: List<NonPositional>
-        get() = emptyList()
-
+) : ParseContext {
     override fun withOptions(options: List<NonPositional>): ParseContext {
-        return NestedContext(this, options)
+        return DefaultContext(positional, this.options + options)
     }
-}
 
-internal class NestedContext(private val parent: ParseContext, override val options: List<NonPositional>) : ParseContext {
-    override val prefix: List<PositionalUsage>
-        get() = parent.prefix
-
-    override fun withOptions(options: List<NonPositional>): ParseContext {
-        return NestedContext(this, options + this.options)
+    override fun replace(positional: Positional, replacement: List<Positional>): ParseContext {
+        val index = this.positional.indexOf(positional)
+        val newPositional = this.positional.toMutableList()
+        newPositional.removeAt(index)
+        newPositional.addAll(index, replacement)
+        return DefaultContext(newPositional, options)
     }
 }

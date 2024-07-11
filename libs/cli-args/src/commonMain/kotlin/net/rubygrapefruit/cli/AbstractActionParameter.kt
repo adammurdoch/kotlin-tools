@@ -20,12 +20,14 @@ internal abstract class AbstractActionParameter<T : Action>(
         val action = locateActionByFirstArg(name)
         if (action != null) {
             this.action = action.value
-            val result = action.value.maybeParse(args.drop(1), context)
+            val nestedContext = context.replace(this, action.value.positional())
+            val result = action.value.maybeParse(args.drop(1), nestedContext)
             return ParseResult(1 + result.count, result.failure)
         }
         if (actions.default != null) {
             this.action = actions.default.value
-            return actions.default.value.maybeParse(args, context)
+            val nestedContext = context.replace(this, actions.default.value.positional())
+            return actions.default.value.maybeParse(args, nestedContext)
         }
 
         if (host.isOption(name)) {
@@ -60,7 +62,8 @@ internal abstract class AbstractActionParameter<T : Action>(
             action != null -> null
             actions.default != null -> {
                 action = actions.default.value
-                return actions.default.value.maybeParse(emptyList(), context).failure
+                val nestedContext = context.replace(this, actions.default.value.positional())
+                return actions.default.value.maybeParse(emptyList(), nestedContext).failure
             }
 
             else -> return whenMissing()

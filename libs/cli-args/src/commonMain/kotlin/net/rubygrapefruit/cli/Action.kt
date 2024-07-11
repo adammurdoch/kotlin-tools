@@ -126,9 +126,10 @@ open class Action {
      * Configures this object from the given arguments.
      */
     fun maybeParse(args: List<String>): Result {
-        val result = maybeParse(args, RootContext)
+        val context = DefaultContext(positional, emptyList())
+        val result = maybeParse(args, context)
         return if (result.count != args.size || result.failure != null) {
-            attemptToRecover(args, result, DefaultHost)
+            attemptToRecover(args, result, DefaultHost, context)
         } else {
             Result.Success
         }
@@ -190,12 +191,12 @@ open class Action {
         return ParseResult(index, failure)
     }
 
-    private fun attemptToRecover(args: List<String>, original: ParseResult, host: Host): Result {
+    private fun attemptToRecover(args: List<String>, original: ParseResult, host: Host, context: ParseContext): Result {
         var index = original.count
         while (index in args.indices) {
             val current = args.subList(index, args.size)
             for (option in options) {
-                val result = option.maybeRecover(current, RootContext)
+                val result = option.maybeRecover(current, context)
                 if (result) {
                     // Don't attempt to keep parsing
                     return Result.Success
@@ -255,6 +256,8 @@ open class Action {
         positional[positional.indexOf(param)] = newParam
         return newParam
     }
+
+    internal fun positional(): List<Positional> = positional
 
     sealed class Result {
         data object Success : Result()

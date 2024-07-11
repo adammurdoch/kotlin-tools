@@ -1,8 +1,6 @@
 package net.rubygrapefruit.cli
 
-internal interface Positional {
-    fun usage(): PositionalUsage
-
+internal interface Positional: HasPositionalUsage {
     /**
      * Attempt to parse the given arguments, returning number of arguments consumed.
      *

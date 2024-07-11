@@ -42,3 +42,10 @@
 - File locations: dir, file, must exist
 - Color output on terminal
 - Fuzzy matching and/or suggestions
+
+
+(action)
+  (p1) (actions 1) (p2)
+    (p1) <name> (action 1) (p2)
+      (p1) <name> (p3) (actions 2) (p2)
+    

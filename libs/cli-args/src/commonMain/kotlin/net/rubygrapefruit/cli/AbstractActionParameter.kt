@@ -20,7 +20,7 @@ internal abstract class AbstractActionParameter<T : Action>(
         val action = locateActionByFirstArg(name)
         if (action != null) {
             this.action = action.value
-            val nestedContext = context.replace(this, action.value.positional())
+            val nestedContext = context.replace(this, listOf(NameUsage(name)) + action.value.positional())
             val result = action.value.maybeParse(args.drop(1), nestedContext)
             return ParseResult(1 + result.count, result.failure)
         }
@@ -71,6 +71,12 @@ internal abstract class AbstractActionParameter<T : Action>(
     }
 
     abstract fun whenMissing(context: ParseContext): ArgParseException?
+
+    private class NameUsage(val name: String) : HasPositionalUsage {
+        override fun usage(): PositionalUsage {
+            return LiteralUsage(name, null)
+        }
+    }
 
     private inner class AllowAnywhereOption(val name: String, val option: ActionDetails<T>) : NonPositional {
 

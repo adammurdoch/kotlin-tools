@@ -40,10 +40,10 @@ internal abstract class Formatter {
         atStartOfLine = true
     }
 
-    fun indent(builder: Formatter.() -> Unit) {
+    fun <T> indent(builder: Formatter.() -> T): T {
         depth++
         try {
-            builder()
+            return builder()
         } finally {
             depth--
         }
@@ -74,7 +74,7 @@ internal abstract class Formatter {
     private fun line(text: String) {
         if (atStartOfLine) {
             for (i in 0 until depth) {
-                write("  ")
+                write("    ")
             }
             atStartOfLine = false
         }

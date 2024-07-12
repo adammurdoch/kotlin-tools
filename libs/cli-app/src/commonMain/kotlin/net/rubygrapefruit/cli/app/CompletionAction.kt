@@ -19,6 +19,8 @@ internal class CompletionAction(
         formatter.run {
             val functionName = appName + "_complete"
 
+            appendln("# Generated ZSH completion script")
+            appendln("# Use `source <this-script>` to enable completion for application '$appName'")
             newLine()
             appendln("compdef $functionName $appName")
             newLine()
@@ -45,43 +47,56 @@ internal class CompletionAction(
         if (action.positional.any { it is ActionParameterUsage }) {
             append(" -C")
         }
-        indent {
+        val last = indent {
             options(action.options)
-            for (index in action.positional.indices) {
-                val positional = action.positional[index]
-                appendln(" \\")
-                when (positional) {
-                    is ParameterUsage -> {
-                        parameter(index, positional)
-                        if (positional.cardinality.multiple) {
-                            break
-                        }
-                    }
+            positional(action.positional)
+        }
+        maybeNewLine()
 
-                    is LiteralUsage -> {
-                        append("'${index + 1}:Literal:(${positional.name})")
-                    }
-
-                    is ActionParameterUsage -> {
-                        appendln("'${index + 1}:Action:(${positional.named.joinToString(" ") { it.name }})' \\")
-                        appendln("'*::arg:->args'")
-                        appendln("case \$line[1] in")
-                        indent {
-                            for (nested in positional.named) {
-                                appendln("${nested.name})")
-                                indent {
-                                    completion(nested.action)
-                                    appendln(";;")
-                                }
-                            }
-                        }
-                        appendln("esac")
-                        break
+        if (last is ActionParameterUsage) {
+            appendln("case \$line[1] in")
+            indent {
+                for (nested in last.named) {
+                    appendln("${nested.name})")
+                    indent {
+                        completion(nested.action)
+                        appendln(";;")
                     }
                 }
             }
+            appendln("esac")
         }
-        maybeNewLine()
+    }
+
+    private fun Formatter.positional(usages: List<PositionalUsage>): PositionalUsage? {
+        for (index in usages.indices) {
+            val positional = usages[index]
+            if (positional(index, positional)) {
+                return positional
+            }
+        }
+        return null
+    }
+
+    private fun Formatter.positional(index: Int, positional: PositionalUsage): Boolean {
+        appendln(" \\")
+        return when (positional) {
+            is ParameterUsage -> {
+                parameter(index, positional)
+                positional.cardinality.multiple
+            }
+
+            is LiteralUsage -> {
+                append("'${index + 1}:Literal:(${positional.name})")
+                false
+            }
+
+            is ActionParameterUsage -> {
+                appendln("'${index + 1}:Action:(${positional.named.joinToString(" ") { it.name }})' \\")
+                appendln("'*::arg:->args'")
+                return true
+            }
+        }
     }
 
     private fun Formatter.options(options: List<NonPositionalUsage>) {

@@ -59,11 +59,14 @@ internal abstract class AbstractActionParameter<T : Action>(
 
     override fun usage(name: String): ActionUsage? {
         val action = actions.named[name]
-        return if (action != null) {
-            action.value.usage()
-        } else {
-            null
+        if (action != null) {
+            return action.value.usage()
         }
+        if (actions.default != null) {
+            return actions.default.value.usage(name)
+        }
+
+        return null
     }
 
     override fun finished(context: ParseContext): ArgParseException? {

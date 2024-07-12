@@ -3,12 +3,12 @@ package net.rubygrapefruit.cli.app
 import net.rubygrapefruit.cli.*
 
 internal fun Formatter.appendUsage(name: String, action: Action) {
-    appendUsage(name, action.usage())
+    appendUsage(PrefixedActionUsage(listOf(LiteralUsage(name, null)), action.usage()))
 }
 
-internal fun Formatter.appendUsage(name: String, action: ActionUsage) {
-    val usage = action.effective()
-    appendUsageSummary(name, usage)
+internal fun Formatter.appendUsage(action: PrefixedActionUsage) {
+    val usage = action.action.effective()
+    appendUsageSummary(action)
 
     val first = usage.positional.firstOrNull()
     val actions = if (first is ActionParameterUsage) {

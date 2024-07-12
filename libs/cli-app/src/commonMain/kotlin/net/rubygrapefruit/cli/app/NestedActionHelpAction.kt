@@ -1,6 +1,8 @@
 package net.rubygrapefruit.cli.app
 
 import net.rubygrapefruit.cli.Action
+import net.rubygrapefruit.cli.LiteralUsage
+import net.rubygrapefruit.cli.PrefixedActionUsage
 
 internal open class NestedActionHelpAction(
     private val name: String,
@@ -14,12 +16,12 @@ internal open class NestedActionHelpAction(
         if (name != null) {
             val nestedAction = action.usage(name)
             if (nestedAction != null) {
-                formatter.appendUsage(this.name, nestedAction)
+                formatter.appendUsage(PrefixedActionUsage(listOf(LiteralUsage(this.name, null), LiteralUsage(name, null)), nestedAction))
             } else {
                 throw RuntimeException("Unknown action: $name")
             }
         } else {
-            formatter.appendUsage(this.name, action)
+            formatter.appendUsage(PrefixedActionUsage(listOf(LiteralUsage(this.name, null)), action.usage()))
         }
     }
 }

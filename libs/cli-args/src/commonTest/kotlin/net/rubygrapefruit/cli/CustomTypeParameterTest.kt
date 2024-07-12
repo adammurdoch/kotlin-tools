@@ -12,7 +12,7 @@ class CustomTypeParameterTest : AbstractActionTest() {
             val param by type { ConversionResult.Success(it.uppercase()) }.parameter("value")
         }
 
-        parse(Parameter(), listOf("abc")) { action ->
+        parse(::Parameter, listOf("abc")) { action ->
             assertEquals("ABC", action.param)
         }
     }
@@ -30,7 +30,7 @@ class CustomTypeParameterTest : AbstractActionTest() {
         }
 
         parseFails(::Parameter, listOf("a"), "Value for parameter 'value' is too short: a")
-        parse(Parameter(), listOf("abc")) { action ->
+        parse(::Parameter, listOf("abc")) { action ->
             assertEquals("abc", action.param)
         }
     }

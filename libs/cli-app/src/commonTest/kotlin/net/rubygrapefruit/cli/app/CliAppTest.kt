@@ -1,9 +1,9 @@
 package net.rubygrapefruit.cli.app
 
 import net.rubygrapefruit.cli.Action
+import net.rubygrapefruit.cli.NestedActionUsage
 import kotlin.test.Test
 import kotlin.test.assertContains
-import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
 class CliAppTest {
@@ -11,17 +11,17 @@ class CliAppTest {
 
     @Test
     fun `can run action`() {
-        class NoConfig : CliApp("cmd")
+        class App : CliApp("cmd")
 
-        val action = NoConfig().actionFor(emptyList(), formatter)
-        assertIs<NoConfig>(action)
+        val action = App().actionFor(emptyList(), formatter)
+        assertIs<App>(action)
     }
 
     @Test
     fun `can run --help action`() {
-        class NoConfig : CliApp("cmd")
+        class App : CliApp("cmd")
 
-        val action = NoConfig().actionFor(listOf("--help"), formatter)
+        val action = App().actionFor(listOf("--help"), formatter)
         assertIs<HelpAction>(action)
 
         action.run()
@@ -32,32 +32,50 @@ class CliAppTest {
     }
 
     @Test
-    fun `can run --help action when unknown option is used`() {
-        class NoConfig : CliApp("cmd")
+    fun `can run --help action and help action when action has nested actions`() {
+        class App : CliApp("cmd") {
+            val action by actions {
+                action(Action(), "action")
+            }
+        }
 
-        val action1 = NoConfig().actionFor(listOf("-o", "--help"), formatter)
+        for (arg in listOf("--help", "help")) {
+            val action = App().actionFor(listOf(arg, "action"), formatter)
+            assertIs<NestedActionHelpAction>(action)
+
+            action.run()
+
+            assertContains(formatter.text, "Usage: cmd action")
+        }
+    }
+
+    @Test
+    fun `can run --help action when unknown option is used`() {
+        class App : CliApp("cmd")
+
+        val action1 = App().actionFor(listOf("-o", "--help"), formatter)
         assertIs<HelpAction>(action1)
 
-        val action2 = NoConfig().actionFor(listOf("--help", "--o"), formatter)
+        val action2 = App().actionFor(listOf("--help", "--o"), formatter)
         assertIs<HelpAction>(action2)
     }
 
     @Test
     fun `can run --help action when unknown parameter is used`() {
-        class NoConfig : CliApp("cmd")
+        class App : CliApp("cmd")
 
-        val action1 = NoConfig().actionFor(listOf("arg", "--help"), formatter)
+        val action1 = App().actionFor(listOf("arg", "--help"), formatter)
         assertIs<HelpAction>(action1)
 
-        val action2 = NoConfig().actionFor(listOf("--help", "arg"), formatter)
+        val action2 = App().actionFor(listOf("--help", "arg"), formatter)
         assertIs<HelpAction>(action2)
     }
 
     @Test
     fun `can run --completion action`() {
-        class NoConfig : CliApp("cmd")
+        class App : CliApp("cmd")
 
-        val action = NoConfig().actionFor(listOf("--completion"), formatter)
+        val action = App().actionFor(listOf("--completion"), formatter)
         assertIs<CompletionAction>(action)
     }
 }

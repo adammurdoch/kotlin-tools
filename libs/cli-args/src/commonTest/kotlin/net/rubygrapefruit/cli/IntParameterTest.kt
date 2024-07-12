@@ -10,7 +10,7 @@ class IntParameterTest : AbstractActionTest() {
             val param by int().parameter("value")
         }
 
-        parse(Parameter(), listOf("123")) { action ->
+        parse(::Parameter, listOf("123")) { action ->
             assertEquals(123, action.param)
         }
     }
@@ -39,11 +39,11 @@ class IntParameterTest : AbstractActionTest() {
             val param by int().parameter("value").whenAbsent(12)
         }
 
-        parse(Parameter(), emptyList()) { action ->
+        parse(::Parameter, emptyList()) { action ->
             assertEquals(12, action.param)
         }
 
-        parse(Parameter(), listOf("123")) { action ->
+        parse(::Parameter, listOf("123")) { action ->
             assertEquals(123, action.param)
         }
     }

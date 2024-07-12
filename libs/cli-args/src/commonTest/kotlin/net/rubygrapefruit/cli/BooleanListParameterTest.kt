@@ -10,13 +10,13 @@ class BooleanListParameterTest : AbstractActionTest() {
             val param by boolean().parameters("value")
         }
 
-        parse(Parameter(), emptyList()) { action ->
+        parse(::Parameter, emptyList()) { action ->
             assertEquals(emptyList(), action.param)
         }
-        parse(Parameter(), listOf("yes")) { action ->
+        parse(::Parameter, listOf("yes")) { action ->
             assertEquals(listOf(true), action.param)
         }
-        parse(Parameter(), listOf("yes", "no", "yes")) { action ->
+        parse(::Parameter, listOf("yes", "no", "yes")) { action ->
             assertEquals(listOf(true, false, true), action.param)
         }
     }

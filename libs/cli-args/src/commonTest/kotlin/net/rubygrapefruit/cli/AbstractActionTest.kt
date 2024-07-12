@@ -10,6 +10,16 @@ abstract class AbstractActionTest {
         verification(action)
     }
 
+    fun <T : Action> parse(factory: () -> T, args: List<String>, verification: (T) -> Unit) {
+        val action1 = factory()
+        action1.parse(args)
+        verification(action1)
+
+        val action2 = factory()
+        val result2 = action2.maybeParse(args)
+        assertIs<Action.Result.Success>(result2)
+    }
+
     fun parseFails(factory: () -> Action, args: List<String>, message: String) {
         parseFails(factory, args) { e -> assertEquals(message, e.message) }
     }
@@ -31,7 +41,7 @@ abstract class AbstractActionTest {
         parseHelp(factory, args)
     }
 
-    fun parseHelp(factory: () -> Action, args: List<String>) {
+    private fun parseHelp(factory: () -> Action, args: List<String>) {
         for (index in args.indices) {
             val copy = args.toMutableList()
             copy.add(index, "--help")

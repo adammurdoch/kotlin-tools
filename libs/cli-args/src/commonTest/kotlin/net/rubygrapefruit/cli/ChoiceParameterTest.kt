@@ -13,10 +13,10 @@ class ChoiceParameterTest : AbstractActionTest() {
             }.parameter("value")
         }
 
-        parse(Parameter(), listOf("one")) { action ->
+        parse(::Parameter, listOf("one")) { action ->
             assertEquals(1, action.param)
         }
-        parse(Parameter(), listOf("2")) { action ->
+        parse(::Parameter, listOf("2")) { action ->
             assertEquals(2, action.param)
         }
     }
@@ -76,19 +76,19 @@ class ChoiceParameterTest : AbstractActionTest() {
             }.parameter("value").whenAbsent(3)
         }
 
-        parse(Parameter(), emptyList()) { action ->
+        parse(::Parameter, emptyList()) { action ->
             assertEquals(3, action.p1)
             assertEquals(3, action.p2)
         }
-        parse(Parameter(), listOf("one")) { action ->
+        parse(::Parameter, listOf("one")) { action ->
             assertEquals(1, action.p1)
             assertEquals(3, action.p2)
         }
-        parse(Parameter(), listOf("2nd")) { action ->
+        parse(::Parameter, listOf("2nd")) { action ->
             assertEquals(3, action.p1)
             assertEquals(2, action.p2)
         }
-        parse(Parameter(), listOf("one", "2nd")) { action ->
+        parse(::Parameter, listOf("one", "2nd")) { action ->
             assertEquals(1, action.p1)
             assertEquals(2, action.p2)
         }

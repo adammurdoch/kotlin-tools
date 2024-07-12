@@ -115,7 +115,7 @@ class NestedActionParameterTest : AbstractActionTest() {
     }
 
     @Test
-    fun `can nest actions multiple levels`() {
+    fun `nested action can have nested actions`() {
         class Sub1 : Action() {
             val a by parameter("a")
         }
@@ -123,12 +123,14 @@ class NestedActionParameterTest : AbstractActionTest() {
         class Sub2 : Action() {
             val action by actions {
                 action(Sub1(), "nested")
+                action(Sub1(), "other")
             }
         }
 
         class WithSub : Action() {
             val action by actions {
                 action(Sub2(), "sub")
+                action(Sub2(), "other")
             }
         }
 
@@ -149,9 +151,40 @@ class NestedActionParameterTest : AbstractActionTest() {
         parseFails(::WithSub, emptyList()) { e ->
             assertIs<PositionalParseException>(e)
             assertEquals("Action not provided", e.message)
+            assertEquals(1, e.positional.size)
+            assertIs<ActionParameterUsage>(e.positional[0])
             assertEquals(2, e.actions.size)
         }
         parseFails(::WithSub, listOf("s1", "s2"), "Unknown parameter: s2")
+    }
+
+    @Test
+    fun `fails when nested action of nested action not provided`() {
+        class Sub1 : Action() {
+            val a by parameter("a")
+        }
+
+        class Sub2 : Action() {
+            val action by actions {
+                action(Sub1(), "nested")
+                action(Sub1(), "other")
+            }
+        }
+
+        class WithSub : Action() {
+            val action by actions {
+                action(Sub2(), "sub")
+                action(Sub2(), "other")
+            }
+        }
+
+        parseFails(::WithSub, listOf("sub")) { e ->
+            assertIs<PositionalParseException>(e)
+            assertEquals("Action not provided", e.message)
+            assertEquals(2, e.positional.size)
+            assertIs<LiteralUsage>(e.positional[0])
+            assertIs<ActionParameterUsage>(e.positional[1])
+        }
     }
 
     @Test
@@ -205,6 +238,8 @@ class NestedActionParameterTest : AbstractActionTest() {
         parseFails(::WithSub, listOf("thing")) { e ->
             assertIs<PositionalParseException>(e)
             assertEquals("Unknown action: thing", e.message)
+            assertEquals(1, e.positional.size)
+            assertIs<ActionParameterUsage>(e.positional[0])
             assertEquals(2, e.actions.size)
         }
     }
@@ -264,22 +299,5 @@ class NestedActionParameterTest : AbstractActionTest() {
         } catch (e: IllegalArgumentException) {
             assertEquals("--sub cannot be used as an action name", e.message)
         }
-    }
-
-    @Test
-    fun `fails when nested action parameters not provided`() {
-        class Sub : Action() {
-            val p1 by parameter("p1")
-            val p2 by parameter("p2")
-        }
-
-        class WithSub : Action() {
-            val sub by actions {
-                action(Sub(), "sub")
-            }
-        }
-
-        parseFails(::WithSub, listOf("sub"), "Parameter 'p1' not provided")
-        parseFails(::WithSub, listOf("sub", "a1"), "Parameter 'p2' not provided")
     }
 }

@@ -9,13 +9,13 @@ class StringListParameterTest : AbstractActionTest() {
             val param by parameters("value")
         }
 
-        parse(Parameter(), emptyList()) { action ->
+        parse(::Parameter, emptyList()) { action ->
             assertEquals(emptyList(), action.param)
         }
-        parse(Parameter(), listOf("abc")) { action ->
+        parse(::Parameter, listOf("abc")) { action ->
             assertEquals(listOf("abc"), action.param)
         }
-        parse(Parameter(), listOf("a", "b", "c")) { action ->
+        parse(::Parameter, listOf("a", "b", "c")) { action ->
             assertEquals(listOf("a", "b", "c"), action.param)
         }
     }
@@ -26,13 +26,13 @@ class StringListParameterTest : AbstractActionTest() {
             val param by parameters("value").whenAbsent(listOf("abc"))
         }
 
-        parse(Parameter(), emptyList()) { action ->
+        parse(::Parameter, emptyList()) { action ->
             assertEquals(listOf("abc"), action.param)
         }
-        parse(Parameter(), listOf("abc")) { action ->
+        parse(::Parameter, listOf("abc")) { action ->
             assertEquals(listOf("abc"), action.param)
         }
-        parse(Parameter(), listOf("a", "b", "c")) { action ->
+        parse(::Parameter, listOf("a", "b", "c")) { action ->
             assertEquals(listOf("a", "b", "c"), action.param)
         }
     }
@@ -45,10 +45,10 @@ class StringListParameterTest : AbstractActionTest() {
 
         parseFails(::Parameter, emptyList(), "Parameter 'value' not provided")
 
-        parse(Parameter(), listOf("abc")) { action ->
+        parse(::Parameter, listOf("abc")) { action ->
             assertEquals(listOf("abc"), action.param)
         }
-        parse(Parameter(), listOf("a", "b", "c")) { action ->
+        parse(::Parameter, listOf("a", "b", "c")) { action ->
             assertEquals(listOf("a", "b", "c"), action.param)
         }
     }
@@ -85,23 +85,23 @@ class StringListParameterTest : AbstractActionTest() {
             val flag by flag("flag")
         }
 
-        parse(Parameter(), listOf("--flag")) { action ->
+        parse(::Parameter, listOf("--flag")) { action ->
             assertEquals(emptyList(), action.param)
             assertTrue(action.flag)
         }
-        parse(Parameter(), listOf("--flag", "a")) { action ->
+        parse(::Parameter, listOf("--flag", "a")) { action ->
             assertEquals(listOf("a"), action.param)
             assertTrue(action.flag)
         }
-        parse(Parameter(), listOf("--other")) { action ->
+        parse(::Parameter, listOf("--other")) { action ->
             assertEquals(listOf("--other"), action.param)
             assertFalse(action.flag)
         }
-        parse(Parameter(), listOf("a", "--flag", "b", "--other")) { action ->
+        parse(::Parameter, listOf("a", "--flag", "b", "--other")) { action ->
             assertEquals(listOf("a", "--flag", "b", "--other"), action.param)
             assertFalse(action.flag)
         }
-        parse(Parameter(), listOf("--flag", "a", "--flag", "b", "--other")) { action ->
+        parse(::Parameter, listOf("--flag", "a", "--flag", "b", "--other")) { action ->
             assertEquals(listOf("a", "--flag", "b", "--other"), action.param)
             assertTrue(action.flag)
         }

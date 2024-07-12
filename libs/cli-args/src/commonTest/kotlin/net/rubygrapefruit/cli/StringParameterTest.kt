@@ -9,7 +9,7 @@ class StringParameterTest : AbstractActionTest() {
             val param by parameter("value")
         }
 
-        parse(Parameter(), listOf("abc")) { action ->
+        parse(::Parameter, listOf("abc")) { action ->
             assertEquals("abc", action.param)
         }
     }
@@ -21,7 +21,7 @@ class StringParameterTest : AbstractActionTest() {
             val p2 by parameter("value")
         }
 
-        parse(Parameter(), listOf("abc", "def")) { action ->
+        parse(::Parameter, listOf("abc", "def")) { action ->
             assertEquals("abc", action.p1)
             assertEquals("def", action.p2)
         }
@@ -36,6 +36,8 @@ class StringParameterTest : AbstractActionTest() {
         parseFails(::Parameter, emptyList()) { e ->
             assertIs<PositionalParseException>(e)
             assertEquals("Parameter 'value' not provided", e.message)
+            assertEquals(1, e.positional.size)
+            assertIs<ParameterUsage>(e.positional[0])
         }
     }
 
@@ -55,11 +57,11 @@ class StringParameterTest : AbstractActionTest() {
             val param by parameter("value").whenAbsent("value")
         }
 
-        parse(Parameter(), emptyList()) { action ->
+        parse(::Parameter, emptyList()) { action ->
             assertEquals("value", action.param)
         }
 
-        parse(Parameter(), listOf("123")) { action ->
+        parse(::Parameter, listOf("123")) { action ->
             assertEquals("123", action.param)
         }
     }
@@ -71,17 +73,17 @@ class StringParameterTest : AbstractActionTest() {
             val p2 by parameter("p2").whenAbsent("p2")
         }
 
-        parse(Parameter(), emptyList()) { action ->
+        parse(::Parameter, emptyList()) { action ->
             assertEquals("p1", action.p1)
             assertEquals("p2", action.p2)
         }
 
-        parse(Parameter(), listOf("123")) { action ->
+        parse(::Parameter, listOf("123")) { action ->
             assertEquals("123", action.p1)
             assertEquals("p2", action.p2)
         }
 
-        parse(Parameter(), listOf("123", "abc")) { action ->
+        parse(::Parameter, listOf("123", "abc")) { action ->
             assertEquals("123", action.p1)
             assertEquals("abc", action.p2)
         }
@@ -93,11 +95,11 @@ class StringParameterTest : AbstractActionTest() {
             val param by parameter("value").optional()
         }
 
-        parse(Parameter(), emptyList()) { action ->
+        parse(::Parameter, emptyList()) { action ->
             assertNull(action.param)
         }
 
-        parse(Parameter(), listOf("123")) { action ->
+        parse(::Parameter, listOf("123")) { action ->
             assertEquals("123", action.param)
         }
     }
@@ -109,17 +111,17 @@ class StringParameterTest : AbstractActionTest() {
             val p2 by parameter("value2").optional()
         }
 
-        parse(Parameter(), emptyList()) { action ->
+        parse(::Parameter, emptyList()) { action ->
             assertNull(action.p1)
             assertNull(action.p2)
         }
 
-        parse(Parameter(), listOf("123")) { action ->
+        parse(::Parameter, listOf("123")) { action ->
             assertEquals("123", action.p1)
             assertNull(action.p2)
         }
 
-        parse(Parameter(), listOf("123", "abc")) { action ->
+        parse(::Parameter, listOf("123", "abc")) { action ->
             assertEquals("123", action.p1)
             assertEquals("abc", action.p2)
         }

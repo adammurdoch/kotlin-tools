@@ -230,7 +230,7 @@ open class Action {
         return Result.Failure(failure)
     }
 
-    open fun usage(): ActionUsage {
+    fun usage(): ActionUsage {
         return ActionUsage(
             options.flatMap { it.usage() },
             positional.map { it.usage() }

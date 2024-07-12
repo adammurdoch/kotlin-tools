@@ -27,6 +27,7 @@
     - Suggest `--help`
     - Unknown option - show available options
     - Unknown option for sub-command - show available options
+    - Unknown action provided to `help`
     - Argument not provided
     - Too many arguments
     - Option value badly formed
@@ -42,3 +43,5 @@
 - File locations: dir, file, must exist
 - Color output on terminal
 - Fuzzy matching and/or suggestions
+
+action.resolve(name) -> usage

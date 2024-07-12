@@ -1,5 +1,7 @@
 - Fix error message when multiple actions are provided, either as names or options or combined with default
 - Merge `NestedActionHelpAction` into `HelpAction`
+- Move calculation of effective usage into `AbstractActionParameter`
+- Move handling of option actions to help
 - Completion for nested actions
 - Clean up usage types
 - Help

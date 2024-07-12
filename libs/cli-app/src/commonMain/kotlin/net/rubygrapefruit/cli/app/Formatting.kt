@@ -7,8 +7,9 @@ internal fun Formatter.appendUsage(name: String, action: Action) {
 }
 
 internal fun Formatter.appendUsage(action: PrefixedActionUsage) {
-    val usage = action.action.effective()
-    appendUsageSummary(action)
+    val effective = PrefixedActionUsage(action.prefix, action.action.effective())
+    val usage = effective.action
+    appendUsageSummary(effective)
 
     val first = usage.positional.firstOrNull()
     val actions = if (first is ActionParameterUsage) {

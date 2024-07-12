@@ -6,7 +6,7 @@ internal class BufferingFormatter : Formatter() {
     val text: String
         get() = buffer.toString()
 
-    override fun text(value: String) {
+    override fun write(value: String) {
         buffer.append(value)
     }
 }

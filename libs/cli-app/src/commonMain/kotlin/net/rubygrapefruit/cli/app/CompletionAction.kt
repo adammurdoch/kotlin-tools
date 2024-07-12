@@ -20,78 +20,74 @@ internal class CompletionAction(
             val functionName = appName + "_complete"
 
             newLine()
-            append(
-                """
-                compdef $functionName $appName
-    
-                function $functionName() {
+            appendln("compdef $functionName $appName")
+            newLine()
+            appendln("function $functionName() {")
+            indent {
+                appendln(
+                    """
                   local context state state_descr line
                   typeset -A opt_args
-    
                 """.trimIndent()
-            )
-            completion(usage, "  ")
-            append("}")
+                )
+                completion(usage)
+            }
+            appendln("}")
             newLine()
         }
     }
 
-    private fun Formatter.completion(action: ActionUsage, indent: String) {
+    private fun Formatter.completion(action: ActionUsage) {
         if (action.positional.isEmpty() && action.options.isEmpty()) {
             return
         }
-        append(indent)
         append("_arguments")
         if (action.positional.any { it is ActionParameterUsage }) {
             append(" -C")
         }
-        val nestedIndent = "$indent  "
-        options(action.options, nestedIndent)
-        for (index in action.positional.indices) {
-            val positional = action.positional[index]
-            append(" \\\n")
-            append(nestedIndent)
-            when (positional) {
-                is ParameterUsage -> {
-                    parameter(index, positional)
-                    if (positional.cardinality.multiple) {
+        indent {
+            options(action.options)
+            for (index in action.positional.indices) {
+                val positional = action.positional[index]
+                appendln(" \\")
+                when (positional) {
+                    is ParameterUsage -> {
+                        parameter(index, positional)
+                        if (positional.cardinality.multiple) {
+                            break
+                        }
+                    }
+
+                    is LiteralUsage -> {
+                        append("'${index + 1}:Literal:(${positional.name})")
+                    }
+
+                    is ActionParameterUsage -> {
+                        appendln("'${index + 1}:Action:(${positional.named.joinToString(" ") { it.name }})' \\")
+                        appendln("'*::arg:->args'")
+                        appendln("case \$line[1] in")
+                        indent {
+                            for (nested in positional.named) {
+                                appendln("${nested.name})")
+                                indent {
+                                    completion(nested.action)
+                                    appendln(";;")
+                                }
+                            }
+                        }
+                        appendln("esac")
                         break
                     }
-                }
-
-                is LiteralUsage -> {
-                    append("'${index + 1}:Literal:(${positional.name})")
-                }
-
-                is ActionParameterUsage -> {
-                    append("'${index + 1}:Action:(${positional.named.joinToString(" ") { it.name }})' \\\n")
-                    append(nestedIndent)
-                    append("'*::arg:->args'\n")
-
-                    append(indent)
-                    append("case \$line[1] in\n")
-                    val caseIndent = "$nestedIndent  "
-                    for (nested in positional.named) {
-                        append(nestedIndent)
-                        append("${nested.name})\n")
-                        completion(nested.action, caseIndent)
-                        append(caseIndent)
-                        append(";;\n")
-                    }
-                    append(indent)
-                    append("esac\n")
-                    break
                 }
             }
         }
         maybeNewLine()
     }
 
-    private fun Formatter.options(options: List<NonPositionalUsage>, indent: String) {
+    private fun Formatter.options(options: List<NonPositionalUsage>) {
         for (option in options) {
             for (item in option.choices) {
-                append(" \\\n")
-                append(indent)
+                appendln(" \\")
                 if (item.names.size == 1) {
                     append("'")
                     append(item.names.first())

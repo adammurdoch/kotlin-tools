@@ -2,12 +2,31 @@ package net.rubygrapefruit.cli.app
 
 internal abstract class Formatter {
     private var atStartOfLine = true
+    private var depth = 0
 
     fun append(value: String?) {
         if (!value.isNullOrEmpty()) {
-            text(value)
-            atStartOfLine = value.endsWith('\n')
+            var pos = 0
+            while (pos < value.length) {
+                val nextPos = value.indexOf('\n', pos)
+                if (nextPos < 0) {
+                    line(value.substring(pos))
+                    break
+                }
+                if (nextPos > pos) {
+                    line(value.substring(pos, nextPos))
+                }
+                newLine()
+                pos = nextPos + 1
+            }
         }
+    }
+
+    fun appendln(value: String?) {
+        if (!value.isNullOrEmpty()) {
+            append(value)
+        }
+        newLine()
     }
 
     fun maybeNewLine() {
@@ -17,37 +36,56 @@ internal abstract class Formatter {
     }
 
     fun newLine() {
-        text("\n")
+        write("\n")
         atStartOfLine = true
+    }
+
+    fun indent(builder: Formatter.() -> Unit) {
+        depth++
+        try {
+            builder()
+        } finally {
+            depth--
+        }
     }
 
     fun <T> table(title: String, items: List<T>, row: (T) -> Pair<String, String?>) {
         if (items.isNotEmpty()) {
             newLine()
-            text("$title:")
+            append("$title:")
             newLine()
             val width = items.maxOf { row(it).first.length }
             for (item in items) {
                 val cells = row(item)
-                text("  ")
+                append("  ")
                 val second = cells.second
                 if (second != null) {
-                    text(cells.first.padEnd(width))
-                    text(" ")
-                    text(second)
+                    append(cells.first.padEnd(width))
+                    append(" ")
+                    append(second)
                 } else {
-                    text(cells.first)
+                    append(cells.first)
                 }
                 newLine()
             }
         }
     }
 
-    protected abstract fun text(value: String)
+    private fun line(text: String) {
+        if (atStartOfLine) {
+            for (i in 0 until depth) {
+                write("  ")
+            }
+            atStartOfLine = false
+        }
+        write(text)
+    }
+
+    protected abstract fun write(value: String)
 }
 
 internal object LoggingFormatter : Formatter() {
-    override fun text(value: String) {
+    override fun write(value: String) {
         print(value)
     }
 }

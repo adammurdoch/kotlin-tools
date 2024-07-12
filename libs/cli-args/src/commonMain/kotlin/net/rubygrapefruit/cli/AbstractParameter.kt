@@ -17,6 +17,10 @@ internal abstract class AbstractParameter<T : Any>(
         return ParameterUsage(usage, "<$name>", help, converter.type, cardinality, converter.candidateValues)
     }
 
+    override fun usage(name: String): ActionUsage? {
+        return null
+    }
+
     override fun accept(args: List<String>, context: ParseContext): ParseResult {
         val candidate = args.first()
         return if (host.isOption(candidate)) {

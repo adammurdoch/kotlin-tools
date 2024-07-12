@@ -1,30 +1,25 @@
 package net.rubygrapefruit.cli.app
 
 import net.rubygrapefruit.cli.Action
-import net.rubygrapefruit.cli.ActionParameterUsage
 
 internal open class NestedActionHelpAction(
     private val name: String,
-    private val action: Action,
+    private val action: MainAction,
     private val formatter: Formatter
 ) : Action() {
     private val actionName by parameter("action").optional()
 
     override fun run() {
-        if (actionName != null) {
-            val positional = action.usage().effective().positional.firstOrNull()
-            val nestedAction = if (positional is ActionParameterUsage) {
-                positional.named.find { it.name == actionName }
-            } else {
-                null
-            }
+        val name = actionName
+        if (name != null) {
+            val nestedAction = action.usage(name)
             if (nestedAction != null) {
-                formatter.appendUsage(nestedAction.name, nestedAction.action)
+                formatter.appendUsage(this.name, nestedAction)
             } else {
-                throw RuntimeException("Unknown action: $actionName")
+                throw RuntimeException("Unknown action: $name")
             }
         } else {
-            formatter.appendUsage(name, action)
+            formatter.appendUsage(this.name, action)
         }
     }
 }

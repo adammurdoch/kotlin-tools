@@ -34,6 +34,10 @@ internal open class DefaultListParameter<T : Any>(
         return ParameterUsage("<$name>...", "<$name>", help, converter.type, if (required) Cardinality.OneOrMore else Cardinality.ZeroOrMore, converter.candidateValues)
     }
 
+    override fun usage(name: String): ActionUsage? {
+        return null
+    }
+
     override fun accept(args: List<String>, context: ParseContext): ParseResult {
         for (index in args.indices) {
             val arg = args[index]

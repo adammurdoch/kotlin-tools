@@ -57,6 +57,15 @@ internal abstract class AbstractActionParameter<T : Action>(
         return ActionParameterUsage("<action>", "<action>", null, optionInfo, actionInfo, defaultInfo)
     }
 
+    override fun usage(name: String): ActionUsage? {
+        val action = actions.named[name]
+        return if (action != null) {
+            action.value.usage()
+        } else {
+            null
+        }
+    }
+
     override fun finished(context: ParseContext): ArgParseException? {
         return when {
             action != null -> null

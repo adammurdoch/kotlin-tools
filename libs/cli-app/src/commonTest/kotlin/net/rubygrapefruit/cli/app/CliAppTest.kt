@@ -1,7 +1,6 @@
 package net.rubygrapefruit.cli.app
 
 import net.rubygrapefruit.cli.Action
-import net.rubygrapefruit.cli.NestedActionUsage
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertIs
@@ -40,6 +39,7 @@ class CliAppTest {
         }
 
         for (arg in listOf("--help", "help")) {
+            val formatter = BufferingFormatter()
             val action = App().actionFor(listOf(arg, "action"), formatter)
             assertIs<NestedActionHelpAction>(action)
 
@@ -55,9 +55,11 @@ class CliAppTest {
 
         val action1 = App().actionFor(listOf("-o", "--help"), formatter)
         assertIs<HelpAction>(action1)
+        action1.run()
 
         val action2 = App().actionFor(listOf("--help", "--o"), formatter)
         assertIs<HelpAction>(action2)
+        action1.run()
     }
 
     @Test
@@ -66,9 +68,11 @@ class CliAppTest {
 
         val action1 = App().actionFor(listOf("arg", "--help"), formatter)
         assertIs<HelpAction>(action1)
+        action1.run()
 
         val action2 = App().actionFor(listOf("--help", "arg"), formatter)
         assertIs<HelpAction>(action2)
+        action2.run()
     }
 
     @Test
@@ -77,5 +81,6 @@ class CliAppTest {
 
         val action = App().actionFor(listOf("--completion"), formatter)
         assertIs<CompletionAction>(action)
+        action.run()
     }
 }

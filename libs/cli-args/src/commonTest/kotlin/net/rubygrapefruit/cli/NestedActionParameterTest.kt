@@ -287,6 +287,18 @@ class NestedActionParameterTest : AbstractActionTest() {
     }
 
     @Test
+    fun `can query usage of nested action by name`() {
+        class WithSub : Action() {
+            val sub by actions {
+                action(Action(), "sub")
+            }
+        }
+
+        assertNotNull(WithSub().usage("sub"))
+        assertNull(WithSub().usage("unknown"))
+    }
+
+    @Test
     fun `name must not start with punctuation`() {
         class WithSub : Action() {
             val sub by actions {

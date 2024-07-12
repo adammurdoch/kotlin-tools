@@ -4,6 +4,7 @@
 - Clean up usage types
 - Help
     - Don't allow `--help <action>` if there are no nested actions
+    - Fix help when action is not the first positional
     - Use choice for action parameter to `help <action>`
     - Show options for action
     - Show path to action in usage for action, eg `usage: cmd [options] action1 ...`

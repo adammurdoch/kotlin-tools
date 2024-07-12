@@ -237,6 +237,10 @@ open class Action {
         )
     }
 
+    fun usage(name: String): ActionUsage? {
+        return positional.firstOrNull()?.usage(name)
+    }
+
     internal fun <T : NonPositional> add(option: T): T {
         options.add(option)
         return option

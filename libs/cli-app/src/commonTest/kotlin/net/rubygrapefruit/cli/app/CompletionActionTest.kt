@@ -51,6 +51,20 @@ class CompletionActionTest : AbstractActionTest() {
     }
 
     @Test
+    fun `generates completion script for app with multiple parameters`() {
+        class App : Action() {
+            val p1 by parameter("param1")
+            val p2 by parameter("param2")
+        }
+
+        val action = CompletionAction("cmd", App(), formatter)
+        action.run()
+
+        assertContains(formatter.text, "'1:Parameter:( )'")
+        assertContains(formatter.text, "'2:Parameter:( )'")
+    }
+
+    @Test
     fun `escapes option help text`() {
         class App : Action() {
             val a1 by option("some-option", help = "some 'option")
@@ -62,5 +76,53 @@ class CompletionActionTest : AbstractActionTest() {
 
         assertContains(formatter.text, """'--some-option[some '"'"'option]:Argument:( )'""")
         assertContains(formatter.text, """{-s,--second-option}'[second '"'"'option]:Argument:( )'""")
+    }
+
+    @Test
+    fun `generates completion script for app with actions`() {
+        class Nested : Action() {
+            val param by parameter("param")
+        }
+
+        class App : Action() {
+            val action by actions {
+                action(Action(), "a1")
+                action(Nested(), "a2")
+            }
+        }
+
+        val action = CompletionAction("cmd", App(), formatter)
+        action.run()
+
+        assertContains(formatter.text, "'1:Action:(a1 a2)'")
+        assertContains(formatter.text, "'1:Parameter:( )'")
+    }
+
+    @Test
+    fun `generates completion script for app with nested actions`() {
+        class Nested1 : Action() {
+            val param by parameter("param")
+        }
+
+        class Nested2: Action() {
+            val action by actions {
+                action(Nested1(), "n1")
+                action(Action(), "n2")
+            }
+        }
+
+        class App : Action() {
+            val action by actions {
+                action(Action(), "a1")
+                action(Nested2(), "a2")
+            }
+        }
+
+        val action = CompletionAction("cmd", App(), formatter)
+        action.run()
+
+        assertContains(formatter.text, "'1:Action:(a1 a2)'")
+        assertContains(formatter.text, "'1:Action:(n1 n2)'")
+        assertContains(formatter.text, "'1:Parameter:( )'")
     }
 }

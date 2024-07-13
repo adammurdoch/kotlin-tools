@@ -54,18 +54,26 @@ internal class CompletionAction(
         maybeNewLine()
 
         if (last is ActionParameterUsage) {
-            appendln("case \$line[1] in")
-            indent {
-                for (nested in last.named) {
-                    appendln("${nested.name})")
-                    indent {
-                        completion(nested.action)
-                        appendln(";;")
-                    }
+            actions(last)
+        }
+    }
+
+    private fun Formatter.actions(actions: ActionParameterUsage) {
+        val notEmpty = actions.named.filterNot { it.action.isEmpty }
+        if (notEmpty.isEmpty()) {
+            return
+        }
+        appendln("case \$line[1] in")
+        indent {
+            for (action in notEmpty) {
+                appendln("${action.name})")
+                indent {
+                    completion(action.action)
+                    appendln(";;")
                 }
             }
-            appendln("esac")
         }
+        appendln("esac")
     }
 
     private fun Formatter.positional(usages: List<PositionalUsage>): PositionalUsage? {

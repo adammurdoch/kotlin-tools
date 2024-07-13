@@ -6,6 +6,9 @@ data class ActionUsage(
     val options: List<NonPositionalUsage>,
     val positional: List<PositionalUsage>
 ) {
+    val isEmpty: Boolean
+        get() = positional.isEmpty() && options.isEmpty()
+
     /**
      * Simplifies this usage by inlining the first action set and replacing its option actions with options on this action.
      */

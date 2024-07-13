@@ -2,7 +2,6 @@
 - Merge `NestedActionHelpAction` into `HelpAction`
 - Move calculation of effective usage into `AbstractActionParameter`
 - Move handling of option actions to help
-- Completion for nested actions
 - Clean up usage types
 - Help
     - Don't allow `--help <action>` if there are no nested actions
@@ -17,6 +16,7 @@
     - Help should indicate parameter is optional
     - Help for nested actions with nested actions
 - Completion
+    - Fix global flags for nested actions 
     - Include help message for each choice completion option
     - Include help message for each action completion option
     - Merge choice options for optional parameter with choice options for next parameter
@@ -46,5 +46,3 @@
 - File locations: dir, file, must exist
 - Color output on terminal
 - Fuzzy matching and/or suggestions
-
-action.resolve(name) -> usage

@@ -1,8 +1,8 @@
 # CLI Application library
 
-A small framework to help implement a CLI application, for JVM 11+, macOS, Linux and Windows. 
+A small framework to help implement a CLI application using Kotlin, for JVM 11+, macOS, Linux and Windows. 
 
-Adds support for:
+Extends the [cli-args](../cli-args) library and adds support for:
 
 - Command line argument parsing
 - Help messages

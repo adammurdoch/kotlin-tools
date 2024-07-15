@@ -4,10 +4,11 @@
 - Move handling of option actions to help
 - Clean up usage types
 - Help
-    - Don't allow `--help <action>` if there are no nested actions
+    - Don't allow `--help <action>` if there are no actions
     - Fix help when action is not the first positional
     - Use choice for action parameter to `help <action>`
     - Show options for action
+    - Show global options for action
     - Show path to action in usage for action, eg `usage: cmd [options] action1 ...`
     - `help` nested action
     - Group long and short choice flags

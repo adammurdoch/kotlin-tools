@@ -4,6 +4,7 @@ internal abstract class AbstractActionParameter<T : Action>(
     protected val actions: ActionSet<T>,
     protected val host: Host
 ) : Positional {
+    private var actionName: String? = null
     protected var action: T? = null
 
     protected val actionInfo
@@ -20,6 +21,7 @@ internal abstract class AbstractActionParameter<T : Action>(
         val action = locateActionByFirstArg(name)
         if (action != null) {
             this.action = action.value
+            this.actionName = name
             val nestedContext = context.replace(this, listOf(NameUsage(name)) + action.value.positional())
             val result = action.value.maybeParse(args.drop(1), nestedContext)
             return ParseResult(1 + result.count, result.failure)
@@ -100,8 +102,8 @@ internal abstract class AbstractActionParameter<T : Action>(
         }
 
         override fun stoppedAt(arg: String): NonPositional.StopResult {
-            return if (arg == name && action != null) {
-                NonPositional.StopResult.Failure(ArgParseException("Cannot use $name here."))
+            return if (arg == name && action != null && actionName != null) {
+                NonPositional.StopResult.Failure(ArgParseException("Cannot use $name with $actionName."))
             } else {
                 NonPositional.StopResult.Nothing
             }

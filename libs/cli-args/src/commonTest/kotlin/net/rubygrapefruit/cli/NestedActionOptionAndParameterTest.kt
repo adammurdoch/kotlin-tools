@@ -38,6 +38,24 @@ class NestedActionOptionAndParameterTest : AbstractActionTest() {
     }
 
     @Test
+    fun `fails when exactly one action not provided and unnamed action specified`() {
+        class Sub: Action() {
+            val param by parameter("param")
+        }
+
+        class WithSub : Action() {
+            val sub by actions {
+                option(Action(), "sub")
+                action(Sub())
+            }
+        }
+
+        parseFails(::WithSub, listOf("unknown", "sub"), "Unknown parameter: sub")
+        parseFails(::WithSub, listOf("sub", "unknown"), "Unknown parameter: unknown")
+        parseFails(::WithSub, listOf("sub", "sub"), "Unknown parameter: sub")
+    }
+
+    @Test
     fun `can define unnamed action to use when none provided`() {
         val s1 = Action()
         val s2 = Action()

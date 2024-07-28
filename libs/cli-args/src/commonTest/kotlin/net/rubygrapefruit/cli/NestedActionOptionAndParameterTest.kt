@@ -33,7 +33,7 @@ class NestedActionOptionAndParameterTest : AbstractActionTest() {
         }
 
         parseFails(::WithSub, listOf("--sub", "sub"), "Unknown parameter: sub")
-        parseFails(::WithSub, listOf("sub", "--sub"), "Unknown option: --sub")
+        parseFails(::WithSub, listOf("sub", "--sub"), "Cannot use option --sub with action 'sub'")
         parseFails(::WithSub, listOf("sub", "sub"), "Unknown parameter: sub")
     }
 

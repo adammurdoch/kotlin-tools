@@ -143,7 +143,7 @@ open class Action {
         var failure: ArgParseException? = null
         while (index in args.indices && failure == null) {
             val current = args.subList(index, args.size)
-            var matched = false
+            var recognized = false
             for (option in context.options) {
                 val result = option.accept(current, context)
                 if (result.count > 0 || result.failure != null) {
@@ -151,11 +151,11 @@ open class Action {
                         failure = result.failure
                     }
                     index += result.count
-                    matched = true
+                    recognized = true
                     break
                 }
             }
-            if (matched) {
+            if (recognized) {
                 continue
             }
 
@@ -175,7 +175,7 @@ open class Action {
                 }
             }
 
-            // Did not match anything
+            // Did not recognize anything
             break
         }
 
@@ -209,19 +209,26 @@ open class Action {
         val arg = args.getOrNull(original.count)
         val failure = when {
             arg != null && host.isOption(arg) -> {
-                var matched = false
+                // Don't keep original failure if parsing stopped on an unknown option.
+                // This handles case where option argument or parameter is missing
+                // Allow the non-positional to override this behavior
+                var failure: ArgParseException? = null
                 for (option in options) {
-                    val result = option.accepts(arg)
-                    if (result) {
-                        matched = true
-                        break
+                    val result = option.stoppedAt(arg)
+                    when (result) {
+                        is NonPositional.StopResult.Nothing -> continue
+                        is NonPositional.StopResult.Recognized -> {
+                            failure = original.failure
+                            break
+                        }
+
+                        is NonPositional.StopResult.Failure -> {
+                            failure = result.failure
+                            break
+                        }
                     }
                 }
-                if (matched && original.failure != null) {
-                    original.failure
-                } else {
-                    ArgParseException("Unknown option: $arg")
-                }
+                failure ?: ArgParseException("Unknown option: $arg")
             }
 
             original.failure != null -> original.failure

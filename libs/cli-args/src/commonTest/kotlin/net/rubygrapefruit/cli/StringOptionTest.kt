@@ -33,7 +33,7 @@ class StringOptionTest : AbstractActionTest() {
     }
 
     @Test
-    fun `can define string option with multiple names`() {
+    fun `can define option with multiple names`() {
         class Option : Action() {
             val option by option("o", "opt")
         }
@@ -58,7 +58,7 @@ class StringOptionTest : AbstractActionTest() {
     }
 
     @Test
-    fun `can provide default value for string option`() {
+    fun `can provide default value for option`() {
         class Option : Action() {
             val option by option("opt").whenAbsent("value")
         }
@@ -73,7 +73,7 @@ class StringOptionTest : AbstractActionTest() {
     }
 
     @Test
-    fun `can define multiple string options`() {
+    fun `can define multiple options`() {
         class Option : Action() {
             val o1 by option("o1")
             val o2 by option("o2")

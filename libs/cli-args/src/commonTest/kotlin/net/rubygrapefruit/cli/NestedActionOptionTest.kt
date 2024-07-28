@@ -101,7 +101,7 @@ class NestedActionOptionTest : AbstractActionTest() {
         }
 
         parseFails(::WithSub, emptyList(), "Action not provided")
-        parseFails(::WithSub, listOf("--s2", "--s1"), "Unknown option: --s1")
+        parseFails(::WithSub, listOf("--s2", "--s1"), "Cannot use option --s1 with option --s2")
     }
 
     @Test

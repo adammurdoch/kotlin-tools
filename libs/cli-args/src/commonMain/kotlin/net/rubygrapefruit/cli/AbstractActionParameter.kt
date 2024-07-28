@@ -9,7 +9,7 @@ internal abstract class AbstractActionParameter<T : Action>(
     protected val actionInfo
         get() = actions.named.map { NamedNestedActionUsage(it.key, it.value.help, it.value.value.usage()) }
 
-    val nonPositional: List<NonPositional> = actions.options.filter { it.value.allowAnywhere }.map { AllowAnywhereOption(it.key, it.value) }
+    val nonPositional: List<NonPositional> = actions.options.map { if (it.value.allowAnywhere) AllowAnywhereOption(it.key, it.value) else DisallowMultipleUseNonPositional(it.key) }
 
     override fun accept(args: List<String>, context: ParseContext): ParseResult {
         if (this.action != null) {
@@ -90,6 +90,24 @@ internal abstract class AbstractActionParameter<T : Action>(
         }
     }
 
+    private inner class DisallowMultipleUseNonPositional(val name: String) : NonPositional {
+        override fun usage(): List<NonPositionalUsage> {
+            return emptyList()
+        }
+
+        override fun accept(args: List<String>, context: ParseContext): ParseResult {
+            return ParseResult.Nothing
+        }
+
+        override fun stoppedAt(arg: String): NonPositional.StopResult {
+            return if (arg == name && action != null) {
+                NonPositional.StopResult.Failure(ArgParseException("Cannot use $name here."))
+            } else {
+                NonPositional.StopResult.Nothing
+            }
+        }
+    }
+
     private inner class AllowAnywhereOption(val name: String, val option: ActionDetails<T>) : NonPositional {
 
         override fun toString(): String {
@@ -100,8 +118,8 @@ internal abstract class AbstractActionParameter<T : Action>(
             return emptyList()
         }
 
-        override fun accepts(arg: String): Boolean {
-            return arg == name
+        override fun stoppedAt(arg: String): NonPositional.StopResult {
+            return if (arg == name) NonPositional.StopResult.Recognized else NonPositional.StopResult.Nothing
         }
 
         override fun accept(args: List<String>, context: ParseContext): ParseResult {

@@ -43,7 +43,7 @@ class IntOptionTest : AbstractActionTest() {
     }
 
     @Test
-    fun `can provide default value for int option`() {
+    fun `can provide default value for option`() {
         class Option : Action() {
             val option by int().option("opt").whenAbsent(45)
         }
@@ -73,5 +73,16 @@ class IntOptionTest : AbstractActionTest() {
         }
 
         parseFails(::Option, listOf("-o", "abc"), "Value for option -o is not an integer: abc")
+    }
+
+    @Test
+    fun `fails when flag used and argument is not an integer`() {
+        class Option : Action() {
+            val option by int().option("o")
+            val other by flag("f", "flag")
+        }
+
+        parseFails(::Option, listOf("-o", "abc", "--flag"), "Value for option -o is not an integer: abc")
+        parseFails(::Option, listOf("-o", "abc", "--unknown"), "Value for option -o is not an integer: abc")
     }
 }

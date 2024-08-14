@@ -54,6 +54,10 @@ data object LinuxX64 : Linux() {
 }
 
 data object LinuxArm64 : Linux() {
+    override fun canBuild(machine: NativeMachine): Boolean {
+        return false
+    }
+
     override val machine: NativeMachine
         get() = throw UnsupportedOperationException("Not supported yet")
 }

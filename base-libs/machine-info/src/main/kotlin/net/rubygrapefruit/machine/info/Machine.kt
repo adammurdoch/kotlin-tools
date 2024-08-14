@@ -6,11 +6,12 @@ import java.io.ByteArrayOutputStream
  * Contains information about the host operating system family and CPU architecture.
  */
 sealed class Machine {
-    sealed class Windows: Machine()
+    sealed class Windows : Machine()
     data object WindowsX64 : Windows()
 
-    sealed class Linux: Machine()
+    sealed class Linux : Machine()
     data object LinuxX64 : Linux()
+    data object LinuxArm64 : Linux()
 
     sealed class MacOS : Machine()
     data object MacOSArm64 : MacOS()
@@ -20,7 +21,11 @@ sealed class Machine {
         val thisMachine by lazy {
             val osName = System.getProperty("os.name")
             if (osName.contains("linux", true)) {
-                LinuxX64
+                if (System.getProperty("os.arch") == "aarch64") {
+                    LinuxArm64
+                } else {
+                    LinuxX64
+                }
             } else if (osName.contains("windows", true)) {
                 WindowsX64
             } else if (osName.contains("Mac OS X")) {

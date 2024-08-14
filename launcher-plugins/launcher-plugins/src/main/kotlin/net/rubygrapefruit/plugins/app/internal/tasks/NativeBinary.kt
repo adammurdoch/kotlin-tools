@@ -46,6 +46,11 @@ abstract class NativeBinary : DefaultTask() {
                 Args(URI("https://download.oracle.com/graalvm/${jdkVersion}/latest/${baseName}_bin.tar.gz"), baseName, "bin")
             }
 
+            LinuxArm64 -> {
+                val baseName = "graalvm-jdk-${jdkVersion}_linux-aarch64"
+                Args(URI("https://download.oracle.com/graalvm/${jdkVersion}/latest/${baseName}_bin.tar.gz"), baseName, "bin")
+            }
+
             MacOsX64 -> {
                 val baseName = "graalvm-jdk-${jdkVersion}_macos-x64"
                 Args(URI("https://download.oracle.com/graalvm/${jdkVersion}/latest/${baseName}_bin.tar.gz"), baseName, "Contents/Home/bin", binPrefix = listOf("arch", "-arch", "x86_64"))

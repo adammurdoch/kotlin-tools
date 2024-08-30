@@ -19,7 +19,7 @@ class StoreApp : CliApp("jvm-store-cli-app") {
 }
 
 abstract class AbstractStoreCommand : CliAction() {
-    private val store by dir().parameter("store", help = "The store to use")
+    private val store by dir(mustExist = false).parameter("store", help = "The store to use")
 
     override fun run() {
         Store.open(store, discard = discard).use {

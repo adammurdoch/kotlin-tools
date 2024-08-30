@@ -1,6 +1,9 @@
 
 # TODO
 
+- Expose path to launcher within a distribution
+  - Allows the launcher to be located in a copy of the distribution
+- Expose host machine to plugins
 - Move JVM test dependency declarations into library and application blocks
 - Don't add a dist task when there is no source for the current target (eg native-launcher on linux)
 - Native-launcher: fix Windows

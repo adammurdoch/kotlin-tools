@@ -4,12 +4,12 @@ plugins {
 }
 
 object Constants {
-    val kotlin = "2.0.0"
-    val serializationPlugin = "2.0.0"
-    val serializationLibrary = "1.7.0"
-    val coroutines = "1.9.0-RC"
-    val dateTime = "0.6.0"
-    val ksp = "2.0.0-1.0.22"
+    val kotlin = "2.0.20"
+    val serializationPlugin = "2.0.20"
+    val serializationLibrary = "1.7.2"
+    val coroutines = "1.9.0-RC.2"
+    val dateTime = "0.6.1"
+    val ksp = "2.0.20-1.0.24"
     val java = 17
     val pluginsJava = 11
 

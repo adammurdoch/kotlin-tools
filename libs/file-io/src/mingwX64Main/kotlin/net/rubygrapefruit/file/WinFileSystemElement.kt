@@ -195,7 +195,7 @@ private class WinDirectoryEntry(private val parentPath: WinPath, override val na
         get() = parentPath.resolve(name)
 
     override fun snapshot(): Result<ElementSnapshot> {
-        TODO()
+        return metadata(path.absolutePath).map { WinElementSnapshot(path, it) }
     }
 
     override fun toDir(): Directory {

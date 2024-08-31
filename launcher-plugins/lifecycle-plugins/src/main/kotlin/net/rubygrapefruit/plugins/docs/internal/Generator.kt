@@ -17,34 +17,39 @@ class Generator {
     fun generate(sourceFiles: List<Path>, outputFile: Path, outputDir: Path) {
         val sourceInfo = parse(sourceFiles)
         val outputFiles = outputFiles(sourceInfo, outputFile, outputDir)
-        outputFiles.entryFile.render()
-        outputFiles.files.iterator().forEach { file ->
+        for (file in outputFiles) {
             file.render()
         }
     }
 
-    private fun outputFiles(sourceInfo: List<SourceFile>, outputFile: Path, outputDir: Path): OutputFiles {
-        val entryFile = sourceInfo.find { it.name == outputFile.name }
+    private fun outputFiles(sourceFiles: List<SourceFile>, outputFile: Path, outputDir: Path): List<OutputFile> {
+        val entryFile = sourceFiles.find { it.name == outputFile.name }
         if (entryFile == null) {
             throw IllegalArgumentException("Could not locate source file ${outputFile.name}")
         }
-        entryFile.node.accept(object : AbstractVisitor() {
-            override fun visit(link: Link) {
-                val target = sourceInfo.find { it.name == link.destination }
-                if (target != null) {
-                    val targetFile = outputDir.resolve(target.name)
-                    link.destination = targetFile.relativeTo(outputFile.parent).pathString
-                }
-            }
-        })
-        val otherFiles = sourceInfo.mapNotNull { sourceFile ->
+
+        val outputFiles = sourceFiles.map { sourceFile ->
             if (sourceFile == entryFile) {
-                null
+                OutputFile(outputFile, sourceFile)
             } else {
-                OutputFile(sourceFile.name, outputDir.resolve(sourceFile.name), sourceFile)
+                OutputFile(outputDir.resolve(sourceFile.name), sourceFile)
             }
         }
-        return OutputFiles(OutputFile(entryFile.name, outputFile, entryFile), otherFiles)
+        val locations = outputFiles.associateBy { it.sourceFile.file }
+
+        for (outputFile in outputFiles) {
+            outputFile.sourceFile.node.accept(object : AbstractVisitor() {
+                override fun visit(link: Link) {
+                    val target = locations[outputFile.sourceFile.file.parent.resolve(link.destination)]
+                    if (target != null) {
+                        link.destination = target.file.relativeTo(outputFile.file.parent).pathString
+                    } else {
+                        throw IllegalArgumentException("Could not locate target for link: ${link.destination}")
+                    }
+                }
+            })
+        }
+        return outputFiles
     }
 
     private fun parse(sourceFiles: List<Path>): List<SourceFile> {

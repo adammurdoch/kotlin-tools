@@ -2,9 +2,11 @@ package net.rubygrapefruit.plugins.docs.internal
 
 import org.commonmark.node.AbstractVisitor
 import org.commonmark.node.Link
+import org.commonmark.node.Text
 import org.commonmark.parser.Parser
 import org.commonmark.renderer.markdown.MarkdownRenderer
 import java.nio.file.Path
+import java.util.regex.Pattern
 import kotlin.io.path.bufferedWriter
 import kotlin.io.path.name
 import kotlin.io.path.pathString
@@ -40,11 +42,24 @@ class Generator {
         for (outputFile in outputFiles) {
             outputFile.sourceFile.node.accept(object : AbstractVisitor() {
                 override fun visit(link: Link) {
-                    val target = locations[outputFile.sourceFile.file.parent.resolve(link.destination)]
+                    link.destination = mapLink(link.destination)
+                }
+
+                override fun visit(text: Text) {
+                    val pattern = Pattern.compile("\\(([^)]+)\\)")
+                    val matcher = pattern.matcher(text.literal)
+                    if (matcher.find()) {
+                        val destination = matcher.group(1)
+                        text.literal = destination
+                    }
+                }
+
+                private fun mapLink(destination: String): String {
+                    val target = locations[outputFile.sourceFile.file.parent.resolve(destination)]
                     if (target != null) {
-                        link.destination = target.file.relativeTo(outputFile.file.parent).pathString
+                        return target.file.relativeTo(outputFile.file.parent).pathString
                     } else {
-                        throw IllegalArgumentException("Could not locate target for link: ${link.destination}")
+                        throw IllegalArgumentException("Could not locate target for link: ${destination}")
                     }
                 }
             })

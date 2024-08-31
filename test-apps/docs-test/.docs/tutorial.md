@@ -6,4 +6,4 @@
 
 Use the library.
 
-See [reference](reference.md) or (reference.md).
+See [reference](reference.md)

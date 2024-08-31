@@ -1,6 +1,7 @@
 package net.rubygrapefruit.plugins.docs.internal
 
 import org.commonmark.node.AbstractVisitor
+import org.commonmark.node.Heading
 import org.commonmark.node.Link
 import org.commonmark.node.Node
 import org.commonmark.node.Text
@@ -43,7 +44,7 @@ class Generator {
         for (outputFile in outputFiles) {
             outputFile.sourceFile.node.accept(object : AbstractVisitor() {
                 override fun visit(link: Link) {
-                    link.destination = mapLink(link.destination)
+                    link.destination = mapLink(link.destination).first
                 }
 
                 override fun visit(text: Text) {
@@ -62,8 +63,18 @@ class Generator {
 
                         val destination = matcher.group(1)
                         val link = Link()
-                        link.destination = mapLink(destination)
-                        link.appendChild(Text(destination))
+                        val target = mapLink(destination)
+                        link.destination = target.first
+                        val title = target.second.sourceFile.title
+                        if (title != null) {
+                            title.accept(object : AbstractVisitor() {
+                                override fun visit(text: Text) {
+                                    link.appendChild(Text(text.literal))
+                                }
+                            })
+                        } else {
+                            link.appendChild(Text(destination))
+                        }
 
                         val fragment = text.literal.substring(pos, matcher.start())
                         if (prev == null) {
@@ -82,10 +93,10 @@ class Generator {
                     }
                 }
 
-                private fun mapLink(destination: String): String {
+                private fun mapLink(destination: String): Pair<String, OutputFile> {
                     val target = locations[outputFile.sourceFile.file.parent.resolve(destination)]
                     if (target != null) {
-                        return target.file.relativeTo(outputFile.file.parent).pathString
+                        return Pair(target.file.relativeTo(outputFile.file.parent).pathString, target)
                     } else {
                         throw IllegalArgumentException("Could not locate target for link: ${destination}")
                     }
@@ -98,7 +109,16 @@ class Generator {
     private fun parse(sourceFiles: List<Path>): List<SourceFile> {
         val parser = Parser.builder().build()
         return sourceFiles.map { sourceFile ->
-            SourceFile(sourceFile, parser.parse(sourceFile.readText()))
+            val node = parser.parse(sourceFile.readText())
+            var title: Heading? = null
+            node.accept(object : AbstractVisitor() {
+                override fun visit(heading: Heading) {
+                    if (heading.level == 1) {
+                        title = heading
+                    }
+                }
+            })
+            SourceFile(sourceFile, node, title)
         }
     }
 

@@ -3,6 +3,6 @@
 
 This is a simple library with generated documentation.
 
-Try the [tutorial](tutorial.md) or see [reference](reference.md) for details.
+Try the [tutorial](tutorial.md) or see the [reference](reference.md) for details.
 
-Links: (README.md), (tutorial.md) and (reference.md)
+Links: [home](README.md), (README.md), (tutorial.md) and (reference.md)

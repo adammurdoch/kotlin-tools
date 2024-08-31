@@ -2,7 +2,7 @@
   This document was generated from ../src/docs/tutorial.md 
 -->
 
-# How to use
+# Tutorial
 
 Use the library.
 

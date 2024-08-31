@@ -2,6 +2,8 @@
   This document was generated from ../src/docs/reference.md 
 -->
 
+# Reference
+
 some reference material.
 
-Links: [README.md](../README.md), [tutorial.md](tutorial.md) and [reference.md](reference.md)
+Links: [Test library](../README.md), [Tutorial](tutorial.md) and [Reference](reference.md)

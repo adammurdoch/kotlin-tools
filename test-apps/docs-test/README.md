@@ -6,6 +6,4 @@
 
 This is a simple library with generated documentation.
 
-Try the [tutorial](.docs/tutorial.md) or see the [reference](.docs/reference.md) for details.
-
-Links: [home](README.md), [Test library](README.md), [Tutorial](.docs/tutorial.md) and [Reference](.docs/reference.md)
+Try the [Tutorial](.docs/tutorial.md) or see the [Reference](.docs/reference.md) for details.

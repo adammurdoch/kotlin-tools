@@ -4,6 +4,6 @@
 
 # Tutorial
 
-Use the library.
+This is how you use the library.
 
-See [reference](reference.md)
+See [Reference](reference.md) for more details.

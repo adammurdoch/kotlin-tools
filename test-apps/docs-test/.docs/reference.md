@@ -4,6 +4,4 @@
 
 # Reference
 
-some reference material.
-
-Links: [Test library](../README.md), [Tutorial](tutorial.md) and [Reference](reference.md)
+Library reference material.

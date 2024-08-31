@@ -4,4 +4,4 @@
 
 some reference material.
 
-Links: (README.md), (tutorial.md) and (reference.md)[README.md](../README.md)
+Links: [README.md](../README.md), [tutorial.md](tutorial.md) and [reference.md](reference.md)

@@ -2,6 +2,7 @@ package net.rubygrapefruit.plugins.docs.internal
 
 import org.commonmark.node.AbstractVisitor
 import org.commonmark.node.Link
+import org.commonmark.node.Node
 import org.commonmark.node.Text
 import org.commonmark.parser.Parser
 import org.commonmark.renderer.markdown.MarkdownRenderer
@@ -48,12 +49,36 @@ class Generator {
                 override fun visit(text: Text) {
                     val pattern = Pattern.compile("\\(([^)]+)\\)")
                     val matcher = pattern.matcher(text.literal)
-                    if (matcher.find()) {
+                    var prev: Node? = null
+                    var pos = 0
+                    while (pos < text.literal.length) {
+                        if (!matcher.find(pos)) {
+                            if (prev != null) {
+                                prev.insertAfter(Text(text.literal.substring(pos)))
+                            }
+                            // Else, no matches in string
+                            break
+                        }
+
                         val destination = matcher.group(1)
                         val link = Link()
                         link.destination = mapLink(destination)
                         link.appendChild(Text(destination))
-                        text.insertAfter(link)
+
+                        val fragment = text.literal.substring(pos, matcher.start())
+                        if (prev == null) {
+                            prev = Text(fragment)
+                            text.insertAfter(prev)
+                            text.unlink()
+                        } else if (fragment.isNotEmpty()) {
+                            val next = Text(fragment)
+                            prev.insertAfter(next)
+                            prev = next
+                        }
+
+                        prev.insertAfter(link)
+                        pos = matcher.end()
+                        prev = link
                     }
                 }
 

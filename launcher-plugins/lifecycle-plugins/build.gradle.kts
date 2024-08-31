@@ -6,6 +6,10 @@ plugins {
 
 group = Versions.plugins.group
 
+dependencies {
+    implementation("org.commonmark:commonmark:0.22.0")
+}
+
 gradlePlugin {
     plugins {
         create("docs") {

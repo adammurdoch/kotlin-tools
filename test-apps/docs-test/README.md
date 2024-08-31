@@ -1,5 +1,9 @@
+<!--
+  This document was generated from src/docs/README.md 
+-->
+
 # Test library
 
 This is a simple library with generated documentation.
 
-See [reference](.docs/reference.md) for details or (reference.md)
+Try the [tutorial](.docs/tutorial.md) or see [reference](.docs/reference.md) for details

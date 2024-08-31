@@ -3,4 +3,4 @@
 
 This is a simple library with generated documentation.
 
-See [reference](reference.md) for details or (reference.md)
+Try the [tutorial](tutorial.md) or see [reference](reference.md) for details

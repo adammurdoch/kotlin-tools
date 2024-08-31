@@ -17,15 +17,9 @@ class Generator {
     fun generate(sourceFiles: List<Path>, outputFile: Path, outputDir: Path) {
         val sourceInfo = parse(sourceFiles)
         val outputFiles = outputFiles(sourceInfo, outputFile, outputDir)
-        outputFiles.entryFile.renderTo(outputFile)
+        outputFiles.entryFile.render()
         outputFiles.files.iterator().forEach { file ->
-            file.renderTo(outputDir.resolve(file.path))
-        }
-    }
-
-    private fun OutputFile.renderTo(outputFile: Path) {
-        outputFile.bufferedWriter().use { writer ->
-            renderer.render(node, writer)
+            file.render()
         }
     }
 
@@ -47,16 +41,31 @@ class Generator {
             if (sourceFile == entryFile) {
                 null
             } else {
-                OutputFile(sourceFile.name, sourceFile)
+                OutputFile(sourceFile.name, outputDir.resolve(sourceFile.name), sourceFile)
             }
         }
-        return OutputFiles(OutputFile(entryFile.name, entryFile), otherFiles)
+        return OutputFiles(OutputFile(entryFile.name, outputFile, entryFile), otherFiles)
     }
 
     private fun parse(sourceFiles: List<Path>): List<SourceFile> {
         val parser = Parser.builder().build()
         return sourceFiles.map { sourceFile ->
             SourceFile(sourceFile, parser.parse(sourceFile.readText()))
+        }
+    }
+
+    private fun OutputFile.render() {
+        file.bufferedWriter().use { writer ->
+            writer.write(
+                """
+                <!--
+                  This document was generated from ${sourceFile.file.relativeTo(file.parent)} 
+                -->
+
+
+                """.trimIndent()
+            )
+            renderer.render(node, writer)
         }
     }
 }

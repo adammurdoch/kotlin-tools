@@ -50,7 +50,10 @@ class Generator {
                     val matcher = pattern.matcher(text.literal)
                     if (matcher.find()) {
                         val destination = matcher.group(1)
-                        text.literal = destination
+                        val link = Link()
+                        link.destination = mapLink(destination)
+                        link.appendChild(Text(destination))
+                        text.insertAfter(link)
                     }
                 }
 

@@ -1,3 +1,5 @@
-This is the README.
+# Test library
 
-See [reference](src/docs/reference.md)
+This is a simple library with generated documentation.
+
+See [reference](.docs/reference.md) for details or (reference.md)

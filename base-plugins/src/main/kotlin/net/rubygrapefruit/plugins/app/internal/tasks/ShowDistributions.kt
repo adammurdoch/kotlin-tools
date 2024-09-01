@@ -22,10 +22,15 @@ abstract class ShowDistributions : DefaultTask() {
             require(distribution is DefaultDistribution)
             println()
             print("Name: ${distribution.name}")
+            if (!(distribution.canBuildForHostMachine)) {
+                print(" (not buildable)")
+            }
             if (distribution.isDefault) {
                 print(" (DEFAULT)")
             }
             println()
+            println("Target machine: ${distribution.targetMachine}")
+            println("Build type: ${distribution.buildType}")
             println("Dist task: ${distribution.distTask.name}")
             println("Image dir: ${distribution.imageDirectory.get()}")
             println("Launcher path: ${distribution.launcherFilePath.get()}")

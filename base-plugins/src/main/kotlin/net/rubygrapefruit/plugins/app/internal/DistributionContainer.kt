@@ -1,6 +1,8 @@
 package net.rubygrapefruit.plugins.app.internal
 
+import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.Distribution
+import net.rubygrapefruit.plugins.app.NativeMachine
 import net.rubygrapefruit.plugins.app.internal.tasks.DistributionImage
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
@@ -14,9 +16,13 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
 
     val distribution: Provider<Distribution> = providers.provider { distContainer.all.find { it.isDefault } }
 
-    fun add(name: String, isDefault: Boolean, canBuildForHostMachine: Boolean): DefaultDistribution {
+    fun add(name: String, isDefault: Boolean, canBuildForHostMachine: Boolean, targetMachine: NativeMachine?, buildType: BuildType): DefaultDistribution {
         val distTask = tasks.register(DefaultDistribution.taskName(name, "dist"), DistributionImage::class.java)
-        val dist = objects.newInstance(DefaultDistribution::class.java, name, isDefault, canBuildForHostMachine, distTask)
+        val dist = if (targetMachine != null) {
+            objects.newInstance(DefaultDistribution::class.java, name, isDefault, canBuildForHostMachine, targetMachine, buildType, distTask)
+        } else {
+            objects.newInstance(DefaultPlatformIndependentDistribution::class.java, name, isDefault, canBuildForHostMachine, buildType, distTask)
+        }
         distContainer.add(dist)
         return dist
     }

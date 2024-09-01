@@ -1,5 +1,6 @@
 package net.rubygrapefruit.plugins.app.internal
 
+import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.JvmApplication
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
@@ -21,6 +22,6 @@ abstract class DefaultJvmCliApplication @Inject constructor(
     override val runtimeModulePath: ConfigurableFileCollection = objects.fileCollection()
 
     init {
-        distributionContainer.add("main", true, true)
+        distributionContainer.add("main", true, true, null, BuildType.Release)
     }
 }

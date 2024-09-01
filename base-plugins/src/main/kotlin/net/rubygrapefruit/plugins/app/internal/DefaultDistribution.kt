@@ -1,6 +1,8 @@
 package net.rubygrapefruit.plugins.app.internal
 
+import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.Distribution
+import net.rubygrapefruit.plugins.app.NativeMachine
 import net.rubygrapefruit.plugins.app.internal.tasks.DistributionImage
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
@@ -14,6 +16,8 @@ abstract class DefaultDistribution @Inject constructor(
     override val name: String,
     val isDefault: Boolean,
     val canBuildForHostMachine: Boolean,
+    val targetMachine: NativeMachine?,
+    val buildType: BuildType,
     val distTask: TaskProvider<DistributionImage>,
     factory: ObjectFactory
 ) : Distribution {

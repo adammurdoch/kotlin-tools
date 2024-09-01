@@ -14,7 +14,6 @@ abstract class ShowDistributions : DefaultTask() {
     @TaskAction
     fun report() {
         val app = app.get()
-        val defaultDist = app.distribution.get()
 
         println("Application: ${app.appName.get()}")
         println()
@@ -23,11 +22,12 @@ abstract class ShowDistributions : DefaultTask() {
             require(distribution is DefaultDistribution)
             println()
             print("Name: ${distribution.name}")
-            if (distribution == defaultDist) {
+            if (distribution.isDefault) {
                 print(" (DEFAULT)")
             }
             println()
-            println("Install dir: ${distribution.imageDirectory.get()}")
+            println("Dist task: ${distribution.distTask.name}")
+            println("Image dir: ${distribution.imageDirectory.get()}")
             println("Launcher path: ${distribution.launcherFilePath.get()}")
         }
     }

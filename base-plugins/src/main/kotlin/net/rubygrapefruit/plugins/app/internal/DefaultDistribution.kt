@@ -17,13 +17,19 @@ abstract class DefaultDistribution @Inject constructor(
     val distTask: TaskProvider<DistributionImage>,
     factory: ObjectFactory
 ) : Distribution {
+    companion object {
+        fun taskName(distName: String, taskName: String): String {
+            return "$distName${taskName.capitalize()}"
+        }
+    }
+
     /**
      * The launcher file to copy into the distribution image.
      */
     val launcherFile: RegularFileProperty = factory.fileProperty()
 
     /**
-     * The location in the distribution image to copy the launcher file to.
+     * The destination location in the distribution image for the launcher file.
      */
     val launcherFilePath: Property<String> = factory.property(String::class.java)
 
@@ -31,11 +37,16 @@ abstract class DefaultDistribution @Inject constructor(
 
     override val launcherOutputFile: RegularFileProperty = factory.fileProperty()
 
-    fun name(base: String): String {
-        return if (isDefault) {
-            base
-        } else {
-            "$base-$name"
+    val imageBaseDir: String
+        get() {
+            return if (isDefault) {
+                "dist"
+            } else {
+                "dist-images/$name"
+            }
         }
+
+    fun taskName(base: String): String {
+        return taskName(name, base)
     }
 }

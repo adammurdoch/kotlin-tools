@@ -20,7 +20,7 @@ open class ApplicationRegistry(private val project: Project) {
         val distTask = project.tasks.register("dist", Distributions::class.java)
 
         app.distributionContainer.each { dist ->
-            dist.imageDirectory.convention(project.layout.buildDirectory.dir(dist.name("dist-image")))
+            dist.imageDirectory.convention(project.layout.buildDirectory.dir(dist.imageBaseDir))
             dist.launcherFilePath.convention(app.appName)
 
             val distImageTask = dist.distTask

@@ -31,10 +31,12 @@ sealed class Machine {
             } else if (osName.contains("Mac OS X")) {
                 val architecture = Arch.getArchitecture()
                 println("-> HOST ARCH: " + architecture);
-                if (architecture.equals("arm64")) {
+                if (architecture.startsWith("Apple")) {
                     MacOSArm64
-                } else {
+                } else if (architecture.startsWith("Intel")){
                     MacOSX64
+                } else {
+                    throw IllegalStateException("Could not determine machine architecture using machine '$architecture'.");
                 }
             } else {
                 throw IllegalStateException("Could not determine the OS family of this machine using OS name '$osName'.")

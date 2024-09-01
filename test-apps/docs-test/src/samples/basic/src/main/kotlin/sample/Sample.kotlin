@@ -1,0 +1,7 @@
+package sample
+
+import lib.Library
+
+fun main(args: Array<String>) {
+    val lib = Library()
+}

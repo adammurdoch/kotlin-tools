@@ -1,6 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.BuildType
+import net.rubygrapefruit.plugins.app.internal.DefaultHasLauncherScriptsDistribution
 import net.rubygrapefruit.plugins.app.internal.DefaultJvmCliApplication
 import net.rubygrapefruit.plugins.app.internal.JvmApplicationWithLauncherScripts
 import net.rubygrapefruit.plugins.app.internal.applications
@@ -35,7 +36,7 @@ class JvmCliApplicationPlugin : Plugin<Project> {
                     it.modulePath.set(libNames)
                 }
 
-                app.distributionContainer.add("launcherScripts", true, true, null, BuildType.Release)
+                app.distributionContainer.add("launcherScripts", true, BuildType.Release, DefaultHasLauncherScriptsDistribution::class.java)
 
                 app.distributionContainer.each { dist ->
                     dist.launcherFile.set(launcherTask.flatMap { it.scriptFile })

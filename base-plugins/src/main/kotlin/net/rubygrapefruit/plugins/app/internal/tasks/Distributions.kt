@@ -5,8 +5,10 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 import java.util.concurrent.Callable
+import kotlin.io.path.relativeTo
 
 abstract class Distributions : DefaultTask() {
     @get:Option(option = "all", description = "Builds distributions for all targets")
@@ -30,5 +32,14 @@ abstract class Distributions : DefaultTask() {
                 }
             }
         })
+    }
+
+    @TaskAction
+    fun report() {
+        if (!all.get()) {
+            println("Installed into ${defaultDistribution.get().imageOutputDirectory.get()}")
+            val launcher = defaultDistribution.get().launcherOutputFile.get().asFile.toPath()
+            println("Run using: $launcher")
+        }
     }
 }

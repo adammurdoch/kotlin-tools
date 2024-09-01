@@ -17,6 +17,13 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
 
     val distribution: Property<Distribution> = objects.property(Distribution::class.java)
 
+    fun <T: DefaultPlatformIndependentDistribution> add(name: String, isDefault: Boolean, buildType: BuildType, type: Class<T>): T {
+        val distTask = tasks.register(DefaultDistribution.taskName(name, "dist"), DistributionImage::class.java)
+        val dist = objects.newInstance(type, name, true, buildType, distTask, distribution)
+        addDist(dist, isDefault)
+        return dist
+    }
+
     fun add(name: String, isDefault: Boolean, canBuildForHostMachine: Boolean, targetMachine: NativeMachine?, buildType: BuildType): DefaultDistribution {
         val distTask = tasks.register(DefaultDistribution.taskName(name, "dist"), DistributionImage::class.java)
         val dist = if (targetMachine != null) {
@@ -24,11 +31,15 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
         } else {
             objects.newInstance(DefaultPlatformIndependentDistribution::class.java, name, canBuildForHostMachine, buildType, distTask, distribution)
         }
+        addDist(dist, isDefault)
+        return dist
+    }
+
+    private fun addDist(dist: DefaultDistribution, isDefault: Boolean) {
         distContainer.add(dist)
         if (isDefault) {
             distribution.set(dist)
         }
-        return dist
     }
 
     fun each(action: (DefaultDistribution) -> Unit) {

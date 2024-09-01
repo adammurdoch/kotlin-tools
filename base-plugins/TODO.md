@@ -3,6 +3,7 @@
 
 - Use subtypes for each distribution, only configure matching distribution types
 - Expose `.bat` as the launcher on Windows
+- Add a `run` task
 - Use correct target machine for embedded JVM distributions
   - Currently, uses whichever JVM architecture that Gradle decides to use
 - Add distribution for each platform for native binary JVM app

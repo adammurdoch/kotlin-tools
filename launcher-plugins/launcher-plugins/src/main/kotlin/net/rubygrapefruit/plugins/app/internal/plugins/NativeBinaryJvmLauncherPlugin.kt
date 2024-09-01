@@ -1,5 +1,6 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
+import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.internal.HostMachine
 import net.rubygrapefruit.plugins.app.internal.JvmApplicationWithNativeBinary
 import net.rubygrapefruit.plugins.app.internal.MutableJvmApplication
@@ -22,6 +23,8 @@ class NativeBinaryJvmLauncherPlugin : Plugin<Project> {
                     it.javaVersion.set(app.targetJavaVersion)
                     it.modulePath.from(app.runtimeModulePath)
                 }
+
+                app.distributionContainer.add("embeddedJvm", true, true, HostMachine.current.machine, BuildType.Release)
 
                 app.distributionContainer.each { dist ->
                     dist.launcherFilePath.set(app.appName.map { HostMachine.current.exeName(it) })

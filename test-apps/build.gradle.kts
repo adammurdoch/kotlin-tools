@@ -61,7 +61,7 @@ class JvmCliApp(private val name: String, private val embeddedJvm: Boolean) : Ap
         }
 
     override val distDirName: String
-        get() = "build/dist-image"
+        get() = "build/dist"
 
     override val nativeBinaryPath = if (embeddedJvm) {
         Machine.thisMachine.executableName("jvm/bin/java")
@@ -87,7 +87,7 @@ class NativeBinaryCliApp(private val name: String) : AppNature() {
     }
 
     override val distDirName: String
-        get() = "build/dist-image"
+        get() = "build/dist"
 
     override val cliLauncherPath: String
         get() = Machine.thisMachine.executableName(name)
@@ -113,7 +113,7 @@ class UiApp(private val appName: String) : AppNature() {
     }
 
     override val distDirName: String
-        get() = "build/dist-image/${appName}.app"
+        get() = "build/dist/${appName}.app"
 
     override val cliLauncherPath: String?
         get() = null

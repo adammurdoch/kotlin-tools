@@ -1,9 +1,9 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
+import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.internal.DefaultJvmCliApplication
 import net.rubygrapefruit.plugins.app.internal.JvmApplicationWithLauncherScripts
 import net.rubygrapefruit.plugins.app.internal.applications
-import net.rubygrapefruit.plugins.app.internal.tasks.RuntimeModulePath
 import net.rubygrapefruit.plugins.app.internal.tasks.LauncherBashScript
 import net.rubygrapefruit.plugins.app.internal.tasks.LauncherBatScript
 import org.gradle.api.Plugin
@@ -34,6 +34,8 @@ class JvmCliApplicationPlugin : Plugin<Project> {
                     it.javaLauncherPath.set(app.javaLauncherPath)
                     it.modulePath.set(libNames)
                 }
+
+                app.distributionContainer.add("main", true, true, null, BuildType.Release)
 
                 app.distributionContainer.each { dist ->
                     dist.launcherFile.set(launcherTask.flatMap { it.scriptFile })

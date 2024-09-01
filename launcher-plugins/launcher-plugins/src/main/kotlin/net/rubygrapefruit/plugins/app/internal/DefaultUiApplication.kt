@@ -14,7 +14,7 @@ abstract class DefaultUiApplication(
     providers: ProviderFactory,
     project: Project
 ) : MutableApplication, UiApplication {
-    protected val targets = NativeTargetsContainer(objects, providers, project.tasks)
+    val targets = NativeTargetsContainer(objects, providers, project.tasks)
 
     final override val distributionContainer = targets.distributions
 

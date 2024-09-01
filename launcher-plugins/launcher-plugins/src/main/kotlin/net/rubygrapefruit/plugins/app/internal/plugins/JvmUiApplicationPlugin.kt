@@ -1,6 +1,9 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
+import net.rubygrapefruit.plugins.app.BuildType
+import net.rubygrapefruit.plugins.app.NativeMachine
 import net.rubygrapefruit.plugins.app.internal.DefaultJvmUiApplication
+import net.rubygrapefruit.plugins.app.internal.HostMachine
 import net.rubygrapefruit.plugins.app.internal.applications
 import net.rubygrapefruit.plugins.app.internal.tasks.LauncherConf
 import net.rubygrapefruit.plugins.app.internal.tasks.NativeUiLauncher
@@ -12,8 +15,8 @@ class JvmUiApplicationPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             plugins.apply(JvmApplicationBasePlugin::class.java)
-            plugins.apply(UiApplicationBasePlugin::class.java)
             plugins.apply(EmbeddedJvmLauncherPlugin::class.java)
+            plugins.apply(UiApplicationBasePlugin::class.java)
 
             applications.withApp<DefaultJvmUiApplication> { app ->
                 val capitalizedAppName = app.capitalizedAppName
@@ -26,6 +29,10 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                     it.module.set(app.module.name)
                     it.mainClass.set(app.mainClass)
                 }
+
+                // TODO - 'can build' flag is incorrect - it depends on the JVM to be embedded
+                app.targets.add(NativeMachine.MacOSArm64, listOf(BuildType.Release), HostMachine.current.machine == NativeMachine.MacOSArm64)
+                app.targets.add(NativeMachine.MacOSX64, listOf(BuildType.Release), HostMachine.current.machine == NativeMachine.MacOSX64)
 
                 app.eachTarget { machine, dist ->
                     val nativeBinary = configurations.create("nativeBinaries${dist.name}") {

@@ -1,5 +1,6 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
+import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.internal.JvmApplicationWithEmbeddedJvm
 import net.rubygrapefruit.plugins.app.internal.MutableJvmApplication
 import net.rubygrapefruit.plugins.app.internal.applications
@@ -26,6 +27,8 @@ open class EmbeddedJvmLauncherPlugin : Plugin<Project> {
                     val launcher = toolchainService.launcherFor(javaExtension.toolchain)
                     t.jlinkPath.set(launcher.map { it.executablePath.asFile.toPath().parent.resolve("jlink").pathString })
                 }
+
+                app.distributionContainer.add("embeddedJvm", true, true, null, BuildType.Release)
 
                 val jvmDir = "jvm"
                 app.javaLauncherPath.set("$jvmDir/bin/java")

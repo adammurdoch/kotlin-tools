@@ -1,8 +1,6 @@
 package net.rubygrapefruit.plugins.app.internal
 
-import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.JvmUiApplication
-import net.rubygrapefruit.plugins.app.NativeMachine
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
@@ -19,11 +17,6 @@ abstract class DefaultJvmUiApplication @Inject constructor(
     override var packaging: JvmApplicationPackaging = JvmApplicationWithEmbeddedJvm()
 
     override val runtimeModulePath: ConfigurableFileCollection = objects.fileCollection()
-
-    init {
-        targets.add(NativeMachine.MacOSArm64, listOf(BuildType.Release), HostMachine.current.machine == NativeMachine.MacOSArm64)
-        targets.add(NativeMachine.MacOSX64, listOf(BuildType.Release), HostMachine.current.machine == NativeMachine.MacOSX64)
-    }
 
     override fun dependencies(config: KotlinDependencyHandler.() -> Unit) {
         project.jvmKotlin.sourceSets.getByName("main").dependencies { config() }

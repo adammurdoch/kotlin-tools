@@ -365,6 +365,10 @@ tasks.register("runMin") {
     dependsOn(runTasks.filterKeys { it.allPlatforms }.values)
 }
 
+tasks.register("showDistributions") {
+    dependsOn(sampleApps.map { ":${it.name}:showDistributions" })
+}
+
 val openTasks = uiApps.map { app ->
     tasks.register("open-${app.name}") {
         dependsOn(":${app.name}:dist")

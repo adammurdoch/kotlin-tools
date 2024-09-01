@@ -35,7 +35,7 @@ class JvmCliApplicationPlugin : Plugin<Project> {
                     it.modulePath.set(libNames)
                 }
 
-                app.distributionContainer.add("main", true, true, null, BuildType.Release)
+                app.distributionContainer.add("launcherScripts", true, true, null, BuildType.Release)
 
                 app.distributionContainer.each { dist ->
                     dist.launcherFile.set(launcherTask.flatMap { it.scriptFile })

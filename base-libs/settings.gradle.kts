@@ -8,3 +8,4 @@ plugins {
 
 include("bytecode")
 include("machine-info")
+include("cpu-info")

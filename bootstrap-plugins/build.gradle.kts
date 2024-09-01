@@ -47,6 +47,10 @@ gradlePlugin {
             id = "net.rubygrapefruit.bootstrap.jvm.lib"
             implementationClass = "net.rubygrapefruit.plugins.bootstrap.JvmLibraryPlugin"
         }
+        create("jni-lib") {
+            id = "net.rubygrapefruit.bootstrap.jni.lib"
+            implementationClass = "net.rubygrapefruit.plugins.bootstrap.JniLibraryPlugin"
+        }
         create("gradle-plugin") {
             id = "net.rubygrapefruit.bootstrap.gradle-plugin"
             implementationClass = "net.rubygrapefruit.plugins.bootstrap.JvmGradlePlugin"

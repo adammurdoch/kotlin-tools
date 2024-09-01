@@ -51,14 +51,10 @@ class JvmCliApp(private val name: String, private val embeddedJvm: Boolean) : Ap
     }
 
     override val cliLauncherPath: String
-        get() = if (Machine.thisMachine is Machine.Windows) {
-            "$name.bat"
-        } else {
-            name
-        }
+        get() = Machine.thisMachine.scriptName(name)
 
     override val cliLauncherPrefix: List<String>
-        get() = if (Machine.thisMachine is Machine.Windows) {
+        get() = if (Machine.thisMachine.isWindows) {
             listOf("cmd", "/C")
         } else {
             emptyList()
@@ -68,11 +64,7 @@ class JvmCliApp(private val name: String, private val embeddedJvm: Boolean) : Ap
         get() = "build/dist-image"
 
     override val nativeBinaryPath = if (embeddedJvm) {
-        if (Machine.thisMachine is Machine.Windows) {
-            "jvm/bin/java.exe"
-        } else {
-            "jvm/bin/java"
-        }
+        Machine.thisMachine.executableName("jvm/bin/java")
     } else {
         null
     }
@@ -98,11 +90,7 @@ class NativeBinaryCliApp(private val name: String) : AppNature() {
         get() = "build/dist-image"
 
     override val cliLauncherPath: String
-        get() = if (Machine.thisMachine is Machine.Windows) {
-            "$name.exe"
-        } else {
-            name
-        }
+        get() = Machine.thisMachine.executableName(name)
 
     override val nativeBinaryPath: String
         get() = cliLauncherPath
@@ -346,7 +334,7 @@ val runTasks = sampleApps.associateWith { app ->
                 throw IllegalStateException("Application binary ${app.nativeBinary} does not exist.")
             }
             println("dist size: " + app.distDir.directorySize().formatSize())
-            if (app.nativeBinary != null && Machine.thisMachine is Machine.MacOS) {
+            if (app.nativeBinary != null && Machine.thisMachine.isMacOS) {
                 val str = ByteArrayOutputStream()
                 exec {
                     commandLine("otool", "-hv", app.nativeBinary)

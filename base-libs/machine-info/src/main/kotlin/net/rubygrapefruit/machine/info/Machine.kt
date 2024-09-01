@@ -1,27 +1,51 @@
 package net.rubygrapefruit.machine.info
 
 import net.rubygrapefruit.machine.cpu.Arch
+import net.rubygrapefruit.machine.info.OperatingSystem.Windows
+
+sealed interface OperatingSystem {
+    fun executableName(name: String) = name
+    fun scriptName(name: String) = name
+
+    data object Windows : OperatingSystem {
+        override fun executableName(name: String) = "$name.exe"
+
+        override fun scriptName(name: String) = "$name.bat"
+    }
+
+    data object Linux : OperatingSystem
+    data object MacOS : OperatingSystem
+}
+
+sealed interface Architecture {
+    data object X64 : Architecture
+    data object Arm64 : Architecture
+}
 
 /**
  * Contains information about the host operating system family and CPU architecture.
  */
-sealed class Machine {
-    sealed class Windows : Machine() {
-        override fun executableName(name: String) = "$name.exe"
-    }
+sealed class Machine(
+    val operatingSystem: OperatingSystem,
+    val architecture: Architecture
+) {
+    data object WindowsX64 : Machine(OperatingSystem.Windows, Architecture.X64)
+    data object WindowsArm64 : Machine(OperatingSystem.Windows, Architecture.Arm64)
 
-    data object WindowsX64 : Windows()
-    data object WindowsArm64 : Windows()
+    data object LinuxX64 : Machine(OperatingSystem.Linux, Architecture.X64)
+    data object LinuxArm64 : Machine(OperatingSystem.Linux, Architecture.Arm64)
 
-    sealed class Linux : Machine()
-    data object LinuxX64 : Linux()
-    data object LinuxArm64 : Linux()
+    data object MacOSArm64 : Machine(OperatingSystem.MacOS, Architecture.Arm64)
+    data object MacOSX64 : Machine(OperatingSystem.MacOS, Architecture.X64)
 
-    sealed class MacOS : Machine()
-    data object MacOSArm64 : MacOS()
-    data object MacOSX64 : MacOS()
+    fun executableName(name: String) = operatingSystem.executableName(name)
+    fun scriptName(name: String) = operatingSystem.scriptName(name)
 
-    open fun executableName(name: String) = name
+    val isWindows: Boolean
+        get() = operatingSystem is Windows
+
+    val isMacOS: Boolean
+        get() = operatingSystem is OperatingSystem.MacOS
 
     companion object {
         val thisMachine by lazy {

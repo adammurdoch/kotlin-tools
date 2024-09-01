@@ -6,7 +6,7 @@ import net.rubygrapefruit.plugins.app.NativeMachine
 sealed class HostMachine {
     companion object {
         val current: HostMachine by lazy {
-            when (Machine.thisMachine) {
+            val machine: HostMachine = when (Machine.thisMachine) {
                 Machine.WindowsX64 -> WindowsX64
                 Machine.WindowsArm64 -> WindowsArm64
                 Machine.LinuxX64 -> LinuxX64
@@ -14,6 +14,7 @@ sealed class HostMachine {
                 Machine.MacOSX64 -> MacOsX64
                 Machine.MacOSArm64 -> MacOsArm64
             }
+            machine
         }
 
         fun of(machine: NativeMachine): HostMachine {

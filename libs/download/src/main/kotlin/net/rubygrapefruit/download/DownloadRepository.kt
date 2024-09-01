@@ -13,7 +13,6 @@ import java.nio.file.StandardOpenOption
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReentrantLock
 import java.util.zip.ZipInputStream
-import javax.swing.Action
 import kotlin.concurrent.withLock
 import kotlin.io.path.*
 
@@ -172,7 +171,7 @@ class DownloadRepository(private val silent: Boolean = false) {
             get() = "zip"
 
         override fun unpack(file: Path, dir: Path) {
-            if (Machine.thisMachine is Machine.Windows) {
+            if (Machine.thisMachine.isWindows) {
                 file.inputStream().use { stream ->
                     val zip = ZipInputStream(stream)
                     while (true) {

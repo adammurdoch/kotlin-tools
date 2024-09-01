@@ -1,5 +1,6 @@
 package net.rubygrapefruit.machine.info
 
+import net.rubygrapefruit.machine.cpu.Arch
 import java.io.ByteArrayOutputStream
 
 /**
@@ -29,6 +30,7 @@ sealed class Machine {
             } else if (osName.contains("windows", true)) {
                 WindowsX64
             } else if (osName.contains("Mac OS X")) {
+                println("-> ARCH: " + Arch.getArchitecture());
                 val output = ByteArrayOutputStream()
                 val builder = ProcessBuilder("sysctl", "-n", "machdep.cpu.brand_string")
                 val process = builder.start()

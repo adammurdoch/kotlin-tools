@@ -3,3 +3,7 @@ plugins {
 }
 
 group = "net.rubygrapefruit.libs"
+
+dependencies {
+    implementation(project(":cpu-info"))
+}

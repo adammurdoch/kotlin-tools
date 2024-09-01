@@ -8,12 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Arch {
-    /**
-     * Returns:
-     * 1 - arm64
-     * 2 - x64
-     */
-    private static native int arch();
+    private static native String arch();
 
     public static String getArchitecture() {
         URL url;
@@ -32,14 +27,7 @@ public class Arch {
                 Files.copy(inputStream, library);
             }
             System.load(library.toString());
-            switch (arch()) {
-                case 1:
-                    return "arm64";
-                case 2:
-                    return "x64";
-                default:
-                    throw new IllegalStateException("Could not determine machine architecture.");
-            }
+            return arch();
         } catch (IOException e) {
             throw new UncheckedIOException("Could not extract native library", e);
         }

@@ -1,7 +1,6 @@
 package net.rubygrapefruit.machine.info
 
 import net.rubygrapefruit.machine.cpu.Arch
-import java.io.ByteArrayOutputStream
 
 /**
  * Contains information about the host operating system family and CPU architecture.
@@ -21,7 +20,7 @@ sealed class Machine {
     companion object {
         val thisMachine by lazy {
             val osName = System.getProperty("os.name")
-            if (osName.contains("linux", true)) {
+            val machine = if (osName.contains("linux", true)) {
                 if (System.getProperty("os.arch") == "aarch64") {
                     LinuxArm64
                 } else {
@@ -30,13 +29,9 @@ sealed class Machine {
             } else if (osName.contains("windows", true)) {
                 WindowsX64
             } else if (osName.contains("Mac OS X")) {
-                println("-> ARCH: " + Arch.getArchitecture());
-                val output = ByteArrayOutputStream()
-                val builder = ProcessBuilder("sysctl", "-n", "machdep.cpu.brand_string")
-                val process = builder.start()
-                process.inputStream.copyTo(output)
-                process.errorStream.copyTo(System.err)
-                if (output.toString().trim().matches(Regex("Apple M\\d+.*"))) {
+                val architecture = Arch.getArchitecture()
+                println("-> HOST ARCH: " + architecture);
+                if (architecture.equals("arm64")) {
                     MacOSArm64
                 } else {
                     MacOSX64
@@ -44,6 +39,8 @@ sealed class Machine {
             } else {
                 throw IllegalStateException("Could not determine the OS family of this machine using OS name '$osName'.")
             }
+            println("-> HOST MACHINE: $machine")
+            machine
         }
     }
 }

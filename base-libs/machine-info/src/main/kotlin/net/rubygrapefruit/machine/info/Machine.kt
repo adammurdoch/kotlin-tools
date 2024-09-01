@@ -6,8 +6,12 @@ import net.rubygrapefruit.machine.cpu.Arch
  * Contains information about the host operating system family and CPU architecture.
  */
 sealed class Machine {
-    sealed class Windows : Machine()
+    sealed class Windows : Machine() {
+        override fun executableName(name: String) = "$name.exe"
+    }
+
     data object WindowsX64 : Windows()
+    data object WindowsArm64 : Windows()
 
     sealed class Linux : Machine()
     data object LinuxX64 : Linux()
@@ -17,23 +21,37 @@ sealed class Machine {
     data object MacOSArm64 : MacOS()
     data object MacOSX64 : MacOS()
 
+    open fun executableName(name: String) = name
+
     companion object {
         val thisMachine by lazy {
             val osName = System.getProperty("os.name")
             val machine = if (osName.contains("linux", true)) {
-                if (System.getProperty("os.arch") == "aarch64") {
+                val architecture = System.getProperty("os.arch")
+                println("-> HOST ARCH: $architecture")
+                if (architecture == "aarch64") {
                     LinuxArm64
-                } else {
+                } else if (architecture == "amd64") {
                     LinuxX64
+                } else {
+                    throw IllegalStateException("Could not determine machine architecture using machine '$architecture'.");
                 }
             } else if (osName.contains("windows", true)) {
-                WindowsX64
+                val architecture = System.getProperty("os.arch")
+                println("-> HOST ARCH: $architecture")
+                if (architecture == "aarch64") {
+                    WindowsArm64
+                } else if (architecture == "x64") {
+                    WindowsX64
+                } else {
+                    throw IllegalStateException("Could not determine machine architecture using machine '$architecture'.");
+                }
             } else if (osName.contains("Mac OS X")) {
-                val architecture = Arch.getArchitecture()
-                println("-> HOST ARCH: " + architecture);
+                val architecture = Arch.getMacOsArchitecture()
+                println("-> HOST ARCH: $architecture")
                 if (architecture.startsWith("Apple")) {
                     MacOSArm64
-                } else if (architecture.startsWith("Intel")){
+                } else if (architecture.startsWith("Intel")) {
                     MacOSX64
                 } else {
                     throw IllegalStateException("Could not determine machine architecture using machine '$architecture'.");

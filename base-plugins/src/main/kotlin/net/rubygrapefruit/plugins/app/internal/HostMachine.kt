@@ -8,6 +8,7 @@ sealed class HostMachine {
         val current: HostMachine by lazy {
             when (Machine.thisMachine) {
                 Machine.WindowsX64 -> WindowsX64
+                Machine.WindowsArm64 -> WindowsArm64
                 Machine.LinuxX64 -> LinuxX64
                 Machine.LinuxArm64 -> LinuxArm64
                 Machine.MacOSX64 -> MacOsX64
@@ -44,6 +45,15 @@ sealed class Windows : HostMachine() {
 data object WindowsX64 : Windows() {
     override val machine: NativeMachine
         get() = NativeMachine.WindowsX64
+}
+
+data object WindowsArm64 : Windows() {
+    override val machine: NativeMachine
+        get() = throw UnsupportedOperationException("Not supported yet")
+
+    override fun canBuild(machine: NativeMachine): Boolean {
+        return false
+    }
 }
 
 sealed class Linux : HostMachine()

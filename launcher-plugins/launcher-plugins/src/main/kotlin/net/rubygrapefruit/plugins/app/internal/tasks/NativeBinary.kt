@@ -65,6 +65,11 @@ abstract class NativeBinary : DefaultTask() {
                 val baseName = "graalvm-jdk-${jdkVersion}_windows-x64"
                 Args(URI("https://download.oracle.com/graalvm/${jdkVersion}/latest/${baseName}_bin.zip"), baseName, "bin", ".cmd")
             }
+
+            WindowsArm64 -> {
+                val baseName = "graalvm-jdk-${jdkVersion}_windows-arm64"
+                Args(URI("https://download.oracle.com/graalvm/${jdkVersion}/latest/${baseName}_bin.zip"), baseName, "bin", ".cmd")
+            }
         }
 
         val dir = repository.install(args.distribution, args.installName)

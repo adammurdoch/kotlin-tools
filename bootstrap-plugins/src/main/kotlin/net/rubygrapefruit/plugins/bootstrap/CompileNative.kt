@@ -38,7 +38,6 @@ abstract class CompileNative : DefaultTask() {
             "-I${System.getProperty("java.home")}/include",
             "-I${System.getProperty("java.home")}/include/darwin"
         ) + headerDirectories.map { "-I$it" } + sourceFiles.map { it.absolutePath }
-        println("ARGS: $args")
         execOperations.exec {
             it.commandLine(args)
         }

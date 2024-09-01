@@ -1,5 +1,8 @@
 package net.rubygrapefruit.plugins.app
 
+/**
+ * Represents a native Kotlin target.
+ */
 enum class NativeMachine(
     val kotlinTarget: String
 ) {

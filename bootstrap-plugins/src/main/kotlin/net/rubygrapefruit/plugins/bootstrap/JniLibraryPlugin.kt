@@ -35,9 +35,11 @@ class JniLibraryPlugin : Plugin<Project> {
                 it.dependsOn(intel)
                 it.dependsOn(apple)
             }
-            tasks.withType(Jar::class.java).named("jar") {
-                it.from(intel.flatMap { it.sharedLibrary })
-                it.from(apple.flatMap { it.sharedLibrary })
+            if (System.getProperty("os.name").contains("Mac OS X")) {
+                tasks.withType(Jar::class.java).named("jar") {
+                    it.from(intel.flatMap { it.sharedLibrary })
+                    it.from(apple.flatMap { it.sharedLibrary })
+                }
             }
         }
     }

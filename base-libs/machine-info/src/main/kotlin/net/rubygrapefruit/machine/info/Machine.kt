@@ -41,7 +41,7 @@ sealed class Machine {
                 println("-> HOST ARCH: $architecture")
                 if (architecture == "aarch64") {
                     WindowsArm64
-                } else if (architecture == "x64") {
+                } else if (architecture == "amd64") {
                     WindowsX64
                 } else {
                     throw IllegalStateException("Could not determine machine architecture using machine '$architecture'.");

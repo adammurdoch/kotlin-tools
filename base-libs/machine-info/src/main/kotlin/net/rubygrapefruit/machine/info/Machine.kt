@@ -47,12 +47,14 @@ sealed class Machine(
     val isMacOS: Boolean
         get() = operatingSystem is OperatingSystem.MacOS
 
+    val isLinux: Boolean
+        get() = operatingSystem is OperatingSystem.Linux
+
     companion object {
         val thisMachine by lazy {
             val osName = System.getProperty("os.name")
             val machine = if (osName.contains("linux", true)) {
                 val architecture = System.getProperty("os.arch")
-                println("-> HOST ARCH: $architecture")
                 if (architecture == "aarch64") {
                     LinuxArm64
                 } else if (architecture == "amd64") {
@@ -62,7 +64,6 @@ sealed class Machine(
                 }
             } else if (osName.contains("windows", true)) {
                 val architecture = System.getProperty("os.arch")
-                println("-> HOST ARCH: $architecture")
                 if (architecture == "aarch64") {
                     WindowsArm64
                 } else if (architecture == "amd64") {
@@ -72,7 +73,6 @@ sealed class Machine(
                 }
             } else if (osName.contains("Mac OS X")) {
                 val architecture = Arch.getMacOsArchitecture()
-                println("-> HOST ARCH: $architecture")
                 if (architecture.startsWith("Apple")) {
                     MacOSArm64
                 } else if (architecture.startsWith("Intel")) {
@@ -83,7 +83,6 @@ sealed class Machine(
             } else {
                 throw IllegalStateException("Could not determine the OS family of this machine using OS name '$osName'.")
             }
-            println("-> HOST MACHINE: $machine")
             machine
         }
     }

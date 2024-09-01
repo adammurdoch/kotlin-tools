@@ -17,7 +17,10 @@ open class ApplicationRegistry(private val project: Project) {
 
         app.appName.convention(project.name)
 
-        val distTask = project.tasks.register("dist", Distributions::class.java)
+        project.tasks.register("dist", Distributions::class.java) { task ->
+            task.defaultDistribution.set(app.distribution.map { it as DefaultDistribution })
+            task.allDistributions.set(app.distributions.map { it.filterIsInstance<DefaultDistribution>() })
+        }
 
         app.distributionContainer.each { dist ->
             dist.imageDirectory.convention(project.layout.buildDirectory.dir(dist.imageBaseDir))
@@ -36,13 +39,6 @@ open class ApplicationRegistry(private val project: Project) {
             }
             dist.imageOutputDirectory.set(distImageTask.flatMap { t -> t.imageDirectory })
             dist.launcherOutputFile.set(distImageTask.flatMap { t -> t.imageDirectory.map { it.file(dist.launcherFilePath.get()) } })
-
-            distTask.configure {
-                if (dist.isDefault) {
-                    it.defaultDist.set(distImageTask)
-                }
-                it.allDists.add(distImageTask)
-            }
         }
 
         project.tasks.register("showDistributions", ShowDistributions::class.java) { task ->

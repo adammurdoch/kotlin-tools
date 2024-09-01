@@ -1,9 +1,15 @@
 
 # TODO
 
+- Use subtypes for each distribution, only configure matching distribution types
+- Expose `.bat` as the launcher on Windows
+- Use correct target machine for embedded JVM distributions
+  - Currently, uses whichever JVM architecture that Gradle decides to use
+- Add distribution for each platform for native binary JVM app
+  - Can build both macOS distributions on macOS
+- Add distributions for debug and release for UI apps
 - Expose path to launcher within a distribution
   - Allows the launcher to be located in a copy of the distribution
-- Expose host machine to plugins
 - Move JVM test dependency declarations into library and application blocks
 - Don't add a dist task when there is no source for the current target (eg native-launcher on linux)
 - Native-launcher: fix Windows

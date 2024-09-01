@@ -1,7 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal.tasks
 
+import net.rubygrapefruit.plugins.app.internal.DefaultDistribution
 import org.gradle.api.DefaultTask
-import org.gradle.api.Task
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Internal
@@ -14,19 +14,19 @@ abstract class Distributions : DefaultTask() {
     abstract val all: Property<Boolean>
 
     @get:Internal
-    abstract val defaultDist: Property<Task>
+    abstract val defaultDistribution: Property<DefaultDistribution>
 
     @get:Internal
-    abstract val allDists: SetProperty<Task>
+    abstract val allDistributions: SetProperty<DefaultDistribution>
 
     init {
         all.convention(false)
         dependsOn(object : Callable<Any> {
             override fun call(): Any {
                 return if (all.get()) {
-                    allDists
+                    allDistributions.map { it.map { it.distTask } }
                 } else {
-                    defaultDist
+                    defaultDistribution.map { it.distTask }
                 }
             }
         })

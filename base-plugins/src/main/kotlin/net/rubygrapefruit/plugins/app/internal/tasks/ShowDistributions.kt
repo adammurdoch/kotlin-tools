@@ -14,6 +14,7 @@ abstract class ShowDistributions : DefaultTask() {
     @TaskAction
     fun report() {
         val app = app.get()
+        val defaultDist = app.distribution.get()
 
         println("Application: ${app.appName.get()}")
         println()
@@ -25,7 +26,7 @@ abstract class ShowDistributions : DefaultTask() {
             if (!(distribution.canBuildForHostMachine)) {
                 print(" (not buildable)")
             }
-            if (distribution.isDefault) {
+            if (distribution == defaultDist) {
                 print(" (DEFAULT)")
             }
             println()

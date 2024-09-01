@@ -16,7 +16,7 @@ class NativeBinaryJvmLauncherPlugin : Plugin<Project> {
             applications.withApp<MutableJvmApplication> { app ->
                 app.packaging = JvmApplicationWithNativeBinary()
 
-                val binaryTask = tasks.register("native-binary", NativeBinary::class.java) {
+                val binaryTask = tasks.register("nativeBinary", NativeBinary::class.java) {
                     it.launcherFile.set(layout.buildDirectory.file("native-binary/launcher"))
                     it.module.set(app.module.name)
                     it.mainClass.set(app.mainClass)

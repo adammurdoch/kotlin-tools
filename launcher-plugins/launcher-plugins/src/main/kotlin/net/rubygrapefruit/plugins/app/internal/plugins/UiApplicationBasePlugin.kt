@@ -35,7 +35,7 @@ class UiApplicationBasePlugin : Plugin<Project> {
                     dist.launcherFilePath.set(capitalizedAppName.map { "MacOS/$it" })
 
                     dist.distTask.configure { distImage ->
-                        distImage.imageDirectory.set(layout.buildDirectory.dir(capitalizedAppName.map { "${dist.imageBaseDir}/$it.app" }))
+                        distImage.imageDirectory.set(layout.buildDirectory.dir(capitalizedAppName.map { "${dist.imageBaseDir.get()}/$it.app" }))
                         distImage.rootDirPath.set("Contents")
                         distImage.includeFile("Info.plist", infoPlistTask.flatMap { it.plistFile })
                         distImage.includeFile(
@@ -57,7 +57,7 @@ class UiApplicationBasePlugin : Plugin<Project> {
                     }
 
                     tasks.register(dist.taskName("release"), ReleaseDistribution::class.java) { t ->
-                        t.imageDirectory.set(layout.buildDirectory.dir(dist.imageBaseDir + capitalizedAppName.map { "${dist.imageBaseDir}/$it.app" }))
+                        t.imageDirectory.set(layout.buildDirectory.dir(capitalizedAppName.map { "${dist.imageBaseDir.get()}/$it.app" }))
                         t.unsignedImage.set(dist.imageOutputDirectory)
                         t.signingIdentity.set(app.signingIdentity)
                         t.notarizationProfileName.set(app.notarizationProfileName)

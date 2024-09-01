@@ -5,6 +5,7 @@ import net.rubygrapefruit.plugins.app.Distribution
 import net.rubygrapefruit.plugins.app.NativeMachine
 import net.rubygrapefruit.plugins.app.internal.tasks.DistributionImage
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.TaskContainer
@@ -14,16 +15,19 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
 
     val distributions: Provider<List<Distribution>> = providers.provider { distContainer.all }
 
-    val distribution: Provider<Distribution> = providers.provider { distContainer.all.find { it.isDefault } }
+    val distribution: Property<Distribution> = objects.property(Distribution::class.java)
 
     fun add(name: String, isDefault: Boolean, canBuildForHostMachine: Boolean, targetMachine: NativeMachine?, buildType: BuildType): DefaultDistribution {
         val distTask = tasks.register(DefaultDistribution.taskName(name, "dist"), DistributionImage::class.java)
         val dist = if (targetMachine != null) {
-            objects.newInstance(DefaultDistribution::class.java, name, isDefault, canBuildForHostMachine, targetMachine, buildType, distTask)
+            objects.newInstance(DefaultDistribution::class.java, name, canBuildForHostMachine, targetMachine, buildType, distTask, distribution)
         } else {
-            objects.newInstance(DefaultPlatformIndependentDistribution::class.java, name, isDefault, canBuildForHostMachine, buildType, distTask)
+            objects.newInstance(DefaultPlatformIndependentDistribution::class.java, name, canBuildForHostMachine, buildType, distTask, distribution)
         }
         distContainer.add(dist)
+        if (isDefault) {
+            distribution.set(dist)
+        }
         return dist
     }
 

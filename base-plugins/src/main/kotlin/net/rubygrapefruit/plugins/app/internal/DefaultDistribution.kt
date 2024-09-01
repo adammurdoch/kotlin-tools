@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 abstract class DefaultDistribution @Inject constructor(
     override val name: String,
-    val canBuildForHostMachine: Boolean,
+    val canBuildOnHostMachine: Boolean,
     val targetMachine: NativeMachine?,
     val buildType: BuildType,
     val distTask: TaskProvider<DistributionImage>,
@@ -50,7 +50,7 @@ abstract class DefaultDistribution @Inject constructor(
                 } else {
                     "dist-images/$name"
                 }
-            }
+            }.orElse("dist-images/$name")
         }
 
     fun taskName(base: String): String {

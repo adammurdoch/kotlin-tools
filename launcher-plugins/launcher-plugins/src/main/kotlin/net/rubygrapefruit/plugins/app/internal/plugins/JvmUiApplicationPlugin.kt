@@ -31,8 +31,9 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                 }
 
                 // TODO - 'can build' flag is incorrect - it depends on the JVM to be embedded
-                app.targets.add(NativeMachine.MacOSArm64, listOf(BuildType.Release), HostMachine.current.machine == NativeMachine.MacOSArm64)
-                app.targets.add(NativeMachine.MacOSX64, listOf(BuildType.Release), HostMachine.current.machine == NativeMachine.MacOSX64)
+                val current = HostMachine.current
+                app.targets.add(NativeMachine.MacOSArm64, listOf(BuildType.Release), current.canBeBuilt && current.machine == NativeMachine.MacOSArm64)
+                app.targets.add(NativeMachine.MacOSX64, listOf(BuildType.Release), current.canBeBuilt && current.machine == NativeMachine.MacOSX64)
 
                 app.eachTarget { machine, dist ->
                     val nativeBinary = configurations.create("nativeBinaries${dist.name}") {

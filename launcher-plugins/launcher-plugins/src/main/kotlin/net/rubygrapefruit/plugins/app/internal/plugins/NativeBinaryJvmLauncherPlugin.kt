@@ -25,7 +25,9 @@ class NativeBinaryJvmLauncherPlugin : Plugin<Project> {
                 }
 
                 // NativeBinary task uses correct JVM architecture to build for host machine
-                app.distributionContainer.add(HostMachine.current.machine.kotlinTarget, true, true, HostMachine.current.machine, BuildType.Release)
+                if (HostMachine.current.canBeBuilt) {
+                    app.distributionContainer.add(HostMachine.current.machine.kotlinTarget, true, true, HostMachine.current.machine, BuildType.Release)
+                }
 
                 app.distributionContainer.each { dist ->
                     dist.launcherFilePath.set(app.appName.map { HostMachine.current.exeName(it) })

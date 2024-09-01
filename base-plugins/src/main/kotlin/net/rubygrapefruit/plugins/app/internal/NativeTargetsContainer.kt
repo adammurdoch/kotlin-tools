@@ -26,12 +26,12 @@ class NativeTargetsContainer(
     fun add(machine: NativeMachine, buildTypes: List<BuildType>, canBuildOnThisHost: Boolean = true) {
         for (buildType in buildTypes) {
             if (targetInfo(machine, buildType) == null) {
-                val hostCanBuild = HostMachine.current.canBuild(machine)
-                val executable = DefaultNativeExecutable(machine, buildType, hostCanBuild, objects)
+                val hostCanBuildTarget = HostMachine.current.canBuild(machine)
+                val executable = DefaultNativeExecutable(machine, buildType, hostCanBuildTarget, objects)
                 val distribution = distributions.add(
                     machine.kotlinTarget + buildType.name,
-                    hostCanBuild && machine == HostMachine.current.machine && (buildType == BuildType.Debug || buildTypes.size == 1),
-                    canBuildOnThisHost && hostCanBuild,
+                    hostCanBuildTarget && HostMachine.current.canBeBuilt && HostMachine.current.machine == machine && (buildType == BuildType.Debug || buildTypes.size == 1),
+                    canBuildOnThisHost && hostCanBuildTarget,
                     machine,
                     buildType
                 )

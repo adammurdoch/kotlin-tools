@@ -29,12 +29,17 @@ sealed class HostMachine {
 
     open fun exeName(name: String) = name
 
-    open fun canBuild(machine: NativeMachine): Boolean {
-        return when (machine) {
+    /**
+     * Can this host machine build binaries for the given target machine.
+     */
+    open fun canBuild(target: NativeMachine): Boolean {
+        return when (target) {
             NativeMachine.LinuxX64, NativeMachine.WindowsX64 -> true
             else -> false
         }
     }
+
+    open val canBeBuilt: Boolean = true
 
     abstract val machine: NativeMachine
 }
@@ -52,9 +57,11 @@ data object WindowsArm64 : Windows() {
     override val machine: NativeMachine
         get() = throw UnsupportedOperationException("Not supported yet")
 
-    override fun canBuild(machine: NativeMachine): Boolean {
+    override fun canBuild(target: NativeMachine): Boolean {
         return false
     }
+
+    override val canBeBuilt: Boolean = false
 }
 
 sealed class Linux : HostMachine()
@@ -65,16 +72,18 @@ data object LinuxX64 : Linux() {
 }
 
 data object LinuxArm64 : Linux() {
-    override fun canBuild(machine: NativeMachine): Boolean {
+    override fun canBuild(target: NativeMachine): Boolean {
         return false
     }
 
     override val machine: NativeMachine
         get() = throw UnsupportedOperationException("Not supported yet")
+
+    override val canBeBuilt: Boolean = false
 }
 
 sealed class MacOS : HostMachine() {
-    override fun canBuild(machine: NativeMachine): Boolean {
+    override fun canBuild(target: NativeMachine): Boolean {
         return true
     }
 }

@@ -17,9 +17,9 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
 
     val distribution: Property<Distribution> = objects.property(Distribution::class.java)
 
-    fun <T: DefaultPlatformIndependentDistribution> add(name: String, isDefault: Boolean, buildType: BuildType, type: Class<T>): T {
+    fun <T : DefaultPlatformIndependentDistribution> add(name: String, isDefault: Boolean, buildType: BuildType, type: Class<T>): T {
         val distTask = tasks.register(DefaultDistribution.taskName(name, "dist"), DistributionImage::class.java)
-        val dist = objects.newInstance(type, name, true, buildType, distTask, distribution)
+        val dist = objects.newInstance(type, name, HostMachine.current.canBeBuilt, buildType, distTask, distribution)
         addDist(dist, isDefault)
         return dist
     }
@@ -37,7 +37,7 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
 
     private fun addDist(dist: DefaultDistribution, isDefault: Boolean) {
         distContainer.add(dist)
-        if (isDefault) {
+        if (isDefault && dist.canBuildOnHostMachine) {
             distribution.set(dist)
         }
     }

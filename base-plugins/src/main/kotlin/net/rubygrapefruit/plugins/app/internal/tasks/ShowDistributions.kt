@@ -15,16 +15,23 @@ abstract class ShowDistributions : DefaultTask() {
     @TaskAction
     fun report() {
         val app = app.get()
-        val defaultDist = app.distribution.get()
+        val defaultDist = app.distribution.orNull
 
         println("Application: ${app.appName.get()}")
         println()
+
+        val distributions = app.distributions.get().filterIsInstance<DefaultDistribution>().sortedBy {
+            when {
+                it == defaultDist -> 1
+                it.canBuildOnHostMachine -> 2
+                else -> 3
+            }
+        }
         println("Distributions:")
-        for (distribution in app.distributions.get()) {
-            require(distribution is DefaultDistribution)
+        for (distribution in distributions) {
             println()
             print("Name: ${distribution.name}")
-            if (!(distribution.canBuildForHostMachine)) {
+            if (!(distribution.canBuildOnHostMachine)) {
                 print(" (not buildable)")
             }
             if (distribution == defaultDist) {

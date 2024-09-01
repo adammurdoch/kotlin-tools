@@ -29,7 +29,7 @@ open class ApplicationRegistry(private val project: Project) {
             val distImageTask = dist.distTask
             distImageTask.configure { t ->
                 t.onlyIf {
-                    dist.canBuildForHostMachine
+                    dist.canBuildOnHostMachine
                 }
                 t.description = "Builds the distribution image"
                 t.group = "Distribution"

@@ -2,6 +2,7 @@ package net.rubygrapefruit.plugins.app.internal
 
 import net.rubygrapefruit.plugins.app.Application
 import net.rubygrapefruit.plugins.app.internal.tasks.Distributions
+import net.rubygrapefruit.plugins.app.internal.tasks.ShowDistributions
 import org.gradle.api.Project
 
 open class ApplicationRegistry(private val project: Project) {
@@ -42,6 +43,10 @@ open class ApplicationRegistry(private val project: Project) {
                 }
                 it.allDists.add(distImageTask)
             }
+        }
+
+        project.tasks.register("showDistributions", ShowDistributions::class.java) { task ->
+            task.app.set(app)
         }
 
         for (builder in whenAppSet) {

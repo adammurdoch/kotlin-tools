@@ -7,6 +7,11 @@ import org.gradle.api.provider.Provider
 
 interface Distribution {
     /**
+     * An identifier for this distribution.
+     */
+    val name: String
+
+    /**
      * The directory to create the distribution image in.
      */
     val imageDirectory: DirectoryProperty

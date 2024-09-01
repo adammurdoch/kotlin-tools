@@ -10,7 +10,7 @@ interface Application {
     val appName: Property<String>
 
     /**
-     * The distributions of this application.
+     * All distributions of this application.
      */
     val distributions: Provider<List<Distribution>>
 

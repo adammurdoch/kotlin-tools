@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 
 abstract class DefaultDistribution @Inject constructor(
-    val name: String,
+    override val name: String,
     val isDefault: Boolean,
     val canBuildForHostMachine: Boolean,
     val distTask: TaskProvider<DistributionImage>,

@@ -23,7 +23,7 @@ class NativeTargetsContainer(
 
     val executable: Provider<NativeExecutable> = providers.provider { targetInfo(HostMachine.current.machine, BuildType.Debug)?.executable }
 
-    fun add(machine: NativeMachine, buildTypes: List<BuildType>, canBuildOnThisHost: Boolean = true) {
+    fun <T: DefaultDistribution> add(machine: NativeMachine, buildTypes: List<BuildType>, distributionType: Class<T>, canBuildOnThisHost: Boolean = true) {
         for (buildType in buildTypes) {
             if (targetInfo(machine, buildType) == null) {
                 val hostCanBuildTarget = HostMachine.current.canBuild(machine)
@@ -33,7 +33,8 @@ class NativeTargetsContainer(
                     hostCanBuildTarget && HostMachine.current.canBeBuilt && HostMachine.current.machine == machine && (buildType == BuildType.Debug || buildTypes.size == 1),
                     canBuildOnThisHost && hostCanBuildTarget,
                     machine,
-                    buildType
+                    buildType,
+                    distributionType
                 )
                 distribution.launcherFile.set(executable.outputBinary)
                 machines.add(TargetInfo(machine, buildType, executable, distribution))

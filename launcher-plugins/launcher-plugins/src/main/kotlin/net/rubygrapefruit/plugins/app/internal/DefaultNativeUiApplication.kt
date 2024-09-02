@@ -14,7 +14,7 @@ abstract class DefaultNativeUiApplication @Inject constructor(
     project: Project
 ) : DefaultUiApplication(objects, providers, project), MutableNativeApplication, NativeUIApplication {
     init {
-        targets.add(NativeMachine.MacOSArm64, listOf(BuildType.Debug, BuildType.Release))
-        targets.add(NativeMachine.MacOSX64, listOf(BuildType.Debug, BuildType.Release))
+        targets.add(NativeMachine.MacOSArm64, listOf(BuildType.Debug, BuildType.Release), DefaultHasLauncherExecutableDistribution::class.java)
+        targets.add(NativeMachine.MacOSX64, listOf(BuildType.Debug, BuildType.Release), DefaultHasLauncherExecutableDistribution::class.java)
     }
 }

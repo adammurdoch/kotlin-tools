@@ -1,6 +1,8 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.BuildType
+import net.rubygrapefruit.plugins.app.internal.DefaultHasEmbeddedJvmAndLauncherScriptsDistribution
+import net.rubygrapefruit.plugins.app.internal.HostMachine
 import net.rubygrapefruit.plugins.app.internal.JvmApplicationWithEmbeddedJvm
 import net.rubygrapefruit.plugins.app.internal.MutableJvmApplication
 import net.rubygrapefruit.plugins.app.internal.applications
@@ -28,7 +30,10 @@ open class EmbeddedJvmLauncherPlugin : Plugin<Project> {
                     t.jlinkPath.set(launcher.map { it.executablePath.asFile.toPath().parent.resolve("jlink").pathString })
                 }
 
-                app.distributionContainer.add("embeddedJvm", true, true, null, BuildType.Release)
+                if (HostMachine.current.canBeBuilt) {
+                    // TODO - the target machine is not necessarily the host machine, it depends on the JVM being used above
+                    app.distributionContainer.add("embeddedJvm", true, true, HostMachine.current.machine, BuildType.Release, DefaultHasEmbeddedJvmAndLauncherScriptsDistribution::class.java)
+                }
 
                 val jvmDir = "jvm"
                 app.javaLauncherPath.set("$jvmDir/bin/java")

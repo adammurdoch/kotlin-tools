@@ -2,6 +2,8 @@ package net.rubygrapefruit.plugins.app.internal.tasks
 
 import net.rubygrapefruit.plugins.app.Application
 import net.rubygrapefruit.plugins.app.internal.DefaultDistribution
+import net.rubygrapefruit.plugins.app.internal.HasEmbeddedJvm
+import net.rubygrapefruit.plugins.app.internal.HasLauncherExecutable
 import net.rubygrapefruit.plugins.app.internal.HasLauncherScripts
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.Property
@@ -38,8 +40,13 @@ abstract class ShowDistributions : DefaultTask() {
                 print(" (DEFAULT)")
             }
             println()
+            if (distribution.targetMachine != null) {
+                println("Target machine: ${distribution.targetMachine}")
+            }
             println("Launcher: ${launcherFor(distribution)}")
-            println("Target machine: ${distribution.targetMachine}")
+            if (distribution is HasEmbeddedJvm) {
+                println("Embedded JVM: yes")
+            }
             println("Build type: ${distribution.buildType}")
             println("Dist task: ${distribution.distTask.name}")
             println("Image dir: ${distribution.imageDirectory.get()}")
@@ -49,8 +56,9 @@ abstract class ShowDistributions : DefaultTask() {
 
     private fun launcherFor(distribution: DefaultDistribution): String {
         return when (distribution) {
-            is HasLauncherScripts -> "launcher scripts"
-            else -> "default"
+            is HasLauncherScripts -> "Scripts"
+            is HasLauncherExecutable -> "Executable"
+            else -> "No launcher"
         }
     }
 }

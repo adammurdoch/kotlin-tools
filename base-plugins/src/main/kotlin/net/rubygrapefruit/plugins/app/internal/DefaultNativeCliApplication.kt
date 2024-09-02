@@ -40,7 +40,7 @@ abstract class DefaultNativeCliApplication @Inject constructor(
 
     private fun KotlinNativeBinaryContainer.register(target: NativeMachine) {
         executable()
-        targets.add(target, listOf(BuildType.Debug, BuildType.Release))
+        targets.add(target, listOf(BuildType.Debug, BuildType.Release), DefaultHasLauncherExecutableDistribution::class.java)
     }
 
     fun attachExecutable(machine: NativeMachine, buildType: BuildType, binaryFile: Provider<RegularFile>) {

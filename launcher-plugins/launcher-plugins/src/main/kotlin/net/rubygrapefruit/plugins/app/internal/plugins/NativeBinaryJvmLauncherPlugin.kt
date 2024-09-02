@@ -1,6 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.BuildType
+import net.rubygrapefruit.plugins.app.internal.DefaultHasLauncherExecutableDistribution
 import net.rubygrapefruit.plugins.app.internal.HostMachine
 import net.rubygrapefruit.plugins.app.internal.JvmApplicationWithNativeBinary
 import net.rubygrapefruit.plugins.app.internal.MutableJvmApplication
@@ -25,13 +26,11 @@ class NativeBinaryJvmLauncherPlugin : Plugin<Project> {
                 }
 
                 // NativeBinary task uses correct JVM architecture to build for host machine
+                // TODO - add distributions for each target
                 if (HostMachine.current.canBeBuilt) {
-                    app.distributionContainer.add(HostMachine.current.machine.kotlinTarget, true, true, HostMachine.current.machine, BuildType.Release)
-                }
-
-                app.distributionContainer.each { dist ->
-                    dist.launcherFilePath.set(app.appName.map { HostMachine.current.exeName(it) })
-                    dist.launcherFile.set(binaryTask.flatMap { it.launcherFile.map { layout.projectDirectory.file(HostMachine.current.exeName(it.asFile.absolutePath)) } })
+                    val dist = app.distributionContainer.add(HostMachine.current.machine.kotlinTarget, true, true, HostMachine.current.machine, BuildType.Release, DefaultHasLauncherExecutableDistribution::class.java)
+                    dist.launcherFilePath.set(app.appName.map { appName -> HostMachine.current.exeName(appName) })
+                    dist.launcherFile.set(binaryTask.flatMap { task -> task.launcherFile.map { layout.projectDirectory.file(HostMachine.current.exeName(it.asFile.absolutePath)) } })
                 }
             }
         }

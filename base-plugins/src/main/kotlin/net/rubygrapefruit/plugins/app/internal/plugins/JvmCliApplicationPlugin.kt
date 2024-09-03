@@ -4,6 +4,8 @@ import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.internal.DefaultHasLauncherScriptsDistribution
 import net.rubygrapefruit.plugins.app.internal.DefaultJvmCliApplication
 import net.rubygrapefruit.plugins.app.internal.HasLauncherScripts
+import net.rubygrapefruit.plugins.app.internal.HostMachine
+import net.rubygrapefruit.plugins.app.internal.Windows
 import net.rubygrapefruit.plugins.app.internal.applications
 import net.rubygrapefruit.plugins.app.internal.tasks.LauncherBashScript
 import net.rubygrapefruit.plugins.app.internal.tasks.LauncherBatScript
@@ -43,9 +45,17 @@ class JvmCliApplicationPlugin : Plugin<Project> {
                         it.modulePath.set(libNames)
                     }
 
-                    launcherFile.set(bashScript.flatMap { it.scriptFile })
-                    withImage {
-                        includeFile(app.appName.map { "$it.bat" }, batScript.flatMap { it.scriptFile })
+                    if (HostMachine.current is Windows) {
+                        launcherFile.set(batScript.flatMap { it.scriptFile })
+                        launcherFilePath.set(app.appName.map { "$it.bat" })
+                        withImage {
+                            includeFile(app.appName, bashScript.flatMap { it.scriptFile })
+                        }
+                    } else {
+                        launcherFile.set(bashScript.flatMap { it.scriptFile })
+                        withImage {
+                            includeFile(app.appName.map { "$it.bat" }, batScript.flatMap { it.scriptFile })
+                        }
                     }
                 }
             }

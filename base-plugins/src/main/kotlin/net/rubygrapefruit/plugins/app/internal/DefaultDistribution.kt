@@ -30,10 +30,7 @@ abstract class DefaultDistribution @Inject constructor(
 
     override val launcherFile: RegularFileProperty = factory.fileProperty()
 
-    /**
-     * The destination location in the distribution image for the launcher file.
-     */
-    val launcherFilePath: Property<String> = factory.property(String::class.java)
+    override val launcherFilePath: Property<String> = factory.property(String::class.java)
 
     override val imageOutputDirectory: DirectoryProperty = factory.directoryProperty()
 

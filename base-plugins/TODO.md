@@ -2,6 +2,7 @@
 # TODO
 
 - Figure out why `tasks.registering` is broken for embedded JVM task
+- UI app `dist` task should fail on non-mac host machines
 - Use subtypes for each distribution, only configure matching distribution types
 - Expose `.bat` as the launcher on Windows
 - Split configuration and output into separate types for app and distribution

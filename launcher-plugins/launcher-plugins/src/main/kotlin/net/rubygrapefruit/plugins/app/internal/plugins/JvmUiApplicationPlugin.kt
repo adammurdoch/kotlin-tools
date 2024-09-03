@@ -3,7 +3,6 @@ package net.rubygrapefruit.plugins.app.internal.plugins
 import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.NativeMachine
 import net.rubygrapefruit.plugins.app.internal.DefaultHasEmbeddedJvmAndLauncherExecutableDistribution
-import net.rubygrapefruit.plugins.app.internal.DefaultHasLauncherExecutableDistribution
 import net.rubygrapefruit.plugins.app.internal.DefaultJvmUiApplication
 import net.rubygrapefruit.plugins.app.internal.HostMachine
 import net.rubygrapefruit.plugins.app.internal.applications
@@ -34,8 +33,18 @@ class JvmUiApplicationPlugin : Plugin<Project> {
 
                 // TODO - 'can build' flag is incorrect - it depends on the JVM to be embedded
                 val current = HostMachine.current
-                app.targets.add(NativeMachine.MacOSArm64, listOf(BuildType.Release), DefaultHasEmbeddedJvmAndLauncherExecutableDistribution::class.java, current.canBeBuilt && current.machine == NativeMachine.MacOSArm64)
-                app.targets.add(NativeMachine.MacOSX64, listOf(BuildType.Release), DefaultHasEmbeddedJvmAndLauncherExecutableDistribution::class.java, current.canBeBuilt && current.machine == NativeMachine.MacOSX64)
+                app.targets.add(
+                    NativeMachine.MacOSArm64,
+                    listOf(BuildType.Release),
+                    DefaultHasEmbeddedJvmAndLauncherExecutableDistribution::class.java,
+                    current.canBeBuilt && current.machine == NativeMachine.MacOSArm64
+                )
+                app.targets.add(
+                    NativeMachine.MacOSX64,
+                    listOf(BuildType.Release),
+                    DefaultHasEmbeddedJvmAndLauncherExecutableDistribution::class.java,
+                    current.canBeBuilt && current.machine == NativeMachine.MacOSX64
+                )
 
                 app.eachTarget { machine, dist ->
                     val nativeBinary = configurations.create("nativeBinaries${dist.name}") {
@@ -48,7 +57,7 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                     }
                     dependencies.add(nativeBinary.name, "net.rubygrapefruit.plugins:native-launcher:1.0-dev")
 
-                    val launcherTask = tasks.register("nativeLauncher${dist.name}", NativeUiLauncher::class.java) {
+                    val launcherTask = tasks.register(dist.taskName("nativeLauncher"), NativeUiLauncher::class.java) {
                         it.inputFile.set(layout.file(nativeBinary.elements.map { it.first().asFile }))
                         it.outputFile.set(layout.buildDirectory.file("app-${dist.name}/native-launcher.kexe"))
                     }

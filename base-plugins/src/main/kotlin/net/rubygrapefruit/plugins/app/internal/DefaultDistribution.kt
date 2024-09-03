@@ -28,10 +28,7 @@ abstract class DefaultDistribution @Inject constructor(
         }
     }
 
-    /**
-     * The launcher file to copy into the distribution image.
-     */
-    val launcherFile: RegularFileProperty = factory.fileProperty()
+    override val launcherFile: RegularFileProperty = factory.fileProperty()
 
     /**
      * The destination location in the distribution image for the launcher file.
@@ -53,11 +50,11 @@ abstract class DefaultDistribution @Inject constructor(
             }.orElse("dist-images/$name")
         }
 
-    fun taskName(base: String): String {
+    override fun taskName(base: String): String {
         return taskName(name, base)
     }
 
-    override fun withImage(action: (DistributionImage) -> Unit) {
+    override fun withImage(action: DistributionImage.() -> Unit) {
         distTask.configure(action)
     }
 }

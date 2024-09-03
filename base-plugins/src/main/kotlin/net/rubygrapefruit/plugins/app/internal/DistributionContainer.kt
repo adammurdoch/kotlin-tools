@@ -48,10 +48,10 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
         distContainer.each(action)
     }
 
-    fun eachImage(action: DistributionImage.() -> Unit) {
-        distContainer.each { dist ->
-            dist.distTask.configure {
-                action(it)
+    inline fun <reified T> eachOfType(crossinline action: T.() -> Unit) {
+        each { dist ->
+            if (dist is T) {
+                action(dist)
             }
         }
     }

@@ -21,7 +21,7 @@ abstract class DefaultDistribution @Inject constructor(
     val distTask: TaskProvider<DistributionImage>,
     val defaultDist: Provider<Distribution>,
     factory: ObjectFactory
-) : Distribution {
+) : Distribution, MutableDistribution {
     companion object {
         fun taskName(distName: String, taskName: String): String {
             return "$distName${taskName.capitalize()}"
@@ -55,5 +55,9 @@ abstract class DefaultDistribution @Inject constructor(
 
     fun taskName(base: String): String {
         return taskName(name, base)
+    }
+
+    override fun withImage(action: (DistributionImage) -> Unit) {
+        distTask.configure(action)
     }
 }

@@ -1,8 +1,11 @@
 
 # TODO
 
+- Figure out why `tasks.registering` is broken for embedded JVM task
 - Use subtypes for each distribution, only configure matching distribution types
+  - Remove JVM app "packaging"
 - Expose `.bat` as the launcher on Windows
+- Split configuration and output into separate types for app and distribution
 - Add a `run` task
 - Use correct target machine for embedded JVM distributions
   - Currently, uses whichever JVM architecture that Gradle decides to use

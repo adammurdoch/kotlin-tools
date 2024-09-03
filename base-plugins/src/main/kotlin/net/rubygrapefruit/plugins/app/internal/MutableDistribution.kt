@@ -12,5 +12,7 @@ interface MutableDistribution: Distribution {
 
     fun taskName(baseName: String): String
 
+    fun buildDirName(baseName: String): String
+
     fun withImage(action: DistributionImage.() -> Unit)
 }

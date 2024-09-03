@@ -39,7 +39,7 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                 )
 
                 app.eachTarget { machine, dist ->
-                    val nativeBinary = configurations.create("nativeBinaries${dist.name}") {
+                    val nativeBinary = configurations.create("nativeBinaries${machine.name}") {
                         it.attributes.attribute(
                             Usage.USAGE_ATTRIBUTE,
                             objects.named(Usage::class.java, "native-binary-${machine.kotlinTarget}")
@@ -51,13 +51,13 @@ class JvmUiApplicationPlugin : Plugin<Project> {
 
                     val launcherTask = tasks.register(dist.taskName("nativeLauncher"), NativeUiLauncher::class.java) {
                         it.inputFile.set(layout.file(nativeBinary.elements.map { it.first().asFile }))
-                        it.outputFile.set(layout.buildDirectory.file("app-${dist.name}/native-launcher.kexe"))
+                        it.outputFile.set(layout.buildDirectory.file(dist.buildDirName("native-launcher") + "/native-launcher.kexe"))
                     }
 
                     require(dist is HasEmbeddedJvm)
 
                     val configTask = tasks.register(dist.taskName("launcherConf"), LauncherConf::class.java) {
-                        it.configFile.set(layout.buildDirectory.file("app/launcher.conf"))
+                        it.configFile.set(layout.buildDirectory.file(dist.buildDirName("launcher-config") + "/launcher.conf"))
                         it.applicationDisplayName.set(capitalizedAppName)
                         it.iconName.set(app.iconName)
                         it.javaCommand.set(dist.javaLauncherPath)

@@ -54,6 +54,10 @@ abstract class DefaultDistribution @Inject constructor(
         return taskName(name, base)
     }
 
+    override fun buildDirName(baseName: String): String {
+        return "$baseName/$name"
+    }
+
     override fun withImage(action: DistributionImage.() -> Unit) {
         distTask.configure(action)
     }

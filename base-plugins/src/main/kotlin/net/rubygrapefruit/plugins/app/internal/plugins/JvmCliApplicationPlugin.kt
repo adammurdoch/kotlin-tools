@@ -25,8 +25,9 @@ class JvmCliApplicationPlugin : Plugin<Project> {
                 }
 
                 app.distributionContainer.eachOfType<HasLauncherScripts> {
+                    // Generate the scripts per distribution, because each distribution may have a different `java` path
                     val bashScript = tasks.register(taskName("bashLauncher"), LauncherBashScript::class.java) {
-                        it.scriptFile.set(layout.buildDirectory.file("scripts/$name/launcher.sh"))
+                        it.scriptFile.set(layout.buildDirectory.file(buildDirName("scripts") + "/launcher.sh"))
                         it.module.set(app.module.name)
                         it.mainClass.set(app.mainClass)
                         it.libsDirPath.set(libsDirPath)
@@ -34,7 +35,7 @@ class JvmCliApplicationPlugin : Plugin<Project> {
                         it.modulePath.set(libNames)
                     }
                     val batScript = tasks.register(taskName("batLauncher"), LauncherBatScript::class.java) {
-                        it.scriptFile.set(layout.buildDirectory.file("scripts/$name/launcher.bat"))
+                        it.scriptFile.set(layout.buildDirectory.file(buildDirName("scripts") + "/launcher.bat"))
                         it.module.set(app.module.name)
                         it.mainClass.set(app.mainClass)
                         it.libsDirPath.set(libsDirPath)

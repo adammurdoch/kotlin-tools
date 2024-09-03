@@ -15,7 +15,5 @@ abstract class DefaultJvmCliApplication @Inject constructor(
 
     final override val distributionContainer = DistributionContainer(project.tasks, objects, providers)
 
-    override var packaging: JvmApplicationPackaging = JvmApplicationWithExternalJvm()
-
     override val runtimeModulePath: ConfigurableFileCollection = objects.fileCollection()
 }

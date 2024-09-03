@@ -30,7 +30,7 @@ class JvmCliApplicationPlugin : Plugin<Project> {
                         it.module.set(app.module.name)
                         it.mainClass.set(app.mainClass)
                         it.libsDirPath.set(libsDirPath)
-                        it.javaLauncherPath.set(app.javaLauncherPath)
+                        it.javaLauncherPath.set(javaLauncherPath)
                         it.modulePath.set(libNames)
                     }
                     val batScript = tasks.register(taskName("batLauncher"), LauncherBatScript::class.java) {
@@ -38,7 +38,7 @@ class JvmCliApplicationPlugin : Plugin<Project> {
                         it.module.set(app.module.name)
                         it.mainClass.set(app.mainClass)
                         it.libsDirPath.set(libsDirPath)
-                        it.javaLauncherPath.set(app.javaLauncherPath)
+                        it.javaLauncherPath.set(javaLauncherPath)
                         it.modulePath.set(libNames)
                     }
 

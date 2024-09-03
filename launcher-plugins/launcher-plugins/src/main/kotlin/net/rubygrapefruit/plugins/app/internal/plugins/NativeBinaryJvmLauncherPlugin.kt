@@ -3,7 +3,6 @@ package net.rubygrapefruit.plugins.app.internal.plugins
 import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.internal.DefaultHasLauncherExecutableDistribution
 import net.rubygrapefruit.plugins.app.internal.HostMachine
-import net.rubygrapefruit.plugins.app.internal.JvmApplicationWithNativeBinary
 import net.rubygrapefruit.plugins.app.internal.MutableJvmApplication
 import net.rubygrapefruit.plugins.app.internal.applications
 import net.rubygrapefruit.plugins.app.internal.registering
@@ -16,8 +15,6 @@ class NativeBinaryJvmLauncherPlugin : Plugin<Project> {
         with(target) {
             plugins.apply(ApplicationBasePlugin::class.java)
             applications.withApp<MutableJvmApplication> { app ->
-                app.packaging = JvmApplicationWithNativeBinary()
-
                 val binaryTask = tasks.registering<NativeBinary>("nativeBinary") {
                     launcherFile.set(layout.buildDirectory.file("native-binary/launcher"))
                     module.set(app.module.name)

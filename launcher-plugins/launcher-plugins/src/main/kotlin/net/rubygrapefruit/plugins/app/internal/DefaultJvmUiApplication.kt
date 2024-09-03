@@ -14,8 +14,6 @@ abstract class DefaultJvmUiApplication @Inject constructor(
     private val project: Project
 ) : DefaultUiApplication(objects, providers, project), MutableJvmApplication, JvmUiApplication {
 
-    override var packaging: JvmApplicationPackaging = JvmApplicationWithEmbeddedJvm()
-
     override val runtimeModulePath: ConfigurableFileCollection = objects.fileCollection()
 
     override fun dependencies(config: KotlinDependencyHandler.() -> Unit) {

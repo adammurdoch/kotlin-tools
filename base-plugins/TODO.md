@@ -3,15 +3,13 @@
 
 - Figure out why `tasks.registering` is broken for embedded JVM task
 - Use subtypes for each distribution, only configure matching distribution types
-  - Remove JVM app "packaging"
 - Expose `.bat` as the launcher on Windows
 - Split configuration and output into separate types for app and distribution
-- Add a `run` task
+- Add distributions for debug and release for UI apps
 - Use correct target machine for embedded JVM distributions
   - Currently, uses whichever JVM architecture that Gradle decides to use
 - Add distribution for each platform for native binary JVM app
   - Can build both macOS distributions on macOS
-- Add distributions for debug and release for UI apps
 - Expose path to launcher within a distribution
   - Allows the launcher to be located in a copy of the distribution
 - Move JVM test dependency declarations into library and application blocks

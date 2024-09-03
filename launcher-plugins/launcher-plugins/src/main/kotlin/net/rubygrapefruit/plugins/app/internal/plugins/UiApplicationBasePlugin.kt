@@ -34,11 +34,11 @@ class UiApplicationBasePlugin : Plugin<Project> {
                 app.eachTarget { _, dist ->
                     dist.launcherFilePath.set(capitalizedAppName.map { "MacOS/$it" })
 
-                    dist.distTask.configure { distImage ->
-                        distImage.imageDirectory.set(layout.buildDirectory.dir(capitalizedAppName.map { "${dist.imageBaseDir.get()}/$it.app" }))
-                        distImage.rootDirPath.set("Contents")
-                        distImage.includeFile("Info.plist", infoPlistTask.flatMap { it.plistFile })
-                        distImage.includeFile(
+                    dist.withImage {
+                        imageDirectory.set(layout.buildDirectory.dir(capitalizedAppName.map { "${dist.imageBaseDir.get()}/$it.app" }))
+                        rootDirPath.set("Contents")
+                        includeFile("Info.plist", infoPlistTask.flatMap { it.plistFile })
+                        includeFile(
                             app.iconName.map { "Resources/$it" },
                             iconTask.flatMap {
                                 if (it.sourceIcon.get().asFile.exists()) {

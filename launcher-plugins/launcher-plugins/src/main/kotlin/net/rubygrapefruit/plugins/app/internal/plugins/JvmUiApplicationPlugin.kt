@@ -4,6 +4,7 @@ import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.NativeMachine
 import net.rubygrapefruit.plugins.app.internal.DefaultHasEmbeddedJvmAndLauncherExecutableDistribution
 import net.rubygrapefruit.plugins.app.internal.DefaultJvmUiApplication
+import net.rubygrapefruit.plugins.app.internal.HasEmbeddedJvm
 import net.rubygrapefruit.plugins.app.internal.HostMachine
 import net.rubygrapefruit.plugins.app.internal.applications
 import net.rubygrapefruit.plugins.app.internal.tasks.LauncherConf
@@ -21,15 +22,6 @@ class JvmUiApplicationPlugin : Plugin<Project> {
 
             applications.withApp<DefaultJvmUiApplication> { app ->
                 val capitalizedAppName = app.capitalizedAppName
-
-                val configTask = tasks.register("launcherConf", LauncherConf::class.java) {
-                    it.configFile.set(layout.buildDirectory.file("app/launcher.conf"))
-                    it.applicationDisplayName.set(capitalizedAppName)
-                    it.iconName.set(app.iconName)
-                    it.javaCommand.set(app.javaLauncherPath)
-                    it.module.set(app.module.name)
-                    it.mainClass.set(app.mainClass)
-                }
 
                 // TODO - 'can build' flag is incorrect - it depends on the JVM to be embedded
                 val current = HostMachine.current
@@ -62,9 +54,20 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                         it.outputFile.set(layout.buildDirectory.file("app-${dist.name}/native-launcher.kexe"))
                     }
 
+                    require(dist is HasEmbeddedJvm)
+
+                    val configTask = tasks.register(dist.taskName("launcherConf"), LauncherConf::class.java) {
+                        it.configFile.set(layout.buildDirectory.file("app/launcher.conf"))
+                        it.applicationDisplayName.set(capitalizedAppName)
+                        it.iconName.set(app.iconName)
+                        it.javaCommand.set(dist.javaLauncherPath)
+                        it.module.set(app.module.name)
+                        it.mainClass.set(app.mainClass)
+                    }
+
                     dist.launcherFile.set(launcherTask.flatMap { it.outputFile })
-                    dist.distTask.configure { distImage ->
-                        distImage.includeFile("Resources/launcher.conf", configTask.flatMap { it.configFile })
+                    dist.withImage {
+                        includeFile("Resources/launcher.conf", configTask.flatMap { it.configFile })
                     }
                 }
             }

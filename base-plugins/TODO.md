@@ -1,20 +1,19 @@
 
 # TODO
 
+- Fix `.bat` to work from any directory, e.g. via a link
 - Figure out why `tasks.registering` is broken for embedded JVM task
 - UI app `dist` task should fail on non-mac host machines
+- Improve failure for `dist` task when nothing can be built
+  - Or, don't add a dist task in this case.
 - Use subtypes for each distribution, only configure matching distribution types
-- Expose `.bat` as the launcher on Windows
 - Split configuration and output into separate types for app and distribution
 - Add distributions for debug and release for UI apps
 - Use correct target machine for embedded JVM distributions
   - Currently, uses whichever JVM architecture that Gradle decides to use
 - Add distribution for each platform for native binary JVM app
   - Can build both macOS distributions on macOS
-- Expose path to launcher within a distribution
-  - Allows the launcher to be located in a copy of the distribution
 - Move JVM test dependency declarations into library and application blocks
-- Don't add a dist task when there is no source for the current target (eg native-launcher on linux)
 - Native-launcher: fix Windows
 - Move dependency declarations into library and application blocks
     - UI applications 
@@ -24,11 +23,9 @@
 - Add `run` task for apps
 - Add `install` task for apps
 - Support KMP app that targets native + jvm + browser + node
-- Don't include launcher script for all targets for embedded JVM and native exe JVM apps (eg don't include bat script for macOS dist)
 - Use `--launcher` instead of `--add-modules` with `jlink`
 - Convert automatic modules to real modules prior to using with `jlink`
 - Download service: don't keep the install dir when install action fails
-- Native app plugin creates distributions for all targets
 - Native macOS bundle plugin
 - Configurable bundle id, app display name, app version
 - Handle missing main class or multiple main classes

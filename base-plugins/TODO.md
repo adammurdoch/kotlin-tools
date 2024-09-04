@@ -1,12 +1,16 @@
 
 # TODO
 
-- Fix `.bat` to work from any directory, e.g. via a link
+- Add an "app bundle" plugin, which will include other apps as JVM resources
+- Fix `.bat` to work from any directory via a link
+  - Or replace with binary launcher
 - Figure out why `tasks.registering` is broken for embedded JVM task
+- `showDistributions` shows wrong image dir for UI apps
+- Add test for alternate distributions, e.g `noJvm`
 - UI app `dist` task should fail on non-mac host machines
+- Don't include `.bat` script for non-windows embedded JVM, or replace with binary launcher
 - Improve failure for `dist` task when nothing can be built
   - Or, don't add a dist task in this case.
-- Use subtypes for each distribution, only configure matching distribution types
 - Split configuration and output into separate types for app and distribution
 - Add distributions for debug and release for UI apps
 - Use correct target machine for embedded JVM distributions
@@ -14,7 +18,6 @@
 - Add distribution for each platform for native binary JVM app
   - Can build both macOS distributions on macOS
 - Move JVM test dependency declarations into library and application blocks
-- Native-launcher: fix Windows
 - Move dependency declarations into library and application blocks
     - UI applications 
     - commonTest for applications 

@@ -14,7 +14,7 @@ abstract class LauncherBashScript : LauncherScript() {
         val libsDirPath = libsDirPath.get()
         val modulePath = modulePath.get()
         val modulePathArg = if (modulePath.isNotEmpty()) {
-            "--module-path \"${modulePath.joinToString(":") { "\$BASE_DIR/$libsDirPath/$it" }}\""
+            "--module-path \"${modulePath.joinToString(":") { "\$LIB_DIR/$it" }}\""
         } else {
             ""
         }
@@ -30,6 +30,7 @@ while [ -L "${'$'}SOURCE" ]; do
     [[ ${'$'}SOURCE != /* ]] && SOURCE=${'$'}DIR/${'$'}SOURCE
 done
 BASE_DIR=${'$'}( cd -P "${'$'}( dirname "${'$'}SOURCE" )" >/dev/null 2>&1 && pwd )
+LIB_DIR="${'$'}BASE_DIR/$libsDirPath"
 
 $javaCommand $modulePathArg --module ${module.get()}/${mainClass.get()} "$@"
 """

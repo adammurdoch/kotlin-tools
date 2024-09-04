@@ -10,7 +10,7 @@ abstract class LauncherBatScript : LauncherScript() {
         val libsDirPath = libsDirPath.get()
         val modulePath = modulePath.get()
         val modulePathArg = if (modulePath.isNotEmpty()) {
-            "--module-path \"${modulePath.joinToString(";") { "%BASE_DIR%/$libsDirPath/$it" }}\""
+            "--module-path \"${modulePath.joinToString(";") { "%LIB_DIR%\\$it" }}\""
         } else {
             ""
         }
@@ -19,8 +19,9 @@ abstract class LauncherBatScript : LauncherScript() {
         scriptFile.writeText(
             """@echo off
 set BASE_DIR=%~dp0
+set LIB_DIR="%BASE_DIR%\\$libsDirPath"
 $javaCommand $modulePathArg --module ${module.get()}/${mainClass.get()} %*            
-"""
+""".replace("\n", "\r\n")
         )
     }
 }

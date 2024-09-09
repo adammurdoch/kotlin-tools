@@ -3,6 +3,7 @@ package net.rubygrapefruit.plugins.app.internal
 import net.rubygrapefruit.plugins.app.JvmLibrary
 import net.rubygrapefruit.plugins.app.JvmModule
 import net.rubygrapefruit.plugins.app.MultiPlatformLibrary
+import net.rubygrapefruit.plugins.app.NativeLibrary
 import net.rubygrapefruit.plugins.app.Versions
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
@@ -15,6 +16,7 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
     private val project: Project
 ) : MultiPlatformLibrary {
     private var jvm: JvmLibrary? = null
+    private var macOs: NativeLibrary? = null
 
     val module: JvmModule
         get() = jvm!!.module
@@ -40,6 +42,14 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
 
     override fun macOS() {
         componentRegistry.macOS()
+    }
+
+    override fun macOS(config: NativeLibrary.() -> Unit) {
+        componentRegistry.macOS()
+        if (macOs == null) {
+            macOs = factory.newInstance(DefaultNativeLibrary::class.java, "macosMain")
+        }
+        config(macOs!!)
     }
 
     override fun nativeDesktop() {

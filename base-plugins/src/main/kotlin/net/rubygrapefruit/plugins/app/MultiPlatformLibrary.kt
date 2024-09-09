@@ -22,6 +22,11 @@ interface MultiPlatformLibrary : MultiPlatformComponent {
     fun macOS()
 
     /**
+     * Adds macOS as a target, if not already, and applies the given configuration.
+     */
+    fun macOS(config: NativeLibrary.() -> Unit)
+
+    /**
      * Adds the browser as a target, if not already.
      */
     fun browser()

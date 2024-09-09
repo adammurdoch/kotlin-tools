@@ -36,7 +36,7 @@ open class CliApp(val name: String) : CliAction() {
             val action = try {
                 main.actionFor(args)
             } catch (e: ArgParseException) {
-                reportParseFailure(formatter, e, main)
+                reportParseFailure(formatter, e)
                 return false
             }
             parsed = true
@@ -54,7 +54,7 @@ open class CliApp(val name: String) : CliAction() {
         }
     }
 
-    private fun reportParseFailure(formatter: Formatter, e: ArgParseException, main: MainAction) {
+    private fun reportParseFailure(formatter: Formatter, e: ArgParseException) {
         formatter.run {
             if (e is PositionalParseException) {
                 append(e.resolution)

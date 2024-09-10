@@ -1,3 +1,4 @@
+- Improve error reporting when empty argument is found and not expected
 - Fix store test apps when store directory does not exist 
 - Fix error message when multiple actions are provided, either as names or options or combined with default
 - Merge `NestedActionHelpAction` into `HelpAction`

@@ -2,14 +2,18 @@
 
 A collection of Gradle plugins for building applications and libraries using Kotlin.
 
-These plugins all target Kotlin 2.0.0 and Java 17 (for Kotlin/JVM apps).
+These plugins all target Kotlin 2.20.0 and Java 17 (for Kotlin/JVM apps).
 The plugins require Gradle 7.5.1 or later and Java 11 or later.
 
-## `net.rubygrapefruit.kotlin-base`
+## Settings plugins
+
+### `net.rubygrapefruit.kotlin-base`
 
 A settings plugin that must be applied to the settings of any build that uses these plugins.
 
-## `net.rubygrapefruit.native.desktop-lib`
+## Native desktop applications and libraries
+
+### `net.rubygrapefruit.native.desktop-lib`
 
 Builds a library implemented in Kotlin multiplatform that targets native desktop platforms.
 
@@ -17,29 +21,31 @@ Builds a library implemented in Kotlin multiplatform that targets native desktop
 - Adds `unixMain` source sets for Kotlin code that is shared by macOS and Linux targets.
 - Adds a `library { }` block.
 
-## `net.rubygrapefruit.native.cli-app`
+### `net.rubygrapefruit.native.cli-app`
 
 Builds a command-line application implemented in Kotlin multiplatform that targets native desktop platforms.
 
 - Adds Linux and Windows x64 targets and macOS x64 and arm64 targets.
 - Adds `unixMain` and `unixTest` source sets for Kotlin code that is shared by macOS and Linux targets.
-- Adds `application { }` block, see below for the available settings.
+- Adds an `application { }` block, see below for the available settings.
 
-## `net.rubygrapefruit.native.ui-app`
+This uses the `net.rubygrapefruit.native.base-cli-app` plugin and adds the targets. 
+
+### `net.rubygrapefruit.native.ui-app`
 
 Builds a UI application implemented in Kotlin multiplatform that targets native desktop platforms.
 
-## `net.rubygrapefruit.native.base-cli-app`
+- Adds macOS x64 and arm64 targets.
+- Adds an `application { }` block, see below for the available settings.
 
-Builds a CLI app implemented in Kotlin multiplatform. Does not define any targets, these have to be explicitly 
-defined.
+### `net.rubygrapefruit.native.base-cli-app`
 
-## `net.rubygrapefruit.kmp.base-lib`
+Builds a command-line application implemented in Kotlin multiplatform.
+Does not define any targets, these have to be explicitly defined.
 
-Builds a library implemented in Kotlin multiplatform. Does not define any targets, these have to be explicitly 
-defined.
+## Native and JVM libraries
 
-## `net.rubygrapefruit.kmp.lib`
+### `net.rubygrapefruit.kmp.lib`
 
 Builds a library implemented in Kotlin multiplatform that targets the JVM, browser and native desktop platforms.
 
@@ -49,14 +55,23 @@ Builds a library implemented in Kotlin multiplatform that targets the JVM, brows
 - Adds `library { }` block, see below for the available settings.
 - Generates a `module-info` for the JVM target.
 
-## `net.rubygrapefruit.jvm.lib`
+This uses the `net.rubygrapefruit.kmp.base-lib` plugin and adds the targets. 
+
+### `net.rubygrapefruit.kmp.base-lib`
+
+Builds a library implemented in Kotlin multiplatform.
+Does not define any targets, these have to be explicitly defined.
+
+## JVM applications and libraries
+
+### `net.rubygrapefruit.jvm.lib`
 
 Builds a library implemented in Kotlin/JVM.
 
 - Adds `library { }` block, see below for the available settings.
 - Generates a `module-info`.
 
-## `net.rubygrapefruit.jvm.cli-app`
+### `net.rubygrapefruit.jvm.cli-app`
 
 Builds a command-line application implemented in Kotlin/JVM.
 Expects that the application uses the JVM module system.
@@ -67,17 +82,17 @@ Expects that the application uses the JVM module system.
 - Automatically determines the application main class.
 - Generates a `module-info`.
 
-## `net.rubygrapefruit.jvm.embedded-jvm`
+### `net.rubygrapefruit.jvm.embedded-jvm`
 
 Can be applied with `net.rubygrapefruit.jvm.cli-app` to include a copy of the JVM in the application distribution.
 The launcher script uses this embedded JVM. Uses `jlink` to create the JVM image.
 
-## `net.rubygrapefruit.jvm.native-binary`
+### `net.rubygrapefruit.jvm.native-binary`
 
 Can be applied with `net.rubygrapefruit.jvm.cli-app` to create a native binary to use in the application distribution,
 instead of using a launcher script. Uses `graalvm` to create the native binary.
 
-## `net.rubygrapefruit.jvm.ui-app`
+### `net.rubygrapefruit.jvm.ui-app`
 
 Builds a desktop UI application implemented in Kotlin/JVM and that presents a Swing or JavaFX UI.
 Expects that the application uses the JVM module system.
@@ -89,7 +104,9 @@ Expects that the application uses the JVM module system.
 - Use `releaseDist` to build the release application bundle
 - Adds `application { }` block, see below for the available settings.
 
-## `net.rubygrapefruit.gradle-plugin`
+## Gradle plugins
+
+### `net.rubygrapefruit.gradle-plugin`
 
 A convention plugin for implementing Gradle plugins in Kotlin/JVM.
 

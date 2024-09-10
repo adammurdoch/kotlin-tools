@@ -1,5 +1,6 @@
 package net.rubygrapefruit.plugins.app.internal
 
+import net.rubygrapefruit.plugins.app.Dependencies
 import net.rubygrapefruit.plugins.app.JvmUiApplication
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
@@ -16,11 +17,11 @@ abstract class DefaultJvmUiApplication @Inject constructor(
 
     override val runtimeModulePath: ConfigurableFileCollection = objects.fileCollection()
 
-    override fun dependencies(config: KotlinDependencyHandler.() -> Unit) {
-        project.jvmKotlin.sourceSets.getByName("main").dependencies { config() }
+    override fun dependencies(config: Dependencies.() -> Unit) {
+        project.jvmKotlin.sourceSets.getByName("main").dependencies { config(KotlinHandlerBackedDependencies(this)) }
     }
 
-    override fun test(config: KotlinDependencyHandler.() -> Unit) {
-        project.jvmKotlin.sourceSets.getByName("test").dependencies { config() }
+    override fun test(config: Dependencies.() -> Unit) {
+        project.jvmKotlin.sourceSets.getByName("test").dependencies { config(KotlinHandlerBackedDependencies(this)) }
     }
 }

@@ -1,6 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal
 
 import net.rubygrapefruit.plugins.app.BuildType
+import net.rubygrapefruit.plugins.app.Dependencies
 import net.rubygrapefruit.plugins.app.NativeApplication
 import net.rubygrapefruit.plugins.app.NativeExecutable
 import net.rubygrapefruit.plugins.app.NativeMachine
@@ -10,7 +11,6 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.jetbrains.kotlin.gradle.dsl.KotlinNativeBinaryContainer
-import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import javax.inject.Inject
 
 abstract class DefaultNativeCliApplication @Inject constructor(
@@ -51,11 +51,11 @@ abstract class DefaultNativeCliApplication @Inject constructor(
         targets.configureTarget(machine, buildType, action)
     }
 
-    override fun common(config: KotlinDependencyHandler.() -> Unit) {
-        project.kotlin.sourceSets.getByName("commonMain").dependencies { config() }
+    override fun common(config: Dependencies.() -> Unit) {
+        project.kotlin.sourceSets.getByName("commonMain").dependencies { config(KotlinHandlerBackedDependencies(this)) }
     }
 
-    override fun test(config: KotlinDependencyHandler.() -> Unit) {
-        project.kotlin.sourceSets.getByName("commonTest").dependencies { config() }
+    override fun test(config: Dependencies.() -> Unit) {
+        project.kotlin.sourceSets.getByName("commonTest").dependencies { config(KotlinHandlerBackedDependencies(this)) }
     }
 }

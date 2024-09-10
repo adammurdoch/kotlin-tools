@@ -13,6 +13,6 @@ library {
     }
     nativeDesktop()
     test {
-        implementation(kotlin("test"))
+        implementation(Versions.test.coordinates)
     }
 }

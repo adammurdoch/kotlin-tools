@@ -1,6 +1,6 @@
 package net.rubygrapefruit.plugins.app
 
-interface MultiPlatformLibrary : MultiPlatformComponent {
+interface MultiPlatformLibrary : MultiPlatformComponent<LibraryDependencies> {
     /**
      * Adds the JVM as a target, if not already, using the defaults.
      */

@@ -19,7 +19,7 @@ library {
         implementation(Versions.serialization.json.coordinates)
     }
     test {
-        implementation(kotlin("test"))
+        implementation(Versions.test.coordinates)
         implementation(project(":file-fixtures"))
     }
 }

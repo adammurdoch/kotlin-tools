@@ -2,7 +2,7 @@ package net.rubygrapefruit.plugins.app
 
 import org.gradle.api.provider.Provider
 
-interface NativeApplication : Application, MultiPlatformComponent {
+interface NativeApplication : Application, MultiPlatformComponent<Dependencies> {
     /**
      * Adds the native desktops (macOS, Linux, Windows) as a target, if not already.
      */

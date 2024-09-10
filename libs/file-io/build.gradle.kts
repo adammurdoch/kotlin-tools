@@ -16,7 +16,7 @@ library {
         api(project(":stream-io"))
     }
     test {
-        implementation(kotlin("test"))
+        implementation(Versions.test.coordinates)
         implementation(project(":file-fixtures"))
     }
 }

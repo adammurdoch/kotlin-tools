@@ -1,3 +1,5 @@
+import net.rubygrapefruit.plugins.app.Versions
+
 plugins {
     id("net.rubygrapefruit.kmp.base-lib")
 }
@@ -11,7 +13,7 @@ library {
     }
     nativeDesktop()
     test {
-        implementation(kotlin("test"))
+        implementation(Versions.test.coordinates)
         implementation(project(":file-fixtures"))
     }
     common {

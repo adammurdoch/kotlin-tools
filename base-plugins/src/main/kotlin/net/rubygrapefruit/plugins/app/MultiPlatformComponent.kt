@@ -1,15 +1,13 @@
 package net.rubygrapefruit.plugins.app
 
-import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
-
-interface MultiPlatformComponent {
+interface MultiPlatformComponent<D : Dependencies> {
     /**
      * Configures common dependencies for this component.
      */
-    fun common(config: KotlinDependencyHandler.() -> Unit)
+    fun common(config: D.() -> Unit)
 
     /**
      * Configures common test dependencies for this component.
      */
-    fun test(config: KotlinDependencyHandler.() -> Unit)
+    fun test(config: D.() -> Unit)
 }

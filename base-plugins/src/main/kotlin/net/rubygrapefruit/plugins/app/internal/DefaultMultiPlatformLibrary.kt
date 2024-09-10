@@ -2,12 +2,12 @@ package net.rubygrapefruit.plugins.app.internal
 
 import net.rubygrapefruit.plugins.app.JvmLibrary
 import net.rubygrapefruit.plugins.app.JvmModule
+import net.rubygrapefruit.plugins.app.LibraryDependencies
 import net.rubygrapefruit.plugins.app.MultiPlatformLibrary
 import net.rubygrapefruit.plugins.app.NativeLibrary
 import net.rubygrapefruit.plugins.app.Versions
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
-import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import javax.inject.Inject
 
 internal open class DefaultMultiPlatformLibrary @Inject constructor(
@@ -56,11 +56,11 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
         componentRegistry.desktop()
     }
 
-    override fun common(config: KotlinDependencyHandler.() -> Unit) {
-        project.kotlin.sourceSets.getByName("commonMain").dependencies { config() }
+    override fun common(config: LibraryDependencies.() -> Unit) {
+        project.kotlin.sourceSets.getByName("commonMain").dependencies { config(KotlinHandlerBackedLibraryDependencies(this)) }
     }
 
-    override fun test(config: KotlinDependencyHandler.() -> Unit) {
-        project.kotlin.sourceSets.getByName("commonTest").dependencies { config() }
+    override fun test(config: LibraryDependencies.() -> Unit) {
+        project.kotlin.sourceSets.getByName("commonTest").dependencies { config(KotlinHandlerBackedLibraryDependencies(this)) }
     }
 }

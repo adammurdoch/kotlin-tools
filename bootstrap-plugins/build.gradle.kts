@@ -78,6 +78,7 @@ val generateResource = tasks.register("generate-version-resource") {
              */
             object Versions {
                 val kotlin = Kotlin
+                val test = KotlinTest
                 val serialization = Serialization
                 val coroutines = Coroutines
                 val dateTime = DateTime
@@ -89,6 +90,11 @@ val generateResource = tasks.register("generate-version-resource") {
             object Kotlin {
                 val version = "${Constants.kotlin}"
                 val pluginCoordinates = "${Constants.kotlinPluginCoordinates}"
+            }
+
+            object KotlinTest {
+                val version = "${Constants.kotlin}"
+                val coordinates = "org.jetbrains.kotlin:kotlin-test:" + version
             }
             
             object Plugins {

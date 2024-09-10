@@ -35,7 +35,7 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     }
 
     override fun nativeDesktop() {
-        componentRegistry.desktop { register(it) }
+        componentRegistry.nativeDesktop { register(it) }
     }
 
     private fun KotlinNativeBinaryContainer.register(target: NativeMachine) {

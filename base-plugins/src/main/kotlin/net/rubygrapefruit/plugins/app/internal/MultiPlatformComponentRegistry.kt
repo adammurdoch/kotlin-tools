@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 open class MultiPlatformComponentRegistry(private val project: Project) {
+    private val desktopSourceSets = mutableSetOf<String>()
     private val unixSourceSets = mutableSetOf<String>()
     private val unixTestSourceSets = mutableSetOf<String>()
     private val machines = mutableSetOf<NativeMachine>()
@@ -19,10 +20,11 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
         project.afterEvaluate {
             createIntermediateSourceSet("unixMain", "nativeMain", unixSourceSets)
             createIntermediateSourceSet("unixTest", "nativeTest", unixTestSourceSets)
+            createIntermediateSourceSet("desktopMain", "commonMain", desktopSourceSets)
         }
     }
 
-    fun desktop(config: KotlinNativeBinaryContainer.(NativeMachine) -> Unit = {}) {
+    fun nativeDesktop(config: KotlinNativeBinaryContainer.(NativeMachine) -> Unit = {}) {
         macOS(config)
         native(setOf(NativeMachine.LinuxX64, NativeMachine.WindowsX64), config)
     }
@@ -39,6 +41,7 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
             jvm()
         }
         jvm.add(true)
+        desktopSourceSets.add("jvmMain")
     }
 
     fun browser() {
@@ -93,6 +96,7 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
                 macosX64 {
                     config(binaries, NativeMachine.MacOSX64)
                 }
+                desktopSourceSets.add("unixMain")
                 unixSourceSets.add("macosMain")
                 unixTestSourceSets.add("macosTest")
             }
@@ -100,6 +104,7 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
                 macosArm64 {
                     config(binaries, NativeMachine.MacOSArm64)
                 }
+                desktopSourceSets.add("unixMain")
                 unixSourceSets.add("macosMain")
                 unixTestSourceSets.add("macosTest")
             }
@@ -107,6 +112,7 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
                 linuxX64 {
                     config(binaries, NativeMachine.LinuxX64)
                 }
+                desktopSourceSets.add("unixMain")
                 unixSourceSets.add("linuxMain")
                 unixTestSourceSets.add("linuxTest")
             }
@@ -114,6 +120,7 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
                 mingwX64 {
                     config(binaries, NativeMachine.WindowsX64)
                 }
+                desktopSourceSets.add("mingwX64Main")
             }
         }
         for (target in targets) {

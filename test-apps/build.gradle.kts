@@ -242,7 +242,7 @@ val nativeUiApp = macOsUiApp("native-ui-app")
 
 val jvmCliFullApp = jvmCliApp("jvm-cli-app-full").cliArgs("list")
 
-val jvmCliStoreApp = jvmCliApp("jvm-store-cli-app").cliArgs("content", "build/test")
+val jvmCliStoreApp = jvmCliApp("store-jvm-cli-app").cliArgs("content", "build/test")
 
 val samples = listOf(
     jvmLib,
@@ -270,7 +270,7 @@ val samples = listOf(
 
     jvmCliMinApp.deriveNative("native-cli-app-min").allPlatforms(),
     jvmCliFullApp.deriveNative("native-cli-app-full").allPlatforms(),
-    jvmCliStoreApp.deriveNative("native-store-cli-app").allPlatforms(),
+    jvmCliStoreApp.deriveNative("store-native-cli-app").allPlatforms(),
 
     nativeUiApp,
     nativeUiApp.derive("customized") { it.launcher("App") }

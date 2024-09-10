@@ -53,7 +53,7 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
     }
 
     override fun nativeDesktop() {
-        componentRegistry.desktop()
+        componentRegistry.nativeDesktop()
     }
 
     override fun common(config: LibraryDependencies.() -> Unit) {

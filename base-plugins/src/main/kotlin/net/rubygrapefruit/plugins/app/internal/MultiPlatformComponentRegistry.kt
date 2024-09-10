@@ -1,6 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal
 
 import net.rubygrapefruit.plugins.app.NativeMachine
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.gradle.jvm.toolchain.JavaLanguageVersion
@@ -18,9 +19,12 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
 
     init {
         project.afterEvaluate {
-            createIntermediateSourceSet("unixMain", "nativeMain", unixSourceSets)
-            createIntermediateSourceSet("unixTest", "nativeTest", unixTestSourceSets)
-            createIntermediateSourceSet("desktopMain", "commonMain", desktopSourceSets)
+            if (unixSourceSets.isNotEmpty() && unixTestSourceSets.isNotEmpty() && desktopSourceSets.isNotEmpty()) {
+                project.kotlin.applyDefaultHierarchyTemplate()
+                createIntermediateSourceSet("unixMain", "nativeMain", unixSourceSets)
+                createIntermediateSourceSet("unixTest", "nativeTest", unixTestSourceSets)
+                createIntermediateSourceSet("desktopMain", "commonMain", desktopSourceSets)
+            }
         }
     }
 
@@ -63,28 +67,31 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
         jvm.each { action() }
     }
 
-    private fun createIntermediateSourceSet(name: String, parent: String, children: MutableSet<String>) {
+    private fun createIntermediateSourceSet(name: String, parentName: String, children: MutableSet<String>) {
         if (children.isEmpty()) {
             return
         }
-        with(project.kotlin) {
-            var intermediate: KotlinSourceSet? = null
+        withSourceSet(parentName) { parent, sourceSets ->
+            val intermediate = sourceSets.create(name) {
+                it.dependsOn(parent)
+            }
+            for (childName in children) {
+                withSourceSet(childName) { child, sourceSets ->
+                    child.dependsOn(intermediate)
+                }
+            }
+        }
+    }
+
+    private fun withSourceSet(name: String, action: (KotlinSourceSet, NamedDomainObjectContainer<KotlinSourceSet>) -> Unit) {
+        val sourceSets = project.kotlin.sourceSets
+        val sourceSet = sourceSets.findByName(name)
+        if (sourceSet != null) {
+            action(sourceSet, sourceSets)
+        } else {
             sourceSets.whenObjectAdded { sourceSet ->
-                if (sourceSet.name == parent) {
-                    intermediate = sourceSets.create(name) {
-                        it.dependsOn(sourceSet)
-                    }
-                    val iter = children.iterator()
-                    for (childName in iter) {
-                        val child = sourceSets.findByName(childName)
-                        if (child != null) {
-                            child.dependsOn(intermediate!!)
-                            iter.remove()
-                        }
-                    }
-                } else if (intermediate != null && children.contains(sourceSet.name)) {
-                    children.remove(sourceSet.name)
-                    sourceSet.dependsOn(intermediate!!)
+                if (sourceSet.name == name) {
+                    action(sourceSet, sourceSets)
                 }
             }
         }
@@ -96,7 +103,6 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
                 macosX64 {
                     config(binaries, NativeMachine.MacOSX64)
                 }
-                desktopSourceSets.add("unixMain")
                 unixSourceSets.add("macosMain")
                 unixTestSourceSets.add("macosTest")
             }
@@ -104,7 +110,6 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
                 macosArm64 {
                     config(binaries, NativeMachine.MacOSArm64)
                 }
-                desktopSourceSets.add("unixMain")
                 unixSourceSets.add("macosMain")
                 unixTestSourceSets.add("macosTest")
             }
@@ -112,7 +117,6 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
                 linuxX64 {
                     config(binaries, NativeMachine.LinuxX64)
                 }
-                desktopSourceSets.add("unixMain")
                 unixSourceSets.add("linuxMain")
                 unixTestSourceSets.add("linuxTest")
             }
@@ -120,8 +124,8 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
                 mingwX64 {
                     config(binaries, NativeMachine.WindowsX64)
                 }
-                desktopSourceSets.add("mingwX64Main")
             }
+            desktopSourceSets.add("nativeMain")
         }
         for (target in targets) {
             if (machines.add(target)) {

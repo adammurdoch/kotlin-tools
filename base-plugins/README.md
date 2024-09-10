@@ -18,7 +18,7 @@ A settings plugin that must be applied to the settings of any build that uses th
 Builds a library implemented in Kotlin multiplatform that targets native desktop platforms.
 
 - Adds Linux and Windows x64 targets and macOS x64 and arm64 targets.
-- Adds `unixMain` source sets for Kotlin code that is shared by macOS and Linux targets.
+- Adds `unixMain` and `unixTest` source sets for Kotlin code that is shared by macOS and Linux targets.
 - Adds a `library { }` block.
 
 ### `net.rubygrapefruit.native.cli-app`
@@ -53,6 +53,8 @@ Builds a library implemented in Kotlin multiplatform that targets the JVM, brows
 - Add browser target.
 - Adds Linux and Windows x64 targets and macOS x64 and arm64 targets.
 - Adds `library { }` block, see below for the available settings.
+- Adds `unixMain` and `unixTest` source sets for Kotlin code that is shared by macOS and Linux targets.
+- Adds `desktopMain` and `desktopTest` source sets for Kotlin code that is shared by JVM, macOS, Linux and Windows targets.
 - Generates a `module-info` for the JVM target.
 
 This uses the `net.rubygrapefruit.kmp.base-lib` plugin and adds the targets. 

@@ -195,7 +195,7 @@ sealed class App(
     fun derive(suffix: String, builder: (AppNature) -> AppNature = { it }): DerivedApp {
         val sampleName = "$name-$suffix"
         val newNature = builder(mainDist.nature.launcher(sampleName))
-        return DerivedApp(sampleName, derivedFrom, baseDir, AppDistribution(newNature), srcDirName, includePackages)
+        return DerivedApp(sampleName, derivedFrom, baseDir, AppDistribution(newNature), emptyList(), srcDirName, includePackages, allPlatforms)
     }
 }
 
@@ -214,7 +214,7 @@ open class BaseApp(
         get() = this
 
     fun deriveNative(name: String): DerivedApp {
-        return DerivedApp(name, derivedFrom, baseDir, AppDistribution(NativeBinaryCliApp(name)), "commonMain", false, allPlatforms)
+        return DerivedApp(name, derivedFrom, baseDir, AppDistribution(NativeBinaryCliApp(name)), emptyList(), "commonMain", false, allPlatforms)
     }
 
     fun allPlatforms(): BaseApp {
@@ -242,14 +242,15 @@ class DerivedApp(
     override val derivedFrom: BaseApp,
     baseDir: File,
     mainDist: AppDistribution,
+    val otherDists: List<AppDistribution>,
     srcDirName: String,
     includePackages: Boolean,
-    allPlatforms: Boolean = false,
+    allPlatforms: Boolean,
 ) :
     App(name, baseDir, mainDist, srcDirName, includePackages, allPlatforms, derivedFrom.invocation), DerivedSample {
 
     fun allPlatforms(): DerivedApp {
-        return DerivedApp(name, derivedFrom, baseDir, mainDist, srcDirName, includePackages, true)
+        return DerivedApp(name, derivedFrom, baseDir, mainDist, otherDists, srcDirName, includePackages, true)
     }
 
     override val derivedSrcDirs: List<DerivedSrcDir>

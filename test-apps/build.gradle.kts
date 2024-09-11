@@ -142,13 +142,15 @@ class UiApp(private val appName: String) : AppNature() {
 data class AppInvocation(val cliArgs: List<String>, val expectedOutput: String?)
 
 class AppDistribution(
-    val nature: AppNature
+    val nature: AppNature,
+    val distTaskName: String = "dist"
 )
 
 sealed class App(
     name: String,
     baseDir: File,
     val mainDist: AppDistribution,
+    val otherDists: List<AppDistribution>,
     val srcDirName: String,
     val includePackages: Boolean,
     val allPlatforms: Boolean,
@@ -158,7 +160,8 @@ sealed class App(
 
     val srcDir = dir.resolve("src/$srcDirName/kotlin")
 
-    val distTask = ":$name:dist"
+    val distTask: String
+        get() = ":$name:${mainDist.distTaskName}"
 
     val distDir = dir.resolve(mainDist.nature.distDirName)
 
@@ -208,13 +211,19 @@ open class BaseApp(
     allPlatforms: Boolean = false,
     invocation: AppInvocation = AppInvocation(listOf("1", "+", "2"), "Expression: (1) + (2)")
 ) :
-    App(name, baseDir, mainDist, srcDirName, includePackages, allPlatforms, invocation) {
+    App(name, baseDir, mainDist, emptyList(), srcDirName, includePackages, allPlatforms, invocation) {
 
     override val derivedFrom: BaseApp
         get() = this
 
     fun deriveNative(name: String): DerivedApp {
-        return DerivedApp(name, derivedFrom, baseDir, AppDistribution(NativeBinaryCliApp(name)), emptyList(), "commonMain", false, allPlatforms)
+        val host = Machine.thisMachine
+        val otherDists = if (host.isMacOS && host.architecture == Arm64) {
+            listOf(AppDistribution(NativeBinaryCliApp(name), "macosX64DebugDist"))
+        } else {
+            emptyList()
+        }
+        return DerivedApp(name, derivedFrom, baseDir, AppDistribution(NativeBinaryCliApp(name)), otherDists, "commonMain", false, allPlatforms)
     }
 
     fun allPlatforms(): BaseApp {
@@ -242,12 +251,12 @@ class DerivedApp(
     override val derivedFrom: BaseApp,
     baseDir: File,
     mainDist: AppDistribution,
-    val otherDists: List<AppDistribution>,
+    otherDists: List<AppDistribution>,
     srcDirName: String,
     includePackages: Boolean,
     allPlatforms: Boolean,
 ) :
-    App(name, baseDir, mainDist, srcDirName, includePackages, allPlatforms, derivedFrom.invocation), DerivedSample {
+    App(name, baseDir, mainDist, otherDists, srcDirName, includePackages, allPlatforms, derivedFrom.invocation), DerivedSample {
 
     fun allPlatforms(): DerivedApp {
         return DerivedApp(name, derivedFrom, baseDir, mainDist, otherDists, srcDirName, includePackages, true)

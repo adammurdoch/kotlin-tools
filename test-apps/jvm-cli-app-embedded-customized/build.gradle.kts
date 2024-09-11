@@ -11,7 +11,7 @@ application {
 
     dependencies {
         implementation(project(":kmp-lib-customized"))
-        implementation(project(":kmp-lib-render"))
+        implementation(project(":kmp-lib-render-customized"))
         implementation(project(":jvm-lib-customized"))
     }
 }

@@ -9,8 +9,8 @@ application {
     module.name = "sample.app"
 
     dependencies {
-        implementation(project(":kmp-lib-customized"))
+        implementation(project(":kmp-lib"))
         implementation(project(":kmp-lib-render"))
-        implementation(project(":jvm-lib-customized"))
+        implementation(project(":jvm-lib"))
     }
 }

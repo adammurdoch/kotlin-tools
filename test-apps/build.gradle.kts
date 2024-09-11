@@ -2,18 +2,18 @@ import net.rubygrapefruit.machine.info.Machine
 import org.jetbrains.kotlin.incremental.createDirectory
 import java.io.ByteArrayOutputStream
 
-sealed class Sample(val name: String, val baseDir: File, val srcDirName: String) {
+sealed class Sample(val name: String, val baseDir: File) {
     val dir = baseDir.resolve(name)
-
-    val srcDir = dir.resolve("src/$srcDirName/kotlin")
 }
+
+data class DerivedSrcDir(val origin: File, val target: File)
 
 interface DerivedSample {
     val name: String
 
     val derivedFrom: Sample
 
-    val srcDir: File
+    val derivedSrcDirs: List<DerivedSrcDir>
 
     val includePackages: Boolean
 }
@@ -129,12 +129,14 @@ sealed class App(
     name: String,
     baseDir: File,
     val nature: AppNature,
-    srcDirName: String,
+    val srcDirName: String,
     val includePackages: Boolean,
     val allPlatforms: Boolean,
     protected val cliArgs: List<String>
 ) :
-    Sample(name, baseDir, srcDirName) {
+    Sample(name, baseDir) {
+
+    val srcDir = dir.resolve("src/$srcDirName/kotlin")
 
     val distTask = ":$name:dist"
 
@@ -214,20 +216,25 @@ class DerivedApp(
     fun allPlatforms(): DerivedApp {
         return DerivedApp(name, derivedFrom, baseDir, nature, srcDirName, includePackages, true, cliArgs)
     }
+
+    override val derivedSrcDirs: List<DerivedSrcDir>
+        get() = listOf(DerivedSrcDir(derivedFrom.srcDir, srcDir))
 }
 
-class BaseLib(name: String, baseDir: File, srcDirName: String) : Sample(name, baseDir, srcDirName) {
+class BaseLib(name: String, baseDir: File, val sourceSets: List<String>) : Sample(name, baseDir) {
     fun derive(suffix: String): DerivedLib {
         val sampleName = "$name-$suffix"
-        return DerivedLib(sampleName, this, baseDir, srcDirName)
+        return DerivedLib(sampleName, this, baseDir)
     }
 }
 
-class DerivedLib(name: String, override val derivedFrom: BaseLib, baseDir: File, srcDirName: String) :
-    Sample(name, baseDir, srcDirName), DerivedSample {
+class DerivedLib(name: String, override val derivedFrom: BaseLib, baseDir: File) : Sample(name, baseDir), DerivedSample {
 
     override val includePackages: Boolean
         get() = true
+
+    override val derivedSrcDirs: List<DerivedSrcDir>
+        get() = derivedFrom.sourceSets.map { DerivedSrcDir(derivedFrom.dir.resolve("src/$it/kotlin"), dir.resolve("src/$it/kotlin")) }
 }
 
 val jvmCliMinApp = jvmCliApp("jvm-cli-app-min").cliArgs("hello", "world")
@@ -236,6 +243,7 @@ val jvmCliApp = jvmCliApp("jvm-cli-app")
 val jvmUiApp = jvmUiApp("jvm-ui-app")
 val jvmLib = jvmLib("jvm-lib")
 val kmpLib = mppLib("kmp-lib")
+val kmpLibRender = mppLib("kmp-lib-render", listOf("desktopMain", "jvmMain", "mingwMain", "unixMain"))
 
 val nativeCliApp = jvmCliApp.deriveNative("native-cli-app")
 val nativeUiApp = macOsUiApp("native-ui-app")
@@ -250,6 +258,9 @@ val samples = listOf(
 
     kmpLib,
     kmpLib.derive("customized"),
+
+    kmpLibRender,
+    kmpLibRender.derive("customized"),
 
     jvmCliApp.allPlatforms(),
     jvmCliApp.derive("customized") { it.launcher("app") }.allPlatforms(),
@@ -281,33 +292,37 @@ val derivedSamples = samples.filterIsInstance<DerivedSample>()
 val uiApps = sampleApps.filter { it.openCommandLine != null }
 
 val generators = derivedSamples.map { sample ->
-    val originDir = sample.derivedFrom.srcDir
-    if (!originDir.isDirectory) {
-        throw IllegalArgumentException("Missing source directory $originDir")
+    for (srcDir in sample.derivedSrcDirs) {
+        if (!srcDir.origin.isDirectory) {
+            throw IllegalArgumentException("Missing source directory ${srcDir.origin}")
+        }
     }
 
     tasks.register("generate-${sample.name}") {
         doLast {
-            sample.srcDir.deleteRecursively()
+            for (srcDir in sample.derivedSrcDirs) {
 
-            originDir.walkTopDown().forEach { file ->
-                val destFile = if (sample.includePackages) {
-                    sample.srcDir.resolve(file.relativeTo(originDir))
-                } else {
-                    sample.srcDir.resolve(file.name)
-                }
-                if (file.isDirectory && sample.includePackages) {
-                    destFile.createDirectory()
-                } else if (file.isFile) {
-                    destFile.parentFile.mkdirs()
-                    val text = file.readText()
-                    if (sample.includePackages) {
-                        destFile.writeText(text)
+                srcDir.target.deleteRecursively()
+
+                srcDir.origin.walkTopDown().forEach { file ->
+                    val destFile = if (sample.includePackages) {
+                        srcDir.target.resolve(file.relativeTo(srcDir.origin))
                     } else {
-                        val lines = text.lines()
-                        val packageIndex = lines.indexOfFirst { it.trim().startsWith("package ") }
-                        val modified = lines.subList(0, packageIndex) + lines.subList(packageIndex + 2, lines.size)
-                        destFile.writeText(modified.joinToString("\n"))
+                        srcDir.target.resolve(file.name)
+                    }
+                    if (file.isDirectory && sample.includePackages) {
+                        destFile.createDirectory()
+                    } else if (file.isFile) {
+                        destFile.parentFile.mkdirs()
+                        val text = file.readText()
+                        if (sample.includePackages) {
+                            destFile.writeText(text)
+                        } else {
+                            val lines = text.lines()
+                            val packageIndex = lines.indexOfFirst { it.trim().startsWith("package ") }
+                            val modified = lines.subList(0, packageIndex) + lines.subList(packageIndex + 2, lines.size)
+                            destFile.writeText(modified.joinToString("\n"))
+                        }
                     }
                 }
             }
@@ -390,15 +405,11 @@ fun jvmCliApp(name: String): BaseApp {
 
 fun jvmUiApp(name: String) = BaseApp(name, projectDir, UiApp(name.capitalize()), "main", true)
 
-fun nativeCliApp(name: String): BaseApp {
-    return BaseApp(name, projectDir, NativeBinaryCliApp(name), "commonMain", false)
-}
-
 fun macOsUiApp(name: String) = BaseApp(name, projectDir, UiApp(name.capitalize()), "macosMain", true)
 
-fun jvmLib(name: String) = BaseLib(name, projectDir, "main")
+fun jvmLib(name: String) = BaseLib(name, projectDir, listOf("main"))
 
-fun mppLib(name: String) = BaseLib(name, projectDir, "commonMain")
+fun mppLib(name: String, sourceSets: List<String> = listOf("commonMain")) = BaseLib(name, projectDir, sourceSets)
 
 fun File.directorySize(): Long {
     var size: Long = 0

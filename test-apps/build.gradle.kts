@@ -59,7 +59,7 @@ class JvmLauncherScripts(private val name: String, private val embeddedJvm: Bool
     }
 
     override fun native(): AppNature {
-        return NativeBinaryCliApp(name)
+        return NativeBinaryCliApp(name, "build/dist")
     }
 
     override val cliLauncherPath: String
@@ -87,9 +87,9 @@ class JvmLauncherScripts(private val name: String, private val embeddedJvm: Bool
         get() = null
 }
 
-class NativeBinaryCliApp(private val name: String) : AppNature() {
+class NativeBinaryCliApp(private val name: String, override val distDirName: String) : AppNature() {
     override fun launcher(launcher: String): AppNature {
-        return NativeBinaryCliApp(launcher)
+        return NativeBinaryCliApp(launcher, distDirName)
     }
 
     override fun embedded(): AppNature {
@@ -99,9 +99,6 @@ class NativeBinaryCliApp(private val name: String) : AppNature() {
     override fun native(): AppNature {
         return this
     }
-
-    override val distDirName: String
-        get() = "build/dist"
 
     override val cliLauncherPath: String
         get() = Machine.thisMachine.executableName(name)
@@ -163,9 +160,11 @@ sealed class App(
     val distTask: String
         get() = distTask(mainDist)
 
-    fun distTask(dist: AppDistribution): String = ":$name:${dist.distTaskName}"
+    fun distTask(dist: AppDistribution) = ":$name:${dist.distTaskName}"
 
     val distDir = dir.resolve(mainDist.nature.distDirName)
+
+    fun distDir(dist: AppDistribution) = dir.resolve(dist.nature.distDirName)
 
     val cliLauncher = if (mainDist.nature.cliLauncherPath != null) {
         distDir.resolve(mainDist.nature.cliLauncherPath!!)
@@ -221,11 +220,11 @@ open class BaseApp(
     fun deriveNative(name: String): DerivedApp {
         val host = Machine.thisMachine
         val otherDists = if (host.isMacOS && host.architecture == Arm64) {
-            listOf(AppDistribution(NativeBinaryCliApp(name), "macosX64DebugDist"))
+            listOf(AppDistribution(NativeBinaryCliApp(name, "build/dist-images/macosX64Debug"), "macosX64DebugDist"))
         } else {
             emptyList()
         }
-        return DerivedApp(name, derivedFrom, baseDir, AppDistribution(NativeBinaryCliApp(name)), otherDists, "commonMain", false, allPlatforms)
+        return DerivedApp(name, derivedFrom, baseDir, AppDistribution(NativeBinaryCliApp(name, "build/dist")), otherDists, "commonMain", false, allPlatforms)
     }
 
     fun allPlatforms(): BaseApp {
@@ -385,9 +384,7 @@ val runTasks = sampleApps.associateWith { app ->
     tasks.register("run-${app.name}") {
         dependsOn(app.distTask)
         doLast {
-            if (!app.distDir.isDirectory) {
-                throw IllegalStateException("Application distribution directory ${app.distDir} does not exist.")
-            }
+            run(app, app.mainDist)
             if (app.cliLauncher != null && !app.cliLauncher.isFile) {
                 throw IllegalStateException("Application launcher ${app.cliLauncher} does not exist.")
             }
@@ -434,6 +431,9 @@ val runOtherTasks = sampleApps.flatMap { app ->
     app.otherDists.map { dist ->
         tasks.register("run-${app.name}-${dist.distTaskName}") {
             dependsOn(app.distTask(dist))
+            doLast {
+                run(app, dist)
+            }
         }
     }
 }
@@ -467,6 +467,13 @@ val openTasks = uiApps.map { app ->
 
 tasks.register("open") {
     dependsOn(openTasks)
+}
+
+fun run(app: App, dist: AppDistribution) {
+    val distDir = app.distDir(dist)
+    if (!distDir.isDirectory) {
+        throw IllegalStateException("Application distribution directory $distDir does not exist.")
+    }
 }
 
 fun jvmCliApp(name: String): JvmBaseApp {

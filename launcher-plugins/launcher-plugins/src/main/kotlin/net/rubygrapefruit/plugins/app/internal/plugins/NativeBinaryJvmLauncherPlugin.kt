@@ -1,8 +1,10 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.BuildType
+import net.rubygrapefruit.plugins.app.NativeMachine
 import net.rubygrapefruit.plugins.app.internal.DefaultHasLauncherExecutableDistribution
 import net.rubygrapefruit.plugins.app.internal.HostMachine
+import net.rubygrapefruit.plugins.app.internal.MacOS
 import net.rubygrapefruit.plugins.app.internal.MutableJvmApplication
 import net.rubygrapefruit.plugins.app.internal.applications
 import net.rubygrapefruit.plugins.app.internal.registering
@@ -23,15 +25,21 @@ class NativeBinaryJvmLauncherPlugin : Plugin<Project> {
                     modulePath.from(app.runtimeModulePath)
                 }
 
+                val targets = when {
+                    HostMachine.current is MacOS -> listOf(NativeMachine.MacOSX64, NativeMachine.MacOSArm64)
+                    HostMachine.current.canBeBuilt -> listOf(HostMachine.current.machine)
+                    else -> emptyList()
+                }
+
                 // NativeBinary task uses correct JVM architecture to build for host machine
-                // Don't add the target if Kotlin cannot be built for this host.
-                // Should instead add distribution for each target
-                if (HostMachine.current.canBeBuilt) {
+                // Could instead be parameterized with target architecture
+                for (machine in targets) {
+                    val default = machine == HostMachine.current.machine
                     val dist = app.distributionContainer.add(
-                        HostMachine.current.machine.kotlinTarget,
-                        true,
-                        true,
-                        HostMachine.current.machine,
+                        machine.kotlinTarget,
+                        default,
+                        default,
+                        machine,
                         BuildType.Release,
                         DefaultHasLauncherExecutableDistribution::class.java
                     )

@@ -95,6 +95,11 @@ val generateResource = tasks.register("generate-version-resource") {
             object KotlinTest {
                 val version = "${Constants.kotlin}"
                 val coordinates = "org.jetbrains.kotlin:kotlin-test:" + version
+                val junit = KotlinTestJunit
+            }
+
+            object KotlinTestJunit {
+                val coordinates = "org.jetbrains.kotlin:kotlin-test-junit:${Constants.kotlin}"
             }
             
             object Plugins {

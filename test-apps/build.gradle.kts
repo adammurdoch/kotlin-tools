@@ -161,7 +161,9 @@ sealed class App(
     val srcDir = dir.resolve("src/$srcDirName/kotlin")
 
     val distTask: String
-        get() = ":$name:${mainDist.distTaskName}"
+        get() = distTask(mainDist)
+
+    fun distTask(dist: AppDistribution): String = ":$name:${dist.distTaskName}"
 
     val distDir = dir.resolve(mainDist.nature.distDirName)
 
@@ -426,6 +428,18 @@ val runTasks = sampleApps.associateWith { app ->
             }
         }
     }
+}
+
+val runOtherTasks = sampleApps.flatMap { app ->
+    app.otherDists.map { dist ->
+        tasks.register("run-${app.name}-${dist.distTaskName}") {
+            dependsOn(app.distTask(dist))
+        }
+    }
+}
+
+tasks.register("runOther") {
+    dependsOn(runOtherTasks)
 }
 
 tasks.register("run") {

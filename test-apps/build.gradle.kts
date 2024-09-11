@@ -141,10 +141,14 @@ class UiApp(private val appName: String) : AppNature() {
 
 data class AppInvocation(val cliArgs: List<String>, val expectedOutput: String?)
 
+class AppDistribution(
+    val nature: AppNature
+)
+
 sealed class App(
     name: String,
     baseDir: File,
-    val nature: AppNature,
+    val mainDist: AppDistribution,
     val srcDirName: String,
     val includePackages: Boolean,
     val allPlatforms: Boolean,
@@ -156,32 +160,32 @@ sealed class App(
 
     val distTask = ":$name:dist"
 
-    val distDir = dir.resolve(nature.distDirName)
+    val distDir = dir.resolve(mainDist.nature.distDirName)
 
-    val cliLauncher = if (nature.cliLauncherPath != null) {
-        distDir.resolve(nature.cliLauncherPath!!)
+    val cliLauncher = if (mainDist.nature.cliLauncherPath != null) {
+        distDir.resolve(mainDist.nature.cliLauncherPath!!)
     } else {
         null
     }
 
-    val cliCommandLine = if (nature.cliLauncherPath != null) {
-        nature.cliLauncherPrefix + distDir.resolve(nature.cliLauncherPath!!) + invocation.cliArgs
+    val cliCommandLine = if (mainDist.nature.cliLauncherPath != null) {
+        mainDist.nature.cliLauncherPrefix + distDir.resolve(mainDist.nature.cliLauncherPath!!) + invocation.cliArgs
     } else {
         null
     }
 
     val expectedOutput = invocation.expectedOutput
 
-    val nativeBinary = if (nature.nativeBinaryPath != null) {
-        distDir.resolve(nature.nativeBinaryPath!!)
+    val nativeBinary = if (mainDist.nature.nativeBinaryPath != null) {
+        distDir.resolve(mainDist.nature.nativeBinaryPath!!)
     } else {
         null
     }
 
-    val expectedArchitecture = nature.expectedArchitecture
+    val expectedArchitecture = mainDist.nature.expectedArchitecture
 
-    val openCommandLine = if (nature.openLauncherPath != null) {
-        listOf("open", distDir.resolve(nature.openLauncherPath!!).absolutePath)
+    val openCommandLine = if (mainDist.nature.openLauncherPath != null) {
+        listOf("open", distDir.resolve(mainDist.nature.openLauncherPath!!).absolutePath)
     } else {
         null
     }
@@ -190,50 +194,62 @@ sealed class App(
 
     fun derive(suffix: String, builder: (AppNature) -> AppNature = { it }): DerivedApp {
         val sampleName = "$name-$suffix"
-        return DerivedApp(sampleName, derivedFrom, baseDir, builder(nature.launcher(sampleName)), srcDirName, includePackages)
+        val newNature = builder(mainDist.nature.launcher(sampleName))
+        return DerivedApp(sampleName, derivedFrom, baseDir, AppDistribution(newNature), srcDirName, includePackages)
     }
 }
 
-class BaseApp(
+open class BaseApp(
     name: String,
     baseDir: File,
-    nature: AppNature,
+    mainDist: AppDistribution,
     srcDirName: String,
     includePackages: Boolean,
     allPlatforms: Boolean = false,
     invocation: AppInvocation = AppInvocation(listOf("1", "+", "2"), "Expression: (1) + (2)")
 ) :
-    App(name, baseDir, nature, srcDirName, includePackages, allPlatforms, invocation) {
+    App(name, baseDir, mainDist, srcDirName, includePackages, allPlatforms, invocation) {
 
     override val derivedFrom: BaseApp
         get() = this
 
     fun deriveNative(name: String): DerivedApp {
-        return DerivedApp(name, derivedFrom, baseDir, NativeBinaryCliApp(name), "commonMain", false, allPlatforms)
+        return DerivedApp(name, derivedFrom, baseDir, AppDistribution(NativeBinaryCliApp(name)), "commonMain", false, allPlatforms)
     }
 
     fun allPlatforms(): BaseApp {
-        return BaseApp(name, baseDir, nature, srcDirName, includePackages, true, invocation)
+        return BaseApp(name, baseDir, mainDist, srcDirName, includePackages, true, invocation)
     }
 
     fun cliArgs(vararg args: String): BaseApp {
-        return BaseApp(name, baseDir, nature, srcDirName, includePackages, allPlatforms, AppInvocation(args.toList(), null))
+        return BaseApp(name, baseDir, mainDist, srcDirName, includePackages, allPlatforms, AppInvocation(args.toList(), null))
     }
 }
+
+class JvmBaseApp(
+    name: String,
+    baseDir: File,
+) : BaseApp(name, baseDir, AppDistribution(JvmLauncherScripts(name, false)), "main", true)
+
+class UiBaseApp(
+    name: String,
+    baseDir: File,
+    srcDirName: String
+) : BaseApp(name, baseDir, AppDistribution(UiApp(name.capitalize())), srcDirName, true)
 
 class DerivedApp(
     name: String,
     override val derivedFrom: BaseApp,
     baseDir: File,
-    nature: AppNature,
+    mainDist: AppDistribution,
     srcDirName: String,
     includePackages: Boolean,
     allPlatforms: Boolean = false,
 ) :
-    App(name, baseDir, nature, srcDirName, includePackages, allPlatforms, derivedFrom.invocation), DerivedSample {
+    App(name, baseDir, mainDist, srcDirName, includePackages, allPlatforms, derivedFrom.invocation), DerivedSample {
 
     fun allPlatforms(): DerivedApp {
-        return DerivedApp(name, derivedFrom, baseDir, nature, srcDirName, includePackages, true)
+        return DerivedApp(name, derivedFrom, baseDir, mainDist, srcDirName, includePackages, true)
     }
 
     override val derivedSrcDirs: List<DerivedSrcDir>
@@ -429,13 +445,13 @@ tasks.register("open") {
     dependsOn(openTasks)
 }
 
-fun jvmCliApp(name: String): BaseApp {
-    return BaseApp(name, projectDir, JvmLauncherScripts(name, false), "main", true)
+fun jvmCliApp(name: String): JvmBaseApp {
+    return JvmBaseApp(name, projectDir)
 }
 
-fun jvmUiApp(name: String) = BaseApp(name, projectDir, UiApp(name.capitalize()), "main", true)
+fun jvmUiApp(name: String) = UiBaseApp(name, projectDir, "main")
 
-fun macOsUiApp(name: String) = BaseApp(name, projectDir, UiApp(name.capitalize()), "macosMain", true)
+fun macOsUiApp(name: String) = UiBaseApp(name, projectDir, "macosMain")
 
 fun jvmLib(name: String) = BaseLib(name, projectDir, listOf("main"))
 

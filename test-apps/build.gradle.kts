@@ -1,3 +1,5 @@
+import net.rubygrapefruit.machine.info.Architecture.Arm64
+import net.rubygrapefruit.machine.info.Architecture.X64
 import net.rubygrapefruit.machine.info.Machine
 import org.jetbrains.kotlin.incremental.createDirectory
 import java.io.ByteArrayOutputStream
@@ -34,16 +36,26 @@ sealed class AppNature {
 
     abstract val nativeBinaryPath: String?
 
+    open val expectedArchitecture: String?
+        get() {
+            return if (nativeBinaryPath == null) {
+                null
+            } else when (Machine.thisMachine.architecture) {
+                X64 -> "x86_64"
+                Arm64 -> "ARM64"
+            }
+        }
+
     abstract val openLauncherPath: String?
 }
 
-class JvmCliApp(private val name: String, private val embeddedJvm: Boolean) : AppNature() {
+class JvmLauncherScripts(private val name: String, private val embeddedJvm: Boolean) : AppNature() {
     override fun launcher(launcher: String): AppNature {
-        return JvmCliApp(launcher, embeddedJvm)
+        return JvmLauncherScripts(launcher, embeddedJvm)
     }
 
     override fun embedded(): AppNature {
-        return JvmCliApp(name, true)
+        return JvmLauncherScripts(name, true)
     }
 
     override fun native(): AppNature {
@@ -68,6 +80,8 @@ class JvmCliApp(private val name: String, private val embeddedJvm: Boolean) : Ap
     } else {
         null
     }
+
+    override val expectedArchitecture = null
 
     override val openLauncherPath: String?
         get() = null
@@ -125,6 +139,8 @@ class UiApp(private val appName: String) : AppNature() {
         get() = nativeBinaryPath
 }
 
+data class AppInvocation(val cliArgs: List<String>, val expectedOutput: String?)
+
 sealed class App(
     name: String,
     baseDir: File,
@@ -132,7 +148,7 @@ sealed class App(
     val srcDirName: String,
     val includePackages: Boolean,
     val allPlatforms: Boolean,
-    protected val cliArgs: List<String>
+    val invocation: AppInvocation,
 ) :
     Sample(name, baseDir) {
 
@@ -149,16 +165,20 @@ sealed class App(
     }
 
     val cliCommandLine = if (nature.cliLauncherPath != null) {
-        nature.cliLauncherPrefix + distDir.resolve(nature.cliLauncherPath!!) + cliArgs
+        nature.cliLauncherPrefix + distDir.resolve(nature.cliLauncherPath!!) + invocation.cliArgs
     } else {
         null
     }
+
+    val expectedOutput = invocation.expectedOutput
 
     val nativeBinary = if (nature.nativeBinaryPath != null) {
         distDir.resolve(nature.nativeBinaryPath!!)
     } else {
         null
     }
+
+    val expectedArchitecture = nature.expectedArchitecture
 
     val openCommandLine = if (nature.openLauncherPath != null) {
         listOf("open", distDir.resolve(nature.openLauncherPath!!).absolutePath)
@@ -181,23 +201,23 @@ class BaseApp(
     srcDirName: String,
     includePackages: Boolean,
     allPlatforms: Boolean = false,
-    cliArgs: List<String> = listOf("1", "+", "2")
+    invocation: AppInvocation = AppInvocation(listOf("1", "+", "2"), "Expression: (1) + (2)")
 ) :
-    App(name, baseDir, nature, srcDirName, includePackages, allPlatforms, cliArgs) {
+    App(name, baseDir, nature, srcDirName, includePackages, allPlatforms, invocation) {
 
     override val derivedFrom: BaseApp
         get() = this
 
     fun deriveNative(name: String): DerivedApp {
-        return DerivedApp(name, derivedFrom, baseDir, NativeBinaryCliApp(name), "commonMain", false, allPlatforms, cliArgs)
+        return DerivedApp(name, derivedFrom, baseDir, NativeBinaryCliApp(name), "commonMain", false, allPlatforms)
     }
 
     fun allPlatforms(): BaseApp {
-        return BaseApp(name, baseDir, nature, srcDirName, includePackages, true, cliArgs)
+        return BaseApp(name, baseDir, nature, srcDirName, includePackages, true, invocation)
     }
 
     fun cliArgs(vararg args: String): BaseApp {
-        return BaseApp(name, baseDir, nature, srcDirName, includePackages, allPlatforms, args.toList())
+        return BaseApp(name, baseDir, nature, srcDirName, includePackages, allPlatforms, AppInvocation(args.toList(), null))
     }
 }
 
@@ -209,12 +229,11 @@ class DerivedApp(
     srcDirName: String,
     includePackages: Boolean,
     allPlatforms: Boolean = false,
-    cliArgs: List<String> = listOf("1", "+", "2")
 ) :
-    App(name, baseDir, nature, srcDirName, includePackages, allPlatforms, cliArgs), DerivedSample {
+    App(name, baseDir, nature, srcDirName, includePackages, allPlatforms, derivedFrom.invocation), DerivedSample {
 
     fun allPlatforms(): DerivedApp {
-        return DerivedApp(name, derivedFrom, baseDir, nature, srcDirName, includePackages, true, cliArgs)
+        return DerivedApp(name, derivedFrom, baseDir, nature, srcDirName, includePackages, true)
     }
 
     override val derivedSrcDirs: List<DerivedSrcDir>
@@ -355,15 +374,26 @@ val runTasks = sampleApps.associateWith { app ->
                     commandLine("otool", "-hv", app.nativeBinary)
                     standardOutput = str
                 }
-                println("binary: ${str.toString().lines()[3].split(Regex("\\s+"))[1]}")
+                val arch = str.toString().lines()[3].split(Regex("\\s+"))[1]
+                println("binary: $arch")
+                val expected = app.expectedArchitecture
+                if (expected != null && arch != expected) {
+                    throw IllegalStateException("Unexpected binary architecture")
+                }
             }
             if (app.cliCommandLine != null) {
-                println()
-                println("----")
+                val str = ByteArrayOutputStream()
                 exec {
                     commandLine(app.cliCommandLine)
+                    standardOutput = str
                 }
+                println()
                 println("----")
+                println(str)
+                println("----")
+                if (app.expectedOutput != null && !str.toString().contains(app.expectedOutput)) {
+                    throw IllegalStateException("Unexpected application output")
+                }
             } else {
                 println()
                 println("(UI app)")
@@ -400,7 +430,7 @@ tasks.register("open") {
 }
 
 fun jvmCliApp(name: String): BaseApp {
-    return BaseApp(name, projectDir, JvmCliApp(name, false), "main", true)
+    return BaseApp(name, projectDir, JvmLauncherScripts(name, false), "main", true)
 }
 
 fun jvmUiApp(name: String) = BaseApp(name, projectDir, UiApp(name.capitalize()), "main", true)

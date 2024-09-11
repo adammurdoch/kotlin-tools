@@ -10,7 +10,6 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 open class MultiPlatformComponentRegistry(private val project: Project) {
-    private val desktopSourceSets = mutableSetOf<String>()
     private val unixSourceSets = mutableSetOf<String>()
     private val unixTestSourceSets = mutableSetOf<String>()
     private val machines = mutableSetOf<NativeMachine>()
@@ -19,11 +18,17 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
 
     init {
         project.afterEvaluate {
-            if (unixSourceSets.isNotEmpty() && unixTestSourceSets.isNotEmpty() && desktopSourceSets.isNotEmpty()) {
+            val hasJvm = jvm.all.isNotEmpty()
+            val hasNative = machines.isNotEmpty()
+            val desktop = hasJvm && hasNative
+            if (unixSourceSets.isNotEmpty() || unixTestSourceSets.isNotEmpty() || desktop) {
                 project.kotlin.applyDefaultHierarchyTemplate()
                 createIntermediateSourceSet("unixMain", "nativeMain", unixSourceSets)
                 createIntermediateSourceSet("unixTest", "nativeTest", unixTestSourceSets)
-                createIntermediateSourceSet("desktopMain", "commonMain", desktopSourceSets)
+                if (desktop) {
+                    createIntermediateSourceSet("desktopMain", "commonMain", setOf("jvmMain", "nativeMain"))
+                    createIntermediateSourceSet("desktopTest", "commonTest", setOf("jvmTest", "nativeTest"))
+                }
             }
         }
     }
@@ -45,7 +50,6 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
             jvm()
         }
         jvm.add(true)
-        desktopSourceSets.add("jvmMain")
     }
 
     fun browser() {
@@ -67,7 +71,7 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
         jvm.each { action() }
     }
 
-    private fun createIntermediateSourceSet(name: String, parentName: String, children: MutableSet<String>) {
+    private fun createIntermediateSourceSet(name: String, parentName: String, children: Set<String>) {
         if (children.isEmpty()) {
             return
         }
@@ -125,7 +129,6 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
                     config(binaries, NativeMachine.WindowsX64)
                 }
             }
-            desktopSourceSets.add("nativeMain")
         }
         for (target in targets) {
             if (machines.add(target)) {

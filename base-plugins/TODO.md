@@ -1,8 +1,6 @@
 
 # TODO
 
-- Don't create the "desktop" source set if there are both JVM and native targets
-- Create "desktopTest" source set.
 - Add an "app bundle" plugin, which will include other apps as JVM resources
 - Fix `.bat` to work from any directory via a link
   - Or replace with binary launcher

@@ -162,18 +162,21 @@ sealed class App(
 
     fun distTask(dist: AppDistribution) = ":$name:${dist.distTaskName}"
 
-    val distDir = dir.resolve(mainDist.nature.distDirName)
+    val distDir: File
+        get() = distDir(mainDist)
 
     fun distDir(dist: AppDistribution) = dir.resolve(dist.nature.distDirName)
 
-    val cliLauncher = if (mainDist.nature.cliLauncherPath != null) {
-        distDir.resolve(mainDist.nature.cliLauncherPath!!)
+    fun cliLauncher(dist: AppDistribution) = if (dist.nature.cliLauncherPath != null) {
+        distDir.resolve(dist.nature.cliLauncherPath!!)
     } else {
         null
     }
 
-    val cliCommandLine = if (mainDist.nature.cliLauncherPath != null) {
-        mainDist.nature.cliLauncherPrefix + distDir.resolve(mainDist.nature.cliLauncherPath!!) + invocation.cliArgs
+    val cliCommandLine: List<String>? get() = cliCommandLine(mainDist)
+
+    fun cliCommandLine(dist: AppDistribution): List<String>? = if (dist.nature.cliLauncherPath != null) {
+        dist.nature.cliLauncherPrefix + distDir.resolve(dist.nature.cliLauncherPath!!).absolutePath + invocation.cliArgs
     } else {
         null
     }
@@ -385,9 +388,6 @@ val runTasks = sampleApps.associateWith { app ->
         dependsOn(app.distTask)
         doLast {
             run(app, app.mainDist)
-            if (app.cliLauncher != null && !app.cliLauncher.isFile) {
-                throw IllegalStateException("Application launcher ${app.cliLauncher} does not exist.")
-            }
             if (app.nativeBinary != null && !app.nativeBinary.isFile) {
                 // For example, embedded JVM app with launcher script, UI apps
                 throw IllegalStateException("Application binary ${app.nativeBinary} does not exist.")
@@ -421,7 +421,7 @@ val runTasks = sampleApps.associateWith { app ->
                 }
             } else {
                 println()
-                println("(UI app)")
+                println("(no CLI)")
             }
         }
     }
@@ -473,6 +473,10 @@ fun run(app: App, dist: AppDistribution) {
     val distDir = app.distDir(dist)
     if (!distDir.isDirectory) {
         throw IllegalStateException("Application distribution directory $distDir does not exist.")
+    }
+    val cliLauncher = app.cliLauncher(dist)
+    if (cliLauncher != null && !cliLauncher.isFile) {
+        throw IllegalStateException("Application launcher $cliLauncher does not exist.")
     }
 }
 

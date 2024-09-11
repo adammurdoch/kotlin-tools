@@ -32,11 +32,10 @@ class UiApplicationBasePlugin : Plugin<Project> {
                 }
 
                 app.eachTarget { _, dist ->
+                    dist.rootDirPath.set(capitalizedAppName.map { "$it.app/Contents" })
                     dist.launcherFilePath.set(capitalizedAppName.map { "MacOS/$it" })
 
                     dist.withImage {
-                        imageDirectory.set(layout.buildDirectory.dir(capitalizedAppName.map { "${dist.imageBaseDir.get()}/$it.app" }))
-                        rootDirPath.set("Contents")
                         includeFile("Info.plist", infoPlistTask.flatMap { it.plistFile })
                         includeFile(
                             app.iconName.map { "Resources/$it" },

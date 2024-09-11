@@ -25,6 +25,7 @@ open class ApplicationRegistry(private val project: Project) {
         app.distributionContainer.each { dist ->
             dist.imageDirectory.convention(project.layout.buildDirectory.dir(dist.imageBaseDir))
             dist.launcherFilePath.convention(app.appName)
+            dist.rootDirPath.convention(".")
 
             val distImageTask = dist.distTask
             distImageTask.configure { t ->
@@ -34,11 +35,11 @@ open class ApplicationRegistry(private val project: Project) {
                 t.description = "Builds the distribution image"
                 t.group = "Distribution"
                 t.imageDirectory.set(dist.imageDirectory)
-                t.rootDirPath.set(".")
+                t.rootDirPath.set(dist.rootDirPath)
                 t.includeFile(dist.launcherFilePath, dist.launcherFile)
             }
             dist.imageOutputDirectory.set(distImageTask.flatMap { t -> t.imageDirectory })
-            dist.launcherOutputFile.set(distImageTask.flatMap { t -> t.imageDirectory.map { it.file(dist.launcherFilePath.get()) } })
+            dist.launcherOutputFile.set(distImageTask.flatMap { t -> t.imageDirectory.map { it.file(dist.effectiveLauncherFilePath.get()) } })
         }
 
         project.tasks.register("showDistributions", ShowDistributions::class.java) { task ->

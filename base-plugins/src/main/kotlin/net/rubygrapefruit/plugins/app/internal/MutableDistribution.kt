@@ -7,6 +7,11 @@ import org.gradle.api.provider.Property
 
 interface MutableDistribution: Distribution {
     /**
+     * The prefix to prepend to all paths in the distribution.
+     */
+    val rootDirPath: Property<String>
+
+    /**
      * The launcher file to copy into the distribution image.
      */
     val launcherFile: RegularFileProperty

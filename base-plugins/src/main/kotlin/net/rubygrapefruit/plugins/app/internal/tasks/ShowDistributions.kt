@@ -49,8 +49,12 @@ abstract class ShowDistributions : DefaultTask() {
             }
             println("Build type: ${distribution.buildType}")
             println("Dist task: ${distribution.distTask.name}")
-            println("Image dir: ${distribution.imageDirectory.get()}")
-            println("Launcher path: ${distribution.launcherFilePath.get()}")
+
+            val imageDirectory = distribution.imageOutputDirectory.get()
+            val launcher = imageDirectory.file(distribution.effectiveLauncherFilePath.get())
+
+            println("Image dir: $imageDirectory")
+            println("Launcher path: $launcher")
         }
     }
 

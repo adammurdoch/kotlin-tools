@@ -2,9 +2,8 @@ package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.NativeMachine
-import net.rubygrapefruit.plugins.app.internal.DefaultHasEmbeddedJvmAndLauncherExecutableDistribution
+import net.rubygrapefruit.plugins.app.internal.DefaultJvmUiAppDistribution
 import net.rubygrapefruit.plugins.app.internal.DefaultJvmUiApplication
-import net.rubygrapefruit.plugins.app.internal.HasEmbeddedJvm
 import net.rubygrapefruit.plugins.app.internal.HostMachine
 import net.rubygrapefruit.plugins.app.internal.applications
 import net.rubygrapefruit.plugins.app.internal.tasks.LauncherConf
@@ -28,17 +27,18 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                 app.targets.add(
                     NativeMachine.MacOSArm64,
                     listOf(BuildType.Release),
-                    DefaultHasEmbeddedJvmAndLauncherExecutableDistribution::class.java,
+                    DefaultJvmUiAppDistribution::class.java,
                     current.canBeBuilt && current.machine == NativeMachine.MacOSArm64
                 )
                 app.targets.add(
                     NativeMachine.MacOSX64,
                     listOf(BuildType.Release),
-                    DefaultHasEmbeddedJvmAndLauncherExecutableDistribution::class.java,
+                    DefaultJvmUiAppDistribution::class.java,
                     current.canBeBuilt && current.machine == NativeMachine.MacOSX64
                 )
 
-                app.eachTarget { machine, dist ->
+                app.distributionContainer.eachOfType<DefaultJvmUiAppDistribution> {
+                    val machine = this.targetMachine!!
                     val nativeBinary = configurations.create("nativeBinaries${machine.name}") {
                         it.attributes.attribute(
                             Usage.USAGE_ATTRIBUTE,
@@ -49,24 +49,22 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                     }
                     dependencies.add(nativeBinary.name, "net.rubygrapefruit.plugins:native-launcher:1.0-dev")
 
-                    val launcherTask = tasks.register(dist.taskName("nativeLauncher"), NativeUiLauncher::class.java) {
+                    val launcherTask = tasks.register(taskName("nativeLauncher"), NativeUiLauncher::class.java) {
                         it.inputFile.set(layout.file(nativeBinary.elements.map { it.first().asFile }))
-                        it.outputFile.set(layout.buildDirectory.file(dist.buildDirName("native-launcher") + "/native-launcher.kexe"))
+                        it.outputFile.set(layout.buildDirectory.file(buildDirName("native-launcher") + "/native-launcher.kexe"))
                     }
 
-                    require(dist is HasEmbeddedJvm)
-
-                    val configTask = tasks.register(dist.taskName("launcherConf"), LauncherConf::class.java) {
-                        it.configFile.set(layout.buildDirectory.file(dist.buildDirName("launcher-config") + "/launcher.conf"))
+                    val configTask = tasks.register(taskName("launcherConf"), LauncherConf::class.java) {
+                        it.configFile.set(layout.buildDirectory.file(buildDirName("launcher-config") + "/launcher.conf"))
                         it.applicationDisplayName.set(capitalizedAppName)
                         it.iconName.set(app.iconName)
-                        it.javaCommand.set(dist.javaLauncherPath)
+                        it.javaCommand.set(javaLauncherPath)
                         it.module.set(app.module.name)
                         it.mainClass.set(app.mainClass)
                     }
 
-                    dist.launcherFile.set(launcherTask.flatMap { it.outputFile })
-                    dist.withImage {
+                    launcherFile.set(launcherTask.flatMap { it.outputFile })
+                    withImage {
                         includeFile("Resources/launcher.conf", configTask.flatMap { it.configFile })
                     }
                 }

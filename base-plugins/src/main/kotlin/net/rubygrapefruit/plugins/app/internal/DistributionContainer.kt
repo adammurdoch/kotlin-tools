@@ -28,7 +28,7 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
     }
 
     /**
-     * Adds a platform dependent distribution.
+     * Adds a platform-dependent distribution.
      */
     fun <T : DefaultDistribution> add(name: String, isDefault: Boolean, canBuildForHostMachine: Boolean, targetMachine: NativeMachine, buildType: BuildType, type: Class<T>): T {
         val distTask = tasks.register(DefaultDistribution.taskName(name, "dist"), DistributionImage::class.java)

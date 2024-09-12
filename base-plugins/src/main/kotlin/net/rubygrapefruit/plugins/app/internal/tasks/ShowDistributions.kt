@@ -43,11 +43,11 @@ abstract class ShowDistributions : DefaultTask() {
             if (distribution.targetMachine != null) {
                 println("Target machine: ${distribution.targetMachine}")
             }
+            println("Build type: ${distribution.buildType}")
             println("Launcher: ${launcherFor(distribution)}")
             if (distribution is HasEmbeddedJvm) {
                 println("Embedded JVM: yes")
             }
-            println("Build type: ${distribution.buildType}")
             println("Dist task: ${distribution.distTask.name}")
 
             val imageDirectory = distribution.imageOutputDirectory.get()

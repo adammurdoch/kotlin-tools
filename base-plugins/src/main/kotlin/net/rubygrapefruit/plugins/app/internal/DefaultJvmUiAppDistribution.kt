@@ -9,11 +9,11 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 import javax.inject.Inject
 
-abstract class DefaultHasEmbeddedJvmAndLauncherExecutableDistribution @Inject constructor(
+abstract class DefaultJvmUiAppDistribution @Inject constructor(
     name: String,
     canBuildForHostMachine: Boolean,
     target: NativeMachine,
     buildType: BuildType,
     distTask: TaskProvider<DistributionImage>,
     defaultDist: Provider<Distribution>,
-    factory: ObjectFactory) : DefaultDistribution(name, canBuildForHostMachine, target, buildType, distTask, defaultDist, factory), HasEmbeddedJvm, HasLauncherExecutable
+    factory: ObjectFactory) : DefaultDistribution(name, canBuildForHostMachine, target, buildType, distTask, defaultDist, factory), HasEmbeddedJvm, HasLauncherExecutable, HasUnsignedUiBundle

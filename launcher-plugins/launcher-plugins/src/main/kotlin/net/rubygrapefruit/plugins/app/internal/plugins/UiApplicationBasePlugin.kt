@@ -1,6 +1,8 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
+import net.rubygrapefruit.plugins.app.internal.DefaultDistribution
 import net.rubygrapefruit.plugins.app.internal.DefaultUiApplication
+import net.rubygrapefruit.plugins.app.internal.HasUnsignedUiBundle
 import net.rubygrapefruit.plugins.app.internal.applications
 import net.rubygrapefruit.plugins.app.internal.tasks.AppIcon
 import net.rubygrapefruit.plugins.app.internal.tasks.DistributionImage
@@ -31,11 +33,11 @@ class UiApplicationBasePlugin : Plugin<Project> {
                     it.sourceIcon.set(app.iconFile)
                 }
 
-                app.eachTarget { _, dist ->
-                    dist.rootDirPath.set(capitalizedAppName.map { "$it.app/Contents" })
-                    dist.launcherFilePath.set(capitalizedAppName.map { "MacOS/$it" })
+                app.distributionContainer.eachOfType<HasUnsignedUiBundle> {
+                    rootDirPath.set(capitalizedAppName.map { "$it.app/Contents" })
+                    launcherFilePath.set(capitalizedAppName.map { "MacOS/$it" })
 
-                    dist.withImage {
+                    withImage {
                         includeFile("Info.plist", infoPlistTask.flatMap { it.plistFile })
                         includeFile(
                             app.iconName.map { "Resources/$it" },
@@ -55,9 +57,13 @@ class UiApplicationBasePlugin : Plugin<Project> {
                             })
                     }
 
-                    tasks.register(dist.taskName("release"), ReleaseDistribution::class.java) { t ->
-                        t.imageDirectory.set(layout.buildDirectory.dir(capitalizedAppName.map { "${dist.imageBaseDir.get()}/$it.app" }))
-                        t.unsignedImage.set(dist.imageOutputDirectory)
+                    val releaseDist = app.distributionContainer.add(
+                        name + "Release",
+                        false,
+                        DefaultDistribution::class.java
+                    )
+                    tasks.register(releaseDist.taskName("sign"), ReleaseDistribution::class.java) { t ->
+                        t.unsignedImage.set(outputs.imageDirectory)
                         t.signingIdentity.set(app.signingIdentity)
                         t.notarizationProfileName.set(app.notarizationProfileName)
                     }

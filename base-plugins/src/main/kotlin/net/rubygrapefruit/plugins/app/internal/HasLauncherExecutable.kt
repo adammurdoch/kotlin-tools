@@ -2,12 +2,10 @@ package net.rubygrapefruit.plugins.app.internal
 
 import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.Distribution
-import net.rubygrapefruit.plugins.app.NativeMachine
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 
-interface HasLauncherExecutable : Distribution {
-    val targetMachine: NativeMachine
+interface HasLauncherExecutable : Distribution, HasTargetMachine {
 
     val buildType: BuildType
 

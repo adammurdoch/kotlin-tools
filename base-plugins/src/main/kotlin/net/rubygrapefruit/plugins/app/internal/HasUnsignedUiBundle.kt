@@ -1,4 +1,4 @@
 package net.rubygrapefruit.plugins.app.internal
 
-interface HasUnsignedUiBundle: MutableDistribution {
+interface HasUnsignedUiBundle : MutableDistribution, HasTargetMachine {
 }

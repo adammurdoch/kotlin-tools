@@ -5,6 +5,7 @@ import net.rubygrapefruit.plugins.app.internal.DefaultDistribution
 import net.rubygrapefruit.plugins.app.internal.HasEmbeddedJvm
 import net.rubygrapefruit.plugins.app.internal.HasLauncherExecutable
 import net.rubygrapefruit.plugins.app.internal.HasLauncherScripts
+import net.rubygrapefruit.plugins.app.internal.HasTargetMachine
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Internal
@@ -40,11 +41,11 @@ abstract class ShowDistributions : DefaultTask() {
                 print(" (DEFAULT)")
             }
             println()
+            if (distribution is HasTargetMachine) {
+                println("Target machine: ${distribution.targetMachine}")
+            }
             if (distribution is HasLauncherExecutable) {
-                println("Target machine: ${distribution.targetMachine}")
                 println("Build type: ${distribution.buildType}")
-            } else if (distribution is HasEmbeddedJvm) {
-                println("Target machine: ${distribution.targetMachine}")
             }
             println("Launcher: ${launcherFor(distribution)}")
             if (distribution is HasEmbeddedJvm) {

@@ -1,6 +1,8 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.BuildType
+import net.rubygrapefruit.plugins.app.NativeMachine
+import net.rubygrapefruit.plugins.app.internal.DefaultNativeUiAppDistribution
 import net.rubygrapefruit.plugins.app.internal.DefaultNativeUiApplication
 import net.rubygrapefruit.plugins.app.internal.applications
 import net.rubygrapefruit.plugins.app.internal.kotlin
@@ -19,6 +21,10 @@ class NativeUiApplicationPlugin : Plugin<Project> {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
             plugins.apply(UiApplicationBasePlugin::class.java)
             applications.withApp<DefaultNativeUiApplication> { app ->
+                for (machine in listOf(NativeMachine.MacOSArm64, NativeMachine.MacOSX64)) {
+                    app.targets.add(machine, listOf(BuildType.Debug, BuildType.Release), DefaultNativeUiAppDistribution::class.java, true)
+                }
+
                 multiplatformComponents.macOS {
                     executable { }
                 }

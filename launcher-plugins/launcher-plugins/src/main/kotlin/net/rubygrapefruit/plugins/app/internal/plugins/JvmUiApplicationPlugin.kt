@@ -23,19 +23,17 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                 val capitalizedAppName = app.capitalizedAppName
 
                 // TODO - 'can build' flag is incorrect - it depends on the JVM to be embedded
-                val current = HostMachine.current
-                app.targets.add(
-                    NativeMachine.MacOSArm64,
-                    listOf(BuildType.Release),
-                    DefaultJvmUiAppDistribution::class.java,
-                    current.canBeBuilt && current.machine == NativeMachine.MacOSArm64
-                )
-                app.targets.add(
-                    NativeMachine.MacOSX64,
-                    listOf(BuildType.Release),
-                    DefaultJvmUiAppDistribution::class.java,
-                    current.canBeBuilt && current.machine == NativeMachine.MacOSX64
-                )
+                for (machine in listOf(NativeMachine.MacOSArm64, NativeMachine.MacOSX64)) {
+                    val canBuild = HostMachine.current.canBeBuilt && HostMachine.current.machine == machine
+                    app.distributionContainer.add(
+                        machine.kotlinTarget + "Unsigned",
+                        canBuild,
+                        canBuild,
+                        machine,
+                        BuildType.Release,
+                        DefaultJvmUiAppDistribution::class.java
+                    )
+                }
 
                 app.distributionContainer.eachOfType<DefaultJvmUiAppDistribution> {
                     val nativeBinary = configurations.create("nativeBinaries${targetMachine.name}") {

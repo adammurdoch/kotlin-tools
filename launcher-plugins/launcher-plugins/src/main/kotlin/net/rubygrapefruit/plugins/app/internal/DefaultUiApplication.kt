@@ -11,9 +11,7 @@ abstract class DefaultUiApplication(
     providers: ProviderFactory,
     project: Project
 ) : MutableApplication, UiApplication {
-    val targets = NativeTargetsContainer(objects, providers, project.tasks)
-
-    final override val distributionContainer = targets.distributions
+    final override val distributionContainer = DistributionContainer(project.tasks, objects, providers)
 
     val capitalizedAppName: Provider<String> = appName.map { it.replaceFirstChar { it.uppercase() } }
 

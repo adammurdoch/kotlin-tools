@@ -3,6 +3,7 @@ import net.rubygrapefruit.machine.info.Architecture.X64
 import net.rubygrapefruit.machine.info.Machine
 import org.jetbrains.kotlin.incremental.createDirectory
 import java.io.ByteArrayOutputStream
+import java.io.File
 
 sealed class Sample(val name: String, val baseDir: File) {
     val dir = baseDir.resolve(name)
@@ -110,7 +111,7 @@ class NativeBinaryCliApp(private val name: String, override val distDirName: Str
         get() = null
 }
 
-class UiApp(private val appName: String) : AppNature() {
+class UiApp(private val appName: String, private val distBaseDir: String = "build/dist") : AppNature() {
     override fun launcher(launcher: String): AppNature {
         return UiApp(launcher)
     }
@@ -124,7 +125,7 @@ class UiApp(private val appName: String) : AppNature() {
     }
 
     override val distDirName: String
-        get() = "build/dist/${appName}.app"
+        get() = "${distBaseDir}/${appName}.app"
 
     override val cliLauncherPath: String?
         get() = null
@@ -167,13 +168,17 @@ sealed class App(
 
     fun distDir(dist: AppDistribution) = dir.resolve(dist.nature.distDirName)
 
-    fun cliLauncher(dist: AppDistribution) = if (dist.nature.cliLauncherPath != null) {
-        distDir.resolve(dist.nature.cliLauncherPath!!)
-    } else {
-        null
+    fun cliLauncher(dist: AppDistribution): File? {
+        val cliLauncherPath = dist.nature.cliLauncherPath
+        return if (cliLauncherPath != null) {
+            distDir(dist).resolve(cliLauncherPath)
+        } else {
+            null
+        }
     }
 
-    val cliCommandLine: List<String>? get() = cliCommandLine(mainDist)
+    val cliCommandLine: List<String>?
+        get() = cliCommandLine(mainDist)
 
     fun cliCommandLine(dist: AppDistribution): List<String>? = if (dist.nature.cliLauncherPath != null) {
         dist.nature.cliLauncherPrefix + distDir.resolve(dist.nature.cliLauncherPath!!).absolutePath + invocation.cliArgs
@@ -183,10 +188,16 @@ sealed class App(
 
     val expectedOutput = invocation.expectedOutput
 
-    val nativeBinary = if (mainDist.nature.nativeBinaryPath != null) {
-        distDir.resolve(mainDist.nature.nativeBinaryPath!!)
-    } else {
-        null
+    val nativeBinary: File?
+        get() = nativeBinary(mainDist)
+
+    fun nativeBinary(dist: AppDistribution): File? {
+        val nativeBinaryPath = dist.nature.nativeBinaryPath
+        return if (nativeBinaryPath != null) {
+            distDir(dist).resolve(nativeBinaryPath)
+        } else {
+            null
+        }
     }
 
     val expectedArchitecture = mainDist.nature.expectedArchitecture
@@ -210,12 +221,13 @@ open class BaseApp(
     name: String,
     baseDir: File,
     mainDist: AppDistribution,
+    otherDists: List<AppDistribution>,
     srcDirName: String,
     includePackages: Boolean,
     allPlatforms: Boolean = false,
     invocation: AppInvocation = AppInvocation(listOf("1", "+", "2"), "Expression: (1) + (2)")
 ) :
-    App(name, baseDir, mainDist, emptyList(), srcDirName, includePackages, allPlatforms, invocation) {
+    App(name, baseDir, mainDist, otherDists, srcDirName, includePackages, allPlatforms, invocation) {
 
     override val derivedFrom: BaseApp
         get() = this
@@ -231,24 +243,26 @@ open class BaseApp(
     }
 
     fun allPlatforms(): BaseApp {
-        return BaseApp(name, baseDir, mainDist, srcDirName, includePackages, true, invocation)
+        return BaseApp(name, baseDir, mainDist, otherDists, srcDirName, includePackages, true, invocation)
     }
 
     fun cliArgs(vararg args: String): BaseApp {
-        return BaseApp(name, baseDir, mainDist, srcDirName, includePackages, allPlatforms, AppInvocation(args.toList(), null))
+        return BaseApp(name, baseDir, mainDist, otherDists, srcDirName, includePackages, allPlatforms, AppInvocation(args.toList(), null))
     }
 }
 
 class JvmBaseApp(
     name: String,
     baseDir: File,
-) : BaseApp(name, baseDir, AppDistribution(JvmLauncherScripts(name, false)), "main", true)
+) : BaseApp(name, baseDir, AppDistribution(JvmLauncherScripts(name, false)), emptyList(), "main", true)
 
 class UiBaseApp(
     name: String,
     baseDir: File,
-    srcDirName: String
-) : BaseApp(name, baseDir, AppDistribution(UiApp(name.capitalize())), srcDirName, true)
+    srcDirName: String,
+    mainDist: AppDistribution = AppDistribution(UiApp(name.capitalize())),
+    otherDists: List<AppDistribution> = emptyList()
+) : BaseApp(name, baseDir, mainDist, otherDists, srcDirName, true)
 
 class DerivedApp(
     name: String,
@@ -291,8 +305,8 @@ val jvmCliMinApp = jvmCliApp("jvm-cli-app-min").cliArgs("hello", "world")
 val jvmCliApp = jvmCliApp("jvm-cli-app")
 val jvmUiApp = jvmUiApp("jvm-ui-app")
 val jvmLib = jvmLib("jvm-lib")
-val kmpLib = mppLib("kmp-lib")
-val kmpLibRender = mppLib("kmp-lib-render", listOf("desktopMain", "jvmMain", "mingwMain", "unixMain"))
+val kmpLib = kmpLib("kmp-lib")
+val kmpLibRender = kmpLib("kmp-lib-render", listOf("desktopMain", "jvmMain", "mingwMain", "unixMain"))
 
 val nativeCliApp = jvmCliApp.deriveNative("native-cli-app")
 val nativeUiApp = macOsUiApp("native-ui-app")
@@ -388,10 +402,6 @@ val runTasks = sampleApps.associateWith { app ->
         dependsOn(app.distTask)
         doLast {
             run(app, app.mainDist)
-            if (app.nativeBinary != null && !app.nativeBinary.isFile) {
-                // For example, embedded JVM app with launcher script, UI apps
-                throw IllegalStateException("Application binary ${app.nativeBinary} does not exist.")
-            }
             println("dist size: " + app.distDir.directorySize().formatSize())
             if (app.nativeBinary != null && Machine.thisMachine.isMacOS) {
                 val str = ByteArrayOutputStream()
@@ -471,12 +481,20 @@ tasks.register("open") {
 
 fun run(app: App, dist: AppDistribution) {
     val distDir = app.distDir(dist)
+    println("Dist dir: $distDir")
     if (!distDir.isDirectory) {
         throw IllegalStateException("Application distribution directory $distDir does not exist.")
     }
     val cliLauncher = app.cliLauncher(dist)
+    println("CLI launcher: ${cliLauncher?.relativeTo(distDir)}")
     if (cliLauncher != null && !cliLauncher.isFile) {
         throw IllegalStateException("Application launcher $cliLauncher does not exist.")
+    }
+    val nativeBinary = app.nativeBinary(dist)
+    println("Native binary: ${nativeBinary?.relativeTo(distDir)}")
+    if (nativeBinary != null && !nativeBinary.isFile) {
+        // Can be non-null when CLI launcher is null, for example, embedded JVM app with launcher script
+        throw IllegalStateException("Application binary $nativeBinary does not exist.")
     }
 }
 
@@ -486,11 +504,20 @@ fun jvmCliApp(name: String): JvmBaseApp {
 
 fun jvmUiApp(name: String) = UiBaseApp(name, projectDir, "main")
 
-fun macOsUiApp(name: String) = UiBaseApp(name, projectDir, "macosMain")
+fun macOsUiApp(name: String): UiBaseApp {
+    val host = Machine.thisMachine
+    val otherDists = if (host.isMacOS && host.architecture == Arm64) {
+        listOf(AppDistribution(UiApp(name, "build/dist-images/macosX64Debug"), "macosX64DebugDist"))
+    } else {
+        emptyList()
+    }
+
+    return UiBaseApp(name, projectDir, "macosMain", otherDists = otherDists)
+}
 
 fun jvmLib(name: String) = BaseLib(name, projectDir, listOf("main"))
 
-fun mppLib(name: String, sourceSets: List<String> = listOf("commonMain")) = BaseLib(name, projectDir, sourceSets)
+fun kmpLib(name: String, sourceSets: List<String> = listOf("commonMain")) = BaseLib(name, projectDir, sourceSets)
 
 fun File.directorySize(): Long {
     var size: Long = 0

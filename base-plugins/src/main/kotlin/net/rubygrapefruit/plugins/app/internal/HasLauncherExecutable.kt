@@ -1,10 +1,16 @@
 package net.rubygrapefruit.plugins.app.internal
 
+import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.Distribution
+import net.rubygrapefruit.plugins.app.NativeMachine
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 
-interface HasLauncherExecutable: Distribution {
+interface HasLauncherExecutable : Distribution {
+    val targetMachine: NativeMachine
+
+    val buildType: BuildType
+
     /**
      * The launcher file to copy into the distribution image.
      */

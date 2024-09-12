@@ -38,11 +38,10 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                 )
 
                 app.distributionContainer.eachOfType<DefaultJvmUiAppDistribution> {
-                    val machine = this.targetMachine!!
-                    val nativeBinary = configurations.create("nativeBinaries${machine.name}") {
+                    val nativeBinary = configurations.create("nativeBinaries${targetMachine.name}") {
                         it.attributes.attribute(
                             Usage.USAGE_ATTRIBUTE,
-                            objects.named(Usage::class.java, "native-binary-${machine.kotlinTarget}")
+                            objects.named(Usage::class.java, "native-binary-${targetMachine.kotlinTarget}")
                         )
                         it.isCanBeResolved = true
                         it.isCanBeConsumed = false

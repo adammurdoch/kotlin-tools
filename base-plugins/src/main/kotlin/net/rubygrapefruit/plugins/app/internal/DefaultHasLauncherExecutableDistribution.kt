@@ -12,8 +12,9 @@ import javax.inject.Inject
 abstract class DefaultHasLauncherExecutableDistribution @Inject constructor(
     name: String,
     canBuildForHostMachine: Boolean,
-    target: NativeMachine,
-    buildType: BuildType,
+    override val targetMachine: NativeMachine,
+    override val buildType: BuildType,
     distTask: TaskProvider<DistributionImage>,
     defaultDist: Provider<Distribution>,
-    factory: ObjectFactory) : DefaultDistribution(name, canBuildForHostMachine, target, buildType, distTask, defaultDist, factory), HasLauncherExecutable
+    factory: ObjectFactory
+) : DefaultDistribution(name, canBuildForHostMachine, distTask, defaultDist, factory), HasLauncherExecutable

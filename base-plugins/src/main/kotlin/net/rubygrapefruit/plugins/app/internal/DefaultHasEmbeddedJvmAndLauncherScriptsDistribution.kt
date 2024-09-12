@@ -12,8 +12,8 @@ import javax.inject.Inject
 abstract class DefaultHasEmbeddedJvmAndLauncherScriptsDistribution @Inject constructor(
     name: String,
     canBuildForHostMachine: Boolean,
-    target: NativeMachine,
+    override val targetMachine: NativeMachine,
     buildType: BuildType,
     distTask: TaskProvider<DistributionImage>,
     defaultDist: Provider<Distribution>,
-    factory: ObjectFactory) : DefaultDistribution(name, canBuildForHostMachine, target, buildType, distTask, defaultDist, factory), HasEmbeddedJvm, HasLauncherScripts
+    factory: ObjectFactory) : DefaultDistribution(name, canBuildForHostMachine, distTask, defaultDist, factory), HasEmbeddedJvm, HasLauncherScripts

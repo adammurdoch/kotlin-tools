@@ -40,10 +40,12 @@ abstract class ShowDistributions : DefaultTask() {
                 print(" (DEFAULT)")
             }
             println()
-            if (distribution.targetMachine != null) {
+            if (distribution is HasLauncherExecutable) {
+                println("Target machine: ${distribution.targetMachine}")
+                println("Build type: ${distribution.buildType}")
+            } else if (distribution is HasEmbeddedJvm) {
                 println("Target machine: ${distribution.targetMachine}")
             }
-            println("Build type: ${distribution.buildType}")
             println("Launcher: ${launcherFor(distribution)}")
             if (distribution is HasEmbeddedJvm) {
                 println("Embedded JVM: yes")

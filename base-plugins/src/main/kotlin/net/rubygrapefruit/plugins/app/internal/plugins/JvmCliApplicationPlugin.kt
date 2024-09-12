@@ -1,6 +1,5 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
-import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.internal.DefaultHasLauncherScriptsDistribution
 import net.rubygrapefruit.plugins.app.internal.DefaultJvmCliApplication
 import net.rubygrapefruit.plugins.app.internal.HasLauncherScripts
@@ -21,7 +20,7 @@ class JvmCliApplicationPlugin : Plugin<Project> {
 
                 val libNames = app.runtimeModulePath.elements.map { it.map { f -> f.asFile.name } }
 
-                val dist = app.distributionContainer.add("noJvm", true, BuildType.Release, DefaultHasLauncherScriptsDistribution::class.java)
+                val dist = app.distributionContainer.add("noJvm", true, DefaultHasLauncherScriptsDistribution::class.java)
                 dist.withImage {
                     includeFilesInDir(libsDirPath, app.runtimeModulePath)
                 }

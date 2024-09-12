@@ -16,4 +16,5 @@ abstract class DefaultJvmUiAppDistribution @Inject constructor(
     buildType: BuildType,
     distTask: TaskProvider<DistributionImage>,
     defaultDist: Provider<Distribution>,
-    factory: ObjectFactory) : DefaultDistribution(name, canBuildForHostMachine, target, buildType, distTask, defaultDist, factory), HasEmbeddedJvm, HasLauncherExecutable, HasUnsignedUiBundle
+    factory: ObjectFactory
+) : DefaultHasLauncherExecutableDistribution(name, canBuildForHostMachine, target, buildType, distTask, defaultDist, factory), HasEmbeddedJvm, HasUnsignedUiBundle

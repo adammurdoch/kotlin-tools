@@ -1,3 +1,4 @@
+import net.rubygrapefruit.machine.info.Architecture
 import net.rubygrapefruit.machine.info.Architecture.Arm64
 import net.rubygrapefruit.machine.info.Architecture.X64
 import net.rubygrapefruit.machine.info.Machine
@@ -37,15 +38,7 @@ sealed class AppNature {
 
     abstract val nativeBinaryPath: String?
 
-    open val expectedArchitecture: String?
-        get() {
-            return if (nativeBinaryPath == null) {
-                null
-            } else when (Machine.thisMachine.architecture) {
-                X64 -> "x86_64"
-                Arm64 -> "ARM64"
-            }
-        }
+    abstract val expectedArchitecture: Architecture?
 
     abstract val openLauncherPath: String?
 }
@@ -60,7 +53,7 @@ class JvmLauncherScripts(private val name: String, private val embeddedJvm: Bool
     }
 
     override fun native(): AppNature {
-        return NativeBinaryCliApp(name, "build/dist")
+        return NativeBinaryCliApp(name, "build/dist", Machine.thisMachine.architecture)
     }
 
     override val cliLauncherPath: String
@@ -88,9 +81,9 @@ class JvmLauncherScripts(private val name: String, private val embeddedJvm: Bool
         get() = null
 }
 
-class NativeBinaryCliApp(private val name: String, override val distDirName: String) : AppNature() {
+class NativeBinaryCliApp(private val name: String, override val distDirName: String, override val expectedArchitecture: Architecture) : AppNature() {
     override fun launcher(launcher: String): AppNature {
-        return NativeBinaryCliApp(launcher, distDirName)
+        return NativeBinaryCliApp(launcher, distDirName, expectedArchitecture)
     }
 
     override fun embedded(): AppNature {
@@ -111,9 +104,9 @@ class NativeBinaryCliApp(private val name: String, override val distDirName: Str
         get() = null
 }
 
-class UiApp(private val appName: String, private val distBaseDir: String = "build/dist") : AppNature() {
+class UiApp(private val appName: String, private val distBaseDir: String, override val expectedArchitecture: Architecture) : AppNature() {
     override fun launcher(launcher: String): AppNature {
-        return UiApp(launcher)
+        return UiApp(launcher, distBaseDir, expectedArchitecture)
     }
 
     override fun embedded(): AppNature {
@@ -188,9 +181,6 @@ sealed class App(
 
     val expectedOutput = invocation.expectedOutput
 
-    val nativeBinary: File?
-        get() = nativeBinary(mainDist)
-
     fun nativeBinary(dist: AppDistribution): File? {
         val nativeBinaryPath = dist.nature.nativeBinaryPath
         return if (nativeBinaryPath != null) {
@@ -199,8 +189,6 @@ sealed class App(
             null
         }
     }
-
-    val expectedArchitecture = mainDist.nature.expectedArchitecture
 
     val openCommandLine = if (mainDist.nature.openLauncherPath != null) {
         listOf("open", distDir.resolve(mainDist.nature.openLauncherPath!!).absolutePath)
@@ -235,11 +223,11 @@ open class BaseApp(
     fun deriveNative(name: String): DerivedApp {
         val host = Machine.thisMachine
         val otherDists = if (host.isMacOS && host.architecture == Arm64) {
-            listOf(AppDistribution(NativeBinaryCliApp(name, "build/dist-images/macosX64Debug"), "macosX64DebugDist"))
+            listOf(AppDistribution(NativeBinaryCliApp(name, "build/dist-images/macosX64Debug", X64), "macosX64DebugDist"))
         } else {
             emptyList()
         }
-        return DerivedApp(name, derivedFrom, baseDir, AppDistribution(NativeBinaryCliApp(name, "build/dist")), otherDists, "commonMain", false, allPlatforms)
+        return DerivedApp(name, derivedFrom, baseDir, AppDistribution(NativeBinaryCliApp(name, "build/dist", host.architecture)), otherDists, "commonMain", false, allPlatforms)
     }
 
     fun allPlatforms(): BaseApp {
@@ -260,7 +248,7 @@ class UiBaseApp(
     name: String,
     baseDir: File,
     srcDirName: String,
-    mainDist: AppDistribution = AppDistribution(UiApp(name.capitalize())),
+    mainDist: AppDistribution = AppDistribution(UiApp(name.capitalize(), "build/dist", Machine.thisMachine.architecture)),
     otherDists: List<AppDistribution> = emptyList()
 ) : BaseApp(name, baseDir, mainDist, otherDists, srcDirName, true)
 
@@ -402,20 +390,6 @@ val runTasks = sampleApps.associateWith { app ->
         dependsOn(app.distTask)
         doLast {
             run(app, app.mainDist)
-            println("dist size: " + app.distDir.directorySize().formatSize())
-            if (app.nativeBinary != null && Machine.thisMachine.isMacOS) {
-                val str = ByteArrayOutputStream()
-                exec {
-                    commandLine("otool", "-hv", app.nativeBinary)
-                    standardOutput = str
-                }
-                val arch = str.toString().lines()[3].split(Regex("\\s+"))[1]
-                println("binary: $arch")
-                val expected = app.expectedArchitecture
-                if (expected != null && arch != expected) {
-                    throw IllegalStateException("Unexpected binary architecture")
-                }
-            }
             if (app.cliCommandLine != null) {
                 val str = ByteArrayOutputStream()
                 exec {
@@ -496,6 +470,25 @@ fun run(app: App, dist: AppDistribution) {
         // Can be non-null when CLI launcher is null, for example, embedded JVM app with launcher script
         throw IllegalStateException("Application binary $nativeBinary does not exist.")
     }
+    println("Dist size: " + distDir.directorySize().formatSize())
+    if (nativeBinary != null && Machine.thisMachine.isMacOS) {
+        val str = ByteArrayOutputStream()
+        exec {
+            commandLine("otool", "-hv", nativeBinary)
+            standardOutput = str
+        }
+        val arch = str.toString().lines()[3].split(Regex("\\s+"))[1]
+        println("Binary: $arch")
+        val expected = when (dist.nature.expectedArchitecture) {
+            X64 -> "X86_64"
+            Arm64 -> "ARM64"
+            null -> null
+        }
+
+        if (expected != null && arch != expected) {
+            throw IllegalStateException("Unexpected binary architecture: $arch, expected: $expected")
+        }
+    }
 }
 
 fun jvmCliApp(name: String): JvmBaseApp {
@@ -507,7 +500,7 @@ fun jvmUiApp(name: String) = UiBaseApp(name, projectDir, "main")
 fun macOsUiApp(name: String): UiBaseApp {
     val host = Machine.thisMachine
     val otherDists = if (host.isMacOS && host.architecture == Arm64) {
-        listOf(AppDistribution(UiApp(name, "build/dist-images/macosX64Debug"), "macosX64DebugDist"))
+        listOf(AppDistribution(UiApp(name, "build/dist-images/macosX64Debug", X64), "macosX64DebugDist"))
     } else {
         emptyList()
     }

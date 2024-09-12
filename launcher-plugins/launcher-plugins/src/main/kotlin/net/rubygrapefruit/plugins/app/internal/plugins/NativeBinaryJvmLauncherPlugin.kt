@@ -36,7 +36,7 @@ class NativeBinaryJvmLauncherPlugin : Plugin<Project> {
                 for (machine in targets) {
                     val default = machine == HostMachine.current.machine
                     val dist = app.distributionContainer.add(
-                        machine.kotlinTarget,
+                        null,
                         default,
                         default,
                         machine,

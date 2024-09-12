@@ -30,7 +30,20 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
     /**
      * Adds a platform-dependent distribution.
      */
-    fun <T : DefaultDistribution> add(name: String, isDefault: Boolean, canBuildForHostMachine: Boolean, targetMachine: NativeMachine, buildType: BuildType, type: Class<T>): T {
+    fun <T : DefaultDistribution> add(
+        baseName: String?,
+        isDefault: Boolean,
+        canBuildForHostMachine: Boolean,
+        targetMachine: NativeMachine,
+        buildType: BuildType,
+        type: Class<T>
+    ): T {
+        val name = targetMachine.kotlinTarget + if (baseName == null) "" else baseName.capitalize()
+        distContainer.all.forEach { distribution ->
+            if (distribution.name == name) {
+                throw IllegalArgumentException("Multiple distributions with name '$name'")
+            }
+        }
         val distTask = tasks.register(DefaultDistribution.taskName(name, "dist"), DistributionImage::class.java)
         val dist = objects.newInstance(type, name, canBuildForHostMachine, targetMachine, buildType, distTask, distribution)
         addDist(dist, isDefault)

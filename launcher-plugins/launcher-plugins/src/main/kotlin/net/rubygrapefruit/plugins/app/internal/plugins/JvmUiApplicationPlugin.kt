@@ -26,7 +26,7 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                 for (machine in listOf(NativeMachine.MacOSArm64, NativeMachine.MacOSX64)) {
                     val canBuild = HostMachine.current.canBeBuilt && HostMachine.current.machine == machine
                     app.distributionContainer.add(
-                        machine.kotlinTarget + "Unsigned",
+                        "unsigned",
                         canBuild,
                         canBuild,
                         machine,

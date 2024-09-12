@@ -17,9 +17,4 @@ interface NativeApplication : Application, MultiPlatformComponent<Dependencies> 
      * The native executables for this application.
      */
     val executables: Provider<List<NativeExecutable>>
-
-    /**
-     * The native executable for this application to use on the current machine, if any.
-     */
-    val executable: Provider<NativeExecutable>
 }

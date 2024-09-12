@@ -12,8 +12,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
-import org.jetbrains.kotlin.gradle.plugin.mpp.Executable
-import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 
 class NativeUiApplicationPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -37,15 +35,8 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                     it.kotlin.srcDir(generatorTask.flatMap { it.sourceDirectory })
                 }
 
-                multiplatformComponents.eachNativeTarget { machine, nativeTarget ->
-                    for (executable in nativeTarget.binaries.withType(Executable::class.java)) {
-                        val binaryFile = layout.file(executable.linkTaskProvider.map { it.binary.outputFile })
-                        val buildType = when (executable.buildType) {
-                            NativeBuildType.DEBUG -> BuildType.Debug
-                            NativeBuildType.RELEASE -> BuildType.Release
-                        }
-                        app.attachExecutable(machine, buildType, binaryFile)
-                    }
+                multiplatformComponents.eachNativeTarget { machine, buildType, binaryFile ->
+                    app.targets.attachExecutable(machine, buildType, binaryFile)
                 }
             }
 

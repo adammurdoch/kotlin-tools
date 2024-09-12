@@ -6,7 +6,6 @@ import net.rubygrapefruit.plugins.app.NativeApplication
 import net.rubygrapefruit.plugins.app.NativeExecutable
 import net.rubygrapefruit.plugins.app.NativeMachine
 import org.gradle.api.Project
-import org.gradle.api.file.RegularFile
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
@@ -20,15 +19,12 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     private val project: Project
 ) : MutableApplication, MutableNativeApplication, NativeApplication {
 
-    private val targets = NativeTargetsContainer(objects, providers, project.tasks)
+    val targets = NativeTargetsContainer(objects, providers, project.tasks)
 
     override val distributionContainer = targets.distributions
 
     override val executables: Provider<List<NativeExecutable>>
         get() = targets.executables
-
-    override val executable: Provider<NativeExecutable>
-        get() = targets.executable
 
     override fun macOS() {
         componentRegistry.macOS { register(it) }
@@ -41,14 +37,6 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     private fun KotlinNativeBinaryContainer.register(target: NativeMachine) {
         executable()
         targets.add(target, listOf(BuildType.Debug, BuildType.Release), DefaultHasLauncherExecutableDistribution::class.java)
-    }
-
-    fun attachExecutable(machine: NativeMachine, buildType: BuildType, binaryFile: Provider<RegularFile>) {
-        targets.attachExecutable(machine, buildType, binaryFile)
-    }
-
-    fun configureTarget(machine: NativeMachine, buildType: BuildType, action: DefaultDistribution.() -> Unit) {
-        targets.configureTarget(machine, buildType, action)
     }
 
     override fun common(config: Dependencies.() -> Unit) {

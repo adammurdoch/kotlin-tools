@@ -13,4 +13,4 @@ abstract class DefaultHasLauncherScriptsDistribution @Inject constructor(
     distTask: TaskProvider<DistributionImage>,
     defaultDist: Provider<Distribution>,
     factory: ObjectFactory
-) : DefaultDistribution(name, canBuildForHostMachine, distTask, defaultDist, factory), HasLauncherScripts
+) : DefaultDistributionWithImage(name, canBuildForHostMachine, distTask, defaultDist, factory), HasLauncherScripts

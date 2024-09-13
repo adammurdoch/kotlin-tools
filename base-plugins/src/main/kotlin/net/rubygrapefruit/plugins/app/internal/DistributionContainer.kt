@@ -11,7 +11,7 @@ import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.TaskContainer
 
 class DistributionContainer(private val tasks: TaskContainer, private val objects: ObjectFactory, providers: ProviderFactory) {
-    private val distContainer = SimpleContainer<DefaultDistribution>()
+    private val distContainer = SimpleContainer<DefaultDistributionWithImage>()
 
     val distributions: Provider<List<Distribution>> = providers.provider { distContainer.all }
 
@@ -20,8 +20,8 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
     /**
      * Adds a platform independent distribution.
      */
-    fun <T : DefaultDistribution> add(name: String, isDefault: Boolean, type: Class<T>): T {
-        val distTask = tasks.register(DefaultDistribution.taskName(name, "dist"), DistributionImage::class.java)
+    fun <T : DefaultDistributionWithImage> add(name: String, isDefault: Boolean, type: Class<T>): T {
+        val distTask = tasks.register(DefaultMutableDistribution.taskName(name, "dist"), DistributionImage::class.java)
         val dist = objects.newInstance(type, name, HostMachine.current.canBeBuilt, distTask, distribution)
         addDist(dist, isDefault)
         return dist
@@ -30,7 +30,7 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
     /**
      * Adds a platform-dependent distribution.
      */
-    fun <T : DefaultDistribution> add(
+    fun <T : DefaultDistributionWithImage> add(
         baseName: String?,
         isDefault: Boolean,
         canBuildForHostMachine: Boolean,
@@ -44,20 +44,20 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
                 throw IllegalArgumentException("Multiple distributions with name '$name'")
             }
         }
-        val distTask = tasks.register(DefaultDistribution.taskName(name, "dist"), DistributionImage::class.java)
+        val distTask = tasks.register(DefaultMutableDistribution.taskName(name, "dist"), DistributionImage::class.java)
         val dist = objects.newInstance(type, name, canBuildForHostMachine, targetMachine, buildType, distTask, distribution)
         addDist(dist, isDefault)
         return dist
     }
 
-    private fun addDist(dist: DefaultDistribution, isDefault: Boolean) {
+    private fun addDist(dist: DefaultDistributionWithImage, isDefault: Boolean) {
         distContainer.add(dist)
         if (isDefault && dist.canBuildOnHostMachine) {
             distribution.set(dist)
         }
     }
 
-    fun each(action: (DefaultDistribution) -> Unit) {
+    fun each(action: (DefaultDistributionWithImage) -> Unit) {
         distContainer.each(action)
     }
 

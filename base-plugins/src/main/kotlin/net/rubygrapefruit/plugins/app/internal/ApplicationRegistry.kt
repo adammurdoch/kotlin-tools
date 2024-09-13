@@ -18,8 +18,8 @@ open class ApplicationRegistry(private val project: Project) {
         app.appName.convention(project.name)
 
         project.tasks.register("dist", Distributions::class.java) { task ->
-            task.defaultDistribution.set(app.distribution.map { it as DefaultDistribution })
-            task.allDistributions.set(app.distributions.map { it.filterIsInstance<DefaultDistribution>() })
+            task.defaultDistribution.set(app.distribution.map { it as BuildableDistribution })
+            task.allDistributions.set(app.distributions.map { it.filterIsInstance<BuildableDistribution>() })
         }
 
         app.distributionContainer.each { dist ->

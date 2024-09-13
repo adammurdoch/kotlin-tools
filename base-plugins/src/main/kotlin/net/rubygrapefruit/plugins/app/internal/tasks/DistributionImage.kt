@@ -14,7 +14,7 @@ import java.nio.file.StandardCopyOption
 /**
  * Creates an image of the application distribution.
  */
-abstract class DistributionImage : DefaultTask() {
+abstract class DistributionImage : AbstractDistributionImage() {
     @get:OutputDirectory
     abstract val imageDirectory: DirectoryProperty
 

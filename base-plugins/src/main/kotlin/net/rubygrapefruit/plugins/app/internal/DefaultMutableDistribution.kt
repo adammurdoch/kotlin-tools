@@ -1,7 +1,6 @@
 package net.rubygrapefruit.plugins.app.internal
 
 import net.rubygrapefruit.plugins.app.Distribution
-import net.rubygrapefruit.plugins.app.internal.tasks.DistributionImage
 import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFile
@@ -10,17 +9,15 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
-import org.gradle.api.tasks.TaskProvider
 import javax.inject.Inject
 
 
-abstract class DefaultDistribution @Inject constructor(
+abstract class DefaultMutableDistribution @Inject constructor(
     override val name: String,
     val canBuildOnHostMachine: Boolean,
-    val distTask: TaskProvider<DistributionImage>,
     val defaultDist: Provider<Distribution>,
     factory: ObjectFactory,
-) : Distribution, MutableDistribution, BuildableDistribution, HasDistributionImage {
+) : Distribution, MutableDistribution {
     companion object {
         fun taskName(distName: String, taskName: String): String {
             return "$distName${taskName.capitalize()}"
@@ -34,9 +31,6 @@ abstract class DefaultDistribution @Inject constructor(
         override val launcherFile: Provider<RegularFile>
             get() = launcherOutputFile
     }
-
-    override val distProducer: Provider<Any>
-        get() = distTask.map { it } // Not sure how to convince kotlin compiler to use distTask unmodified
 
     override val launcherFile: RegularFileProperty = factory.fileProperty()
 
@@ -71,9 +65,5 @@ abstract class DefaultDistribution @Inject constructor(
 
     override fun buildDirName(baseName: String): String {
         return "$baseName/$name"
-    }
-
-    override fun withImage(action: DistributionImage.() -> Unit) {
-        distTask.configure(action)
     }
 }

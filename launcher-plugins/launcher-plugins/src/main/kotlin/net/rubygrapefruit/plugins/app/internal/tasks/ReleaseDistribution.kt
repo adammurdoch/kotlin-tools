@@ -1,7 +1,6 @@
 package net.rubygrapefruit.plugins.app.internal.tasks
 
 import net.rubygrapefruit.plugins.app.internal.copyDir
-import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -13,7 +12,7 @@ import javax.inject.Inject
 import kotlin.io.path.name
 import kotlin.io.path.pathString
 
-abstract class ReleaseDistribution : DefaultTask() {
+abstract class ReleaseDistribution : AbstractDistributionImage() {
     @get:OutputDirectory
     abstract val imageDirectory: DirectoryProperty
 
@@ -35,7 +34,6 @@ abstract class ReleaseDistribution : DefaultTask() {
         val unsignedImage = unsignedImage.get().asFile.toPath()
         imageDirectory.toFile().deleteRecursively()
         copyDir(unsignedImage, imageDirectory)
-        /*
         execOperations.exec {
             it.commandLine("codesign", "--options", "runtime", "--sign", signingIdentity.get(), imageDirectory.pathString)
         }
@@ -49,6 +47,5 @@ abstract class ReleaseDistribution : DefaultTask() {
         execOperations.exec {
             it.commandLine("xcrun", "stapler", "staple", imageDirectory.pathString)
         }
-         */
     }
 }

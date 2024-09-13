@@ -16,4 +16,4 @@ abstract class DefaultHasEmbeddedJvmAndLauncherScriptsDistribution @Inject const
     buildType: BuildType,
     distTask: TaskProvider<DistributionImage>,
     defaultDist: Provider<Distribution>,
-    factory: ObjectFactory) : DefaultDistribution(name, canBuildForHostMachine, distTask, defaultDist, factory), HasEmbeddedJvm, HasLauncherScripts
+    factory: ObjectFactory) : DefaultDistributionWithImage(name, canBuildForHostMachine, distTask, defaultDist, factory), HasEmbeddedJvm, HasLauncherScripts

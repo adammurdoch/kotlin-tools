@@ -17,4 +17,4 @@ abstract class DefaultHasLauncherExecutableDistribution @Inject constructor(
     distTask: TaskProvider<DistributionImage>,
     defaultDist: Provider<Distribution>,
     factory: ObjectFactory
-) : DefaultDistribution(name, canBuildForHostMachine, distTask, defaultDist, factory), HasLauncherExecutable
+) : DefaultDistributionWithImage(name, canBuildForHostMachine, distTask, defaultDist, factory), HasLauncherExecutable

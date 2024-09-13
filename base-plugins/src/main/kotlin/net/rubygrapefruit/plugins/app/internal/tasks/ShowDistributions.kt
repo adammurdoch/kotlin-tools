@@ -1,7 +1,8 @@
 package net.rubygrapefruit.plugins.app.internal.tasks
 
 import net.rubygrapefruit.plugins.app.Application
-import net.rubygrapefruit.plugins.app.internal.DefaultDistribution
+import net.rubygrapefruit.plugins.app.Distribution
+import net.rubygrapefruit.plugins.app.internal.DefaultDistributionWithImage
 import net.rubygrapefruit.plugins.app.internal.HasEmbeddedJvm
 import net.rubygrapefruit.plugins.app.internal.HasLauncherExecutable
 import net.rubygrapefruit.plugins.app.internal.HasLauncherScripts
@@ -23,7 +24,7 @@ abstract class ShowDistributions : DefaultTask() {
         println("Application: ${app.appName.get()}")
         println()
 
-        val distributions = app.distributions.get().filterIsInstance<DefaultDistribution>().sortedBy {
+        val distributions = app.distributions.get().filterIsInstance<DefaultDistributionWithImage>().sortedBy {
             when {
                 it == defaultDist -> 1
                 it.canBuildOnHostMachine -> 2
@@ -61,7 +62,7 @@ abstract class ShowDistributions : DefaultTask() {
         }
     }
 
-    private fun launcherFor(distribution: DefaultDistribution): String {
+    private fun launcherFor(distribution: Distribution): String {
         return when (distribution) {
             is HasLauncherScripts -> "Scripts"
             is HasLauncherExecutable -> "Executable"

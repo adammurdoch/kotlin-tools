@@ -35,6 +35,7 @@ abstract class ReleaseDistribution : DefaultTask() {
         val unsignedImage = unsignedImage.get().asFile.toPath()
         imageDirectory.toFile().deleteRecursively()
         copyDir(unsignedImage, imageDirectory)
+        /*
         execOperations.exec {
             it.commandLine("codesign", "--options", "runtime", "--sign", signingIdentity.get(), imageDirectory.pathString)
         }
@@ -48,5 +49,6 @@ abstract class ReleaseDistribution : DefaultTask() {
         execOperations.exec {
             it.commandLine("xcrun", "stapler", "staple", imageDirectory.pathString)
         }
+         */
     }
 }

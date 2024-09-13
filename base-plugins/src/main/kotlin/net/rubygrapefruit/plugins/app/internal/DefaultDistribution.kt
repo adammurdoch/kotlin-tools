@@ -20,7 +20,7 @@ abstract class DefaultDistribution @Inject constructor(
     val distTask: TaskProvider<DistributionImage>,
     val defaultDist: Provider<Distribution>,
     factory: ObjectFactory,
-) : Distribution, MutableDistribution {
+) : Distribution, MutableDistribution, BuildableDistribution, HasDistributionImage {
     companion object {
         fun taskName(distName: String, taskName: String): String {
             return "$distName${taskName.capitalize()}"
@@ -34,6 +34,9 @@ abstract class DefaultDistribution @Inject constructor(
         override val launcherFile: Provider<RegularFile>
             get() = launcherOutputFile
     }
+
+    override val distProducer: Provider<Any>
+        get() = distTask.map { it } // Not sure how to convince kotlin compiler to use distTask unmodified
 
     override val launcherFile: RegularFileProperty = factory.fileProperty()
 

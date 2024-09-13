@@ -67,8 +67,10 @@ class UiApplicationBasePlugin : Plugin<Project> {
                             buildType,
                             DefaultHasLauncherExecutableDistribution::class.java
                         )
+                        releaseDist.launcherFilePath.set(launcherFilePath)
                         tasks.register(releaseDist.taskName("sign"), ReleaseDistribution::class.java) { t ->
                             t.unsignedImage.set(outputs.imageDirectory)
+                            t.imageDirectory.set(releaseDist.imageDirectory)
                             t.signingIdentity.set(app.signingIdentity)
                             t.notarizationProfileName.set(app.notarizationProfileName)
                         }

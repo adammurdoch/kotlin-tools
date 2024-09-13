@@ -22,26 +22,25 @@ open class ApplicationRegistry(private val project: Project) {
             task.allDistributions.set(app.distributions.map { it.filterIsInstance<BuildableDistribution>() })
         }
 
-        app.distributionContainer.each { dist ->
-            dist.imageDirectory.convention(project.layout.buildDirectory.dir(dist.imageBaseDir))
-            dist.launcherFilePath.convention(app.appName)
-            dist.rootDirPath.convention(".")
-
-            require(dist is DefaultDistributionWithImage)
-
-            val distImageTask = dist.distTask
+        app.distributionContainer.each {
+            imageDirectory.convention(project.layout.buildDirectory.dir(imageBaseDirName))
+            launcherFilePath.convention(app.appName)
+            rootDirPath.convention(".")
+        }
+        app.distributionContainer.eachOfType<HasDistributionImage> {
+            val distImageTask = distTask
             distImageTask.configure { t ->
                 t.onlyIf {
-                    dist.canBuildOnHostMachine
+                    canBuildOnHostMachine
                 }
                 t.description = "Builds the distribution image"
                 t.group = "Distribution"
-                t.imageDirectory.set(dist.imageDirectory)
-                t.rootDirPath.set(dist.rootDirPath)
-                t.includeFile(dist.launcherFilePath, dist.launcherFile)
+                t.imageDirectory.set(imageDirectory)
+                t.rootDirPath.set(rootDirPath)
+                t.includeFile(launcherFilePath, launcherFile)
             }
-            dist.imageOutputDirectory.set(distImageTask.flatMap { t -> t.imageDirectory })
-            dist.launcherOutputFile.set(distImageTask.flatMap { t -> t.imageDirectory.map { it.file(dist.effectiveLauncherFilePath.get()) } })
+            imageOutputDirectory.set(distImageTask.flatMap { t -> t.imageDirectory })
+            launcherOutputFile.set(distImageTask.flatMap { t -> t.imageDirectory.map { it.file(effectiveLauncherFilePath.get()) } })
         }
 
         project.tasks.register("showDistributions", ShowDistributions::class.java) { task ->

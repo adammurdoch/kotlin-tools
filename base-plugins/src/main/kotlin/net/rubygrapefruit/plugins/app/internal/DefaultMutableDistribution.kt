@@ -38,14 +38,14 @@ abstract class DefaultMutableDistribution @Inject constructor(
 
     override val imageOutputDirectory: DirectoryProperty = factory.directoryProperty()
 
-    val launcherOutputFile: RegularFileProperty = factory.fileProperty()
+    override val launcherOutputFile: RegularFileProperty = factory.fileProperty()
 
     override val effectiveLauncherFilePath: Provider<String>
         get() {
             return providers.zip(rootDirPath, launcherFilePath) { a, b -> "$a/$b" }
         }
 
-    override val imageBaseDir: Provider<String>
+    override val imageBaseDirName: Provider<String>
         get() {
             return defaultDist.map {
                 if (this == it) {

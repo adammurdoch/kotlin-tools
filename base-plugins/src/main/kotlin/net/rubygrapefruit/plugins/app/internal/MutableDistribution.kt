@@ -1,12 +1,11 @@
 package net.rubygrapefruit.plugins.app.internal
 
-import net.rubygrapefruit.plugins.app.Distribution
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 
-interface MutableDistribution : Distribution {
+interface MutableDistribution : BuildableDistribution {
     val canBuildOnHostMachine: Boolean
 
     /**
@@ -24,11 +23,13 @@ interface MutableDistribution : Distribution {
      */
     val launcherFilePath: Property<String>
 
-    val effectiveLauncherFilePath: Provider<String>
-
     val imageOutputDirectory: DirectoryProperty
 
-    val imageBaseDir: Provider<String>
+    val launcherOutputFile: RegularFileProperty
+
+    val effectiveLauncherFilePath: Provider<String>
+
+    val imageBaseDirName: Provider<String>
 
     fun taskName(baseName: String): String
 

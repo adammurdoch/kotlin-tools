@@ -62,11 +62,12 @@ class UiApplicationBasePlugin : Plugin<Project> {
                         val releaseDist = app.distributionContainer.add(
                             "release",
                             false,
-                            true,
+                            canBuildOnHostMachine,
                             targetMachine,
                             buildType,
                             DefaultHasLauncherExecutableDistribution::class.java
                         )
+                        releaseDist.rootDirPath.set(rootDirPath)
                         releaseDist.launcherFilePath.set(launcherFilePath)
                         tasks.register(releaseDist.taskName("sign"), ReleaseDistribution::class.java) { t ->
                             t.unsignedImage.set(outputs.imageDirectory)

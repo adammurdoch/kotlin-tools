@@ -2,7 +2,6 @@ package net.rubygrapefruit.plugins.app.internal.tasks
 
 import net.rubygrapefruit.plugins.app.Application
 import net.rubygrapefruit.plugins.app.Distribution
-import net.rubygrapefruit.plugins.app.internal.BuildableDistribution
 import net.rubygrapefruit.plugins.app.internal.HasEmbeddedJvm
 import net.rubygrapefruit.plugins.app.internal.HasLauncherExecutable
 import net.rubygrapefruit.plugins.app.internal.HasLauncherScripts
@@ -25,13 +24,15 @@ abstract class ShowDistributions : DefaultTask() {
         println("Application: ${app.appName.get()}")
         println()
 
-        val distributions = app.distributions.get().filterIsInstance<MutableDistribution>().sortedBy {
+        val comparator = Comparator.comparingInt<MutableDistribution> {
             when {
                 it == defaultDist -> 1
                 it.canBuildOnHostMachine -> 2
                 else -> 3
             }
-        }
+        }.thenBy { dist -> dist.name }
+
+        val distributions = app.distributions.get().filterIsInstance<MutableDistribution>().sortedWith(comparator)
         println("Distributions:")
         for (distribution in distributions) {
             println()
@@ -53,9 +54,7 @@ abstract class ShowDistributions : DefaultTask() {
             if (distribution is HasEmbeddedJvm) {
                 println("Embedded JVM: yes")
             }
-            if (distribution is BuildableDistribution) {
-                println("Dist task: ${distribution.distProducer.name}")
-            }
+            println("Dist task: ${distribution.distProducer.get().path}")
 
             val imageDirectory = distribution.imageOutputDirectory.get()
             val launcher = imageDirectory.file(distribution.effectiveLauncherFilePath.get())

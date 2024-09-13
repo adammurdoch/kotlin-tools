@@ -57,14 +57,14 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
         }
     }
 
-    fun each(action: (MutableDistribution) -> Unit) {
+    fun each(action: MutableDistribution.() -> Unit) {
         distContainer.each(action)
     }
 
     inline fun <reified T> eachOfType(crossinline action: T.() -> Unit) {
-        each { dist ->
-            if (dist is T) {
-                action(dist)
+        each {
+            if (this is T) {
+                action()
             }
         }
     }

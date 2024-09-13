@@ -12,7 +12,7 @@ import javax.inject.Inject
 abstract class DefaultDistributionWithImage @Inject constructor(
     name: String,
     canBuildOnHostMachine: Boolean,
-    val distTask: TaskProvider<DistributionImage>,
+    override val distTask: TaskProvider<DistributionImage>,
     defaultDist: Provider<Distribution>,
     factory: ObjectFactory,
 ) : DefaultMutableDistribution(name, canBuildOnHostMachine, defaultDist, factory), BuildableDistribution, HasDistributionImage {

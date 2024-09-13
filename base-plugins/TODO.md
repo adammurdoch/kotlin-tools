@@ -1,7 +1,6 @@
 
 # TODO
 
-- `showDistributions` shows wrong image dir for UI apps
 - Add `dist --release`
 - Add an "app bundle" plugin, which will include other apps as JVM resources
 - Fix `.bat` to work from any directory via a link
@@ -12,16 +11,12 @@
 - Don't include `.bat` script for non-windows embedded JVM, or replace with binary launcher
 - Improve failure for `dist` task when nothing can be built
   - Or, don't add a dist task in this case.
-- Split configuration and output into separate types for app and distribution
-- Add distributions for debug and release for UI apps
 - Use correct target machine for embedded JVM distributions
   - Currently, uses whichever JVM architecture that Gradle decides to use
 - Add distribution for each platform for native binary JVM app
   - Can build both macOS distributions on macOS
-- Move JVM test dependency declarations into library and application blocks
 - Move dependency declarations into library and application blocks
     - UI applications 
-    - commonTest for applications 
 - Libraries in this repo should target Java 11?
 - Enable CC
 - Add `run` task for apps
@@ -38,7 +33,6 @@
     - Only export packages that contain public non-internal types
     - Figure out how to enforce for Kotlin JVM compilation
     - Use an artifact transform to extract the module info for dependencies
-- Add some kind `assembleDebug` task to build a single dev target.
 - Add functional tests for plugins.
     - Customisation
 - Refactor `DownloadRepository` to use Gradle exec service when used in a plugin.

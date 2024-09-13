@@ -35,10 +35,6 @@ open class ApplicationRegistry(private val project: Project) {
             launcherFilePath.convention(app.appName)
             rootDirPath.convention(".")
 
-            imageOutputDirectory.set(distTask.flatMap { t -> t.imageDirectory })
-            launcherOutputFile.set(distTask.flatMap { t -> t.imageDirectory.map { it.file(effectiveLauncherFilePath.get()) } })
-        }
-        app.distributionContainer.eachOfType<HasDistributionImage> {
             distTask.configure { t ->
                 t.onlyIf {
                     canBuildOnHostMachine
@@ -47,6 +43,13 @@ open class ApplicationRegistry(private val project: Project) {
                 t.group = "Distribution"
                 t.imageDirectory.set(imageDirectory)
                 t.rootDirPath.set(rootDirPath)
+            }
+
+            imageOutputDirectory.set(distTask.flatMap { t -> t.imageDirectory })
+            launcherOutputFile.set(distTask.flatMap { t -> t.imageDirectory.map { it.file(effectiveLauncherFilePath.get()) } })
+        }
+        app.distributionContainer.eachOfType<HasDistributionImage> {
+            distTask.configure { t ->
                 t.includeFile(launcherFilePath, launcherFile)
             }
         }

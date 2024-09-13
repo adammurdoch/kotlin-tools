@@ -7,7 +7,6 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileSystemLocation
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.ListProperty
-import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import java.nio.file.Files
@@ -17,9 +16,6 @@ import java.nio.file.StandardCopyOption
  * Creates an image of the application distribution.
  */
 abstract class DistributionImage : AbstractDistributionImage() {
-    @get:Input
-    abstract val rootDirPath: Property<String>
-
     @get:Nested
     abstract val contributions: ListProperty<Contribution>
 

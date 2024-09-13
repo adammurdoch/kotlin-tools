@@ -30,18 +30,21 @@ abstract class ReleaseDistribution : AbstractDistributionImage() {
         val unsignedImage = unsignedImage.get().asFile.toPath()
         imageDirectory.toFile().deleteRecursively()
         copyDir(unsignedImage, imageDirectory)
+
+        val bundleDir = imageDirectory.resolve(rootDirPath.get()).parent
+
         execOperations.exec {
-            it.commandLine("codesign", "--options", "runtime", "--sign", signingIdentity.get(), imageDirectory.pathString)
+            it.commandLine("codesign", "--options", "runtime", "--sign", signingIdentity.get(), bundleDir.pathString)
         }
-        val zip = temporaryDir.toPath().resolve(imageDirectory.name.replace(".app", ".zip"))
+        val zip = temporaryDir.toPath().resolve(bundleDir.name.replace(".app", ".zip"))
         execOperations.exec {
-            it.commandLine("/usr/bin/ditto", "-c", "-k", "--keepParent", imageDirectory.pathString, zip.pathString)
+            it.commandLine("/usr/bin/ditto", "-c", "-k", "--keepParent", bundleDir.pathString, zip.pathString)
         }
         execOperations.exec {
             it.commandLine("xcrun", "notarytool", "submit", zip.pathString, "--wait", "--keychain-profile", notarizationProfileName.get())
         }
         execOperations.exec {
-            it.commandLine("xcrun", "stapler", "staple", imageDirectory.pathString)
+            it.commandLine("xcrun", "stapler", "staple", bundleDir.pathString)
         }
     }
 }

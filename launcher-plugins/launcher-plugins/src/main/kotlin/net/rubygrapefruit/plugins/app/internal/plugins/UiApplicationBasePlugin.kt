@@ -1,13 +1,17 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.BuildType
-import net.rubygrapefruit.plugins.app.internal.*
+import net.rubygrapefruit.plugins.app.internal.DefaultReleaseDistribution
+import net.rubygrapefruit.plugins.app.internal.DefaultUiApplication
+import net.rubygrapefruit.plugins.app.internal.HasUnsignedUiBundle
+import net.rubygrapefruit.plugins.app.internal.applications
 import net.rubygrapefruit.plugins.app.internal.tasks.AppIcon
 import net.rubygrapefruit.plugins.app.internal.tasks.DistributionImage
 import net.rubygrapefruit.plugins.app.internal.tasks.InfoPlist
 import net.rubygrapefruit.plugins.app.internal.tasks.ReleaseDistribution
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.provider.Provider
 
 class UiApplicationBasePlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -16,6 +20,9 @@ class UiApplicationBasePlugin : Plugin<Project> {
             applications.withApp<DefaultUiApplication> { app ->
                 val capitalizedAppName = app.capitalizedAppName
                 app.iconFile.set(layout.projectDirectory.file("src/main/Icon1024.png"))
+
+                app.notarizationProfileName.set(envVar("APP_NOTARIZATION_PROFILE"))
+                app.signingIdentity.set(envVar("APP_SIGNING_IDENTITY"))
 
                 val infoPlistTask = tasks.register("infoPlist", InfoPlist::class.java) {
                     it.plistFile.set(layout.buildDirectory.file("app/Info.plist"))
@@ -67,9 +74,8 @@ class UiApplicationBasePlugin : Plugin<Project> {
                         )
                         releaseDist.rootDirPath.set(rootDirPath)
                         releaseDist.launcherFilePath.set(launcherFilePath)
-                        tasks.register(releaseDist.taskName("sign"), ReleaseDistribution::class.java) { t ->
+                        releaseDist.distTask.configure { t ->
                             t.unsignedImage.set(outputs.imageDirectory)
-                            t.imageDirectory.set(releaseDist.imageDirectory)
                             t.signingIdentity.set(app.signingIdentity)
                             t.notarizationProfileName.set(app.notarizationProfileName)
                         }
@@ -77,5 +83,9 @@ class UiApplicationBasePlugin : Plugin<Project> {
                 }
             }
         }
+    }
+
+    private fun Project.envVar(name: String): Provider<String> {
+        return providers.environmentVariable(name).orElse(provider { throw RuntimeException("Environment variable '$name' not set") })
     }
 }

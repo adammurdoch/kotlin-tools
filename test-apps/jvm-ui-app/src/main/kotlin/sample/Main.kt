@@ -29,48 +29,16 @@ fun main() {
     val labelInsets = Insets(10, 20, 10, 20)
 
     val input = JTextField()
-    main.add(JLabel("Input:"), GridBagConstraints().also {
-        it.gridx = 0
-        it.gridy = 0
-        it.anchor = GridBagConstraints.BASELINE_TRAILING
-        it.insets = labelInsets
-    })
-    main.add(input, GridBagConstraints().also {
-        it.gridx = 1
-        it.gridy = 0
-        it.fill = GridBagConstraints.HORIZONTAL
-        it.anchor = GridBagConstraints.BASELINE_LEADING
-        it.weightx = 1.0
-    })
+    main.row(0, "Input", input) {
+        fill = GridBagConstraints.HORIZONTAL
+    }
 
     val expressionLabel = JLabel("")
     val originalColor = expressionLabel.foreground
-    main.add(JLabel("Expression:"), GridBagConstraints().also {
-        it.gridx = 0
-        it.gridy = 1
-        it.anchor = GridBagConstraints.BASELINE_TRAILING
-        it.insets = labelInsets
-    })
-    main.add(expressionLabel, GridBagConstraints().also {
-        it.gridx = 1
-        it.gridy = 1
-        it.anchor = GridBagConstraints.BASELINE_LEADING
-        it.weightx = 1.0
-    })
+    main.row(1, "Expression", expressionLabel)
 
     val resultLabel = JLabel("")
-    main.add(JLabel("Result:"), GridBagConstraints().also {
-        it.gridx = 0
-        it.gridy = 2
-        it.anchor = GridBagConstraints.BASELINE_TRAILING
-        it.insets = labelInsets
-    })
-    main.add(resultLabel, GridBagConstraints().also {
-        it.gridx = 1
-        it.gridy = 2
-        it.anchor = GridBagConstraints.BASELINE_LEADING
-        it.weightx = 1.0
-    })
+    main.row(2, "Result", resultLabel)
 
     main.add(JLabel(), GridBagConstraints().also {
         it.gridx = 0
@@ -81,21 +49,10 @@ fun main() {
         it.weighty = 1.0
     })
 
-    main.add(JLabel("Kotlin:"), GridBagConstraints().also {
-        it.gridx = 0
-        it.gridy = 4
-        it.anchor = GridBagConstraints.BASELINE_TRAILING
-        it.insets = labelInsets
-    })
-
     val systemInfo = getSystemInfo()
-    val systemInfoLabel = JLabel(systemInfo.kotlinVersion)
-    main.add(systemInfoLabel, GridBagConstraints().also {
-        it.gridx = 1
-        it.gridy = 4
-        it.anchor = GridBagConstraints.BASELINE_LEADING
-        it.weightx = 1.0
-    })
+    main.row(4, "Kotlin", JLabel(systemInfo.kotlinVersion))
+    main.row(5, "JVM", JLabel(systemInfo.jvm))
+    main.row(6, "OS", JLabel(systemInfo.os))
 
     input.document.addDocumentListener(object : DocumentListener {
         override fun insertUpdate(e: DocumentEvent?) {
@@ -135,4 +92,22 @@ fun main() {
     frame.setLocation(x, y)
 
     frame.isVisible = true
+}
+
+fun JPanel.row(row: Int, label: String, value: JComponent, constraints: GridBagConstraints.() -> Unit = {}) {
+    val labelInsets = Insets(10, 20, 10, 20)
+
+    add(JLabel("$label:"), GridBagConstraints().also {
+        it.gridx = 0
+        it.gridy = row
+        it.anchor = GridBagConstraints.BASELINE_TRAILING
+        it.insets = labelInsets
+    })
+    add(value, GridBagConstraints().also {
+        it.gridx = 1
+        it.gridy = row
+        it.anchor = GridBagConstraints.BASELINE_LEADING
+        it.weightx = 1.0
+        it.constraints()
+    })
 }

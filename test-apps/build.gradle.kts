@@ -170,9 +170,6 @@ sealed class App(
         }
     }
 
-    val cliCommandLine: List<String>?
-        get() = cliCommandLine(mainDist)
-
     fun cliCommandLine(dist: AppDistribution): List<String>? = if (dist.nature.cliLauncherPath != null) {
         dist.nature.cliLauncherPrefix + distDir.resolve(dist.nature.cliLauncherPath!!).absolutePath + invocation.cliArgs
     } else {
@@ -390,23 +387,6 @@ val runTasks = sampleApps.associateWith { app ->
         dependsOn(app.distTask)
         doLast {
             run(app, app.mainDist)
-            if (app.cliCommandLine != null) {
-                val str = ByteArrayOutputStream()
-                exec {
-                    commandLine(app.cliCommandLine)
-                    standardOutput = str
-                }
-                println()
-                println("----")
-                println(str)
-                println("----")
-                if (app.expectedOutput != null && !str.toString().contains(app.expectedOutput)) {
-                    throw IllegalStateException("Unexpected application output")
-                }
-            } else {
-                println()
-                println("(no CLI)")
-            }
         }
     }
 }
@@ -488,6 +468,24 @@ fun run(app: App, dist: AppDistribution) {
         if (expected != null && arch != expected) {
             throw IllegalStateException("Unexpected binary architecture: $arch, expected: $expected")
         }
+    }
+    val cliCommandLine = app.cliCommandLine(dist)
+    if (cliCommandLine != null) {
+        val str = ByteArrayOutputStream()
+        exec {
+            commandLine(cliCommandLine)
+            standardOutput = str
+        }
+        println()
+        println("----")
+        println(str)
+        println("----")
+        if (app.expectedOutput != null && !str.toString().contains(app.expectedOutput)) {
+            throw IllegalStateException("Unexpected application output")
+        }
+    } else {
+        println()
+        println("(no CLI)")
     }
 }
 

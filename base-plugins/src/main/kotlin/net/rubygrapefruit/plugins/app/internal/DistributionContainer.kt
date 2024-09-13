@@ -3,6 +3,7 @@ package net.rubygrapefruit.plugins.app.internal
 import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.Distribution
 import net.rubygrapefruit.plugins.app.NativeMachine
+import net.rubygrapefruit.plugins.app.internal.tasks.AbstractDistributionImage
 import net.rubygrapefruit.plugins.app.internal.tasks.DistributionImage
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -22,7 +23,7 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
      */
     fun <T : MutableDistribution> add(name: String, isDefault: Boolean, type: Class<T>): T {
         val distTask = tasks.register(DefaultMutableDistribution.taskName(name, "dist"), DistributionImage::class.java)
-        val dist = objects.newInstance(type, name, HostMachine.current.canBeBuilt, distTask, distribution)
+        val dist = objects.newInstance(type, name, HostMachine.current.canBeBuilt, distTask)
         addDist(dist, isDefault)
         return dist
     }
@@ -36,7 +37,8 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
         canBuildForHostMachine: Boolean,
         targetMachine: NativeMachine,
         buildType: BuildType,
-        type: Class<T>
+        type: Class<T>,
+        taskType: Class<out AbstractDistributionImage> = DistributionImage::class.java
     ): T {
         val name = targetMachine.kotlinTarget + if (baseName == null) "" else baseName.capitalize()
         distContainer.all.forEach { distribution ->
@@ -44,8 +46,8 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
                 throw IllegalArgumentException("Multiple distributions with name '$name'")
             }
         }
-        val distTask = tasks.register(DefaultMutableDistribution.taskName(name, "dist"), DistributionImage::class.java)
-        val dist = objects.newInstance(type, name, canBuildForHostMachine, targetMachine, buildType, distTask, distribution)
+        val distTask = tasks.register(DefaultMutableDistribution.taskName(name, "dist"), taskType)
+        val dist = objects.newInstance(type, name, canBuildForHostMachine, targetMachine, buildType, distTask)
         addDist(dist, isDefault)
         return dist
     }

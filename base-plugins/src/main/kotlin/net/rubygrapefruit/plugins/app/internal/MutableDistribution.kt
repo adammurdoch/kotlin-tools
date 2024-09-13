@@ -29,8 +29,6 @@ interface MutableDistribution : BuildableDistribution {
 
     val effectiveLauncherFilePath: Provider<String>
 
-    val imageBaseDirName: Provider<String>
-
     fun taskName(baseName: String): String
 
     fun buildDirName(baseName: String): String

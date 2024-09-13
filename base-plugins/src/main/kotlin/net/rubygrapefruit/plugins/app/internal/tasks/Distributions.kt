@@ -25,9 +25,9 @@ abstract class Distributions : DefaultTask() {
         dependsOn(object : Callable<Any> {
             override fun call(): Any {
                 return if (all.get()) {
-                    allDistributions.map { it.map { it.distProducer } }
+                    allDistributions.map { it.map { it.distTask } }
                 } else {
-                    defaultDistribution.map { it.distProducer }
+                    defaultDistribution.map { it.distTask }
                 }
             }
         })

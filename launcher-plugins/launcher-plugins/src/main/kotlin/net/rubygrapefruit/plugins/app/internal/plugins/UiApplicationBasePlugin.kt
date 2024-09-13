@@ -1,10 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.BuildType
-import net.rubygrapefruit.plugins.app.internal.DefaultHasLauncherExecutableDistribution
-import net.rubygrapefruit.plugins.app.internal.DefaultUiApplication
-import net.rubygrapefruit.plugins.app.internal.HasUnsignedUiBundle
-import net.rubygrapefruit.plugins.app.internal.applications
+import net.rubygrapefruit.plugins.app.internal.*
 import net.rubygrapefruit.plugins.app.internal.tasks.AppIcon
 import net.rubygrapefruit.plugins.app.internal.tasks.DistributionImage
 import net.rubygrapefruit.plugins.app.internal.tasks.InfoPlist
@@ -65,7 +62,8 @@ class UiApplicationBasePlugin : Plugin<Project> {
                             canBuildOnHostMachine,
                             targetMachine,
                             buildType,
-                            DefaultHasLauncherExecutableDistribution::class.java
+                            DefaultReleaseDistribution::class.java,
+                            ReleaseDistribution::class.java
                         )
                         releaseDist.rootDirPath.set(rootDirPath)
                         releaseDist.launcherFilePath.set(launcherFilePath)

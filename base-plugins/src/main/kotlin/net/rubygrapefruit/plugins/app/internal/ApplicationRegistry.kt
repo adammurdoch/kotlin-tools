@@ -23,13 +23,23 @@ open class ApplicationRegistry(private val project: Project) {
         }
 
         app.distributionContainer.each {
+            val imageBaseDirName = app.distributionContainer.distribution.map {
+                if (this == it) {
+                    "dist"
+                } else {
+                    "dist-images/$name"
+                }
+            }.orElse("dist-images/$name")
+
             imageDirectory.convention(project.layout.buildDirectory.dir(imageBaseDirName))
             launcherFilePath.convention(app.appName)
             rootDirPath.convention(".")
+
+            imageOutputDirectory.set(distTask.flatMap { t -> t.imageDirectory })
+            launcherOutputFile.set(distTask.flatMap { t -> t.imageDirectory.map { it.file(effectiveLauncherFilePath.get()) } })
         }
         app.distributionContainer.eachOfType<HasDistributionImage> {
-            val distImageTask = distTask
-            distImageTask.configure { t ->
+            distTask.configure { t ->
                 t.onlyIf {
                     canBuildOnHostMachine
                 }
@@ -39,8 +49,6 @@ open class ApplicationRegistry(private val project: Project) {
                 t.rootDirPath.set(rootDirPath)
                 t.includeFile(launcherFilePath, launcherFile)
             }
-            imageOutputDirectory.set(distImageTask.flatMap { t -> t.imageDirectory })
-            launcherOutputFile.set(distImageTask.flatMap { t -> t.imageDirectory.map { it.file(effectiveLauncherFilePath.get()) } })
         }
 
         project.tasks.register("showDistributions", ShowDistributions::class.java) { task ->

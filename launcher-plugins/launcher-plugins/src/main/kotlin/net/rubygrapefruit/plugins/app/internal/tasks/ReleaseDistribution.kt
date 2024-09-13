@@ -5,7 +5,6 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
 import javax.inject.Inject
@@ -13,9 +12,6 @@ import kotlin.io.path.name
 import kotlin.io.path.pathString
 
 abstract class ReleaseDistribution : AbstractDistributionImage() {
-    @get:OutputDirectory
-    abstract val imageDirectory: DirectoryProperty
-
     @get:InputDirectory
     abstract val unsignedImage: DirectoryProperty
 

@@ -5,5 +5,5 @@ import net.rubygrapefruit.plugins.app.internal.tasks.AbstractDistributionImage
 import org.gradle.api.provider.Provider
 
 interface BuildableDistribution : Distribution {
-    val distProducer: Provider<AbstractDistributionImage>
+    val distTask: Provider<out AbstractDistributionImage>
 }

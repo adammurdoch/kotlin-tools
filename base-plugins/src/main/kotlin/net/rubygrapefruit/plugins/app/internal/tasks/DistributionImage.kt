@@ -2,8 +2,10 @@ package net.rubygrapefruit.plugins.app.internal.tasks
 
 import net.rubygrapefruit.plugins.app.internal.copyDir
 import net.rubygrapefruit.plugins.app.internal.makeEmpty
-import org.gradle.api.DefaultTask
-import org.gradle.api.file.*
+import org.gradle.api.file.Directory
+import org.gradle.api.file.FileCollection
+import org.gradle.api.file.FileSystemLocation
+import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -15,9 +17,6 @@ import java.nio.file.StandardCopyOption
  * Creates an image of the application distribution.
  */
 abstract class DistributionImage : AbstractDistributionImage() {
-    @get:OutputDirectory
-    abstract val imageDirectory: DirectoryProperty
-
     @get:Input
     abstract val rootDirPath: Property<String>
 

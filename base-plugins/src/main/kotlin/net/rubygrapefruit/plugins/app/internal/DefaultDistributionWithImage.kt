@@ -1,6 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal
 
 import net.rubygrapefruit.plugins.app.Distribution
+import net.rubygrapefruit.plugins.app.internal.tasks.AbstractDistributionImage
 import net.rubygrapefruit.plugins.app.internal.tasks.DistributionImage
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
@@ -16,8 +17,8 @@ abstract class DefaultDistributionWithImage @Inject constructor(
     factory: ObjectFactory,
 ) : DefaultMutableDistribution(name, canBuildOnHostMachine, defaultDist, factory), BuildableDistribution, HasDistributionImage {
 
-    override val distProducer: Provider<Any>
-        get() = distTask.map { it } // Not sure how to convince kotlin compiler to use distTask unmodified
+    override val distProducer: TaskProvider<AbstractDistributionImage>
+        get() = distTask as TaskProvider<AbstractDistributionImage>
 
     override fun withImage(action: DistributionImage.() -> Unit) {
         distTask.configure(action)

@@ -27,6 +27,8 @@ open class ApplicationRegistry(private val project: Project) {
             dist.launcherFilePath.convention(app.appName)
             dist.rootDirPath.convention(".")
 
+            require(dist is DefaultDistributionWithImage)
+
             val distImageTask = dist.distTask
             distImageTask.configure { t ->
                 t.onlyIf {

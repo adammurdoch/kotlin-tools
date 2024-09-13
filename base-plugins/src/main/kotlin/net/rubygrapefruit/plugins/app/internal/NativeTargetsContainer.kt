@@ -21,7 +21,7 @@ class NativeTargetsContainer(
 
     val executables: Provider<List<NativeExecutable>> = providers.provider { machines.all.map { it.executable } }
 
-    fun <T : DefaultDistributionWithImage> add(machine: NativeMachine, buildTypes: List<BuildType>, distributionType: Class<T>, canBuildOnThisHost: Boolean = true) {
+    fun <T : MutableDistribution> add(machine: NativeMachine, buildTypes: List<BuildType>, distributionType: Class<T>, canBuildOnThisHost: Boolean = true) {
         for (buildType in buildTypes) {
             val targetInfo = targetInfo(machine, buildType)
             if (targetInfo != null) {
@@ -52,7 +52,7 @@ class NativeTargetsContainer(
         }
     }
 
-    fun configureTarget(machine: NativeMachine, buildType: BuildType, action: DefaultDistributionWithImage.() -> Unit) {
+    fun configureTarget(machine: NativeMachine, buildType: BuildType, action: MutableDistribution.() -> Unit) {
         action(targetInfo(machine, buildType)!!.distribution)
     }
 
@@ -60,7 +60,7 @@ class NativeTargetsContainer(
         val machine: NativeMachine,
         val buildType: BuildType,
         val executable: DefaultNativeExecutable,
-        val distribution: DefaultDistributionWithImage
+        val distribution: MutableDistribution
     )
 
     private class DefaultNativeExecutable(

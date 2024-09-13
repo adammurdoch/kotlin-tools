@@ -11,7 +11,7 @@ import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.TaskContainer
 
 class DistributionContainer(private val tasks: TaskContainer, private val objects: ObjectFactory, providers: ProviderFactory) {
-    private val distContainer = SimpleContainer<DefaultDistributionWithImage>()
+    private val distContainer = SimpleContainer<MutableDistribution>()
 
     val distributions: Provider<List<Distribution>> = providers.provider { distContainer.all }
 
@@ -20,7 +20,7 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
     /**
      * Adds a platform independent distribution.
      */
-    fun <T : DefaultDistributionWithImage> add(name: String, isDefault: Boolean, type: Class<T>): T {
+    fun <T : MutableDistribution> add(name: String, isDefault: Boolean, type: Class<T>): T {
         val distTask = tasks.register(DefaultMutableDistribution.taskName(name, "dist"), DistributionImage::class.java)
         val dist = objects.newInstance(type, name, HostMachine.current.canBeBuilt, distTask, distribution)
         addDist(dist, isDefault)
@@ -30,7 +30,7 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
     /**
      * Adds a platform-dependent distribution.
      */
-    fun <T : DefaultDistributionWithImage> add(
+    fun <T : MutableDistribution> add(
         baseName: String?,
         isDefault: Boolean,
         canBuildForHostMachine: Boolean,
@@ -50,14 +50,14 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
         return dist
     }
 
-    private fun addDist(dist: DefaultDistributionWithImage, isDefault: Boolean) {
+    private fun addDist(dist: MutableDistribution, isDefault: Boolean) {
         distContainer.add(dist)
         if (isDefault && dist.canBuildOnHostMachine) {
             distribution.set(dist)
         }
     }
 
-    fun each(action: (DefaultDistributionWithImage) -> Unit) {
+    fun each(action: (MutableDistribution) -> Unit) {
         distContainer.each(action)
     }
 

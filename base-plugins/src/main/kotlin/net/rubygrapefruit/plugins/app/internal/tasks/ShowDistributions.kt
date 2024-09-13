@@ -2,11 +2,12 @@ package net.rubygrapefruit.plugins.app.internal.tasks
 
 import net.rubygrapefruit.plugins.app.Application
 import net.rubygrapefruit.plugins.app.Distribution
-import net.rubygrapefruit.plugins.app.internal.DefaultDistributionWithImage
+import net.rubygrapefruit.plugins.app.internal.BuildableDistribution
 import net.rubygrapefruit.plugins.app.internal.HasEmbeddedJvm
 import net.rubygrapefruit.plugins.app.internal.HasLauncherExecutable
 import net.rubygrapefruit.plugins.app.internal.HasLauncherScripts
 import net.rubygrapefruit.plugins.app.internal.HasTargetMachine
+import net.rubygrapefruit.plugins.app.internal.MutableDistribution
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Internal
@@ -24,7 +25,7 @@ abstract class ShowDistributions : DefaultTask() {
         println("Application: ${app.appName.get()}")
         println()
 
-        val distributions = app.distributions.get().filterIsInstance<DefaultDistributionWithImage>().sortedBy {
+        val distributions = app.distributions.get().filterIsInstance<MutableDistribution>().sortedBy {
             when {
                 it == defaultDist -> 1
                 it.canBuildOnHostMachine -> 2
@@ -52,7 +53,9 @@ abstract class ShowDistributions : DefaultTask() {
             if (distribution is HasEmbeddedJvm) {
                 println("Embedded JVM: yes")
             }
-            println("Dist task: ${distribution.distTask.name}")
+            if (distribution is BuildableDistribution) {
+                println("Dist task: ${distribution.distProducer.name}")
+            }
 
             val imageDirectory = distribution.imageOutputDirectory.get()
             val launcher = imageDirectory.file(distribution.effectiveLauncherFilePath.get())

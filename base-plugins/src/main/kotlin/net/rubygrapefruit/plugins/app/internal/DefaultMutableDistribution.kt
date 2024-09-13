@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 abstract class DefaultMutableDistribution @Inject constructor(
     override val name: String,
-    val canBuildOnHostMachine: Boolean,
+    override val canBuildOnHostMachine: Boolean,
     val defaultDist: Provider<Distribution>,
     factory: ObjectFactory,
 ) : Distribution, MutableDistribution {
@@ -36,16 +36,16 @@ abstract class DefaultMutableDistribution @Inject constructor(
 
     override val launcherFilePath: Property<String> = factory.property(String::class.java)
 
-    val imageOutputDirectory: DirectoryProperty = factory.directoryProperty()
+    override val imageOutputDirectory: DirectoryProperty = factory.directoryProperty()
 
     val launcherOutputFile: RegularFileProperty = factory.fileProperty()
 
-    val effectiveLauncherFilePath: Provider<String>
+    override val effectiveLauncherFilePath: Provider<String>
         get() {
             return providers.zip(rootDirPath, launcherFilePath) { a, b -> "$a/$b" }
         }
 
-    val imageBaseDir: Provider<String>
+    override val imageBaseDir: Provider<String>
         get() {
             return defaultDist.map {
                 if (this == it) {

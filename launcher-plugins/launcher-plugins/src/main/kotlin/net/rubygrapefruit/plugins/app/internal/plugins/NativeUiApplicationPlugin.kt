@@ -25,7 +25,7 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                 multiplatformComponents.eachNativeTarget { machine, buildType, binaryFile ->
                     val name = when (buildType) {
                         BuildType.Debug -> buildType.name
-                        BuildType.Release -> "UnsignedRelease"
+                        BuildType.Release -> "unsignedRelease"
                     }
                     val default = buildType == BuildType.Debug && HostMachine.current.canBeBuilt && HostMachine.current.machine == machine
                     val dist = app.distributionContainer.add(name, default, HostMachine.current.canBuild(machine), machine, buildType, DefaultNativeUiAppDistribution::class.java)

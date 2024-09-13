@@ -1,11 +1,12 @@
 
 # TODO
 
+- `showDistributions` shows wrong image dir for UI apps
+- Add `dist --release`
 - Add an "app bundle" plugin, which will include other apps as JVM resources
 - Fix `.bat` to work from any directory via a link
   - Or replace with binary launcher
 - Figure out why `tasks.registering` is broken for embedded JVM task
-- `showDistributions` shows wrong image dir for UI apps
 - Add test for alternate distributions, e.g `noJvm`
 - UI app `dist` task should fail on non-mac host machines
 - Don't include `.bat` script for non-windows embedded JVM, or replace with binary launcher

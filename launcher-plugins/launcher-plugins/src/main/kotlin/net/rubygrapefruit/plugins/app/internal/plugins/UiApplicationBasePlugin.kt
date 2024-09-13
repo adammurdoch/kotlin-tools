@@ -1,6 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
-import net.rubygrapefruit.plugins.app.internal.DefaultDistribution
+import net.rubygrapefruit.plugins.app.BuildType
+import net.rubygrapefruit.plugins.app.internal.DefaultHasLauncherExecutableDistribution
 import net.rubygrapefruit.plugins.app.internal.DefaultUiApplication
 import net.rubygrapefruit.plugins.app.internal.HasUnsignedUiBundle
 import net.rubygrapefruit.plugins.app.internal.applications
@@ -57,15 +58,20 @@ class UiApplicationBasePlugin : Plugin<Project> {
                             })
                     }
 
-                    val releaseDist = app.distributionContainer.add(
-                        name + "Release",
-                        false,
-                        DefaultDistribution::class.java
-                    )
-                    tasks.register(releaseDist.taskName("sign"), ReleaseDistribution::class.java) { t ->
-                        t.unsignedImage.set(outputs.imageDirectory)
-                        t.signingIdentity.set(app.signingIdentity)
-                        t.notarizationProfileName.set(app.notarizationProfileName)
+                    if (buildType == BuildType.Release) {
+                        val releaseDist = app.distributionContainer.add(
+                            "release",
+                            false,
+                            true,
+                            targetMachine,
+                            buildType,
+                            DefaultHasLauncherExecutableDistribution::class.java
+                        )
+                        tasks.register(releaseDist.taskName("sign"), ReleaseDistribution::class.java) { t ->
+                            t.unsignedImage.set(outputs.imageDirectory)
+                            t.signingIdentity.set(app.signingIdentity)
+                            t.notarizationProfileName.set(app.notarizationProfileName)
+                        }
                     }
                 }
             }

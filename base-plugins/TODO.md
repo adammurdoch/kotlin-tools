@@ -2,7 +2,7 @@
 # TODO
 
 - Add something like `testing { kotlinTest() }`
-- Allow desktop dependencies to be declared
+- Fix `desktop { }` does not add targets, but for example `jvm { }` does.
 - Add `dist --release`
 - Add an "app bundle" plugin, which will include other apps as JVM resources
 - Split app code signing and notarization into separate tasks
@@ -39,6 +39,7 @@
 - Add functional tests for plugins.
     - Customisation
 - Refactor `DownloadRepository` to use Gradle exec service when used in a plugin.
+- Installer:
 - Gradle issues:
     - `MapProperty.getting()` does not seem to retain task dependencies
     - `@Nested Property<T>` does not seem to retain task dependencies

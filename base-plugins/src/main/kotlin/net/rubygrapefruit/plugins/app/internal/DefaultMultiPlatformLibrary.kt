@@ -47,13 +47,7 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
         config(macOs!!)
     }
 
-    override fun desktop() {
-        jvm()
-        nativeDesktop()
-    }
-
     override fun desktop(config: NativeLibrary.() -> Unit) {
-        desktop()
         val lib = factory.newInstance(DefaultNativeLibrary::class.java, "desktopMain")
         config(lib)
     }

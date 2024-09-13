@@ -12,12 +12,7 @@ interface MultiPlatformLibrary : MultiPlatformComponent<LibraryDependencies> {
     fun jvm(config: JvmLibrary.() -> Unit)
 
     /**
-     * Adds all desktops targets (JVM, macOS, Linux, Windows), if not already.
-     */
-    fun desktop()
-
-    /**
-     * Adds all desktops targets (JVM, macOS, Linux, Windows), if not already, and applies the given configuration.
+     * Configures all desktops targets (JVM, macOS, Linux, Windows) that are present.
      */
     fun desktop(config: NativeLibrary.() -> Unit)
 

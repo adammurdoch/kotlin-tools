@@ -1,8 +1,11 @@
 
 # TODO
 
+- Add something like `testing { kotlinTest() }`
+- Allow desktop dependencies to be declared
 - Add `dist --release`
 - Add an "app bundle" plugin, which will include other apps as JVM resources
+- Split app code signing and notarization into separate tasks
 - Fix `.bat` to work from any directory via a link
   - Or replace with binary launcher
 - Figure out why `tasks.registering` is broken for embedded JVM task

@@ -1,11 +1,6 @@
 package net.rubygrapefruit.plugins.app.internal
 
-import net.rubygrapefruit.plugins.app.JvmLibrary
-import net.rubygrapefruit.plugins.app.JvmModule
-import net.rubygrapefruit.plugins.app.LibraryDependencies
-import net.rubygrapefruit.plugins.app.MultiPlatformLibrary
-import net.rubygrapefruit.plugins.app.NativeLibrary
-import net.rubygrapefruit.plugins.app.Versions
+import net.rubygrapefruit.plugins.app.*
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
 import javax.inject.Inject
@@ -50,6 +45,17 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
             macOs = factory.newInstance(DefaultNativeLibrary::class.java, "macosMain")
         }
         config(macOs!!)
+    }
+
+    override fun desktop() {
+        jvm()
+        nativeDesktop()
+    }
+
+    override fun desktop(config: NativeLibrary.() -> Unit) {
+        desktop()
+        val lib = factory.newInstance(DefaultNativeLibrary::class.java, "desktopMain")
+        config(lib)
     }
 
     override fun nativeDesktop() {

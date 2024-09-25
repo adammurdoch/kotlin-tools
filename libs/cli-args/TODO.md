@@ -40,6 +40,8 @@
     - Parameter value badly formed
     - Option value missing
     - Multiple actions specified, eg multiple args, multiple options, etc.
+- Allow actions to calculate the set of options dynamically
+  - For example, action is constructed with a list of enum _types_
 - Handle required list parameter with default value - disallow? succeed if absent and default provided?
 - Validate names do not contain spaces
 - Validate at least one action or choice is defined, if no default

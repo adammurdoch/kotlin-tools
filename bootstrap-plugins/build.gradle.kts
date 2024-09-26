@@ -9,6 +9,7 @@ object Constants {
     val serializationLibrary = "1.7.2"
     val coroutines = "1.9.0-RC.2"
     val dateTime = "0.6.1"
+    val io = "0.5.4"
     val ksp = "2.0.20-1.0.24"
     val java = 17
     val pluginsJava = 11
@@ -82,6 +83,7 @@ val generateResource = tasks.register("generate-version-resource") {
                 val serialization = Serialization
                 val coroutines = Coroutines
                 val dateTime = DateTime
+                val io = IO
                 val ksp = Ksp
                 val java = ${Constants.java}
                 val plugins = Plugins
@@ -131,6 +133,11 @@ val generateResource = tasks.register("generate-version-resource") {
             object DateTime {
                 val version = "${Constants.dateTime}"
                 val coordinates = "org.jetbrains.kotlinx:kotlinx-datetime:${Constants.dateTime}"
+            }
+
+            object IO {
+                val version = "${Constants.io}"
+                val coordinates = "org.jetbrains.kotlinx:kotlinx-io-core:${Constants.io}"
             }
 
             object Ksp {

@@ -12,6 +12,9 @@ library {
         module.name = "net.rubygrapefruit.stream_io"
     }
     nativeDesktop()
+    common {
+        api(Versions.io.coordinates)
+    }
     test {
         implementation(Versions.test.coordinates)
     }

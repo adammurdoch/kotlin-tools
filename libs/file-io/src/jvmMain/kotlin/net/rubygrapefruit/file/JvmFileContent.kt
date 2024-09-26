@@ -1,11 +1,19 @@
 package net.rubygrapefruit.file
 
+import kotlinx.io.Buffer
+import kotlinx.io.RawSink
+import kotlinx.io.RawSource
+import kotlinx.io.UnsafeIoApi
+import kotlinx.io.unsafe.UnsafeBufferOperations
+import kotlinx.io.unsafe.withData
 import net.rubygrapefruit.io.stream.*
 import java.io.RandomAccessFile
+import kotlin.math.min
 
+@OptIn(UnsafeIoApi::class)
 internal class JvmFileContent(
     private val file: RandomAccessFile
-) : FileContent, ReadStream, WriteStream, AutoCloseable {
+) : FileContent, ReadStream, WriteStream, RawSource, RawSink, AutoCloseable {
     override val currentPosition: Long
         get() = file.filePointer
 
@@ -29,6 +37,29 @@ internal class JvmFileContent(
     override val readStream: ReadStream
         get() = this
 
+    override val sink: RawSink
+        get() = this
+
+    override val source: RawSource
+        get() = this
+
+    override fun readAtMostTo(sink: Buffer, byteCount: Long): Long {
+        val ncopied = UnsafeBufferOperations.writeToTail(sink, 1) { buffer, startIndex, endIndex ->
+            val count = min(byteCount.toInt(), endIndex - startIndex)
+            val nread = file.read(buffer, startIndex, count)
+            if (nread < 0) 0 else nread
+        }
+        return if (ncopied == 0) -1 else ncopied.toLong()
+    }
+
+    override fun write(source: Buffer, byteCount: Long) {
+        UnsafeBufferOperations.forEachSegment(source) { context, segment ->
+            context.withData(segment) { buffer, startIndex, endIndex ->
+                file.write(buffer, startIndex, endIndex - startIndex)
+            }
+        }
+    }
+
     override fun read(buffer: ByteArray, offset: Int, max: Int): ReadResult {
         val nread = file.read(buffer, offset, max)
         return if (nread < 0) {
@@ -40,6 +71,9 @@ internal class JvmFileContent(
 
     override fun write(bytes: ByteArray, offset: Int, count: Int) {
         file.write(bytes, offset, count)
+    }
+
+    override fun flush() {
     }
 
     override fun close() {

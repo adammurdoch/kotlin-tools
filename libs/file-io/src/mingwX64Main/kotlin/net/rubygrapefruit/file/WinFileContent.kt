@@ -3,6 +3,8 @@
 package net.rubygrapefruit.file
 
 import kotlinx.cinterop.*
+import kotlinx.io.RawSink
+import kotlinx.io.RawSource
 import net.rubygrapefruit.io.stream.FileBackedReadStream
 import net.rubygrapefruit.io.stream.FileBackedWriteStream
 import net.rubygrapefruit.io.stream.ReadStream
@@ -29,6 +31,12 @@ class WinFileContent(
     override val writeStream: WriteStream = FileBackedWriteStream(path, handle)
 
     override val readStream: ReadStream = FileBackedReadStream(path, handle)
+
+    override val sink: RawSink
+        get() = TODO("Not yet implemented")
+
+    override val source: RawSource
+        get() = TODO("Not yet implemented")
 
     override fun length(): Long {
         return memScoped {

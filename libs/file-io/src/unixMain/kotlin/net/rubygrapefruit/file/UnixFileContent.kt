@@ -3,6 +3,8 @@
 package net.rubygrapefruit.file
 
 import kotlinx.cinterop.*
+import kotlinx.io.RawSink
+import kotlinx.io.RawSource
 import net.rubygrapefruit.io.stream.*
 import platform.posix.*
 
@@ -23,6 +25,12 @@ internal class UnixFileContent(
     override val writeStream: WriteStream = FileDescriptorBackedWriteStream(source, WriteDescriptor(des))
 
     override val readStream: ReadStream = FileDescriptorBackedReadStream(source, ReadDescriptor(des))
+
+    override val sink: RawSink
+        get() = TODO("Not yet implemented")
+
+    override val source: RawSource
+        get() = TODO("Not yet implemented")
 
     override fun length(): Long {
         return memScoped {

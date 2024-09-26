@@ -1,5 +1,7 @@
 package net.rubygrapefruit.file
 
+import kotlinx.io.RawSink
+import kotlinx.io.RawSource
 import net.rubygrapefruit.io.stream.ReadStream
 import net.rubygrapefruit.io.stream.WriteStream
 
@@ -18,6 +20,16 @@ interface FileContent {
      * Returns a [ReadStream] that reads from the current position in the file.
      */
     val readStream: ReadStream
+
+    /**
+     * Returns a [RawSink] that writes to the current position in the file.
+     */
+    val sink: RawSink
+
+    /**
+     * Returns a [RawSource] that reads from the current position in the file.
+     */
+    val source: RawSource
 
     /**
      * Returns the current file length.

@@ -1,5 +1,8 @@
 package net.rubygrapefruit.file
 
+import kotlinx.io.Buffer
+import kotlinx.io.readString
+import kotlinx.io.writeString
 import net.rubygrapefruit.io.IOException
 import net.rubygrapefruit.io.stream.CollectingBuffer
 import net.rubygrapefruit.io.stream.EndOfStream
@@ -121,7 +124,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     }
 
     @Test
-    fun `can random access write bytes to a file to create it`() {
+    fun `can random access write bytes to a file to create it using WriteStream`() {
         listOf("123".encodeToByteArray(), byteArrayOf()).forEachIndexed { index, bytes ->
             val file = fixture.testDir.file("file-$index")
             assertTrue(file.metadata().missing)
@@ -131,6 +134,37 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
                 assertEquals(0L, content.currentPosition)
 
                 content.writeStream.write(bytes)
+
+                assertEquals(bytes.size.toLong(), content.length())
+                assertEquals(bytes.size.toLong(), content.currentPosition)
+
+                "result"
+            }
+
+            assertIs<Success<*>>(result)
+            assertEquals("result", result.get())
+
+            val metadata = file.metadata().get()
+            assertIs<RegularFileMetadata>(metadata)
+            assertEquals(bytes.size.toLong(), metadata.size)
+
+            assertContentEquals(bytes, file.readBytes().get())
+        }
+    }
+
+    @Test
+    fun `can random access write bytes to a file to create it`() {
+        listOf("123".encodeToByteArray(), byteArrayOf()).forEachIndexed { index, bytes ->
+            val file = fixture.testDir.file("file-$index")
+            assertTrue(file.metadata().missing)
+
+            val result = file.withContent { content ->
+                assertEquals(0L, content.length())
+                assertEquals(0L, content.currentPosition)
+
+                val buffer = Buffer()
+                buffer.write(bytes, 0, bytes.size)
+                content.sink.write(buffer, buffer.size)
 
                 assertEquals(bytes.size.toLong(), content.length())
                 assertEquals(bytes.size.toLong(), content.currentPosition)
@@ -169,7 +203,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     }
 
     @Test
-    fun `can random access read bytes from a file to create it`() {
+    fun `can random access read bytes from a file to create it using ReadStream`() {
         val file = fixture.testDir.file("file")
         assertTrue(file.metadata().missing)
 
@@ -179,6 +213,33 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
 
             val result = content.readStream.read(ByteArray(1024))
             assertEquals(EndOfStream, result)
+            assertEquals(0L, content.currentPosition)
+
+            "result"
+        }
+
+        assertIs<Success<*>>(result)
+        assertEquals("result", result.get())
+
+        val metadata = file.metadata().get()
+        assertIs<RegularFileMetadata>(metadata)
+        assertEquals(0, metadata.size)
+
+        assertContentEquals(byteArrayOf(), file.readBytes().get())
+    }
+
+    @Test
+    fun `can random access read bytes from a file to create it`() {
+        val file = fixture.testDir.file("file")
+        assertTrue(file.metadata().missing)
+
+        val result = file.withContent { content ->
+            assertEquals(0L, content.length())
+            assertEquals(0L, content.currentPosition)
+
+            val buffer = Buffer()
+            val result = content.source.readAtMostTo(buffer, 1024)
+            assertEquals(-1, result)
             assertEquals(0L, content.currentPosition)
 
             "result"
@@ -277,7 +338,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     }
 
     @Test
-    fun `can random access read from file`() {
+    fun `can random access read from file using ReadStream`() {
         val bytes = "1234567".encodeToByteArray()
         val file = fixture.testDir.file("file")
         file.writeBytes(bytes)
@@ -300,7 +361,31 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     }
 
     @Test
-    fun `can random access write to file`() {
+    fun `can random access read from file`() {
+        val bytes = "1234567".encodeToByteArray()
+        val file = fixture.testDir.file("file")
+        file.writeBytes(bytes)
+
+        val result = file.withContent { content ->
+            content.seek(3)
+            assertEquals(3L, content.currentPosition)
+
+            val buffer = Buffer()
+            val result = content.source.readAtMostTo(buffer, 2)
+            assertEquals(2, result)
+            assertEquals("45", buffer.readString())
+
+            assertEquals(5L, content.currentPosition)
+
+            "result"
+        }
+
+        assertIs<Success<*>>(result)
+        assertEquals("result", result.get())
+    }
+
+    @Test
+    fun `can random access write to file using WriteStream`() {
         val bytes = "123__67".encodeToByteArray()
         val file = fixture.testDir.file("file")
         file.writeBytes(bytes)
@@ -311,6 +396,32 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
 
             val buffer = "45".encodeToByteArray()
             content.writeStream.write(buffer, 0, 2)
+
+            assertEquals(5L, content.currentPosition)
+            assertEquals(7L, content.length())
+
+            "result"
+        }
+
+        assertIs<Success<*>>(result)
+        assertEquals("result", result.get())
+
+        assertEquals("1234567", file.readText().get())
+    }
+
+    @Test
+    fun `can random access write to file`() {
+        val bytes = "123__67".encodeToByteArray()
+        val file = fixture.testDir.file("file")
+        file.writeBytes(bytes)
+
+        val result = file.withContent { content ->
+            content.seek(3)
+            assertEquals(3L, content.currentPosition)
+
+            val buffer = Buffer()
+            buffer.writeString("45")
+            content.sink.write(buffer, buffer.size)
 
             assertEquals(5L, content.currentPosition)
             assertEquals(7L, content.length())

@@ -2,7 +2,6 @@ package net.rubygrapefruit.io.codec
 
 import kotlinx.io.Buffer
 import kotlinx.io.RawSink
-import kotlinx.io.writeUByte
 
 /**
  * Uses big-endian, fixed width encoding
@@ -14,7 +13,7 @@ internal class SimpleEncoder(
 
     override fun ubyte(value: UByte): Encoder {
         buffer.clear()
-        buffer.writeUByte(value)
+        buffer.writeByte(value.toByte())
         sink.write(buffer, 1)
         return this
     }
@@ -38,6 +37,7 @@ internal class SimpleEncoder(
     }
 
     override fun long(value: Long): Encoder {
+        buffer.clear()
         buffer.writeByte(value.rotateRight(56).toByte())
         buffer.writeByte(value.rotateRight(48).toByte())
         buffer.writeByte(value.rotateRight(40).toByte())
@@ -51,9 +51,9 @@ internal class SimpleEncoder(
     }
 
     override fun string(value: String): Encoder {
-        buffer.clear()
         val bytes = value.encodeToByteArray()
-        buffer.writeInt(bytes.size)
+        int(bytes.size)
+        buffer.clear()
         buffer.write(bytes)
         sink.write(buffer, buffer.size)
         return this

@@ -4,6 +4,7 @@ package net.rubygrapefruit.file
 
 import kotlinx.cinterop.*
 import kotlinx.io.Sink
+import kotlinx.io.Source
 import net.rubygrapefruit.io.Resource
 import net.rubygrapefruit.io.ResourceResult
 import net.rubygrapefruit.io.WinErrorCode
@@ -289,6 +290,10 @@ internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), Regul
                 CloseHandle(handle)
             }
         }
+    }
+
+    override fun <T> read(action: (Source) -> Result<T>): Result<T> {
+        TODO("Not yet implemented")
     }
 }
 

@@ -1,6 +1,7 @@
 package net.rubygrapefruit.file
 
 import kotlinx.io.Sink
+import kotlinx.io.Source
 import kotlinx.io.buffered
 import net.rubygrapefruit.io.Resource
 import net.rubygrapefruit.io.ResourceResult
@@ -154,6 +155,20 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
         }
         return inputStream.use { stream ->
             action(InputStreamBackedReadStream(this, stream))
+        }
+    }
+
+    override fun <T> read(action: (Source) -> Result<T>): Result<T> {
+        val inputStream = try {
+            Files.newInputStream(delegate)
+        } catch (e: NoSuchFileException) {
+            return readFileThatDoesNotExist(absolutePath, e)
+        } catch (e: Exception) {
+            return readFile(this, cause = e)
+        }
+        return inputStream.use { stream ->
+            val source = InputStreamBackedRawSource(stream).buffered()
+            action(source)
         }
     }
 }

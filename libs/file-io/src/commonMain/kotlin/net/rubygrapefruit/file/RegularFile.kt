@@ -1,6 +1,7 @@
 package net.rubygrapefruit.file
 
 import kotlinx.io.Sink
+import kotlinx.io.Source
 import net.rubygrapefruit.io.ResourceResult
 import net.rubygrapefruit.io.TryFailure
 import net.rubygrapefruit.io.stream.CollectingBuffer
@@ -18,14 +19,16 @@ interface RegularFile : FileSystemElement {
     fun delete()
 
     /**
-     * Applies a batch of random access reads or writes to this file. The stream is positioned at the start of the file.
+     * Applies a batch of random access reads or writes to this file.
+     * The stream is positioned at the start of the file.
      *
      * Creates the file if it does not exist.
      */
     fun <T> withContent(action: (FileContent) -> T): Result<T>
 
     /**
-     * Opens the content of this file. The stream is positioned at the start of the file.
+     * Opens the content of this file for random access reads or writes.
+     * The stream is positioned at the start of the file.
      *
      * Creates the file if it does not exist.
      *
@@ -35,17 +38,17 @@ interface RegularFile : FileSystemElement {
 
     /**
      * Writes zero or more bytes to the file, replacing any existing content.
+     */
+    @Throws(FileSystemException::class)
+    fun write(action: (Sink) -> Unit)
+
+    /**
+     * Writes zero or more bytes to the file, replacing any existing content.
      *
      * The [WriteStream] is not buffered.
      */
     @Throws(FileSystemException::class)
     fun writeBytes(action: (WriteStream) -> Unit)
-
-    /**
-     * Writes zero or more bytes to the file, replacing any existing content.
-     */
-    @Throws(FileSystemException::class)
-    fun write(action: (Sink) -> Unit)
 
     /**
      * Writes the given bytes to the file, replacing any existing content.
@@ -62,6 +65,11 @@ interface RegularFile : FileSystemElement {
     fun writeText(text: String) {
         writeBytes { stream -> stream.write(text.encodeToByteArray()) }
     }
+
+    /**
+     * Reads bytes from the file.
+     */
+    fun <T> read(action: (Source) -> Result<T>): Result<T>
 
     /**
      * Reads bytes from the file.

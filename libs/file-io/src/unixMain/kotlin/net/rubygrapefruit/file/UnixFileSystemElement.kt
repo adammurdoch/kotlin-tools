@@ -178,6 +178,10 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
         }
     }
 
+    override fun <T> read(action: (kotlinx.io.Source) -> Result<T>): Result<T> {
+        TODO("Not yet implemented")
+    }
+
     internal class FileSource(val path: AbsolutePath) : Source {
         override val displayName: String
             get() = "file $path"

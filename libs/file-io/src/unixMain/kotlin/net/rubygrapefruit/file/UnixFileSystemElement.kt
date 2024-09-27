@@ -4,6 +4,7 @@ package net.rubygrapefruit.file
 
 import kotlinx.cinterop.*
 import kotlinx.io.Sink
+import kotlinx.io.buffered
 import net.rubygrapefruit.io.Resource
 import net.rubygrapefruit.io.ResourceResult
 import net.rubygrapefruit.io.UnixErrorCode
@@ -141,7 +142,22 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
     }
 
     override fun write(action: (Sink) -> Unit) {
-        TODO("Not yet implemented")
+        memScoped {
+            val des = doOpen(path.absolutePath, O_WRONLY or O_CREAT or O_TRUNC or O_NOFOLLOW or O_CLOEXEC, PosixPermissions.readWriteFile.mode)
+            if (des < 0) {
+                if (errno == EISDIR) {
+                    throw writeFileThatExistsAndIsNotAFile(path.absolutePath)
+                }
+                throw writeToFile(this@UnixRegularFile, UnixErrorCode.last())
+            }
+            try {
+                val sink = FileDescriptorBackedRawSink(FileSource(path), WriteDescriptor(des)).buffered()
+                action(sink)
+                sink.flush()
+            } finally {
+                close(des)
+            }
+        }
     }
 
     override fun <T> readBytes(action: (ReadStream) -> Result<T>): Result<T> {

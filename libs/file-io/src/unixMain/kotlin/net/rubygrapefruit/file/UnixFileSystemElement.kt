@@ -179,7 +179,21 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
     }
 
     override fun <T> read(action: (kotlinx.io.Source) -> Result<T>): Result<T> {
-        TODO("Not yet implemented")
+        return memScoped {
+            val des = open(path.absolutePath, O_RDONLY or O_NOFOLLOW or O_CLOEXEC)
+            if (des < 0) {
+                return if (errno == ENOENT) {
+                    readFileThatDoesNotExist(path.absolutePath)
+                } else {
+                    readFile(this@UnixRegularFile, UnixErrorCode.last())
+                }
+            }
+            try {
+                action(FileDescriptorBackedRawSource(FileSource(path), ReadDescriptor(des)).buffered())
+            } finally {
+                close(des)
+            }
+        }
     }
 
     internal class FileSource(val path: AbsolutePath) : Source {

@@ -1,6 +1,8 @@
 
 ## TODO
 
+- Prevent `sink.close()` and `source.close()`
+- Use Kotlinx IO exceptions in source and sink implementations
 - Windows: open files with `FILE_SHARE_READ` when reading?
 - Seek to location
   - Represent locations using `ULong` 
@@ -11,7 +13,7 @@
   - Directory for app to write data files to
   - Directory for app configuration
 - Add specialized kinds of `Failure` and `Success` types for specific operations
-  - Mismatched type for an operation, eg read text from a directory
+  - Mismatched type for an operation, e.g. read text from a directory
   - Only use `UnsupportedOperation` in cases where it can actually be received
   - boolean result
   - unit result

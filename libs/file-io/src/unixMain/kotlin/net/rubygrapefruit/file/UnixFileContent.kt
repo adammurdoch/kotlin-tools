@@ -26,11 +26,9 @@ internal class UnixFileContent(
 
     override val readStream: ReadStream = FileDescriptorBackedReadStream(source, ReadDescriptor(des))
 
-    override val sink: RawSink
-        get() = TODO("Not yet implemented")
+    override val sink: RawSink = FileDescriptorBackedRawSink(source, WriteDescriptor(des))
 
-    override val source: RawSource
-        get() = TODO("Not yet implemented")
+    override val source: RawSource = FileDescriptorBackedRawSource(source, ReadDescriptor(des))
 
     override fun length(): Long {
         return memScoped {

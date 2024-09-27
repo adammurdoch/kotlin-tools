@@ -436,7 +436,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     }
 
     @Test
-    fun `can random access read and write to file`() {
+    fun `can random access read and write to file using ReadStream and WriteStream`() {
         val file = fixture.testDir.file("file")
 
         val result = file.withContent { content ->
@@ -462,7 +462,35 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     }
 
     @Test
-    fun `can random access append to file`() {
+    fun `can random access read and write to file`() {
+        val file = fixture.testDir.file("file")
+
+        val result = file.withContent { content ->
+            val buffer = Buffer()
+            buffer.writeString("1234567")
+            content.sink.write(buffer, buffer.size)
+
+            assertEquals(7L, content.currentPosition)
+            assertEquals(7L, content.length())
+
+            content.seek(0)
+
+            buffer.clear()
+            buffer.transferFrom(content.source)
+
+            assertEquals("1234567", buffer.readString())
+
+            "result"
+        }
+
+        assertIs<Success<*>>(result)
+        assertEquals("result", result.get())
+
+        assertEquals("1234567", file.readText().get())
+    }
+
+    @Test
+    fun `can random access append to file using WriteStream`() {
         val bytes = "1234".encodeToByteArray()
         val file = fixture.testDir.file("file")
         file.writeBytes(bytes)
@@ -473,6 +501,32 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
 
             val buffer = "567".encodeToByteArray()
             content.writeStream.write(buffer)
+
+            assertEquals(7L, content.currentPosition)
+            assertEquals(7L, content.length())
+
+            "result"
+        }
+
+        assertIs<Success<*>>(result)
+        assertEquals("result", result.get())
+
+        assertEquals("1234567", file.readText().get())
+    }
+
+    @Test
+    fun `can random access append to file`() {
+        val bytes = "1234".encodeToByteArray()
+        val file = fixture.testDir.file("file")
+        file.writeBytes(bytes)
+
+        val result = file.withContent { content ->
+            content.seekToEnd()
+            assertEquals(4L, content.currentPosition)
+
+            val buffer = Buffer()
+            buffer.writeString("567")
+            content.sink.write(buffer, buffer.size)
 
             assertEquals(7L, content.currentPosition)
             assertEquals(7L, content.length())

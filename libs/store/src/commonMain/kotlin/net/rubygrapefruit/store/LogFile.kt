@@ -26,7 +26,7 @@ internal class LogFile(
 
     fun append(change: StoreChange) {
         writeContent.using { content ->
-            val encoder = codec.encoder(content.writeStream)
+            val encoder = codec.encoder(content.sink)
             encoder.encode(change)
         }
     }

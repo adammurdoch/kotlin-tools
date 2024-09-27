@@ -3,7 +3,7 @@
 package net.rubygrapefruit.io.codec
 
 import net.rubygrapefruit.io.stream.ByteArrayReadStream
-import net.rubygrapefruit.io.stream.CollectingWriteStream
+import net.rubygrapefruit.io.stream.CollectingRawSink
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -44,15 +44,15 @@ class SimpleCodecTest {
     }
 
     private fun <T> encodeAndDecode(value: T, encode: (Encoder, T) -> Unit, decode: (Decoder) -> T): T {
-        val writeStream = CollectingWriteStream()
+        val sink = CollectingRawSink()
         val codec = SimpleCodec()
-        val encoder = codec.encoder(writeStream)
+        val encoder = codec.encoder(sink)
 
         println("encode: ${value.dump()}")
 
         encode(encoder, value)
 
-        val decoder = codec.decoder(ByteArrayReadStream(writeStream.toByteArray()))
+        val decoder = codec.decoder(ByteArrayReadStream(sink.toByteArray()))
 
         return decode(decoder).also {
             println("decoded: ${it.dump()}")

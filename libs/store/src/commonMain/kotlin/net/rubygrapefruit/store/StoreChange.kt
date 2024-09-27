@@ -118,6 +118,6 @@ internal fun Decoder.decode(): StoreChange {
             RemoveEntry(storeId, key)
         }
 
-        else -> throw IllegalArgumentException()
+        else -> throw IllegalArgumentException("Unknown tag: ${tag.toString(16)}")
     }
 }

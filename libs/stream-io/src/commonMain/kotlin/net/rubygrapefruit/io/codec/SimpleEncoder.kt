@@ -1,54 +1,61 @@
 package net.rubygrapefruit.io.codec
 
-import net.rubygrapefruit.io.stream.WriteStream
+import kotlinx.io.Buffer
+import kotlinx.io.RawSink
+import kotlinx.io.writeUByte
 
 /**
  * Uses big-endian, fixed width encoding
  */
 internal class SimpleEncoder(
-    private val stream: WriteStream
+    private val sink: RawSink
 ) : Encoder {
-    private val buffer = ByteArray(8)
+    private val buffer = Buffer()
 
     override fun ubyte(value: UByte): Encoder {
-        buffer[0] = value.toByte()
-        stream.write(buffer, 0, 1)
+        buffer.clear()
+        buffer.writeUByte(value)
+        sink.write(buffer, 1)
         return this
     }
 
     override fun ushort(value: UShort): Encoder {
-        buffer[0] = value.rotateRight(8).toByte()
-        buffer[1] = value.toByte()
-        stream.write(buffer, 0, 2)
+        buffer.clear()
+        buffer.writeByte(value.rotateRight(8).toByte())
+        buffer.writeByte(value.toByte())
+        sink.write(buffer, 2)
         return this
     }
 
     override fun int(value: Int): Encoder {
-        buffer[0] = value.rotateRight(24).toByte()
-        buffer[1] = value.rotateRight(16).toByte()
-        buffer[2] = value.rotateRight(8).toByte()
-        buffer[3] = value.toByte()
-        stream.write(buffer, 0, 4)
+        buffer.clear()
+        buffer.writeByte(value.rotateRight(24).toByte())
+        buffer.writeByte(value.rotateRight(16).toByte())
+        buffer.writeByte(value.rotateRight(8).toByte())
+        buffer.writeByte(value.toByte())
+        sink.write(buffer, 4)
         return this
     }
 
     override fun long(value: Long): Encoder {
-        buffer[0] = value.rotateRight(56).toByte()
-        buffer[1] = value.rotateRight(48).toByte()
-        buffer[2] = value.rotateRight(40).toByte()
-        buffer[3] = value.rotateRight(32).toByte()
-        buffer[4] = value.rotateRight(24).toByte()
-        buffer[5] = value.rotateRight(16).toByte()
-        buffer[6] = value.rotateRight(8).toByte()
-        buffer[7] = value.toByte()
-        stream.write(buffer, 0, 8)
+        buffer.writeByte(value.rotateRight(56).toByte())
+        buffer.writeByte(value.rotateRight(48).toByte())
+        buffer.writeByte(value.rotateRight(40).toByte())
+        buffer.writeByte(value.rotateRight(32).toByte())
+        buffer.writeByte(value.rotateRight(24).toByte())
+        buffer.writeByte(value.rotateRight(16).toByte())
+        buffer.writeByte(value.rotateRight(8).toByte())
+        buffer.writeByte(value.toByte())
+        sink.write(buffer, 8)
         return this
     }
 
     override fun string(value: String): Encoder {
+        buffer.clear()
         val bytes = value.encodeToByteArray()
-        int(bytes.size)
-        stream.write(bytes)
+        buffer.writeInt(bytes.size)
+        buffer.write(bytes)
+        sink.write(buffer, buffer.size)
         return this
     }
 }

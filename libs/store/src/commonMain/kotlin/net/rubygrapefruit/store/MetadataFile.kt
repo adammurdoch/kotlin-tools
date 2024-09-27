@@ -40,7 +40,7 @@ internal class MetadataFile(
 
     private fun storeMetadata() {
         metadataFile.withContent { content ->
-            val encoder = codec.encoder(content.writeStream)
+            val encoder = codec.encoder(content.sink)
             encoder.fileHeader(codec)
             encoder.int(metadata.generation)
             encoder.int(metadata.compactedChanges)

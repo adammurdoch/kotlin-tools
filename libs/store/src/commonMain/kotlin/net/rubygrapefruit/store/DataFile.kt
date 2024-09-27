@@ -1,11 +1,11 @@
 package net.rubygrapefruit.store
 
+import kotlinx.io.buffered
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.json.Json
 import net.rubygrapefruit.file.RegularFile
 import net.rubygrapefruit.io.codec.SimpleCodec
-import kotlin.math.min
 
 internal class DataFile(
     private val file: RegularFile,
@@ -33,7 +33,7 @@ internal class DataFile(
     fun <T> read(block: Block, serializer: DeserializationStrategy<T>): T {
         return readContent.using { content ->
             content.seek(block.address.offset)
-            val decoder = codec.decoder(content.readStream)
+            val decoder = codec.decoder(content.source)
             Json.decodeFromString(serializer, decoder.string())
         }
     }
@@ -52,15 +52,10 @@ internal class DataFile(
         return writeContent.using { dest ->
             sourceFile.readContent.using { source ->
                 val pos = dest.currentPosition
-                val buffer = ByteArray(16 * 1024)
                 source.seek(block.address.offset)
-                var remaining = block.size.value
-                while (remaining > 0) {
-                    val count = min(remaining, buffer.size)
-                    source.readStream.readFully(buffer, 0, count)
-                    dest.writeStream.write(buffer, 0, count)
-                    remaining -= count
-                }
+                val bufferedSink = dest.sink.buffered()
+                bufferedSink.write(source.source, block.size.value.toLong())
+                bufferedSink.flush()
                 Block(Address(pos), block.size)
             }
         }

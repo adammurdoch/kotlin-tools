@@ -34,7 +34,7 @@ internal class LogFile(
     fun read(visitor: (StoreChange) -> Unit) {
         file.withContent { content ->
             val length = content.length()
-            val decoder = codec.decoder(content.readStream)
+            val decoder = codec.decoder(content.source)
             while (content.currentPosition != length) {
                 val change = decoder.decode()
                 visitor(change)

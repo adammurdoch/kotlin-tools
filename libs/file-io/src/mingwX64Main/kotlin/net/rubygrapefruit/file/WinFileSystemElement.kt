@@ -3,6 +3,7 @@
 package net.rubygrapefruit.file
 
 import kotlinx.cinterop.*
+import kotlinx.io.Sink
 import net.rubygrapefruit.io.Resource
 import net.rubygrapefruit.io.ResourceResult
 import net.rubygrapefruit.io.WinErrorCode
@@ -266,6 +267,10 @@ internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), Regul
                 CloseHandle(handle)
             }
         }
+    }
+
+    override fun write(action: (Sink) -> Unit) {
+        TODO("Not yet implemented")
     }
 
     override fun <T> readBytes(action: (ReadStream) -> Result<T>): Result<T> {

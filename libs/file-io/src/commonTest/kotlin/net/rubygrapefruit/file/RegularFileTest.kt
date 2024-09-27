@@ -25,6 +25,8 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         { file -> file.writeBytes("text".encodeToByteArray()) },
         { file -> file.writeBytes { it.write("text".encodeToByteArray()) } },
         { file -> file.writeBytes { } },
+        { file -> file.write { it.writeString("text") } },
+        { file -> file.write { } },
     )
 
     /**
@@ -92,7 +94,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     }
 
     @Test
-    fun `can stream bytes to a file to create it`() {
+    fun `can stream bytes to a file to create it using writeBytes`() {
         listOf("123".encodeToByteArray(), byteArrayOf()).forEachIndexed { index, bytes ->
             val file = fixture.testDir.file("file-$index")
             assertTrue(file.metadata().missing)
@@ -110,11 +112,45 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     }
 
     @Test
-    fun `can stream nothing to a file to create it`() {
+    fun `can stream bytes to a file to create it`() {
+        listOf("123".encodeToByteArray(), byteArrayOf()).forEachIndexed { index, bytes ->
+            val file = fixture.testDir.file("file-$index")
+            assertTrue(file.metadata().missing)
+
+            file.write { stream ->
+                val buffer = Buffer()
+                buffer.write(bytes)
+                stream.write(buffer, buffer.size)
+            }
+
+            val metadata = file.metadata().get()
+            assertIs<RegularFileMetadata>(metadata)
+            assertEquals(bytes.size.toLong(), metadata.size)
+
+            assertContentEquals(bytes, file.readBytes().get())
+        }
+    }
+
+    @Test
+    fun `can stream nothing to a file to create it using writeBytes`() {
         val file = fixture.testDir.file("file")
         assertTrue(file.metadata().missing)
 
         file.writeBytes { _ -> }
+
+        val metadata = file.metadata().get()
+        assertIs<RegularFileMetadata>(metadata)
+        assertEquals(0, metadata.size)
+
+        assertContentEquals(byteArrayOf(), file.readBytes().get())
+    }
+
+    @Test
+    fun `can stream nothing to a file to create it`() {
+        val file = fixture.testDir.file("file")
+        assertTrue(file.metadata().missing)
+
+        file.write { _ -> }
 
         val metadata = file.metadata().get()
         assertIs<RegularFileMetadata>(metadata)

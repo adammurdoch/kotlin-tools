@@ -23,11 +23,15 @@ interface FileContent {
 
     /**
      * Returns a [RawSink] that writes to the current position in the file.
+     *
+     * The [RawSink] is not buffered.
      */
     val sink: RawSink
 
     /**
      * Returns a [RawSource] that reads from the current position in the file.
+     *
+     * The [RawSource] is not buffered.
      */
     val source: RawSource
 

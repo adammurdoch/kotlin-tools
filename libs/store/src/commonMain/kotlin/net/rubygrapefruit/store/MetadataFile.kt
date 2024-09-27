@@ -21,7 +21,7 @@ internal class MetadataFile(
             if (length == 0L) {
                 storeMetadata()
             } else {
-                val decoder = codec.decoder(content.readStream)
+                val decoder = codec.decoder(content.source)
                 decoder.checkFileHeader(codec, metadataFile)
                 metadata = Metadata(decoder.int(), decoder.int(), decoder.int())
             }

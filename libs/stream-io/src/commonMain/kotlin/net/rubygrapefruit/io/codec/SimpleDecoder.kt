@@ -1,14 +1,16 @@
 package net.rubygrapefruit.io.codec
 
-import net.rubygrapefruit.io.stream.ReadStream
+import kotlinx.io.Buffer
+import kotlinx.io.RawSource
+import kotlinx.io.readString
 
 /**
  * Uses big-endian, fixed width encoding
  */
 internal class SimpleDecoder(
-    private val stream: ReadStream
+    private val source: RawSource
 ) : Decoder {
-    private val buffer = ByteArray(8)
+    private val buffer = Buffer()
 
     override fun ubyte(): UByte {
         read(buffer, 1)
@@ -43,12 +45,12 @@ internal class SimpleDecoder(
 
     override fun string(): String {
         val length = int()
-        val buffer = ByteArray(length)
         read(buffer, length)
-        return buffer.decodeToString()
+        return buffer.readString()
     }
 
-    private fun read(buffer: ByteArray, count: Int) {
-        stream.readFully(buffer, 0, count)
+    private fun read(buffer: Buffer, count: Int) {
+        buffer.clear()
+        buffer.write(source, count.toLong())
     }
 }

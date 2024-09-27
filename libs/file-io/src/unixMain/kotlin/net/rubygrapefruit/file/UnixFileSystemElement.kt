@@ -3,6 +3,7 @@
 package net.rubygrapefruit.file
 
 import kotlinx.cinterop.*
+import kotlinx.io.Sink
 import net.rubygrapefruit.io.Resource
 import net.rubygrapefruit.io.ResourceResult
 import net.rubygrapefruit.io.UnixErrorCode
@@ -137,6 +138,10 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
                 close(des)
             }
         }
+    }
+
+    override fun write(action: (Sink) -> Unit) {
+        TODO("Not yet implemented")
     }
 
     override fun <T> readBytes(action: (ReadStream) -> Result<T>): Result<T> {

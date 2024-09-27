@@ -2,6 +2,7 @@
 ## TODO
 
 - Prevent `sink.close()` and `source.close()`
+- RegularFile.write() should take a Sink instead of RawSink?
 - Use Kotlinx IO exceptions in source and sink implementations
 - Windows: open files with `FILE_SHARE_READ` when reading?
 - Seek to location

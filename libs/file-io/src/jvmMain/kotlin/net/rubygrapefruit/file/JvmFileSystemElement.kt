@@ -1,5 +1,7 @@
 package net.rubygrapefruit.file
 
+import kotlinx.io.Sink
+import kotlinx.io.buffered
 import net.rubygrapefruit.io.Resource
 import net.rubygrapefruit.io.ResourceResult
 import net.rubygrapefruit.io.stream.ReadStream
@@ -8,9 +10,9 @@ import java.io.IOException
 import java.io.RandomAccessFile
 import java.nio.file.*
 import java.nio.file.attribute.PosixFileAttributeView
+import java.util.stream.Collectors
 import kotlin.io.path.deleteExisting
 import kotlin.io.path.pathString
-import kotlin.streams.toList
 
 internal open class JvmFileSystemElement(protected val delegate: Path) : AbstractFileSystemElement() {
     init {
@@ -129,6 +131,19 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
         }
     }
 
+    override fun write(action: (Sink) -> Unit) {
+        val outputStream = try {
+            Files.newOutputStream(delegate)
+        } catch (e: Exception) {
+            throw writeToFile(this, cause = e)
+        }
+        outputStream.use { stream ->
+            val sink = OutputStreamBackedRawSink(stream).buffered()
+            action(sink)
+            sink.flush()
+        }
+    }
+
     override fun <T> readBytes(action: (ReadStream) -> Result<T>): Result<T> {
         val inputStream = try {
             Files.newInputStream(delegate)
@@ -209,7 +224,7 @@ internal class JvmDirectory(path: Path) : JvmFileSystemElement(path), Directory 
         } catch (e: Exception) {
             return listDirectory(this, cause = e)
         }
-        val entries = stream.map { JvmDirectoryEntry(it, metadataOfExistingFile(it).type) }.toList()
+        val entries = stream.map { JvmDirectoryEntry(it, metadataOfExistingFile(it).type) }.collect(Collectors.toList())
         return Success(entries)
     }
 

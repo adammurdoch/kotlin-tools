@@ -1,5 +1,6 @@
 package net.rubygrapefruit.store
 
+import kotlinx.io.buffered
 import net.rubygrapefruit.file.regularFile
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -34,7 +35,9 @@ class StoreTest : AbstractStoreTest() {
 
         storeFile.withContent {
             // Overwrite the first byte
-            it.writeStream.write(byteArrayOf(1))
+            val bufferedSink = it.sink.buffered()
+            bufferedSink.write(byteArrayOf(1))
+            bufferedSink.flush()
         }
 
         try {
@@ -66,7 +69,6 @@ class StoreTest : AbstractStoreTest() {
 
     @Test
     fun `can compact store content on open`() {
-        println("CREATE STORE")
         withStore { store ->
             val value = store.value<Int>("int")
             val map = store.map<Int, String>("ints")
@@ -80,22 +82,18 @@ class StoreTest : AbstractStoreTest() {
             assertEquals(1, store.generation())
         }
 
-        println("COMPACTED STORE")
         withCompactedStore { store ->
             assertEquals(13, store.changes())
             assertEquals(0, store.changesSinceCompaction())
             assertEquals(2, store.generation())
         }
 
-        println("COMPACTED STORE")
         withCompactedStore { store ->
             // Does not compact again
             assertEquals(13, store.changes())
             assertEquals(0, store.changesSinceCompaction())
             assertEquals(2, store.generation())
         }
-
-        println("DONE")
     }
 
     @Test

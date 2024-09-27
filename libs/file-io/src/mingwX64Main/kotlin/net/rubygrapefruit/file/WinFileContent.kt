@@ -5,6 +5,8 @@ package net.rubygrapefruit.file
 import kotlinx.cinterop.*
 import kotlinx.io.RawSink
 import kotlinx.io.RawSource
+import net.rubygrapefruit.io.stream.FileBackedRawSink
+import net.rubygrapefruit.io.stream.FileBackedRawSource
 import net.rubygrapefruit.io.stream.FileBackedReadStream
 import net.rubygrapefruit.io.stream.FileBackedWriteStream
 import net.rubygrapefruit.io.stream.ReadStream
@@ -32,11 +34,9 @@ class WinFileContent(
 
     override val readStream: ReadStream = FileBackedReadStream(path, handle)
 
-    override val sink: RawSink
-        get() = TODO("Not yet implemented")
+    override val sink: RawSink = FileBackedRawSink(path, handle)
 
-    override val source: RawSource
-        get() = TODO("Not yet implemented")
+    override val source: RawSource = FileBackedRawSource(path, handle)
 
     override fun length(): Long {
         return memScoped {
@@ -60,12 +60,15 @@ class WinFileContent(
     }
 
     override fun seekToEnd(): Long {
-        val result = SetFilePointer(handle, 0, null, FILE_END.convert())
-        if (result == INVALID_SET_FILE_POINTER) {
-            throw NativeException("Could not set current position")
+        return memScoped {
+            val high = alloc<LONGVar>()
+            high.value = 0
+            val result = SetFilePointer(handle, 0, high.ptr, FILE_END.convert())
+            if (result == INVALID_SET_FILE_POINTER) {
+                throw NativeException("Could not set current position")
+            }
+            high.value.long().shl(32).or(result.long())
         }
-        // Need to pass in parameter to get the high 4 bytes
-        TODO()
     }
 
     override fun close() {

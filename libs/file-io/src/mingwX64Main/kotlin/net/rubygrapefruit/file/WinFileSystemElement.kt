@@ -250,7 +250,7 @@ internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), Regul
                 null
             )
             if (handle == INVALID_HANDLE_VALUE) {
-                throw NativeException("Could not open $absolutePath")
+                throw openFile(this@WinRegularFile, errorCode = WinErrorCode.last())
             }
             WinFileContent(absolutePath, handle)
         }

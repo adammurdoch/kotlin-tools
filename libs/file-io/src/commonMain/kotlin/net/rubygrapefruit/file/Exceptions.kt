@@ -32,8 +32,14 @@ internal fun <T> readFileThatDoesNotExist(path: String, cause: Throwable? = null
 internal fun <T> readFileThatIsNotAFile(path: String, cause: Throwable? = null) =
     FailedOperation<T>(FileSystemException("Could not read from file $path as it is not a file.", cause))
 
-internal fun <T> openFileThatIsNotAFile(path: String, cause: Throwable? = null) =
-    FailedOperation<T>(FileSystemException("Could not open file $path as it is not a file.", cause))
+internal fun openFileThatIsNotAFile(path: String, cause: Throwable? = null) =
+    FileSystemException("Could not open file $path as it is not a file.", cause)
+
+internal fun openFileInDirectoryThatDoesNotExist(path: String, ancestor: String, cause: Throwable? = null) =
+    FileSystemException("Could not open file $path as directory $ancestor does not exist.", cause)
+
+internal fun openFileInDirectoryThatIsNotADir(path: String, ancestor: String, cause: Throwable? = null) =
+    FileSystemException("Could not open file $path as $ancestor exists but is not a directory.", cause)
 
 internal fun deleteFileThatIsNotAFile(path: String, cause: Throwable? = null) = FileSystemException("Could not delete file $path as it is not a file.", cause)
 
@@ -84,10 +90,31 @@ internal fun deleteDirectory(directory: Directory, cause: Throwable? = null): Fi
 /**
  * Tries to infer why a file could not be opened.
  */
-internal fun <T> openFile(file: RegularFile, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null): Failed<T> {
+internal fun openFile(file: RegularFile, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null): FileSystemException {
     val fileMetadata = file.metadata()
-    return if (fileMetadata.regularFile || fileMetadata.missing) {
-        FailedOperation(FileSystemException("Could not open ${file.absolutePath}", errorCode, cause))
+    return if (fileMetadata.regularFile) {
+        FileSystemException("Could not open ${file.absolutePath}", errorCode, cause)
+    } else if (fileMetadata.missing) {
+        var lastMissing: Directory? = null
+        var p = file.parent
+        while (p != null) {
+            val parentMetadata = p.metadata()
+            if (parentMetadata.missing) {
+                lastMissing = p
+            } else if (parentMetadata is Success) {
+                if (parentMetadata.get() is DirectoryMetadata) {
+                    if (lastMissing != null) {
+                        return openFileInDirectoryThatDoesNotExist(file.absolutePath, lastMissing.absolutePath, cause)
+                    } else {
+                        break
+                    }
+                } else {
+                    return openFileInDirectoryThatIsNotADir(file.absolutePath, p.absolutePath, cause)
+                }
+            }
+            p = p.parent
+        }
+        FileSystemException("Could not open ${file.absolutePath}", errorCode, cause)
     } else {
         openFileThatIsNotAFile(file.absolutePath, cause)
     }

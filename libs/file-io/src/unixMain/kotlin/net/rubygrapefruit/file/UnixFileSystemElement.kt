@@ -118,7 +118,7 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
         return memScoped {
             val des = doOpen(path.absolutePath, O_RDWR or O_CREAT or O_NOFOLLOW or O_CLOEXEC, PosixPermissions.readWriteFile.mode)
             if (des < 0) {
-                throw NativeException("Could not open $absolutePath")
+                throw openFile(this@UnixRegularFile, errorCode = UnixErrorCode.last())
             }
             UnixFileContent(FileSource(path), des)
         }

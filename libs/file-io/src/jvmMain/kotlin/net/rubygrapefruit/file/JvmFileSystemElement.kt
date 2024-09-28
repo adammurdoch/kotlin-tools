@@ -62,7 +62,7 @@ internal open class JvmFileSystemElement(protected val delegate: Path) : Abstrac
             try {
                 val attributes = view.readAttributes()
                 Success(attributes.permissions().permissions())
-            } catch (e: NoSuchFileException) {
+            } catch (_: NoSuchFileException) {
                 readPermissionOnMissingElement(absolutePath)
             } catch (e: Exception) {
                 readPermission(absolutePath, cause = e)
@@ -77,7 +77,7 @@ internal open class JvmFileSystemElement(protected val delegate: Path) : Abstrac
         }
         try {
             view.setPermissions(permissions.permSet())
-        } catch (e: NoSuchFileException) {
+        } catch (_: NoSuchFileException) {
             throw setPermissionsOnMissingElement(absolutePath)
         } catch (e: IOException) {
             if (metadata().symlink) {
@@ -123,7 +123,7 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
         val file = try {
             RandomAccessFile(delegate.toFile(), "rw")
         } catch (e: Exception) {
-            throw openFile<Any>(this, cause = e).failure
+            throw openFile(this, cause = e)
         }
         return JvmFileContent(this, file)
     }

@@ -831,6 +831,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         val file = parent.file("file.txt")
 
         for (action in readActionsThatStream) {
+            assertTrue(parent.metadata().missing)
             val result = action(file)
             try {
                 result.get()
@@ -847,6 +848,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         val file = ancestor.file("dir2/file.txt")
 
         for (action in readActionsThatStream) {
+            assertTrue(ancestor.metadata().missing)
             val result = action(file)
             try {
                 result.get()

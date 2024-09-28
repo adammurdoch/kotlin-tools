@@ -155,8 +155,6 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
     override fun <T> readBytes(action: (ReadStream) -> Result<T>): Result<T> {
         val inputStream = try {
             Files.newInputStream(delegate)
-        } catch (e: NoSuchFileException) {
-            return readFileThatDoesNotExist(absolutePath, e)
         } catch (e: Exception) {
             return readFile(this, cause = e)
         }
@@ -168,8 +166,6 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
     override fun <T> read(action: (Source) -> Result<T>): Result<T> {
         val inputStream = try {
             Files.newInputStream(delegate)
-        } catch (e: NoSuchFileException) {
-            return readFileThatDoesNotExist(absolutePath, e)
         } catch (e: Exception) {
             return readFile(this, cause = e)
         }

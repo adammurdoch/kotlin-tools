@@ -134,25 +134,32 @@ internal fun <T> readFile(file: RegularFile, errorCode: ErrorCode = NoErrorCode,
     return if (fileMetadata.regularFile) {
         FailedOperation(FileSystemException("Could not read from ${file.absolutePath}", errorCode, cause))
     } else if (fileMetadata.missing) {
+        println("-> READ FILE: $file, cause: $cause")
+
         var lastMissing: Directory? = null
         var p = file.parent
         while (p != null) {
             val parentMetadata = p.metadata()
+            println("-> ANCESTOR: $p, METADATA RESULT: $parentMetadata")
             if (parentMetadata.missing) {
                 lastMissing = p
             } else if (parentMetadata is Success) {
+                println("-> ANCESTOR: $p, METADATA: ${parentMetadata.get()}")
                 if (parentMetadata.get() is DirectoryMetadata) {
                     if (lastMissing != null) {
+                        println("-> ANCESTOR DOES NOT EXIST: ${lastMissing.absolutePath}")
                         return readFileInDirectoryThatDoesNotExist(file.absolutePath, lastMissing.absolutePath, cause)
                     } else {
                         break
                     }
                 } else {
+                    println("-> ANCESTOR NOT A DIR: ${p.absolutePath}")
                     return readFileInDirectoryThatIsNotADir(file.absolutePath, p.absolutePath, cause)
                 }
             }
             p = p.parent
         }
+        println("-> COULD NOT DETERMINE CAUSE")
         readFileThatDoesNotExist(file.absolutePath, cause)
     } else {
         readFileThatIsNotAFile(file.absolutePath, cause)

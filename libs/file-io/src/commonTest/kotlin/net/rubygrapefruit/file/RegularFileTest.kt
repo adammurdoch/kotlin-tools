@@ -1,8 +1,6 @@
 package net.rubygrapefruit.file
 
 import kotlinx.io.Buffer
-import kotlinx.io.files.Path
-import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readByteArray
 import kotlinx.io.readString
 import kotlinx.io.writeString
@@ -26,10 +24,18 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     private val writeActions: List<(RegularFile) -> Unit> = listOf(
         { file -> file.writeText("text") },
         { file -> file.writeBytes("text".encodeToByteArray()) },
-        { file -> file.writeBytes { it.write("text".encodeToByteArray()) } },
+        { file -> file.writeBytes { stream -> stream.write("text".encodeToByteArray()) } },
         { file -> file.writeBytes { } },
-        { file -> file.write { it.writeString("text") } },
+        { file -> file.write { sink -> sink.writeString("text") } },
         { file -> file.write { } },
+        { file -> file.withContent { content -> content.write { sink -> sink.writeString("text") } } },
+    )
+
+    private val textWriteActions: List<(String, RegularFile) -> Unit> = listOf(
+        { text, file -> file.writeText(text) },
+        { text, file -> file.writeBytes(text.encodeToByteArray()) },
+        { text, file -> file.write { it.writeString(text) } },
+        { text, file -> file.withContent { content -> content.write { sink -> sink.writeString(text) } } },
     )
 
     /**
@@ -50,6 +56,12 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
                         Success("ok")
                     }
                 }
+            }
+        },
+        { file ->
+            file.read { source ->
+                source.readByteArray()
+                Success("ok")
             }
         },
     )
@@ -690,13 +702,17 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
 
         val longString = (0..2000).joinToString(",")
 
-        file.writeText(longString)
+        for (action in textWriteActions) {
+            file.writeText("1234")
 
-        val metadata = file.metadata().get()
-        assertIs<RegularFileMetadata>(metadata)
-        assertEquals(longString.length.toLong(), metadata.size)
+            action(longString, file)
 
-        assertEquals(longString, file.readText().get())
+            val metadata = file.metadata().get()
+            assertIs<RegularFileMetadata>(metadata)
+            assertEquals(longString.length.toLong(), metadata.size)
+
+            assertEquals(longString, file.readText().get())
+        }
     }
 
     @Test

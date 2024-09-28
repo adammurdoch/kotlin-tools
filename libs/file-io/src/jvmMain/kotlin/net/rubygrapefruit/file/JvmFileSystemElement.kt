@@ -7,6 +7,7 @@ import net.rubygrapefruit.io.Resource
 import java.io.IOException
 import java.io.RandomAccessFile
 import java.nio.file.*
+import java.nio.file.LinkOption.NOFOLLOW_LINKS
 import java.nio.file.attribute.PosixFileAttributeView
 import java.util.stream.Collectors
 import kotlin.io.path.deleteExisting
@@ -141,7 +142,7 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
 
     override fun <T> read(action: (Source) -> T): T {
         val inputStream = try {
-            Files.newInputStream(delegate)
+            Files.newInputStream(delegate, NOFOLLOW_LINKS)
         } catch (e: Exception) {
             throw readFile<Any>(this, cause = e).failure
         }

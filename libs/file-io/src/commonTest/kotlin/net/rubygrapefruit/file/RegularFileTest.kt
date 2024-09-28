@@ -535,6 +535,22 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     }
 
     @Test
+    fun `cannot write to a file that exists as a symlink`() {
+        val target = fixture.file("target")
+        val file = fixture.symlink("file", target.absolutePath).toFile()
+
+        for (action in writeActions) {
+            println("-> ACTION: $action")
+            try {
+                action(file)
+                fail()
+            } catch (e: FileSystemException) {
+                assertEquals("Could not write to $file as it is not a file.", e.message)
+            }
+        }
+    }
+
+    @Test
     fun `cannot write to a file whose parent does not exist`() {
         val parent = fixture.testDir.dir("dir1")
         val file = parent.file("file.txt")
@@ -610,6 +626,21 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     @Test
     fun `cannot read from a file that exists as a directory`() {
         val file = fixture.dir("dir1").toFile()
+
+        for (action in readActionsThatStream) {
+            try {
+                action(file)
+                fail()
+            } catch (e: IOException) {
+                assertEquals("Could not read from file $file as it is not a file.", e.message)
+            }
+        }
+    }
+
+    @Test
+    fun `cannot read from a file that exists as a symlink`() {
+        val target = fixture.file("target")
+        val file = fixture.symlink("file", target.absolutePath).toFile()
 
         for (action in readActionsThatStream) {
             try {

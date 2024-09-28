@@ -27,17 +27,17 @@ interface HasPath {
     fun snapshot(): Result<ElementSnapshot>
 
     /**
-     * View the element as a regular file. Does not check whether the file system element is a regular file.
+     * Views this element as a regular file. Does not check whether the file system element is a regular file.
      */
     fun toFile(): RegularFile
 
     /**
-     * View the element as a directory. Does not check whether the file system element is a directory file.
+     * Views this element as a directory. Does not check whether the file system element is a directory file.
      */
     fun toDir(): Directory
 
     /**
-     * View the element as a symlink. Does not check whether the file system element is a symlink file.
+     * Views this element as a symlink. Does not check whether the file system element is a symlink file.
      */
     fun toSymLink(): SymLink
 }

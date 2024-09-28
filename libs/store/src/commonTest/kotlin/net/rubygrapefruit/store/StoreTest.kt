@@ -1,6 +1,5 @@
 package net.rubygrapefruit.store
 
-import kotlinx.io.buffered
 import net.rubygrapefruit.file.regularFile
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -33,11 +32,9 @@ class StoreTest : AbstractStoreTest() {
         val storeFile = testStore.file(StoreFile.Metadata.name)
         assertTrue(storeFile.metadata().regularFile)
 
-        storeFile.withContent {
+        storeFile.withContent { content ->
             // Overwrite the first byte
-            val bufferedSink = it.sink.buffered()
-            bufferedSink.write(byteArrayOf(1))
-            bufferedSink.flush()
+            content.write { sink -> sink.write(byteArrayOf(1)) }
         }
 
         try {

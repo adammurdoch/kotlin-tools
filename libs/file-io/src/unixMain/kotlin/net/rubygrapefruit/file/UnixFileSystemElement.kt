@@ -104,12 +104,9 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
         return Resource.of(doOpenContent())
     }
 
-    override fun <T> withContent(action: (FileContent) -> T): Result<T> {
-        val content = doOpenContent()
-        return try {
-            Success(action(content))
-        } finally {
-            content.close()
+    override fun <T> withContent(action: (FileContent) -> T): T {
+        return doOpenContent().use { content ->
+            action(content)
         }
     }
 

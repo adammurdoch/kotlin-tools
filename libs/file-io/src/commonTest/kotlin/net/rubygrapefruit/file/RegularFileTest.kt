@@ -151,8 +151,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
                 "result"
             }
 
-            assertIs<Success<*>>(result)
-            assertEquals("result", result.get())
+            assertEquals("result", result)
 
             val metadata = file.metadata().get()
             assertIs<RegularFileMetadata>(metadata)
@@ -171,8 +170,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
             "result"
         }
 
-        assertIs<Success<*>>(result)
-        assertEquals("result", result.get())
+        assertEquals("result", result)
 
         val metadata = file.metadata().get()
         assertIs<RegularFileMetadata>(metadata)
@@ -198,8 +196,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
             "result"
         }
 
-        assertIs<Success<*>>(result)
-        assertEquals("result", result.get())
+        assertEquals("result", result)
 
         val metadata = file.metadata().get()
         assertIs<RegularFileMetadata>(metadata)
@@ -328,8 +325,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
             "result"
         }
 
-        assertIs<Success<*>>(result)
-        assertEquals("result", result.get())
+        assertEquals("result", result)
     }
 
     @Test
@@ -352,8 +348,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
             "result"
         }
 
-        assertIs<Success<*>>(result)
-        assertEquals("result", result.get())
+        assertEquals("result", result)
 
         assertEquals("1234567", file.readText().get())
     }
@@ -378,8 +373,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
             "result"
         }
 
-        assertIs<Success<*>>(result)
-        assertEquals("result", result.get())
+        assertEquals("result", result)
 
         assertEquals("1234567", file.readText().get())
     }
@@ -406,8 +400,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
             "result"
         }
 
-        assertIs<Success<*>>(result)
-        assertEquals("result", result.get())
+        assertEquals("result", result)
 
         assertEquals("1234567", file.readText().get())
     }
@@ -432,8 +425,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
             "result"
         }
 
-        assertIs<Success<*>>(result)
-        assertEquals("result", result.get())
+        assertEquals("result", result)
 
         assertEquals("1234567", file.readText().get())
     }

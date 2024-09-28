@@ -222,10 +222,9 @@ internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), Regul
         }
     }
 
-    override fun <T> withContent(action: (FileContent) -> T): Result<T> {
-        val content = doOpenContent()
-        return content.use {
-            Success(action(content))
+    override fun <T> withContent(action: (FileContent) -> T): T {
+        return doOpenContent().use { content ->
+            action(content)
         }
     }
 

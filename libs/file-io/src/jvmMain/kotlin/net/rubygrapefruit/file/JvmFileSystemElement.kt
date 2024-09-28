@@ -110,9 +110,9 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
         return Resource(doOpenContent()) { it.close() }
     }
 
-    override fun <T> withContent(action: (FileContent) -> T): Result<T> {
-        return doOpenContent().use { file ->
-            Success(action((file)))
+    override fun <T> withContent(action: (FileContent) -> T): T {
+        return doOpenContent().use { content ->
+            action((content))
         }
     }
 

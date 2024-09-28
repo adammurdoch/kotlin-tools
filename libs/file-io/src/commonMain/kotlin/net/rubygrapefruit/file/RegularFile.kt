@@ -24,7 +24,7 @@ interface RegularFile : FileSystemElement {
      * Creates the file if it does not exist.
      */
     @Throws(FileSystemException::class)
-    fun <T> withContent(action: (FileContent) -> T): Result<T>
+    fun <T> withContent(action: (FileContent) -> T): T
 
     /**
      * Opens the content of this file for random access reads or writes.

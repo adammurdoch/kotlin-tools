@@ -70,15 +70,15 @@ interface RegularFile : FileSystemElement {
      * Reads the content of this file into a [ByteArray].
      */
     @Throws(FileSystemException::class)
-    fun readBytes(): Result<ByteArray> {
-        return read { source -> Success(source.readByteArray()) }
+    fun readBytes(): ByteArray {
+        return read { source -> Success(source.readByteArray()) }.get()
     }
 
     /**
      * Reads the content of this file as text. The file content is decoded using UTF-8.
      */
     @Throws(FileSystemException::class)
-    fun readText(): Result<String> {
-        return read { source -> Success(source.readString()) }
+    fun readText(): String {
+        return read { source -> Success(source.readString()) }.get()
     }
 }

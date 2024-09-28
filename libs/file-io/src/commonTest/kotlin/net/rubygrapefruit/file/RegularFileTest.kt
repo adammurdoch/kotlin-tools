@@ -42,18 +42,21 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     /**
      * Read actions that attempt to read content from the file
      */
-    private val readActionsThatStream: List<(RegularFile) -> Result<*>> = listOf(
-        { file -> file.readText() },
-        { file -> file.readBytes() },
+    private val readActionsThatStream: List<(RegularFile) -> Unit> = listOf(
+        { file ->
+            file.readText()
+        },
+        { file ->
+            file.readBytes()
+        },
         { file ->
             file.read { source ->
-                source.readByteArray()
-                Success("ok")
-            }
+                Success(source.readByteArray())
+            }.get()
         },
     )
 
-    private val readActions: List<(RegularFile) -> Result<*>> =
+    private val readActions: List<(RegularFile) -> Unit> =
         readActionsThatStream + listOf(
             { file -> file.read { Success(it.readByteArray()) } },
             { file -> file.read { Success(12) } },
@@ -111,7 +114,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
             assertIs<RegularFileMetadata>(metadata)
             assertEquals(bytes.size.toLong(), metadata.size)
 
-            assertContentEquals(bytes, file.readBytes().get())
+            assertContentEquals(bytes, file.readBytes())
         }
     }
 
@@ -126,7 +129,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         assertIs<RegularFileMetadata>(metadata)
         assertEquals(0, metadata.size)
 
-        assertContentEquals(byteArrayOf(), file.readBytes().get())
+        assertContentEquals(byteArrayOf(), file.readBytes())
     }
 
     @Test
@@ -157,7 +160,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
             assertIs<RegularFileMetadata>(metadata)
             assertEquals(bytes.size.toLong(), metadata.size)
 
-            assertContentEquals(bytes, file.readBytes().get())
+            assertContentEquals(bytes, file.readBytes())
         }
     }
 
@@ -176,7 +179,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         assertIs<RegularFileMetadata>(metadata)
         assertEquals(0, metadata.size)
 
-        assertContentEquals(byteArrayOf(), file.readBytes().get())
+        assertContentEquals(byteArrayOf(), file.readBytes())
     }
 
     @Test
@@ -202,7 +205,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         assertIs<RegularFileMetadata>(metadata)
         assertEquals(0, metadata.size)
 
-        assertContentEquals(byteArrayOf(), file.readBytes().get())
+        assertContentEquals(byteArrayOf(), file.readBytes())
     }
 
     @Test
@@ -217,7 +220,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
             assertIs<RegularFileMetadata>(metadata)
             assertEquals(bytes.size.toLong(), metadata.size)
 
-            assertContentEquals(bytes, file.readBytes().get())
+            assertContentEquals(bytes, file.readBytes())
         }
     }
 
@@ -234,7 +237,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
             assertIs<RegularFileMetadata>(metadata)
             assertEquals(text.encodeToByteArray().size.toLong(), metadata.size)
 
-            assertEquals(text, file.readText().get())
+            assertEquals(text, file.readText())
         }
     }
 
@@ -350,7 +353,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
 
         assertEquals("result", result)
 
-        assertEquals("1234567", file.readText().get())
+        assertEquals("1234567", file.readText())
     }
 
     @Test
@@ -375,7 +378,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
 
         assertEquals("result", result)
 
-        assertEquals("1234567", file.readText().get())
+        assertEquals("1234567", file.readText())
     }
 
     @Test
@@ -402,7 +405,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
 
         assertEquals("result", result)
 
-        assertEquals("1234567", file.readText().get())
+        assertEquals("1234567", file.readText())
     }
 
     @Test
@@ -427,7 +430,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
 
         assertEquals("result", result)
 
-        assertEquals("1234567", file.readText().get())
+        assertEquals("1234567", file.readText())
     }
 
     @Test
@@ -436,7 +439,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         file.writeText("1234")
 
         assertIs<RegularFileMetadata>(file.metadata().get())
-        assertEquals("1234", file.readText().get())
+        assertEquals("1234", file.readText())
     }
 
     @Test
@@ -451,7 +454,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         assertIs<RegularFileMetadata>(metadata)
         assertEquals(8, metadata.size)
 
-        assertEquals("abcdefgh", file.readText().get())
+        assertEquals("abcdefgh", file.readText())
     }
 
     @Test
@@ -471,7 +474,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
             assertIs<RegularFileMetadata>(metadata)
             assertEquals(longString.length.toLong(), metadata.size)
 
-            assertEquals(longString, file.readText().get())
+            assertEquals(longString, file.readText())
         }
     }
 
@@ -554,10 +557,8 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         val file = fixture.testDir.file("missing")
 
         for (action in readActions) {
-            val result = action(file)
-            assertIs<MissingEntry<*>>(result)
             try {
-                result.get()
+                action(file)
             } catch (e: IOException) {
                 assertEquals("Could not read from file $file as it does not exist.", e.message)
             }
@@ -570,7 +571,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
 
         for (action in readActionsThatStream) {
             try {
-                action(file).get()
+                action(file)
                 fail()
             } catch (e: IOException) {
                 assertEquals("Could not read from file $file as it is not a file.", e.message)
@@ -585,9 +586,8 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
 
         for (action in readActionsThatStream) {
             assertTrue(parent.metadata().missing)
-            val result = action(file)
             try {
-                result.get()
+                action(file)
                 fail()
             } catch (e: FileSystemException) {
                 assertEquals("Could not read from $file as directory $parent does not exist.", e.message)
@@ -602,9 +602,8 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
 
         for (action in readActionsThatStream) {
             assertTrue(ancestor.metadata().missing)
-            val result = action(file)
             try {
-                result.get()
+                action(file)
                 fail()
             } catch (e: FileSystemException) {
                 assertEquals("Could not read from $file as directory $ancestor does not exist.", e.message)
@@ -618,9 +617,8 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         val file = fixture.testDir.file("dir1/file.txt")
 
         for (action in readActionsThatStream) {
-            val result = action(file)
             try {
-                result.get()
+                action(file)
                 fail()
             } catch (e: FileSystemException) {
                 assertEquals("Could not read from $file as $parent exists but is not a directory.", e.message)
@@ -634,9 +632,8 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         val file = fixture.testDir.file("dir1/dir2/file.txt")
 
         for (action in readActionsThatStream) {
-            val result = action(file)
             try {
-                result.get()
+                action(file)
                 fail()
             } catch (e: FileSystemException) {
                 assertEquals("Could not read from $file as $ancestor exists but is not a directory.", e.message)

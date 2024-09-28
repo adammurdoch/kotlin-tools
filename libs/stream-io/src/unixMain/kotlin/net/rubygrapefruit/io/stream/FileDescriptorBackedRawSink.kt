@@ -11,14 +11,14 @@ import kotlinx.io.RawSink
 import kotlinx.io.UnsafeIoApi
 import net.rubygrapefruit.io.IOException
 import net.rubygrapefruit.io.UnixErrorCode
-import net.rubygrapefruit.io.write
+import net.rubygrapefruit.io.readFrom
 import platform.posix.write
 
 @OptIn(UnsafeIoApi::class)
 class FileDescriptorBackedRawSink(private val fileSource: StreamSource, private val descriptor: WriteDescriptor) : RawSink {
     override fun write(source: Buffer, byteCount: Long) {
         memScoped {
-            source.write(byteCount) { buffer, startIndex, count ->
+            source.readFrom(byteCount) { buffer, startIndex, count ->
                 var pos = startIndex
                 var remaining = count
                 while (remaining > 0) {

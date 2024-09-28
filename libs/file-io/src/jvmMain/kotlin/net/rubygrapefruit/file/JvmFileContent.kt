@@ -4,11 +4,10 @@ import kotlinx.io.Buffer
 import kotlinx.io.RawSink
 import kotlinx.io.RawSource
 import kotlinx.io.UnsafeIoApi
-import kotlinx.io.unsafe.UnsafeBufferOperations
+import net.rubygrapefruit.io.readFrom
 import net.rubygrapefruit.io.stream.*
-import net.rubygrapefruit.io.write
+import net.rubygrapefruit.io.writeAtMostTo
 import java.io.RandomAccessFile
-import kotlin.math.min
 
 @OptIn(UnsafeIoApi::class)
 internal class JvmFileContent(
@@ -44,8 +43,7 @@ internal class JvmFileContent(
         get() = this
 
     override fun readAtMostTo(sink: Buffer, byteCount: Long): Long {
-        val ncopied = UnsafeBufferOperations.writeToTail(sink, 1) { buffer, startIndex, endIndex ->
-            val count = min(byteCount.toInt(), endIndex - startIndex)
+        val ncopied = sink.writeAtMostTo(byteCount) { buffer, startIndex, count ->
             val nread = file.read(buffer, startIndex, count)
             if (nread < 0) 0 else nread
         }
@@ -53,7 +51,7 @@ internal class JvmFileContent(
     }
 
     override fun write(source: Buffer, byteCount: Long) {
-        source.write(byteCount) { buffer, startIndex, count ->
+        source.readFrom(byteCount) { buffer, startIndex, count ->
             file.write(buffer, startIndex, count)
         }
     }

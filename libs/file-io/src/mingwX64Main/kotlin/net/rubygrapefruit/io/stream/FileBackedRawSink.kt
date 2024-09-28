@@ -7,7 +7,7 @@ import kotlinx.io.Buffer
 import kotlinx.io.RawSink
 import kotlinx.io.UnsafeIoApi
 import net.rubygrapefruit.file.NativeException
-import net.rubygrapefruit.io.write
+import net.rubygrapefruit.io.readFrom
 import platform.windows.CloseHandle
 import platform.windows.DWORDVar
 import platform.windows.HANDLE
@@ -19,7 +19,7 @@ internal class FileBackedRawSink(private val path: String, private val handle: H
     override fun write(source: Buffer, byteCount: Long) {
         memScoped {
             val nbytes = alloc<DWORDVar>()
-            source.write(byteCount) { buffer, startIndex, count ->
+            source.readFrom(byteCount) { buffer, startIndex, count ->
                 buffer.usePinned { ptr ->
                     var pos = startIndex
                     var remaining = count

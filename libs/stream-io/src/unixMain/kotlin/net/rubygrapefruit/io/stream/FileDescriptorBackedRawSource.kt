@@ -8,18 +8,16 @@ import kotlinx.cinterop.refTo
 import kotlinx.io.Buffer
 import kotlinx.io.RawSource
 import kotlinx.io.UnsafeIoApi
-import kotlinx.io.unsafe.UnsafeBufferOperations
 import net.rubygrapefruit.io.UnixErrorCode
+import net.rubygrapefruit.io.writeAtMostTo
 import platform.posix.EISDIR
 import platform.posix.errno
 import platform.posix.read
-import kotlin.math.min
 
 @OptIn(UnsafeIoApi::class)
 class FileDescriptorBackedRawSource(private val fileSource: StreamSource, private val descriptor: ReadDescriptor) : RawSource {
     override fun readAtMostTo(sink: Buffer, byteCount: Long): Long {
-        val ncopied = UnsafeBufferOperations.writeToTail(sink, 1) { buffer, startIndex, endIndex ->
-            val count = min(byteCount.toInt(), endIndex - startIndex)
+        val ncopied = sink.writeAtMostTo(byteCount) { buffer, startIndex, count ->
             val nread = read(descriptor.descriptor, buffer.refTo(startIndex), count.convert()).convert<Int>()
             if (nread < 0) {
                 if (errno == EISDIR) {

@@ -58,8 +58,8 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
 
     private val readActions: List<(RegularFile) -> Unit> =
         readActionsThatStream + listOf(
-            { file -> file.read { Success(it.readByteArray()) } },
-            { file -> file.read { Success(12) } },
+            { file -> file.read { it.readByteArray() } },
+            { file -> file.read { 12 } },
         )
 
     @Test
@@ -254,11 +254,10 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
             val buffer2 = source.readByteArray()
             assertEquals(0, buffer2.size)
 
-            Success(buffer)
+            buffer
         }
 
-        assertIs<Success<*>>(result)
-        assertContentEquals(bytes, result.get())
+        assertContentEquals(bytes, result)
     }
 
     @Test
@@ -270,11 +269,10 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
             val buffer = source.readByteArray(3)
             assertEquals(3, buffer.size)
 
-            Success(buffer)
+            buffer
         }
 
-        assertIs<Success<*>>(result)
-        assertContentEquals("123".encodeToByteArray(), result.get())
+        assertContentEquals("123".encodeToByteArray(), result)
     }
 
     @Test
@@ -290,11 +288,10 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
             val buffer2 = source.readByteArray()
             assertEquals(0, buffer2.size)
 
-            Success("result")
+            "result"
         }
 
-        assertIs<Success<*>>(result)
-        assertEquals("result", result.get())
+        assertEquals("result", result)
     }
 
     @Test
@@ -302,10 +299,9 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         val file = fixture.testDir.file("file")
         file.writeBytes("123".encodeToByteArray())
 
-        val result = file.read { _ -> Success("result") }
+        val result = file.read { _ -> "result" }
 
-        assertIs<Success<*>>(result)
-        assertEquals("result", result.get())
+        assertEquals("result", result)
     }
 
     @Test

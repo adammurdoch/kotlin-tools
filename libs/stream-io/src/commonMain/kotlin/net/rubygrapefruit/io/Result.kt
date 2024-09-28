@@ -8,28 +8,10 @@ interface Result<out T, out F> {
     fun <S> map(transform: (T) -> S): Result<S, F>
 }
 
-interface Success<out T, out F> : Result<T, F> {
-    val result: T
-}
-
 interface Failure<out T, out F> : Result<T, F> {
     fun rethrow(): Nothing
 
     fun <S> cast(): Failure<S, F>
-}
-
-open class DefaultSuccess<out T, out F>(override val result: T) : Success<T, F> {
-    override fun get() = result
-
-    override fun getOrNull() = result
-
-    override fun <S> map(transform: (T) -> S): Success<S, F> {
-        return of(transform(result))
-    }
-
-    protected fun <S> of(result: S): Success<S, F> {
-        return DefaultSuccess(result)
-    }
 }
 
 abstract class AbstractFailure<out T, out F> : Failure<T, F> {

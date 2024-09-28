@@ -1,8 +1,8 @@
 package net.rubygrapefruit.process
 
+import kotlinx.io.RawSink
+import kotlinx.io.RawSource
 import net.rubygrapefruit.file.Directory
-import net.rubygrapefruit.io.stream.ReadStream
-import net.rubygrapefruit.io.stream.WriteStream
 
 internal class ProcessStartSpec(
     val commandLine: List<String>,
@@ -13,9 +13,9 @@ internal class ProcessStartSpec(
 )
 
 internal interface ProcessControl {
-    val stdout: ReadStream
+    val stdout: RawSource
 
-    val stdin: WriteStream
+    val stdin: RawSink
 
     fun waitFor(): Int
 }

@@ -3,6 +3,8 @@
 package net.rubygrapefruit.process
 
 import kotlinx.cinterop.*
+import kotlinx.io.RawSink
+import kotlinx.io.RawSource
 import net.rubygrapefruit.io.IOException
 import net.rubygrapefruit.io.UnixErrorCode
 import net.rubygrapefruit.io.stream.*
@@ -16,11 +18,11 @@ internal class UnixProcess(
     private val stdoutDescriptor: ReadDescriptor?,
     private val stdinDescriptor: WriteDescriptor?
 ) : ProcessControl {
-    override val stdout: ReadStream
-        get() = FileDescriptorBackedReadStream(ProcessSource, stdoutDescriptor!!)
+    override val stdout: RawSource
+        get() = FileDescriptorBackedRawSource(ProcessSource, stdoutDescriptor!!)
 
-    override val stdin: WriteStream
-        get() = FileDescriptorBackedWriteStream(ProcessSource, stdinDescriptor!!)
+    override val stdin: RawSink
+        get() = FileDescriptorBackedRawSink(ProcessSource, stdinDescriptor!!)
 
     override fun waitFor(): Int {
         try {

@@ -5,7 +5,6 @@ import kotlinx.io.RawSink
 import kotlinx.io.RawSource
 import kotlinx.io.UnsafeIoApi
 import net.rubygrapefruit.io.readFrom
-import net.rubygrapefruit.io.stream.*
 import net.rubygrapefruit.io.writeAtMostTo
 import java.io.RandomAccessFile
 
@@ -13,7 +12,7 @@ import java.io.RandomAccessFile
 internal class JvmFileContent(
     private val owner: JvmRegularFile,
     private val file: RandomAccessFile
-) : FileContent, ReadStream, WriteStream, RawSource, RawSink, AutoCloseable {
+) : FileContent, RawSource, RawSink, AutoCloseable {
     override val currentPosition: Long
         get() = file.filePointer
 
@@ -53,19 +52,6 @@ internal class JvmFileContent(
         source.readFrom(byteCount) { buffer, startIndex, count ->
             file.write(buffer, startIndex, count)
         }
-    }
-
-    override fun read(buffer: ByteArray, offset: Int, max: Int): ReadResult {
-        val nread = file.read(buffer, offset, max)
-        return if (nread < 0) {
-            EndOfStream
-        } else {
-            ReadBytes(nread)
-        }
-    }
-
-    override fun write(bytes: ByteArray, offset: Int, count: Int) {
-        file.write(bytes, offset, count)
     }
 
     override fun flush() {

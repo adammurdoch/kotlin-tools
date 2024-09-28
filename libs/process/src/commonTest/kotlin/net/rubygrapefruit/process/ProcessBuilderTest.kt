@@ -1,9 +1,10 @@
 package net.rubygrapefruit.process
 
+import kotlinx.io.readString
+import kotlinx.io.writeString
 import net.rubygrapefruit.file.fileSystem
 import net.rubygrapefruit.file.fixtures.FilesFixture
 import net.rubygrapefruit.io.IOException
-import net.rubygrapefruit.io.stream.CollectingBuffer
 import kotlin.test.*
 
 
@@ -90,10 +91,8 @@ class ProcessBuilderTest {
     @Test
     fun `can run command and act on input and output`() {
         val result = Process.command("head", "-n", "1").withInputAndOutput { read, write ->
-            write.write("greetings\nignore this\n".encodeToByteArray())
-            val buffer = CollectingBuffer()
-            buffer.appendFrom(read)
-            buffer.decodeToString()
+            write.writeString("greetings\nignore this\n")
+            read.readString()
         }.start().waitFor()
 
         assertEquals("greetings\n", result)

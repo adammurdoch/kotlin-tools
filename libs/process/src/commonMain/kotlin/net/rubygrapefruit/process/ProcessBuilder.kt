@@ -1,9 +1,10 @@
 package net.rubygrapefruit.process
 
+import kotlinx.io.Sink
+import kotlinx.io.Source
+import kotlinx.io.buffered
+import kotlinx.io.readString
 import net.rubygrapefruit.file.Directory
-import net.rubygrapefruit.io.stream.CollectingBuffer
-import net.rubygrapefruit.io.stream.ReadStream
-import net.rubygrapefruit.io.stream.WriteStream
 
 interface ProcessBuilder : ProcessStarter<Unit> {
     /**
@@ -30,7 +31,7 @@ interface ProcessBuilder : ProcessStarter<Unit> {
     /**
      * Uses the given action to read from and write to the child process to produce a result.
      */
-    fun <T> withInputAndOutput(action: (ReadStream, WriteStream) -> T): ProcessStarter<T>
+    fun <T> withInputAndOutput(action: (Source, Sink) -> T): ProcessStarter<T>
 }
 
 interface ProcessStarter<T> {
@@ -67,7 +68,7 @@ internal class DefaultProcessBuilder(private val commandLine: List<String>) : Pr
         }
     }
 
-    override fun <T> withInputAndOutput(action: (ReadStream, WriteStream) -> T): ProcessStarter<T> {
+    override fun <T> withInputAndOutput(action: (Source, Sink) -> T): ProcessStarter<T> {
         val spec = ProcessStartSpec(commandLine, dir, true, true, false)
         return object : ProcessStarter<T> {
             override fun start(): Process<T> {
@@ -77,8 +78,7 @@ internal class DefaultProcessBuilder(private val commandLine: List<String>) : Pr
     }
 }
 
-internal abstract class AbstractProcess<T>(protected val control: ProcessControl) : Process<T> {
-}
+internal abstract class AbstractProcess<T>(protected val control: ProcessControl) : Process<T>
 
 internal class ProcessWithNoResult(control: ProcessControl) : AbstractProcess<Unit>(control) {
     override fun waitFor() {
@@ -94,17 +94,18 @@ internal class ProcessWithExitCodeResult(control: ProcessControl) : AbstractProc
 
 internal class ProcessWithStringResult(control: ProcessControl) : AbstractProcess<String>(control) {
     override fun waitFor(): String {
-        val buffer = CollectingBuffer()
-        buffer.appendFrom(control.stdout)
+        val stdout = control.stdout.buffered().readString()
         control.waitFor()
-        return buffer.decodeToString()
+        return stdout
     }
 }
 
-internal class ProcessWithInputAndOutput<T>(private val action: (ReadStream, WriteStream) -> T, control: ProcessControl) :
+internal class ProcessWithInputAndOutput<T>(private val action: (Source, Sink) -> T, control: ProcessControl) :
     AbstractProcess<T>(control) {
     override fun waitFor(): T {
-        val result = action(control.stdout, control.stdin)
+        val stdin = control.stdin.buffered()
+        val result = action(control.stdout.buffered(), stdin)
+        stdin.flush()
         control.waitFor()
         return result
     }

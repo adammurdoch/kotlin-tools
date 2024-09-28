@@ -3,10 +3,10 @@
 package net.rubygrapefruit.process
 
 import kotlinx.cinterop.*
+import kotlinx.io.RawSink
+import kotlinx.io.RawSource
 import net.rubygrapefruit.io.IOException
 import net.rubygrapefruit.io.WinErrorCode
-import net.rubygrapefruit.io.stream.ReadStream
-import net.rubygrapefruit.io.stream.WriteStream
 import platform.windows.*
 
 internal actual fun start(spec: ProcessStartSpec): ProcessControl {
@@ -27,10 +27,10 @@ internal actual fun start(spec: ProcessStartSpec): ProcessControl {
         CloseHandle(info.hThread)
 
         object : ProcessControl {
-            override val stdout: ReadStream
+            override val stdout: RawSource
                 get() = TODO("Not yet implemented")
 
-            override val stdin: WriteStream
+            override val stdin: RawSink
                 get() = TODO("Not yet implemented")
 
             override fun waitFor(): Int {

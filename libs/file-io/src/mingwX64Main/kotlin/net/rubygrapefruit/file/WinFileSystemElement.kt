@@ -8,10 +8,6 @@ import kotlinx.io.Source
 import net.rubygrapefruit.io.Resource
 import net.rubygrapefruit.io.ResourceResult
 import net.rubygrapefruit.io.WinErrorCode
-import net.rubygrapefruit.io.stream.FileBackedReadStream
-import net.rubygrapefruit.io.stream.FileBackedWriteStream
-import net.rubygrapefruit.io.stream.ReadStream
-import net.rubygrapefruit.io.stream.WriteStream
 import platform.windows.*
 
 internal open class WinFileSystemElement(override val path: WinPath) : AbstractFileSystemElement() {
@@ -256,40 +252,8 @@ internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), Regul
         }
     }
 
-    override fun writeBytes(action: (WriteStream) -> Unit) {
-        memScoped {
-            val handle = CreateFileW(absolutePath, GENERIC_WRITE.convert(), 0.convert(), null, CREATE_ALWAYS.convert(), FILE_ATTRIBUTE_NORMAL.convert(), null)
-            if (handle == INVALID_HANDLE_VALUE) {
-                throw writeToFile(this@WinRegularFile, WinErrorCode.last())
-            }
-            try {
-                action(FileBackedWriteStream(absolutePath, handle))
-            } finally {
-                CloseHandle(handle)
-            }
-        }
-    }
-
     override fun write(action: (Sink) -> Unit) {
         TODO("Not yet implemented")
-    }
-
-    override fun <T> readBytes(action: (ReadStream) -> Result<T>): Result<T> {
-        return memScoped {
-            val handle = CreateFileW(absolutePath, GENERIC_READ.convert(), 0.convert(), null, OPEN_EXISTING.convert(), FILE_ATTRIBUTE_NORMAL.convert(), null)
-            if (handle == INVALID_HANDLE_VALUE) {
-                return if (GetLastError().convert<Int>() == ERROR_FILE_NOT_FOUND) {
-                    readFileThatDoesNotExist(absolutePath)
-                } else {
-                    readFile(this@WinRegularFile, WinErrorCode.last())
-                }
-            }
-            try {
-                action(FileBackedReadStream(absolutePath, handle))
-            } finally {
-                CloseHandle(handle)
-            }
-        }
     }
 
     override fun <T> read(action: (Source) -> Result<T>): Result<T> {

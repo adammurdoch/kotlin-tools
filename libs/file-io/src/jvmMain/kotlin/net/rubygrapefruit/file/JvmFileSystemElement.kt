@@ -5,8 +5,6 @@ import kotlinx.io.Source
 import kotlinx.io.buffered
 import net.rubygrapefruit.io.Resource
 import net.rubygrapefruit.io.ResourceResult
-import net.rubygrapefruit.io.stream.ReadStream
-import net.rubygrapefruit.io.stream.WriteStream
 import java.io.IOException
 import java.io.RandomAccessFile
 import java.nio.file.*
@@ -128,17 +126,6 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
         return JvmFileContent(this, file)
     }
 
-    override fun writeBytes(action: (WriteStream) -> Unit) {
-        val outputStream = try {
-            Files.newOutputStream(delegate)
-        } catch (e: Exception) {
-            throw writeToFile(this, cause = e)
-        }
-        outputStream.use { stream ->
-            action(OutputStreamBackedWriteStream(stream))
-        }
-    }
-
     override fun write(action: (Sink) -> Unit) {
         val outputStream = try {
             Files.newOutputStream(delegate)
@@ -149,17 +136,6 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
             val sink = OutputStreamBackedRawSink(stream).buffered()
             action(sink)
             sink.flush()
-        }
-    }
-
-    override fun <T> readBytes(action: (ReadStream) -> Result<T>): Result<T> {
-        val inputStream = try {
-            Files.newInputStream(delegate)
-        } catch (e: Exception) {
-            return readFile(this, cause = e)
-        }
-        return inputStream.use { stream ->
-            action(InputStreamBackedReadStream(this, stream))
         }
     }
 

@@ -6,8 +6,6 @@ import kotlinx.io.readByteArray
 import kotlinx.io.readString
 import kotlinx.io.writeString
 import net.rubygrapefruit.io.ResourceResult
-import net.rubygrapefruit.io.stream.ReadStream
-import net.rubygrapefruit.io.stream.WriteStream
 
 /**
  * A regular file in the file system.
@@ -40,21 +38,13 @@ interface RegularFile : FileSystemElement {
     fun openContent(): ResourceResult<FileContent>
 
     /**
-     * Writes zero or more bytes to the file, replacing any existing content.
+     * Writes zero or more bytes to the file. Replaces existing content if the file exists, or creates the file if it does not exist.
      */
     @Throws(FileSystemException::class)
     fun write(action: (Sink) -> Unit)
 
     /**
-     * Writes zero or more bytes to the file, replacing any existing content.
-     *
-     * The [WriteStream] is not buffered.
-     */
-    @Throws(FileSystemException::class)
-    fun writeBytes(action: (WriteStream) -> Unit)
-
-    /**
-     * Writes the given bytes to the file, replacing any existing content.
+     * Writes the given bytes to the file. Replaces existing content if the file exists, or creates the file if it does not exist.
      */
     @Throws(FileSystemException::class)
     fun writeBytes(bytes: ByteArray) {
@@ -62,7 +52,8 @@ interface RegularFile : FileSystemElement {
     }
 
     /**
-     * Writes the given text to the file, replacing any existing content. The text is encoded using UTF-8.
+     * Writes the given text to the file. Replaces existing content if the file exists, or creates the file if it does not exist.
+     * The text is encoded using UTF-8.
      */
     @Throws(FileSystemException::class)
     fun writeText(text: String) {
@@ -76,14 +67,7 @@ interface RegularFile : FileSystemElement {
     fun <T> read(action: (Source) -> Result<T>): Result<T>
 
     /**
-     * Reads bytes from the file.
-     *
-     * The [ReadStream] is not buffered.
-     */
-    fun <T> readBytes(action: (ReadStream) -> Result<T>): Result<T>
-
-    /**
-     * Reads bytes from the file into a [ByteArray].
+     * Reads the content of this file into a [ByteArray].
      */
     @Throws(FileSystemException::class)
     fun readBytes(): Result<ByteArray> {
@@ -91,7 +75,7 @@ interface RegularFile : FileSystemElement {
     }
 
     /**
-     * Reads text from the file. The file content is decoded using UTF-8.
+     * Reads the content of this file as text. The file content is decoded using UTF-8.
      */
     @Throws(FileSystemException::class)
     fun readText(): Result<String> {

@@ -7,8 +7,6 @@ import kotlinx.io.writeString
 import net.rubygrapefruit.io.IOException
 import net.rubygrapefruit.io.stream.CollectingBuffer
 import net.rubygrapefruit.io.stream.EndOfStream
-import net.rubygrapefruit.io.stream.ReadBytes
-import net.rubygrapefruit.io.stream.ReadFailed
 import kotlin.test.*
 
 class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
@@ -24,8 +22,6 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     private val writeActions: List<(RegularFile) -> Unit> = listOf(
         { file -> file.writeText("text") },
         { file -> file.writeBytes("text".encodeToByteArray()) },
-        { file -> file.writeBytes { stream -> stream.write("text".encodeToByteArray()) } },
-        { file -> file.writeBytes { } },
         { file -> file.write { sink -> sink.writeString("text") } },
         { file -> file.write { } }
     )
@@ -52,20 +48,6 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         { file -> file.readText() },
         { file -> file.readBytes() },
         { file ->
-            file.readBytes { stream ->
-                val result = stream.read(ByteArray(1024))
-                when (result) {
-                    is ReadFailed -> {
-                        FailedOperation(result.exception)
-                    }
-
-                    EndOfStream, is ReadBytes -> {
-                        Success("ok")
-                    }
-                }
-            }
-        },
-        { file ->
             file.read { source ->
                 source.readByteArray()
                 Success("ok")
@@ -75,8 +57,6 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
 
     private val readActions: List<(RegularFile) -> Result<*>> =
         readActionsThatStream + listOf(
-            { file -> file.readBytes { Success(it.read(ByteArray(10))) } },
-            { file -> file.readBytes { Success(12) } },
             { file -> file.read { Success(it.readByteArray()) } },
             { file -> file.read { Success(12) } },
         )
@@ -118,12 +98,14 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     }
 
     @Test
-    fun `can stream bytes to a file to create it using writeBytes`() {
-        listOf("123".encodeToByteArray(), byteArrayOf()).forEachIndexed { index, bytes ->
+    fun `can stream bytes to a file to create it`() {
+        listOf("123", "").forEachIndexed { index, string ->
+            val bytes = string.encodeToByteArray()
+
             val file = fixture.testDir.file("file-$index")
             assertTrue(file.metadata().missing)
 
-            file.writeBytes { stream ->
+            file.write { stream ->
                 stream.write(bytes)
             }
 
@@ -136,41 +118,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     }
 
     @Test
-    fun `can stream bytes to a file to create it`() {
-        listOf("123".encodeToByteArray(), byteArrayOf()).forEachIndexed { index, bytes ->
-            val file = fixture.testDir.file("file-$index")
-            assertTrue(file.metadata().missing)
-
-            file.write { stream ->
-                val buffer = Buffer()
-                buffer.write(bytes)
-                stream.write(buffer, buffer.size)
-            }
-
-            val metadata = file.metadata().get()
-            assertIs<RegularFileMetadata>(metadata)
-            assertEquals(bytes.size.toLong(), metadata.size)
-
-            assertContentEquals(bytes, file.readBytes().get())
-        }
-    }
-
-    @Test
-    fun `can stream nothing to a file to create it using writeBytes`() {
-        val file = fixture.testDir.file("file")
-        assertTrue(file.metadata().missing)
-
-        file.writeBytes { _ -> }
-
-        val metadata = file.metadata().get()
-        assertIs<RegularFileMetadata>(metadata)
-        assertEquals(0, metadata.size)
-
-        assertContentEquals(byteArrayOf(), file.readBytes().get())
-    }
-
-    @Test
-    fun `can stream nothing to a file to create it`() {
+    fun `can stream no bytes to a file to create it`() {
         val file = fixture.testDir.file("file")
         assertTrue(file.metadata().missing)
 
@@ -349,28 +297,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     }
 
     @Test
-    fun `can stream bytes from file using readBytes`() {
-        val bytes = "123".encodeToByteArray()
-        val file = fixture.testDir.file("file")
-        file.writeBytes(bytes)
-
-        val result = file.readBytes { stream ->
-            val buffer = ByteArray(1024)
-            val result = stream.read(buffer)
-            assertIs<ReadBytes>(result)
-            assertEquals(bytes.size, result.get())
-
-            val result2 = stream.read(buffer)
-            assertEquals(EndOfStream, result2)
-            Success(buffer.take(bytes.size).toByteArray())
-        }
-
-        assertIs<Success<*>>(result)
-        assertContentEquals(bytes, result.get())
-    }
-
-    @Test
-    fun `can stream bytes from file`() {
+    fun `can stream all bytes from file`() {
         val bytes = "123".encodeToByteArray()
         val file = fixture.testDir.file("file")
         file.writeBytes(bytes)
@@ -390,20 +317,19 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     }
 
     @Test
-    fun `can stream bytes from empty file using readBytes`() {
-        val bytes = byteArrayOf()
+    fun `can stream some bytes from file`() {
         val file = fixture.testDir.file("file")
-        file.writeBytes(bytes)
+        file.writeBytes("123456".encodeToByteArray())
 
-        val result = file.readBytes { stream ->
-            val buffer = ByteArray(1024)
-            val result = stream.read(buffer)
-            assertEquals(EndOfStream, result)
-            Success("result")
+        val result = file.read { source ->
+            val buffer = source.readByteArray(3)
+            assertEquals(3, buffer.size)
+
+            Success(buffer)
         }
 
         assertIs<Success<*>>(result)
-        assertEquals("result", result.get())
+        assertContentEquals("123".encodeToByteArray(), result.get())
     }
 
     @Test
@@ -427,20 +353,9 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     }
 
     @Test
-    fun `can stream no bytes from file using readBytes`() {
-        val file = fixture.testDir.file("file")
-        file.writeBytes(byteArrayOf())
-
-        val result = file.readBytes { _ -> Success("result") }
-
-        assertIs<Success<*>>(result)
-        assertEquals("result", result.get())
-    }
-
-    @Test
     fun `can stream no bytes from file`() {
         val file = fixture.testDir.file("file")
-        file.writeBytes(byteArrayOf())
+        file.writeBytes("123".encodeToByteArray())
 
         val result = file.read { _ -> Success("result") }
 

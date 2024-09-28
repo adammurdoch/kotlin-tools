@@ -125,16 +125,17 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
         return JvmFileContent(this, file)
     }
 
-    override fun write(action: (Sink) -> Unit) {
+    override fun <T> write(action: (Sink) -> T): T {
         val outputStream = try {
             Files.newOutputStream(delegate)
         } catch (e: Exception) {
             throw writeToFile(this, cause = e)
         }
-        outputStream.use { stream ->
+        return outputStream.use { stream ->
             val sink = OutputStreamBackedRawSink(stream).buffered()
-            action(sink)
+            val result = action(sink)
             sink.flush()
+            result
         }
     }
 

@@ -242,6 +242,29 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     }
 
     @Test
+    fun `can stream bytes to a file to replace its content`() {
+        val file = fixture.testDir.file("file")
+        file.writeText("ignored")
+
+        listOf("123", "").forEachIndexed { index, string ->
+            val bytes = string.encodeToByteArray()
+
+            val result = file.write { stream ->
+                stream.write(bytes)
+                "result"
+            }
+
+            assertEquals("result", result)
+
+            val metadata = file.metadata().get()
+            assertIs<RegularFileMetadata>(metadata)
+            assertEquals(bytes.size.toLong(), metadata.size)
+
+            assertContentEquals(bytes, file.readBytes())
+        }
+    }
+
+    @Test
     fun `can stream all bytes from file`() {
         val bytes = "123".encodeToByteArray()
         val file = fixture.testDir.file("file")
@@ -305,7 +328,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     }
 
     @Test
-    fun `can random access read from file`() {
+    fun `can random access read from file using raw source`() {
         val bytes = "1234567".encodeToByteArray()
         val file = fixture.testDir.file("file")
         file.writeBytes(bytes)
@@ -320,6 +343,29 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
             assertEquals("45", buffer.readString())
 
             assertEquals(5L, content.currentPosition)
+
+            "result"
+        }
+
+        assertEquals("result", result)
+    }
+
+    @Test
+    fun `can random access read from file using buffered source`() {
+        val bytes = "1234567".encodeToByteArray()
+        val file = fixture.testDir.file("file")
+        file.writeBytes(bytes)
+
+        val result = file.withContent { content ->
+            content.seek(3)
+            assertEquals(3L, content.currentPosition)
+
+            val result = content.read { source ->
+                source.readString(2)
+            }
+            assertEquals("45", result)
+
+            assertEquals(7L, content.currentPosition) // read is buffering
 
             "result"
         }

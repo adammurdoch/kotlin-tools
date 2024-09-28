@@ -250,7 +250,7 @@ internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), Regul
         }
     }
 
-    override fun write(action: (Sink) -> Unit) {
+    override fun <T> write(action: (Sink) -> T): T {
         TODO("Not yet implemented")
     }
 

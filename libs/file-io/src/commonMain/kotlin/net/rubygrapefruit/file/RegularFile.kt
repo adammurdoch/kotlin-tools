@@ -41,7 +41,7 @@ interface RegularFile : FileSystemElement {
      * Writes zero or more bytes to the file. Replaces existing content if the file exists, or creates the file if it does not exist.
      */
     @Throws(FileSystemException::class)
-    fun write(action: (Sink) -> Unit)
+    fun <T> write(action: (Sink) -> T): T
 
     /**
      * Writes the given bytes to the file. Replaces existing content if the file exists, or creates the file if it does not exist.

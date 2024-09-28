@@ -121,8 +121,8 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
         }
     }
 
-    override fun write(action: (Sink) -> Unit) {
-        memScoped {
+    override fun <T> write(action: (Sink) -> T): T {
+        return memScoped {
             val des = doOpen(path.absolutePath, O_WRONLY or O_CREAT or O_TRUNC or O_NOFOLLOW or O_CLOEXEC, PosixPermissions.readWriteFile.mode)
             if (des < 0) {
                 if (errno == EISDIR) {
@@ -132,8 +132,9 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
             }
             try {
                 val sink = FileDescriptorBackedRawSink(FileSource(path), WriteDescriptor(des)).buffered()
-                action(sink)
+                val result = action(sink)
                 sink.flush()
+                result
             } finally {
                 close(des)
             }

@@ -24,18 +24,12 @@ internal class JvmFileContent(
     override fun seekToEnd(): Long {
         val length = file.length()
         file.seek(length)
-        return length;
+        return length
     }
 
     override fun length(): Long {
         return file.length()
     }
-
-    override val writeStream: WriteStream
-        get() = this
-
-    override val readStream: ReadStream
-        get() = this
 
     override val sink: RawSink
         get() = this

@@ -4,24 +4,12 @@ import kotlinx.io.RawSink
 import kotlinx.io.RawSource
 import kotlinx.io.Sink
 import kotlinx.io.buffered
-import net.rubygrapefruit.io.stream.ReadStream
-import net.rubygrapefruit.io.stream.WriteStream
 
 interface FileContent {
     /**
      * Returns the current position in the file where the next read or write will happen.
      */
     val currentPosition: Long
-
-    /**
-     * Returns a [WriteStream] that writes to the current position in the file.
-     */
-    val writeStream: WriteStream
-
-    /**
-     * Returns a [ReadStream] that reads from the current position in the file.
-     */
-    val readStream: ReadStream
 
     /**
      * Returns a [RawSink] that writes to the current position in the file.

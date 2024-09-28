@@ -9,7 +9,7 @@ import net.rubygrapefruit.io.stream.*
 import platform.posix.*
 
 internal class UnixFileContent(
-    source: UnixRegularFile.FileSource,
+    private val fileSource: UnixRegularFile.FileSource,
     private val des: Int
 ) : FileContent, AutoCloseable {
     override val currentPosition: Long
@@ -22,13 +22,11 @@ internal class UnixFileContent(
             }
         }
 
-    override val writeStream: WriteStream = FileDescriptorBackedWriteStream(source, WriteDescriptor(des))
+    override val sink: RawSink
+        get() = FileDescriptorBackedRawSink(fileSource, WriteDescriptor(des))
 
-    override val readStream: ReadStream = FileDescriptorBackedReadStream(source, ReadDescriptor(des))
-
-    override val sink: RawSink = FileDescriptorBackedRawSink(source, WriteDescriptor(des))
-
-    override val source: RawSource = FileDescriptorBackedRawSource(source, ReadDescriptor(des))
+    override val source: RawSource
+        get() = FileDescriptorBackedRawSource(fileSource, ReadDescriptor(des))
 
     override fun length(): Long {
         return memScoped {

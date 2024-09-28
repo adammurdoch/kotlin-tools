@@ -7,14 +7,10 @@ import kotlinx.io.RawSink
 import kotlinx.io.RawSource
 import net.rubygrapefruit.io.stream.FileBackedRawSink
 import net.rubygrapefruit.io.stream.FileBackedRawSource
-import net.rubygrapefruit.io.stream.FileBackedReadStream
-import net.rubygrapefruit.io.stream.FileBackedWriteStream
-import net.rubygrapefruit.io.stream.ReadStream
-import net.rubygrapefruit.io.stream.WriteStream
 import platform.windows.*
 
 class WinFileContent(
-    path: String,
+    private val path: String,
     private val handle: HANDLE?
 ) : FileContent, AutoCloseable {
     override val currentPosition: Long
@@ -30,13 +26,11 @@ class WinFileContent(
             }
         }
 
-    override val writeStream: WriteStream = FileBackedWriteStream(path, handle)
+    override val sink: RawSink
+        get() = FileBackedRawSink(path, handle)
 
-    override val readStream: ReadStream = FileBackedReadStream(path, handle)
-
-    override val sink: RawSink = FileBackedRawSink(path, handle)
-
-    override val source: RawSource = FileBackedRawSource(path, handle)
+    override val source: RawSource
+        get() = FileBackedRawSource(path, handle)
 
     override fun length(): Long {
         return memScoped {

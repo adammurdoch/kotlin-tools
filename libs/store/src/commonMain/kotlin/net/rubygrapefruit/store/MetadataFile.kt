@@ -1,5 +1,6 @@
 package net.rubygrapefruit.store
 
+import kotlinx.io.buffered
 import net.rubygrapefruit.file.RegularFile
 import net.rubygrapefruit.io.codec.SimpleCodec
 
@@ -21,7 +22,7 @@ internal class MetadataFile(
             if (length == 0L) {
                 storeMetadata()
             } else {
-                val decoder = codec.decoder(content.source)
+                val decoder = codec.decoder(content.source.buffered())
                 decoder.checkFileHeader(codec, metadataFile)
                 metadata = Metadata(decoder.int(), decoder.int(), decoder.int())
             }

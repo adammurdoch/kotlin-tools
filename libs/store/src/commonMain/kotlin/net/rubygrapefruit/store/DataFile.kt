@@ -33,7 +33,7 @@ internal class DataFile(
     fun <T> read(block: Block, serializer: DeserializationStrategy<T>): T {
         return readContent.using { content ->
             content.seek(block.address.offset)
-            val decoder = codec.decoder(content.source)
+            val decoder = codec.decoder(content.source.buffered())
             Json.decodeFromString(serializer, decoder.string())
         }
     }

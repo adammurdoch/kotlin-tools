@@ -9,6 +9,7 @@
 ### Later
 
 - Values as byte streams
+- Serialize via streams using kotlinx-serialization-json-io, replace calls to `Json.decodeFromString()`
 - Multi-map
 - Reset generation to 1 at some point before overflowing to negative value
 - Compact only once amount of garbage exceeds certain threshold

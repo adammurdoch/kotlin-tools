@@ -16,7 +16,7 @@ import platform.posix.read
 import kotlin.math.min
 
 @OptIn(UnsafeIoApi::class)
-class FileDescriptorBackedRawSource(private val fileSource: Source, private val descriptor: ReadDescriptor) : RawSource {
+class FileDescriptorBackedRawSource(private val fileSource: StreamSource, private val descriptor: ReadDescriptor) : RawSource {
     override fun readAtMostTo(sink: Buffer, byteCount: Long): Long {
         val ncopied = UnsafeBufferOperations.writeToTail(sink, 1) { buffer, startIndex, endIndex ->
             val count = min(byteCount.toInt(), endIndex - startIndex)

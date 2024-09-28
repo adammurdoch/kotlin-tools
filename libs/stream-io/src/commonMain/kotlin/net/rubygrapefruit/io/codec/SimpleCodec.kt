@@ -1,7 +1,7 @@
 package net.rubygrapefruit.io.codec
 
 import kotlinx.io.RawSink
-import kotlinx.io.RawSource
+import kotlinx.io.Source
 
 class SimpleCodec {
     val version: UShort
@@ -9,5 +9,5 @@ class SimpleCodec {
 
     fun encoder(sink: RawSink): Encoder = SimpleEncoder(sink)
 
-    fun decoder(source: RawSource): Decoder = SimpleDecoder(source)
+    fun decoder(source: Source): Decoder = SimpleDecoder(source)
 }

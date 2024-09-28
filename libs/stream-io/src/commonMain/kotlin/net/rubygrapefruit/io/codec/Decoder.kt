@@ -1,6 +1,8 @@
 package net.rubygrapefruit.io.codec
 
 interface Decoder {
+    fun hasMore(): Boolean
+
     /**
      * Decodes a [UByte]
      */

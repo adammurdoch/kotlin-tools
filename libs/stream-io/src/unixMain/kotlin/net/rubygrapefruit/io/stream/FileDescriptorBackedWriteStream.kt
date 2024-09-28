@@ -10,7 +10,7 @@ import net.rubygrapefruit.io.IOException
 import net.rubygrapefruit.io.UnixErrorCode
 import platform.posix.write
 
-class FileDescriptorBackedWriteStream(private val source: Source, private val descriptor: WriteDescriptor) : WriteStream {
+class FileDescriptorBackedWriteStream(private val source: StreamSource, private val descriptor: WriteDescriptor) : WriteStream {
     override fun write(bytes: ByteArray, offset: Int, count: Int) {
         memScoped {
             var pos = offset

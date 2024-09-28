@@ -1,5 +1,6 @@
 package net.rubygrapefruit.store
 
+import kotlinx.io.buffered
 import net.rubygrapefruit.file.RegularFile
 import net.rubygrapefruit.io.codec.SimpleCodec
 
@@ -33,9 +34,8 @@ internal class LogFile(
 
     fun read(visitor: (StoreChange) -> Unit) {
         file.withContent { content ->
-            val length = content.length()
-            val decoder = codec.decoder(content.source)
-            while (content.currentPosition != length) {
+            val decoder = codec.decoder(content.source.buffered())
+            while (decoder.hasMore()) {
                 val change = decoder.decode()
                 visitor(change)
             }

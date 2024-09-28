@@ -10,7 +10,7 @@ import platform.posix.EISDIR
 import platform.posix.errno
 import platform.posix.read
 
-class FileDescriptorBackedReadStream(private val source: Source, private val descriptor: ReadDescriptor) : ReadStream {
+class FileDescriptorBackedReadStream(private val source: StreamSource, private val descriptor: ReadDescriptor) : ReadStream {
     override fun read(buffer: ByteArray, offset: Int, max: Int): ReadResult {
         val nread = read(descriptor.descriptor, buffer.refTo(offset), max.convert()).convert<Int>()
         if (nread < 0) {

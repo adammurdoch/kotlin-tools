@@ -16,7 +16,7 @@ import net.rubygrapefruit.io.UnixErrorCode
 import platform.posix.write
 
 @OptIn(UnsafeIoApi::class)
-class FileDescriptorBackedRawSink(private val fileSource: Source, private val descriptor: WriteDescriptor) : RawSink {
+class FileDescriptorBackedRawSink(private val fileSource: StreamSource, private val descriptor: WriteDescriptor) : RawSink {
     override fun write(source: Buffer, byteCount: Long) {
         memScoped {
             UnsafeBufferOperations.forEachSegment(source) { context, segment ->

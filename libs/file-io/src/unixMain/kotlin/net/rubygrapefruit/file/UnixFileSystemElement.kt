@@ -196,7 +196,7 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
         }
     }
 
-    internal class FileSource(val path: AbsolutePath) : Source {
+    internal class FileSource(val path: AbsolutePath) : StreamSource {
         override val displayName: String
             get() = "file $path"
     }

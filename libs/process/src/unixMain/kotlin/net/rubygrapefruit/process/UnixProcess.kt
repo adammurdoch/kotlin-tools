@@ -49,7 +49,7 @@ internal class UnixProcess(
         }
     }
 
-    private object ProcessSource : Source {
+    private object ProcessSource : StreamSource {
         override val displayName: String
             get() = "child process"
     }

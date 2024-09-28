@@ -17,7 +17,7 @@ jobs:
       - name: Execute Gradle build
         run: ./gradlew check test-apps:runMin --continue
         timeout-minutes: 60
-  windows:
+  windows-check:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,7 +30,22 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
       - name: Execute Gradle build
-        run: ./gradlew check test-apps:runMin --continue --info
+        run: ./gradlew check --continue --info
+        timeout-minutes: 60
+  windows-apps:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+      - name: Execute Gradle build
+        run: ./gradlew test-apps:runMin --continue
         timeout-minutes: 60
   macos:
     runs-on: macos-latest

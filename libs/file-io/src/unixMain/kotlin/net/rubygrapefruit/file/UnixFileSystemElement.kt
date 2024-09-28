@@ -4,6 +4,7 @@ package net.rubygrapefruit.file
 
 import kotlinx.cinterop.*
 import kotlinx.io.Sink
+import kotlinx.io.Source
 import kotlinx.io.buffered
 import net.rubygrapefruit.io.Resource
 import net.rubygrapefruit.io.UnixErrorCode
@@ -139,11 +140,11 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
         }
     }
 
-    override fun <T> read(action: (kotlinx.io.Source) -> Result<T>): Result<T> {
+    override fun <T> read(action: (Source) -> T): T {
         return memScoped {
             val des = open(path.absolutePath, O_RDONLY or O_NOFOLLOW or O_CLOEXEC)
             if (des < 0) {
-                return readFile(this@UnixRegularFile, UnixErrorCode.last())
+                throw readFile<Any>(this@UnixRegularFile, UnixErrorCode.last()).failure
             }
             try {
                 action(FileDescriptorBackedRawSource(FileSource(path), ReadDescriptor(des)).buffered())

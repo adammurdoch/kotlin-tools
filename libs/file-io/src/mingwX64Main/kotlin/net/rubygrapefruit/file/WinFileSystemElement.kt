@@ -254,7 +254,7 @@ internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), Regul
         TODO("Not yet implemented")
     }
 
-    override fun <T> read(action: (Source) -> Result<T>): Result<T> {
+    override fun <T> read(action: (Source) -> T): T {
         TODO("Not yet implemented")
     }
 }

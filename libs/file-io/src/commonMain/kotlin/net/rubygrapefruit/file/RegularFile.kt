@@ -64,14 +64,14 @@ interface RegularFile : FileSystemElement {
      * Reads bytes from the file.
      */
     @Throws(FileSystemException::class)
-    fun <T> read(action: (Source) -> Result<T>): Result<T>
+    fun <T> read(action: (Source) -> T): T
 
     /**
      * Reads the content of this file into a [ByteArray].
      */
     @Throws(FileSystemException::class)
     fun readBytes(): ByteArray {
-        return read { source -> Success(source.readByteArray()) }.get()
+        return read { source -> source.readByteArray() }
     }
 
     /**
@@ -79,6 +79,6 @@ interface RegularFile : FileSystemElement {
      */
     @Throws(FileSystemException::class)
     fun readText(): String {
-        return read { source -> Success(source.readString()) }.get()
+        return read { source -> source.readString() }
     }
 }

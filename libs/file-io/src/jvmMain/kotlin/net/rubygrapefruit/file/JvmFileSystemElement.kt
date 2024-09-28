@@ -138,11 +138,11 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
         }
     }
 
-    override fun <T> read(action: (Source) -> Result<T>): Result<T> {
+    override fun <T> read(action: (Source) -> T): T {
         val inputStream = try {
             Files.newInputStream(delegate)
         } catch (e: Exception) {
-            return readFile(this, cause = e)
+            throw readFile<Any>(this, cause = e).failure
         }
         return inputStream.use { stream ->
             val source = InputStreamBackedRawSource(this, stream).buffered()

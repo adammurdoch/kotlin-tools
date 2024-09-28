@@ -41,11 +41,13 @@ internal class MetadataFile(
 
     private fun storeMetadata() {
         metadataFile.withContent { content ->
-            val encoder = codec.encoder(content.sink)
-            encoder.fileHeader(codec)
-            encoder.int(metadata.generation)
-            encoder.int(metadata.compactedChanges)
-            encoder.int(metadata.nonCompactedChanges)
+            content.write { sink ->
+                val encoder = codec.encoder(sink)
+                encoder.fileHeader(codec)
+                encoder.int(metadata.generation)
+                encoder.int(metadata.compactedChanges)
+                encoder.int(metadata.nonCompactedChanges)
+            }
         }
     }
 }

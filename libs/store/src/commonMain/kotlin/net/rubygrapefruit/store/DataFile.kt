@@ -41,8 +41,10 @@ internal class DataFile(
     fun <T> append(value: T, serializer: SerializationStrategy<T>): Block {
         return writeContent.using { content ->
             val pos = content.currentPosition
-            val encoder = codec.encoder(content.sink)
-            encoder.string(Json.encodeToString(serializer, value))
+            content.write { sink ->
+                val encoder = codec.encoder(sink)
+                encoder.string(Json.encodeToString(serializer, value))
+            }
             val size = content.currentPosition - pos
             Block(Address(pos), Size(size))
         }

@@ -500,7 +500,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     }
 
     @Test
-    fun `can random access write to file`() {
+    fun `can random access write to file using raw sink`() {
         val bytes = "123__67".encodeToByteArray()
         val file = fixture.testDir.file("file")
         file.writeBytes(bytes)
@@ -512,6 +512,32 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
             val buffer = Buffer()
             buffer.writeString("45")
             content.sink.write(buffer, buffer.size)
+
+            assertEquals(5L, content.currentPosition)
+            assertEquals(7L, content.length())
+
+            "result"
+        }
+
+        assertIs<Success<*>>(result)
+        assertEquals("result", result.get())
+
+        assertEquals("1234567", file.readText().get())
+    }
+
+    @Test
+    fun `can random access write to file using buffered sink`() {
+        val bytes = "123__67".encodeToByteArray()
+        val file = fixture.testDir.file("file")
+        file.writeBytes(bytes)
+
+        val result = file.withContent { content ->
+            content.seek(3)
+            assertEquals(3L, content.currentPosition)
+
+            content.write { sink ->
+                sink.writeString("45")
+            }
 
             assertEquals(5L, content.currentPosition)
             assertEquals(7L, content.length())

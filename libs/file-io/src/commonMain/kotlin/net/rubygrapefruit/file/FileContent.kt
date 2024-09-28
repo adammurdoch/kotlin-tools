@@ -2,6 +2,8 @@ package net.rubygrapefruit.file
 
 import kotlinx.io.RawSink
 import kotlinx.io.RawSource
+import kotlinx.io.Sink
+import kotlinx.io.buffered
 import net.rubygrapefruit.io.stream.ReadStream
 import net.rubygrapefruit.io.stream.WriteStream
 
@@ -27,6 +29,15 @@ interface FileContent {
      * The [RawSink] is not buffered.
      */
     val sink: RawSink
+
+    /**
+     * Writes zero or more bytes to the file at the current position.
+     */
+    fun write(action: (Sink) -> Unit) {
+        val sink = sink.buffered()
+        action(sink)
+        sink.flush()
+    }
 
     /**
      * Returns a [RawSource] that reads from the current position in the file.

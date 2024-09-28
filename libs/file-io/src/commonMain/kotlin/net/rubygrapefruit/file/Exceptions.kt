@@ -32,6 +32,12 @@ internal fun <T> readFileThatDoesNotExist(path: String, cause: Throwable? = null
 internal fun <T> readFileThatIsNotAFile(path: String, cause: Throwable? = null) =
     FailedOperation<T>(FileSystemException("Could not read from file $path as it is not a file.", cause))
 
+internal fun <T> readFileInDirectoryThatDoesNotExist(path: String, ancestor: String, cause: Throwable? = null) =
+    FailedOperation<T>(FileSystemException("Could not read from $path as directory $ancestor does not exist.", cause))
+
+internal fun <T> readFileInDirectoryThatIsNotADir(path: String, ancestor: String, cause: Throwable? = null) =
+    FailedOperation<T>(FileSystemException("Could not read from $path as $ancestor exists but is not a directory.", cause))
+
 internal fun openFileThatIsNotAFile(path: String, cause: Throwable? = null) =
     FileSystemException("Could not open file $path as it is not a file.", cause)
 
@@ -128,6 +134,25 @@ internal fun <T> readFile(file: RegularFile, errorCode: ErrorCode = NoErrorCode,
     return if (fileMetadata.regularFile) {
         FailedOperation(FileSystemException("Could not read from ${file.absolutePath}", errorCode, cause))
     } else if (fileMetadata.missing) {
+        var lastMissing: Directory? = null
+        var p = file.parent
+        while (p != null) {
+            val parentMetadata = p.metadata()
+            if (parentMetadata.missing) {
+                lastMissing = p
+            } else if (parentMetadata is Success) {
+                if (parentMetadata.get() is DirectoryMetadata) {
+                    if (lastMissing != null) {
+                        return readFileInDirectoryThatDoesNotExist(file.absolutePath, lastMissing.absolutePath, cause)
+                    } else {
+                        break
+                    }
+                } else {
+                    return readFileInDirectoryThatIsNotADir(file.absolutePath, p.absolutePath, cause)
+                }
+            }
+            p = p.parent
+        }
         readFileThatDoesNotExist(file.absolutePath, cause)
     } else {
         readFileThatIsNotAFile(file.absolutePath, cause)

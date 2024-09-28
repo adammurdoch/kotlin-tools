@@ -75,7 +75,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
 
     private val readActions: List<(RegularFile) -> Result<*>> =
         readActionsThatStream + listOf(
-            { file -> file.readBytes { Success(it.read(ByteArray(0))) } },
+            { file -> file.readBytes { Success(it.read(ByteArray(10))) } },
             { file -> file.readBytes { Success(12) } },
             { file -> file.read { Success(it.readByteArray()) } },
             { file -> file.read { Success(12) } },
@@ -816,10 +816,76 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         val file = fixture.dir("dir1").toFile()
 
         for (action in readActionsThatStream) {
+            val result = action(file)
             try {
-                action(file)
+                result.get()
+                fail()
             } catch (e: IOException) {
                 assertEquals("Could not read from file $file as it is not a file.", e.message)
+            }
+        }
+    }
+
+    @Test
+    fun `cannot read from a file whose parent does not exist`() {
+        val parent = fixture.testDir.dir("dir1")
+        val file = parent.file("file.txt")
+
+        for (action in readActionsThatStream) {
+            val result = action(file)
+            try {
+                result.get()
+                fail()
+            } catch (e: FileSystemException) {
+                assertEquals("Could not read from $file as directory $parent does not exist.", e.message)
+            }
+        }
+    }
+
+    @Test
+    fun `cannot read from a file whose ancestor does not exist`() {
+        val ancestor = fixture.testDir.dir("dir1")
+        val file = ancestor.file("dir2/file.txt")
+
+        for (action in readActionsThatStream) {
+            val result = action(file)
+            try {
+                result.get()
+                fail()
+            } catch (e: FileSystemException) {
+                assertEquals("Could not read from $file as directory $ancestor does not exist.", e.message)
+            }
+        }
+    }
+
+    @Test
+    fun `cannot read from a file whose parent is a file`() {
+        val parent = fixture.file("dir1")
+        val file = fixture.testDir.file("dir1/file.txt")
+
+        for (action in readActionsThatStream) {
+            val result = action(file)
+            try {
+                result.get()
+                fail()
+            } catch (e: FileSystemException) {
+                assertEquals("Could not read from $file as $parent exists but is not a directory.", e.message)
+            }
+        }
+    }
+
+    @Test
+    fun `cannot read from a file whose ancestor is a file`() {
+        val ancestor = fixture.file("dir1")
+        val file = fixture.testDir.file("dir1/dir2/file.txt")
+
+        for (action in readActionsThatStream) {
+            val result = action(file)
+            try {
+                result.get()
+                fail()
+            } catch (e: FileSystemException) {
+                assertEquals("Could not read from $file as $ancestor exists but is not a directory.", e.message)
             }
         }
     }
@@ -849,6 +915,51 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
                 fail()
             } catch (e: FileSystemException) {
                 assertEquals("Could not open file $file as directory $parent does not exist.", e.message)
+            }
+        }
+    }
+
+    @Test
+    fun `cannot open content of a file whose ancestor does not exist`() {
+        val ancestor = fixture.testDir.dir("dir1")
+        val file = ancestor.file("dir2/file.txt")
+
+        for (action in withContentActions) {
+            try {
+                action(file)
+                fail()
+            } catch (e: FileSystemException) {
+                assertEquals("Could not open file $file as directory $ancestor does not exist.", e.message)
+            }
+        }
+    }
+
+    @Test
+    fun `cannot open content of a file whose parent is a file`() {
+        val parent = fixture.file("dir1")
+        val file = fixture.testDir.file("dir1/file.txt")
+
+        for (action in withContentActions) {
+            try {
+                action(file)
+                fail()
+            } catch (e: FileSystemException) {
+                assertEquals("Could not open file $file as $parent exists but is not a directory.", e.message)
+            }
+        }
+    }
+
+    @Test
+    fun `cannot open content of a file whose ancestor is a file`() {
+        val ancestor = fixture.file("dir1")
+        val file = fixture.testDir.file("dir1/dir2/file.txt")
+
+        for (action in withContentActions) {
+            try {
+                action(file)
+                fail()
+            } catch (e: FileSystemException) {
+                assertEquals("Could not open file $file as $ancestor exists but is not a directory.", e.message)
             }
         }
     }

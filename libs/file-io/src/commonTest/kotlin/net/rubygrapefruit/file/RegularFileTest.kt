@@ -809,10 +809,8 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         val file = fixture.dir("dir1").toFile()
 
         for (action in readActionsThatStream) {
-            val result = action(file)
-            assertIs<FailedOperation<*>>(result)
             try {
-                result.get()
+                action(file)
             } catch (e: IOException) {
                 assertEquals("Could not read from file $file as it is not a file.", e.message)
             }

@@ -11,6 +11,7 @@ import java.io.RandomAccessFile
 
 @OptIn(UnsafeIoApi::class)
 internal class JvmFileContent(
+    private val owner: JvmRegularFile,
     private val file: RandomAccessFile
 ) : FileContent, ReadStream, WriteStream, RawSource, RawSink, AutoCloseable {
     override val currentPosition: Long
@@ -44,7 +45,11 @@ internal class JvmFileContent(
 
     override fun readAtMostTo(sink: Buffer, byteCount: Long): Long {
         val ncopied = sink.writeAtMostTo(byteCount) { buffer, startIndex, count ->
-            val nread = file.read(buffer, startIndex, count)
+            val nread = try {
+                file.read(buffer, startIndex, count)
+            } catch (e: Exception) {
+                throw readFile<Any>(owner, cause = e).failure
+            }
             if (nread < 0) 0 else nread
         }
         return if (ncopied == 0) -1 else ncopied.toLong()

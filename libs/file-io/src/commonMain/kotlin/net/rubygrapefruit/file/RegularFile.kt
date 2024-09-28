@@ -70,6 +70,7 @@ interface RegularFile : FileSystemElement {
     /**
      * Reads bytes from the file.
      */
+    @Throws(FileSystemException::class)
     fun <T> read(action: (Source) -> Result<T>): Result<T>
 
     /**
@@ -82,6 +83,7 @@ interface RegularFile : FileSystemElement {
     /**
      * Reads bytes from the file into a [ByteArray].
      */
+    @Throws(FileSystemException::class)
     fun readBytes(): Result<ByteArray> {
         return read { source -> Success(source.readByteArray()) }
     }
@@ -89,6 +91,7 @@ interface RegularFile : FileSystemElement {
     /**
      * Reads text from the file. The file content is decoded using UTF-8.
      */
+    @Throws(FileSystemException::class)
     fun readText(): Result<String> {
         return read { source -> Success(source.readString()) }
     }

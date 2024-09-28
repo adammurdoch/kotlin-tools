@@ -5,7 +5,6 @@ import kotlinx.io.Source
 import kotlinx.io.buffered
 import net.rubygrapefruit.io.Resource
 import net.rubygrapefruit.io.ResourceResult
-import net.rubygrapefruit.io.stream.ReadFailed
 import net.rubygrapefruit.io.stream.ReadStream
 import net.rubygrapefruit.io.stream.WriteStream
 import java.io.IOException
@@ -123,8 +122,6 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
     private fun doOpenContent(): JvmFileContent {
         val file = try {
             RandomAccessFile(delegate.toFile(), "rw")
-        } catch (e: NoSuchFileException) {
-            throw openFileThatDoesNotExist<Any>(absolutePath, e).failure
         } catch (e: Exception) {
             throw openFile<Any>(this, cause = e).failure
         }

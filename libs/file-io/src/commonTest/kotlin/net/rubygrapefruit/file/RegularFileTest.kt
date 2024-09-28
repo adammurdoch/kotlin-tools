@@ -27,8 +27,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         { file -> file.writeBytes { stream -> stream.write("text".encodeToByteArray()) } },
         { file -> file.writeBytes { } },
         { file -> file.write { sink -> sink.writeString("text") } },
-        { file -> file.write { } },
-        { file -> file.withContent { content -> content.write { sink -> sink.writeString("text") } } },
+        { file -> file.write { } }
     )
 
     private val textWriteActions: List<(String, RegularFile) -> Unit> = listOf(
@@ -36,6 +35,14 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         { text, file -> file.writeBytes(text.encodeToByteArray()) },
         { text, file -> file.write { it.writeString(text) } },
         { text, file -> file.withContent { content -> content.write { sink -> sink.writeString(text) } } },
+        { text, file ->
+            file.openContent().successful().using { content -> content.write { sink -> sink.writeString(text) } }
+        }
+    )
+
+    private val withContentActions: List<(RegularFile) -> Unit> = listOf(
+        { file -> file.withContent { } },
+        { file -> file.openContent().successful().close() }
     )
 
     /**
@@ -813,6 +820,35 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
                 action(file)
             } catch (e: IOException) {
                 assertEquals("Could not read from file $file as it is not a file.", e.message)
+            }
+        }
+    }
+
+    @Test
+    fun `cannot open content of a file that exists as a directory`() {
+        val file = fixture.dir("dir1").toFile()
+
+        for (action in withContentActions) {
+            try {
+                action(file)
+                fail()
+            } catch (e: FileSystemException) {
+                assertEquals("Could not open file $file as it is not a file.", e.message)
+            }
+        }
+    }
+
+    @Test
+    fun `cannot open content of a file whose parent does not exist`() {
+        val parent = fixture.testDir.dir("dir1")
+        val file = parent.file("file.txt")
+
+        for (action in withContentActions) {
+            try {
+                action(file)
+                fail()
+            } catch (e: FileSystemException) {
+                assertEquals("Could not open file $file as directory $parent does not exist.", e.message)
             }
         }
     }

@@ -25,6 +25,7 @@ interface RegularFile : FileSystemElement {
      *
      * Creates the file if it does not exist.
      */
+    @Throws(FileSystemException::class)
     fun <T> withContent(action: (FileContent) -> T): Result<T>
 
     /**
@@ -35,6 +36,7 @@ interface RegularFile : FileSystemElement {
      *
      * The caller is responsible for closing the contents.
      */
+    @Throws(FileSystemException::class)
     fun openContent(): ResourceResult<FileContent>
 
     /**

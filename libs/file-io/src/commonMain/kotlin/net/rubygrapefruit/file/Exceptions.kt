@@ -29,9 +29,6 @@ internal fun writeFileInDirectoryThatIsNotADir(path: String, ancestor: String, c
 internal fun <T> readFileThatDoesNotExist(path: String, cause: Throwable? = null) =
     MissingEntry<T> { FileSystemException("Could not read from file $path as it does not exist.", cause) }
 
-internal fun <T> openFileThatDoesNotExist(path: String, cause: Throwable? = null) =
-    MissingEntry<T> { FileSystemException("Could not open file $path as it does not exist.", cause) }
-
 internal fun <T> readFileThatIsNotAFile(path: String, cause: Throwable? = null) =
     FailedOperation<T>(FileSystemException("Could not read from file $path as it is not a file.", cause))
 
@@ -89,10 +86,8 @@ internal fun deleteDirectory(directory: Directory, cause: Throwable? = null): Fi
  */
 internal fun <T> openFile(file: RegularFile, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null): Failed<T> {
     val fileMetadata = file.metadata()
-    return if (fileMetadata.regularFile) {
+    return if (fileMetadata.regularFile || fileMetadata.missing) {
         FailedOperation(FileSystemException("Could not open ${file.absolutePath}", errorCode, cause))
-    } else if (fileMetadata.missing) {
-        openFileThatDoesNotExist(file.absolutePath, cause)
     } else {
         openFileThatIsNotAFile(file.absolutePath, cause)
     }

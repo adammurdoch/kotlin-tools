@@ -102,7 +102,7 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
     }
 
     override fun openContent(): ResourceResult<FileContent> {
-        return Resource.of(doOpenContent());
+        return Resource.of(doOpenContent())
     }
 
     override fun <T> withContent(action: (FileContent) -> T): Result<T> {
@@ -164,11 +164,7 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
         return memScoped {
             val des = open(path.absolutePath, O_RDONLY or O_NOFOLLOW or O_CLOEXEC)
             if (des < 0) {
-                return if (errno == ENOENT) {
-                    readFileThatDoesNotExist(path.absolutePath)
-                } else {
-                    readFile(this@UnixRegularFile, UnixErrorCode.last())
-                }
+                return readFile(this@UnixRegularFile, UnixErrorCode.last())
             }
             try {
                 action(FileDescriptorBackedReadStream(FileSource(path), ReadDescriptor(des)))
@@ -182,11 +178,7 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
         return memScoped {
             val des = open(path.absolutePath, O_RDONLY or O_NOFOLLOW or O_CLOEXEC)
             if (des < 0) {
-                return if (errno == ENOENT) {
-                    readFileThatDoesNotExist(path.absolutePath)
-                } else {
-                    readFile(this@UnixRegularFile, UnixErrorCode.last())
-                }
+                return readFile(this@UnixRegularFile, UnixErrorCode.last())
             }
             try {
                 action(FileDescriptorBackedRawSource(FileSource(path), ReadDescriptor(des)).buffered())

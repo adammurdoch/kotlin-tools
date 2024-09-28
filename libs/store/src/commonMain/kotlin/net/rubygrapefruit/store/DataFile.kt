@@ -11,8 +11,8 @@ internal class DataFile(
     private val file: RegularFile,
     private val codec: SimpleCodec
 ) : StoreFile() {
-    private val readContent = file.openContent().successful()
-    private val writeContent = file.openContent().successful()
+    private val readContent = file.openContent()
+    private val writeContent = file.openContent()
 
     init {
         writeContent.using { content ->

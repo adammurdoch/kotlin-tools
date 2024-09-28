@@ -4,7 +4,6 @@ import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.buffered
 import net.rubygrapefruit.io.Resource
-import net.rubygrapefruit.io.ResourceResult
 import java.io.IOException
 import java.io.RandomAccessFile
 import java.nio.file.*
@@ -107,7 +106,7 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
         delete(this) { Files.deleteIfExists(it.delegate) }
     }
 
-    override fun openContent(): ResourceResult<FileContent> {
+    override fun openContent(): Resource<FileContent> {
         return Resource(doOpenContent()) { it.close() }
     }
 

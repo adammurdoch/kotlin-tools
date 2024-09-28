@@ -5,7 +5,7 @@ import kotlinx.io.Source
 import kotlinx.io.readByteArray
 import kotlinx.io.readString
 import kotlinx.io.writeString
-import net.rubygrapefruit.io.ResourceResult
+import net.rubygrapefruit.io.Resource
 
 /**
  * A regular file in the file system.
@@ -35,7 +35,7 @@ interface RegularFile : FileSystemElement {
      * The caller is responsible for closing the contents.
      */
     @Throws(FileSystemException::class)
-    fun openContent(): ResourceResult<FileContent>
+    fun openContent(): Resource<FileContent>
 
     /**
      * Writes zero or more bytes to the file. Replaces existing content if the file exists, or creates the file if it does not exist.

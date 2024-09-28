@@ -6,7 +6,6 @@ import kotlinx.cinterop.*
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import net.rubygrapefruit.io.Resource
-import net.rubygrapefruit.io.ResourceResult
 import net.rubygrapefruit.io.WinErrorCode
 import platform.windows.*
 
@@ -230,7 +229,7 @@ internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), Regul
         }
     }
 
-    override fun openContent(): ResourceResult<FileContent> {
+    override fun openContent(): Resource<FileContent> {
         return Resource.of(doOpenContent())
     }
 

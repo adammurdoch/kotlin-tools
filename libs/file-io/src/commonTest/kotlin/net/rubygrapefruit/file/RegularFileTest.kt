@@ -30,13 +30,13 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         { text, file -> file.write { it.writeString(text) } },
         { text, file -> file.withContent { content -> content.write { sink -> sink.writeString(text) } } },
         { text, file ->
-            file.openContent().successful().using { content -> content.write { sink -> sink.writeString(text) } }
+            file.openContent().using { content -> content.write { sink -> sink.writeString(text) } }
         }
     )
 
     private val withContentActions: List<(RegularFile) -> Unit> = listOf(
         { file -> file.withContent { } },
-        { file -> file.openContent().successful().close() }
+        { file -> file.openContent().close() }
     )
 
     /**

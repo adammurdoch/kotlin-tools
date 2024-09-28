@@ -6,7 +6,6 @@ import kotlinx.cinterop.*
 import kotlinx.io.Sink
 import kotlinx.io.buffered
 import net.rubygrapefruit.io.Resource
-import net.rubygrapefruit.io.ResourceResult
 import net.rubygrapefruit.io.UnixErrorCode
 import net.rubygrapefruit.io.stream.*
 import platform.posix.*
@@ -101,7 +100,7 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
         }
     }
 
-    override fun openContent(): ResourceResult<FileContent> {
+    override fun openContent(): Resource<FileContent> {
         return Resource.of(doOpenContent())
     }
 

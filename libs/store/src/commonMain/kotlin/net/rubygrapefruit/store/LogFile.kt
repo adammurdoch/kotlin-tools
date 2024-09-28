@@ -8,7 +8,7 @@ internal class LogFile(
     private val file: RegularFile,
     private val codec: SimpleCodec
 ) : StoreFile() {
-    private val writeContent = file.openContent().successful()
+    private val writeContent = file.openContent()
 
     init {
         writeContent.using { content ->

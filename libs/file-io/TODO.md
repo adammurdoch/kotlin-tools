@@ -4,7 +4,11 @@
 - Prevent `sink.close()` and `source.close()`
 - Use Kotlinx IO exceptions in source and sink implementations
 - Windows: open files with `FILE_SHARE_READ` when reading?
-- Each `FileContents` instance should reuse the same buffer?
+- More efficient `RegularFile`
+  - Each `FileContent` instance should reuse the same buffer?
+  - `writeBytes()` copies byte array into buffer then to sink 
+  - `writeText()` encodes into buffer then to sink
+  - `readBytes()` could alloc byte array and read into it
 - Seek to location
   - Represent locations using `ULong` 
 - Lock file
@@ -18,7 +22,6 @@
   - Only use `UnsupportedOperation` in cases where it can actually be received
   - boolean result
   - unit result
-- More efficient `readText()` and `writeText()` 
 - Error handling for read and write on all platforms
 - Error handling for read and write actions that fail
 - Add some abstract permission functions, e.g. can read, set readable, etc

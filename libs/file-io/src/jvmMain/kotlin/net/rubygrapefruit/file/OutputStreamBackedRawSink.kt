@@ -3,8 +3,7 @@ package net.rubygrapefruit.file
 import kotlinx.io.Buffer
 import kotlinx.io.RawSink
 import kotlinx.io.UnsafeIoApi
-import kotlinx.io.unsafe.UnsafeBufferOperations
-import kotlinx.io.unsafe.withData
+import net.rubygrapefruit.io.write
 import java.io.OutputStream
 
 @OptIn(UnsafeIoApi::class)
@@ -12,10 +11,8 @@ internal class OutputStreamBackedRawSink(
     private val outputStream: OutputStream
 ) : RawSink {
     override fun write(source: Buffer, byteCount: Long) {
-        UnsafeBufferOperations.forEachSegment(source) { context, segment ->
-            context.withData(segment) { buffer, startIndex, endIndex ->
-                outputStream.write(buffer, startIndex, endIndex - startIndex)
-            }
+        source.write(byteCount) { buffer, startIndex, count ->
+            outputStream.write(buffer, startIndex, count)
         }
     }
 

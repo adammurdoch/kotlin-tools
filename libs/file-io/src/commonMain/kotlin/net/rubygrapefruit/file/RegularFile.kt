@@ -2,9 +2,10 @@ package net.rubygrapefruit.file
 
 import kotlinx.io.Sink
 import kotlinx.io.Source
+import kotlinx.io.readByteArray
+import kotlinx.io.readString
+import kotlinx.io.writeString
 import net.rubygrapefruit.io.ResourceResult
-import net.rubygrapefruit.io.TryFailure
-import net.rubygrapefruit.io.stream.CollectingBuffer
 import net.rubygrapefruit.io.stream.ReadStream
 import net.rubygrapefruit.io.stream.WriteStream
 
@@ -55,7 +56,7 @@ interface RegularFile : FileSystemElement {
      */
     @Throws(FileSystemException::class)
     fun writeBytes(bytes: ByteArray) {
-        writeBytes { stream -> stream.write(bytes) }
+        write { sink -> sink.write(bytes) }
     }
 
     /**
@@ -63,7 +64,7 @@ interface RegularFile : FileSystemElement {
      */
     @Throws(FileSystemException::class)
     fun writeText(text: String) {
-        writeBytes { stream -> stream.write(text.encodeToByteArray()) }
+        write { sink -> sink.writeString(text) }
     }
 
     /**
@@ -82,25 +83,13 @@ interface RegularFile : FileSystemElement {
      * Reads bytes from the file into a [ByteArray].
      */
     fun readBytes(): Result<ByteArray> {
-        return readIntoBuffer().map { buffer -> buffer.toByteArray() }
+        return read { source -> Success(source.readByteArray()) }
     }
 
     /**
      * Reads text from the file. The file content is decoded using UTF-8.
      */
     fun readText(): Result<String> {
-        return readIntoBuffer().map { buffer -> buffer.decodeToString() }
-    }
-}
-
-internal fun RegularFile.readIntoBuffer(): Result<CollectingBuffer> {
-    return readBytes { stream ->
-        val buffer = CollectingBuffer()
-        val result = buffer.appendFrom(stream)
-        if (result is TryFailure) {
-            FailedOperation(result.exception)
-        } else {
-            Success(buffer)
-        }
+        return read { source -> Success(source.readString()) }
     }
 }

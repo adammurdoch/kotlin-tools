@@ -9,28 +9,25 @@ import kotlinx.cinterop.refTo
 import kotlinx.io.Buffer
 import kotlinx.io.RawSink
 import kotlinx.io.UnsafeIoApi
-import kotlinx.io.unsafe.UnsafeBufferOperations
-import kotlinx.io.unsafe.withData
 import net.rubygrapefruit.io.IOException
 import net.rubygrapefruit.io.UnixErrorCode
+import net.rubygrapefruit.io.write
 import platform.posix.write
 
 @OptIn(UnsafeIoApi::class)
 class FileDescriptorBackedRawSink(private val fileSource: StreamSource, private val descriptor: WriteDescriptor) : RawSink {
     override fun write(source: Buffer, byteCount: Long) {
         memScoped {
-            UnsafeBufferOperations.forEachSegment(source) { context, segment ->
-                context.withData(segment) { buffer, startIndex, endIndex ->
-                    var pos = startIndex
-                    var remaining = endIndex - startIndex
-                    while (remaining > 0) {
-                        val bytesWritten = write(descriptor.descriptor, buffer.refTo(pos), remaining.convert()).convert<Int>()
-                        if (bytesWritten < 0) {
-                            throw IOException("Could not write to ${fileSource.displayName}.", UnixErrorCode.last())
-                        }
-                        pos += bytesWritten
-                        remaining -= bytesWritten
+            source.write(byteCount) { buffer, startIndex, count ->
+                var pos = startIndex
+                var remaining = count
+                while (remaining > 0) {
+                    val bytesWritten = write(descriptor.descriptor, buffer.refTo(pos), remaining.convert()).convert<Int>()
+                    if (bytesWritten < 0) {
+                        throw IOException("Could not write to ${fileSource.displayName}.", UnixErrorCode.last())
                     }
+                    pos += bytesWritten
+                    remaining -= bytesWritten
                 }
             }
         }

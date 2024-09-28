@@ -5,8 +5,8 @@ import kotlinx.io.RawSink
 import kotlinx.io.RawSource
 import kotlinx.io.UnsafeIoApi
 import kotlinx.io.unsafe.UnsafeBufferOperations
-import kotlinx.io.unsafe.withData
 import net.rubygrapefruit.io.stream.*
+import net.rubygrapefruit.io.write
 import java.io.RandomAccessFile
 import kotlin.math.min
 
@@ -53,10 +53,8 @@ internal class JvmFileContent(
     }
 
     override fun write(source: Buffer, byteCount: Long) {
-        UnsafeBufferOperations.forEachSegment(source) { context, segment ->
-            context.withData(segment) { buffer, startIndex, endIndex ->
-                file.write(buffer, startIndex, endIndex - startIndex)
-            }
+        source.write(byteCount) { buffer, startIndex, count ->
+            file.write(buffer, startIndex, count)
         }
     }
 

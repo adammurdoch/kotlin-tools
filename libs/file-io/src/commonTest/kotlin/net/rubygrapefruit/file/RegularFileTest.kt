@@ -1,6 +1,8 @@
 package net.rubygrapefruit.file
 
 import kotlinx.io.Buffer
+import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readByteArray
 import kotlinx.io.readString
 import kotlinx.io.writeString

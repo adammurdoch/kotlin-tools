@@ -145,7 +145,7 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
         return memScoped {
             val des = open(path.absolutePath, O_RDONLY or O_NOFOLLOW or O_CLOEXEC)
             if (des < 0) {
-                throw readFile<Any>(this@UnixRegularFile, UnixErrorCode.last()).failure
+                throw readFile(this@UnixRegularFile, UnixErrorCode.last())
             }
             try {
                 action(FileDescriptorBackedRawSource(FileSource(path), ReadDescriptor(des)).buffered())

@@ -8,6 +8,9 @@ import java.io.IOException
 import java.io.RandomAccessFile
 import java.nio.file.*
 import java.nio.file.LinkOption.NOFOLLOW_LINKS
+import java.nio.file.StandardOpenOption.CREATE
+import java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
+import java.nio.file.StandardOpenOption.WRITE
 import java.nio.file.attribute.PosixFileAttributeView
 import java.util.stream.Collectors
 import kotlin.io.path.deleteExisting
@@ -128,7 +131,7 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
 
     override fun <T> write(action: (Sink) -> T): T {
         val outputStream = try {
-            Files.newOutputStream(delegate)
+            Files.newOutputStream(delegate, NOFOLLOW_LINKS, CREATE, TRUNCATE_EXISTING, WRITE)
         } catch (e: Exception) {
             throw writeToFile(this, cause = e)
         }
@@ -144,7 +147,7 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
         val inputStream = try {
             Files.newInputStream(delegate, NOFOLLOW_LINKS)
         } catch (e: Exception) {
-            throw readFile<Any>(this, cause = e).failure
+            throw readFile(this, cause = e)
         }
         return inputStream.use { stream ->
             val source = InputStreamBackedRawSource(this, stream).buffered()

@@ -41,7 +41,7 @@ internal class JvmFileContent(
             val nread = try {
                 file.read(buffer, startIndex, count)
             } catch (e: Exception) {
-                throw readFile<Any>(owner, cause = e).failure
+                throw readFile(owner, cause = e)
             }
             if (nread < 0) 0 else nread
         }

@@ -26,17 +26,17 @@ internal fun writeFileInDirectoryThatDoesNotExist(path: String, ancestor: String
 internal fun writeFileInDirectoryThatIsNotADir(path: String, ancestor: String, cause: Throwable? = null) =
     FileSystemException("Could not write to $path as $ancestor exists but is not a directory.", cause)
 
-internal fun <T> readFileThatDoesNotExist(path: String, cause: Throwable? = null) =
-    MissingEntry<T> { FileSystemException("Could not read from file $path as it does not exist.", cause) }
+internal fun readFileThatDoesNotExist(path: String, cause: Throwable? = null) =
+    FileSystemException("Could not read from file $path as it does not exist.", cause)
 
-internal fun <T> readFileThatIsNotAFile(path: String, cause: Throwable? = null) =
-    FailedOperation<T>(FileSystemException("Could not read from file $path as it is not a file.", cause))
+internal fun readFileThatIsNotAFile(path: String, cause: Throwable? = null) =
+    FileSystemException("Could not read from file $path as it is not a file.", cause)
 
-internal fun <T> readFileInDirectoryThatDoesNotExist(path: String, ancestor: String, cause: Throwable? = null) =
-    FailedOperation<T>(FileSystemException("Could not read from $path as directory $ancestor does not exist.", cause))
+internal fun readFileInDirectoryThatDoesNotExist(path: String, ancestor: String, cause: Throwable? = null) =
+    FileSystemException("Could not read from $path as directory $ancestor does not exist.", cause)
 
-internal fun <T> readFileInDirectoryThatIsNotADir(path: String, ancestor: String, cause: Throwable? = null) =
-    FailedOperation<T>(FileSystemException("Could not read from $path as $ancestor exists but is not a directory.", cause))
+internal fun readFileInDirectoryThatIsNotADir(path: String, ancestor: String, cause: Throwable? = null) =
+    FileSystemException("Could not read from $path as $ancestor exists but is not a directory.", cause)
 
 internal fun openFileThatIsNotAFile(path: String, cause: Throwable? = null) =
     FileSystemException("Could not open file $path as it is not a file.", cause)
@@ -62,7 +62,7 @@ internal fun setPermissions(path: String, errorCode: ErrorCode = NoErrorCode, ca
 
 internal fun <T> readPermissionNotSupported(path: String) = UnsupportedOperation<T>(path, "read POSIX permissions for")
 
-internal fun <T> readPermissionOnMissingElement(path: String) = MissingEntry<T>() { FileSystemException("Could not read POSIX permissions for $path as it does not exist.") }
+internal fun <T> readPermissionOnMissingElement(path: String) = MissingEntry<T> { FileSystemException("Could not read POSIX permissions for $path as it does not exist.") }
 
 internal fun <T> readPermission(path: String, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null) =
     FailedOperation<T>(FileSystemException("Could not read POSIX permissions for $path.", errorCode, cause))
@@ -129,10 +129,10 @@ internal fun openFile(file: RegularFile, errorCode: ErrorCode = NoErrorCode, cau
 /**
  * Tries to infer why a file could not be read.
  */
-internal fun <T> readFile(file: RegularFile, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null): Failed<T> {
+internal fun readFile(file: RegularFile, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null): FileSystemException {
     val fileMetadata = file.metadata()
     return if (fileMetadata.regularFile) {
-        FailedOperation(FileSystemException("Could not read from ${file.absolutePath}", errorCode, cause))
+        FileSystemException("Could not read from ${file.absolutePath}", errorCode, cause)
     } else if (fileMetadata.missing) {
         var lastMissing: Directory? = null
         var p = file.parent

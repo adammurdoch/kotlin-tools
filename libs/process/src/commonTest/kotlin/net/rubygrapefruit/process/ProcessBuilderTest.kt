@@ -92,6 +92,7 @@ class ProcessBuilderTest {
     fun `can run command and act on input and output`() {
         val result = Process.command("head", "-n", "1").withInputAndOutput { read, write ->
             write.writeString("greetings\nignore this\n")
+            write.emit()
             read.readString()
         }.start().waitFor()
 

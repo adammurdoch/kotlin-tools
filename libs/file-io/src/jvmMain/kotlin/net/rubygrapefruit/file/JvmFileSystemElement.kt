@@ -97,7 +97,7 @@ internal open class JvmFileSystemElement(protected val delegate: Path) : Abstrac
     }
 
     private fun posixFileAttributeView(): PosixFileAttributeView? =
-        Files.getFileAttributeView(delegate, PosixFileAttributeView::class.java, LinkOption.NOFOLLOW_LINKS)
+        Files.getFileAttributeView(delegate, PosixFileAttributeView::class.java, NOFOLLOW_LINKS)
 }
 
 internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularFile {
@@ -183,8 +183,10 @@ internal class JvmDirectory(path: Path) : JvmFileSystemElement(path), Directory 
             if (entry is JvmDirectoryEntry) {
                 try {
                     entry.delegate.deleteExisting()
+                } catch (e: AccessDeniedException) {
+                    throw deleteElementThatIsNotWritable(entry.absolutePath, entry.path.parent!!.absolutePath, cause = e)
                 } catch (e: Exception) {
-                    throw deleteDirectory(entry.toDir(), cause = e)
+                    throw deleteElement(entry.absolutePath, cause = e)
                 }
             } else {
                 Paths.get(entry.absolutePath).deleteExisting()

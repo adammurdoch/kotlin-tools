@@ -54,7 +54,7 @@ internal fun deleteFileThatIsNotAFile(path: String, cause: Throwable? = null) = 
 
 internal fun deleteFile(path: String, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null) = FileSystemException("Could not delete file $path.", errorCode, cause)
 
-internal fun deleteElementThatIsNotWritable(path: String, cause: Throwable? = null) = FileSystemException("Could not delete file $path as it is not writable.", cause)
+internal fun deleteElementThatIsNotWritable(path: String, parent: String, cause: Throwable? = null) = FileSystemException("Could not delete file $path as directory $parent is not writable.", cause)
 
 internal fun deleteElement(path: String, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null) = FileSystemException("Could not delete file $path.", errorCode, cause)
 

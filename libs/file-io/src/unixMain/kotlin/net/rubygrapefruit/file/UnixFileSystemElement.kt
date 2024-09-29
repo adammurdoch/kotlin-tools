@@ -184,8 +184,8 @@ internal class UnixDirectory(path: AbsolutePath) : UnixFileSystemElement(path), 
         deleteRecursively(this) { entry ->
             val absolutePath = entry.absolutePath
             if (remove(absolutePath) != 0) {
-                if (errno == EPERM) {
-                    throw deleteElementThatIsNotWritable(absolutePath)
+                if (errno == EACCES) {
+                    throw deleteElementThatIsNotWritable(absolutePath, entry.path.parent!!.absolutePath)
                 }
                 throw deleteElement(path.absolutePath, UnixErrorCode.last())
             }

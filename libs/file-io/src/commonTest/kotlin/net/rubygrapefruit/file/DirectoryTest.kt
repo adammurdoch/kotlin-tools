@@ -388,7 +388,7 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
             dir.deleteRecursively()
             fail()
         } catch (e: FileSystemException) {
-            assertEquals("Could not delete directory $file.", e.message)
+            assertEquals("Could not delete file $file as directory $dir is not writable.", e.message)
         }
     }
 

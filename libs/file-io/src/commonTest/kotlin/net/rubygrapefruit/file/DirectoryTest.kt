@@ -47,6 +47,9 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
             "../dir/./child" to child,
             "../sibling" to parent.resolve("sibling"),
             "./../x/../." to parent,
+            dir.absolutePath to dir.path,
+            child.absolutePath to child,
+            parent.absolutePath to parent,
         )
 
         for (entry in values) {

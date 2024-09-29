@@ -31,7 +31,9 @@ internal data class AbsolutePath(override val absolutePath: String) : ElementPat
         }
 
     override fun resolve(path: String): AbsolutePath {
-        return if (path.startsWith("/")) {
+        return if (path == absolutePath || path == ".") {
+            this
+        } else if (path.startsWith("/")) {
             resolve(ROOT, path.drop(1))
         } else {
             resolve(this, path)
@@ -47,8 +49,10 @@ internal data class AbsolutePath(override val absolutePath: String) : ElementPat
             }
             if (element == "..") {
                 current = current.parent ?: ROOT
-            } else {
+            } else if (current != ROOT) {
                 current = AbsolutePath("$current/$element")
+            } else {
+                current = AbsolutePath("/$element")
             }
         }
         return current

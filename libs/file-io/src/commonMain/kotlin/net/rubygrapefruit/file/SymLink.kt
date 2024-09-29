@@ -14,7 +14,7 @@ interface SymLink : FileSystemElement {
     /**
      * Resolves this symlink to its target element. Follows symlinks to reach something that is not a symlink
      */
-    fun resolveFile(): Result<ElementSnapshot> {
+    fun resolve(): Result<ElementSnapshot> {
         var current = this
         while (true) {
             val path = current.readSymLink()

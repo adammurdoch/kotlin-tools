@@ -269,6 +269,22 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
     }
 
     @Test
+    fun `cannot list contents of an unreadable directory`() {
+        val dir = fixture.dir("dir") {
+            file("file1")
+        }
+        dir.setPermissions(PosixPermissions.nothing)
+
+        val entries = dir.listEntries()
+        assertIs<UnreadableEntry<*>>(entries)
+        try {
+            entries.get()
+        } catch (e: FileSystemException) {
+            assertEquals("File $dir is not readable.", e.message)
+        }
+    }
+
+    @Test
     fun `can visit contents of directory in top down order`() {
         val empty = fixture.dir("empty")
         val dir = fixture.dir("dir") {
@@ -357,6 +373,22 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
             fail()
         } catch (e: FileSystemException) {
             assertEquals("Could not delete directory $dir as it is not a directory.", e.message)
+        }
+    }
+
+    @Test
+    fun `cannot delete a read only directory`() {
+        val dir = fixture.dir("dir") {
+            file("file1")
+        }
+        val file = dir.file("file1")
+        dir.setPermissions(PosixPermissions.readOnlyDirectory)
+
+        try {
+            dir.deleteRecursively()
+            fail()
+        } catch (e: FileSystemException) {
+            assertEquals("Could not delete directory $file.", e.message)
         }
     }
 

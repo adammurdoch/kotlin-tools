@@ -18,6 +18,12 @@ value class PosixPermissions(val mode: UInt) {
         /**
          * Read-only by user, group and others.
          */
+        val nothing: PosixPermissions
+            get() = PosixPermissions(0u)
+
+        /**
+         * Read-only by user, group and others.
+         */
         val readOnlyFile: PosixPermissions
             get() = PosixPermissions(ownerRead or groupRead or othersRead)
 
@@ -45,6 +51,13 @@ value class PosixPermissions(val mode: UInt) {
 
     override fun toString(): String {
         return mode.toString(8).padStart(3, '0')
+    }
+
+    /**
+     * Returns a copy of this permission set with read and execute permissions removed.
+     */
+    fun writeOnly(): PosixPermissions {
+        return PosixPermissions(mode and (ownerWrite or groupWrite or othersWrite))
     }
 
     /**

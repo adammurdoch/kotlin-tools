@@ -181,7 +181,11 @@ internal class JvmDirectory(path: Path) : JvmFileSystemElement(path), Directory 
     override fun deleteRecursively() {
         deleteRecursively(this) { entry ->
             if (entry is JvmDirectoryEntry) {
-                entry.delegate.deleteExisting()
+                try {
+                    entry.delegate.deleteExisting()
+                } catch (e: Exception) {
+                    throw deleteDirectory(entry.toDir(), cause = e)
+                }
             } else {
                 Paths.get(entry.absolutePath).deleteExisting()
             }
@@ -223,6 +227,8 @@ internal class JvmDirectory(path: Path) : JvmFileSystemElement(path), Directory 
             Files.list(delegate)
         } catch (e: NoSuchFileException) {
             return listDirectoryThatDoesNotExist(delegate.pathString, cause = e)
+        } catch (_: AccessDeniedException) {
+            return listDirectoryThatIsNotReadable(delegate.pathString)
         } catch (e: Exception) {
             return listDirectory(this, cause = e)
         }

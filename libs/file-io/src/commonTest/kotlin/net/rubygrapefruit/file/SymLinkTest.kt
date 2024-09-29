@@ -84,7 +84,7 @@ class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
 
         link.writeSymLink(target.name)
 
-        val result = link.resolveFile()
+        val result = link.resolve()
 
         assertIs<Success<*>>(result)
         assertIs<RegularFileMetadata>(result.get().metadata)
@@ -100,7 +100,7 @@ class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
 
         link.writeSymLink(target.absolutePath)
 
-        val result = link.resolveFile()
+        val result = link.resolve()
 
         assertIs<Success<*>>(result)
         assertIs<RegularFileMetadata>(result.get().metadata)
@@ -118,7 +118,7 @@ class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
         val link2 = fixture.testDir.symLink("link-2")
         link2.writeSymLink(link1.name)
 
-        val result = link2.resolveFile()
+        val result = link2.resolve()
 
         assertIs<Success<*>>(result)
         assertIs<RegularFileMetadata>(result.get().metadata)
@@ -131,7 +131,7 @@ class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
 
         link.writeSymLink("unknown")
 
-        val result = link.resolveFile()
+        val result = link.resolve()
 
         assertIs<MissingEntry<*>>(result)
     }

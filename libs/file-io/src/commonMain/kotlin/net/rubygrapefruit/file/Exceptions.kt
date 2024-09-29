@@ -15,6 +15,9 @@ internal fun createDirectory(path: String, cause: Throwable? = null) = FileSyste
 internal fun <T> listDirectoryThatDoesNotExist(path: String, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null) =
     MissingEntry<T> { FileSystemException("Could not list directory $path as it does not exist.", errorCode, cause) }
 
+internal fun <T> listDirectoryThatIsNotReadable(path: String) =
+    UnreadableEntry<T>(path)
+
 internal fun <T> listDirectoryThatIsNotADirectory(path: String, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null) =
     FailedOperation<T>(FileSystemException("Could not list directory $path as it is not a directory.", errorCode, cause))
 
@@ -50,6 +53,10 @@ internal fun openFileInDirectoryThatIsNotADir(path: String, ancestor: String, ca
 internal fun deleteFileThatIsNotAFile(path: String, cause: Throwable? = null) = FileSystemException("Could not delete file $path as it is not a file.", cause)
 
 internal fun deleteFile(path: String, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null) = FileSystemException("Could not delete file $path.", errorCode, cause)
+
+internal fun deleteElementThatIsNotWritable(path: String, cause: Throwable? = null) = FileSystemException("Could not delete file $path as it is not writable.", cause)
+
+internal fun deleteElement(path: String, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null) = FileSystemException("Could not delete file $path.", errorCode, cause)
 
 internal fun notSupported(path: String, operation: String) = FileSystemException("Could not $operation $path as it is not supported by this filesystem.")
 

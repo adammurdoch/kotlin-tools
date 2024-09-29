@@ -84,8 +84,11 @@ class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
 
         link.writeSymLink(target.name)
 
-        val file = link.resolveFile()
-        assertEquals(target.path, file.path)
+        val result = link.resolveFile()
+
+        assertIs<Success<*>>(result)
+        assertIs<RegularFileMetadata>(result.get().metadata)
+        assertEquals(target.path, result.get().path)
     }
 
     @Test
@@ -97,8 +100,11 @@ class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
 
         link.writeSymLink(target.absolutePath)
 
-        val file = link.resolveFile()
-        assertEquals(target.path, file.path)
+        val result = link.resolveFile()
+
+        assertIs<Success<*>>(result)
+        assertIs<RegularFileMetadata>(result.get().metadata)
+        assertEquals(target.path, result.get().path)
     }
 
     @Test
@@ -112,8 +118,22 @@ class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
         val link2 = fixture.testDir.symLink("link-2")
         link2.writeSymLink(link1.name)
 
-        val file = link2.resolveFile()
-        assertEquals(target.path, file.path)
+        val result = link2.resolveFile()
+
+        assertIs<Success<*>>(result)
+        assertIs<RegularFileMetadata>(result.get().metadata)
+        assertEquals(target.path, result.get().path)
+    }
+
+    @Test
+    fun `can resolve relative symlink to missing element`() {
+        val link = fixture.testDir.symLink("link")
+
+        link.writeSymLink("unknown")
+
+        val result = link.resolveFile()
+
+        assertIs<MissingEntry<*>>(result)
     }
 
     @Test

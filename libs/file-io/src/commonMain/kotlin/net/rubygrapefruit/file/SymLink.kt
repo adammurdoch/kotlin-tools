@@ -12,9 +12,9 @@ interface SymLink : FileSystemElement {
     fun readSymLink(): Result<String>
 
     /**
-     * Resolves this symlink to a regular file.
+     * Resolves this symlink to its target element. Follows symlinks to reach something that is not a symlink
      */
-    fun resolveFile(): RegularFile {
+    fun resolveFile(): Result<ElementSnapshot> {
         var current = this
         while (true) {
             val path = current.readSymLink()
@@ -23,7 +23,7 @@ interface SymLink : FileSystemElement {
             if (snapshot is Success && snapshot.get().metadata is SymlinkMetadata) {
                 current = parent.symLink(target.absolutePath)
             } else {
-                return parent.file(target.absolutePath)
+                return snapshot
             }
         }
     }

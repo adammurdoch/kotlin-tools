@@ -1,6 +1,10 @@
 package net.rubygrapefruit.file
 
 internal data class AbsolutePath(override val absolutePath: String) : ElementPath {
+    companion object {
+        internal val ROOT = AbsolutePath("/")
+    }
+
     init {
         require(absolutePath.startsWith("/"))
     }
@@ -28,18 +32,26 @@ internal data class AbsolutePath(override val absolutePath: String) : ElementPat
 
     override fun resolve(path: String): AbsolutePath {
         return if (path.startsWith("/")) {
-            AbsolutePath(path)
-        } else if (path == ".") {
-            this
-        } else if (path.startsWith("./")) {
-            resolve(path.substring(2))
-        } else if (path == "..") {
-            parent!!
-        } else if (path.startsWith("../")) {
-            parent!!.resolve(path.substring(3))
+            resolve(ROOT, path.drop(1))
         } else {
-            AbsolutePath("${absolutePath}/$path")
+            resolve(this, path)
         }
+    }
+
+    private fun resolve(base: AbsolutePath, path: String): AbsolutePath {
+        val elements = path.split("/").toMutableList()
+        var current = base
+        for (element in elements) {
+            if (element == "" || element == ".") {
+                continue
+            }
+            if (element == "..") {
+                current = current.parent ?: ROOT
+            } else {
+                current = AbsolutePath("$current/$element")
+            }
+        }
+        return current
     }
 
     override fun snapshot(): Result<ElementSnapshot> {

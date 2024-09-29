@@ -2,6 +2,8 @@
 ## TODO
 
 - Prevent `sink.close()` and `source.close()`
+- Change `Directory.listEntries()` and `FileSystemElement.posixPermissions()` to throw exceptions instead of returning `Result`
+- Strongly typed exceptions
 - Use Kotlinx IO exceptions in source and sink implementations
 - Windows: open files with `FILE_SHARE_READ` when reading?
 - More efficient `RegularFile`
@@ -17,11 +19,6 @@
 - Query platform specific locations for applications
   - Directory for app to write data files to
   - Directory for app configuration
-- Add specialized kinds of `Failure` and `Success` types for specific operations
-  - Mismatched type for an operation, e.g. read text from a directory
-  - Only use `UnsupportedOperation` in cases where it can actually be received
-  - boolean result
-  - unit result
 - Error handling for read and write on all platforms
 - Error handling for read and write actions that fail
 - Add some abstract permission functions, e.g. can read, set readable, etc

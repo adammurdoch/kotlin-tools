@@ -163,16 +163,18 @@ internal class JvmDirectory(path: Path) : JvmFileSystemElement(path), Directory 
     }
 
     override fun file(name: String): RegularFile {
-        return JvmRegularFile(delegate.resolve(name))
+        return JvmRegularFile(resolve(name))
     }
 
     override fun dir(name: String): Directory {
-        return JvmDirectory(delegate.resolve(name))
+        return JvmDirectory(resolve(name))
     }
 
     override fun symLink(name: String): SymLink {
-        return JvmSymlink(delegate.resolve(name))
+        return JvmSymlink(resolve(name))
     }
+
+    private fun resolve(name: String): Path = delegate.resolve(name).normalize()
 
     override fun deleteRecursively() {
         deleteRecursively(this) { entry ->

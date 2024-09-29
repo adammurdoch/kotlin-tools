@@ -16,7 +16,7 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
 
     @Test
     fun `can query directory metadata`() {
-        val dir = fixture.dir("file")
+        val dir = fixture.dir("dir")
 
         val result = dir.metadata()
         assertTrue(result.directory)
@@ -24,6 +24,35 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
         val metadata = result.get()
         assertIs<DirectoryMetadata>(metadata)
         assertEquals(dir.supports(FileSystemCapability.PosixPermissions), metadata.posixPermissions != null)
+    }
+
+    @Test
+    fun `can resolve files relative to directory`() {
+        val dir = fixture.dir("dir")
+
+        val child = dir.path.resolve("child")
+        val sub = dir.path.resolve("child/sub")
+        val parent = dir.parent!!.path
+
+        val values = mapOf<String, ElementPath>(
+            "child" to child,
+            "child/sub" to sub,
+            "." to dir.path,
+            "./." to dir.path,
+            "" to dir.path,
+            "./child" to child,
+            "child/." to child,
+            ".." to parent,
+            "./../." to parent,
+            "../dir/./child" to child,
+            "../sibling" to parent.resolve("sibling"),
+            "./../x/../." to parent,
+        )
+
+        for (entry in values) {
+            val file = dir.file(entry.key)
+            assertEquals(entry.value, file.path)
+        }
     }
 
     @Test
@@ -37,11 +66,6 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
 
         val snapshot3 = fixture.testDir.path.resolve(dir.name).snapshot().get()
         assertIsDirectorySnapshot(snapshot3, dir)
-    }
-
-    private fun assertIsDirectorySnapshot(snapshot: ElementSnapshot, dir: Directory) {
-        assertIs<DirectoryMetadata>(snapshot.metadata)
-        assertEquals(dir.absolutePath, snapshot.absolutePath)
     }
 
     @Test
@@ -331,5 +355,10 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
         } catch (e: FileSystemException) {
             assertEquals("Could not delete directory $dir as it is not a directory.", e.message)
         }
+    }
+
+    private fun assertIsDirectorySnapshot(snapshot: ElementSnapshot, dir: Directory) {
+        assertIs<DirectoryMetadata>(snapshot.metadata)
+        assertEquals(dir.absolutePath, snapshot.absolutePath)
     }
 }

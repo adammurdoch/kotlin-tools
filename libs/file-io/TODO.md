@@ -2,7 +2,10 @@
 ## TODO
 
 - Prevent `sink.close()` and `source.close()`
-- Change `Directory.listEntries()` and `FileSystemElement.posixPermissions()` to throw exceptions instead of returning `Result`
+- Change quey methods to throw exceptions instead of returning `Result`
+  - `Directory.listEntries()`
+  - `FileSystemElement.posixPermissions()`
+  - `Symlink.readLink()`
 - Strongly typed exceptions
 - Use Kotlinx IO exceptions in source and sink implementations
 - Windows: open files with `FILE_SHARE_READ` when reading?

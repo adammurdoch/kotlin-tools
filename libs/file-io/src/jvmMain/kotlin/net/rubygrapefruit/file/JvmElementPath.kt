@@ -25,7 +25,7 @@ internal data class JvmElementPath(val delegate: Path) : ElementPath {
             }
         }
 
-    override fun resolve(path: String): ElementPath {
+    override fun resolve(path: String): JvmElementPath {
         return JvmElementPath(delegate.resolve(path))
     }
 

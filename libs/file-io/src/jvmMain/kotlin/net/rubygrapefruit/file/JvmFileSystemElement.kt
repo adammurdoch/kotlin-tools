@@ -23,7 +23,7 @@ internal open class JvmFileSystemElement(protected val delegate: Path) : Abstrac
 
     override val path = JvmElementPath(delegate)
 
-    override val parent: Directory?
+    override val parent: JvmDirectory?
         get() {
             val parent = delegate.parent
             return if (parent != null) {
@@ -101,6 +101,8 @@ internal open class JvmFileSystemElement(protected val delegate: Path) : Abstrac
 }
 
 internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularFile {
+    override val parent: JvmDirectory
+        get() = super.parent!!
 
     override fun toFile(): RegularFile {
         return this
@@ -234,6 +236,9 @@ internal class JvmDirectory(path: Path) : JvmFileSystemElement(path), Directory 
 }
 
 internal class JvmSymlink(path: Path) : JvmFileSystemElement(path), SymLink {
+    override val parent: JvmDirectory
+        get() = super.parent!!
+
     override fun toSymLink(): SymLink {
         return this
     }

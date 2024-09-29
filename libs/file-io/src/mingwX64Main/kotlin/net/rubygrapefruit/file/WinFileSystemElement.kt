@@ -209,6 +209,8 @@ private class WinDirectoryEntry(private val parentPath: WinPath, override val na
 }
 
 internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), RegularFile {
+    override val parent: WinDirectory
+        get() = super.parent!!
 
     override fun toFile(): RegularFile {
         return this
@@ -260,6 +262,8 @@ internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), Regul
 }
 
 internal class WinSymLink(path: WinPath) : WinFileSystemElement(path), SymLink {
+    override val parent: WinDirectory
+        get() = super.parent!!
 
     override fun toSymLink(): SymLink {
         return this

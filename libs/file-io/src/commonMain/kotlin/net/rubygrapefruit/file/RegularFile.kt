@@ -11,6 +11,8 @@ import net.rubygrapefruit.io.Resource
  * A regular file in the file system.
  */
 interface RegularFile : FileSystemElement {
+    override val parent: Directory
+
     /**
      * Deletes this file, if it exists.
      */

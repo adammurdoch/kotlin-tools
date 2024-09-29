@@ -76,6 +76,47 @@ class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
     }
 
     @Test
+    fun `can resolve relative symlink to file`() {
+        val target = fixture.file("other.txt")
+        target.writeText("1234")
+
+        val link = fixture.testDir.symLink("link")
+
+        link.writeSymLink(target.name)
+
+        val file = link.resolveFile()
+        assertEquals(target.path, file.path)
+    }
+
+    @Test
+    fun `can resolve absolute symlink to file`() {
+        val target = fixture.file("other.txt")
+        target.writeText("1234")
+
+        val link = fixture.testDir.symLink("link")
+
+        link.writeSymLink(target.absolutePath)
+
+        val file = link.resolveFile()
+        assertEquals(target.path, file.path)
+    }
+
+    @Test
+    fun `can resolve a chain of symlinks to file`() {
+        val target = fixture.file("other.txt")
+        target.writeText("1234")
+
+        val link1 = fixture.testDir.symLink("link-1")
+        link1.writeSymLink(target.name)
+
+        val link2 = fixture.testDir.symLink("link-2")
+        link2.writeSymLink(link1.name)
+
+        val file = link2.resolveFile()
+        assertEquals(target.path, file.path)
+    }
+
+    @Test
     fun `set and query posix permissions on symlink acts on the link and not the target`() {
         val file = fixture.file("file")
         val symLink = fixture.symlink("link", file.name)

@@ -88,6 +88,8 @@ internal open class UnixFileSystemElement(override val path: AbsolutePath) : Abs
 }
 
 internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path), RegularFile {
+    override val parent: Directory
+        get() = super.parent!!
 
     override fun toFile(): RegularFile {
         return this
@@ -255,6 +257,8 @@ internal class UnixDirectory(path: AbsolutePath) : UnixFileSystemElement(path), 
 expect val canSetSymLinkPermissions: Boolean
 
 internal class UnixSymLink(path: AbsolutePath) : UnixFileSystemElement(path), SymLink {
+    override val parent: Directory
+        get() = super.parent!!
 
     override fun toSymLink(): SymLink {
         return this

@@ -102,7 +102,7 @@ internal fun openFile(file: RegularFile, errorCode: ErrorCode = NoErrorCode, cau
         FileSystemException("Could not open ${file.absolutePath}", errorCode, cause)
     } else if (fileMetadata.missing) {
         var lastMissing: Directory? = null
-        var p = file.parent
+        var p: Directory? = file.parent
         while (p != null) {
             val parentMetadata = p.metadata()
             if (parentMetadata.missing) {
@@ -135,7 +135,7 @@ internal fun readFile(file: RegularFile, errorCode: ErrorCode = NoErrorCode, cau
         FileSystemException("Could not read from ${file.absolutePath}", errorCode, cause)
     } else if (fileMetadata.missing) {
         var lastMissing: Directory? = null
-        var p = file.parent
+        var p: Directory? = file.parent
         while (p != null) {
             val parentMetadata = p.metadata()
             if (parentMetadata.missing) {
@@ -169,7 +169,7 @@ internal fun writeToFile(file: RegularFile, errorCode: ErrorCode = NoErrorCode, 
     }
     if (fileMetadata.missing) {
         var lastMissing: Directory? = null
-        var p = file.parent
+        var p: Directory? = file.parent
         while (p != null) {
             val parentMetadata = p.metadata()
             if (parentMetadata.missing) {

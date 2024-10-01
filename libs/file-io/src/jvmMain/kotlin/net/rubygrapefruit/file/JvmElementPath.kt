@@ -21,7 +21,7 @@ internal data class JvmElementPath(val delegate: Path) : ElementPath {
             return if (parent == null) {
                 null
             } else {
-                JvmElementPath(delegate)
+                JvmElementPath(parent)
             }
         }
 

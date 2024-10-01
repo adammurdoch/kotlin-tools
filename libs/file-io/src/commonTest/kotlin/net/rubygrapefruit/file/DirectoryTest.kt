@@ -212,6 +212,7 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
         assertEquals(listOf("dir1", "file1", "link1", "link2"), sorted.map { it.name })
         assertEquals(listOf("dir1", "file1", "link1", "link2"), sorted.map { it.path.name })
         assertEquals(listOf(ElementType.Directory, ElementType.RegularFile, ElementType.SymLink, ElementType.SymLink), sorted.map { it.type })
+        assertTrue(entries2.get().all { it.path.parent == dir.path })
     }
 
     @Test

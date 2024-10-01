@@ -2,7 +2,7 @@
 ## TODO
 
 - Prevent `sink.close()` and `source.close()`
-- Change quey methods to throw exceptions instead of returning `Result`
+- Change query methods to throw exceptions instead of returning `Result`
   - `Directory.listEntries()`
   - `FileSystemElement.posixPermissions()`
   - `Symlink.readLink()`
@@ -35,7 +35,6 @@
 - Remove a symlink
 - Follow symlinks
 - Canonicalize a element
-- Normalize paths
 - Calculate relative paths
 - Add context exceptions to all operations
 - Test delete files, directories and symlinks

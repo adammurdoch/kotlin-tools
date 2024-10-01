@@ -14,6 +14,7 @@ import java.nio.file.StandardOpenOption.WRITE
 import java.nio.file.attribute.PosixFileAttributeView
 import java.util.stream.Collectors
 import kotlin.io.path.deleteExisting
+import kotlin.io.path.deleteIfExists
 import kotlin.io.path.pathString
 
 internal open class JvmFileSystemElement(protected val delegate: Path) : AbstractFileSystemElement() {
@@ -180,16 +181,17 @@ internal class JvmDirectory(path: Path) : JvmFileSystemElement(path), Directory 
 
     override fun deleteRecursively() {
         deleteRecursively(this) { entry ->
-            if (entry is JvmDirectoryEntry) {
-                try {
+            try {
+                if (entry is JvmDirectoryEntry) {
                     entry.delegate.deleteExisting()
-                } catch (e: AccessDeniedException) {
-                    throw deleteElementThatIsNotWritable(entry.absolutePath, entry.path.parent!!.absolutePath, cause = e)
-                } catch (e: Exception) {
-                    throw deleteElement(entry.absolutePath, cause = e)
+                } else {
+                    // The directory itself
+                    Paths.get(entry.absolutePath).deleteIfExists()
                 }
-            } else {
-                Paths.get(entry.absolutePath).deleteExisting()
+            } catch (e: AccessDeniedException) {
+                throw deleteElementThatIsNotWritable(entry.absolutePath, entry.path.parent!!.absolutePath, cause = e)
+            } catch (e: Exception) {
+                throw deleteElement(entry.absolutePath, cause = e)
             }
         }
     }

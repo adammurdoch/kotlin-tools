@@ -271,6 +271,11 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
 
     @Test
     fun `cannot list contents of an unreadable directory`() {
+        if (!canRecoverFromNoPermissions()) {
+            // For some reason cannot restore the directory permissions on the JVM, in order to delete the directory later
+            return
+        }
+
         val dir = fixture.dir("dir") {
             file("file1")
         }

@@ -5,6 +5,10 @@ internal data class AbsolutePath(override val absolutePath: String) : StringBack
         internal val ROOT = AbsolutePath("/")
     }
 
+    init {
+        require(isAbsolute(absolutePath))
+    }
+
     override val separator: Char
         get() = '/'
 
@@ -21,6 +25,10 @@ internal data class AbsolutePath(override val absolutePath: String) : StringBack
                 }
             }
         }
+
+    override fun toString(): String {
+        return absolutePath
+    }
 
     override fun isAbsolute(path: String): Boolean {
         return path.startsWith('/')

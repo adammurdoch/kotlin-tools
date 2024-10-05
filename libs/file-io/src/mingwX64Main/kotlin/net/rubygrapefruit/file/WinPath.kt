@@ -1,6 +1,10 @@
 package net.rubygrapefruit.file
 
 internal data class WinPath(override val absolutePath: String) : StringBackedAbsolutePath() {
+    init {
+        require(isAbsolute(absolutePath))
+    }
+
     override val separator: Char
         get() = '\\'
 
@@ -19,6 +23,10 @@ internal data class WinPath(override val absolutePath: String) : StringBackedAbs
                 }
             }
         }
+
+    override fun toString(): String {
+        return absolutePath
+    }
 
     override fun child(name: String): StringBackedAbsolutePath {
         return WinPath("$absolutePath\\$name")

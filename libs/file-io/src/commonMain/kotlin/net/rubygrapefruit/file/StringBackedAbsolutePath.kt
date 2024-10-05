@@ -5,20 +5,12 @@ import kotlin.text.split
 import kotlin.text.substringAfterLast
 
 internal abstract class StringBackedAbsolutePath : ElementPath {
-    init {
-        require(isAbsolute(absolutePath))
-    }
-
     override val name: String
         get() = absolutePath.substringAfterLast("/")
 
     abstract override val parent: StringBackedAbsolutePath?
 
     protected abstract val separator: Char
-
-    override fun toString(): String {
-        return absolutePath
-    }
 
     protected abstract fun isAbsolute(path: String): Boolean
 

@@ -45,7 +45,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
       - name: Execute Gradle build
-        run: ./gradlew build --continue --info
+        run: ./gradlew libs:stream-io:check libs:file-io:check --continue --info
         timeout-minutes: 60
   windows-apps:
     runs-on: windows-latest

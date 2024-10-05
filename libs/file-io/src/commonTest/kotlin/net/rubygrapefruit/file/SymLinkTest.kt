@@ -169,4 +169,18 @@ class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
             link.readSymLink().get()
         }
     }
+
+    @Test
+    fun `cannot read unreadable symlink`() {
+        val file = fixture.file("file.txt")
+        val link = fixture.symlink("link.txt", file.absolutePath)
+        if (!link.supports(FileSystemCapability.SetSymLinkPosixPermissions) || !link.supports(FileSystemCapability.PosixPermissions)) {
+            return
+        }
+        link.setPermissions(link.posixPermissions().writeOnly())
+
+        fails<FileSystemException>("Symlink $link is not readable.") {
+            link.readSymLink().get()
+        }
+    }
 }

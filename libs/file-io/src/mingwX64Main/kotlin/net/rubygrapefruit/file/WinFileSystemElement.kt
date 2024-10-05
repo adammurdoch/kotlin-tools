@@ -9,7 +9,7 @@ import net.rubygrapefruit.io.Resource
 import net.rubygrapefruit.io.WinErrorCode
 import platform.windows.*
 
-internal open class WinFileSystemElement(override val path: WinPath) : AbstractFileSystemElement() {
+internal open class WinFileSystemElement(override val path: ElementPath) : AbstractFileSystemElement() {
 
     override val parent: WinDirectory?
         get() {
@@ -57,7 +57,7 @@ internal open class WinFileSystemElement(override val path: WinPath) : AbstractF
     }
 }
 
-internal class WinElementSnapshot(override val path: WinPath, override val metadata: ElementMetadata) : AbstractElementSnapshot() {
+internal class WinElementSnapshot(override val path: ElementPath, override val metadata: ElementMetadata) : AbstractElementSnapshot() {
     override fun asDirectory(): Directory {
         return WinDirectory(path)
     }
@@ -71,7 +71,7 @@ internal class WinElementSnapshot(override val path: WinPath, override val metad
     }
 }
 
-internal class WinDirectory(path: WinPath) : WinFileSystemElement(path), Directory {
+internal class WinDirectory(path: ElementPath) : WinFileSystemElement(path), Directory {
 
     override fun toDir(): Directory {
         return this
@@ -187,8 +187,8 @@ internal class WinDirectory(path: WinPath) : WinFileSystemElement(path), Directo
     }
 }
 
-private class WinDirectoryEntry(private val parentPath: WinPath, override val name: String, override val type: ElementType) : DirectoryEntry {
-    override val path: WinPath
+private class WinDirectoryEntry(private val parentPath: ElementPath, override val name: String, override val type: ElementType) : DirectoryEntry {
+    override val path: ElementPath
         get() = parentPath.resolve(name)
 
     override fun snapshot(): Result<ElementSnapshot> {
@@ -208,7 +208,7 @@ private class WinDirectoryEntry(private val parentPath: WinPath, override val na
     }
 }
 
-internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), RegularFile {
+internal class WinRegularFile(path: ElementPath) : WinFileSystemElement(path), RegularFile {
     override val parent: WinDirectory
         get() = super.parent!!
 
@@ -261,7 +261,7 @@ internal class WinRegularFile(path: WinPath) : WinFileSystemElement(path), Regul
     }
 }
 
-internal class WinSymLink(path: WinPath) : WinFileSystemElement(path), SymLink {
+internal class WinSymLink(path: ElementPath) : WinFileSystemElement(path), SymLink {
     override val parent: WinDirectory
         get() = super.parent!!
 

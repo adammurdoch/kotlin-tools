@@ -61,6 +61,8 @@ internal fun deleteElement(path: String, errorCode: ErrorCode = NoErrorCode, cau
 
 internal fun notSupported(path: String, operation: String) = FileSystemException("Could not $operation $path as it is not supported by this filesystem.")
 
+internal fun unreadableSymlink(path: String, cause: Throwable? = null) = FileSystemException("Symlink $path is not readable.", cause)
+
 internal fun readMissingSymlink(path: String) = FileSystemException("Could not read symlink $path as it does not exist.")
 
 internal fun setPermissionsNotSupported(path: String) = notSupported(path, "set POSIX permissions on")

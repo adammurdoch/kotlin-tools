@@ -1,16 +1,8 @@
 package net.rubygrapefruit.file
 
-internal data class WinPath(override val absolutePath: String) : ElementPath {
-    init {
-        require(isAbsolute(absolutePath)) { "'$absolutePath' is not absolute" }
-    }
-
-    override fun toString(): String {
-        return absolutePath
-    }
-
-    override val name: String
-        get() = absolutePath.substringAfterLast("\\")
+internal data class WinPath(override val absolutePath: String) : StringBackedAbsolutePath() {
+    override val separator: Char
+        get() = '\\'
 
     override val parent: WinPath?
         get() {
@@ -28,20 +20,17 @@ internal data class WinPath(override val absolutePath: String) : ElementPath {
             }
         }
 
-    override fun resolve(path: String): WinPath {
+    override fun child(name: String): StringBackedAbsolutePath {
+        return WinPath("$absolutePath\\$name")
+    }
+
+    override fun resolve(path: String): StringBackedAbsolutePath {
         val normalized = path.replace("/", "\\")
         return if (isAbsolute(normalized)) {
-            WinPath(normalized)
-        } else if (normalized == ".") {
-            this
-        } else if (normalized.startsWith("./")) {
-            resolve(normalized.substring(2))
-        } else if (normalized == "..") {
-            parent!!
-        } else if (normalized.startsWith("../")) {
-            parent!!.resolve(normalized.substring(3))
+            val root = WinPath("${normalized[0]}:\\")
+            resolve(root, path.drop(3))
         } else {
-            WinPath("${absolutePath}\\$normalized")
+            resolve(this, normalized)
         }
     }
 
@@ -49,7 +38,7 @@ internal data class WinPath(override val absolutePath: String) : ElementPath {
         return metadata(absolutePath).map { WinElementSnapshot(this, it) }
     }
 
-    private fun isAbsolute(path: String): Boolean {
+    override fun isAbsolute(path: String): Boolean {
         return path.length >= 3 && path[0].isLetter() && path[1] == ':' && path[2] == '\\'
     }
 }

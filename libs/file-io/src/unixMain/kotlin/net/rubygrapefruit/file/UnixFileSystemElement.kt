@@ -11,7 +11,7 @@ import net.rubygrapefruit.io.UnixErrorCode
 import net.rubygrapefruit.io.stream.*
 import platform.posix.*
 
-internal open class UnixFileSystemElement(override val path: AbsolutePath) : AbstractFileSystemElement() {
+internal open class UnixFileSystemElement(override val path: ElementPath) : AbstractFileSystemElement() {
     override val parent: Directory?
         get() {
             val parentPath = path.parent
@@ -79,7 +79,7 @@ internal open class UnixFileSystemElement(override val path: AbsolutePath) : Abs
     }
 }
 
-internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path), RegularFile {
+internal class UnixRegularFile(path: ElementPath) : UnixFileSystemElement(path), RegularFile {
     override val parent: Directory
         get() = super.parent!!
 
@@ -149,13 +149,13 @@ internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path)
         }
     }
 
-    internal class FileSource(val path: AbsolutePath) : StreamSource {
+    internal class FileSource(val path: ElementPath) : StreamSource {
         override val displayName: String
             get() = "file $path"
     }
 }
 
-internal class UnixDirectory(path: AbsolutePath) : UnixFileSystemElement(path), Directory {
+internal class UnixDirectory(path: ElementPath) : UnixFileSystemElement(path), Directory {
     override fun file(name: String): RegularFile {
         return UnixRegularFile(path.resolve(name))
     }
@@ -251,7 +251,7 @@ internal class UnixDirectory(path: AbsolutePath) : UnixFileSystemElement(path), 
 
 expect val canSetSymLinkPermissions: Boolean
 
-internal class UnixSymLink(path: AbsolutePath) : UnixFileSystemElement(path), SymLink {
+internal class UnixSymLink(path: ElementPath) : UnixFileSystemElement(path), SymLink {
     override val parent: Directory
         get() = super.parent!!
 
@@ -273,7 +273,7 @@ internal class UnixSymLink(path: AbsolutePath) : UnixFileSystemElement(path), Sy
             val count = readlink(path.absolutePath, buffer.refTo(0), size.convert())
             if (count < 0) {
                 if (errno == EACCES) {
-                    return UnreadableEntry(path.absolutePath)
+                    throw unreadableSymlink(path.absolutePath)
                 } else {
                     throw NativeException("Could not read symlink '$path'.")
                 }
@@ -295,8 +295,8 @@ internal class UnixSymLink(path: AbsolutePath) : UnixFileSystemElement(path), Sy
     }
 }
 
-private class UnixDirectoryEntry(private val parentPath: AbsolutePath, override val name: String, override val type: ElementType) : DirectoryEntry {
-    override val path: AbsolutePath
+private class UnixDirectoryEntry(private val parentPath: ElementPath, override val name: String, override val type: ElementType) : DirectoryEntry {
+    override val path: ElementPath
         get() = parentPath.resolve(name)
 
     override fun snapshot(): Result<ElementSnapshot> {
@@ -316,7 +316,7 @@ private class UnixDirectoryEntry(private val parentPath: AbsolutePath, override 
     }
 }
 
-internal class UnixSnapshot(override val path: AbsolutePath, override val metadata: ElementMetadata) : AbstractElementSnapshot() {
+internal class UnixSnapshot(override val path: ElementPath, override val metadata: ElementMetadata) : AbstractElementSnapshot() {
     override fun asRegularFile(): RegularFile {
         return UnixRegularFile(path)
     }

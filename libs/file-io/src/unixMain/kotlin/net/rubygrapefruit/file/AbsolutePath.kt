@@ -1,20 +1,12 @@
 package net.rubygrapefruit.file
 
-internal data class AbsolutePath(override val absolutePath: String) : ElementPath {
+internal data class AbsolutePath(override val absolutePath: String) : StringBackedAbsolutePath() {
     companion object {
         internal val ROOT = AbsolutePath("/")
     }
 
-    init {
-        require(absolutePath.startsWith("/"))
-    }
-
-    override fun toString(): String {
-        return absolutePath
-    }
-
-    override val name: String
-        get() = absolutePath.substringAfterLast("/")
+    override val separator: Char
+        get() = '/'
 
     override val parent: AbsolutePath?
         get() {
@@ -22,7 +14,7 @@ internal data class AbsolutePath(override val absolutePath: String) : ElementPat
                 null
             } else {
                 val parentPath = absolutePath.substringBeforeLast("/")
-                return if (parentPath.length == 0) {
+                return if (parentPath.isEmpty()) {
                     AbsolutePath("/")
                 } else {
                     AbsolutePath(parentPath)
@@ -30,7 +22,19 @@ internal data class AbsolutePath(override val absolutePath: String) : ElementPat
             }
         }
 
-    override fun resolve(path: String): AbsolutePath {
+    override fun isAbsolute(path: String): Boolean {
+        return path.startsWith('/')
+    }
+
+    override fun child(name: String): StringBackedAbsolutePath {
+        return if (absolutePath == "/") {
+            AbsolutePath("/$name")
+        } else {
+            AbsolutePath("$absolutePath/$name")
+        }
+    }
+
+    override fun resolve(path: String): StringBackedAbsolutePath {
         return if (path == absolutePath || path == ".") {
             this
         } else if (path.startsWith("/")) {
@@ -38,24 +42,6 @@ internal data class AbsolutePath(override val absolutePath: String) : ElementPat
         } else {
             resolve(this, path)
         }
-    }
-
-    private fun resolve(base: AbsolutePath, path: String): AbsolutePath {
-        val elements = path.split("/").toMutableList()
-        var current = base
-        for (element in elements) {
-            if (element == "" || element == ".") {
-                continue
-            }
-            if (element == "..") {
-                current = current.parent ?: ROOT
-            } else if (current != ROOT) {
-                current = AbsolutePath("$current/$element")
-            } else {
-                current = AbsolutePath("/$element")
-            }
-        }
-        return current
     }
 
     override fun snapshot(): Result<ElementSnapshot> {

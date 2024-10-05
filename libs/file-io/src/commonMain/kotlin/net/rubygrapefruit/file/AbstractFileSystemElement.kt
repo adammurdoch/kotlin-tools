@@ -13,23 +13,17 @@ internal abstract class AbstractFileSystemElement : FileSystemElement {
 
     protected fun visitTopDown(dir: Directory, visitor: (DirectoryEntry) -> Unit) {
         val result = dir.listEntries()
-        if (result is Failed) {
-            throw FileSystemException("Could not visit entries of $dir.", result.failure)
-        }
 
         visitor(DirBackedEntry(dir))
 
-        val queue = result.get().toMutableList()
+        val queue = result.toMutableList()
         while (queue.isNotEmpty()) {
             val entry = queue.removeFirst()
             visitor(entry)
             if (entry.type == ElementType.Directory) {
                 val childDir = entry.toDir()
                 val childResult = childDir.listEntries()
-                if (childResult is Failed) {
-                    throw FileSystemException("Could not visit entries of $childDir.", childResult.failure)
-                }
-                queue.addAll(childResult.get())
+                queue.addAll(childResult)
             }
         }
     }
@@ -42,10 +36,7 @@ internal abstract class AbstractFileSystemElement : FileSystemElement {
             if (entry.type == ElementType.Directory && visiting.add(entry)) {
                 val childDir = entry.toDir()
                 val childResult = childDir.listEntries()
-                if (childResult is Failed) {
-                    throw FileSystemException("Could not visit entries of $childDir.", childResult.failure)
-                }
-                queue.addAll(0, childResult.get())
+                queue.addAll(0, childResult)
             } else {
                 queue.removeFirst()
                 visitor(entry)
@@ -56,14 +47,13 @@ internal abstract class AbstractFileSystemElement : FileSystemElement {
     }
 
     protected fun deleteRecursively(dir: Directory, delete: (DirectoryEntry) -> Unit) {
-        val result = dir.listEntries()
-        if (result is MissingEntry) {
+        val result = try {
+            dir.listEntries()
+        } catch (_: MissingDirectoryException) {
+            // Ignore
             return
-        } else if (result is Failed) {
-            throw deleteDirectory(dir, result.failure)
         }
-
-        visitBottomUp(dir, result.get(), delete)
+        visitBottomUp(dir, result, delete)
     }
 
     protected fun <T : RegularFile> delete(file: T, delete: (T) -> Unit) {

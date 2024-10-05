@@ -225,18 +225,18 @@ internal class JvmDirectory(path: Path) : JvmFileSystemElement(path), Directory 
         }
     }
 
-    override fun listEntries(): Result<List<DirectoryEntry>> {
-        val stream = try {
-            Files.list(delegate)
+    override fun listEntries(): List<DirectoryEntry> {
+        try {
+            return Files.list(delegate).use { stream ->
+                stream.map { JvmDirectoryEntry(it, metadataOfExistingFile(it).type) }.collect(Collectors.toList())
+            }
         } catch (e: NoSuchFileException) {
-            return listDirectoryThatDoesNotExist(delegate.pathString, cause = e)
+            throw listDirectoryThatDoesNotExist(delegate.pathString, cause = e)
         } catch (_: AccessDeniedException) {
-            return listDirectoryThatIsNotReadable(delegate.pathString)
+            throw listDirectoryThatIsNotReadable(delegate.pathString)
         } catch (e: Exception) {
-            return listDirectory(this, cause = e)
+            throw listDirectory(this, cause = e)
         }
-        val entries = stream.map { JvmDirectoryEntry(it, metadataOfExistingFile(it).type) }.collect(Collectors.toList())
-        return Success(entries)
     }
 
     override fun visitTopDown(visitor: (DirectoryEntry) -> Unit) {

@@ -165,7 +165,7 @@ class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
         val parent = fixture.testDir.dir("dir")
         val link = parent.symLink("file.txt")
 
-        fails<FileSystemException>("Could not read symlink $link as it does not exist.") {
+        failsWith<FileSystemException>("Could not read symlink $link as it does not exist.") {
             link.readSymLink()
         }
     }
@@ -179,7 +179,7 @@ class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
         }
         link.setPermissions(link.posixPermissions().writeOnly())
 
-        fails<FileSystemException>("Symlink $link is not readable.") {
+        failsWith<FileSystemException>("Symlink $link is not readable.") {
             link.readSymLink()
         }
     }

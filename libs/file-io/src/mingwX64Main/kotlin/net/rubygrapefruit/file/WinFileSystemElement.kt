@@ -145,12 +145,12 @@ internal class WinDirectory(path: ElementPath) : WinFileSystemElement(path), Dir
         }
     }
 
-    override fun listEntries(): Result<List<DirectoryEntry>> {
+    override fun listEntries(): List<DirectoryEntry> {
         return memScoped {
             val data = alloc<WIN32_FIND_DATAW>()
             val handle = FindFirstFileW("$absolutePath\\*", data.ptr)
             if (handle == INVALID_HANDLE_VALUE) {
-                return if (GetLastError().convert<Int>() == ERROR_FILE_NOT_FOUND) {
+                throw if (GetLastError().convert<Int>() == ERROR_FILE_NOT_FOUND) {
                     listDirectoryThatDoesNotExist(absolutePath)
                 } else {
                     listDirectory(this@WinDirectory, errorCode = WinErrorCode.last())
@@ -172,10 +172,10 @@ internal class WinDirectory(path: ElementPath) : WinFileSystemElement(path), Dir
                         if (GetLastError().convert<Int>() == ERROR_NO_MORE_FILES) {
                             break
                         }
-                        return listDirectory(this@WinDirectory, errorCode = WinErrorCode.last())
+                        throw listDirectory(this@WinDirectory, errorCode = WinErrorCode.last())
                     }
                 }
-                Success(result)
+                result
             } finally {
                 FindClose(handle)
             }

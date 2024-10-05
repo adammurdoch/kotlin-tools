@@ -39,6 +39,7 @@ interface Directory : FileSystemElement {
 
     /**
      * Creates a new temporary directory in this directory.
+     *
      * Note: the implementation is not guaranteed to be atomic.
      */
     @Throws(FileSystemException::class)
@@ -46,13 +47,19 @@ interface Directory : FileSystemElement {
 
     /**
      * Returns a snapshot of the entries in this directory. Does not follow symlinks in the entries.
+     *
+     * Note: the implementation is not guaranteed to be atomic.
+     *
+     * @throws MissingDirectoryException When the directory cannot be listed because it does not exist.
      */
-    fun listEntries(): Result<List<DirectoryEntry>>
+    @Throws(FileSystemException::class)
+    fun listEntries(): List<DirectoryEntry>
 
     /**
      * Visits the contents of this directory tree. Visits a directory before its entries.
      *
      * Does not follow symlinks.
      */
+    @Throws(FileSystemException::class)
     fun visitTopDown(visitor: DirectoryEntry.() -> Unit)
 }

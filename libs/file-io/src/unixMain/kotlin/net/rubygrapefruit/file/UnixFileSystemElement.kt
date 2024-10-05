@@ -200,19 +200,19 @@ internal class UnixDirectory(path: ElementPath) : UnixFileSystemElement(path), D
         createDir(this)
     }
 
-    override fun listEntries(): Result<List<DirectoryEntry>> {
+    override fun listEntries(): List<DirectoryEntry> {
         val dirPointer = opendir(path.absolutePath)
         if (dirPointer == null) {
             if (errno == ENOENT) {
-                return listDirectoryThatDoesNotExist(path.absolutePath)
+                throw listDirectoryThatDoesNotExist(path.absolutePath)
             }
             if (errno == EPERM || errno == EACCES) {
-                return UnreadableEntry(path.absolutePath)
+                throw UnreadableEntry<Any>(path.absolutePath).failure
             }
             if (errno == ENOTDIR) {
-                return listDirectoryThatIsNotADirectory(path.absolutePath)
+                throw listDirectoryThatIsNotADirectory(path.absolutePath)
             }
-            return listDirectory(this, UnixErrorCode.last())
+            throw listDirectory(this, UnixErrorCode.last())
         }
         try {
             val entries = mutableListOf<DirectoryEntry>()
@@ -237,7 +237,7 @@ internal class UnixDirectory(path: ElementPath) : UnixFileSystemElement(path), D
                     }
                 }
             }
-            return Success(entries)
+            return entries
         } finally {
             closedir(dirPointer)
         }

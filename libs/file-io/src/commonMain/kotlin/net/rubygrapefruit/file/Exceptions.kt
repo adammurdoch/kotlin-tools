@@ -12,14 +12,13 @@ internal fun createDirectoryThatExistsAndIsNotADir(path: String, cause: Throwabl
 
 internal fun createDirectory(path: String, cause: Throwable? = null) = FileSystemException("Could not create directory $path.", cause)
 
-internal fun <T> listDirectoryThatDoesNotExist(path: String, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null) =
-    MissingEntry<T> { FileSystemException("Could not list directory $path as it does not exist.", errorCode, cause) }
+internal fun listDirectoryThatDoesNotExist(path: String, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null) =
+    MissingDirectoryException("Could not list directory $path as it does not exist.", errorCode, cause)
 
-internal fun <T> listDirectoryThatIsNotReadable(path: String) =
-    UnreadableEntry<T>(path)
+internal fun listDirectoryThatIsNotReadable(path: String) = UnreadableEntry<Any>(path).failure
 
-internal fun <T> listDirectoryThatIsNotADirectory(path: String, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null) =
-    FailedOperation<T>(FileSystemException("Could not list directory $path as it is not a directory.", errorCode, cause))
+internal fun listDirectoryThatIsNotADirectory(path: String, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null) =
+    FileSystemException("Could not list directory $path as it is not a directory.", errorCode, cause)
 
 internal fun writeFileThatExistsAndIsNotAFile(path: String, cause: Throwable? = null) = FileSystemException("Could not write to $path as it is not a file.", cause)
 
@@ -82,12 +81,12 @@ internal fun readPermission(path: String, errorCode: ErrorCode = NoErrorCode, ca
 /**
  * Tries to infer why a directory could not be listed.
  */
-internal fun <T> listDirectory(directory: Directory, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null): Failed<T> {
+internal fun listDirectory(directory: Directory, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null): FileSystemException {
     val metadata = directory.metadata()
     return if (!metadata.missing) {
         listDirectoryThatIsNotADirectory(directory.absolutePath, errorCode, cause)
     } else if (metadata.directory) {
-        FailedOperation(FileSystemException("Could not list directory ${directory.absolutePath}.", errorCode, cause))
+        FileSystemException("Could not list directory ${directory.absolutePath}.", errorCode, cause)
     } else {
         listDirectoryThatDoesNotExist(directory.absolutePath, errorCode, cause)
     }

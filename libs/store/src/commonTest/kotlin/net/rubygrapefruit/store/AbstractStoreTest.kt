@@ -41,7 +41,7 @@ abstract class AbstractStoreTest : AbstractFileTest() {
 
     private fun verifyAfterClose() {
         // Should always be 3 files
-        assertEquals(3, testStore.listEntries().get().size)
+        assertEquals(3, testStore.listEntries().size)
     }
 
     fun Store.values(): List<String> {

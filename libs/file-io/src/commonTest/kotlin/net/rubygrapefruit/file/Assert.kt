@@ -3,7 +3,7 @@ package net.rubygrapefruit.file
 import kotlin.test.assertEquals
 import kotlin.test.fail
 
-inline fun <reified T : Throwable> fails(message: String, action: () -> Unit) {
+inline fun <reified T : Throwable> failsWith(message: String, action: () -> Unit) {
     try {
         action()
         fail("Action should have failed")
@@ -11,7 +11,6 @@ inline fun <reified T : Throwable> fails(message: String, action: () -> Unit) {
         if (e !is T) {
             throw e
         }
-        e.printStackTrace()
         assertEquals(message, e.message)
     }
 }

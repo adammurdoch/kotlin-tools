@@ -2,10 +2,10 @@
 ## TODO
 
 - Prevent `sink.close()` and `source.close()`
-- Change query methods to throw exceptions instead of returning `Result`
-  - `Directory.listEntries()`
-  - `Symlink.readLink()`
+- `Directory.listEntries()` queries metadata for each element in directory on JVM. Should make this lazy
+- `Directory.deleteRecursively()` uses an exception to signal that the directory does not exist.
 - Strongly typed exceptions
+  - `MissingDirectoryException`
 - Use Kotlinx IO exceptions in source and sink implementations
 - Windows: open files with `FILE_SHARE_READ` when reading?
 - More efficient `RegularFile`

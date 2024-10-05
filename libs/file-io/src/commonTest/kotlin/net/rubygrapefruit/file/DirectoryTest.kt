@@ -94,18 +94,15 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
 
         assertIs<MissingEntry<*>>(dir.metadata())
         val entries1 = parent.listEntries()
-        assertIs<Success<*>>(entries1)
-        assertTrue(entries1.get().isEmpty())
+        assertTrue(entries1.isEmpty())
 
         dir.createDirectories()
 
         assertIs<DirectoryMetadata>(dir.metadata().get())
         val entries2 = dir.listEntries()
-        assertIs<Success<*>>(entries2)
-        assertTrue(entries2.get().isEmpty())
+        assertTrue(entries2.isEmpty())
         val entries3 = parent.listEntries()
-        assertIs<Success<*>>(entries3)
-        assertEquals(listOf("dir"), entries3.get().map { it.name })
+        assertEquals(listOf("dir"), entries3.map { it.name })
     }
 
     @Test
@@ -203,28 +200,22 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
         }
 
         val entries1 = empty.listEntries()
-        assertIs<Success<*>>(entries1)
-        assertTrue(entries1.get().isEmpty())
+        assertTrue(entries1.isEmpty())
 
         val entries2 = dir.listEntries()
-        assertIs<Success<*>>(entries2)
-        val sorted = entries2.get().sortedBy { it.name }
+        val sorted = entries2.sortedBy { it.name }
         assertEquals(listOf("dir1", "file1", "link1", "link2"), sorted.map { it.name })
         assertEquals(listOf("dir1", "file1", "link1", "link2"), sorted.map { it.path.name })
         assertEquals(listOf(ElementType.Directory, ElementType.RegularFile, ElementType.SymLink, ElementType.SymLink), sorted.map { it.type })
-        assertTrue(entries2.get().all { it.path.parent == dir.path })
+        assertTrue(entries2.all { it.path.parent == dir.path })
     }
 
     @Test
     fun `cannot list contents of a directory that does not exist`() {
         val dir = fixture.testDir.dir("dir1")
 
-        val entries = dir.listEntries()
-        assertIs<MissingEntry<*>>(entries)
-        try {
-            entries.get()
-        } catch (e: FileSystemException) {
-            assertEquals("Could not list directory $dir as it does not exist.", e.message)
+        failsWith<MissingDirectoryException>("Could not list directory $dir as it does not exist.") {
+            dir.listEntries()
         }
     }
 
@@ -233,12 +224,8 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
         val parent = fixture.testDir.dir("dir")
         val dir = parent.dir("dir1")
 
-        val entries = dir.listEntries()
-        assertIs<MissingEntry<*>>(entries)
-        try {
-            entries.get()
-        } catch (e: FileSystemException) {
-            assertEquals("Could not list directory $dir as it does not exist.", e.message)
+        failsWith<FileSystemException>("Could not list directory $dir as it does not exist.") {
+            dir.listEntries()
         }
     }
 
@@ -247,12 +234,8 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
         val ancestor = fixture.testDir.dir("dir")
         val dir = ancestor.dir("dir1/dir2")
 
-        val entries = dir.listEntries()
-        assertIs<MissingEntry<*>>(entries)
-        try {
-            entries.get()
-        } catch (e: FileSystemException) {
-            assertEquals("Could not list directory $dir as it does not exist.", e.message)
+        failsWith<FileSystemException>("Could not list directory $dir as it does not exist.") {
+            dir.listEntries()
         }
     }
 
@@ -260,12 +243,8 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
     fun `cannot list contents of a directory that exists as a file`() {
         val dir = fixture.file("file").toDir()
 
-        val entries = dir.listEntries()
-        assertIs<FailedOperation<*>>(entries)
-        try {
-            entries.get()
-        } catch (e: FileSystemException) {
-            assertEquals("Could not list directory $dir as it is not a directory.", e.message)
+        failsWith<FileSystemException>("Could not list directory $dir as it is not a directory.") {
+            dir.listEntries()
         }
     }
 
@@ -281,12 +260,8 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
         }
         dir.setPermissions(PosixPermissions.nothing)
 
-        val entries = dir.listEntries()
-        assertIs<UnreadableEntry<*>>(entries)
-        try {
-            entries.get()
-        } catch (e: FileSystemException) {
-            assertEquals("File $dir is not readable.", e.message)
+        failsWith<FileSystemException>("File $dir is not readable.") {
+            dir.listEntries()
         }
     }
 
@@ -374,11 +349,8 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
         val dir = fixture.file("file").toDir()
         assertTrue(dir.metadata().regularFile)
 
-        try {
+        failsWith<FileSystemException>("Could not delete directory $dir as it is not a directory.") {
             dir.deleteRecursively()
-            fail()
-        } catch (e: FileSystemException) {
-            assertEquals("Could not delete directory $dir as it is not a directory.", e.message)
         }
     }
 
@@ -390,11 +362,8 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
         val file = dir.file("file1")
         dir.setPermissions(PosixPermissions.readOnlyDirectory)
 
-        try {
+        failsWith<FileSystemException>("Could not delete file $file as directory $dir is not writable.") {
             dir.deleteRecursively()
-            fail()
-        } catch (e: FileSystemException) {
-            assertEquals("Could not delete file $file as directory $dir is not writable.", e.message)
         }
     }
 

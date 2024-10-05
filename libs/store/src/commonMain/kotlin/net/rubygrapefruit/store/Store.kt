@@ -42,12 +42,12 @@ class Store private constructor(
             val metadata = directory.file("store.bin")
             if (discard) {
                 metadata.delete()
-                for (entry in directory.listEntries().get()) {
+                for (entry in directory.listEntries()) {
                     if (entry.type == ElementType.RegularFile) {
                         entry.toFile().delete()
                     }
                 }
-            } else if (directory.listEntries().get().isNotEmpty() && !metadata.metadata().regularFile) {
+            } else if (directory.listEntries().isNotEmpty() && !metadata.metadata().regularFile) {
                 unrecognizedFormat(directory)
             }
             return Store(directory, metadata, maxChanges, compact)

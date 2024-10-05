@@ -46,8 +46,13 @@ value class PosixPermissions(val mode: UInt) {
             get() = PosixPermissions(ownerRead or ownerWrite or groupRead or othersRead)
     }
 
+    val isOwnerReadable: Boolean
+        get() = isEnabled(ownerRead)
+
     val isOwnerExecutable: Boolean
-        get() = (mode and ownerExecute) == ownerExecute
+        get() = isEnabled(ownerExecute)
+
+    private fun isEnabled(flag: UInt) = (mode and flag) == flag
 
     override fun toString(): String {
         return mode.toString(8).padStart(3, '0')

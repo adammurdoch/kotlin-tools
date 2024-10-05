@@ -828,9 +828,9 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
             return
         }
 
-        assertFalse(file.posixPermissions().get().isOwnerExecutable)
+        assertFalse(file.posixPermissions().isOwnerExecutable)
 
-        file.setPermissions(file.posixPermissions().get().executable())
-        assertTrue(file.posixPermissions().get().isOwnerExecutable)
+        file.setPermissions(file.posixPermissions().executable())
+        assertTrue(file.posixPermissions().isOwnerExecutable)
     }
 }

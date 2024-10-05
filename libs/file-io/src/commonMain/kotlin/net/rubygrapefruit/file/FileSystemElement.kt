@@ -17,7 +17,8 @@ sealed interface FileSystemElement : HasPath {
     /**
      * Returns a snapshot of the current permissions. Does not follow symlinks.
      */
-    fun posixPermissions(): Result<PosixPermissions>
+    @Throws(FileSystemException::class)
+    fun posixPermissions(): PosixPermissions
 
     /**
      * Sets the permissions of this element. Note that when this element is a symlink, the permissions of the symlink itself are changed.

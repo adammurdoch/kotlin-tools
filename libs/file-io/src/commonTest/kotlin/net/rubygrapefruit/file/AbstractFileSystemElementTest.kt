@@ -75,7 +75,8 @@ abstract class AbstractFileSystemElementTest<T : FileSystemElement> : AbstractFi
             return
         }
 
-        element.posixPermissions().get()
+        val permissions = element.posixPermissions()
+        assertTrue(permissions.isOwnerReadable)
     }
 
     @Test
@@ -85,10 +86,10 @@ abstract class AbstractFileSystemElementTest<T : FileSystemElement> : AbstractFi
             return
         }
 
-        assertNotEquals(PosixPermissions.readOnlyFile, element.posixPermissions().get())
+        assertNotEquals(PosixPermissions.readOnlyFile, element.posixPermissions())
 
         element.setPermissions(PosixPermissions.readOnlyFile)
-        assertEquals(PosixPermissions.readOnlyFile, element.posixPermissions().get())
+        assertEquals(PosixPermissions.readOnlyFile, element.posixPermissions())
     }
 
     @Test
@@ -98,10 +99,8 @@ abstract class AbstractFileSystemElementTest<T : FileSystemElement> : AbstractFi
             return
         }
 
-        val result = element.posixPermissions()
-        assertIs<MissingEntry<*>>(result)
         try {
-            result.get()
+            element.posixPermissions()
         } catch (e: FileSystemException) {
             assertEquals("Could not read POSIX permissions for $element as it does not exist.", e.message)
         }
@@ -114,10 +113,8 @@ abstract class AbstractFileSystemElementTest<T : FileSystemElement> : AbstractFi
             return
         }
 
-        val result = element.posixPermissions()
-        assertIs<UnsupportedOperation<*>>(result)
         try {
-            result.get()
+            element.posixPermissions()
         } catch (e: FileSystemException) {
             assertEquals("Could not read POSIX permissions for $element as it is not supported by this filesystem.", e.message)
         }

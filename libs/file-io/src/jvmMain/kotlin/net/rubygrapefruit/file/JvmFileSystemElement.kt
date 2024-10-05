@@ -56,19 +56,18 @@ internal open class JvmFileSystemElement(protected val delegate: Path) : Abstrac
         return metadata().map { JvmSnapshot(path, it) }
     }
 
-    override fun posixPermissions(): Result<PosixPermissions> {
+    override fun posixPermissions(): PosixPermissions {
         val view = posixFileAttributeView()
-        return if (view == null) {
-            readPermissionNotSupported(absolutePath)
-        } else {
-            try {
-                val attributes = view.readAttributes()
-                Success(attributes.permissions().permissions())
-            } catch (_: NoSuchFileException) {
-                readPermissionOnMissingElement(absolutePath)
-            } catch (e: Exception) {
-                readPermission(absolutePath, cause = e)
-            }
+        if (view == null) {
+            throw readPermissionNotSupported(absolutePath)
+        }
+        try {
+            val attributes = view.readAttributes()
+            return attributes.permissions().permissions()
+        } catch (_: NoSuchFileException) {
+            throw readPermissionOnMissingElement(absolutePath)
+        } catch (e: Exception) {
+            throw readPermission(absolutePath, cause = e)
         }
     }
 

@@ -145,18 +145,18 @@ class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
             return
         }
 
-        assertNotEquals(PosixPermissions.readOnlyFile, symLink.posixPermissions().get())
-        assertNotEquals(PosixPermissions.readWriteFile, symLink.posixPermissions().get())
+        assertNotEquals(PosixPermissions.readOnlyFile, symLink.posixPermissions())
+        assertNotEquals(PosixPermissions.readWriteFile, symLink.posixPermissions())
 
         file.setPermissions(PosixPermissions.readOnlyFile)
 
-        assertNotEquals(file.posixPermissions().get(), symLink.posixPermissions().get())
+        assertNotEquals(file.posixPermissions(), symLink.posixPermissions())
 
         if (!symLink.supports(FileSystemCapability.SetSymLinkPosixPermissions)) {
             return
         }
         symLink.setPermissions(PosixPermissions.readWriteFile)
 
-        assertEquals(PosixPermissions.readWriteFile, symLink.posixPermissions().get())
+        assertEquals(PosixPermissions.readWriteFile, symLink.posixPermissions())
     }
 }

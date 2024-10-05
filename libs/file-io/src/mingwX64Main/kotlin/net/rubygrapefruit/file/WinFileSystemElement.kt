@@ -25,8 +25,8 @@ internal open class WinFileSystemElement(override val path: WinPath) : AbstractF
         return metadata(absolutePath)
     }
 
-    override fun posixPermissions(): Result<PosixPermissions> {
-        return readPermissionNotSupported(path.absolutePath)
+    override fun posixPermissions(): PosixPermissions {
+        throw readPermissionNotSupported(path.absolutePath)
     }
 
     override fun setPermissions(permissions: PosixPermissions) {

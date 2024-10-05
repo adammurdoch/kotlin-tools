@@ -43,17 +43,17 @@ internal open class UnixFileSystemElement(override val path: AbsolutePath) : Abs
     }
 
     @OptIn(UnsafeNumber::class)
-    override fun posixPermissions(): Result<PosixPermissions> {
+    override fun posixPermissions(): PosixPermissions {
         return memScoped {
             val statBuf = alloc<stat>()
             if (lstat(path.absolutePath, statBuf.ptr) != 0) {
                 if (errno == ENOENT) {
-                    readPermissionOnMissingElement(absolutePath)
+                    throw readPermissionOnMissingElement(absolutePath)
                 } else {
-                    readPermission(absolutePath, errorCode = UnixErrorCode.last())
+                    throw readPermission(absolutePath, errorCode = UnixErrorCode.last())
                 }
             } else {
-                Success(posixPermissions(statBuf))
+                posixPermissions(statBuf)
             }
         }
     }

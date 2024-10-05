@@ -1,8 +1,8 @@
 package net.rubygrapefruit.file
 
-internal data class AbsolutePath(override val absolutePath: String) : StringBackedAbsolutePath() {
+internal data class UnixPath(override val absolutePath: String) : StringBackedAbsolutePath() {
     companion object {
-        internal val ROOT = AbsolutePath("/")
+        internal val ROOT = UnixPath("/")
     }
 
     init {
@@ -12,16 +12,16 @@ internal data class AbsolutePath(override val absolutePath: String) : StringBack
     override val separator: Char
         get() = '/'
 
-    override val parent: AbsolutePath?
+    override val parent: UnixPath?
         get() {
             return if (absolutePath == "/") {
                 null
             } else {
                 val parentPath = absolutePath.substringBeforeLast("/")
                 return if (parentPath.isEmpty()) {
-                    AbsolutePath("/")
+                    UnixPath("/")
                 } else {
-                    AbsolutePath(parentPath)
+                    UnixPath(parentPath)
                 }
             }
         }
@@ -36,9 +36,9 @@ internal data class AbsolutePath(override val absolutePath: String) : StringBack
 
     override fun child(name: String): StringBackedAbsolutePath {
         return if (absolutePath == "/") {
-            AbsolutePath("/$name")
+            UnixPath("/$name")
         } else {
-            AbsolutePath("$absolutePath/$name")
+            UnixPath("$absolutePath/$name")
         }
     }
 

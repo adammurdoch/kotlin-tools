@@ -8,7 +8,7 @@ import platform.posix.getcwd
 import platform.posix.getpwuid
 import platform.posix.getuid
 
-private class NativeFileSystem : FileSystem {
+private class UnixFileSystem : FileSystem {
     override val currentDirectory: Directory
         get() = getCurrentDir()
 
@@ -16,7 +16,7 @@ private class NativeFileSystem : FileSystem {
         get() = getUserHomeDir()
 }
 
-actual val fileSystem: FileSystem = NativeFileSystem()
+actual val fileSystem: FileSystem = UnixFileSystem()
 
 internal fun getUserHomeDir(): UnixDirectory {
     return memScoped {
@@ -25,7 +25,7 @@ internal fun getUserHomeDir(): UnixDirectory {
         if (pwd == null) {
             throw NativeException("Could not get user home directory.")
         }
-        UnixDirectory(AbsolutePath(pwd.pointed.pw_dir!!.toKString()))
+        UnixDirectory(UnixPath(pwd.pointed.pw_dir!!.toKString()))
     }
 }
 
@@ -37,6 +37,6 @@ internal fun getCurrentDir(): UnixDirectory {
         if (path == null) {
             throw NativeException("Could not get current directory.")
         }
-        UnixDirectory(AbsolutePath(buffer.toKString()))
+        UnixDirectory(UnixPath(buffer.toKString()))
     }
 }

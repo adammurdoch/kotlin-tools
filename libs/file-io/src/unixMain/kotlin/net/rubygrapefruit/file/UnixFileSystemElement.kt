@@ -342,7 +342,7 @@ internal fun createTempDir(baseDir: UnixDirectory): Directory {
         if (mkdtemp(pathCopy) == null) {
             throw NativeException("Could not create temporary directory in ${baseDir}.")
         }
-        UnixDirectory(AbsolutePath(pathCopy.toKString()))
+        UnixDirectory(UnixPath(pathCopy.toKString()))
     }
 }
 

@@ -5,8 +5,11 @@ package net.rubygrapefruit.file
 import kotlinx.cinterop.*
 import kotlinx.io.Sink
 import kotlinx.io.Source
+import kotlinx.io.buffered
 import net.rubygrapefruit.io.Resource
 import net.rubygrapefruit.io.WinErrorCode
+import net.rubygrapefruit.io.stream.FileBackedRawSink
+import net.rubygrapefruit.io.stream.FileBackedRawSource
 import platform.windows.*
 
 internal open class WinFileSystemElement(override val path: ElementPath) : AbstractFileSystemElement() {
@@ -200,11 +203,11 @@ private class WinDirectoryEntry(private val parentPath: ElementPath, override va
     }
 
     override fun toFile(): RegularFile {
-        TODO()
+        return WinRegularFile(path)
     }
 
     override fun toSymLink(): SymLink {
-        TODO()
+        return WinSymLink(path)
     }
 }
 
@@ -235,29 +238,67 @@ internal class WinRegularFile(path: ElementPath) : WinFileSystemElement(path), R
     }
 
     private fun doOpenContent(): WinFileContent {
-        return memScoped {
-            val handle = CreateFileW(
-                absolutePath,
-                (GENERIC_WRITE.toUInt() or GENERIC_READ).convert<DWORD>(),
-                0.convert<DWORD>(),
-                null,
-                OPEN_ALWAYS.convert<DWORD>(),
-                FILE_ATTRIBUTE_NORMAL.convert<DWORD>(),
-                null
-            )
-            if (handle == INVALID_HANDLE_VALUE) {
-                throw openFile(this@WinRegularFile, errorCode = WinErrorCode.last())
-            }
-            WinFileContent(absolutePath, handle)
+        val handle = CreateFileW(
+            absolutePath,
+            (GENERIC_WRITE.toUInt() or GENERIC_READ).convert<DWORD>(),
+            0.convert<DWORD>(),
+            null,
+            OPEN_ALWAYS.convert<DWORD>(),
+            FILE_ATTRIBUTE_NORMAL.convert<DWORD>(),
+            null
+        )
+        if (handle == INVALID_HANDLE_VALUE) {
+            throw openFile(this@WinRegularFile, errorCode = WinErrorCode.last())
         }
+        return WinFileContent(absolutePath, handle)
     }
 
     override fun <T> write(action: (Sink) -> T): T {
-        TODO("Not yet implemented")
+        val handle = CreateFileW(
+            absolutePath,
+            GENERIC_WRITE.convert<DWORD>(),
+            0.convert<DWORD>(),
+            null,
+            OPEN_ALWAYS.convert<DWORD>(),
+            FILE_ATTRIBUTE_NORMAL.convert<DWORD>(),
+            null
+        )
+        if (handle == INVALID_HANDLE_VALUE) {
+            throw writeToFile(this@WinRegularFile, errorCode = WinErrorCode.last())
+        }
+        return try {
+            FileBackedRawSink(absolutePath, handle).use {
+                val buffered = it.buffered()
+                val result = action(buffered)
+                buffered.flush()
+                result
+            }
+        } finally {
+            CloseHandle(handle)
+        }
     }
 
     override fun <T> read(action: (Source) -> T): T {
-        TODO("Not yet implemented")
+        val handle = CreateFileW(
+            absolutePath,
+            GENERIC_READ.convert<DWORD>(),
+            0.convert<DWORD>(),
+            null,
+            OPEN_ALWAYS.convert<DWORD>(),
+            FILE_ATTRIBUTE_NORMAL.convert<DWORD>(),
+            null
+        )
+        if (handle == INVALID_HANDLE_VALUE) {
+            throw readFile(this@WinRegularFile, errorCode = WinErrorCode.last())
+        }
+        return try {
+            FileBackedRawSource(absolutePath, handle).use {
+                val buffered = it.buffered()
+                action(buffered)
+            }
+        } finally {
+            CloseHandle(handle)
+        }
     }
 }
 

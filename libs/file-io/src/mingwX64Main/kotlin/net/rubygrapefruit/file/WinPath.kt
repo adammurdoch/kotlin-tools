@@ -29,7 +29,11 @@ internal data class WinPath(override val absolutePath: String) : StringBackedAbs
     }
 
     override fun child(name: String): StringBackedAbsolutePath {
-        return WinPath("$absolutePath\\$name")
+        return if (absolutePath.length == 3) {
+            WinPath("$absolutePath$name")
+        } else {
+            WinPath("$absolutePath\\$name")
+        }
     }
 
     override fun resolve(path: String): StringBackedAbsolutePath {

@@ -4,7 +4,6 @@
 - Prevent `sink.close()` and `source.close()`
 - Change query methods to throw exceptions instead of returning `Result`
   - `Directory.listEntries()`
-  - `FileSystemElement.posixPermissions()`
   - `Symlink.readLink()`
 - Strongly typed exceptions
 - Use Kotlinx IO exceptions in source and sink implementations

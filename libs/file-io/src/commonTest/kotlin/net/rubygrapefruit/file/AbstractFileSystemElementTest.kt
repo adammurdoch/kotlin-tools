@@ -99,10 +99,8 @@ abstract class AbstractFileSystemElementTest<T : FileSystemElement> : AbstractFi
             return
         }
 
-        try {
+        fails<FileSystemException>("Could not read POSIX permissions for $element as it does not exist.") {
             element.posixPermissions()
-        } catch (e: FileSystemException) {
-            assertEquals("Could not read POSIX permissions for $element as it does not exist.", e.message)
         }
     }
 
@@ -113,10 +111,8 @@ abstract class AbstractFileSystemElementTest<T : FileSystemElement> : AbstractFi
             return
         }
 
-        try {
+        fails<FileSystemException>("Could not read POSIX permissions for $element as it is not supported by this filesystem.") {
             element.posixPermissions()
-        } catch (e: FileSystemException) {
-            assertEquals("Could not read POSIX permissions for $element as it is not supported by this filesystem.", e.message)
         }
     }
 
@@ -127,10 +123,8 @@ abstract class AbstractFileSystemElementTest<T : FileSystemElement> : AbstractFi
             return
         }
 
-        try {
+        fails<FileSystemException>("Could not set POSIX permissions on $element as it does not exist.") {
             element.setPermissions(PosixPermissions.readOnlyFile)
-        } catch (e: FileSystemException) {
-            assertEquals("Could not set POSIX permissions on $element as it does not exist.", e.message)
         }
     }
 
@@ -141,10 +135,8 @@ abstract class AbstractFileSystemElementTest<T : FileSystemElement> : AbstractFi
             return
         }
 
-        try {
+        fails<FileSystemException>("Could not set POSIX permissions on $element as it is not supported by this filesystem.") {
             element.setPermissions(PosixPermissions.readOnlyFile)
-        } catch (e: FileSystemException) {
-            assertEquals("Could not set POSIX permissions on $element as it is not supported by this filesystem.", e.message)
         }
     }
 }

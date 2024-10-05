@@ -77,14 +77,6 @@ internal open class UnixFileSystemElement(override val path: AbsolutePath) : Abs
             FileSystemCapability.PosixPermissions -> true
         }
     }
-
-    protected fun MemScope.fileSize(): Long {
-        val statBuf = alloc<stat>()
-        if (lstat(path.absolutePath, statBuf.ptr) != 0) {
-            throw NativeException("Could not stat $path.")
-        }
-        return statBuf.st_size
-    }
 }
 
 internal class UnixRegularFile(path: AbsolutePath) : UnixFileSystemElement(path), RegularFile {
@@ -269,7 +261,14 @@ internal class UnixSymLink(path: AbsolutePath) : UnixFileSystemElement(path), Sy
 
     override fun readSymLink(): Result<String> {
         memScoped {
-            val size = fileSize()
+            val statBuf = alloc<stat>()
+            if (lstat(path.absolutePath, statBuf.ptr) != 0) {
+                if (errno == ENOENT) {
+                    throw readMissingSymlink(path.absolutePath)
+                }
+                throw NativeException("Could not stat $path.")
+            }
+            val size = statBuf.st_size
             val buffer = ByteArray(size.convert())
             val count = readlink(path.absolutePath, buffer.refTo(0), size.convert())
             if (count < 0) {

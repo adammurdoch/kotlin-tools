@@ -54,11 +54,14 @@ internal fun deleteFileThatIsNotAFile(path: String, cause: Throwable? = null) = 
 
 internal fun deleteFile(path: String, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null) = FileSystemException("Could not delete file $path.", errorCode, cause)
 
-internal fun deleteElementThatIsNotWritable(path: String, parent: String, cause: Throwable? = null) = FileSystemException("Could not delete file $path as directory $parent is not writable.", cause)
+internal fun deleteElementThatIsNotWritable(path: String, parent: String, cause: Throwable? = null) =
+    FileSystemException("Could not delete file $path as directory $parent is not writable.", cause)
 
 internal fun deleteElement(path: String, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null) = FileSystemException("Could not delete file $path.", errorCode, cause)
 
 internal fun notSupported(path: String, operation: String) = FileSystemException("Could not $operation $path as it is not supported by this filesystem.")
+
+internal fun readMissingSymlink(path: String) = FileSystemException("Could not read symlink $path as it does not exist.")
 
 internal fun setPermissionsNotSupported(path: String) = notSupported(path, "set POSIX permissions on")
 

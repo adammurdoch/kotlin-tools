@@ -252,13 +252,12 @@ internal class JvmSymlink(path: Path) : JvmFileSystemElement(path), SymLink {
         return this
     }
 
-    override fun readSymLink(): Result<String> {
-        val path = try {
-            Files.readSymbolicLink(delegate).pathString
+    override fun readSymLink(): String {
+        try {
+            return Files.readSymbolicLink(delegate).pathString
         } catch (_: NoSuchFileException) {
             throw readMissingSymlink(absolutePath)
         }
-        return Success(path)
     }
 
     override fun writeSymLink(target: String) {

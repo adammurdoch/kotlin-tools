@@ -48,7 +48,7 @@ class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
         link.writeSymLink("1234")
 
         assertIs<SymlinkMetadata>(link.metadata().get())
-        assertEquals("1234", link.readSymLink().get())
+        assertEquals("1234", link.readSymLink())
     }
 
     @Test
@@ -59,7 +59,7 @@ class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
         link.writeSymLink("abc")
 
         assertIs<SymlinkMetadata>(link.metadata().get())
-        assertEquals("abc", link.readSymLink().get())
+        assertEquals("abc", link.readSymLink())
     }
 
     @Test
@@ -72,7 +72,7 @@ class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
         link.writeSymLink(file.name)
 
         assertIs<SymlinkMetadata>(link.metadata().get())
-        assertEquals(file.name, link.readSymLink().get())
+        assertEquals(file.name, link.readSymLink())
     }
 
     @Test
@@ -166,7 +166,7 @@ class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
         val link = parent.symLink("file.txt")
 
         fails<FileSystemException>("Could not read symlink $link as it does not exist.") {
-            link.readSymLink().get()
+            link.readSymLink()
         }
     }
 
@@ -180,7 +180,7 @@ class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
         link.setPermissions(link.posixPermissions().writeOnly())
 
         fails<FileSystemException>("Symlink $link is not readable.") {
-            link.readSymLink().get()
+            link.readSymLink()
         }
     }
 }

@@ -269,14 +269,14 @@ internal class WinSymLink(path: ElementPath) : WinFileSystemElement(path), SymLi
         return this
     }
 
-    override fun readSymLink(): Result<String> {
+    override fun readSymLink(): String {
         return memScoped {
             val handle = CreateFileW(absolutePath, GENERIC_READ, 0.convert(), null, OPEN_EXISTING.convert(), FILE_ATTRIBUTE_NORMAL.convert(), null)
             try {
                 val size = GetFinalPathNameByHandleW(handle, null, 0.convert(), FILE_NAME_NORMALIZED.convert())
                 val buffer = allocArray<WCHARVar>(size.convert())
                 GetFinalPathNameByHandleW(handle, buffer, size, FILE_NAME_NORMALIZED.convert())
-                Success(buffer.toKString())
+                buffer.toKString()
             } finally {
                 CloseHandle(handle)
             }

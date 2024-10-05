@@ -9,7 +9,8 @@ interface SymLink : FileSystemElement {
     /**
      * Reads the symlink target.
      */
-    fun readSymLink(): Result<String>
+    @Throws(FileSystemException::class)
+    fun readSymLink(): String
 
     /**
      * Resolves this symlink to its target element. Follows symlinks to reach something that is not a symlink
@@ -18,7 +19,7 @@ interface SymLink : FileSystemElement {
         var current = this
         while (true) {
             val path = current.readSymLink()
-            val target = parent.path.resolve(path.get())
+            val target = parent.path.resolve(path)
             val snapshot = target.snapshot()
             if (snapshot is Success && snapshot.get().metadata is SymlinkMetadata) {
                 current = parent.symLink(target.absolutePath)

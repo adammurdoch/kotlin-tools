@@ -259,7 +259,7 @@ internal class UnixSymLink(path: ElementPath) : UnixFileSystemElement(path), Sym
         return this
     }
 
-    override fun readSymLink(): Result<String> {
+    override fun readSymLink(): String {
         memScoped {
             val statBuf = alloc<stat>()
             if (lstat(path.absolutePath, statBuf.ptr) != 0) {
@@ -278,7 +278,7 @@ internal class UnixSymLink(path: ElementPath) : UnixFileSystemElement(path), Sym
                     throw NativeException("Could not read symlink '$path'.")
                 }
             }
-            return Success(buffer.decodeToString(0, count.convert()))
+            return buffer.decodeToString(0, count.convert())
         }
     }
 

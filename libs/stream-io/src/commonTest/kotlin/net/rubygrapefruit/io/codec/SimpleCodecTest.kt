@@ -8,6 +8,13 @@ import kotlin.test.assertEquals
 
 class SimpleCodecTest {
     @Test
+    fun `encodes and decodes Byte`() {
+        for (value in listOf(0, 0x1, -0x1, 0x10, Byte.MAX_VALUE, Byte.MAX_VALUE)) {
+            assertEquals(value, encodeAndDecode(value, Encoder::byte, Decoder::byte))
+        }
+    }
+
+    @Test
     fun `encodes and decodes UByte`() {
         for (value in listOf(0u, 0x1u, 0x10u, 0xffu, UByte.MAX_VALUE)) {
             assertEquals(value, encodeAndDecode(value, Encoder::ubyte, Decoder::ubyte))
@@ -32,6 +39,14 @@ class SimpleCodecTest {
     fun `encodes and decodes Long`() {
         for (value in listOf(0, 1, -1, 0xff, 0xff01, 0xff0001, 0xff000001, 0xff000000000001, 0x7f00000000000000, 0x1122334455667788, Long.MAX_VALUE, Long.MIN_VALUE)) {
             assertEquals(value, encodeAndDecode(value, Encoder::long, Decoder::long))
+        }
+    }
+
+    @Test
+    fun `encodes and decodes byte array`() {
+        for (value in listOf("", "123", "日本ご")) {
+            val bytes = value.encodeToByteArray()
+            assertEquals(value, encodeAndDecode(bytes, Encoder::bytes, Decoder::bytes).decodeToString())
         }
     }
 

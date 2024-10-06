@@ -14,6 +14,11 @@ interface Decoder {
     fun ushort(): UShort
 
     /**
+     * Decodes a [Byte]
+     */
+    fun byte(): Byte
+
+    /**
      * Decodes an [Int]
      */
     fun int(): Int
@@ -24,7 +29,12 @@ interface Decoder {
     fun long(): Long
 
     /**
-     * Decodes a [String]
+     * Decodes a byte array.
+     */
+    fun bytes(): ByteArray
+
+    /**
+     * Decodes a string
      */
     fun string(): String
 }

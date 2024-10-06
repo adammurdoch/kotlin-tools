@@ -19,6 +19,11 @@ internal class SimpleEncoder(
         return this
     }
 
+    override fun byte(value: Byte): Encoder {
+        sink.writeByte(value)
+        return this
+    }
+
     override fun int(value: Int): Encoder {
         sink.writeByte(value.rotateRight(24).toByte())
         sink.writeByte(value.rotateRight(16).toByte())
@@ -36,6 +41,12 @@ internal class SimpleEncoder(
         sink.writeByte(value.rotateRight(16).toByte())
         sink.writeByte(value.rotateRight(8).toByte())
         sink.writeByte(value.toByte())
+        return this
+    }
+
+    override fun bytes(value: ByteArray): Encoder {
+        int(value.size)
+        sink.write(value)
         return this
     }
 

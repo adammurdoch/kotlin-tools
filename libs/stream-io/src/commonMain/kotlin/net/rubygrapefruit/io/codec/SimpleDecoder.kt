@@ -22,6 +22,10 @@ internal class SimpleDecoder(
             .or(source.readByte().toUShort().and(0xffu))
     }
 
+    override fun byte(): Byte {
+        return source.readByte()
+    }
+
     override fun int(): Int {
         return (source.readByte().toInt().and(0xff).shl(24))
             .or(source.readByte().toInt().and(0xff).shl(16))
@@ -38,6 +42,11 @@ internal class SimpleDecoder(
             .or(source.readByte().toLong().and(0xff).shl(16))
             .or(source.readByte().toLong().and(0xff).shl(8))
             .or(source.readByte().toLong().and(0xff))
+    }
+
+    override fun bytes(): ByteArray {
+        val length = int()
+        return source.readByteArray(length)
     }
 
     override fun string(): String {

@@ -16,6 +16,13 @@ interface Encoder {
     fun ushort(value: UShort): Encoder
 
     /**
+     * Encodes the given [Byte] value.
+     *
+     * @return this
+     */
+    fun byte(value: Byte): Encoder
+
+    /**
      * Encodes the given [Int] value.
      *
      * @return this
@@ -28,6 +35,13 @@ interface Encoder {
      * @return this
      */
     fun long(value: Long): Encoder
+
+    /**
+     * Encodes the given byte array.
+     *
+     * @return this
+     */
+    fun bytes(value: ByteArray): Encoder
 
     /**
      * Encodes the given string.

@@ -2,7 +2,7 @@
 ## TODO
 
 - Prevent `sink.close()` and `source.close()`
-- `Directory.listEntries()` queries metadata for each element in directory on JVM. Should make this lazy
+- `Directory.listEntries()` queries metadata for each element in directory on JVM. Should make this lazy?
 - `Directory.deleteRecursively()` uses an exception to signal that the directory does not exist.
 - Strongly typed exceptions
   - `MissingDirectoryException`
@@ -32,8 +32,7 @@
 - Atomic move
 - Atomic recursive delete, if supported by FS
 - Remove a symlink
-- Follow symlinks
-- Canonicalize a element
+- Canonicalize an element
 - Calculate relative paths
 - Add context exceptions to all operations
 - Test delete files, directories and symlinks

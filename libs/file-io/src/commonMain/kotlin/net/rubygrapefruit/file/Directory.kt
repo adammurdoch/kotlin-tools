@@ -50,7 +50,8 @@ interface Directory : FileSystemElement {
      *
      * Note: the implementation is not guaranteed to be atomic.
      *
-     * @throws MissingDirectoryException When the directory cannot be listed because it does not exist.
+     * @throws MissingDirectoryException When the directory cannot be listed because it or one of its ancestors does not exist.
+     * @throws DirectoryPermissionException When the directory cannot be listed because the current process does not have the appropriate permissions to list the directory contents.
      * @throws FileSystemException When the directory cannot be listed for some other reason.
      */
     @Throws(FileSystemException::class)

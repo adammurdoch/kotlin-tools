@@ -15,7 +15,7 @@ internal fun createDirectory(path: String, cause: Throwable? = null) = FileSyste
 internal fun listDirectoryThatDoesNotExist(path: String, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null) =
     MissingDirectoryException("Could not list directory $path as it does not exist.", errorCode, cause)
 
-internal fun listDirectoryThatIsNotReadable(path: String) = UnreadableEntry<Any>(path).failure
+internal fun listDirectoryThatIsNotReadable(path: String) = DirectoryPermissionException("Directory $path is not readable.")
 
 internal fun listDirectoryThatIsNotADirectory(path: String, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null) =
     NotADirectoryException("Could not list directory $path as it is not a directory.", errorCode, cause)

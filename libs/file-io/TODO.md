@@ -1,6 +1,8 @@
 
 ## TODO
 
+- Read symlink -> distinguish between (value) or (unreadable) or (broken)
+- Read directory entries -> distinguish between (value) or (missing) or (unreadable) or (broken)
 - Prevent `sink.close()` and `source.close()`
 - `Directory.listEntries()` queries metadata for each element in directory on JVM. Should make this lazy?
 - `Directory.deleteRecursively()` uses an exception to signal that the directory does not exist.

@@ -1,3 +1,4 @@
-- Abstraction that can read or write individual bytes, use this in codecs
-- Variable length encoding for string length
-- "small" numeric values
+- Variable length encoding for string and byte array length
+- Chunked large string or byte array
+- Small positive numeric values
+- Source and sink for stdout, stderr and stdin

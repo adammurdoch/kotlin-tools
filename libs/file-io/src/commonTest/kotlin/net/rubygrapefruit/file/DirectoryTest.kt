@@ -215,7 +215,7 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
         val parent = fixture.testDir.dir("dir")
         val dir = parent.dir("dir1")
 
-        failsWith<FileSystemException>("Could not list directory $dir as it does not exist.") {
+        failsWith<MissingDirectoryException>("Could not list directory $dir as it does not exist.") {
             dir.listEntries()
         }
     }
@@ -225,7 +225,7 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
         val ancestor = fixture.testDir.dir("dir")
         val dir = ancestor.dir("dir1/dir2")
 
-        failsWith<FileSystemException>("Could not list directory $dir as it does not exist.") {
+        failsWith<MissingDirectoryException>("Could not list directory $dir as it does not exist.") {
             dir.listEntries()
         }
     }
@@ -251,7 +251,7 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
         }
         dir.setPermissions(PosixPermissions.nothing)
 
-        failsWith<FileSystemException>("File $dir is not readable.") {
+        failsWith<DirectoryPermissionException>("Directory $dir is not readable.") {
             dir.listEntries()
         }
     }

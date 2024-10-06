@@ -207,7 +207,7 @@ internal class UnixDirectory(path: ElementPath) : UnixFileSystemElement(path), D
                 throw listDirectoryThatDoesNotExist(path.absolutePath)
             }
             if (errno == EPERM || errno == EACCES) {
-                throw UnreadableEntry<Any>(path.absolutePath).failure
+                throw listDirectoryThatIsNotReadable(path.absolutePath)
             }
             if (errno == ENOTDIR) {
                 throw listDirectoryThatIsNotADirectory(path.absolutePath)

@@ -179,7 +179,7 @@ class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
         }
         link.setPermissions(link.posixPermissions().writeOnly())
 
-        failsWith<FileSystemException>("Symlink $link is not readable.") {
+        failsWith<SymlinkPermissionException>("Symlink $link is not readable.") {
             link.readSymLink()
         }
     }

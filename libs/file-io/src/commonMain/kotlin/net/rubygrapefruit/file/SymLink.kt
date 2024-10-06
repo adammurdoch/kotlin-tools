@@ -8,6 +8,9 @@ interface SymLink : FileSystemElement {
 
     /**
      * Reads the symlink target.
+     *
+     * @throws SymlinkPermissionException When the current process does not have permission to read the symlink.
+     * @throws FileSystemException When the symlink cannot be read for some other reason.
      */
     @Throws(FileSystemException::class)
     fun readSymLink(): String

@@ -52,6 +52,8 @@ internal abstract class AbstractFileSystemElement : FileSystemElement {
         } catch (_: MissingDirectoryException) {
             // Ignore
             return
+        } catch (_: NotADirectoryException) {
+            throw NotADirectoryException("Could not delete directory ${absolutePath} as it is not a directory.")
         }
         visitBottomUp(dir, result, delete)
     }

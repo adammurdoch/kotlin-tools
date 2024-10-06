@@ -51,6 +51,7 @@ interface Directory : FileSystemElement {
      * Note: the implementation is not guaranteed to be atomic.
      *
      * @throws MissingDirectoryException When the directory cannot be listed because it does not exist.
+     * @throws FileSystemException When the directory cannot be listed for some other reason.
      */
     @Throws(FileSystemException::class)
     fun listEntries(): List<DirectoryEntry>

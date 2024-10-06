@@ -18,7 +18,7 @@ internal fun listDirectoryThatDoesNotExist(path: String, errorCode: ErrorCode = 
 internal fun listDirectoryThatIsNotReadable(path: String) = UnreadableEntry<Any>(path).failure
 
 internal fun listDirectoryThatIsNotADirectory(path: String, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null) =
-    FileSystemException("Could not list directory $path as it is not a directory.", errorCode, cause)
+    NotADirectoryException("Could not list directory $path as it is not a directory.", errorCode, cause)
 
 internal fun writeFileThatExistsAndIsNotAFile(path: String, cause: Throwable? = null) = FileSystemException("Could not write to $path as it is not a file.", cause)
 

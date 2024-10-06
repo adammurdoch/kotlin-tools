@@ -136,11 +136,8 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
 
         assertIs<RegularFileMetadata>(dir.metadata().get())
 
-        try {
+        failsWith<FileSystemException>("Could not create directory $dir as it already exists but is not a directory.") {
             dir.createDirectories()
-            fail()
-        } catch (e: FileSystemException) {
-            assertEquals("Could not create directory $dir as it already exists but is not a directory.", e.message)
         }
 
         assertIs<RegularFileMetadata>(dir.metadata().get())
@@ -154,11 +151,8 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
         assertIs<RegularFileMetadata>(file.metadata().get())
         assertIs<MissingEntry<*>>(dir.metadata())
 
-        try {
+        failsWith<FileSystemException>("Could not create directory $file as it already exists but is not a directory.") {
             dir.createDirectories()
-            fail()
-        } catch (e: FileSystemException) {
-            assertEquals("Could not create directory $file as it already exists but is not a directory.", e.message)
         }
 
         assertIs<RegularFileMetadata>(file.metadata().get())
@@ -175,11 +169,8 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
         assertIs<MissingEntry<*>>(parent.metadata())
         assertIs<MissingEntry<*>>(dir.metadata())
 
-        try {
+        failsWith<FileSystemException>("Could not create directory $file as it already exists but is not a directory.") {
             dir.createDirectories()
-            fail()
-        } catch (e: FileSystemException) {
-            assertEquals("Could not create directory $file as it already exists but is not a directory.", e.message)
         }
 
         assertIs<RegularFileMetadata>(file.metadata().get())
@@ -352,6 +343,8 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
         failsWith<FileSystemException>("Could not delete directory $dir as it is not a directory.") {
             dir.deleteRecursively()
         }
+
+        assertTrue(dir.metadata().regularFile)
     }
 
     @Test

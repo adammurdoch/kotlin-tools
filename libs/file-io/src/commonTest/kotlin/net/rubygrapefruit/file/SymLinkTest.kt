@@ -92,6 +92,22 @@ class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
     }
 
     @Test
+    fun `can resolve relative symlink to file in ancestor directory`() {
+        val target = fixture.file("file.txt")
+        val dir = fixture.dir("dir") {
+            symLink("link", "../file.txt")
+        }
+
+        val link = dir.symLink("link")
+
+        val result = link.resolve()
+
+        assertIs<Success<*>>(result)
+        assertIs<RegularFileMetadata>(result.get().metadata)
+        assertEquals(target.path, result.get().path)
+    }
+
+    @Test
     fun `can resolve absolute symlink to file`() {
         val target = fixture.file("other.txt")
         target.writeText("1234")
@@ -119,6 +135,25 @@ class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
         link2.writeSymLink(link1.name)
 
         val result = link2.resolve()
+
+        assertIs<Success<*>>(result)
+        assertIs<RegularFileMetadata>(result.get().metadata)
+        assertEquals(target.path, result.get().path)
+    }
+
+    @Test
+    fun `can resolve a chain of relative symlinks to files in ancestor directory`() {
+        val target = fixture.file("file.txt")
+        val dir = fixture.dir("dir") {
+            symLink("file.txt", "../file.txt")
+            dir("dir1") {
+                symLink("file.txt", "../file.txt")
+            }
+        }
+
+        val link = dir.symLink("dir1/file.txt")
+
+        val result = link.resolve()
 
         assertIs<Success<*>>(result)
         assertIs<RegularFileMetadata>(result.get().metadata)

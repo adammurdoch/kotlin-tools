@@ -1,7 +1,7 @@
 
 ## TODO
 
-- Prevent `sink.close()` and `source.close()`
+- Prevent `sink.close()` and `source.close()` in `write()`, `read()`, etc
 - `Directory.listEntries()` queries metadata for each element in directory on JVM. Should make this lazy?
 - `Directory.deleteRecursively()` uses an exception to signal that the directory does not exist.
 - Strongly typed exceptions

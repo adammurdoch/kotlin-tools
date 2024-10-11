@@ -26,7 +26,7 @@ internal data class JvmElementPath(val delegate: Path) : ElementPath {
         }
 
     override fun resolve(path: String): JvmElementPath {
-        return JvmElementPath(delegate.resolve(path))
+        return JvmElementPath(delegate.resolve(path).normalize())
     }
 
     override fun snapshot(): Result<ElementSnapshot> {

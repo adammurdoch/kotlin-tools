@@ -22,7 +22,7 @@ interface SymLink : FileSystemElement {
         var current = this
         while (true) {
             val path = current.readSymLink()
-            val target = parent.path.resolve(path)
+            val target = current.parent.path.resolve(path)
             val snapshot = target.snapshot()
             if (snapshot is Success && snapshot.get().metadata is SymlinkMetadata) {
                 current = parent.symLink(target.absolutePath)

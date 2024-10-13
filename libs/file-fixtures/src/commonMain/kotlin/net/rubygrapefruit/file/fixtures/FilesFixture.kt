@@ -25,7 +25,7 @@ class FilesFixture {
      */
     fun file(name: String, content: String = "test"): RegularFile {
         val file = testDir.file(name)
-        file.parent?.createDirectories()
+        file.parent.createDirectories()
         file.writeText(content)
         return file
     }

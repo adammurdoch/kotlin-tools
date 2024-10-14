@@ -192,6 +192,7 @@ open class Action {
     }
 
     private fun attemptToRecover(args: List<String>, original: ParseResult, host: Host, context: ParseContext): Result {
+        // Allow an option to recover from parse failure by attempting to do a "recovery" parse from where parsing stopped
         var index = original.count
         while (index in args.indices) {
             val current = args.subList(index, args.size)
@@ -206,8 +207,10 @@ open class Action {
             index++
         }
 
+        // Determine the parse failure to report
         val arg = args.getOrNull(original.count)
         val failure = when {
+            // Parsing stopped on an unknown option
             arg != null && host.isOption(arg) -> {
                 // Don't keep original failure if parsing stopped on an unknown option.
                 // This handles case where option argument or parameter is missing
@@ -231,7 +234,10 @@ open class Action {
                 failure ?: ArgParseException("Unknown option: $arg")
             }
 
+            // Parsing stopped due to a failure
             original.failure != null -> original.failure
+
+            // Parsing stopped on a positional parameter
             else -> ArgParseException("Unknown parameter: $arg")
         }
         return Result.Failure(failure)

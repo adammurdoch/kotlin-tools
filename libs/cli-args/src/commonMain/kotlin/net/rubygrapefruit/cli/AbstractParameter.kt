@@ -35,7 +35,7 @@ internal abstract class AbstractParameter<T : Any>(
                 set = true
                 ParseResult.Nothing
             } else {
-                ParseResult.Failure(0, result.exceptionOrNull() as ArgParseException)
+                ParseResult.Failure(1, result.exceptionOrNull() as ArgParseException)
             }
         }
     }

@@ -24,7 +24,7 @@ internal abstract class AbstractActionParameter<T : Action>(
             this.actionName = name
             val nestedContext = context.replace(this, listOf(NameUsage(name)) + action.value.positional())
             val result = action.value.maybeParse(args.drop(1), nestedContext)
-            return result.consume(1)
+            return result.prepend(1)
         }
         if (actions.default != null) {
             this.action = actions.default.value
@@ -43,10 +43,11 @@ internal abstract class AbstractActionParameter<T : Action>(
         if (name == null) {
             return null
         }
-        if (host.isOption(name)) {
-            return actions.options[name]
+        return if (host.isOption(name)) {
+            actions.options[name]
+        } else {
+            actions.named[name]
         }
-        return actions.named[name]
     }
 
     override fun canAcceptMore(): Boolean {

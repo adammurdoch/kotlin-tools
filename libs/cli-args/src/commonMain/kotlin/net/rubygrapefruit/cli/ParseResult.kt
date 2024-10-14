@@ -1,12 +1,12 @@
 package net.rubygrapefruit.cli
 
 internal sealed class ParseResult {
-    // Number of arguments recognized. Should not include badly formed/unexpected argument carried by the exception
+    // Number of arguments recognized, including badly formed/unexpected argument referenced by the exception
     abstract val count: Int
 
     abstract val failure: ArgParseException?
 
-    abstract fun consume(count: Int): ParseResult
+    abstract fun prepend(count: Int): ParseResult
 
     companion object {
         fun of(count: Int, failure: ArgParseException?): ParseResult {
@@ -23,23 +23,33 @@ internal sealed class ParseResult {
             }
         }
 
-        internal val Nothing = Success(0)
         internal val One = Success(1)
         internal val Two = Success(2)
+    }
+
+    data object Nothing : ParseResult() {
+        override val count: Int
+            get() = 0
+        override val failure: ArgParseException?
+            get() = null
+
+        override fun prepend(count: Int): Success {
+            return Success(count)
+        }
     }
 
     class Success(override val count: Int) : ParseResult() {
         override val failure: ArgParseException?
             get() = null
 
-        override fun consume(count: Int): Success {
+        override fun prepend(count: Int): Success {
             return Success(this.count + count)
         }
     }
 
-    class Failure(override val count: Int, override val failure: ArgParseException, val missing: Boolean = false) : ParseResult() {
-        override fun consume(count: Int): Failure {
-            return Failure(this.count + count, this.failure, missing)
+    class Failure(override val count: Int, override val failure: ArgParseException, val expectedMore: Boolean = false) : ParseResult() {
+        override fun prepend(count: Int): Failure {
+            return Failure(this.count + count, this.failure, this.expectedMore)
         }
     }
 }

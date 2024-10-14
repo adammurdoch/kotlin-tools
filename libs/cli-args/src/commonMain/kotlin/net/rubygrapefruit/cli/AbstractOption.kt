@@ -28,14 +28,14 @@ internal abstract class AbstractOption<T : Any>(
             return ParseResult.Nothing
         }
         if (args.size == 1 || host.isOption(args[1])) {
-            return ParseResult.Failure(1, ArgParseException("Value missing for option $arg"))
+            return ParseResult.Failure(1, ArgParseException("Value missing for option $arg"), expectedMore = true)
         }
         if (value != null) {
             return ParseResult.Failure(1, ArgParseException("Value for option $arg already provided"))
         }
         val result = converter.convert("option $arg", args[1])
         if (result.isFailure) {
-            return ParseResult.Failure(1, result.exceptionOrNull() as ArgParseException)
+            return ParseResult.Failure(2, result.exceptionOrNull() as ArgParseException)
         }
         value = result.getOrThrow()
         return ParseResult.Two

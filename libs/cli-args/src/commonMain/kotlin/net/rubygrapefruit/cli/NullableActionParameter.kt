@@ -12,6 +12,6 @@ internal class NullableActionParameter<T : Action>(
     }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T? {
-        return action
+        return selected
     }
 }

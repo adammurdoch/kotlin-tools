@@ -13,6 +13,6 @@ internal class OptionalActionParameter<T : Action>(
     }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        return action ?: default
+        return selected ?: default
     }
 }

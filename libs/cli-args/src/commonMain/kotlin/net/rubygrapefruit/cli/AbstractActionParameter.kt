@@ -5,7 +5,7 @@ internal abstract class AbstractActionParameter<T : Action>(
     protected val host: Host
 ) : Positional {
     private var actionName: String? = null
-    protected var action: T? = null
+    protected var selected: T? = null
 
     protected val actionInfo
         get() = actions.named.map { NamedNestedActionUsage(it.key, it.value.help, it.value.value.usage()) }
@@ -26,7 +26,10 @@ internal abstract class AbstractActionParameter<T : Action>(
             if (action == null) {
                 return ParseResult.Nothing
             } else {
-                return parseAction(name, action, args, context)
+                if (selected != null && !action.allowAnywhere) {
+                    return ParseResult.Failure(1, ArgParseException("Cannot use option $name with $actionName"))
+                }
+                return parseAction("option $name", action, args, context)
             }
         }
 
@@ -36,18 +39,21 @@ internal abstract class AbstractActionParameter<T : Action>(
     }
 
     override fun accept(args: List<String>, context: ParseContext): ParseResult {
-        if (this.action != null) {
-            return ParseResult.Nothing
-        }
 
         val name = args.first()
         val action = actions.named[name]
         if (action != null) {
+            if (selected != null) {
+                return ParseResult.Failure(1, ArgParseException("Cannot use action '$name' with $actionName"))
+            }
             val nestedContext = context.nested(this, listOf(NameUsage(name)) + action.value.positional())
-            return parseAction(name, action, args, nestedContext)
+            return parseAction("action '$name'", action, args, nestedContext)
+        }
+        if (this.selected != null) {
+            return ParseResult.Nothing
         }
         if (actions.default != null) {
-            this.action = actions.default.value
+            this.selected = actions.default.value
             val nestedContext = context.nested(this, actions.default.value.positional())
             return actions.default.value.maybeParse(args, nestedContext)
         }
@@ -66,13 +72,13 @@ internal abstract class AbstractActionParameter<T : Action>(
         context: ParseContext
     ): ParseResult {
         this.actionName = name
-        this.action = action.value
+        this.selected = action.value
         val result = action.value.maybeParse(args.drop(1), context)
         return result.prepend(1)
     }
 
     override fun canAcceptMore(): Boolean {
-        return action == null
+        return selected == null
     }
 
     override fun usage(): PositionalUsage {
@@ -95,9 +101,9 @@ internal abstract class AbstractActionParameter<T : Action>(
 
     override fun finished(context: ParseContext): FinishResult {
         return when {
-            action != null -> FinishResult.Success
+            selected != null -> FinishResult.Success
             actions.default != null -> {
-                action = actions.default.value
+                selected = actions.default.value
                 val nestedContext = context.nested(this, actions.default.value.positional())
                 return actions.default.value.maybeParse(emptyList(), nestedContext).asFinishResult()
             }
@@ -121,10 +127,10 @@ internal abstract class AbstractActionParameter<T : Action>(
         }
 
         override fun maybeRecover(args: List<String>, context: ParseContext): Boolean {
-            return if (action == option.value) {
+            return if (selected == option.value) {
                 true
             } else if (args.firstOrNull() == this.name) {
-                action = option.value
+                selected = option.value
                 val result = option.value.maybeParse(args.drop(1), context)
                 result.failure == null
             } else {

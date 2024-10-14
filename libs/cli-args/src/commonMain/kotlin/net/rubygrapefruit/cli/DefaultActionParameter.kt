@@ -22,6 +22,6 @@ internal class DefaultActionParameter<T : Action>(
     }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        return action ?: throw IllegalStateException()
+        return selected ?: throw IllegalStateException()
     }
 }

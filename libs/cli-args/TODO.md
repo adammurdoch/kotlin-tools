@@ -5,6 +5,8 @@
 - Move calculation of effective usage into `AbstractActionParameter`
 - Move handling of option actions to help
 - Clean up usage types
+- Repeated `-option <value>`
+- `-<value>` option
 - Help
     - Allow display name for parameter to be specified, eg `--download <url>` instead of `--download <value>`
     - Don't allow `--help <action>` if there are no actions
@@ -52,4 +54,3 @@
 - File locations: dir, file, must exist
 - Color output on terminal
 - Fuzzy matching and/or suggestions
-- `-<value>` options

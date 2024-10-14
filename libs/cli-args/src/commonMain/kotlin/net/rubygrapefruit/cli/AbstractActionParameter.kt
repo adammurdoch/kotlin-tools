@@ -17,6 +17,9 @@ internal abstract class AbstractActionParameter<T : Action>(
             return emptyList()
         }
 
+        override val inheritable: Boolean
+            get() = false
+
         override fun accept(args: List<String>, context: ParseContext): ParseResult {
             val name = args.first()
             val action = actions.options[name]
@@ -40,12 +43,12 @@ internal abstract class AbstractActionParameter<T : Action>(
         val name = args.first()
         val action = actions.named[name]
         if (action != null) {
-            val nestedContext = context.replace(this, listOf(NameUsage(name)) + action.value.positional())
+            val nestedContext = context.nested(this, listOf(NameUsage(name)) + action.value.positional())
             return parseAction(name, action, args, nestedContext)
         }
         if (actions.default != null) {
             this.action = actions.default.value
-            val nestedContext = context.replace(this, actions.default.value.positional())
+            val nestedContext = context.nested(this, actions.default.value.positional())
             return actions.default.value.maybeParse(args, nestedContext)
         }
 
@@ -95,7 +98,7 @@ internal abstract class AbstractActionParameter<T : Action>(
             action != null -> FinishResult.Success
             actions.default != null -> {
                 action = actions.default.value
-                val nestedContext = context.replace(this, actions.default.value.positional())
+                val nestedContext = context.nested(this, actions.default.value.positional())
                 return actions.default.value.maybeParse(emptyList(), nestedContext).asFinishResult()
             }
 

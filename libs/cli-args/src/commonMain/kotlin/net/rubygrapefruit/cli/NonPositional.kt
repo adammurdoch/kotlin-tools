@@ -3,6 +3,9 @@ package net.rubygrapefruit.cli
 internal interface NonPositional {
     fun usage(): List<NonPositionalUsage>
 
+    val inheritable: Boolean
+        get() = true
+
     /**
      * Attempt to parse the given arguments.
      *

@@ -7,7 +7,7 @@ internal sealed interface ParseContext {
 
     fun withOptions(options: List<NonPositional>): ParseContext
 
-    fun replace(positional: Positional, replacement: List<HasPositionalUsage>): ParseContext
+    fun nested(positional: Positional, replacement: List<HasPositionalUsage>): ParseContext
 }
 
 internal class DefaultContext(
@@ -21,11 +21,11 @@ internal class DefaultContext(
         return DefaultContext(items, this.options + options)
     }
 
-    override fun replace(positional: Positional, replacement: List<HasPositionalUsage>): ParseContext {
+    override fun nested(positional: Positional, replacement: List<HasPositionalUsage>): ParseContext {
         val index = items.indexOf(positional)
         val newPositional = items.toMutableList()
         newPositional.removeAt(index)
         newPositional.addAll(index, replacement)
-        return DefaultContext(newPositional, options)
+        return DefaultContext(newPositional, options.filter { it.inheritable })
     }
 }

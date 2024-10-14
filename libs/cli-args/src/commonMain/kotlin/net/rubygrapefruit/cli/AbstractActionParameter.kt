@@ -24,7 +24,7 @@ internal abstract class AbstractActionParameter<T : Action>(
             this.actionName = name
             val nestedContext = context.replace(this, listOf(NameUsage(name)) + action.value.positional())
             val result = action.value.maybeParse(args.drop(1), nestedContext)
-            return ParseResult(1 + result.count, result.failure)
+            return result.consume(1)
         }
         if (actions.default != null) {
             this.action = actions.default.value
@@ -35,7 +35,7 @@ internal abstract class AbstractActionParameter<T : Action>(
         if (host.isOption(name)) {
             return ParseResult.Nothing
         } else {
-            return ParseResult(1, PositionalParseException("Unknown action: $name", positional = context.positional, actions = actionInfo))
+            return ParseResult.Failure(1, PositionalParseException("Unknown action: $name", positional = context.positional, actions = actionInfo))
         }
     }
 

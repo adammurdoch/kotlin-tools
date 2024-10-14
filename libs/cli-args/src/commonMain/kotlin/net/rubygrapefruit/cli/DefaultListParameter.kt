@@ -42,15 +42,15 @@ internal open class DefaultListParameter<T : Any>(
         for (index in args.indices) {
             val arg = args[index]
             if (!acceptOptions && host.isOption(arg)) {
-                return ParseResult(index, null)
+                return ParseResult.Success(index)
             }
             val converted = converter.convert("parameter '$name'", arg)
             if (converted.isFailure) {
-                return ParseResult(index, converted.exceptionOrNull() as ArgParseException)
+                return ParseResult.Failure(index, converted.exceptionOrNull() as ArgParseException)
             }
             values.add(converted.getOrThrow())
         }
-        return ParseResult(args.size, null)
+        return ParseResult.Success(args.size)
     }
 
     override fun canAcceptMore(): Boolean {

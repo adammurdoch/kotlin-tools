@@ -211,11 +211,19 @@ open class Action {
         val arg = args.getOrNull(original.recognized)
         val originalFailure = original.failure
         val failure = when {
+            // Parsing stopped on an unknown option
+            arg != null && host.isOption(arg) -> {
+                // Throw away the failure if parsing expected more but stopped on an unknown option
+                val failure = if (original is ParseResult.Failure && original.expectedMore && !context.options.any { it.accepts(arg) }) {
+                    null
+                } else {
+                    originalFailure
+                }
+                failure ?: ArgParseException("Unknown option: $arg")
+            }
+
             // Parsing stopped due to a failure
             originalFailure != null -> originalFailure
-
-            // Parsing stopped on an unknown option
-            arg != null && host.isOption(arg) -> ArgParseException("Unknown option: $arg")
 
             // Parsing stopped on a positional parameter
             else -> ArgParseException("Unknown parameter: $arg")

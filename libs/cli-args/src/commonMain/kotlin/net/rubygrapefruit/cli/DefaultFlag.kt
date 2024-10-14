@@ -48,4 +48,8 @@ internal class DefaultFlag private constructor(
             ParseResult.Nothing
         }
     }
+
+    override fun accepts(option: String): Boolean {
+        return enableFlags.contains(option) || disableFlags.contains(option)
+    }
 }

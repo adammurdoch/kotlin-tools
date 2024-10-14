@@ -19,4 +19,8 @@ internal abstract class AbstractChoice<T : Any>(
             ParseResult.Nothing
         }
     }
+
+    override fun accepts(option: String): Boolean {
+        return choices.any { it.names.contains(option) }
+    }
 }

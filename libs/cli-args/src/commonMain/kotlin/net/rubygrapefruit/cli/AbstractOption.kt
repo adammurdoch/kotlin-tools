@@ -36,4 +36,8 @@ internal abstract class AbstractOption<T : Any>(
         value = result.getOrThrow()
         return ParseResult.Two
     }
+
+    override fun accepts(option: String): Boolean {
+        return option in flags
+    }
 }

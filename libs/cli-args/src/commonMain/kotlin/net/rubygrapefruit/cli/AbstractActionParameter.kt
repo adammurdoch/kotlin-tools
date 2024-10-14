@@ -102,6 +102,9 @@ internal abstract class AbstractActionParameter<T : Action>(
             return ParseResult.Nothing
         }
 
+        override fun accepts(option: String): Boolean {
+            return false
+        }
     }
 
     private inner class AllowAnywhereOption(val name: String, val option: ActionDetails<T>) : NonPositional {
@@ -116,6 +119,10 @@ internal abstract class AbstractActionParameter<T : Action>(
 
         override fun accept(args: List<String>, context: ParseContext): ParseResult {
             return ParseResult.Nothing
+        }
+
+        override fun accepts(option: String): Boolean {
+            return false
         }
 
         override fun maybeRecover(args: List<String>, context: ParseContext): Boolean {

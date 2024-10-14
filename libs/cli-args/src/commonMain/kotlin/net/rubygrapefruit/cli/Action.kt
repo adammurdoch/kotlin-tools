@@ -128,7 +128,7 @@ open class Action {
     fun maybeParse(args: List<String>): Result {
         val context = DefaultContext(positional, emptyList())
         val result = maybeParse(args, context)
-        return if (result.count != args.size || result.failure != null) {
+        return if (result.recognized != args.size || result.failure != null) {
             attemptToRecover(args, result, DefaultHost, context)
         } else {
             Result.Success
@@ -146,11 +146,11 @@ open class Action {
             var recognized = false
             for (option in context.options) {
                 val result = option.accept(current, context)
-                if (result.count > 0 || result.failure != null) {
+                if (result.recognized > 0 || result.failure != null) {
                     if (result is ParseResult.Failure) {
                         failure = result.asFinishResult()
                     }
-                    index += result.count
+                    index += result.recognized
                     recognized = true
                     break
                 }
@@ -166,11 +166,11 @@ open class Action {
                 if (finished) {
                     pending.removeFirst()
                 }
-                if (result.count > 0 || result.failure != null || finished) {
+                if (result.recognized > 0 || result.failure != null || finished) {
                     if (result is ParseResult.Failure) {
                         failure = result.asFinishResult()
                     }
-                    index += result.count
+                    index += result.recognized
                     continue
                 }
             }
@@ -193,7 +193,7 @@ open class Action {
 
     private fun attemptToRecover(args: List<String>, original: ParseResult, host: Host, context: ParseContext): Result {
         // Allow an option to recover from parse failure by attempting to do a "recovery" parse from where parsing stopped
-        var index = original.count
+        var index = original.recognized
         while (index in args.indices) {
             val current = args.subList(index, args.size)
             for (option in options) {
@@ -208,7 +208,7 @@ open class Action {
         }
 
         // Determine the parse failure to report
-        val arg = args.getOrNull(original.count)
+        val arg = args.getOrNull(original.recognized)
         val originalFailure = original.failure
         val failure = when {
             // Parsing stopped due to a failure

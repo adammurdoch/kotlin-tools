@@ -12,19 +12,35 @@ internal abstract class AbstractActionParameter<T : Action>(
 
     val recoverables: List<Recoverable> = actions.options.mapNotNull { if (it.value.allowAnywhere) AllowAnywhereOption(it.key, it.value) else null }
 
+    val option: NonPositional = object : NonPositional {
+        override fun usage(): List<NonPositionalUsage> {
+            return emptyList()
+        }
+
+        override fun accept(args: List<String>, context: ParseContext): ParseResult {
+            val name = args.first()
+            val action = actions.options[name]
+            if (action == null) {
+                return ParseResult.Nothing
+            } else {
+                return parseAction(name, action, args, context)
+            }
+        }
+
+        override fun accepts(option: String): Boolean {
+            return actions.options.containsKey(option)
+        }
+    }
+
     override fun accept(args: List<String>, context: ParseContext): ParseResult {
         if (this.action != null) {
             return ParseResult.Nothing
         }
 
         val name = args.first()
-        val action = locateActionByFirstArg(name)
+        val action = actions.named[name]
         if (action != null) {
-            this.action = action.value
-            this.actionName = name
-            val nestedContext = context.replace(this, listOf(NameUsage(name)) + action.value.positional())
-            val result = action.value.maybeParse(args.drop(1), nestedContext)
-            return result.prepend(1)
+            return parseAction(name, action, args, context)
         }
         if (actions.default != null) {
             this.action = actions.default.value
@@ -39,15 +55,17 @@ internal abstract class AbstractActionParameter<T : Action>(
         }
     }
 
-    private fun locateActionByFirstArg(name: String?): ActionDetails<T>? {
-        if (name == null) {
-            return null
-        }
-        return if (host.isOption(name)) {
-            actions.options[name]
-        } else {
-            actions.named[name]
-        }
+    private fun parseAction(
+        name: String,
+        action: ActionDetails<T>,
+        args: List<String>,
+        context: ParseContext
+    ): ParseResult {
+        this.actionName = name
+        this.action = action.value
+        val nestedContext = context.replace(this, listOf(NameUsage(name)) + action.value.positional())
+        val result = action.value.maybeParse(args.drop(1), nestedContext)
+        return result.prepend(1)
     }
 
     override fun canAcceptMore(): Boolean {

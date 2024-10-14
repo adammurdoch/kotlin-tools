@@ -40,7 +40,8 @@ internal abstract class AbstractActionParameter<T : Action>(
         val name = args.first()
         val action = actions.named[name]
         if (action != null) {
-            return parseAction(name, action, args, context)
+            val nestedContext = context.replace(this, listOf(NameUsage(name)) + action.value.positional())
+            return parseAction(name, action, args, nestedContext)
         }
         if (actions.default != null) {
             this.action = actions.default.value
@@ -63,8 +64,7 @@ internal abstract class AbstractActionParameter<T : Action>(
     ): ParseResult {
         this.actionName = name
         this.action = action.value
-        val nestedContext = context.replace(this, listOf(NameUsage(name)) + action.value.positional())
-        val result = action.value.maybeParse(args.drop(1), nestedContext)
+        val result = action.value.maybeParse(args.drop(1), context)
         return result.prepend(1)
     }
 

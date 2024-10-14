@@ -179,19 +179,20 @@ open class Action {
             break
         }
 
-        if (failure == null) {
-            for (positional in pending) {
-                val result = positional.finished(context)
-                if (result is FinishResult.Failure) {
-                    failure = result
-                }
+        while (failure == null && pending.isNotEmpty()) {
+            val positional = pending.removeFirst()
+            val result = positional.finished(context)
+            if (result is FinishResult.Failure) {
+                failure = result
             }
         }
 
         return ParseResult.of(index, failure)
     }
 
-    private fun attemptToRecover(args: List<String>, original: ParseResult, host: Host, context: ParseContext): Result {
+    private fun attemptToRecover(args: List<String>, original: ParseResult, host: Host, parent: ParseContext): Result {
+        val context = parent.withOptions(options)
+
         // Allow an option to recover from parse failure by attempting to do a "recovery" parse from where parsing stopped
         var index = original.recognized
         while (index in args.indices) {

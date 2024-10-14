@@ -11,13 +11,4 @@ internal interface NonPositional {
     fun accept(args: List<String>, context: ParseContext): ParseResult
 
     fun accepts(option: String): Boolean
-
-    /**
-     * Attempt to continue parsing following a parse failure.
-     *
-     * @param args May be empty.
-     */
-    fun maybeRecover(args: List<String>, context: ParseContext): Boolean {
-        return false
-    }
 }

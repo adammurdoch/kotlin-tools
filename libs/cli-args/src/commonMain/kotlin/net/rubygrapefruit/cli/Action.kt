@@ -8,6 +8,7 @@ import kotlin.reflect.KClass
 open class Action {
     private val options = mutableListOf<NonPositional>()
     private val positional = mutableListOf<Positional>()
+    private val recoverables = mutableListOf<Recoverable>()
 
     /**
      * Allows configuration values of type [String] to be added to this action.
@@ -102,7 +103,7 @@ open class Action {
         builder(actions)
         val parameter = DefaultActionParameter(actions.build(), DefaultHost, this)
         positional.add(parameter)
-        options.addAll(parameter.nonPositional)
+        recoverables.addAll(parameter.recoverables)
         return parameter
     }
 
@@ -197,7 +198,7 @@ open class Action {
         var index = original.recognized
         while (index in args.indices) {
             val current = args.subList(index, args.size)
-            for (option in options) {
+            for (option in recoverables) {
                 val result = option.maybeRecover(current, context)
                 if (result) {
                     // Don't attempt to keep parsing

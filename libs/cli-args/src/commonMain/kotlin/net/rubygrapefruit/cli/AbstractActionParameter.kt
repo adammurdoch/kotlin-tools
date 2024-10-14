@@ -10,7 +10,7 @@ internal abstract class AbstractActionParameter<T : Action>(
     protected val actionInfo
         get() = actions.named.map { NamedNestedActionUsage(it.key, it.value.help, it.value.value.usage()) }
 
-    val nonPositional: List<NonPositional> = actions.options.map { if (it.value.allowAnywhere) AllowAnywhereOption(it.key, it.value) else DisallowMultipleUseNonPositional(it.key) }
+    val recoverables: List<Recoverable> = actions.options.mapNotNull { if (it.value.allowAnywhere) AllowAnywhereOption(it.key, it.value) else null }
 
     override fun accept(args: List<String>, context: ParseContext): ParseResult {
         if (this.action != null) {
@@ -93,36 +93,10 @@ internal abstract class AbstractActionParameter<T : Action>(
         }
     }
 
-    private inner class DisallowMultipleUseNonPositional(val name: String) : NonPositional {
-        override fun usage(): List<NonPositionalUsage> {
-            return emptyList()
-        }
-
-        override fun accept(args: List<String>, context: ParseContext): ParseResult {
-            return ParseResult.Nothing
-        }
-
-        override fun accepts(option: String): Boolean {
-            return false
-        }
-    }
-
-    private inner class AllowAnywhereOption(val name: String, val option: ActionDetails<T>) : NonPositional {
+    private inner class AllowAnywhereOption(val name: String, val option: ActionDetails<T>) : Recoverable {
 
         override fun toString(): String {
             return name
-        }
-
-        override fun usage(): List<OptionUsage> {
-            return emptyList()
-        }
-
-        override fun accept(args: List<String>, context: ParseContext): ParseResult {
-            return ParseResult.Nothing
-        }
-
-        override fun accepts(option: String): Boolean {
-            return false
         }
 
         override fun maybeRecover(args: List<String>, context: ParseContext): Boolean {

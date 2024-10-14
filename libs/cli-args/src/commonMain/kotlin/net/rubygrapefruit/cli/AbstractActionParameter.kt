@@ -26,8 +26,8 @@ internal abstract class AbstractActionParameter<T : Action>(
             if (action == null) {
                 return ParseResult.Nothing
             } else {
-                if (selected != null && !action.allowAnywhere) {
-                    return ParseResult.Failure(1, ArgParseException("Cannot use option $name with $actionName"))
+                if (selected != null) {
+                    return ParseResult.Failure(0, ArgParseException("Cannot use option $name with $actionName"))
                 }
                 return parseAction("option $name", action, args, context)
             }
@@ -44,7 +44,7 @@ internal abstract class AbstractActionParameter<T : Action>(
         val action = actions.named[name]
         if (action != null) {
             if (selected != null) {
-                return ParseResult.Failure(1, ArgParseException("Cannot use action '$name' with $actionName"))
+                return ParseResult.Failure(0, ArgParseException("Cannot use action '$name' with $actionName"))
             }
             val nestedContext = context.nested(this, listOf(NameUsage(name)) + action.value.positional())
             return parseAction("action '$name'", action, args, nestedContext)

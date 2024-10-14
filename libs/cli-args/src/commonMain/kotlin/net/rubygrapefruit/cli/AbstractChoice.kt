@@ -9,10 +9,6 @@ internal abstract class AbstractChoice<T : Any>(
         return choices.map { FlagUsage.of(it.names, it.help) }
     }
 
-    override fun stoppedAt(arg: String): NonPositional.StopResult {
-        return if (choices.any { it.names.contains(arg) }) NonPositional.StopResult.Recognized else NonPositional.StopResult.Nothing
-    }
-
     override fun accept(args: List<String>, context: ParseContext): ParseResult {
         val name = args.first()
         val result = choices.firstOrNull { it.names.contains(name) }

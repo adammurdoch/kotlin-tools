@@ -18,10 +18,6 @@ internal abstract class AbstractOption<T : Any>(
         return listOf(OptionUsage(usage.usage, help, converter.type, listOf(usage)))
     }
 
-    override fun stoppedAt(arg: String): NonPositional.StopResult {
-        return if (flags.contains(arg)) NonPositional.StopResult.Recognized else NonPositional.StopResult.Nothing
-    }
-
     override fun accept(args: List<String>, context: ParseContext): ParseResult {
         val arg = args.first()
         if (!flags.contains(arg)) {

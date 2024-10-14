@@ -211,32 +211,11 @@ open class Action {
         val arg = args.getOrNull(original.count)
         val originalFailure = original.failure
         val failure = when {
-            // Parsing stopped on an unknown option
-            arg != null && host.isOption(arg) -> {
-                // Don't keep original failure if parsing stopped on an unknown option.
-                // This handles case where option argument or parameter is missing
-                // Allow the non-positional to override this behavior
-                var failure: ArgParseException? = null
-                for (option in options) {
-                    val result = option.stoppedAt(arg)
-                    when (result) {
-                        is NonPositional.StopResult.Nothing -> continue
-                        is NonPositional.StopResult.Recognized -> {
-                            failure = originalFailure
-                            break
-                        }
-
-                        is NonPositional.StopResult.Failure -> {
-                            failure = result.failure
-                            break
-                        }
-                    }
-                }
-                failure ?: ArgParseException("Unknown option: $arg")
-            }
-
             // Parsing stopped due to a failure
             originalFailure != null -> originalFailure
+
+            // Parsing stopped on an unknown option
+            arg != null && host.isOption(arg) -> ArgParseException("Unknown option: $arg")
 
             // Parsing stopped on a positional parameter
             else -> ArgParseException("Unknown parameter: $arg")

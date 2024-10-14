@@ -102,13 +102,6 @@ internal abstract class AbstractActionParameter<T : Action>(
             return ParseResult.Nothing
         }
 
-        override fun stoppedAt(arg: String): NonPositional.StopResult {
-            return if (arg == name && action != null && actionName != null) {
-                NonPositional.StopResult.Failure(ArgParseException("Cannot use $name with $actionName."))
-            } else {
-                NonPositional.StopResult.Nothing
-            }
-        }
     }
 
     private inner class AllowAnywhereOption(val name: String, val option: ActionDetails<T>) : NonPositional {
@@ -119,10 +112,6 @@ internal abstract class AbstractActionParameter<T : Action>(
 
         override fun usage(): List<OptionUsage> {
             return emptyList()
-        }
-
-        override fun stoppedAt(arg: String): NonPositional.StopResult {
-            return if (arg == name) NonPositional.StopResult.Recognized else NonPositional.StopResult.Nothing
         }
 
         override fun accept(args: List<String>, context: ParseContext): ParseResult {

@@ -7,8 +7,8 @@ internal class NullableActionParameter<T : Action>(
     host: Host
 ) : AbstractActionParameter<T>(actions, host), Parameter<T?> {
 
-    override fun whenMissing(context: ParseContext): ArgParseException? {
-        return null
+    override fun whenMissing(context: ParseContext): FinishResult {
+        return FinishResult.Success
     }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T? {

@@ -16,12 +16,9 @@ internal class DefaultActionParameter<T : Action>(
         return owner.replace(this, NullableActionParameter(actions, host))
     }
 
-    override fun whenMissing(context: ParseContext): ArgParseException? {
-        return if (action == null) {
-            PositionalParseException("Action not provided", resolution = "Please specify an action to run.", positional = context.positional, actions = actionInfo)
-        } else {
-            null
-        }
+    override fun whenMissing(context: ParseContext): FinishResult {
+        val exception = PositionalParseException("Action not provided", resolution = "Please specify an action to run.", positional = context.positional, actions = actionInfo)
+        return FinishResult.Failure(exception, expectedMore = true)
     }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T {

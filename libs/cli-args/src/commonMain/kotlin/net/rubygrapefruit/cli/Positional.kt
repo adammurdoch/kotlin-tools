@@ -16,7 +16,7 @@ internal interface Positional: HasPositionalUsage {
     fun canAcceptMore(): Boolean
 
     /**
-     * Called when parsing is finished and [accept] will not be called again. Allows a specific exception to be generated.
+     * Called when parsing is finished and [accept] will not be called again. Allows a specific exception to be generated when this positional is missing.
      */
-    fun finished(context: ParseContext): ArgParseException?
+    fun finished(context: ParseContext): FinishResult
 }

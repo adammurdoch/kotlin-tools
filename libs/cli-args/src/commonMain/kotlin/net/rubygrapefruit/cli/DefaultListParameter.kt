@@ -57,11 +57,11 @@ internal open class DefaultListParameter<T : Any>(
         return true
     }
 
-    override fun finished(context: ParseContext): ArgParseException? {
+    override fun finished(context: ParseContext): FinishResult {
         return if (required && values.isEmpty()) {
-            ArgParseException("Parameter '$name' not provided")
+            FinishResult.Failure(ArgParseException("Parameter '$name' not provided"), expectedMore = true)
         } else {
-            null
+            FinishResult.Success
         }
     }
 }

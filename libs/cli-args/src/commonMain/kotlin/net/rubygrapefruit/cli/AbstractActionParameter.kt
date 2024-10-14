@@ -72,20 +72,20 @@ internal abstract class AbstractActionParameter<T : Action>(
         return null
     }
 
-    override fun finished(context: ParseContext): ArgParseException? {
+    override fun finished(context: ParseContext): FinishResult {
         return when {
-            action != null -> null
+            action != null -> FinishResult.Success
             actions.default != null -> {
                 action = actions.default.value
                 val nestedContext = context.replace(this, actions.default.value.positional())
-                return actions.default.value.maybeParse(emptyList(), nestedContext).failure
+                return actions.default.value.maybeParse(emptyList(), nestedContext).asFinishResult()
             }
 
             else -> return whenMissing(context)
         }
     }
 
-    abstract fun whenMissing(context: ParseContext): ArgParseException?
+    abstract fun whenMissing(context: ParseContext): FinishResult
 
     private class NameUsage(val name: String) : HasPositionalUsage {
         override fun usage(): PositionalUsage {

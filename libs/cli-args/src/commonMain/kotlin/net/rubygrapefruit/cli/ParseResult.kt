@@ -8,10 +8,12 @@ internal sealed class ParseResult {
 
     abstract fun prepend(count: Int): ParseResult
 
+    abstract fun asFinishResult(): FinishResult
+
     companion object {
-        fun of(count: Int, failure: ArgParseException?): ParseResult {
+        fun of(count: Int, failure: FinishResult.Failure?): ParseResult {
             return if (failure != null) {
-                Failure(count, failure)
+                Failure(count, failure.failure, failure.expectedMore)
             } else if (count == 0) {
                 Nothing
             } else if (count == 1) {
@@ -30,26 +32,39 @@ internal sealed class ParseResult {
     data object Nothing : ParseResult() {
         override val count: Int
             get() = 0
+
         override val failure: ArgParseException?
             get() = null
 
         override fun prepend(count: Int): Success {
             return Success(count)
         }
+
+        override fun asFinishResult(): FinishResult {
+            return FinishResult.Success
+        }
     }
 
-    class Success(override val count: Int) : ParseResult() {
+    data class Success(override val count: Int) : ParseResult() {
         override val failure: ArgParseException?
             get() = null
 
         override fun prepend(count: Int): Success {
             return Success(this.count + count)
         }
+
+        override fun asFinishResult(): FinishResult {
+            return FinishResult.Success
+        }
     }
 
-    class Failure(override val count: Int, override val failure: ArgParseException, val expectedMore: Boolean = false) : ParseResult() {
+    data class Failure(override val count: Int, override val failure: ArgParseException, val expectedMore: Boolean = false) : ParseResult() {
         override fun prepend(count: Int): Failure {
             return Failure(this.count + count, this.failure, this.expectedMore)
+        }
+
+        override fun asFinishResult(): FinishResult.Failure {
+            return FinishResult.Failure(failure, expectedMore)
         }
     }
 }

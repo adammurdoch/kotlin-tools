@@ -140,15 +140,15 @@ open class Action {
         val context = parent.withOptions(options)
 
         var index = 0
-        var failure: ArgParseException? = null
+        var failure: FinishResult.Failure? = null
         while (index in args.indices && failure == null) {
             val current = args.subList(index, args.size)
             var recognized = false
             for (option in context.options) {
                 val result = option.accept(current, context)
                 if (result.count > 0 || result.failure != null) {
-                    if (result.failure != null) {
-                        failure = result.failure
+                    if (result is ParseResult.Failure) {
+                        failure = result.asFinishResult()
                     }
                     index += result.count
                     recognized = true
@@ -167,8 +167,8 @@ open class Action {
                     pending.removeFirst()
                 }
                 if (result.count > 0 || result.failure != null || finished) {
-                    if (result.failure != null) {
-                        failure = result.failure
+                    if (result is ParseResult.Failure) {
+                        failure = result.asFinishResult()
                     }
                     index += result.count
                     continue
@@ -181,9 +181,9 @@ open class Action {
 
         if (failure == null) {
             for (positional in pending) {
-                val missing = positional.finished(context)
-                if (missing != null && failure == null) {
-                    failure = missing
+                val result = positional.finished(context)
+                if (result is FinishResult.Failure) {
+                    failure = result
                 }
             }
         }

@@ -4,7 +4,7 @@ internal interface NonPositional {
     fun usage(): List<NonPositionalUsage>
 
     /**
-     * Attempt to parse the given arguments, returning number of arguments consumed.
+     * Attempt to parse the given arguments.
      *
      * @param args Is never empty.
      */

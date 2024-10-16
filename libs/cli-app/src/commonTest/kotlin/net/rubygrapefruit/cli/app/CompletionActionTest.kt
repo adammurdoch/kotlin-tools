@@ -12,7 +12,8 @@ class CompletionActionTest : AbstractActionTest() {
         val action = CompletionAction("cmd", Action(), formatter)
         action.run()
 
-        assertContains(formatter.text, "compdef cmd_complete cmd")
+        assertContains(formatter.text, "compdef _cmd_complete cmd")
+        assertContains(formatter.text, "function _cmd_complete() {")
     }
 
     @Test

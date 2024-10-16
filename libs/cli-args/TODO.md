@@ -1,12 +1,18 @@
+- Use Kotlinx IO types for files
+- Fixes for combining actions:
+  - name-action --action when name action is not complete -> should report `--action` cannot be used with name-action 
+  - name-action --<action when name action is complete -> reports cannot use `--action` with "null"
 - Improve error reporting when empty argument is found and not expected
+- Add some kind of integration with app plugins to supply app name
 - Fix store test apps when store directory does not exist 
 - Fix error message when multiple actions are provided, either as names or options or combined with default
 - Merge `NestedActionHelpAction` into `HelpAction`
 - Move calculation of effective usage into `AbstractActionParameter`
 - Move handling of option actions to help
 - Clean up usage types
-- Repeated `-option <value>`
+- Repeated `--option <value>`
 - `-<value>` option
+- Range values
 - Help
     - Allow display name for parameter to be specified, eg `--download <url>` instead of `--download <value>`
     - Don't allow `--help <action>` if there are no actions

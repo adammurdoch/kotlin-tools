@@ -7,6 +7,11 @@ import net.rubygrapefruit.cli.PositionalParseException
 
 /**
  * An [Action] that can be used as the main action for a CLI application.
+ *
+ * Adds:
+ * - `--help` option or `help` action.
+ * - `--completion` option to generate a ZSH completion script.
+ * - `--stack` option to log the Kotlin stack trace on failure.
  */
 open class CliApp(val name: String) : CliAction() {
 

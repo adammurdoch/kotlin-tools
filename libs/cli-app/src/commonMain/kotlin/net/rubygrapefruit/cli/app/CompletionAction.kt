@@ -17,7 +17,7 @@ internal class CompletionAction(
         val appName = name
 
         formatter.run {
-            val functionName = appName + "_complete"
+            val functionName = "_${appName}_complete"
 
             appendln("# Generated ZSH completion script")
             appendln("# Use `source <this-script>` to enable completion for application '$appName'")

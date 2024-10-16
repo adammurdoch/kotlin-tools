@@ -332,7 +332,9 @@ val samples = listOf(
     jvmCliStoreApp.deriveNative("store-native-cli-app").allPlatforms(),
 
     nativeUiApp,
-    nativeUiApp.derive("customized") { it.launcher("App") }
+    nativeUiApp.derive("customized") { it.launcher("App") },
+
+    jvmCliApp("cli-args-test").cliArgs("--help")
 )
 
 val sampleApps = samples.filterIsInstance<App>()

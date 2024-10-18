@@ -8,14 +8,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Arch {
+    private static String arch;
+
     private static native String arch();
 
     public static synchronized String getMacOsArchitecture() {
-        URL url = locateDynamicLibrary();
-        Path library = extractLibrary(url);
+        if (arch == null) {
+            URL url = locateDynamicLibrary();
+            Path library = extractLibrary(url);
 
-        System.load(library.toString());
-        return arch();
+            System.load(library.toString());
+            arch = arch();
+        }
+        return arch;
     }
 
     private static Path extractLibrary(URL url) {
@@ -25,6 +30,7 @@ public class Arch {
             try (InputStream inputStream = url.openStream()) {
                 Files.copy(inputStream, library);
             }
+            library.toFile().deleteOnExit();
             return library;
         } catch (IOException e) {
             throw new UncheckedIOException("Could not extract native library.", e);

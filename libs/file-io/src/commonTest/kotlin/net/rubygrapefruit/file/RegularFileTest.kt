@@ -50,7 +50,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     )
 
     /**
-     * Read actions that attempt to read content from the file
+     * Read actions that attempt to read content from the file by streaming (rather than random access).
      */
     private val readActionsThatStream: List<(RegularFile) -> Unit> = listOf(
         { file ->
@@ -61,8 +61,8 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         },
         { file ->
             file.read { source ->
-                Success(source.readByteArray())
-            }.get()
+                source.readByteArray()
+            }
         },
     )
 

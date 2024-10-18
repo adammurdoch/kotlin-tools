@@ -296,7 +296,7 @@ internal class WinRegularFile(path: ElementPath) : WinFileSystemElement(path), R
             0.convert<DWORD>(),
             null,
             OPEN_EXISTING.convert<DWORD>(),
-            FILE_ATTRIBUTE_NORMAL.convert<DWORD>(),
+            (FILE_ATTRIBUTE_NORMAL or FILE_FLAG_OPEN_REPARSE_POINT).convert<DWORD>(),
             null
         )
         if (handle == INVALID_HANDLE_VALUE) {
@@ -326,7 +326,15 @@ internal class WinSymLink(path: ElementPath) : WinFileSystemElement(path), SymLi
 
     override fun readSymLink(): String {
         return memScoped {
-            val handle = CreateFileW(absolutePath, GENERIC_READ, 0.convert(), null, OPEN_EXISTING.convert(), FILE_ATTRIBUTE_NORMAL.convert(), null)
+            val handle = CreateFileW(
+                absolutePath,
+                GENERIC_READ,
+                0.convert(),
+                null,
+                OPEN_EXISTING.convert(),
+                (FILE_ATTRIBUTE_NORMAL or FILE_FLAG_OPEN_REPARSE_POINT).convert(),
+                null
+            )
             if (handle == INVALID_HANDLE_VALUE) {
                 if (GetLastError().convert<Int>() == ERROR_PATH_NOT_FOUND) {
                     throw readMissingSymlink(absolutePath)

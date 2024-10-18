@@ -73,6 +73,9 @@ open class CliApp(val name: String) : CliAction() {
                 append(e.message)
                 maybeNewLine()
             }
+            newLine()
+            append("Run with --help for more information.")
+            newLine()
         }
     }
 

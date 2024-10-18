@@ -8,6 +8,20 @@ class CliAppErrorReportingTest {
     private val formatter = BufferingFormatter()
 
     @Test
+    fun `reports unknown option`() {
+        class App : CliApp("cmd") {
+            val flag by flag("flag")
+        }
+
+        App().run(listOf("-x", "42"), formatter)
+        hasUsageMessage(
+            """
+            Unknown option: -x
+        """
+        )
+    }
+
+    @Test
     fun `reports missing parameter for first positional`() {
         class App : CliApp("cmd") {
             val param by parameter("param", help = "parameter 1")
@@ -16,7 +30,7 @@ class CliAppErrorReportingTest {
         }
 
         App().run(emptyList(), formatter)
-        assertEquals(
+        hasUsageMessage(
             """
             Please provide a value for parameter 'param'.
             
@@ -25,8 +39,7 @@ class CliAppErrorReportingTest {
             Parameters:
               <param>  parameter 1
               <param2> parameter 2
-
-        """.trimIndent(), formatter.text
+        """
         )
     }
 
@@ -45,7 +58,7 @@ class CliAppErrorReportingTest {
 
         App().run(listOf("arg1", "action"), formatter)
 
-        assertEquals(
+        hasUsageMessage(
             """
             Please provide a value for parameter 'param2'.
             
@@ -54,8 +67,7 @@ class CliAppErrorReportingTest {
             Parameters:
               <param1> parameter 1
               <param2> parameter 2
-
-        """.trimIndent(), formatter.text
+        """
         )
     }
 
@@ -75,7 +87,7 @@ class CliAppErrorReportingTest {
 
         App().run(listOf("arg1"), formatter)
 
-        assertEquals(
+        hasUsageMessage(
             """
             Please provide a value for parameter 'param2'.
             
@@ -84,8 +96,7 @@ class CliAppErrorReportingTest {
             Parameters:
               <param1> parameter 1
               <param2> parameter 2
-
-        """.trimIndent(), formatter.text
+        """
         )
     }
 
@@ -100,7 +111,7 @@ class CliAppErrorReportingTest {
 
         Nested().run(emptyList(), formatter)
 
-        assertEquals(
+        hasUsageMessage(
             """
             Please specify an action to run.
             
@@ -109,8 +120,7 @@ class CliAppErrorReportingTest {
             Available actions:
               one
               two run action two
-
-        """.trimIndent(), formatter.text
+        """
         )
     }
 
@@ -126,7 +136,7 @@ class CliAppErrorReportingTest {
 
         Nested().run(listOf("arg"), formatter)
 
-        assertEquals(
+        hasUsageMessage(
             """
             Please specify an action to run.
             
@@ -135,8 +145,7 @@ class CliAppErrorReportingTest {
             Available actions:
               one
               two run action two
-
-        """.trimIndent(), formatter.text
+        """
         )
     }
 
@@ -151,7 +160,7 @@ class CliAppErrorReportingTest {
 
         Nested().run(listOf("unknown"), formatter)
 
-        assertEquals(
+        hasUsageMessage(
             """
             Unknown action: unknown
             
@@ -160,8 +169,7 @@ class CliAppErrorReportingTest {
             Available actions:
               one
               two run action two
-
-        """.trimIndent(), formatter.text
+        """
         )
     }
 
@@ -177,7 +185,7 @@ class CliAppErrorReportingTest {
 
         Nested().run(listOf("arg", "unknown"), formatter)
 
-        assertEquals(
+        hasUsageMessage(
             """
             Unknown action: unknown
             
@@ -186,8 +194,18 @@ class CliAppErrorReportingTest {
             Available actions:
               one
               two run action two
-
-        """.trimIndent(), formatter.text
+        """
         )
+    }
+
+    fun hasUsageMessage(message: String) {
+        assertEquals(
+            message.trimIndent() +
+                    """
+
+Run with --help for more information.
+""", formatter.text
+        )
+
     }
 }

@@ -500,6 +500,7 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         file.writeText("1234")
         assertTrue(file.metadata().regularFile)
 
+        // Longer content
         file.writeText("abcdefgh")
 
         val metadata = file.metadata().get()
@@ -507,6 +508,15 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         assertEquals(8, metadata.size)
 
         assertEquals("abcdefgh", file.readText())
+
+        // Shorter content
+        file.writeText("12")
+
+        val metadata2 = file.metadata().get()
+        assertIs<RegularFileMetadata>(metadata2)
+        assertEquals(2, metadata2.size)
+
+        assertEquals("12", file.readText())
     }
 
     @Test

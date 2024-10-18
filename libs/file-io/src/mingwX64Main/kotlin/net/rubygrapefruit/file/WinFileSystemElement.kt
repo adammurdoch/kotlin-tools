@@ -270,8 +270,7 @@ internal class WinRegularFile(path: ElementPath) : WinFileSystemElement(path), R
             GENERIC_WRITE.convert<DWORD>(),
             0.convert<DWORD>(),
             null,
-            OPEN_ALWAYS.convert<DWORD>(),
-//            (FILE_ATTRIBUTE_NORMAL or TRUNCATE_EXISTING).convert<DWORD>(),
+            CREATE_ALWAYS.convert<DWORD>(),
             FILE_ATTRIBUTE_NORMAL.convert<DWORD>(),
             null
         )

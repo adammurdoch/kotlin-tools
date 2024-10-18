@@ -8,17 +8,19 @@ import kotlin.math.min
 
 /**
  * Transfers the given number of bytes from this buffer to some consumer.
+ *
+ * Invokes the consumer function zero or more times.
  */
 @UnsafeIoApi
-inline fun Buffer.readFrom(byteCount: Long, consumer: (ByteArray, Int, Int) -> Unit) {
+inline fun Buffer.readFrom(byteCount: Long, consumer: (ByteArray, Int, Int) -> Int) {
     var remaining = byteCount
     while (remaining > 0) {
         val read = UnsafeBufferOperations.readFromHead(this) { buffer, startIndex, endIndex ->
             val max = if (remaining > Int.MAX_VALUE) Int.MAX_VALUE else remaining.toInt()
             val available = endIndex - startIndex
             val count = min(max, available)
-            consumer(buffer, startIndex, count)
-            count
+            val consumed = consumer(buffer, startIndex, count)
+            consumed
         }
         if (read == 0) {
             throw EOFException()

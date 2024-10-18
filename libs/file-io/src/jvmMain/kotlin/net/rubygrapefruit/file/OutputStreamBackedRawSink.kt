@@ -13,6 +13,7 @@ internal class OutputStreamBackedRawSink(
     override fun write(source: Buffer, byteCount: Long) {
         source.readFrom(byteCount) { buffer, startIndex, count ->
             outputStream.write(buffer, startIndex, count)
+            count
         }
     }
 

@@ -19,16 +19,11 @@ class FileDescriptorBackedRawSink(private val fileSource: StreamSource, private 
     override fun write(source: Buffer, byteCount: Long) {
         memScoped {
             source.readFrom(byteCount) { buffer, startIndex, count ->
-                var pos = startIndex
-                var remaining = count
-                while (remaining > 0) {
-                    val bytesWritten = write(descriptor.descriptor, buffer.refTo(pos), remaining.convert()).convert<Int>()
-                    if (bytesWritten < 0) {
-                        throw IOException("Could not write to ${fileSource.displayName}.", UnixErrorCode.last())
-                    }
-                    pos += bytesWritten
-                    remaining -= bytesWritten
+                val bytesWritten = write(descriptor.descriptor, buffer.refTo(startIndex), count.convert()).convert<Int>()
+                if (bytesWritten < 0) {
+                    throw IOException("Could not write to ${fileSource.displayName}.", UnixErrorCode.last())
                 }
+                bytesWritten
             }
         }
     }

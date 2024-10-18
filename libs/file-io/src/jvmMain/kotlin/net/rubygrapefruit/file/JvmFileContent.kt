@@ -51,6 +51,7 @@ internal class JvmFileContent(
     override fun write(source: Buffer, byteCount: Long) {
         source.readFrom(byteCount) { buffer, startIndex, count ->
             file.write(buffer, startIndex, count)
+            count
         }
     }
 

@@ -18,19 +18,13 @@ internal class FileBackedRawSink(private val path: String, private val handle: H
 
     override fun write(source: Buffer, byteCount: Long) {
         memScoped {
-            val nbytes = alloc<DWORDVar>()
+            val written = alloc<DWORDVar>()
             source.readFrom(byteCount) { buffer, startIndex, count ->
                 buffer.usePinned { ptr ->
-                    var pos = startIndex
-                    var remaining = count
-                    while (remaining > 0) {
-                        if (WriteFile(handle, ptr.addressOf(pos), remaining.convert(), nbytes.ptr, null) == 0) {
-                            throw NativeException("Could not write to file $path.")
-                        }
+                    if (WriteFile(handle, ptr.addressOf(startIndex), count.convert(), written.ptr, null) == 0) {
+                        throw NativeException("Could not write to file $path.")
                     }
-                    val bytesWritten = nbytes.value.convert<Int>()
-                    pos += bytesWritten
-                    remaining -= bytesWritten
+                    written.value.convert<Int>()
                 }
             }
         }

@@ -249,6 +249,10 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
         val dir = fixture.dir("dir") {
             file("file1")
         }
+
+        if (!canSetPermissions(dir)) {
+            return
+        }
         dir.setPermissions(PosixPermissions.nothing)
 
         failsWith<DirectoryPermissionException>("Directory $dir is not readable.") {
@@ -353,6 +357,10 @@ class DirectoryTest : AbstractFileSystemElementTest<Directory>() {
             file("file1")
         }
         val file = dir.file("file1")
+
+        if (!canSetPermissions(dir)) {
+            return
+        }
         dir.setPermissions(PosixPermissions.readOnlyDirectory)
 
         failsWith<FileSystemException>("Could not delete file $file as directory $dir is not writable.") {

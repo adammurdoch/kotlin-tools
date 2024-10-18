@@ -159,10 +159,15 @@ internal class WinDirectory(path: ElementPath) : WinFileSystemElement(path), Dir
             val data = alloc<WIN32_FIND_DATAW>()
             val handle = FindFirstFileW("$absolutePath\\*", data.ptr)
             if (handle == INVALID_HANDLE_VALUE) {
-                throw if (GetLastError().convert<Int>() == ERROR_FILE_NOT_FOUND) {
-                    listDirectoryThatDoesNotExist(absolutePath)
-                } else {
-                    listDirectory(this@WinDirectory, errorCode = WinErrorCode.last())
+                throw when (GetLastError().convert<Int>()) {
+                    ERROR_FILE_NOT_FOUND ->
+                        listDirectoryThatDoesNotExist(absolutePath)
+
+                    ERROR_DIRECTORY ->
+                        listDirectoryThatIsNotADirectory(absolutePath)
+
+                    else ->
+                        listDirectory(this@WinDirectory, errorCode = WinErrorCode.last())
                 }
             }
             try {
@@ -266,6 +271,7 @@ internal class WinRegularFile(path: ElementPath) : WinFileSystemElement(path), R
             0.convert<DWORD>(),
             null,
             OPEN_ALWAYS.convert<DWORD>(),
+//            (FILE_ATTRIBUTE_NORMAL or TRUNCATE_EXISTING).convert<DWORD>(),
             FILE_ATTRIBUTE_NORMAL.convert<DWORD>(),
             null
         )
@@ -290,11 +296,14 @@ internal class WinRegularFile(path: ElementPath) : WinFileSystemElement(path), R
             GENERIC_READ.convert<DWORD>(),
             0.convert<DWORD>(),
             null,
-            OPEN_ALWAYS.convert<DWORD>(),
+            OPEN_EXISTING.convert<DWORD>(),
             FILE_ATTRIBUTE_NORMAL.convert<DWORD>(),
             null
         )
         if (handle == INVALID_HANDLE_VALUE) {
+            if (GetLastError().convert<Int>() == ERROR_FILE_NOT_FOUND) {
+                throw readFileThatDoesNotExist(absolutePath)
+            }
             throw readFile(this@WinRegularFile, errorCode = WinErrorCode.last())
         }
         return try {

@@ -160,7 +160,7 @@ internal class WinDirectory(path: ElementPath) : WinFileSystemElement(path), Dir
             val handle = FindFirstFileW("$absolutePath\\*", data.ptr)
             if (handle == INVALID_HANDLE_VALUE) {
                 throw when (GetLastError().convert<Int>()) {
-                    ERROR_FILE_NOT_FOUND ->
+                    ERROR_PATH_NOT_FOUND ->
                         listDirectoryThatDoesNotExist(absolutePath)
 
                     ERROR_DIRECTORY ->

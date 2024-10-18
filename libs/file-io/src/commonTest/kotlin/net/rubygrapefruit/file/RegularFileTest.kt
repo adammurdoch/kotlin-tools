@@ -25,12 +25,22 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
     )
 
     private val textWriteActions: List<(String, RegularFile) -> Unit> = listOf(
-        { text, file -> file.writeText(text) },
-        { text, file -> file.writeBytes(text.encodeToByteArray()) },
-        { text, file -> file.write { it.writeString(text) } },
-        { text, file -> file.withContent { content -> content.write { sink -> sink.writeString(text) } } },
         { text, file ->
-            file.openContent().using { content -> content.write { sink -> sink.writeString(text) } }
+            file.writeText(text)
+        },
+        { text, file ->
+            file.writeBytes(text.encodeToByteArray())
+        },
+        { text, file ->
+            file.write { it.writeString(text) }
+        },
+        { text, file ->
+            file.withContent { content -> content.write { sink -> sink.writeString(text) } }
+        },
+        { text, file ->
+            val content = file.openContent()
+            content.using { content -> content.write { sink -> sink.writeString(text) } }
+            content.close()
         }
     )
 

@@ -352,7 +352,7 @@ internal fun createDir(dir: UnixDirectory) {
         val result = mkdir(dir.path.absolutePath, S_IRWXU.convert())
         if (result != 0) {
             if (errno != EEXIST) {
-                throw NativeException("Could not create directory $dir.")
+                throw createDirectory(dir, errorCode = UnixErrorCode.last())
             }
             val stat = metadata(dir.path.absolutePath)
             if (!stat.directory) {

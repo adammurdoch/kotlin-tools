@@ -110,12 +110,18 @@ internal class WinDirectory(path: ElementPath) : WinFileSystemElement(path), Dir
         memScoped {
             if (CreateDirectoryW(absolutePath, null) == 0) {
                 when (GetLastError().convert<Int>()) {
-                    ERROR_ALREADY_EXISTS -> return
+                    ERROR_ALREADY_EXISTS -> {
+                        if (metadata().directory) {
+                            return
+                        }
+                        throw createDirectoryThatExistsAndIsNotADir(absolutePath)
+                    }
+
                     ERROR_PATH_NOT_FOUND -> {
                         // Continue below
                     }
 
-                    else -> throw NativeException("Could not create directory $absolutePath.")
+                    else -> throw createDirectory(this@WinDirectory, errorCode = WinErrorCode.last())
                 }
             }
         }
@@ -124,7 +130,7 @@ internal class WinDirectory(path: ElementPath) : WinFileSystemElement(path), Dir
             if (CreateDirectoryW(absolutePath, null) == 0) {
                 when (GetLastError().convert<Int>()) {
                     ERROR_ALREADY_EXISTS -> return
-                    else -> throw NativeException("Could not create directory $absolutePath.")
+                    else -> throw createDirectory(this@WinDirectory, errorCode = WinErrorCode.last())
                 }
             }
         }

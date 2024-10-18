@@ -10,7 +10,28 @@ internal fun unreadableElement(path: String, cause: Throwable? = null) = FileSys
 internal fun createDirectoryThatExistsAndIsNotADir(path: String, cause: Throwable? = null) =
     FileSystemException("Could not create directory $path as it already exists but is not a directory.", cause)
 
-internal fun createDirectory(path: String, cause: Throwable? = null) = FileSystemException("Could not create directory $path.", cause)
+internal fun createDirectory(path: String, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null) =
+    FileSystemException("Could not create directory $path.", errorCode, cause)
+
+internal fun createDirectory(dir: Directory, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null): FileSystemException {
+    var p = dir.parent
+    while (p != null) {
+        val metadata = p.metadata()
+        if (metadata is MissingEntry) {
+            // Keep looking
+            p = p.parent
+            continue
+        }
+        if (metadata.directory) {
+            // Found a directory - should have been able to create dir so rethrow original failure
+            throw createDirectory(dir.absolutePath, errorCode, cause)
+        }
+        // Found something else - fail
+        throw createDirectoryThatExistsAndIsNotADir(p.absolutePath, cause)
+    }
+    // Nothing in the hierarchy exists, which is unexpected, so rethrow original failure
+    throw createDirectory(dir.absolutePath, errorCode, cause)
+}
 
 internal fun listDirectoryThatDoesNotExist(path: String, errorCode: ErrorCode = NoErrorCode, cause: Throwable? = null) =
     MissingDirectoryException("Could not list directory $path as it does not exist.", errorCode, cause)

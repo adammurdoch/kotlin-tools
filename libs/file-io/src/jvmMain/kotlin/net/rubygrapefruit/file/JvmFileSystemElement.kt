@@ -8,9 +8,7 @@ import java.io.IOException
 import java.io.RandomAccessFile
 import java.nio.file.*
 import java.nio.file.LinkOption.NOFOLLOW_LINKS
-import java.nio.file.StandardOpenOption.CREATE
-import java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
-import java.nio.file.StandardOpenOption.WRITE
+import java.nio.file.StandardOpenOption.*
 import java.nio.file.attribute.PosixFileAttributeView
 import java.util.stream.Collectors
 import kotlin.io.path.deleteExisting
@@ -205,23 +203,7 @@ internal class JvmDirectory(path: Path) : JvmFileSystemElement(path), Directory 
         } catch (e: FileAlreadyExistsException) {
             throw createDirectoryThatExistsAndIsNotADir(delegate.pathString, e)
         } catch (e: IOException) {
-            var p = parent
-            while (p != null) {
-                val metadata = p.metadata()
-                if (metadata is MissingEntry) {
-                    // Keep looking
-                    p = p.parent
-                    continue
-                }
-                if (metadata.directory) {
-                    // Found a directory - should have been able to create dir so rethrow original failure
-                    throw createDirectory(delegate.pathString, e)
-                }
-                // Found something else - fail
-                throw createDirectoryThatExistsAndIsNotADir(p.absolutePath, e)
-            }
-            // Nothing in the hierarchy exists, which is unexpected, so rethrow original failure
-            throw createDirectory(delegate.pathString, e)
+            throw createDirectory(this, cause = e)
         }
     }
 

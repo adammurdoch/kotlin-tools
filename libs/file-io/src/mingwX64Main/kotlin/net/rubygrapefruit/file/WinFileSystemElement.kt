@@ -319,11 +319,17 @@ internal class WinSymLink(path: ElementPath) : WinFileSystemElement(path), SymLi
     override fun readSymLink(): String {
         return memScoped {
             val handle = CreateFileW(absolutePath, GENERIC_READ, 0.convert(), null, OPEN_EXISTING.convert(), FILE_ATTRIBUTE_NORMAL.convert(), null)
+            if (handle == INVALID_HANDLE_VALUE) {
+                if (GetLastError().convert<Int>() == ERROR_PATH_NOT_FOUND) {
+                    throw readMissingSymlink(absolutePath)
+                }
+                throw NativeException("Could not read symlink $absolutePath")
+            }
             try {
                 val size = GetFinalPathNameByHandleW(handle, null, 0.convert(), FILE_NAME_NORMALIZED.convert())
                 val buffer = allocArray<WCHARVar>(size.convert())
                 GetFinalPathNameByHandleW(handle, buffer, size, FILE_NAME_NORMALIZED.convert())
-                buffer.toKString()
+                buffer.toKString().removePrefix("""\\?""")
             } finally {
                 CloseHandle(handle)
             }

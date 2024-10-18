@@ -6,7 +6,7 @@ import kotlin.text.substringAfterLast
 
 internal abstract class StringBackedAbsolutePath : ElementPath {
     override val name: String
-        get() = absolutePath.substringAfterLast("/")
+        get() = absolutePath.substringAfterLast(separator)
 
     abstract override val parent: StringBackedAbsolutePath?
 

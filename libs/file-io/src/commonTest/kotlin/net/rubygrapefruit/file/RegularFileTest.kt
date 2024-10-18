@@ -505,7 +505,8 @@ class RegularFileTest : AbstractFileSystemElementTest<RegularFile>() {
         file.writeText("1234")
         assertTrue(file.metadata().regularFile)
 
-        val longString = (0..2000).joinToString(",")
+        val longString = (0..20000).joinToString(",")
+        require(longString.length > 16384)
 
         for (action in textWriteActions) {
             file.writeText("1234")

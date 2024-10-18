@@ -1,6 +1,7 @@
 package net.rubygrapefruit.io
 
 import kotlinx.io.Buffer
+import kotlinx.io.EOFException
 import kotlinx.io.UnsafeIoApi
 import kotlinx.io.unsafe.UnsafeBufferOperations
 import kotlin.math.min
@@ -10,17 +11,19 @@ import kotlin.math.min
  */
 @UnsafeIoApi
 inline fun Buffer.readFrom(byteCount: Long, consumer: (ByteArray, Int, Int) -> Unit) {
-    if (byteCount == 0L) {
-        return
-    }
     var remaining = byteCount
-    UnsafeBufferOperations.readFromHead(this) { buffer, startIndex, endIndex ->
-        val max = if (remaining > Int.MAX_VALUE) Int.MAX_VALUE else remaining.toInt()
-        val available = endIndex - startIndex
-        val count = min(max, available)
-        consumer(buffer, startIndex, count)
-        remaining -= count
-        count
+    while (remaining > 0) {
+        val read = UnsafeBufferOperations.readFromHead(this) { buffer, startIndex, endIndex ->
+            val max = if (remaining > Int.MAX_VALUE) Int.MAX_VALUE else remaining.toInt()
+            val available = endIndex - startIndex
+            val count = min(max, available)
+            consumer(buffer, startIndex, count)
+            count
+        }
+        if (read == 0) {
+            throw EOFException()
+        }
+        remaining -= read
     }
 }
 

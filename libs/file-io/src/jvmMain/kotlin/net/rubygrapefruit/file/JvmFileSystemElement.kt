@@ -152,7 +152,7 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
             throw readFile(this, cause = e)
         }
         return inputStream.use { stream ->
-            val source = InputStreamBackedRawSource(FileSource(path), stream).buffered()
+            val source = InputStreamBackedRawSource(FileSource(this@JvmRegularFile), stream).buffered()
             action(source)
         }
     }

@@ -3,7 +3,6 @@ package net.rubygrapefruit.io.stream
 import kotlinx.io.Buffer
 import kotlinx.io.RawSource
 import kotlinx.io.UnsafeIoApi
-import net.rubygrapefruit.io.readFile
 import net.rubygrapefruit.io.writeAtMostTo
 import java.io.InputStream
 
@@ -17,7 +16,7 @@ class InputStreamBackedRawSource(
             val nread = try {
                 inputStream.read(buffer, startIndex, count)
             } catch (e: Exception) {
-                throw readFile(streamSource, cause = e)
+                throw streamSource.readFailed(e)
             }
             if (nread < 0) 0 else nread
         }

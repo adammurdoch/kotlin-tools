@@ -111,7 +111,7 @@ internal class UnixRegularFile(path: ElementPath) : UnixFileSystemElement(path),
             if (des < 0) {
                 throw openFile(this@UnixRegularFile, errorCode = UnixErrorCode.last())
             }
-            UnixFileContent(FileSource(path), des)
+            UnixFileContent(FileSource(this@UnixRegularFile), des)
         }
     }
 
@@ -125,7 +125,7 @@ internal class UnixRegularFile(path: ElementPath) : UnixFileSystemElement(path),
                 throw writeToFile(this@UnixRegularFile, UnixErrorCode.last())
             }
             try {
-                val sink = FileDescriptorBackedRawSink(FileSource(path), WriteDescriptor(des)).buffered()
+                val sink = FileDescriptorBackedRawSink(FileSource(this@UnixRegularFile), WriteDescriptor(des)).buffered()
                 val result = action(sink)
                 sink.flush()
                 result
@@ -142,7 +142,7 @@ internal class UnixRegularFile(path: ElementPath) : UnixFileSystemElement(path),
                 throw readFile(this@UnixRegularFile, UnixErrorCode.last())
             }
             try {
-                action(FileDescriptorBackedRawSource(FileSource(path), ReadDescriptor(des)).buffered())
+                action(FileDescriptorBackedRawSource(FileSource(this@UnixRegularFile), ReadDescriptor(des)).buffered())
             } finally {
                 close(des)
             }

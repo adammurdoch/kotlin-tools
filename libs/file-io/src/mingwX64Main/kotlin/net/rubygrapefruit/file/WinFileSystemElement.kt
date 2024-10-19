@@ -261,7 +261,7 @@ internal class WinRegularFile(path: ElementPath) : WinFileSystemElement(path), R
         if (handle == INVALID_HANDLE_VALUE) {
             throw openFile(this@WinRegularFile, errorCode = WinErrorCode.last())
         }
-        return WinFileContent(path, handle!!)
+        return WinFileContent(FileSource(this), handle!!)
     }
 
     override fun <T> write(action: (Sink) -> T): T {
@@ -278,7 +278,7 @@ internal class WinRegularFile(path: ElementPath) : WinFileSystemElement(path), R
             throw writeToFile(this@WinRegularFile, errorCode = WinErrorCode.last())
         }
         return try {
-            FileBackedRawSink(FileSource(path), handle!!).use {
+            FileBackedRawSink(FileSource(this), handle!!).use {
                 val buffered = it.buffered()
                 val result = action(buffered)
                 buffered.flush()
@@ -306,7 +306,7 @@ internal class WinRegularFile(path: ElementPath) : WinFileSystemElement(path), R
             throw readFile(this@WinRegularFile, errorCode = WinErrorCode.last())
         }
         return try {
-            FileBackedRawSource(FileSource(path), handle!!).use {
+            FileBackedRawSource(FileSource(this), handle!!).use {
                 val buffered = it.buffered()
                 action(buffered)
             }

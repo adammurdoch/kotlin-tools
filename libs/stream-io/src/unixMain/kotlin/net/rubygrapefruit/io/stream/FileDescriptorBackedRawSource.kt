@@ -10,7 +10,6 @@ import kotlinx.io.RawSource
 import kotlinx.io.UnsafeIoApi
 import net.rubygrapefruit.io.UnixErrorCode
 import net.rubygrapefruit.io.isNotFile
-import net.rubygrapefruit.io.readFile
 import net.rubygrapefruit.io.writeAtMostTo
 import platform.posix.EISDIR
 import platform.posix.errno
@@ -25,7 +24,7 @@ class FileDescriptorBackedRawSource(private val streamSource: StreamSource, priv
                 if (errno == EISDIR) {
                     throw isNotFile(streamSource)
                 } else {
-                    throw readFile(streamSource, UnixErrorCode.last())
+                    throw streamSource.readFailed(UnixErrorCode.last())
                 }
             }
             nread

@@ -6,7 +6,6 @@ import kotlinx.cinterop.*
 import kotlinx.io.Buffer
 import kotlinx.io.RawSource
 import kotlinx.io.UnsafeIoApi
-import net.rubygrapefruit.io.IOException
 import net.rubygrapefruit.io.WinErrorCode
 import net.rubygrapefruit.io.writeAtMostTo
 import platform.windows.*
@@ -20,7 +19,7 @@ class FileBackedRawSource(private val streamSource: StreamSource, private val ha
                 buffer.usePinned { ptr ->
                     if (ReadFile(handle, ptr.addressOf(startIndex), count.convert(), nbytes.ptr, null) == 0) {
                         if (GetLastError().convert<Int>() != ERROR_BROKEN_PIPE) {
-                            throw IOException("Could not read from ${streamSource.displayName}.", WinErrorCode.last())
+                            throw streamSource.readFailed(WinErrorCode.last())
                         }
                         nbytes.value = 0.convert()
                     }

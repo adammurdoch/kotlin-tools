@@ -49,15 +49,15 @@ internal actual fun start(spec: ProcessStartSpec): ProcessControl {
         startupInfo.cbReserved2 = 0.convert()
         if (descriptors != null) {
             startupInfo.dwFlags = STARTF_USESTDHANDLES.convert()
-            startupInfo.hStdInput = null
+            startupInfo.hStdInput = GetStdHandle(STD_INPUT_HANDLE)
             startupInfo.hStdOutput = descriptors.write
-            startupInfo.hStdError = null
+            startupInfo.hStdError = GetStdHandle(STD_ERROR_HANDLE)
         }
         val processInfo = alloc<PROCESS_INFORMATION>()
-        formattedCommandLine.usePinned {
+        formattedCommandLine.usePinned { cl ->
             if (CreateProcessW(
                     null,
-                    it.addressOf(0).reinterpret(),
+                    cl.addressOf(0).reinterpret(),
                     null,
                     null,
                     FALSE,

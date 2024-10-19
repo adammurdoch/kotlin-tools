@@ -49,9 +49,9 @@ internal actual fun start(spec: ProcessStartSpec): ProcessControl {
         startupInfo.cbReserved2 = 0.convert()
         if (descriptors != null) {
             startupInfo.dwFlags = STARTF_USESTDHANDLES.convert()
-            startupInfo.hStdInput = GetStdHandle(STD_INPUT_HANDLE)
+            startupInfo.hStdInput = null
             startupInfo.hStdOutput = descriptors.write
-            startupInfo.hStdError = GetStdHandle(STD_ERROR_HANDLE)
+            startupInfo.hStdError = null
         }
         val processInfo = alloc<PROCESS_INFORMATION>()
         formattedCommandLine.usePinned { cl ->
@@ -60,7 +60,7 @@ internal actual fun start(spec: ProcessStartSpec): ProcessControl {
                     cl.addressOf(0).reinterpret(),
                     null,
                     null,
-                    FALSE,
+                    if (descriptors != null) TRUE else FALSE,
                     0.convert(),
                     null,
                     null,
@@ -73,6 +73,7 @@ internal actual fun start(spec: ProcessStartSpec): ProcessControl {
         }
         CloseHandle(processInfo.hThread)
         if (descriptors != null) {
+            // TODO - close this
             CloseHandle(descriptors.write)
         }
         processInfo.hProcess

@@ -22,6 +22,7 @@ class FileBackedRawSource(private val streamSource: StreamSource, private val ha
                         if (GetLastError().convert<Int>() != ERROR_BROKEN_PIPE) {
                             throw IOException("Could not read from ${streamSource.displayName}.", WinErrorCode.last())
                         }
+                        nbytes.value = 0.convert()
                     }
                 }
                 nbytes.value.convert()

@@ -36,14 +36,15 @@ internal class UnixProcess(
     }
 
     private fun MemScope.waitAndGetExitCode(): Int {
-        val exitCode = alloc<IntVar>()
+        val status = alloc<IntVar>()
         while (true) {
-            val result = waitpid(pid, exitCode.ptr, 0)
+            val result = waitpid(pid, status.ptr, 0)
             if (result == pid) {
-                if (spec.checkExitCode && exitCode.value != 0) {
-                    throw IOException("Command failed with exit code ${exitCode.value}")
+                val exitCode = status.value.and(0xFF00).ushr(8)
+                if (spec.checkExitCode && exitCode != 0) {
+                    throw IOException("Command failed with exit code ${exitCode}")
                 }
-                return exitCode.value.and(0xFF00).ushr(8)
+                return exitCode
             } else if (errno != EINTR) {
                 throw IOException("Could not wait for child process.", UnixErrorCode.last())
             }

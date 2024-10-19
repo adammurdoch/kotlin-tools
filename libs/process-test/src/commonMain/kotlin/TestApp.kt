@@ -4,6 +4,7 @@ import kotlin.system.exitProcess
 
 class TestApp : CliApp("test") {
     private val action by actions {
+        action(EchoAction(), "echo")
         action(CountAction(), "count")
         action(FailAction(), "fail")
         action(DefaultAction())
@@ -35,6 +36,14 @@ class CountAction : CliAction() {
         for (i in 1..number) {
             println(i)
         }
+    }
+}
+
+class EchoAction : CliAction() {
+    val message by parameter("message")
+
+    override fun run() {
+        println(message)
     }
 }
 

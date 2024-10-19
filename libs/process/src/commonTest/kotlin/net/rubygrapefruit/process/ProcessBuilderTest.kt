@@ -29,12 +29,12 @@ class ProcessBuilderTest {
 
     @Test
     fun `throws exception when command exits with non-zero`() {
-        val process = Process.start(listOf(TestApp.path, "fail"))
+        val process = Process.start(listOf(TestApp.path, "fail", "12"))
         try {
             process.waitFor()
             fail()
-        } catch (_: IOException) {
-            // Expected
+        } catch (e: IOException) {
+            assertEquals("Command failed with exit code 12", e.message)
         }
     }
 
@@ -55,12 +55,12 @@ class ProcessBuilderTest {
 
     @Test
     fun `throws exception when collecting output and command exits with non-zero`() {
-        val process = Process.command(listOf(TestApp.path, "fail")).collectOutput().start()
+        val process = Process.command(listOf(TestApp.path, "fail", "4")).collectOutput().start()
         try {
             process.waitFor()
             fail()
-        } catch (_: IOException) {
-            // Expected
+        } catch (e: IOException) {
+            assertEquals("Command failed with exit code 4", e.message)
         }
     }
 
@@ -87,5 +87,13 @@ class ProcessBuilderTest {
         }.start().waitFor()
 
         assertEquals("greetings\n", result)
+    }
+
+    @Test
+    fun `can run command with spaces in arguments`() {
+        Process.start(listOf(TestApp.path, "echo", "this is an argument")).waitFor()
+
+        val out = Process.command(listOf(TestApp.path, "echo", "this is an argument")).collectOutput().start().waitFor()
+        assertEquals("this is an argument", out.trim())
     }
 }

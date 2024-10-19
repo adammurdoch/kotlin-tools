@@ -332,7 +332,7 @@ internal class WinSymLink(path: ElementPath) : WinFileSystemElement(path), SymLi
                 0.convert(),
                 null,
                 OPEN_EXISTING.convert(),
-                (FILE_ATTRIBUTE_NORMAL or FILE_FLAG_OPEN_REPARSE_POINT).convert(),
+                FILE_ATTRIBUTE_NORMAL.convert(),
                 null
             )
             if (handle == INVALID_HANDLE_VALUE) {
@@ -345,7 +345,7 @@ internal class WinSymLink(path: ElementPath) : WinFileSystemElement(path), SymLi
                 val size = GetFinalPathNameByHandleW(handle, null, 0.convert(), FILE_NAME_NORMALIZED.convert())
                 val buffer = allocArray<WCHARVar>(size.convert())
                 GetFinalPathNameByHandleW(handle, buffer, size, FILE_NAME_NORMALIZED.convert())
-                buffer.toKString().removePrefix("""\\?""")
+                buffer.toKString().removePrefix("""\\?\""")
             } finally {
                 CloseHandle(handle)
             }

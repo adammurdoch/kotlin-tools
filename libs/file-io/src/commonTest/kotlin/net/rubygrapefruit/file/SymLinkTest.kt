@@ -40,7 +40,7 @@ class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
     }
 
     @Test
-    fun `can create a symlink`() {
+    fun `can create a symlink that references nothing`() {
         val link = fixture.testDir.symLink("link")
 
         assertTrue(link.metadata().missing)
@@ -73,6 +73,20 @@ class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
 
         assertIs<SymlinkMetadata>(link.metadata().get())
         assertEquals(file.name, link.readSymLink())
+    }
+
+    @Test
+    fun `can create a symlink that references a directory`() {
+        val dir = fixture.dir("dir") {
+            file("a1.txt")
+        }
+
+        val link = fixture.testDir.symLink("link")
+
+        link.writeSymLink(dir.name)
+
+        assertIs<SymlinkMetadata>(link.metadata().get())
+        assertEquals(dir.name, link.readSymLink())
     }
 
     @Test
@@ -157,6 +171,23 @@ class SymLinkTest : AbstractFileSystemElementTest<SymLink>() {
 
         assertIs<Success<*>>(result)
         assertIs<RegularFileMetadata>(result.get().metadata)
+        assertEquals(target.path, result.get().path)
+    }
+
+    @Test
+    fun `can resolve relative symlink to directory`() {
+        val target = fixture.dir("dir") {
+            file("file.txt")
+        }
+
+        val link = fixture.testDir.symLink("link")
+
+        link.writeSymLink(target.name)
+
+        val result = link.resolve()
+
+        assertIs<Success<*>>(result)
+        assertIs<DirectoryMetadata>(result.get().metadata)
         assertEquals(target.path, result.get().path)
     }
 

@@ -25,6 +25,7 @@
 - Error handling for read and write actions that fail
 - Add some abstract permission functions, e.g. can read, set readable, etc
 - Atomic `Directory.createTemporaryDirectory()` implementation on Windows
+- Query symlinks on Windows as reparse points: FSCTL_GET_REPARSE_POINT
 - Query Windows ACLs
 - Query file systems on the machine
 - Provide specialized subtypes of `FileSystemElement` for each platform

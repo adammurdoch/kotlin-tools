@@ -23,7 +23,7 @@ internal actual fun start(spec: ProcessStartSpec): ProcessControl {
                 throw IOException("Could not create pipe", WinErrorCode.last())
             }
             if (SetHandleInformation(readHandle.value, HANDLE_FLAG_INHERIT.convert(), 0.convert()) == 0) {
-                throw IOException("Could not create pipe", WinErrorCode.last())
+                throw IOException("Could set handle information", WinErrorCode.last())
             }
             Descriptors(readHandle.value!!, writeHandle.value!!)
         }
@@ -34,7 +34,13 @@ internal actual fun start(spec: ProcessStartSpec): ProcessControl {
         TODO()
     }
     val handle = memScoped {
-        val formattedCommandLine = spec.commandLine.joinToString(" ")
+        val formattedCommandLine = spec.commandLine.joinToString(" ") { arg ->
+            if (arg.contains(" ")) {
+                "\"$arg\""
+            } else {
+                arg
+            }
+        }
         val startupInfo = alloc<STARTUPINFOW>()
         startupInfo.cb = sizeOf<STARTUPINFOW>().convert()
         startupInfo.dwFlags = 0.convert()
@@ -96,6 +102,9 @@ internal actual fun start(spec: ProcessStartSpec): ProcessControl {
                     exitCode
                 }
             } finally {
+                if (descriptors != null) {
+                    CloseHandle(descriptors.read)
+                }
                 CloseHandle(handle)
             }
         }

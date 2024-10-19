@@ -7,6 +7,7 @@ import kotlinx.io.Buffer
 import kotlinx.io.RawSource
 import kotlinx.io.UnsafeIoApi
 import net.rubygrapefruit.io.IOException
+import net.rubygrapefruit.io.WinErrorCode
 import net.rubygrapefruit.io.writeAtMostTo
 import platform.windows.CloseHandle
 import platform.windows.DWORDVar
@@ -21,7 +22,7 @@ class FileBackedRawSource(private val streamSource: StreamSource, private val ha
             val ncopied = sink.writeAtMostTo(byteCount) { buffer, startIndex, count ->
                 buffer.usePinned { ptr ->
                     if (ReadFile(handle, ptr.addressOf(startIndex), count.convert(), nbytes.ptr, null) == 0) {
-                        throw IOException("Could not read from ${streamSource.displayName}.")
+                        throw IOException("Could not read from ${streamSource.displayName}.", WinErrorCode.last())
                     }
                 }
                 nbytes.value.convert()

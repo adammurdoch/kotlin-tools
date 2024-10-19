@@ -22,7 +22,7 @@ class FileBackedRawSink(private val streamSource: StreamSource, private val hand
             source.readFrom(byteCount) { buffer, startIndex, count ->
                 buffer.usePinned { ptr ->
                     if (WriteFile(handle, ptr.addressOf(startIndex), count.convert(), written.ptr, null) == 0) {
-                        throw IOException("Could not write to ${streamSource.displayName}.")
+                        throw IOException("Could not write to ${streamSource.displayName}.", WinErrorCode.last())
                     }
                     written.value.convert<Int>()
                 }

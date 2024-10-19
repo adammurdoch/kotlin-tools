@@ -2,10 +2,12 @@ package net.rubygrapefruit.process
 
 import kotlinx.io.readString
 import kotlinx.io.writeString
-import net.rubygrapefruit.file.fileSystem
 import net.rubygrapefruit.file.fixtures.FilesFixture
 import net.rubygrapefruit.io.IOException
-import kotlin.test.*
+import kotlin.test.AfterTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.fail
 
 
 expect fun pwd(): List<String>
@@ -27,48 +29,37 @@ class ProcessBuilderTest {
 
     @Test
     fun `throws exception when command exits with non-zero`() {
-        val process = Process.start(ls() + listOf("missing"))
+        val process = Process.start(listOf(TestApp.path, "fail"))
         try {
             process.waitFor()
             fail()
-        } catch (e: IOException) {
+        } catch (_: IOException) {
             // Expected
         }
     }
 
     @Test
     fun `can run command and get exit code`() {
-        val pwd = Process.command(pwd()).collectExitCode().start().waitFor()
-        assertEquals(0, pwd)
+        val zero = Process.command(listOf(TestApp.path)).collectExitCode().start().waitFor()
+        assertEquals(0, zero)
 
-        val ls = Process.command(ls()).collectExitCode().start().waitFor()
-        assertEquals(0, ls)
-
-        val ls2 = Process.command(ls() + listOf("missing")).collectExitCode().start().waitFor()
-        assertNotEquals(0, ls2)
+        val nonZero = Process.command(listOf(TestApp.path, "fail", "12")).collectExitCode().start().waitFor()
+        assertEquals(12, nonZero)
     }
 
     @Test
     fun `can run command and collect output`() {
-        val pwd = Process.command(pwd()).collectOutput().start().waitFor()
-        assertEquals(fileSystem.currentDirectory.absolutePath, pwd.trim())
-
-        val dir = fixture.dir("test") {
-            file("1")
-            file("2")
-        }
-
-        val ls = Process.command(listOf("ls", dir.absolutePath)).collectOutput().start().waitFor()
-        assertEquals(listOf("1", "2"), ls.trim().lines().sorted())
+        val out = Process.command(listOf(TestApp.path, "count", "2")).collectOutput().start().waitFor()
+        assertEquals(listOf("1", "2"), out.trim().lines())
     }
 
     @Test
     fun `throws exception when collecting output and command exits with non-zero`() {
-        val process = Process.command(ls() + listOf("missing")).collectOutput().start()
+        val process = Process.command(listOf(TestApp.path, "fail")).collectOutput().start()
         try {
             process.waitFor()
             fail()
-        } catch (e: IOException) {
+        } catch (_: IOException) {
             // Expected
         }
     }

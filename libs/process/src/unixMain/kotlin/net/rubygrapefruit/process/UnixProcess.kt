@@ -43,7 +43,7 @@ internal class UnixProcess(
                 if (spec.checkExitCode && exitCode.value != 0) {
                     throw IOException("Command failed with exit code ${exitCode.value}")
                 }
-                return exitCode.value
+                return exitCode.value.and(0xFF00).ushr(8)
             } else if (errno != EINTR) {
                 throw IOException("Could not wait for child process.", UnixErrorCode.last())
             }

@@ -40,22 +40,22 @@ class ProcessBuilderTest {
 
     @Test
     fun `can run command and get exit code`() {
-        val zero = Process.command(listOf(TestApp.path)).collectExitCode().start().waitFor()
+        val zero = Process.command(TestApp.path).collectExitCode().start().waitFor()
         assertEquals(0, zero)
 
-        val nonZero = Process.command(listOf(TestApp.path, "fail", "12")).collectExitCode().start().waitFor()
+        val nonZero = Process.command(TestApp.path, "fail", "12").collectExitCode().start().waitFor()
         assertEquals(12, nonZero)
     }
 
     @Test
     fun `can run command and collect output`() {
-        val out = Process.command(listOf(TestApp.path, "count", "2")).collectOutput().start().waitFor()
+        val out = Process.command(TestApp.path, "count", "2").collectOutput().start().waitFor()
         assertEquals(listOf("1", "2"), out.trim().lines())
     }
 
     @Test
     fun `throws exception when collecting output and command exits with non-zero`() {
-        val process = Process.command(listOf(TestApp.path, "fail", "4")).collectOutput().start()
+        val process = Process.command(TestApp.path, "fail", "4").collectOutput().start()
         try {
             process.waitFor()
             fail()
@@ -69,13 +69,13 @@ class ProcessBuilderTest {
         val dir = fixture.dir("test") {
         }
 
-        val pwd = Process.command(listOf(TestApp.path, "pwd")).directory(dir).collectOutput().start().waitFor()
+        val pwd = Process.command(TestApp.path, "pwd").directory(dir).collectOutput().start().waitFor()
         assertEquals(dir.absolutePath, pwd.trim())
     }
 
     @Test
     fun `can run command and act on input and output`() {
-        val result = Process.command("head", "-n", "1").withInputAndOutput { read, write ->
+        val result = Process.command(TestApp.path, "head", "1").withInputAndOutput { read, write ->
             write.writeString("greetings\nignore this\n")
             write.emit()
             read.readString()

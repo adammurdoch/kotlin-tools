@@ -7,31 +7,28 @@ import kotlinx.io.RawSink
 import kotlinx.io.RawSource
 import net.rubygrapefruit.io.IOException
 import net.rubygrapefruit.io.WinErrorCode
+import net.rubygrapefruit.io.stream.FileBackedRawSink
 import net.rubygrapefruit.io.stream.FileBackedRawSource
 import platform.windows.*
 
 internal actual fun start(spec: ProcessStartSpec): ProcessControl {
-    val descriptors = if (spec.collectStdout) {
-        memScoped {
-            val securityAttributes = alloc<SECURITY_ATTRIBUTES>()
-            securityAttributes.nLength = sizeOf<SECURITY_ATTRIBUTES>().convert()
-            securityAttributes.bInheritHandle = TRUE
-            securityAttributes.lpSecurityDescriptor = null
-            val readHandle = alloc<HANDLEVar>()
-            val writeHandle = alloc<HANDLEVar>()
-            if (CreatePipe(readHandle.ptr, writeHandle.ptr, securityAttributes.ptr, 0.convert()) == 0) {
-                throw IOException("Could not create pipe", WinErrorCode.last())
-            }
-            if (SetHandleInformation(readHandle.value, HANDLE_FLAG_INHERIT.convert(), 0.convert()) == 0) {
-                throw IOException("Could set handle information", WinErrorCode.last())
-            }
-            Descriptors(readHandle.value!!, writeHandle.value!!)
+    val stdoutDescriptors = if (spec.collectStdout) {
+        val pipe = pipe()
+        if (SetHandleInformation(pipe.read, HANDLE_FLAG_INHERIT.convert(), 0.convert()) == 0) {
+            throw IOException("Could set handle information", WinErrorCode.last())
         }
+        pipe
     } else {
         null
     }
-    if (spec.receiveStdin) {
-        TODO()
+    val stdinDescriptors = if (spec.receiveStdin) {
+        val pipe = pipe()
+        if (SetHandleInformation(pipe.write, HANDLE_FLAG_INHERIT.convert(), 0.convert()) == 0) {
+            throw IOException("Could set handle information", WinErrorCode.last())
+        }
+        pipe
+    } else {
+        null
     }
     val handle = memScoped {
         val formattedCommandLine = spec.commandLine.joinToString(" ") { arg ->
@@ -47,11 +44,16 @@ internal actual fun start(spec: ProcessStartSpec): ProcessControl {
         startupInfo.lpReserved = null
         startupInfo.lpReserved2 = null
         startupInfo.cbReserved2 = 0.convert()
-        if (descriptors != null) {
+        startupInfo.hStdInput = null
+        startupInfo.hStdOutput = null
+        startupInfo.hStdError = null
+        if (stdoutDescriptors != null) {
             startupInfo.dwFlags = STARTF_USESTDHANDLES.convert()
-            startupInfo.hStdInput = null
-            startupInfo.hStdOutput = descriptors.write
-            startupInfo.hStdError = null
+            startupInfo.hStdOutput = stdoutDescriptors.write
+        }
+        if (stdinDescriptors != null) {
+            startupInfo.dwFlags = STARTF_USESTDHANDLES.convert()
+            startupInfo.hStdInput = stdinDescriptors.read
         }
         val processInfo = alloc<PROCESS_INFORMATION>()
         formattedCommandLine.usePinned { cl ->
@@ -60,10 +62,10 @@ internal actual fun start(spec: ProcessStartSpec): ProcessControl {
                     cl.addressOf(0).reinterpret(),
                     null,
                     null,
-                    if (descriptors != null) TRUE else FALSE,
+                    if (stdoutDescriptors != null) TRUE else FALSE,
                     0.convert(),
                     null,
-                    null,
+                    spec.directory?.absolutePath,
                     startupInfo.ptr,
                     processInfo.ptr
                 ) == 0
@@ -72,19 +74,23 @@ internal actual fun start(spec: ProcessStartSpec): ProcessControl {
             }
         }
         CloseHandle(processInfo.hThread)
-        if (descriptors != null) {
-            // TODO - close this
-            CloseHandle(descriptors.write)
+        if (stdoutDescriptors != null) {
+            // TODO - close this on error
+            CloseHandle(stdoutDescriptors.write)
+        }
+        if (stdinDescriptors != null) {
+            // TODO - close this on error
+            CloseHandle(stdinDescriptors.read)
         }
         processInfo.hProcess
     }
 
     return object : ProcessControl {
         override val stdout: RawSource
-            get() = FileBackedRawSource(ProcessSource, descriptors!!.read)
+            get() = FileBackedRawSource(ProcessSource, stdoutDescriptors!!.read)
 
         override val stdin: RawSink
-            get() = TODO("Not yet implemented")
+            get() = FileBackedRawSink(ProcessSource, stdinDescriptors!!.write)
 
         override fun waitFor(): Int {
             try {
@@ -103,12 +109,30 @@ internal actual fun start(spec: ProcessStartSpec): ProcessControl {
                     exitCode
                 }
             } finally {
-                if (descriptors != null) {
-                    CloseHandle(descriptors.read)
+                if (stdoutDescriptors != null) {
+                    CloseHandle(stdoutDescriptors.read)
+                }
+                if (stdinDescriptors != null) {
+                    CloseHandle(stdinDescriptors.write)
                 }
                 CloseHandle(handle)
             }
         }
+    }
+}
+
+private fun pipe(): Descriptors {
+    return memScoped {
+        val securityAttributes = alloc<SECURITY_ATTRIBUTES>()
+        securityAttributes.nLength = sizeOf<SECURITY_ATTRIBUTES>().convert()
+        securityAttributes.bInheritHandle = TRUE
+        securityAttributes.lpSecurityDescriptor = null
+        val readHandle = alloc<HANDLEVar>()
+        val writeHandle = alloc<HANDLEVar>()
+        if (CreatePipe(readHandle.ptr, writeHandle.ptr, securityAttributes.ptr, 0.convert()) == 0) {
+            throw IOException("Could not create pipe", WinErrorCode.last())
+        }
+        Descriptors(readHandle.value!!, writeHandle.value!!)
     }
 }
 

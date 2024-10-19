@@ -278,7 +278,7 @@ internal class WinRegularFile(path: ElementPath) : WinFileSystemElement(path), R
             throw writeToFile(this@WinRegularFile, errorCode = WinErrorCode.last())
         }
         return try {
-            FileBackedRawSink(FileSource(path), handle).use {
+            FileBackedRawSink(FileSource(path), handle!!).use {
                 val buffered = it.buffered()
                 val result = action(buffered)
                 buffered.flush()

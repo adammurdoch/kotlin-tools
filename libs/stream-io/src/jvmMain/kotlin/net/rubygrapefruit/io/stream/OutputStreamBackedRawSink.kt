@@ -1,4 +1,4 @@
-package net.rubygrapefruit.file
+package net.rubygrapefruit.io.stream
 
 import kotlinx.io.Buffer
 import kotlinx.io.RawSink
@@ -7,7 +7,7 @@ import net.rubygrapefruit.io.readFrom
 import java.io.OutputStream
 
 @OptIn(UnsafeIoApi::class)
-internal class OutputStreamBackedRawSink(
+class OutputStreamBackedRawSink(
     private val outputStream: OutputStream
 ) : RawSink {
     override fun write(source: Buffer, byteCount: Long) {

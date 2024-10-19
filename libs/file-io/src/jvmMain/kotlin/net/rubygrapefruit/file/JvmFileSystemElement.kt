@@ -4,6 +4,8 @@ import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.buffered
 import net.rubygrapefruit.io.Resource
+import net.rubygrapefruit.io.stream.InputStreamBackedRawSource
+import net.rubygrapefruit.io.stream.OutputStreamBackedRawSink
 import java.io.IOException
 import java.io.RandomAccessFile
 import java.nio.file.*
@@ -150,7 +152,7 @@ internal class JvmRegularFile(path: Path) : JvmFileSystemElement(path), RegularF
             throw readFile(this, cause = e)
         }
         return inputStream.use { stream ->
-            val source = InputStreamBackedRawSource(this, stream).buffered()
+            val source = InputStreamBackedRawSource(FileSource(path), stream).buffered()
             action(source)
         }
     }

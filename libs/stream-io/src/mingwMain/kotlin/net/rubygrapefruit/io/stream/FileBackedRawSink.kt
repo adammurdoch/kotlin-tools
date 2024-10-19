@@ -15,7 +15,7 @@ import platform.windows.HANDLE
 import platform.windows.WriteFile
 
 @OptIn(UnsafeIoApi::class)
-class FileBackedRawSink(private val streamSource: StreamSource, private val handle: HANDLE?) : RawSink {
+class FileBackedRawSink(private val streamSource: StreamSource, private val handle: HANDLE) : RawSink {
 
     override fun write(source: Buffer, byteCount: Long) {
         memScoped {

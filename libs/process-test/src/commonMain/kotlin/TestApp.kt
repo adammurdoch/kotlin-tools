@@ -1,6 +1,12 @@
+import kotlinx.io.Buffer
+import kotlinx.io.buffered
+import kotlinx.io.readString
+import kotlinx.io.writeCodePointValue
 import net.rubygrapefruit.cli.app.CliAction
 import net.rubygrapefruit.cli.app.CliApp
 import net.rubygrapefruit.file.fileSystem
+import net.rubygrapefruit.io.stream.stdin
+import net.rubygrapefruit.io.stream.stdout
 import kotlin.system.exitProcess
 
 class TestApp : CliApp("test") {
@@ -8,6 +14,7 @@ class TestApp : CliApp("test") {
         action(PwdAction(), "pwd")
         action(EchoAction(), "echo")
         action(CountAction(), "count")
+        action(HeadAction(), "head")
         action(FailAction(), "fail")
         action(DefaultAction())
     }
@@ -32,10 +39,10 @@ class FailAction : CliAction() {
 }
 
 class CountAction : CliAction() {
-    val number by int().parameter("number")
+    val count by int().parameter("count")
 
     override fun run() {
-        for (i in 1..number) {
+        for (i in 1..count) {
             println(i)
         }
     }
@@ -46,6 +53,36 @@ class EchoAction : CliAction() {
 
     override fun run() {
         println(message)
+    }
+}
+
+class HeadAction : CliAction() {
+    val count by int().parameter("count")
+
+    override fun run() {
+        val sink = stdout.buffered()
+        try {
+            var lines = 0
+            while (true) {
+                val buffer = Buffer()
+                val nread = stdin.readAtMostTo(buffer, 1024)
+                if (nread < 0) {
+                    return
+                }
+                val text = buffer.readString()
+                for (ch in text) {
+                    sink.writeCodePointValue(ch.code)
+                    if (ch == '\n') {
+                        lines++
+                    }
+                    if (lines >= count) {
+                        return
+                    }
+                }
+            }
+        } finally {
+            sink.flush()
+        }
     }
 }
 

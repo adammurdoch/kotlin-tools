@@ -5,6 +5,7 @@ plugins {
 application {
     common {
         implementation(project(":cli-app"))
+        implementation(project(":stream-io"))
         implementation(project(":file-io"))
     }
 }

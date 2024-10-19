@@ -2,14 +2,20 @@
 
 package net.rubygrapefruit.file
 
-import kotlinx.cinterop.*
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.alloc
+import kotlinx.cinterop.memScoped
+import kotlinx.cinterop.ptr
 import kotlinx.io.RawSink
 import kotlinx.io.RawSource
-import net.rubygrapefruit.io.stream.*
+import net.rubygrapefruit.io.stream.FileDescriptorBackedRawSink
+import net.rubygrapefruit.io.stream.FileDescriptorBackedRawSource
+import net.rubygrapefruit.io.stream.ReadDescriptor
+import net.rubygrapefruit.io.stream.WriteDescriptor
 import platform.posix.*
 
 internal class UnixFileContent(
-    private val fileSource: UnixRegularFile.FileSource,
+    private val fileSource: FileSource,
     private val des: Int
 ) : FileContent, AutoCloseable {
     override val currentPosition: Long

@@ -6,7 +6,7 @@ import kotlinx.cinterop.*
 import kotlinx.io.Buffer
 import kotlinx.io.RawSink
 import kotlinx.io.UnsafeIoApi
-import net.rubygrapefruit.file.NativeException
+import net.rubygrapefruit.io.IOException
 import net.rubygrapefruit.io.readFrom
 import platform.windows.CloseHandle
 import platform.windows.DWORDVar
@@ -14,7 +14,7 @@ import platform.windows.HANDLE
 import platform.windows.WriteFile
 
 @OptIn(UnsafeIoApi::class)
-internal class FileBackedRawSink(private val path: String, private val handle: HANDLE?) : RawSink {
+class FileBackedRawSink(private val streamSource: StreamSource, private val handle: HANDLE?) : RawSink {
 
     override fun write(source: Buffer, byteCount: Long) {
         memScoped {
@@ -22,7 +22,7 @@ internal class FileBackedRawSink(private val path: String, private val handle: H
             source.readFrom(byteCount) { buffer, startIndex, count ->
                 buffer.usePinned { ptr ->
                     if (WriteFile(handle, ptr.addressOf(startIndex), count.convert(), written.ptr, null) == 0) {
-                        throw NativeException("Could not write to file $path.")
+                        throw IOException("Could not write to ${streamSource.displayName}.")
                     }
                     written.value.convert<Int>()
                 }

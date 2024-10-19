@@ -17,15 +17,15 @@ import platform.posix.errno
 import platform.posix.read
 
 @OptIn(UnsafeIoApi::class)
-class FileDescriptorBackedRawSource(private val fileSource: StreamSource, private val descriptor: ReadDescriptor) : RawSource {
+class FileDescriptorBackedRawSource(private val streamSource: StreamSource, private val descriptor: ReadDescriptor) : RawSource {
     override fun readAtMostTo(sink: Buffer, byteCount: Long): Long {
         val ncopied = sink.writeAtMostTo(byteCount) { buffer, startIndex, count ->
             val nread = read(descriptor.descriptor, buffer.refTo(startIndex), count.convert()).convert<Int>()
             if (nread < 0) {
                 if (errno == EISDIR) {
-                    throw isNotFile(fileSource)
+                    throw isNotFile(streamSource)
                 } else {
-                    throw readFile(fileSource, UnixErrorCode.last())
+                    throw readFile(streamSource, UnixErrorCode.last())
                 }
             }
             nread

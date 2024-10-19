@@ -74,7 +74,7 @@ internal actual fun start(spec: ProcessStartSpec): ProcessControl {
 
     return object : ProcessControl {
         override val stdout: RawSource
-            get() = FileBackedRawSource("??", descriptors!!.read)
+            get() = FileBackedRawSource(ProcessSource, descriptors!!.read)
 
         override val stdin: RawSink
             get() = TODO("Not yet implemented")

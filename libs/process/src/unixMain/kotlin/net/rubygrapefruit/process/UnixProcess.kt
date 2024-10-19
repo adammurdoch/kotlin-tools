@@ -7,7 +7,10 @@ import kotlinx.io.RawSink
 import kotlinx.io.RawSource
 import net.rubygrapefruit.io.IOException
 import net.rubygrapefruit.io.UnixErrorCode
-import net.rubygrapefruit.io.stream.*
+import net.rubygrapefruit.io.stream.FileDescriptorBackedRawSink
+import net.rubygrapefruit.io.stream.FileDescriptorBackedRawSource
+import net.rubygrapefruit.io.stream.ReadDescriptor
+import net.rubygrapefruit.io.stream.WriteDescriptor
 import platform.posix.EINTR
 import platform.posix.errno
 import platform.posix.waitpid
@@ -42,7 +45,7 @@ internal class UnixProcess(
             if (result == pid) {
                 val exitCode = status.value.and(0xFF00).ushr(8)
                 if (spec.checkExitCode && exitCode != 0) {
-                    throw IOException("Command failed with exit code ${exitCode}")
+                    throw IOException("Command failed with exit code $exitCode")
                 }
                 return exitCode
             } else if (errno != EINTR) {
@@ -50,10 +53,5 @@ internal class UnixProcess(
             }
             // Interrupted, continue
         }
-    }
-
-    private object ProcessSource : StreamSource {
-        override val displayName: String
-            get() = "child process"
     }
 }

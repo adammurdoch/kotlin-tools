@@ -148,11 +148,6 @@ internal class UnixRegularFile(path: ElementPath) : UnixFileSystemElement(path),
             }
         }
     }
-
-    internal class FileSource(val path: ElementPath) : StreamSource {
-        override val displayName: String
-            get() = "file $path"
-    }
 }
 
 internal class UnixDirectory(path: ElementPath) : UnixFileSystemElement(path), Directory {

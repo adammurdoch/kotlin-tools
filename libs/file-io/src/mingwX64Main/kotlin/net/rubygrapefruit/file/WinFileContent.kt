@@ -10,7 +10,7 @@ import net.rubygrapefruit.io.stream.FileBackedRawSource
 import platform.windows.*
 
 class WinFileContent(
-    private val path: String,
+    private val path: ElementPath,
     private val handle: HANDLE
 ) : FileContent, AutoCloseable {
     override val currentPosition: Long
@@ -27,10 +27,10 @@ class WinFileContent(
         }
 
     override val sink: RawSink
-        get() = FileBackedRawSink(path, handle)
+        get() = FileBackedRawSink(FileSource(path), handle)
 
     override val source: RawSource
-        get() = FileBackedRawSource(path, handle)
+        get() = FileBackedRawSource(FileSource(path), handle)
 
     override fun length(): Long {
         return memScoped {

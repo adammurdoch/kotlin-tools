@@ -15,13 +15,13 @@ import net.rubygrapefruit.io.readFrom
 import platform.posix.write
 
 @OptIn(UnsafeIoApi::class)
-class FileDescriptorBackedRawSink(private val fileSource: StreamSource, private val descriptor: WriteDescriptor) : RawSink {
+class FileDescriptorBackedRawSink(private val streamSource: StreamSource, private val descriptor: WriteDescriptor) : RawSink {
     override fun write(source: Buffer, byteCount: Long) {
         memScoped {
             source.readFrom(byteCount) { buffer, startIndex, count ->
                 val bytesWritten = write(descriptor.descriptor, buffer.refTo(startIndex), count.convert()).convert<Int>()
                 if (bytesWritten < 0) {
-                    throw IOException("Could not write to ${fileSource.displayName}.", UnixErrorCode.last())
+                    throw IOException("Could not write to ${streamSource.displayName}.", UnixErrorCode.last())
                 }
                 bytesWritten
             }

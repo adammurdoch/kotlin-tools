@@ -11,7 +11,7 @@ import platform.windows.*
 
 class WinFileContent(
     private val path: String,
-    private val handle: HANDLE?
+    private val handle: HANDLE
 ) : FileContent, AutoCloseable {
     override val currentPosition: Long
         get() {

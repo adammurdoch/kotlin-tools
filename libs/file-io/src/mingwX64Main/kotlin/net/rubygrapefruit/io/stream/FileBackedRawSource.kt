@@ -14,7 +14,7 @@ import platform.windows.HANDLE
 import platform.windows.ReadFile
 
 @OptIn(UnsafeIoApi::class)
-internal class FileBackedRawSource(private val path: String, private val handle: HANDLE?) : RawSource {
+class FileBackedRawSource(private val path: String, private val handle: HANDLE) : RawSource {
     override fun readAtMostTo(sink: Buffer, byteCount: Long): Long {
         return memScoped {
             val nbytes = alloc<DWORDVar>()

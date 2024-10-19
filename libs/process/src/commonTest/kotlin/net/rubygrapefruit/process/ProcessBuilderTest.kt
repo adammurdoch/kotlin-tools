@@ -67,15 +67,10 @@ class ProcessBuilderTest {
     @Test
     fun `can run command in directory`() {
         val dir = fixture.dir("test") {
-            file("1")
-            file("2")
         }
 
-        val pwd = Process.command(pwd()).directory(dir).collectOutput().start().waitFor()
+        val pwd = Process.command(listOf(TestApp.path, "pwd")).directory(dir).collectOutput().start().waitFor()
         assertEquals(dir.absolutePath, pwd.trim())
-
-        val ls = Process.command(ls()).directory(dir).collectOutput().start().waitFor()
-        assertEquals(listOf("1", "2"), ls.trim().lines().sorted())
     }
 
     @Test

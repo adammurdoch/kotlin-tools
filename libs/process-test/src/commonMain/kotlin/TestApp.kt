@@ -1,9 +1,11 @@
 import net.rubygrapefruit.cli.app.CliAction
 import net.rubygrapefruit.cli.app.CliApp
+import net.rubygrapefruit.file.fileSystem
 import kotlin.system.exitProcess
 
 class TestApp : CliApp("test") {
     private val action by actions {
+        action(PwdAction(), "pwd")
         action(EchoAction(), "echo")
         action(CountAction(), "count")
         action(FailAction(), "fail")
@@ -44,6 +46,12 @@ class EchoAction : CliAction() {
 
     override fun run() {
         println(message)
+    }
+}
+
+class PwdAction : CliAction() {
+    override fun run() {
+        println(fileSystem.currentDirectory.absolutePath)
     }
 }
 

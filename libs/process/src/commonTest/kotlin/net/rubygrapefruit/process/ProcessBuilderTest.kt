@@ -22,8 +22,7 @@ class ProcessBuilderTest {
 
     @Test
     fun `can run command`() {
-        Process.start(pwd()).waitFor()
-        Process.start(ls()).waitFor()
+        Process.start(listOf(TestApp.path)).waitFor()
     }
 
     @Test

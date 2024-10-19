@@ -68,10 +68,11 @@ gradlePlugin {
 }
 
 val outFile = layout.buildDirectory.file("generated-src/main/kotlin/net/rubygrapefruit/plugins/app/Versions.kt")
-val generateResource = tasks.register("generate-version-resource") {
+val generateResource = tasks.register("generateVersionResource") {
     outputs.file(outFile)
     doLast {
-        outFile.get().asFile.writeText("""
+        outFile.get().asFile.writeText(
+            """
             package net.rubygrapefruit.plugins.app
             
             /*
@@ -146,7 +147,8 @@ val generateResource = tasks.register("generate-version-resource") {
                 val pluginCoordinates = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:${Constants.ksp}"
                 val pluginId = "com.google.devtools.ksp"
             }
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 }
 

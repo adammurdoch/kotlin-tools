@@ -18,13 +18,19 @@ internal actual fun start(spec: ProcessStartSpec): ProcessControl {
     }
     return memScoped {
         val formattedCommandLine = spec.commandLine.joinToString(" ")
-        val info = alloc<PROCESS_INFORMATION>()
+        val startupInfo = alloc<STARTUPINFOW>()
+        startupInfo.cb = sizeOf<STARTUPINFOW>().convert()
+        startupInfo.dwFlags = 0.convert()
+        startupInfo.lpReserved = null
+        startupInfo.lpReserved2 = null
+        startupInfo.cbReserved2 = 0.convert()
+        val processInfo = alloc<PROCESS_INFORMATION>()
         formattedCommandLine.usePinned {
-            if (CreateProcessW(spec.commandLine.first(), it.addressOf(0).reinterpret(), null, null, 0, 0.convert(), null, null, null, info.ptr) == 0) {
+            if (CreateProcessW(null, it.addressOf(0).reinterpret(), null, null, FALSE, 0.convert(), null, null, startupInfo.ptr, processInfo.ptr) == 0) {
                 throw IOException("Could not create child process", WinErrorCode.last())
             }
         }
-        CloseHandle(info.hThread)
+        CloseHandle(processInfo.hThread)
 
         object : ProcessControl {
             override val stdout: RawSource
@@ -34,10 +40,10 @@ internal actual fun start(spec: ProcessStartSpec): ProcessControl {
                 get() = TODO("Not yet implemented")
 
             override fun waitFor(): Int {
-                if (WaitForSingleObject(info.hProcess, INFINITE) != WAIT_OBJECT_0) {
+                if (WaitForSingleObject(processInfo.hProcess, INFINITE) != WAIT_OBJECT_0) {
                     throw IOException("Could not wait for child process.", WinErrorCode.last())
                 }
-                CloseHandle(info.hProcess)
+                CloseHandle(processInfo.hProcess)
                 return 0
             }
         }

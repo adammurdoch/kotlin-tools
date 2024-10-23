@@ -19,6 +19,9 @@ public class Arch {
 
             System.load(library.toString());
             arch = arch();
+            if (arch == null) {
+                throw new RuntimeException("Could not determine OS architecture.");
+            }
         }
         return arch;
     }

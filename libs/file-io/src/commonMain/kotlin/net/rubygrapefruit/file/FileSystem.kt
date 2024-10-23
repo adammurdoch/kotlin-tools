@@ -13,6 +13,10 @@ interface FileSystem {
      * The current user's home directory.
      */
     val userHomeDirectory: Directory
+
+    companion object {
+        val local: FileSystem get() = fileSystem
+    }
 }
 
 expect val fileSystem: FileSystem

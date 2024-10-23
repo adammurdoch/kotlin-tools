@@ -37,7 +37,9 @@ interface Encoder {
     fun long(value: Long): Encoder
 
     /**
-     * Encodes the given byte array.
+     * Encodes the given byte array, including length information.
+     *
+     * The value can be read using [Decoder.bytes].
      *
      * @return this
      */

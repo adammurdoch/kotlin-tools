@@ -40,35 +40,45 @@ abstract class NativeBinary : DefaultTask() {
     fun install() {
         val repository = DownloadRepository()
         val jdkVersion = javaVersion.get()
+        val baseURI = if (jdkVersion < 21) {
+            URI("https://download.oracle.com/graalvm/${jdkVersion}/archive/")
+        } else {
+            URI("https://download.oracle.com/graalvm/${jdkVersion}/latest/")
+        }
+        val binVersion = if (jdkVersion == 17) {
+            "17.0.12"
+        } else {
+            jdkVersion.toString()
+        }
         val args = when (HostMachine.current) {
             LinuxX64 -> {
-                val baseName = "graalvm-jdk-${jdkVersion}_linux-x64"
-                Args(URI("https://download.oracle.com/graalvm/${jdkVersion}/latest/${baseName}_bin.tar.gz"), baseName, "bin")
+                val baseName = "graalvm-jdk-${binVersion}_linux-x64"
+                Args(baseURI.resolve("${baseName}_bin.tar.gz"), baseName, "bin")
             }
 
             LinuxArm64 -> {
-                val baseName = "graalvm-jdk-${jdkVersion}_linux-aarch64"
-                Args(URI("https://download.oracle.com/graalvm/${jdkVersion}/latest/${baseName}_bin.tar.gz"), baseName, "bin")
+                val baseName = "graalvm-jdk-${binVersion}_linux-aarch64"
+                Args(baseURI.resolve("${baseName}_bin.tar.gz"), baseName, "bin")
             }
 
             MacOsX64 -> {
-                val baseName = "graalvm-jdk-${jdkVersion}_macos-x64"
-                Args(URI("https://download.oracle.com/graalvm/${jdkVersion}/latest/${baseName}_bin.tar.gz"), baseName, "Contents/Home/bin", binPrefix = listOf("arch", "-arch", "x86_64"))
+                val baseName = "graalvm-jdk-${binVersion}_macos-x64"
+                Args(baseURI.resolve("${baseName}_bin.tar.gz"), baseName, "Contents/Home/bin", binPrefix = listOf("arch", "-arch", "x86_64"))
             }
 
             MacOsArm64 -> {
-                val baseName = "graalvm-jdk-${jdkVersion}_macos-aarch64"
-                Args(URI("https://download.oracle.com/graalvm/${jdkVersion}/latest/${baseName}_bin.tar.gz"), baseName, "Contents/Home/bin", binPrefix = listOf("arch", "-arch", "arm64"))
+                val baseName = "graalvm-jdk-${binVersion}_macos-aarch64"
+                Args(baseURI.resolve("${baseName}_bin.tar.gz"), baseName, "Contents/Home/bin", binPrefix = listOf("arch", "-arch", "arm64"))
             }
 
             WindowsX64 -> {
-                val baseName = "graalvm-jdk-${jdkVersion}_windows-x64"
-                Args(URI("https://download.oracle.com/graalvm/${jdkVersion}/latest/${baseName}_bin.zip"), baseName, "bin", ".cmd")
+                val baseName = "graalvm-jdk-${binVersion}_windows-x64"
+                Args(baseURI.resolve("${baseName}_bin.zip"), baseName, "bin", ".cmd")
             }
 
             WindowsArm64 -> {
-                val baseName = "graalvm-jdk-${jdkVersion}_windows-arm64"
-                Args(URI("https://download.oracle.com/graalvm/${jdkVersion}/latest/${baseName}_bin.zip"), baseName, "bin", ".cmd")
+                val baseName = "graalvm-jdk-${binVersion}_windows-arm64"
+                Args(baseURI.resolve("${baseName}_bin.zip"), baseName, "bin", ".cmd")
             }
         }
 

@@ -33,7 +33,7 @@
 - Atomic move
 - Atomic recursive delete, if supported by FS
 - Remove a symlink
-- Canonicalize an element
+- Canonicalize an element: `realpath()` and `GetFinalPathNameByHandleW()`
 - Calculate relative paths
 - Add context exceptions to all operations
 - Test delete files, directories and symlinks

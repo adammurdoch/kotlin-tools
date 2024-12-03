@@ -11,6 +11,8 @@ The plugins require Gradle 7.5.1 or later and Java 11 or later.
 
 A settings plugin that must be applied to the settings of any build that uses these plugins.
 
+- Applies the foojay toolchain convention plugin.
+
 ## Native desktop applications and libraries
 
 ### `net.rubygrapefruit.native.desktop-lib`

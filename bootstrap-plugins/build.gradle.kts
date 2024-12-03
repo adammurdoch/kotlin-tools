@@ -27,11 +27,13 @@ group = Constants.pluginsGroup
 
 repositories {
     mavenCentral()
+    gradlePluginPortal()
 }
 
 dependencies {
     api(Constants.kotlinPluginCoordinates)
     api(Constants.serializationPluginCoordinates)
+    implementation("org.gradle.toolchains:foojay-resolver:0.9.0")
 }
 
 kotlin {

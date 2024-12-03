@@ -7,6 +7,7 @@ import net.rubygrapefruit.plugins.app.Versions
 class SettingsPlugin : Plugin<Settings> {
     override fun apply(target: Settings) {
         target.run {
+            plugins.apply("org.gradle.toolchains.foojay-resolver-convention")
             gradle.rootProject { project ->
                 project.run {
                     buildscript.repositories.mavenCentral()

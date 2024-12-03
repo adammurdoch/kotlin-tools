@@ -4,7 +4,6 @@ pluginManagement {
 plugins {
     id("net.rubygrapefruit.kotlin-base")
     id("net.rubygrapefruit.included-build")
-    id("org.gradle.toolchains.foojay-resolver-convention") version("0.4.0")
 }
 
 include("strings")

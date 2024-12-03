@@ -15,6 +15,7 @@ class GradlePluginPlugin : Plugin<Project> {
             plugins.apply(JvmConventionsPlugin::class.java)
 
             repositories.mavenCentral()
+            repositories.gradlePluginPortal()
 
             JvmConventionsPlugin.javaVersion(this, Versions.plugins.java)
             dependencies.add("implementation", Versions.plugins.bootstrapPluginCoordinates)

@@ -5,8 +5,8 @@ package net.rubygrapefruit.process
 import kotlinx.cinterop.*
 import kotlinx.io.RawSink
 import kotlinx.io.RawSource
+import net.rubygrapefruit.error.UnixErrorCode
 import net.rubygrapefruit.io.IOException
-import net.rubygrapefruit.io.UnixErrorCode
 import net.rubygrapefruit.io.stream.FileDescriptorBackedRawSink
 import net.rubygrapefruit.io.stream.FileDescriptorBackedRawSource
 import net.rubygrapefruit.io.stream.ReadDescriptor

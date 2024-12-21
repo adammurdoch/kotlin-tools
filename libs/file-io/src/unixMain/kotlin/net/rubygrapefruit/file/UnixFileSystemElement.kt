@@ -6,9 +6,12 @@ import kotlinx.cinterop.*
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.buffered
+import net.rubygrapefruit.error.UnixErrorCode
 import net.rubygrapefruit.io.Resource
-import net.rubygrapefruit.io.UnixErrorCode
-import net.rubygrapefruit.io.stream.*
+import net.rubygrapefruit.io.stream.FileDescriptorBackedRawSink
+import net.rubygrapefruit.io.stream.FileDescriptorBackedRawSource
+import net.rubygrapefruit.io.stream.ReadDescriptor
+import net.rubygrapefruit.io.stream.WriteDescriptor
 import platform.posix.*
 
 internal open class UnixFileSystemElement(override val path: ElementPath) : AbstractFileSystemElement() {

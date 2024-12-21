@@ -7,7 +7,7 @@ import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.buffered
 import net.rubygrapefruit.io.Resource
-import net.rubygrapefruit.io.WinErrorCode
+import net.rubygrapefruit.error.WinErrorCode
 import net.rubygrapefruit.io.stream.FileBackedRawSink
 import net.rubygrapefruit.io.stream.FileBackedRawSource
 import platform.windows.*

@@ -9,8 +9,8 @@ import kotlinx.cinterop.refTo
 import kotlinx.io.Buffer
 import kotlinx.io.RawSink
 import kotlinx.io.UnsafeIoApi
+import net.rubygrapefruit.error.UnixErrorCode
 import net.rubygrapefruit.io.IOException
-import net.rubygrapefruit.io.UnixErrorCode
 import net.rubygrapefruit.io.readFrom
 import platform.posix.write
 

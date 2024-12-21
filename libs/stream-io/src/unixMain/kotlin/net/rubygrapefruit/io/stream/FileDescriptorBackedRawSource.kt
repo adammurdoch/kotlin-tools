@@ -8,7 +8,7 @@ import kotlinx.cinterop.refTo
 import kotlinx.io.Buffer
 import kotlinx.io.RawSource
 import kotlinx.io.UnsafeIoApi
-import net.rubygrapefruit.io.UnixErrorCode
+import net.rubygrapefruit.error.UnixErrorCode
 import net.rubygrapefruit.io.isNotFile
 import net.rubygrapefruit.io.writeAtMostTo
 import platform.posix.EISDIR

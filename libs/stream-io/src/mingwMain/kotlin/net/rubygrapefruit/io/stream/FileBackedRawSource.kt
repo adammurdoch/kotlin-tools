@@ -6,7 +6,7 @@ import kotlinx.cinterop.*
 import kotlinx.io.Buffer
 import kotlinx.io.RawSource
 import kotlinx.io.UnsafeIoApi
-import net.rubygrapefruit.io.WinErrorCode
+import net.rubygrapefruit.error.WinErrorCode
 import net.rubygrapefruit.io.writeAtMostTo
 import platform.windows.*
 

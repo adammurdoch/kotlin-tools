@@ -6,8 +6,8 @@ import kotlinx.cinterop.*
 import kotlinx.io.Buffer
 import kotlinx.io.RawSink
 import kotlinx.io.UnsafeIoApi
+import net.rubygrapefruit.error.WinErrorCode
 import net.rubygrapefruit.io.IOException
-import net.rubygrapefruit.io.WinErrorCode
 import net.rubygrapefruit.io.readFrom
 import platform.windows.CloseHandle
 import platform.windows.DWORDVar

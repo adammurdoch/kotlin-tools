@@ -1,5 +1,8 @@
 package net.rubygrapefruit.error
 
+/**
+ * A failure represented by an error code.
+ */
 interface ErrorCode {
     /**
      * Can be empty.

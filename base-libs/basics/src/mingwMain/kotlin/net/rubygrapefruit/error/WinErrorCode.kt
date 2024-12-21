@@ -1,7 +1,6 @@
-package net.rubygrapefruit.io
+package net.rubygrapefruit.error
 
 import kotlinx.cinterop.*
-import net.rubygrapefruit.error.ErrorCode
 import platform.windows.*
 
 @OptIn(ExperimentalForeignApi::class)

@@ -6,7 +6,7 @@ import kotlinx.cinterop.*
 import kotlinx.io.RawSink
 import kotlinx.io.RawSource
 import net.rubygrapefruit.io.IOException
-import net.rubygrapefruit.io.WinErrorCode
+import net.rubygrapefruit.error.WinErrorCode
 import net.rubygrapefruit.io.stream.FileBackedRawSink
 import net.rubygrapefruit.io.stream.FileBackedRawSource
 import platform.windows.*

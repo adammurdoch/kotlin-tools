@@ -3,8 +3,8 @@
 package net.rubygrapefruit.process
 
 import kotlinx.cinterop.*
+import net.rubygrapefruit.error.UnixErrorCode
 import net.rubygrapefruit.io.IOException
-import net.rubygrapefruit.io.UnixErrorCode
 import net.rubygrapefruit.io.stream.ReadDescriptor
 import net.rubygrapefruit.io.stream.WriteDescriptor
 import platform.posix.*

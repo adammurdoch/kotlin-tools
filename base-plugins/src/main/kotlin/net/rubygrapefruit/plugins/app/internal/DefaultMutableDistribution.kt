@@ -1,6 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal
 
 import net.rubygrapefruit.plugins.app.Distribution
+import net.rubygrapefruit.strings.capitalized
 import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFile
@@ -19,7 +20,7 @@ abstract class DefaultMutableDistribution @Inject constructor(
 ) : Distribution, MutableDistribution {
     companion object {
         fun taskName(distName: String, taskName: String): String {
-            return "$distName${taskName.capitalize()}"
+            return "$distName${taskName.capitalized()}"
         }
     }
 

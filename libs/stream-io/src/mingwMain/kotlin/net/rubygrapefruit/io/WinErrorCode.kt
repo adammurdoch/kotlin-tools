@@ -1,22 +1,8 @@
 package net.rubygrapefruit.io
 
-import kotlinx.cinterop.CPointerVar
-import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.alloc
-import kotlinx.cinterop.convert
-import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.ptr
-import kotlinx.cinterop.reinterpret
-import kotlinx.cinterop.toKString
-import kotlinx.cinterop.value
-import platform.windows.DWORD
-import platform.windows.FORMAT_MESSAGE_ALLOCATE_BUFFER
-import platform.windows.FORMAT_MESSAGE_FROM_SYSTEM
-import platform.windows.FormatMessageW
-import platform.windows.GetLastError
-import platform.windows.LANG_USER_DEFAULT
-import platform.windows.LocalFree
-import platform.windows.WCHARVar
+import kotlinx.cinterop.*
+import net.rubygrapefruit.error.ErrorCode
+import platform.windows.*
 
 @OptIn(ExperimentalForeignApi::class)
 class WinErrorCode(private val code: DWORD) : ErrorCode {

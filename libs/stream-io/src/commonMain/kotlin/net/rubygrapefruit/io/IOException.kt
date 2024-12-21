@@ -1,5 +1,8 @@
 package net.rubygrapefruit.io
 
+import net.rubygrapefruit.error.ErrorCode
+import net.rubygrapefruit.error.NoErrorCode
+
 /**
  * Thrown from an IO operation.
  */

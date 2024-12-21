@@ -4,7 +4,7 @@ plugins {
     id("net.rubygrapefruit.kmp.base-lib")
 }
 
-group = "net.rubygrapefruit.libs"
+group = Versions.libs.group
 
 library {
     jvm {
@@ -14,6 +14,7 @@ library {
     nativeDesktop()
     common {
         api(project(":stream-io"))
+        implementation(Versions.libs.group + ":basics:1.0")
     }
     test {
         implementation(Versions.test.coordinates)

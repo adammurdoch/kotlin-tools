@@ -5,7 +5,7 @@ plugins {
     id("net.rubygrapefruit.kmp.base-lib")
 }
 
-group = "net.rubygrapefruit.libs"
+group = Versions.libs.group
 
 library {
     nativeDesktop()
@@ -25,8 +25,11 @@ val config = configurations.create("testBinary") {
     isCanBeResolved = true
     isCanBeConsumed = false
 }
-val testApp = config.elements.map { elements -> elements.first().asFile.absolutePath }
 
+/*
+ * Generate a source file containing the location of the test application.
+ */
+val testApp = config.elements.map { elements -> elements.first().asFile.absolutePath }
 val outFile = layout.buildDirectory.file("generated-src/commonTest/kotlin/net/rubygrapefruit/process/TestApp.kt")
 val generateResource = tasks.register("generateTestResource") {
     outputs.file(outFile)

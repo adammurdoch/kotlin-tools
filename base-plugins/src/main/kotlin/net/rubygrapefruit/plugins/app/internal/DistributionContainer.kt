@@ -5,6 +5,7 @@ import net.rubygrapefruit.plugins.app.Distribution
 import net.rubygrapefruit.plugins.app.NativeMachine
 import net.rubygrapefruit.plugins.app.internal.tasks.AbstractDistributionImage
 import net.rubygrapefruit.plugins.app.internal.tasks.DistributionImage
+import net.rubygrapefruit.strings.capitalized
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -40,7 +41,7 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
         type: Class<T>,
         taskType: Class<out AbstractDistributionImage> = DistributionImage::class.java
     ): T {
-        val name = targetMachine.kotlinTarget + if (baseName == null) "" else baseName.capitalize()
+        val name = targetMachine.kotlinTarget + if (baseName == null) "" else baseName.capitalized()
         distContainer.all.forEach { distribution ->
             if (distribution.name == name) {
                 throw IllegalArgumentException("Multiple distributions with name '$name'")

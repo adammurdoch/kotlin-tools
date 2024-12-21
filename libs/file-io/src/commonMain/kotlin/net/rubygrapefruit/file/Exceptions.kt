@@ -1,7 +1,7 @@
 package net.rubygrapefruit.file
 
-import net.rubygrapefruit.io.ErrorCode
-import net.rubygrapefruit.io.NoErrorCode
+import net.rubygrapefruit.error.ErrorCode
+import net.rubygrapefruit.error.NoErrorCode
 
 internal fun missingElement(path: String, cause: Throwable? = null) = FileSystemException("File $path does not exist.", cause)
 

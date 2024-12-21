@@ -4,6 +4,7 @@ package net.rubygrapefruit.io
 
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.toKString
+import net.rubygrapefruit.error.ErrorCode
 import platform.posix.errno
 import platform.posix.strerror
 

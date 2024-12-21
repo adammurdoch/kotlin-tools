@@ -1,6 +1,6 @@
 package net.rubygrapefruit.io.stream
 
-import net.rubygrapefruit.io.ErrorCode
+import net.rubygrapefruit.error.ErrorCode
 import net.rubygrapefruit.io.IOException
 import net.rubygrapefruit.io.readFile
 

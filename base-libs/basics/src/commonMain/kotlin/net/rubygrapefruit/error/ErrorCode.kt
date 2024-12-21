@@ -1,4 +1,4 @@
-package net.rubygrapefruit.io
+package net.rubygrapefruit.error
 
 interface ErrorCode {
     /**

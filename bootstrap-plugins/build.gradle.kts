@@ -54,6 +54,10 @@ gradlePlugin {
             id = "net.rubygrapefruit.bootstrap.jni.lib"
             implementationClass = "net.rubygrapefruit.plugins.bootstrap.JniLibraryPlugin"
         }
+        create("kmp-lib") {
+            id = "net.rubygrapefruit.bootstrap.kmp.lib"
+            implementationClass = "net.rubygrapefruit.plugins.bootstrap.KmpLibraryPlugin"
+        }
         create("gradle-plugin") {
             id = "net.rubygrapefruit.bootstrap.gradle-plugin"
             implementationClass = "net.rubygrapefruit.plugins.bootstrap.JvmGradlePlugin"
@@ -90,6 +94,7 @@ val generateResource = tasks.register("generateVersionResource") {
                 val ksp = Ksp
                 val java = ${Constants.java}
                 val plugins = Plugins
+                val libs = Libraries
             }
 
             object Kotlin {
@@ -113,6 +118,10 @@ val generateResource = tasks.register("generateVersionResource") {
                 val version = "${Constants.pluginsVersion}"
                 val basePluginsCoordinates = group + ":base-plugins:" + version
                 val bootstrapPluginCoordinates = group + ":bootstrap-plugins:" + version
+            }
+
+            object Libraries {
+                val group = "net.rubygrapefruit.libs"
             }
 
             object Serialization {

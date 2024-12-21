@@ -6,6 +6,7 @@ plugins {
     id("net.rubygrapefruit.bootstrap.included-build")
 }
 
+include("basics")
 include("bytecode")
 include("machine-info")
 include("cpu-info")

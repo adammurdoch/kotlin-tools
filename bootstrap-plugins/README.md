@@ -1,4 +1,5 @@
+# Bootstrap plugins
 
-Gradle plugins that can build the Kotlin JVM libraries used as dependencies for the launcher plugins.
+Gradle plugins that can build the Kotlin tools plugins and the JVM libraries that they use as dependencies.
 
-Only used locally.
+These plugins are not intended to be used outside of this repository.

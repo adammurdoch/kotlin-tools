@@ -29,8 +29,8 @@ sealed class Machine(
     val operatingSystem: OperatingSystem,
     val architecture: Architecture
 ) {
-    data object WindowsX64 : Machine(OperatingSystem.Windows, Architecture.X64)
-    data object WindowsArm64 : Machine(OperatingSystem.Windows, Architecture.Arm64)
+    data object WindowsX64 : Machine(Windows, Architecture.X64)
+    data object WindowsArm64 : Machine(Windows, Architecture.Arm64)
 
     data object LinuxX64 : Machine(OperatingSystem.Linux, Architecture.X64)
     data object LinuxArm64 : Machine(OperatingSystem.Linux, Architecture.Arm64)
@@ -60,7 +60,7 @@ sealed class Machine(
                 } else if (architecture == "amd64") {
                     LinuxX64
                 } else {
-                    throw IllegalStateException("Could not determine machine architecture using machine '$architecture'.");
+                    throw IllegalStateException("Could not determine machine architecture using machine '$architecture'.")
                 }
             } else if (osName.contains("windows", true)) {
                 val architecture = System.getProperty("os.arch")
@@ -69,7 +69,7 @@ sealed class Machine(
                 } else if (architecture == "amd64") {
                     WindowsX64
                 } else {
-                    throw IllegalStateException("Could not determine machine architecture using machine '$architecture'.");
+                    throw IllegalStateException("Could not determine machine architecture using machine '$architecture'.")
                 }
             } else if (osName.contains("Mac OS X")) {
                 val architecture = Arch.getMacOsArchitecture()
@@ -78,7 +78,7 @@ sealed class Machine(
                 } else if (architecture.startsWith("Intel")) {
                     MacOSX64
                 } else {
-                    throw IllegalStateException("Could not determine machine architecture using machine '$architecture'.");
+                    throw IllegalStateException("Could not determine machine architecture using machine '$architecture'.")
                 }
             } else {
                 throw IllegalStateException("Could not determine the OS family of this machine using OS name '$osName'.")

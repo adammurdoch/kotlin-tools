@@ -13,6 +13,10 @@ class JniLibraryPlugin : Plugin<Project> {
         with(target) {
             pluginManager.apply("java-library")
 
+            repositories.mavenCentral()
+
+            group = Versions.libs.group
+
             val java = extensions.getByType(JavaPluginExtension::class.java)
             java.toolchain.languageVersion.set(JavaLanguageVersion.of(Versions.plugins.java))
 

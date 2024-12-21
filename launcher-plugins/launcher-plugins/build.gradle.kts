@@ -7,7 +7,7 @@ plugins {
 group = Versions.plugins.group
 
 dependencies {
-    implementation("net.rubygrapefruit.libs:download:1.0")
+    implementation(Versions.libs.coordinates("download"))
 }
 
 gradlePlugin {

@@ -12,6 +12,6 @@ library {
     module.requires.add("machine.info")
     targetJavaVersion = Versions.plugins.java
     dependencies {
-        implementation("net.rubygrapefruit.libs:machine-info:any")
+        implementation(Versions.libs.coordinates("machine-info"))
     }
 }

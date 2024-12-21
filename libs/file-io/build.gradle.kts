@@ -14,7 +14,7 @@ library {
     nativeDesktop()
     common {
         api(project(":stream-io"))
-        implementation(Versions.libs.group + ":basics:1.0")
+        implementation(Versions.libs.coordinates("basics"))
     }
     test {
         implementation(Versions.test.coordinates)

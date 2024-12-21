@@ -8,6 +8,7 @@ plugins {
 group = Versions.plugins.group
 
 dependencies {
+    implementation("net.rubygrapefruit.libs:basics:1.0")
     implementation("net.rubygrapefruit.libs:bytecode:1.0")
     implementation("net.rubygrapefruit.libs:machine-info:1.0")
     implementation(Versions.serialization.json.coordinates)

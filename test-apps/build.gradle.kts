@@ -2,6 +2,7 @@ import net.rubygrapefruit.machine.info.Architecture
 import net.rubygrapefruit.machine.info.Architecture.Arm64
 import net.rubygrapefruit.machine.info.Architecture.X64
 import net.rubygrapefruit.machine.info.Machine
+import net.rubygrapefruit.strings.capitalized
 import org.jetbrains.kotlin.incremental.createDirectory
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -245,7 +246,7 @@ class UiBaseApp(
     name: String,
     baseDir: File,
     srcDirName: String,
-    mainDist: AppDistribution = AppDistribution(UiApp(name.capitalize(), "build/dist", Machine.thisMachine.architecture)),
+    mainDist: AppDistribution = AppDistribution(UiApp(name.capitalized(), "build/dist", Machine.thisMachine.architecture)),
     otherDists: List<AppDistribution> = emptyList()
 ) : BaseApp(name, baseDir, mainDist, otherDists, srcDirName, true)
 

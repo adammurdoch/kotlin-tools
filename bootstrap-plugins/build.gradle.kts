@@ -20,7 +20,6 @@ object Constants {
         get() = "org.jetbrains.kotlin:kotlin-serialization:${serializationPlugin}"
 
     val pluginsGroup = "net.rubygrapefruit.plugins"
-    val pluginsVersion = "0.1-dev"
 }
 
 group = Constants.pluginsGroup
@@ -115,7 +114,7 @@ val generateResource = tasks.register("generateVersionResource") {
             object Plugins {
                 val java = ${Constants.pluginsJava}
                 val group = "${Constants.pluginsGroup}"
-                val version = "${Constants.pluginsVersion}"
+                val version = "0.1-dev"
                 val basePluginsCoordinates = group + ":base-plugins:" + version
                 val bootstrapPluginCoordinates = group + ":bootstrap-plugins:" + version
             }

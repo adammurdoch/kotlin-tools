@@ -6,7 +6,6 @@ plugins {
     id("net.rubygrapefruit.included-build")
 }
 
-include("strings")
 include("download")
 include("stream-io")
 include("file-io")

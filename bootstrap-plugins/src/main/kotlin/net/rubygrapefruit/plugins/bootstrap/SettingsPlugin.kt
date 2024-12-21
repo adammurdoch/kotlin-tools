@@ -12,6 +12,9 @@ class SettingsPlugin : Plugin<Settings> {
                 project.run {
                     buildscript.repositories.mavenCentral()
                     buildscript.dependencies.add("classpath", Versions.kotlin.pluginCoordinates)
+
+                    // For commonization
+                    repositories.mavenCentral()
                 }
             }
         }

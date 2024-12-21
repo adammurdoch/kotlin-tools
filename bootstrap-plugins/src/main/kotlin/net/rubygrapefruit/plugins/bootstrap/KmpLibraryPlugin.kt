@@ -17,6 +17,15 @@ class KmpLibraryPlugin : Plugin<Project> {
             extensions.getByType(KotlinMultiplatformExtension::class.java).apply {
                 jvmToolchain(Versions.plugins.java)
                 jvm()
+
+                linuxX64()
+                mingwX64()
+                macosX64()
+                macosArm64()
+
+                js {
+                    browser()
+                }
             }
         }
     }

@@ -1,11 +1,6 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
-import net.rubygrapefruit.plugins.app.internal.DefaultHasLauncherScriptsDistribution
-import net.rubygrapefruit.plugins.app.internal.DefaultJvmCliApplication
-import net.rubygrapefruit.plugins.app.internal.HasLauncherScripts
-import net.rubygrapefruit.plugins.app.internal.HostMachine
-import net.rubygrapefruit.plugins.app.internal.Windows
-import net.rubygrapefruit.plugins.app.internal.applications
+import net.rubygrapefruit.plugins.app.internal.*
 import net.rubygrapefruit.plugins.app.internal.tasks.LauncherBashScript
 import net.rubygrapefruit.plugins.app.internal.tasks.LauncherBatScript
 import org.gradle.api.Plugin
@@ -61,6 +56,7 @@ class JvmCliApplicationPlugin : Plugin<Project> {
 
             val app = extensions.create("application", DefaultJvmCliApplication::class.java)
             applications.register(app)
+            project.jvmKotlin.sourceSets.getByName("main").kotlin.srcDirs(app.kotlin)
         }
     }
 }

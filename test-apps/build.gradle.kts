@@ -5,7 +5,6 @@ import net.rubygrapefruit.machine.info.Machine
 import net.rubygrapefruit.strings.capitalized
 import org.jetbrains.kotlin.incremental.createDirectory
 import java.io.ByteArrayOutputStream
-import java.io.File
 
 sealed class Sample(val name: String, val baseDir: File) {
     val dir = baseDir.resolve(name)
@@ -305,6 +304,8 @@ val samples = listOf(
     jvmLib,
     jvmLib.derive("customized"),
 
+    jvmLib("jvm-lib-generated-source"),
+
     kmpLib,
     kmpLib.derive("customized"),
 
@@ -321,6 +322,7 @@ val samples = listOf(
     jvmCliMinApp.allPlatforms(),
     jvmCliFullApp.allPlatforms(),
     jvmCliStoreApp.allPlatforms(),
+    jvmCliApp("jvm-cli-app-generated-source").cliArgs().allPlatforms(),
 
     jvmUiApp,
     jvmUiApp.derive("customized") { it.launcher("App") },
@@ -335,7 +337,7 @@ val samples = listOf(
     nativeUiApp,
     nativeUiApp.derive("customized") { it.launcher("App") },
 
-    jvmCliApp("cli-args-test").cliArgs("--help")
+    jvmCliApp("cli-args-test").cliArgs("--help").allPlatforms()
 )
 
 val sampleApps = samples.filterIsInstance<App>()

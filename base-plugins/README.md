@@ -105,7 +105,7 @@ Expects that the application uses the JVM module system.
 - Includes an embedded JVM in the application bundle
 - Provides an application icon, default location is `src/main/Icon1024.png`
 - Use `dist` task to build the debug application bundle
-- Use `releaseDist` to build the release application bundle
+- Use `dist --release` to build the release application bundle
 - Adds `application { }` block, see below for the available settings.
 
 ## Gradle plugins

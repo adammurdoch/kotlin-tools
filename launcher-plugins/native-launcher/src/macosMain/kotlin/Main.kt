@@ -1,9 +1,8 @@
-@file:OptIn(ExperimentalForeignApi::class)
-
 import kotlinx.cinterop.*
 import platform.Foundation.NSBundle
 import platform.posix.*
 
+@OptIn(ExperimentalForeignApi::class)
 fun main() {
     memScoped {
         val appId = NSBundle.mainBundle.bundleIdentifier ?: "app"
@@ -37,6 +36,7 @@ fun main() {
     }
 }
 
+@OptIn(ExperimentalForeignApi::class)
 private fun redirectStdoutAndErr(appId: String) {
     val homeDir = getHomeDir()
     val logsDir = "$homeDir/Library/Logs/$appId"
@@ -59,6 +59,7 @@ private fun redirectStdoutAndErr(appId: String) {
     }
 }
 
+@OptIn(ExperimentalForeignApi::class)
 private fun readConfigFile(configFilePath: String): List<String> {
     return memScoped {
         val configFile = fopen(configFilePath, "r")
@@ -77,6 +78,7 @@ private fun readConfigFile(configFilePath: String): List<String> {
     }
 }
 
+@OptIn(ExperimentalForeignApi::class)
 private fun getCurrentDir(): String {
     return memScoped {
         val length = MAXPATHLEN
@@ -89,6 +91,7 @@ private fun getCurrentDir(): String {
     }
 }
 
+@OptIn(ExperimentalForeignApi::class)
 private fun getHomeDir(): String {
     val uid = getuid()
     val pwd = getpwuid(uid)
@@ -98,6 +101,7 @@ private fun getHomeDir(): String {
     return pwd.pointed.pw_dir!!.toKString()
 }
 
+@OptIn(ExperimentalForeignApi::class)
 fun failed(message: String): Nothing {
     val code = errno
     throw RuntimeException("$message, errno=$code (${strerror(code)?.toKString()})")

@@ -117,6 +117,7 @@ val generateResource = tasks.register("generateVersionResource") {
                 val version = "0.1-dev"
                 val basePluginsCoordinates = group + ":base-plugins:" + version
                 val bootstrapPluginCoordinates = group + ":bootstrap-plugins:" + version
+                val launcherPluginCoordinates = group + ":launcher-plugins:" + version
             }
 
             object Libraries {

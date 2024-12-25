@@ -8,7 +8,7 @@ group = Versions.libs.group
 
 library {
     jvm {
-        module.name = "net.rubygrapefruit.cli-args"
+        module.name = "net.rubygrapefruit.cli_args"
         targetJavaVersion = 11
     }
     nativeDesktop()

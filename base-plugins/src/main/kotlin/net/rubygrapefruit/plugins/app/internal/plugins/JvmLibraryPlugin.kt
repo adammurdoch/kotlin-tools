@@ -1,11 +1,10 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.JvmLibrary
+import net.rubygrapefruit.plugins.app.Versions
 import net.rubygrapefruit.plugins.app.internal.DefaultJvmLibrary
 import net.rubygrapefruit.plugins.app.internal.JvmModuleRegistry
 import net.rubygrapefruit.plugins.app.internal.toModuleName
-import net.rubygrapefruit.plugins.app.Versions
-import net.rubygrapefruit.plugins.app.internal.jvmKotlin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSetContainer
@@ -19,12 +18,12 @@ class JvmLibraryPlugin : Plugin<Project> {
             plugins.apply(LibraryBasePlugin::class.java)
             plugins.apply(JvmConventionsPlugin::class.java)
 
-            val lib = extensions.create(JvmLibrary::class.java, "library", DefaultJvmLibrary::class.java, "main")
+            val lib = extensions.create(JvmLibrary::class.java, "library", DefaultJvmLibrary::class.java, "main") as DefaultJvmLibrary
             lib.module.name.convention(toModuleName(project.name))
             lib.targetJavaVersion.convention(Versions.java)
 
             JvmConventionsPlugin.javaVersion(this, lib.targetJavaVersion)
-            project.jvmKotlin.sourceSets.getByName("main").kotlin.srcDirs(lib.kotlin)
+            lib.attach()
 
             JvmConventionsPlugin.addApiConstraints(this, "api")
 

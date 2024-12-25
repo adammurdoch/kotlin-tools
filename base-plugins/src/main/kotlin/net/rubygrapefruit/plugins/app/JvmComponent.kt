@@ -1,7 +1,6 @@
 package net.rubygrapefruit.plugins.app
 
 import org.gradle.api.file.Directory
-import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Nested
@@ -29,7 +28,7 @@ interface JvmComponent<D: Dependencies> {
     fun test(config: D.() -> Unit)
 
     /**
-     * The Kotlin source directories for this component.
+     * Generated Kotlin source directories for this component.
      */
-    val kotlin: SetProperty<Directory>
+    val generatedSource: SetProperty<Directory>
 }

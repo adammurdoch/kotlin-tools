@@ -24,4 +24,8 @@ abstract class DefaultJvmUiApplication @Inject constructor(
     override fun test(config: Dependencies.() -> Unit) {
         project.jvmKotlin.sourceSets.getByName("test").dependencies { config(KotlinHandlerBackedDependencies(this)) }
     }
+
+    fun attach() {
+        project.jvmKotlin.sourceSets.getByName("main").kotlin.srcDirs(generatedSource)
+    }
 }

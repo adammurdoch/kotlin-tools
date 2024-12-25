@@ -27,6 +27,7 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
             lib.targetJavaVersion.convention(Versions.java)
             jvm = lib
             componentRegistry.jvm(lib.targetJavaVersion)
+            lib.attach()
         }
         config(jvm!!)
     }

@@ -9,8 +9,9 @@ val generatorTask = tasks.register<SourceGeneratorTask>("generateSource") {
 application {
     dependencies {
         implementation(project(":jvm-lib-generated-source"))
+        implementation(project(":kmp-lib-generated-source"))
     }
-    kotlin.add(generatorTask.flatMap { it.outputDir })
+    generatedSource.add(generatorTask.flatMap { it.outputDir })
 }
 
 abstract class SourceGeneratorTask : DefaultTask() {
@@ -20,7 +21,8 @@ abstract class SourceGeneratorTask : DefaultTask() {
     @TaskAction
     fun exec() {
         val dir = outputDir.get().asFile
-        val sourceFile = dir.resolve("Generated.kt")
+        dir.deleteRecursively()
+        val sourceFile = dir.resolve("App.kt")
         sourceFile.parentFile.mkdirs()
         sourceFile.bufferedWriter().use { writer ->
             writer.write(
@@ -29,6 +31,7 @@ abstract class SourceGeneratorTask : DefaultTask() {
                 
                 fun main(args: Array<String>) {
                     sample.lib.generated.Generated()
+                    sample.lib.jvm.generated.Generated()
                 }
             """.trimIndent()
             )

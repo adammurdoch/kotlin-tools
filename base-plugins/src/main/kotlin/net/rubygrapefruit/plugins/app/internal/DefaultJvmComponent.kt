@@ -11,12 +11,19 @@ abstract class DefaultJvmComponent<D : Dependencies> @Inject constructor(
     private val project: Project,
     private val mainSourceSetName: String
 ) : JvmComponent<D> {
+    private val mainSourceSet
+        get() = project.extensions.getByType(KotlinProjectExtension::class.java).sourceSets.getByName(mainSourceSetName)
+
     override fun dependencies(config: D.() -> Unit) {
-        project.extensions.getByType(KotlinProjectExtension::class.java).sourceSets.getByName(mainSourceSetName).dependencies { config(wrap(this)) }
+        mainSourceSet.dependencies { config(wrap(this)) }
     }
 
     override fun test(config: D.() -> Unit) {
         project.extensions.getByType(KotlinProjectExtension::class.java).sourceSets.getByName("test").dependencies { config(wrap(this)) }
+    }
+
+    fun attach() {
+        mainSourceSet.kotlin.srcDirs(generatedSource)
     }
 
     abstract fun wrap(dependencyHandler: KotlinDependencyHandler): D

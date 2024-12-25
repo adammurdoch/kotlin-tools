@@ -1,13 +1,15 @@
 plugins {
-    id("net.rubygrapefruit.jvm.lib")
+    id("net.rubygrapefruit.kmp.lib")
 }
 
 val generatorTask = tasks.register<SourceGeneratorTask>("generateSource") {
-    outputDir = layout.buildDirectory.dir("generated-source")
+    outputDir = layout.buildDirectory.dir("generated-source/jvm")
 }
 
 library {
-    generatedSource.add(generatorTask.flatMap { it.outputDir })
+    jvm {
+        generatedSource.add(generatorTask.flatMap { it.outputDir })
+    }
 }
 
 abstract class SourceGeneratorTask : DefaultTask() {
@@ -21,11 +23,13 @@ abstract class SourceGeneratorTask : DefaultTask() {
         val sourceFile = dir.resolve("Generated.kt")
         sourceFile.parentFile.mkdirs()
         sourceFile.bufferedWriter().use { writer ->
-            writer.write("""
-                package sample.lib.generated
+            writer.write(
+                """
+                package sample.lib.jvm.generated
                 
                 class Generated
-            """.trimIndent())
+            """.trimIndent()
+            )
         }
     }
 }

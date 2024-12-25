@@ -56,7 +56,7 @@ class JvmCliApplicationPlugin : Plugin<Project> {
 
             val app = extensions.create("application", DefaultJvmCliApplication::class.java)
             applications.register(app)
-            project.jvmKotlin.sourceSets.getByName("main").kotlin.srcDirs(app.kotlin)
+            app.attach()
         }
     }
 }

@@ -21,6 +21,7 @@ class JvmUiApplicationPlugin : Plugin<Project> {
 
             applications.withApp<DefaultJvmUiApplication> { app ->
                 val capitalizedAppName = app.capitalizedAppName
+                app.attach()
 
                 // TODO - 'can build' flag is incorrect - it depends on the JVM to be embedded
                 for (machine in listOf(NativeMachine.MacOSArm64, NativeMachine.MacOSX64)) {
@@ -69,7 +70,6 @@ class JvmUiApplicationPlugin : Plugin<Project> {
 
             val app = extensions.create("application", DefaultJvmUiApplication::class.java)
             applications.register(app)
-            app.attach()
         }
     }
 }

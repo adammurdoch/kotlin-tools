@@ -119,36 +119,38 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
     }
 
     private fun native(targets: Set<NativeMachine>, config: KotlinNativeBinaryContainer.(NativeMachine) -> Unit) {
-        with(project.kotlin) {
-            if (targets.contains(NativeMachine.MacOSX64)) {
-                macosX64 {
-                    config(binaries, NativeMachine.MacOSX64)
-                }
-                unixSourceSets.add("macosMain")
-                unixTestSourceSets.add("macosTest")
-            }
-            if (targets.contains(NativeMachine.MacOSArm64)) {
-                macosArm64 {
-                    config(binaries, NativeMachine.MacOSArm64)
-                }
-                unixSourceSets.add("macosMain")
-                unixTestSourceSets.add("macosTest")
-            }
-            if (targets.contains(NativeMachine.LinuxX64)) {
-                linuxX64 {
-                    config(binaries, NativeMachine.LinuxX64)
-                }
-                unixSourceSets.add("linuxMain")
-                unixTestSourceSets.add("linuxTest")
-            }
-            if (targets.contains(NativeMachine.WindowsX64)) {
-                mingwX64 {
-                    config(binaries, NativeMachine.WindowsX64)
-                }
-            }
-        }
         for (target in targets) {
             if (machines.add(target)) {
+                with(project.kotlin) {
+                    when (target) {
+                        NativeMachine.MacOSX64 -> {
+                            macosX64 {
+                                config(binaries, NativeMachine.MacOSX64)
+                            }
+                            unixSourceSets.add("macosMain")
+                            unixTestSourceSets.add("macosTest")
+                        }
+                        NativeMachine.MacOSArm64 -> {
+                            macosArm64 {
+                                config(binaries, NativeMachine.MacOSArm64)
+                            }
+                            unixSourceSets.add("macosMain")
+                            unixTestSourceSets.add("macosTest")
+                        }
+                        NativeMachine.LinuxX64 -> {
+                            linuxX64 {
+                                config(binaries, NativeMachine.LinuxX64)
+                            }
+                            unixSourceSets.add("linuxMain")
+                            unixTestSourceSets.add("linuxTest")
+                        }
+                        NativeMachine.WindowsX64 -> {
+                            mingwX64 {
+                                config(binaries, NativeMachine.WindowsX64)
+                            }
+                        }
+                    }
+                }
                 val nativeTarget = project.kotlin.targets.getByName(target.kotlinTarget) as KotlinNativeTarget
                 for (action in machineActions) {
                     action(target, nativeTarget)

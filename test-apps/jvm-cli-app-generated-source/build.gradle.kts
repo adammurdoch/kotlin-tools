@@ -27,11 +27,12 @@ abstract class SourceGeneratorTask : DefaultTask() {
         sourceFile.bufferedWriter().use { writer ->
             writer.write(
                 """
-                package sample.app.generated
+                package sample
                 
-                fun main(args: Array<String>) {
-                    sample.lib.generated.Generated()
-                    sample.lib.jvm.generated.Generated()
+                class Generated {
+                    fun log() {
+                        println("Generated app class")
+                    }
                 }
             """.trimIndent()
             )

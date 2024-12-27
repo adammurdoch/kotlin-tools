@@ -20,6 +20,11 @@ interface NativeApplication : Application, MultiPlatformComponent<Dependencies> 
     fun macOS()
 
     /**
+     * Adds macOS as a target, if not already, and configures it.
+     */
+    fun macOS(config: NativeComponent<Dependencies>.() -> Unit)
+
+    /**
      * The native executables for this application.
      */
     val executables: Provider<List<NativeExecutable>>

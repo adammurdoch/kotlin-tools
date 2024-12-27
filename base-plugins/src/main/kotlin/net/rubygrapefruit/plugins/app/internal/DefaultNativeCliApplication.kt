@@ -1,10 +1,6 @@
 package net.rubygrapefruit.plugins.app.internal
 
-import net.rubygrapefruit.plugins.app.BuildType
-import net.rubygrapefruit.plugins.app.Dependencies
-import net.rubygrapefruit.plugins.app.NativeApplication
-import net.rubygrapefruit.plugins.app.NativeExecutable
-import net.rubygrapefruit.plugins.app.NativeMachine
+import net.rubygrapefruit.plugins.app.*
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
@@ -14,7 +10,7 @@ import javax.inject.Inject
 
 abstract class DefaultNativeCliApplication @Inject constructor(
     private val componentRegistry: MultiPlatformComponentRegistry,
-    objects: ObjectFactory,
+    private val objects: ObjectFactory,
     providers: ProviderFactory,
     private val project: Project
 ) : MutableApplication, MutableNativeApplication, NativeApplication {
@@ -28,6 +24,13 @@ abstract class DefaultNativeCliApplication @Inject constructor(
 
     override fun macOS() {
         componentRegistry.macOS { register(it) }
+    }
+
+    override fun macOS(config: NativeComponent<Dependencies>.() -> Unit) {
+        macOS()
+        val component = objects.newInstance(DefaultNativeComponent::class.java, project, "macosMain")
+        config(component)
+        component.attach()
     }
 
     override fun nativeDesktop() {

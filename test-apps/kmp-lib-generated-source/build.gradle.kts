@@ -25,9 +25,13 @@ abstract class SourceGeneratorTask : DefaultTask() {
         sourceFile.bufferedWriter().use { writer ->
             writer.write(
                 """
-                package sample.lib.jvm.generated
+                package sample.lib.kmp.generated
                 
-                class Generated
+                class GeneratedKmp {
+                    fun log() {
+                        println("Generated KMP JVM class")
+                    }
+                }
             """.trimIndent()
             )
         }

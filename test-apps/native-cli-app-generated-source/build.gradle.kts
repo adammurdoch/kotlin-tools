@@ -1,13 +1,20 @@
 plugins {
-    id("net.rubygrapefruit.jvm.lib")
+    id("net.rubygrapefruit.native.cli-app")
 }
 
 val generatorTask = tasks.register<SourceGeneratorTask>("generateSource") {
     outputDir = layout.buildDirectory.dir("generated-source")
 }
 
-library {
-    generatedSource.add(generatorTask.flatMap { it.outputDir })
+application {
+    entryPoint = "sample.main"
+    common {
+        implementation(project(":native-lib-generated-source"))
+        implementation(project(":kmp-lib-generated-source"))
+    }
+    macOS {
+        generatedSource.add(generatorTask.flatMap { it.outputDir })
+    }
 }
 
 abstract class SourceGeneratorTask : DefaultTask() {
@@ -18,18 +25,20 @@ abstract class SourceGeneratorTask : DefaultTask() {
     fun exec() {
         val dir = outputDir.get().asFile
         dir.deleteRecursively()
-        val sourceFile = dir.resolve("Generated.kt")
+        val sourceFile = dir.resolve("App.kt")
         sourceFile.parentFile.mkdirs()
         sourceFile.bufferedWriter().use { writer ->
-            writer.write("""
-                package sample.lib.jvm.generated
+            writer.write(
+                """
+                package sample
                 
-                class GeneratedJvm {
+                class Generated {
                     fun log() {
-                        println("Generated JVM class")
+                        println("Generated app class")
                     }
                 }
-            """.trimIndent())
+            """.trimIndent()
+            )
         }
     }
 }

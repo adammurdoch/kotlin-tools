@@ -1,5 +1,5 @@
 plugins {
-    id("net.rubygrapefruit.jvm.lib")
+    id("net.rubygrapefruit.native.desktop-lib")
 }
 
 val generatorTask = tasks.register<SourceGeneratorTask>("generateSource") {
@@ -7,7 +7,9 @@ val generatorTask = tasks.register<SourceGeneratorTask>("generateSource") {
 }
 
 library {
-    generatedSource.add(generatorTask.flatMap { it.outputDir })
+    macOS {
+        generatedSource.add(generatorTask.flatMap { it.outputDir })
+    }
 }
 
 abstract class SourceGeneratorTask : DefaultTask() {
@@ -22,13 +24,9 @@ abstract class SourceGeneratorTask : DefaultTask() {
         sourceFile.parentFile.mkdirs()
         sourceFile.bufferedWriter().use { writer ->
             writer.write("""
-                package sample.lib.jvm.generated
+                package sample.lib.generated
                 
-                class GeneratedJvm {
-                    fun log() {
-                        println("Generated JVM class")
-                    }
-                }
+                class Generated
             """.trimIndent())
         }
     }

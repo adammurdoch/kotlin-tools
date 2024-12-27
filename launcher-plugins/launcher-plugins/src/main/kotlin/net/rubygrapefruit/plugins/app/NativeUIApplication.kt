@@ -7,4 +7,9 @@ interface NativeUIApplication : Application, UiApplication, MultiPlatformCompone
      * The entry point for the application.
      */
     val entryPoint: Property<String>
+
+    /**
+     * Adds macOS as a target, if not already, and configures it.
+     */
+    fun macOS(config: NativeLibrary.() -> Unit)
 }

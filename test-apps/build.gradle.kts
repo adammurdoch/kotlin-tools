@@ -288,6 +288,7 @@ val nativeCliApp = jvmCliApp.deriveNative("native-cli-app")
 val nativeUiApp = macOsUiApp("native-ui-app")
 
 val jvmCliFullApp = jvmCliApp("jvm-cli-app-full").cliArgs("list")
+val jvmCliGeneratedSource = jvmCliApp("jvm-cli-app-generated-source").cliArgs()
 
 val jvmCliStoreApp = jvmCliApp("store-jvm-cli-app").cliArgs("content", "build/test")
 
@@ -303,6 +304,8 @@ val samples = listOf(
     kmpLibRender,
     kmpLibRender.derive("customized"),
 
+    kmpLib("kmp-lib-generated-source"),
+
     jvmCliApp.allPlatforms(),
     jvmCliApp.derive("customized") { it.launcher("app") }.allPlatforms(),
     jvmCliApp.derive("embedded") { it.embedded() }.allPlatforms(),
@@ -313,13 +316,14 @@ val samples = listOf(
     jvmCliMinApp.allPlatforms(),
     jvmCliFullApp.allPlatforms(),
     jvmCliStoreApp.allPlatforms(),
-    jvmCliApp("jvm-cli-app-generated-source").cliArgs().allPlatforms(),
+    jvmCliGeneratedSource.allPlatforms(),
 
     jvmUiApp,
     jvmUiApp.derive("customized") { it.launcher("App") },
 
     nativeCliApp.allPlatforms(),
     nativeCliApp.derive("customized") { it.launcher("app") }.allPlatforms(),
+    jvmCliGeneratedSource.deriveNative("native-cli-app-generated-source").allPlatforms(),
 
     jvmCliMinApp.deriveNative("native-cli-app-min").allPlatforms(),
     jvmCliFullApp.deriveNative("native-cli-app-full").allPlatforms(),

@@ -1,6 +1,11 @@
 
 # TODO
 
+- JVM apps option to define JVM args when launching JVM
+- JVM UI cli option to log to stdout
+- MacOS UI redirect to log file
+- Native apps discover main() method
+- Validate app main class and entry point names
 - Add something like `testing { kotlinTest() }`
 - Fix `desktop { }` does not add targets, but for example `jvm { }` does.
 - Add `dist --release`

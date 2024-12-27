@@ -19,10 +19,12 @@ class NativeUiApplicationPlugin : Plugin<Project> {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
             plugins.apply(UiApplicationBasePlugin::class.java)
             applications.withApp<DefaultNativeUiApplication> { app ->
+                app.entryPoint.convention("main")
+
                 multiplatformComponents.macOS {
                     executable { }
                 }
-                multiplatformComponents.eachNativeExecutable { machine, buildType, binaryFile, _ ->
+                multiplatformComponents.eachNativeExecutable { machine, buildType, binaryFile, executable ->
                     val name = when (buildType) {
                         BuildType.Debug -> buildType.name
                         BuildType.Release -> "unsignedRelease"
@@ -30,11 +32,13 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                     val default = buildType == BuildType.Debug && HostMachine.current.canBeBuilt && HostMachine.current.machine == machine
                     val dist = app.distributionContainer.add(name, default, HostMachine.current.canBuild(machine), machine, buildType, DefaultNativeUiAppDistribution::class.java)
                     dist.launcherFile.set(binaryFile)
+                    executable.entryPoint = "uiMain"
                 }
 
                 val generatorTask = tasks.register("nativeLauncher", NativeLauncher::class.java) {
                     it.sourceDirectory.set(layout.buildDirectory.dir("generated-main"))
-                    it.delegateClass.set(app.delegateClass)
+                    it.mainMethod.set("uiMain")
+                    it.delegateMethod.set(app.entryPoint)
                 }
                 withMacosMain(kotlin) {
                     it.kotlin.srcDir(generatorTask.flatMap { it.sourceDirectory })

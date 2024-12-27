@@ -4,7 +4,7 @@ import org.gradle.api.provider.Property
 
 interface NativeUIApplication : Application, UiApplication, MultiPlatformComponent<Dependencies> {
     /**
-     * The name of the NSApplicationDelegate class for the application.
+     * The entry point for the application.
      */
-    val delegateClass: Property<String>
+    val entryPoint: Property<String>
 }

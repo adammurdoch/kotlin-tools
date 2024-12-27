@@ -12,19 +12,20 @@ abstract class NativeLauncher : DefaultTask() {
     abstract val sourceDirectory: DirectoryProperty
 
     @get:Input
-    abstract val delegateClass: Property<String>
+    abstract val mainMethod: Property<String>
+
+    @get:Input
+    abstract val delegateMethod: Property<String>
 
     @TaskAction
     fun generate() {
-        sourceDirectory.file("main.kt").get().asFile.printWriter().use {
+        sourceDirectory.file("${mainMethod.get()}.kt").get().asFile.printWriter().use {
             it.println(
                 """
-                import platform.AppKit.NSApplication
-
-                fun main() {
-                    val application = NSApplication.sharedApplication
-                    application.delegate = ${delegateClass.get()}()
-                    application.run()
+                fun ${mainMethod.get()}() {
+                    println("LAUNCHER!!")
+                    ${delegateMethod.get()}()
+                    println("FINISHED!!")
                 }
             """.trimIndent()
             )

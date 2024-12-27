@@ -4,5 +4,5 @@ plugins {
 
 application {
     appName = "app"
-    delegateClass = "sample.AppDelegate"
+    entryPoint = "sample.main"
 }

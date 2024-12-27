@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalForeignApi::class)
-
 package sample
 
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -8,6 +6,7 @@ import platform.Foundation.NSMakeRect
 import platform.Foundation.NSNotification
 import platform.darwin.NSObject
 
+@OptIn(ExperimentalForeignApi::class)
 class AppDelegate : NSObject(), NSApplicationDelegateProtocol {
     override fun applicationDidFinishLaunching(notification: NSNotification) {
         val appName = "Test App"

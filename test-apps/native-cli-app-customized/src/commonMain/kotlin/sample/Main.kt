@@ -1,3 +1,5 @@
+package sample
+
 import sample.calc.Failure
 import sample.calc.Parser
 import sample.calc.Success

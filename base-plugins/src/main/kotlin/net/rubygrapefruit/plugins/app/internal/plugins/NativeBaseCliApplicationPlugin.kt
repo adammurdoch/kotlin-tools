@@ -15,10 +15,14 @@ open class NativeBaseCliApplicationPlugin : Plugin<Project> {
             plugins.apply(ApplicationBasePlugin::class.java)
 
             applications.withApp<DefaultNativeCliApplication> { app ->
-                multiplatformComponents.eachNativeTarget { machine, buildType, binaryFile ->
+                app.entryPoint.convention("main")
+                multiplatformComponents.eachNativeExecutable { machine, buildType, binaryFile, executable ->
                     app.targets.attachExecutable(machine, buildType, binaryFile)
                     app.targets.configureTarget(machine, buildType) {
                         launcherFilePath.set(app.appName.map { HostMachine.of(machine).exeName(it) })
+                    }
+                    target.afterEvaluate {
+                        executable.entryPoint = app.entryPoint.get()
                     }
                 }
             }

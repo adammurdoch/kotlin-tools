@@ -6,6 +6,7 @@ plugins {
 }
 
 application {
+    entryPoint = "sample.main"
     common {
         implementation(Versions.coroutines.coordinates)
         implementation("com.github.ajalt.clikt:clikt:4.2.1")

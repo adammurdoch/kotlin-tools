@@ -11,6 +11,8 @@ class JvmCliApplicationPlugin : Plugin<Project> {
         with(target) {
             plugins.apply(JvmApplicationBasePlugin::class.java)
             applications.withApp<DefaultJvmCliApplication> { app ->
+                app.attach()
+
                 val libsDirPath = "lib"
 
                 val libNames = app.runtimeModulePath.elements.map { it.map { f -> f.asFile.name } }
@@ -56,7 +58,6 @@ class JvmCliApplicationPlugin : Plugin<Project> {
 
             val app = extensions.create("application", DefaultJvmCliApplication::class.java)
             applications.register(app)
-            app.attach()
         }
     }
 }

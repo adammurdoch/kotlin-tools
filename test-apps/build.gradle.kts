@@ -358,24 +358,13 @@ val generators = derivedSamples.map { sample ->
                 srcDir.target.deleteRecursively()
 
                 srcDir.origin.walkTopDown().forEach { file ->
-                    val destFile = if (sample.includePackages) {
-                        srcDir.target.resolve(file.relativeTo(srcDir.origin))
-                    } else {
-                        srcDir.target.resolve(file.name)
-                    }
-                    if (file.isDirectory && sample.includePackages) {
+                    val destFile = srcDir.target.resolve(file.relativeTo(srcDir.origin))
+                    if (file.isDirectory) {
                         destFile.createDirectory()
                     } else if (file.isFile) {
                         destFile.parentFile.mkdirs()
                         val text = file.readText()
-                        if (sample.includePackages) {
-                            destFile.writeText(text)
-                        } else {
-                            val lines = text.lines()
-                            val packageIndex = lines.indexOfFirst { it.trim().startsWith("package ") }
-                            val modified = lines.subList(0, packageIndex) + lines.subList(packageIndex + 2, lines.size)
-                            destFile.writeText(modified.joinToString("\n"))
-                        }
+                        destFile.writeText(text)
                     }
                 }
             }

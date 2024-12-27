@@ -4,6 +4,7 @@ plugins {
 }
 
 application {
+    entryPoint = "sample.main"
     common {
         implementation("net.rubygrapefruit.libs:cli-app:1.0")
         implementation("net.rubygrapefruit.libs:file-io:1.0")

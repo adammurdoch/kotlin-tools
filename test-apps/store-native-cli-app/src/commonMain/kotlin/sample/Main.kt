@@ -1,3 +1,5 @@
+package sample
+
 import net.rubygrapefruit.cli.app.CliAction
 import net.rubygrapefruit.cli.app.CliApp
 import net.rubygrapefruit.store.ContentVisitor

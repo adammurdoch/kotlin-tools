@@ -22,7 +22,7 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                 multiplatformComponents.macOS {
                     executable { }
                 }
-                multiplatformComponents.eachNativeTarget { machine, buildType, binaryFile ->
+                multiplatformComponents.eachNativeExecutable { machine, buildType, binaryFile, _ ->
                     val name = when (buildType) {
                         BuildType.Debug -> buildType.name
                         BuildType.Release -> "unsignedRelease"

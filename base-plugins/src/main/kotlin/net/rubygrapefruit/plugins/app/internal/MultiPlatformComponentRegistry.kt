@@ -71,7 +71,7 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
         }
     }
 
-    fun eachNativeTarget(action: (NativeMachine, BuildType, Provider<RegularFile>) -> Unit) {
+    fun eachNativeExecutable(action: (NativeMachine, BuildType, Provider<RegularFile>, Executable) -> Unit) {
         eachNativeTarget { machine, nativeTarget ->
             for (executable in nativeTarget.binaries.withType(Executable::class.java)) {
                 val binaryFile = project.layout.file(executable.linkTaskProvider.map { it.binary.outputFile })
@@ -79,7 +79,7 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
                     NativeBuildType.DEBUG -> BuildType.Debug
                     NativeBuildType.RELEASE -> BuildType.Release
                 }
-                action(machine, buildType, binaryFile)
+                action(machine, buildType, binaryFile, executable)
             }
         }
     }
@@ -97,7 +97,7 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
                 it.dependsOn(parent)
             }
             for (childName in children) {
-                withSourceSet(childName) { child, sourceSets ->
+                withSourceSet(childName) { child, _ ->
                     child.dependsOn(intermediate)
                 }
             }

@@ -3,6 +3,7 @@ plugins {
 }
 
 application {
+    entryPoint = "sample.main"
     common {
         implementation(project(":kmp-lib"))
         implementation(project(":kmp-lib-render"))

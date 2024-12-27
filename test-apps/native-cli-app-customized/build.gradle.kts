@@ -4,6 +4,7 @@ plugins {
 
 application {
     appName = "app"
+    entryPoint = "sample.main"
     common {
         implementation(project(":kmp-lib-customized"))
         implementation(project(":kmp-lib-render"))

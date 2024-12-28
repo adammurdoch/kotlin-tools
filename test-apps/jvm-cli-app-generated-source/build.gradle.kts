@@ -3,7 +3,7 @@ plugins {
 }
 
 val generatorTask = tasks.register<SourceGeneratorTask>("generateSource") {
-    outputDir = layout.buildDirectory.dir("generated-source")
+    outputDir = layout.buildDirectory.dir("generated/main")
 }
 
 application {

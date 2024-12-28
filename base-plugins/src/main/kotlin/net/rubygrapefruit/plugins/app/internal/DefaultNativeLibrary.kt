@@ -4,28 +4,32 @@ import net.rubygrapefruit.plugins.app.LibraryDependencies
 import net.rubygrapefruit.plugins.app.NativeLibrary
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ExternalModuleDependency
-import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import javax.inject.Inject
 
 abstract class DefaultNativeLibrary @Inject constructor(
-    private val project: Project,
+    private val sourceSets: SourceSets,
     private val mainSourceSetName: String
 ) : NativeLibrary {
     override fun dependencies(config: LibraryDependencies.() -> Unit) {
         val dependencies = DependenciesImpl()
         config(dependencies)
 
-        val sourceSets = project.extensions.getByType(KotlinProjectExtension::class.java).sourceSets
-        sourceSets.whenObjectAdded { sourceSet ->
-            if (sourceSet.name == mainSourceSetName) {
-                sourceSet.dependencies {
-                    for (notation in dependencies.api) {
-                        api(notation)
-                    }
-                    for (notation in dependencies.implementation) {
-                        implementation(notation)
-                    }
+        sourceSets.withSourceSet(mainSourceSetName) { sourceSet, _ ->
+            sourceSet.dependencies {
+                for (notation in dependencies.api) {
+                    api(notation)
                 }
+                for (notation in dependencies.implementation) {
+                    implementation(notation)
+                }
+            }
+        }
+    }
+
+    fun attach() {
+        sourceSets.withSourceSet(mainSourceSetName) { sourceSet, _ ->
+            sourceSets.withSourceSet(mainSourceSetName) { mainSourceSet, _ ->
+                mainSourceSet.kotlin.srcDirs(generatedSource)
             }
         }
     }

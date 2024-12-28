@@ -11,25 +11,17 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
     private val project: Project
 ) : MultiPlatformLibrary {
     private var jvm: JvmLibrary? = null
-    private var macOs: NativeLibrary? = null
+    private var macOs: DefaultNativeLibrary? = null
 
     val module: JvmModule
-        get() = jvm!!.module
+        get() = createJvm().module
 
     override fun jvm() {
         jvm {}
     }
 
     override fun jvm(config: JvmLibrary.() -> Unit) {
-        if (jvm == null) {
-            val lib = factory.newInstance(DefaultJvmLibrary::class.java, "jvmMain")
-            lib.module.name.convention(toModuleName(project.name))
-            lib.targetJavaVersion.convention(Versions.java)
-            jvm = lib
-            componentRegistry.jvm(lib.targetJavaVersion)
-            lib.attach()
-        }
-        config(jvm!!)
+        config(createJvm())
     }
 
     override fun browser() {
@@ -42,14 +34,11 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
 
     override fun macOS(config: NativeLibrary.() -> Unit) {
         componentRegistry.macOS()
-        if (macOs == null) {
-            macOs = factory.newInstance(DefaultNativeLibrary::class.java, "macosMain")
-        }
-        config(macOs!!)
+        config(createMacOS())
     }
 
     override fun desktop(config: NativeLibrary.() -> Unit) {
-        val lib = factory.newInstance(DefaultNativeLibrary::class.java, "desktopMain")
+        val lib = factory.newInstance(DefaultNativeLibrary::class.java, componentRegistry.sourceSets, "desktopMain")
         config(lib)
     }
 
@@ -64,4 +53,27 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
     override fun test(config: LibraryDependencies.() -> Unit) {
         project.kotlin.sourceSets.getByName("commonTest").dependencies { config(KotlinHandlerBackedLibraryDependencies(this)) }
     }
+
+    private fun createJvm(): JvmLibrary {
+        if (jvm == null) {
+            val lib = factory.newInstance(DefaultJvmLibrary::class.java, "jvmMain")
+            lib.module.name.convention(toModuleName(project.name))
+            lib.targetJavaVersion.convention(Versions.java)
+            jvm = lib
+            // This can call back to query JVM object
+            componentRegistry.jvm(lib.targetJavaVersion)
+            lib.attach()
+        }
+        return jvm!!
+    }
+
+    private fun createMacOS(): DefaultNativeLibrary {
+        if (macOs == null) {
+            val lib = factory.newInstance(DefaultNativeLibrary::class.java, componentRegistry.sourceSets, "macosMain")
+            macOs = lib
+            lib.attach()
+        }
+        return macOs!!
+    }
+
 }

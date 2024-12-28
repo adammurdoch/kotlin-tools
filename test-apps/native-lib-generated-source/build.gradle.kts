@@ -3,7 +3,7 @@ plugins {
 }
 
 val generatorTask = tasks.register<SourceGeneratorTask>("generateSource") {
-    outputDir = layout.buildDirectory.dir("generated-source")
+    outputDir = layout.buildDirectory.dir("generated/macos")
 }
 
 library {
@@ -26,7 +26,11 @@ abstract class SourceGeneratorTask : DefaultTask() {
             writer.write("""
                 package sample.lib.generated
                 
-                class Generated
+                class GeneratedNative {
+                    fun log() {
+                        println("Generated macOS lib class")
+                    }
+                }
             """.trimIndent())
         }
     }

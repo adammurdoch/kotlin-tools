@@ -39,7 +39,7 @@ abstract class SourceGeneratorTask : DefaultTask() {
     fun exec() {
         val dir = outputDir.get().asFile
         dir.deleteRecursively()
-        val sourceFile = dir.resolve("Generated.kt")
+        val sourceFile = dir.resolve("${className.get()}.kt")
         sourceFile.parentFile.mkdirs()
         sourceFile.bufferedWriter().use { writer ->
             writer.write(

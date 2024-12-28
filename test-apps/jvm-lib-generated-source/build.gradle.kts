@@ -3,7 +3,7 @@ plugins {
 }
 
 val generatorTask = tasks.register<SourceGeneratorTask>("generateSource") {
-    outputDir = layout.buildDirectory.dir("generated-source")
+    outputDir = layout.buildDirectory.dir("generated/main")
 }
 
 library {
@@ -26,7 +26,7 @@ abstract class SourceGeneratorTask : DefaultTask() {
                 
                 class GeneratedJvm {
                     fun log() {
-                        println("Generated JVM class")
+                        println("Generated JVM lib class")
                     }
                 }
             """.trimIndent())

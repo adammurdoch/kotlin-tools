@@ -2,8 +2,15 @@ plugins {
     id("net.rubygrapefruit.native.cli-app")
 }
 
-val generatorTask = tasks.register<SourceGeneratorTask>("generateSource") {
-    outputDir = layout.buildDirectory.dir("generated-source")
+val commonGeneratorTask = tasks.register<SourceGeneratorTask>("generateCommonSource") {
+    outputDir = layout.buildDirectory.dir("generated/common")
+    className = "Generated"
+    displayName = "common app"
+}
+val macosGeneratorTask = tasks.register<SourceGeneratorTask>("generateMacOSSource") {
+    outputDir = layout.buildDirectory.dir("generated/macos")
+    className = "GeneratedMacOS"
+    displayName = "macOS app"
 }
 
 application {
@@ -12,12 +19,21 @@ application {
         implementation(project(":native-lib-generated-source"))
         implementation(project(":kmp-lib-generated-source"))
     }
-    generatedSource.add(generatorTask.flatMap { it.outputDir })
+    generatedSource.add(commonGeneratorTask.flatMap { it.outputDir })
+    macOS {
+        generatedSource.add(macosGeneratorTask.flatMap { it.outputDir })
+    }
 }
 
 abstract class SourceGeneratorTask : DefaultTask() {
     @get:OutputDirectory
     abstract val outputDir: DirectoryProperty
+
+    @get:Input
+    abstract val className: Property<String>
+
+    @get:Input
+    abstract val displayName: Property<String>
 
     @TaskAction
     fun exec() {
@@ -30,9 +46,9 @@ abstract class SourceGeneratorTask : DefaultTask() {
                 """
                 package sample
                 
-                class Generated {
+                class ${className.get()} {
                     fun log() {
-                        println("Generated app class")
+                        println("Generated ${displayName.get()} class")
                     }
                 }
             """.trimIndent()

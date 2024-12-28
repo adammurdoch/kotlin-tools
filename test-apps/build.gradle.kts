@@ -384,14 +384,17 @@ val runTasks = sampleApps.associateWith { app ->
     }
 }
 
-val runOtherTasks = sampleApps.flatMap { app ->
-    app.otherDists.map { dist ->
+val runOtherTasks = sampleApps.map { app ->
+    val runTasks = app.otherDists.map { dist ->
         tasks.register("run-${app.name}-${dist.distTaskName}") {
             dependsOn(app.distTask(dist))
             doLast {
                 run(app, dist)
             }
         }
+    }
+    tasks.register("run-other-${app.name}") {
+        dependsOn(runTasks)
     }
 }
 
@@ -471,7 +474,7 @@ fun run(app: App, dist: AppDistribution) {
         }
         println()
         println("----")
-        println(str)
+        print(str)
         println("----")
         if (app.expectedOutput != null && !str.toString().contains(app.expectedOutput)) {
             throw IllegalStateException("Unexpected application output")

@@ -11,5 +11,5 @@ interface NativeUIApplication : Application, UiApplication, MultiPlatformCompone
     /**
      * Adds macOS as a target, if not already, and configures it.
      */
-    fun macOS(config: NativeLibrary.() -> Unit)
+    fun macOS(config: NativeComponent<Dependencies>.() -> Unit)
 }

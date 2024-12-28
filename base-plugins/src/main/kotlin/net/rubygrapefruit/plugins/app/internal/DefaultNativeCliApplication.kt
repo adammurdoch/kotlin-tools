@@ -10,14 +10,12 @@ import javax.inject.Inject
 
 abstract class DefaultNativeCliApplication @Inject constructor(
     private val componentRegistry: MultiPlatformComponentRegistry,
-    private val objects: ObjectFactory,
+    objects: ObjectFactory,
     providers: ProviderFactory,
-    private val project: Project
+    project: Project
 ) : MutableApplication, MutableNativeApplication, NativeApplication {
-
-    private val mainSourceSet get() = project.kotlin.sourceSets.getByName("commonMain")
-
     val targets = NativeTargetsContainer(objects, providers, project.tasks)
+    private val appTargets = NativeApplicationTargets(componentRegistry, objects, project)
 
     override val distributionContainer = targets.distributions
 
@@ -30,9 +28,7 @@ abstract class DefaultNativeCliApplication @Inject constructor(
 
     override fun macOS(config: NativeComponent<Dependencies>.() -> Unit) {
         macOS()
-        val component = objects.newInstance(DefaultNativeComponent::class.java, componentRegistry.sourceSets, "macosMain")
-        config(component)
-        component.attach()
+        config(appTargets.macOS())
     }
 
     override fun nativeDesktop() {
@@ -45,14 +41,14 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     }
 
     override fun common(config: Dependencies.() -> Unit) {
-        mainSourceSet.dependencies { config(KotlinHandlerBackedDependencies(this)) }
+        appTargets.common(config)
     }
 
     override fun test(config: Dependencies.() -> Unit) {
-        project.kotlin.sourceSets.getByName("commonTest").dependencies { config(KotlinHandlerBackedDependencies(this)) }
+        appTargets.test(config)
     }
 
     fun attach() {
-        mainSourceSet.kotlin.srcDirs(generatedSource)
+        appTargets.mainSourceSet.kotlin.srcDirs(generatedSource)
     }
 }

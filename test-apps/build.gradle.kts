@@ -248,7 +248,7 @@ class UiBaseApp(
     srcDirName: String,
     mainDist: AppDistribution = AppDistribution(UiApp(name.capitalized(), "build/dist", Machine.thisMachine.architecture)),
     otherDists: List<AppDistribution> = emptyList()
-) : BaseApp(name, baseDir, mainDist, otherDists, srcDirName, true)
+) : BaseApp(name, baseDir, mainDist, otherDists, srcDirName, false)
 
 class DerivedApp(
     name: String,

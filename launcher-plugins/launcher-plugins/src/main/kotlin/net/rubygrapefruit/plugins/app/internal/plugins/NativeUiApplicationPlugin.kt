@@ -1,17 +1,10 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.BuildType
-import net.rubygrapefruit.plugins.app.internal.DefaultNativeUiAppDistribution
-import net.rubygrapefruit.plugins.app.internal.DefaultNativeUiApplication
-import net.rubygrapefruit.plugins.app.internal.HostMachine
-import net.rubygrapefruit.plugins.app.internal.applications
-import net.rubygrapefruit.plugins.app.internal.kotlin
-import net.rubygrapefruit.plugins.app.internal.multiplatformComponents
+import net.rubygrapefruit.plugins.app.internal.*
 import net.rubygrapefruit.plugins.app.internal.tasks.NativeLauncher
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 
 class NativeUiApplicationPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -40,26 +33,13 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                     it.mainMethod.set("uiMain")
                     it.delegateMethod.set(app.entryPoint)
                 }
-                withMacosMain(kotlin) {
-                    it.kotlin.srcDir(generatorTask.flatMap { it.sourceDirectory })
+                app.macOS {
+                    generatedSource.add(generatorTask.flatMap { it.sourceDirectory })
                 }
             }
 
             val app = extensions.create("application", DefaultNativeUiApplication::class.java, multiplatformComponents)
             applications.register(app)
-        }
-    }
-
-    private fun withMacosMain(extension: KotlinMultiplatformExtension, action: (KotlinSourceSet) -> Unit) {
-        val macosMain = extension.sourceSets.findByName("macosMain")
-        if (macosMain != null) {
-            action(macosMain)
-        } else {
-            extension.sourceSets.whenObjectAdded {
-                if (it.name == "macosMain") {
-                    action(it)
-                }
-            }
         }
     }
 }

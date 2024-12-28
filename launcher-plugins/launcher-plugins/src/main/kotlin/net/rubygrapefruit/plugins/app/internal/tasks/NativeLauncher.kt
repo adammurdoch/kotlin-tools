@@ -22,10 +22,8 @@ abstract class NativeLauncher : DefaultTask() {
         sourceDirectory.file("${mainMethod.get()}.kt").get().asFile.printWriter().use {
             it.println(
                 """
-                fun ${mainMethod.get()}() {
-                    println("LAUNCHER!!")
-                    ${delegateMethod.get()}()
-                    println("FINISHED!!")
+                fun ${mainMethod.get()}(args: Array<String>) {
+                    ${delegateMethod.get()}(args)
                 }
             """.trimIndent()
             )

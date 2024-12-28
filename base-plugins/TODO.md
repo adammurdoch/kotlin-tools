@@ -1,12 +1,13 @@
 
 # TODO
 
-- Native UI app allows generated source
+- Native UI app allows generated common source
+- Native library allows generated common source
 - UI apps pass CLI args to main function
 - JVM apps option to define JVM args when launching JVM
 - JVM UI cli option to log to stdout
 - MacOS UI redirect to log file
-- Native apps discover `main()` function, and fix samples
+- Native apps discover `main()` function with or without args, and fix samples
 - Validate app main class and entry point names
 - Add something like `testing { kotlinTest() }`
 - Fix `desktop { }` does not add targets, but for example `jvm { }` does.

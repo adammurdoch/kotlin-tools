@@ -2,13 +2,11 @@ package net.rubygrapefruit.plugins.app.internal
 
 import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.NativeMachine
-import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.jetbrains.kotlin.gradle.dsl.KotlinNativeBinaryContainer
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.mpp.Executable
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
@@ -19,6 +17,7 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
     private val machines = mutableSetOf<NativeMachine>()
     private val machineActions = mutableListOf<(NativeMachine, KotlinNativeTarget) -> Unit>()
     private val jvm = SimpleContainer<Boolean>()
+    val sourceSets = SourceSets(project)
 
     init {
         project.afterEvaluate {
@@ -88,31 +87,17 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
         jvm.each { action() }
     }
 
-    private fun createIntermediateSourceSet(name: String, parentName: String, children: Set<String>) {
-        if (children.isEmpty()) {
+    private fun createIntermediateSourceSet(name: String, parentName: String, childNames: Set<String>) {
+        if (childNames.isEmpty()) {
             return
         }
-        withSourceSet(parentName) { parent, sourceSets ->
-            val intermediate = sourceSets.create(name) {
+        sourceSets.withSourceSet(parentName) { parent, container ->
+            val intermediate = container.create(name) {
                 it.dependsOn(parent)
             }
-            for (childName in children) {
-                withSourceSet(childName) { child, _ ->
+            for (childName in childNames) {
+                sourceSets.withSourceSet(childName) { child, _ ->
                     child.dependsOn(intermediate)
-                }
-            }
-        }
-    }
-
-    private fun withSourceSet(name: String, action: (KotlinSourceSet, NamedDomainObjectContainer<KotlinSourceSet>) -> Unit) {
-        val sourceSets = project.kotlin.sourceSets
-        val sourceSet = sourceSets.findByName(name)
-        if (sourceSet != null) {
-            action(sourceSet, sourceSets)
-        } else {
-            sourceSets.whenObjectAdded { sourceSet ->
-                if (sourceSet.name == name) {
-                    action(sourceSet, sourceSets)
                 }
             }
         }
@@ -130,6 +115,7 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
                             unixSourceSets.add("macosMain")
                             unixTestSourceSets.add("macosTest")
                         }
+
                         NativeMachine.MacOSArm64 -> {
                             macosArm64 {
                                 config(binaries, NativeMachine.MacOSArm64)
@@ -137,6 +123,7 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
                             unixSourceSets.add("macosMain")
                             unixTestSourceSets.add("macosTest")
                         }
+
                         NativeMachine.LinuxX64 -> {
                             linuxX64 {
                                 config(binaries, NativeMachine.LinuxX64)
@@ -144,6 +131,7 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
                             unixSourceSets.add("linuxMain")
                             unixTestSourceSets.add("linuxTest")
                         }
+
                         NativeMachine.WindowsX64 -> {
                             mingwX64 {
                                 config(binaries, NativeMachine.WindowsX64)

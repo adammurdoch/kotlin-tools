@@ -22,7 +22,7 @@ abstract class SourceGeneratorTask : DefaultTask() {
     fun exec() {
         val dir = outputDir.get().asFile
         dir.deleteRecursively()
-        val sourceFile = dir.resolve("App.kt")
+        val sourceFile = dir.resolve("Generated.kt")
         sourceFile.parentFile.mkdirs()
         sourceFile.bufferedWriter().use { writer ->
             writer.write(

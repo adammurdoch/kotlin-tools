@@ -15,6 +15,8 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     private val project: Project
 ) : MutableApplication, MutableNativeApplication, NativeApplication {
 
+    private val mainSourceSet get() = project.kotlin.sourceSets.getByName("commonMain")
+
     val targets = NativeTargetsContainer(objects, providers, project.tasks)
 
     override val distributionContainer = targets.distributions
@@ -28,7 +30,7 @@ abstract class DefaultNativeCliApplication @Inject constructor(
 
     override fun macOS(config: NativeComponent<Dependencies>.() -> Unit) {
         macOS()
-        val component = objects.newInstance(DefaultNativeComponent::class.java, project, "macosMain")
+        val component = objects.newInstance(DefaultNativeComponent::class.java, componentRegistry.sourceSets, "macosMain")
         config(component)
         component.attach()
     }
@@ -43,10 +45,14 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     }
 
     override fun common(config: Dependencies.() -> Unit) {
-        project.kotlin.sourceSets.getByName("commonMain").dependencies { config(KotlinHandlerBackedDependencies(this)) }
+        mainSourceSet.dependencies { config(KotlinHandlerBackedDependencies(this)) }
     }
 
     override fun test(config: Dependencies.() -> Unit) {
         project.kotlin.sourceSets.getByName("commonTest").dependencies { config(KotlinHandlerBackedDependencies(this)) }
+    }
+
+    fun attach() {
+        mainSourceSet.kotlin.srcDirs(generatedSource)
     }
 }

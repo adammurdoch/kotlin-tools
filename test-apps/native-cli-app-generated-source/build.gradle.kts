@@ -12,9 +12,7 @@ application {
         implementation(project(":native-lib-generated-source"))
         implementation(project(":kmp-lib-generated-source"))
     }
-    macOS {
-        generatedSource.add(generatorTask.flatMap { it.outputDir })
-    }
+    generatedSource.add(generatorTask.flatMap { it.outputDir })
 }
 
 abstract class SourceGeneratorTask : DefaultTask() {
@@ -25,7 +23,7 @@ abstract class SourceGeneratorTask : DefaultTask() {
     fun exec() {
         val dir = outputDir.get().asFile
         dir.deleteRecursively()
-        val sourceFile = dir.resolve("App.kt")
+        val sourceFile = dir.resolve("Generated.kt")
         sourceFile.parentFile.mkdirs()
         sourceFile.bufferedWriter().use { writer ->
             writer.write(

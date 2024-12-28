@@ -15,6 +15,7 @@ open class NativeBaseCliApplicationPlugin : Plugin<Project> {
             plugins.apply(ApplicationBasePlugin::class.java)
 
             applications.withApp<DefaultNativeCliApplication> { app ->
+                app.attach()
                 app.entryPoint.convention("main")
                 multiplatformComponents.eachNativeExecutable { machine, buildType, binaryFile, executable ->
                     app.targets.attachExecutable(machine, buildType, binaryFile)

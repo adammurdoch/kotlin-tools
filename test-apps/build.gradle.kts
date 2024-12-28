@@ -205,10 +205,10 @@ open class BaseApp(
     mainDist: AppDistribution,
     otherDists: List<AppDistribution>,
     srcDirName: String,
-    includePackages: Boolean,
+    allPlatforms: Boolean,
     invocation: AppInvocation = AppInvocation(listOf("1", "+", "2"), "Expression: (1) + (2)")
 ) :
-    App(name, baseDir, mainDist, otherDists, srcDirName, includePackages, invocation) {
+    App(name, baseDir, mainDist, otherDists, srcDirName, allPlatforms, invocation) {
 
     override val derivedFrom: BaseApp
         get() = this
@@ -236,6 +236,11 @@ class JvmBaseApp(
     name: String,
     baseDir: File,
 ) : BaseApp(name, baseDir, AppDistribution(JvmLauncherScripts(name, false)), emptyList(), "main", true)
+
+class NativeBaseApp(
+    name: String,
+    baseDir: File,
+) : BaseApp(name, baseDir, AppDistribution(NativeBinaryCliApp(name, "build/dist", Arm64)), emptyList(), "commonMain", true)
 
 class UiBaseApp(
     name: String,
@@ -288,7 +293,6 @@ val nativeCliApp = jvmCliApp.deriveNative("native-cli-app")
 val nativeUiApp = macOsUiApp("native-ui-app")
 
 val jvmCliFullApp = jvmCliApp("jvm-cli-app-full").cliArgs("list")
-val jvmCliGeneratedSource = jvmCliApp("jvm-cli-app-generated-source").cliArgs()
 
 val jvmCliStoreApp = jvmCliApp("store-jvm-cli-app").cliArgs("content", "build/test")
 
@@ -316,14 +320,14 @@ val samples = listOf(
     jvmCliMinApp.allPlatforms(),
     jvmCliFullApp.allPlatforms(),
     jvmCliStoreApp.allPlatforms(),
-    jvmCliGeneratedSource.allPlatforms(),
+    jvmCliApp("jvm-cli-app-generated-source").cliArgs().allPlatforms(),
 
     jvmUiApp,
     jvmUiApp.derive("customized") { it.launcher("App") },
 
     nativeCliApp.allPlatforms(),
     nativeCliApp.derive("customized") { it.launcher("app") }.allPlatforms(),
-    jvmCliGeneratedSource.deriveNative("native-cli-app-generated-source").allPlatforms(),
+    nativeCliApp("native-cli-app-generated-source").cliArgs().allPlatforms(),
 
     jvmCliMinApp.deriveNative("native-cli-app-min").allPlatforms(),
     jvmCliFullApp.deriveNative("native-cli-app-full").allPlatforms(),
@@ -483,6 +487,10 @@ fun jvmCliApp(name: String): JvmBaseApp {
 }
 
 fun jvmUiApp(name: String) = UiBaseApp(name, projectDir, "main")
+
+fun nativeCliApp(name: String): NativeBaseApp {
+    return NativeBaseApp(name, projectDir)
+}
 
 fun macOsUiApp(name: String): UiBaseApp {
     val host = Machine.thisMachine

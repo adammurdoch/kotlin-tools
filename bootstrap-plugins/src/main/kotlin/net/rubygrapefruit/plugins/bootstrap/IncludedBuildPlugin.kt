@@ -1,33 +1,39 @@
 package net.rubygrapefruit.plugins.bootstrap
 
 import org.gradle.api.Plugin
+import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.initialization.Settings
 
 class IncludedBuildPlugin : Plugin<Settings> {
     override fun apply(target: Settings) {
         target.run {
             gradle.rootProject { project ->
-                with(project) {
+                project.run {
                     plugins.apply("lifecycle-base")
                     val includedBuilds = target.gradle.includedBuilds
                     tasks.named("clean") {
-                        it.dependsOn(includedBuilds.map { it.task(":clean") })
-                        it.dependsOn(subprojects.mapNotNull { it.tasks.findByName("clean") })
+                        it.dependsOnChildren("clean", target, project)
                     }
                     tasks.named("check") {
-                        it.dependsOn(includedBuilds.map { it.task(":check") })
-                        it.dependsOn(subprojects.mapNotNull { it.tasks.findByName("check") })
+                        it.dependsOnChildren("check", target, project)
                     }
                     tasks.named("assemble") {
-                        it.dependsOn(includedBuilds.map { it.task(":assemble") })
-                        it.dependsOn(subprojects.mapNotNull { it.tasks.findByName("assemble") })
+                        it.dependsOnChildren("assemble", target, project)
                     }
                     tasks.register("dist") {
-                        it.dependsOn(includedBuilds.map { it.task(":dist") })
-                        it.dependsOn(subprojects.mapNotNull { it.tasks.findByName("dist") })
+                        it.dependsOnChildren("dist", target, project)
+                    }
+                    tasks.register("release") {
+                        it.dependsOnChildren("release", target, project)
                     }
                 }
             }
         }
+    }
+
+    private fun Task.dependsOnChildren(name: String, settings: Settings, rootProject: Project) {
+        dependsOn(settings.gradle.includedBuilds.map { it.task(":${name}") })
+        dependsOn(rootProject.subprojects.mapNotNull { it.tasks.findByName(name) })
     }
 }

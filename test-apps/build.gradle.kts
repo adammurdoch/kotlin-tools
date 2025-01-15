@@ -3,8 +3,8 @@ import net.rubygrapefruit.machine.info.Architecture.Arm64
 import net.rubygrapefruit.machine.info.Architecture.X64
 import net.rubygrapefruit.machine.info.Machine
 import net.rubygrapefruit.strings.capitalized
-import org.jetbrains.kotlin.incremental.createDirectory
 import java.io.ByteArrayOutputStream
+import kotlin.io.path.createDirectory
 
 sealed class Sample(val name: String, val baseDir: File) {
     val dir = baseDir.resolve(name)
@@ -359,7 +359,7 @@ val generators = derivedSamples.map { sample ->
                 srcDir.origin.walkTopDown().forEach { file ->
                     val destFile = srcDir.target.resolve(file.relativeTo(srcDir.origin))
                     if (file.isDirectory) {
-                        destFile.createDirectory()
+                        destFile.toPath().createDirectory()
                     } else if (file.isFile) {
                         destFile.parentFile.mkdirs()
                         val text = file.readText()

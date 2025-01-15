@@ -47,25 +47,37 @@
 - Add functional tests for plugins.
     - Customisation
 - Refactor `DownloadRepository` to use Gradle exec service when used in a plugin.
-- Installer:
-- Gradle issues:
-    - `MapProperty.getting()` does not seem to retain task dependencies
-    - `@Nested Property<T>` does not seem to retain task dependencies
-    - Make it easier to use ArtifactCollection from task
-    - Fix import of `test-apps` - does not seem to be included
-    - Use version catalog
-    - "Included build 'x' does not exist" does not give any content, e.g. where is it defined?
-    - Get the jlink tool for a toolchain
-    - Add some way to get a dependency on all tasks with a given name in a build
-    - Add some way to get a dependency on task with given path in a build, where the task may not exist
-    - Fix `task.flatMap { it.someOutputDir.file("some-file") }` -> does not carry task dependencies
-    - Awkward to discard property value from Kotlin (set(null) is ambiguous)
-    - Set property using `Path`.
-    - Some kind of managed type `Property<T>` or `Provider<T>` that allows deferred configuration (eg `Property<Distribution>`)
-    - Create a property of managed type (eg `val dist: Distribution`)
-    - Some way to get `FileCollection` elements as locations or file names (ie without the build dependencies, to generate a manifest, etc.)
-    - No way to have a generated output directory (eg a task that uses `DownloadRepository` to locate the output)
-    - Improve error message when settings plugin is applied to project, and vice versa
-    - Some way to apply concurrent limits across all builds (eg to work around `commonizeNativeDistribution` concurrency issue)
-    - Some way to map the base name of a Provider<RegularFile>
-    - Some way to convert a `File`, `Path`, or string path to `RegularFile`
+- Installer
+- Release
+  - Release a suite of libraries "atomically"
+  - Pre-release vs release
+  - Verify no changes
+  - Run tests
+  - Sign publications
+  - Upload to Maven central
+  - Generate Github release
+  - Verify usable from Maven central?
+  - Update build script with next version
+
+### Gradle issues
+
+- `MapProperty.getting()` does not seem to retain task dependencies
+- `@Nested Property<T>` does not seem to retain task dependencies
+- Make it easier to use ArtifactCollection from task
+- Fix import of `test-apps` - does not seem to be included
+- Use version catalog
+- "Included build 'x' does not exist" does not give any content, e.g. where is it defined?
+- Get the jlink tool for a toolchain
+- Add some way to get a dependency on all tasks with a given name in a build
+- Add some way to get a dependency on task with given path in a build, where the task may not exist
+- Fix `task.flatMap { it.someOutputDir.file("some-file") }` -> does not carry task dependencies
+- Awkward to discard property value from Kotlin (set(null) is ambiguous)
+- Set property using `Path`.
+- Some kind of managed type `Property<T>` or `Provider<T>` that allows deferred configuration (eg `Property<Distribution>`)
+- Create a property of managed type (eg `val dist: Distribution`)
+- Some way to get `FileCollection` elements as locations or file names (ie without the build dependencies, to generate a manifest, etc.)
+- No way to have a generated output directory (eg a task that uses `DownloadRepository` to locate the output)
+- Improve error message when settings plugin is applied to project, and vice versa
+- Some way to apply concurrent limits across all builds (eg to work around `commonizeNativeDistribution` concurrency issue)
+- Some way to map the base name of a Provider<RegularFile>
+- Some way to convert a `File`, `Path`, or string path to `RegularFile`

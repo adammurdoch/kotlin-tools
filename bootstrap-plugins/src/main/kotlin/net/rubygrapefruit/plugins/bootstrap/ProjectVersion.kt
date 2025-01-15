@@ -2,8 +2,8 @@ package net.rubygrapefruit.plugins.bootstrap
 
 import org.gradle.api.provider.Provider
 
-internal class ProjectVersion(val version: Provider<String>) {
+internal class ProjectVersion(val version: Provider<VersionNumber>) {
     override fun toString(): String {
-        return version.get()
+        return version.get().toString()
     }
 }

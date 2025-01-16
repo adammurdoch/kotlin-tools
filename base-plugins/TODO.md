@@ -50,14 +50,13 @@
 - Installer
 - Release
   - Release a suite of libraries "atomically"
-  - Pre-release vs release
-  - Verify no changes
-  - Run tests
+  - Alpha/Beta/milestone/RC vs final release
+  - Verify no VCS changes
+  - Run check
   - Sign publications
   - Upload to Maven central
   - Generate Github release
   - Verify usable from Maven central?
-  - Update build script with next version
 
 ### Gradle issues
 

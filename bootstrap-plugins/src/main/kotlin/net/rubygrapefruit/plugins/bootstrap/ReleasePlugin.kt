@@ -6,11 +6,13 @@ import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 import org.gradle.internal.extensions.stdlib.capitalized
+import org.gradle.plugins.signing.SigningExtension
 
 open class ReleasePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.run {
             target.plugins.apply("maven-publish")
+            target.plugins.apply("signing")
 
             val model = extensions.create("release", ReleaseExtension::class.java)
             model.nextVersion.convention("0.0.1")
@@ -38,6 +40,10 @@ open class ReleasePlugin : Plugin<Project> {
                     it.url = repoDir.asFile.toURI()
                 }
             }
+
+            val signingModel = extensions.getByType(SigningExtension::class.java)
+            signingModel.useGpgCmd()
+            signingModel.sign(publishingModel.publications)
 
             val preTask = tasks.register("preRelease") { t ->
                 t.doLast {

@@ -9,13 +9,29 @@ import org.gradle.api.tasks.TaskAction
 
 internal abstract class UpdateVersion : DefaultTask() {
     @get:Input
-    abstract val version: Property<VersionNumber>
+    abstract val nextVersion: Property<VersionNumber>
 
     @get:Internal
     abstract val buildFile: RegularFileProperty
 
     @TaskAction
     fun update() {
-        println("Next version: ${version.get()}")
+        println("Next version: ${nextVersion.get()}")
+        val file = buildFile.get().asFile
+        val text = file.readText()
+        val pattern = Regex("nextVersion\\s*=\\s*\"([^\"]+)\"")
+        val match = pattern.find(text)
+        val updatedText = if (match != null) {
+            text.replaceRange(match.groups[1]!!.range, nextVersion.get().toString())
+        } else {
+            text + """
+
+                release {
+                    nextVersion = "${nextVersion.get()}"
+                }
+
+            """.trimIndent()
+        }
+        file.writeText(updatedText)
     }
 }

@@ -27,7 +27,7 @@ open class ReleasePlugin : Plugin<Project> {
             version = ProjectVersion(effectiveVersion)
 
             val updateTask = tasks.register("updateVersion", UpdateVersion::class.java) { t ->
-                t.version.set(effectiveVersion.map { it.next() })
+                t.nextVersion.set(effectiveVersion.map { it.next() })
                 t.buildFile.set(buildFile)
             }
             releaseTask.configure { t ->

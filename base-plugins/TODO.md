@@ -61,6 +61,7 @@
 
 ### Gradle issues
 
+- Difficult to configure version based on presence of `release` task, in particular when the library is also used by a local plugin 
 - `MapProperty.getting()` does not seem to retain task dependencies
 - `@Nested Property<T>` does not seem to retain task dependencies
 - Make it easier to use ArtifactCollection from task

@@ -19,19 +19,21 @@ open class ReleasePlugin : Plugin<Project> {
             model.nextVersion.convention("0.1")
 
             val releaseTask = tasks.register("release") { t ->
-                t.dependsOn("assemble")
-//                t.dependsOn("publishAllPublicationsToMavenRepository")
+                t.dependsOn("publishAllPublicationsToMavenRepository")
                 t.doLast {
                     println("Release version: ${project.version}")
                 }
             }
 
             val effectiveVersion = model.nextVersion.map<VersionNumber> { v: String ->
+                // Use a system property, because it is not possible to determine the version based on the presence of the `release` task in the graph when this project
+                // is also used by a plugin (the jar for the JVM target is built at configuration time, when the `release` task is not scheduled)
                 val version = VersionNumber(v)
-                if (gradle.taskGraph.hasTask(releaseTask.get())) {
-                    version
-                } else {
-                    version.dev()
+                val releaseType = System.getProperty("release.type")
+                when (releaseType) {
+                    "final" -> version
+                    null -> version.dev()
+                    else -> throw IllegalArgumentException("Unknown release type: '$releaseType'")
                 }
             }
 

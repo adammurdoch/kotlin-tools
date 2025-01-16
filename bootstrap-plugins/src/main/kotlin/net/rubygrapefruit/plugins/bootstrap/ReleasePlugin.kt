@@ -2,14 +2,25 @@ package net.rubygrapefruit.plugins.bootstrap
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.publish.PublishingExtension
 
 open class ReleasePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.run {
+            target.plugins.apply("maven-publish")
+            val publishingModel = extensions.getByType(PublishingExtension::class.java)
+            publishingModel.repositories {
+                it.maven {
+                    it.url = layout.buildDirectory.file("repo").get().asFile.toURI()
+                }
+            }
+
             val model = extensions.create("release", ReleaseExtension::class.java)
             model.nextVersion.convention("0.1")
 
             val releaseTask = tasks.register("release") { t ->
+                t.dependsOn("assemble")
+//                t.dependsOn("publishAllPublicationsToMavenRepository")
                 t.doLast {
                     println("Release version: ${project.version}")
                 }

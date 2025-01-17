@@ -15,16 +15,16 @@ open class ReleasePlugin : Plugin<Project> {
             target.plugins.apply("signing")
 
             val model = extensions.create("release", ReleaseExtension::class.java)
-            model.nextVersion.convention("0.0.1")
+            model.nextVersion.convention("0.0.1-milestone-1")
 
             val effectiveVersion = model.nextVersion.map<VersionNumber> { v: String ->
                 // Use a system property, because it is not possible to determine the version based on the presence of the `release` task in the graph when this project
                 // is also used by a plugin (the jar for the JVM target is built at configuration time, when the `release` task is not scheduled)
-                val version = VersionNumber(v)
+                val version = VersionNumber.of(v)
                 val releaseType = System.getProperty("release.type")
                 when (releaseType) {
-                    "final" -> version
-                    null -> version.dev()
+                    "final" -> version.final()
+                    null -> version.milestone()
                     else -> throw IllegalArgumentException("Unknown release type: '$releaseType'")
                 }
             }

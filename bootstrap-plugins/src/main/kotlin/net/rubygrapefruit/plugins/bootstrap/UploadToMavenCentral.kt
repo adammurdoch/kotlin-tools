@@ -6,6 +6,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
+import java.io.OutputStream
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -14,7 +15,6 @@ import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import kotlin.io.path.createParentDirectories
-import kotlin.io.path.name
 import kotlin.io.path.outputStream
 
 abstract class UploadToMavenCentral : DefaultTask() {
@@ -50,53 +50,38 @@ abstract class UploadToMavenCentral : DefaultTask() {
         val repoDir = repoDirectory.get().asFile
         val moduleDir = repoDir.resolve("${groupId.replace('.', '/')}/$artifactId/$version")
         val files = moduleDir.listFiles().filter { it.isFile }
-        println("Found ${files.size} files")
 
         val boundary = "*".repeat(10)
 
         val bodyFile = tempDirectory.file("${artifactId}-${version}.body").get().asFile.toPath()
         bodyFile.createParentDirectories()
         bodyFile.outputStream().use { outStream ->
-            outStream.write("--".toByteArray())
-            outStream.write(boundary.toByteArray())
-            outStream.write("\r\n".toByteArray())
-            outStream.write("""Content-Disposition: form-data; name="bundle"; filename="${artifactId}-${version}.zip"""".toByteArray())
-            outStream.write("\r\n".toByteArray())
-            outStream.write("Content-Type: application/octet-stream".toByteArray())
-            outStream.write("\r\n".toByteArray())
-            outStream.write("\r\n".toByteArray())
-            val zipStream = ZipOutputStream(outStream)
-            for (file in files) {
-                zipStream.putNextEntry(ZipEntry(file.name))
-                file.inputStream().use { inStream ->
-                    inStream.copyTo(zipStream)
+            val builder = BodyBuilder(outStream, boundary)
+            builder.file("bundle", "${artifactId}-${version}.zip") {
+                val zipStream = ZipOutputStream(outStream)
+                for (file in files) {
+                    zipStream.putNextEntry(ZipEntry("/${groupId.replace('.', '/')}/${artifactId}/${version}/${file.name}"))
+                    file.inputStream().use { inStream ->
+                        inStream.copyTo(zipStream)
+                    }
                 }
+                zipStream.finish()
             }
-            zipStream.finish()
-            outStream.write("\r\n".toByteArray())
-            outStream.write("--".toByteArray())
-            outStream.write(boundary.toByteArray())
-            outStream.write("--\r\n".toByteArray())
+            builder.finish()
         }
-        println("Wrote $bodyFile")
 
         val authToken = Base64.getEncoder().withoutPadding().encodeToString("${userName.get()}:${token.get()}".toByteArray())
-        println("Auth token: $authToken")
 
         // TODO - name parameter in URL
-        // TODO - fix file names in zip
-        // TODO - empty Javadoc jar
+        // TODO - empty Javadoc jar for main publication?
         // TODO - POM includes:
-        //          - developers
-        //          - license
         //          - project URL
         //          - project description
-        //          - SCM URL
         // TODO - expect 201 status code
 
         val client = HttpClient.newHttpClient()
         val request = HttpRequest.newBuilder()
-            .uri(URI("https://central.sonatype.com/api/v1/publisher/upload?publishingType=USER_MANAGED"))
+            .uri(URI("https://central.sonatype.com/api/v1/publisher/upload?publishingType=USER_MANAGED&name=$artifactId%20$version"))
             .header("Authorization", "Bearer $authToken")
             .header("Content-Type", "multipart/form-data, boundary=$boundary")
             .POST(HttpRequest.BodyPublishers.ofFile(bodyFile))
@@ -107,6 +92,27 @@ abstract class UploadToMavenCentral : DefaultTask() {
         println("Body: ${response.body()}")
         if (response.statusCode() != 200) {
             throw RuntimeException("Upload failed with status code ${response.statusCode()}")
+        }
+    }
+
+    private class BodyBuilder(val outStream: OutputStream, val boundary: String) {
+        fun file(name: String, fileName: String, body: (OutputStream) -> Unit) {
+            outStream.write("--".toByteArray())
+            outStream.write(boundary.toByteArray())
+            outStream.write("\r\n".toByteArray())
+            outStream.write("""Content-Disposition: form-data; name="$name"; filename="$fileName"""".toByteArray())
+            outStream.write("\r\n".toByteArray())
+            outStream.write("Content-Type: application/octet-stream".toByteArray())
+            outStream.write("\r\n".toByteArray())
+            outStream.write("\r\n".toByteArray())
+            body(outStream)
+            outStream.write("\r\n".toByteArray())
+        }
+
+        fun finish() {
+            outStream.write("--".toByteArray())
+            outStream.write(boundary.toByteArray())
+            outStream.write("--\r\n".toByteArray())
         }
     }
 }

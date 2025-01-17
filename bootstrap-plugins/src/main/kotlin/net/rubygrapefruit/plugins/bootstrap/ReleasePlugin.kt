@@ -7,6 +7,8 @@ import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 import org.gradle.internal.extensions.stdlib.capitalized
 import org.gradle.plugins.signing.SigningExtension
+import java.nio.file.Path
+import kotlin.io.path.isDirectory
 
 open class ReleasePlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -68,7 +70,31 @@ open class ReleasePlugin : Plugin<Project> {
                 it.mustRunAfter(preTask)
             }
 
-            val uploadTasks = publishingModel.publications.withType(MavenPublication::class.java).map { p ->
+            val publications = publishingModel.publications.withType(MavenPublication::class.java)
+            val gitRepoDir = findGitRepoDir()
+            publications.configureEach { p ->
+                p.pom.run {
+                    val pathToProject = gitRepoDir.relativize(projectDir.toPath())
+                    url.set("https://github.com/adammurdoch/kotlin-tools/tree/main/$pathToProject")
+                    scm { s ->
+                        s.connection.set("scm:git:https://github.com/adammurdoch/kotlin-tools")
+                        s.url.set("https://github.com/adammurdoch/kotlin-tools")
+                    }
+                    licenses { l ->
+                        l.license { license ->
+                            license.name.set("The Apache License, Version 2.0")
+                            license.url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                        }
+                    }
+                    developers { d ->
+                        d.developer { dev ->
+                            dev.id.set("adam")
+                            dev.name.set("Adam Murdoch")
+                        }
+                    }
+                }
+            }
+            val uploadTasks = publications.map { p ->
                 tasks.register("upload${p.name.capitalized()}", UploadToMavenCentral::class.java) { t ->
                     t.dependsOn("publish${p.name.capitalized()}PublicationToMavenRepository")
                     t.groupId.set(p.groupId)
@@ -98,5 +124,16 @@ open class ReleasePlugin : Plugin<Project> {
                 }
             }
         }
+    }
+
+    private fun Project.findGitRepoDir(): Path {
+        var current = rootDir.toPath()
+        while (current != null) {
+            if (current.resolve(".git").isDirectory()) {
+                return current
+            }
+            current = current.parent
+        }
+        throw IllegalStateException("Couldn't find the git repo root directory for $rootDir")
     }
 }

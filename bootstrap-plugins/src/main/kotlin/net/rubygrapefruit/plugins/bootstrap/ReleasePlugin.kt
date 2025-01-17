@@ -31,8 +31,11 @@ open class ReleasePlugin : Plugin<Project> {
 
             version = ProjectVersion(effectiveVersion)
 
-            // Maven repo does not use a lazy property, so use an eager value here
-            val repoDir = layout.buildDirectory.dir("repo").get()
+            val releaseDir = layout.buildDirectory.dir("release")
+            val zipDir = releaseDir.map { it.dir("zips") }
+
+            // Maven repo does not use a lazy property, so use an eager values here
+            val repoDir = releaseDir.map { it.dir("repo") }.get()
 
             val publishingModel = extensions.getByType(PublishingExtension::class.java)
             publishingModel.repositories {
@@ -45,8 +48,17 @@ open class ReleasePlugin : Plugin<Project> {
             signingModel.useGpgCmd()
             signingModel.sign(publishingModel.publications)
 
+            val mavenCentralUsername = providers.environmentVariable("MAVEN_CENTRAL_USERNAME")
+            val mavenCentralToken = providers.environmentVariable("MAVEN_CENTRAL_TOKEN")
+
             val preTask = tasks.register("preRelease") { t ->
                 t.doLast {
+                    if (!(mavenCentralUsername.isPresent)) {
+                        throw IllegalArgumentException("Please set 'MAVEN_CENTRAL_USERNAME' environment variable")
+                    }
+                    if (!(mavenCentralToken.isPresent)) {
+                        throw IllegalArgumentException("Please set 'MAVEN_CENTRAL_TOKEN' environment variable")
+                    }
                     println("Releasing version: ${project.version}")
                     repoDir.asFile.deleteRecursively()
                 }
@@ -62,7 +74,10 @@ open class ReleasePlugin : Plugin<Project> {
                     t.groupId.set(p.groupId)
                     t.artifactId.set(p.artifactId)
                     t.version.set(p.version)
+                    t.userName.set(mavenCentralUsername)
+                    t.token.set(mavenCentralToken)
                     t.repoDirectory.set(repoDir)
+                    t.tempDirectory.set(zipDir)
                 }
             }
             val uploadTask = tasks.register("upload") {

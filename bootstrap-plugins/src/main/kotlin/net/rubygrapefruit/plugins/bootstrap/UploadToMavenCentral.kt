@@ -6,6 +6,9 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
+import java.util.*
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 abstract class UploadToMavenCentral : DefaultTask() {
     @get:Input
@@ -17,8 +20,17 @@ abstract class UploadToMavenCentral : DefaultTask() {
     @get:Input
     abstract val version: Property<String>
 
+    @get:Input
+    abstract val userName: Property<String>
+
+    @get:Input
+    abstract val token: Property<String>
+
     @get:Internal
     abstract val repoDirectory: DirectoryProperty
+
+    @get:Internal
+    abstract val tempDirectory: DirectoryProperty
 
     @TaskAction
     fun upload() {
@@ -31,8 +43,23 @@ abstract class UploadToMavenCentral : DefaultTask() {
         val repoDir = repoDirectory.get().asFile
         val moduleDir = repoDir.resolve("${groupId.replace('.', '/')}/$artifactId/$version")
         val files = moduleDir.listFiles().filter { it.isFile }
-        for (file in files) {
-            println("  $file")
+        println("Found ${files.size} files")
+
+        val zipFile = tempDirectory.file("${artifactId}-${version}.zip").get().asFile
+        zipFile.parentFile.mkdirs()
+        zipFile.outputStream().use { outStream ->
+            ZipOutputStream(outStream).use { zipStream ->
+                for (file in files) {
+                    zipStream.putNextEntry(ZipEntry(file.name))
+                    file.inputStream().use { inStream ->
+                        inStream.copyTo(zipStream)
+                    }
+                }
+            }
         }
+        println("Wrote $zipFile")
+
+        val authToken = Base64.getEncoder().withoutPadding().encodeToString("${userName.get()}:${token.get()}".toByteArray())
+        println("Auth token: $authToken")
     }
 }

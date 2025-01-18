@@ -21,7 +21,7 @@ open class ReleasePlugin : Plugin<Project> {
             model.nextVersion.convention("0.0.1-milestone-1")
 
             val effectiveVersion = model.nextVersion.map<VersionNumber> { v: String ->
-                // Use a system property, because it is not possible to determine the version based on the presence of the `release` task in the graph when this project
+                // Use a system property, because it is not possible to calculate the version based on the presence of the `release` task in the graph when this project
                 // is also used by a plugin (the jar for the JVM target is built at configuration time, when the `release` task is not scheduled)
                 val version = VersionNumber.of(v)
                 val releaseType = System.getProperty("release.type")
@@ -119,14 +119,25 @@ open class ReleasePlugin : Plugin<Project> {
                 t.dependsOn(uploadTasks)
             }
 
-            val updateVersion = tasks.register("updateVersion", UpdateVersion::class.java) { t ->
+            val tag = tasks.register("gitTag") { t ->
                 t.mustRunAfter(uploadTask)
+                t.doLast {
+                    exec { e ->
+                        e.commandLine("git", "tag", "${project.name} V${effectiveVersion.get()}")
+                    }
+                }
+            }
+
+            val updateVersion = tasks.register("updateVersion", UpdateVersion::class.java) { t ->
+                t.mustRunAfter(tag)
                 t.nextVersion.set(effectiveVersion.map { it.next() })
                 t.buildFile.set(buildFile)
             }
+
             tasks.register("release") { t ->
                 t.dependsOn(preTask)
                 t.dependsOn(uploadTask)
+                t.dependsOn(tag)
                 t.dependsOn(updateVersion)
                 t.doLast {
                     println("Released version: ${project.version}")

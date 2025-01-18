@@ -6,6 +6,7 @@ import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 import org.gradle.internal.extensions.stdlib.capitalized
+import org.gradle.jvm.tasks.Jar
 import org.gradle.plugins.signing.SigningExtension
 import java.nio.file.Path
 import kotlin.io.path.isDirectory
@@ -56,23 +57,30 @@ open class ReleasePlugin : Plugin<Project> {
             val preTask = tasks.register("preRelease") { t ->
                 t.doLast {
                     if (!(mavenCentralUsername.isPresent)) {
-                        throw IllegalArgumentException("Please set 'MAVEN_CENTRAL_USERNAME' environment variable")
+                        throw IllegalArgumentException("Please set the 'MAVEN_CENTRAL_USERNAME' environment variable")
                     }
                     if (!(mavenCentralToken.isPresent)) {
-                        throw IllegalArgumentException("Please set 'MAVEN_CENTRAL_TOKEN' environment variable")
+                        throw IllegalArgumentException("Please set the 'MAVEN_CENTRAL_TOKEN' environment variable")
                     }
                     println("Releasing version: ${project.version}")
                     repoDir.asFile.deleteRecursively()
                 }
             }
 
-            tasks.withType(PublishToMavenRepository::class.java).configureEach {
-                it.mustRunAfter(preTask)
+            tasks.withType(PublishToMavenRepository::class.java).configureEach { t ->
+                t.mustRunAfter(preTask)
+            }
+
+            val javadocJar = tasks.register("javadocJar", Jar::class.java) { t ->
+                t.archiveClassifier.set("javadoc")
             }
 
             val publications = publishingModel.publications.withType(MavenPublication::class.java)
             val gitRepoDir = findGitRepoDir()
             publications.configureEach { p ->
+                if (p.name == "jvm") {
+                    p.artifact(javadocJar)
+                }
                 p.pom.run {
                     val pathToProject = gitRepoDir.relativize(projectDir.toPath())
                     description.set(model.description)
@@ -107,8 +115,8 @@ open class ReleasePlugin : Plugin<Project> {
                     t.tempDirectory.set(zipDir)
                 }
             }
-            val uploadTask = tasks.register("upload") {
-                it.dependsOn(uploadTasks)
+            val uploadTask = tasks.register("upload") { t ->
+                t.dependsOn(uploadTasks)
             }
 
             val updateVersion = tasks.register("updateVersion", UpdateVersion::class.java) { t ->

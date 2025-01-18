@@ -72,8 +72,6 @@ abstract class UploadToMavenCentral : DefaultTask() {
 
         val authToken = Base64.getEncoder().withoutPadding().encodeToString("${userName.get()}:${token.get()}".toByteArray())
 
-        // TODO - empty Javadoc jar for main publication?
-
         val client = HttpClient.newHttpClient()
         val request = HttpRequest.newBuilder()
             .uri(URI("https://central.sonatype.com/api/v1/publisher/upload?publishingType=USER_MANAGED&name=$artifactId%20$version"))
@@ -83,9 +81,9 @@ abstract class UploadToMavenCentral : DefaultTask() {
             .build()
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-        println("Status code: ${response.statusCode()}")
-        println("Body: ${response.body()}")
         if (response.statusCode() != 201) {
+            println("Status code: ${response.statusCode()}")
+            println("Body: ${response.body()}")
             throw RuntimeException("Upload failed with status code ${response.statusCode()}")
         }
     }

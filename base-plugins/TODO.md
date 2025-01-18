@@ -49,14 +49,14 @@
 - Refactor `DownloadRepository` to use Gradle exec service when used in a plugin.
 - Installer
 - Release
-  - Release a suite of libraries "atomically"
-  - Alpha/Beta/milestone/RC vs final release
-  - Verify no VCS changes
-  - Run check
-  - Sign publications
   - Upload to Maven central
+  - Verify no VCS changes
+  - Create git tag
+  - Run check
   - Generate Github release
   - Verify usable from Maven central?
+  - Release a suite of libraries "atomically"
+  - Alpha/Beta/RC releases
 
 ### Gradle issues
 

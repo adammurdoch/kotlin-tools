@@ -72,12 +72,7 @@ abstract class UploadToMavenCentral : DefaultTask() {
 
         val authToken = Base64.getEncoder().withoutPadding().encodeToString("${userName.get()}:${token.get()}".toByteArray())
 
-        // TODO - name parameter in URL
         // TODO - empty Javadoc jar for main publication?
-        // TODO - POM includes:
-        //          - project URL
-        //          - project description
-        // TODO - expect 201 status code
 
         val client = HttpClient.newHttpClient()
         val request = HttpRequest.newBuilder()
@@ -90,7 +85,7 @@ abstract class UploadToMavenCentral : DefaultTask() {
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
         println("Status code: ${response.statusCode()}")
         println("Body: ${response.body()}")
-        if (response.statusCode() != 200) {
+        if (response.statusCode() != 201) {
             throw RuntimeException("Upload failed with status code ${response.statusCode()}")
         }
     }

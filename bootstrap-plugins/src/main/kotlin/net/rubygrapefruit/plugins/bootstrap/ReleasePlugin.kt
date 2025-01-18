@@ -75,6 +75,7 @@ open class ReleasePlugin : Plugin<Project> {
             publications.configureEach { p ->
                 p.pom.run {
                     val pathToProject = gitRepoDir.relativize(projectDir.toPath())
+                    description.set(model.description)
                     url.set("https://github.com/adammurdoch/kotlin-tools/tree/main/$pathToProject")
                     scm { s ->
                         s.connection.set("scm:git:https://github.com/adammurdoch/kotlin-tools")

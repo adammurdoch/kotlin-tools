@@ -39,10 +39,6 @@ abstract class UploadToMavenCentral : DefaultTask() {
     @get:Internal
     abstract val tempDirectory: DirectoryProperty
 
-    init {
-        outputs.upToDateWhen { false }
-    }
-
     @TaskAction
     fun upload() {
         val groupId = groupId.get()

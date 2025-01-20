@@ -49,7 +49,10 @@
 - Refactor `DownloadRepository` to use Gradle exec service when used in a plugin.
 - Installer
 - Release
+  - Fix version update to locate existing `release { }` block
   - Verify no VCS changes
+  - Validate tag, release, publication, etc. does not exist
+  - Validate description has been specified
   - Create git tag
   - Run check?
   - Create Github release

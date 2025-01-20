@@ -23,10 +23,6 @@ abstract class GithubRelease : DefaultTask() {
     @get:Internal
     abstract val token: Property<String>
 
-    init {
-        outputs.upToDateWhen { false }
-    }
-
     @TaskAction
     fun release() {
         val client = HttpClient.newHttpClient()

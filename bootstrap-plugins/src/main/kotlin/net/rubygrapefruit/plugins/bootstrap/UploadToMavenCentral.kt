@@ -30,7 +30,7 @@ abstract class UploadToMavenCentral : DefaultTask() {
     @get:Input
     abstract val userName: Property<String>
 
-    @get:Input
+    @get:Internal
     abstract val token: Property<String>
 
     @get:Internal
@@ -38,6 +38,10 @@ abstract class UploadToMavenCentral : DefaultTask() {
 
     @get:Internal
     abstract val tempDirectory: DirectoryProperty
+
+    init {
+        outputs.upToDateWhen { false }
+    }
 
     @TaskAction
     fun upload() {
@@ -84,7 +88,7 @@ abstract class UploadToMavenCentral : DefaultTask() {
         if (response.statusCode() != 201) {
             println("Status code: ${response.statusCode()}")
             println("Body: ${response.body()}")
-            throw RuntimeException("Upload failed with status code ${response.statusCode()}")
+            throw RuntimeException("Could not upload release to Maven Central. Failed with status code ${response.statusCode()}")
         }
     }
 

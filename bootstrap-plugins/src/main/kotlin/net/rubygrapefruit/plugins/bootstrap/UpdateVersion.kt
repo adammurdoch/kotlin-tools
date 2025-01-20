@@ -14,6 +14,10 @@ internal abstract class UpdateVersion : DefaultTask() {
     @get:Internal
     abstract val buildFile: RegularFileProperty
 
+    init {
+        outputs.upToDateWhen { false }
+    }
+
     @TaskAction
     fun update() {
         println("Next version: ${nextVersion.get()}")

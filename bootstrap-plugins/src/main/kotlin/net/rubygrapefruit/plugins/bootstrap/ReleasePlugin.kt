@@ -53,6 +53,7 @@ open class ReleasePlugin : Plugin<Project> {
 
             val mavenCentralUsername = providers.environmentVariable("MAVEN_CENTRAL_USERNAME")
             val mavenCentralToken = providers.environmentVariable("MAVEN_CENTRAL_TOKEN")
+            val githubToken = providers.environmentVariable("GITHUB_TOKEN")
 
             val preTask = tasks.register("preRelease") { t ->
                 t.doLast {
@@ -61,6 +62,9 @@ open class ReleasePlugin : Plugin<Project> {
                     }
                     if (!(mavenCentralToken.isPresent)) {
                         throw IllegalArgumentException("Please set the 'MAVEN_CENTRAL_TOKEN' environment variable")
+                    }
+                    if (!(githubToken.isPresent)) {
+                        throw IllegalArgumentException("Please set the 'GITHUB_TOKEN' environment variable")
                     }
                     println("Releasing version: ${project.version}")
                     repoDir.asFile.deleteRecursively()
@@ -119,13 +123,20 @@ open class ReleasePlugin : Plugin<Project> {
                 t.dependsOn(uploadTasks)
             }
 
+            val tagName = effectiveVersion.map { "${project.name}-v${it}" }
+
             val tag = tasks.register("gitTag") { t ->
                 t.mustRunAfter(uploadTask)
                 t.doLast {
                     exec { e ->
-                        e.commandLine("git", "tag", "${project.name} V${effectiveVersion.get()}")
+                        e.commandLine("git", "tag", tagName.get())
                     }
                 }
+            }
+            val githubRelease = tasks.register("githubRelease", GithubRelease::class.java) { t ->
+                t.tag.set(tag.flatMap { tagName })
+                t.releaseName.set(effectiveVersion.map { "${project.name.capitalized()} v${it}" })
+                t.token.set(githubToken)
             }
 
             val updateVersion = tasks.register("updateVersion", UpdateVersion::class.java) { t ->
@@ -137,7 +148,7 @@ open class ReleasePlugin : Plugin<Project> {
             tasks.register("release") { t ->
                 t.dependsOn(preTask)
                 t.dependsOn(uploadTask)
-                t.dependsOn(tag)
+                t.dependsOn(githubRelease)
                 t.dependsOn(updateVersion)
                 t.doLast {
                     println("Released version: ${project.version}")

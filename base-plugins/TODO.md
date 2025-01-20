@@ -53,11 +53,14 @@
   - Create git tag
   - Run check
   - Create Github release
+    - Mark milestone as prerelease on Github 
   - Verify usable from Maven central
   - Release a suite of libraries "atomically"
     - Single tag
     - Single post-release update commit 
+  - Changelog and release notes
   - Alpha/Beta/RC releases
+  - Run from a Github action
 
 ### Gradle issues
 

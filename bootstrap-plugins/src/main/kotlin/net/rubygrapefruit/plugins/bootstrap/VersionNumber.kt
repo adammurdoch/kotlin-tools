@@ -18,6 +18,8 @@ internal class VersionNumber private constructor(private val components: List<In
         }
     }
 
+    val prerelease: Boolean get() = qualifier != null
+
     fun milestone(): VersionNumber {
         val qualifier = if (qualifier != null && qualifier.name == "milestone") {
             qualifier

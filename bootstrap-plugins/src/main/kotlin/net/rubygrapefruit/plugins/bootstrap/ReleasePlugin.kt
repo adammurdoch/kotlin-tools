@@ -131,11 +131,16 @@ open class ReleasePlugin : Plugin<Project> {
                     exec { e ->
                         e.commandLine("git", "tag", tagName.get())
                     }
+                    exec { e ->
+                        e.commandLine("git", "push", "origin", tagName.get())
+                    }
                 }
             }
             val githubRelease = tasks.register("githubRelease", GithubRelease::class.java) { t ->
-                t.tag.set(tag.flatMap { tagName })
+                t.dependsOn(tag)
+                t.tag.set(tagName)
                 t.releaseName.set(effectiveVersion.map { "${project.name.capitalized()} v${it}" })
+                t.prerelease.set(effectiveVersion.map { it.prerelease })
                 t.token.set(githubToken)
             }
 

@@ -51,7 +51,7 @@
 - Release
   - Verify no VCS changes
   - Create git tag
-  - Run check
+  - Run check?
   - Create Github release
     - Mark milestone as prerelease on Github 
   - Verify usable from Maven central

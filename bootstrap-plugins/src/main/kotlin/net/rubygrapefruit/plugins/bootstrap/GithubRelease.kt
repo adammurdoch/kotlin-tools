@@ -17,6 +17,9 @@ abstract class GithubRelease : DefaultTask() {
     @get:Input
     abstract val releaseName: Property<String>
 
+    @get:Input
+    abstract val prerelease: Property<Boolean>
+
     @get:Internal
     abstract val token: Property<String>
 
@@ -38,6 +41,7 @@ abstract class GithubRelease : DefaultTask() {
                 {
                     "tag_name": "${tag.get()}",
                     "name": "${releaseName.get()}",
+                    "prerelease": ${prerelease.get()},
                     "draft": true,
                     "generate_release_notes": true
                 }

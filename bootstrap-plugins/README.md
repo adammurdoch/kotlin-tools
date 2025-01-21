@@ -15,5 +15,6 @@ These plugins are not intended to be used outside of this repository.
   - Don't include `-Drelease.type` for a milestone release
 - Publish release on Maven Central
 - Update and run test consumer app in `verification`
+- Update README for released libraries to reference new coordinates
 - Commit build script updates and push
 - Update Github release

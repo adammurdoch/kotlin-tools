@@ -20,7 +20,7 @@ Kotlin tools includes several Kotlin multiplatform libraries:
 - [`file-fixtures`](libs/file-fixtures): Helps write tests that access the file system.
 - [`process`](libs/process): Provides APIs to fork processes.
 - [`cli-args`](libs/cli-args): A lightweight CLI argument parser.
-- [`cli-app`](libs/cli-app): A small framework to simplify implementing a CLI application, including parsing CLI arguments.
+- [`cli-app`](libs/cli-app): A small framework to simplify implementing CLI applications, including parsing CLI arguments.
 
 ## Repository layout
 

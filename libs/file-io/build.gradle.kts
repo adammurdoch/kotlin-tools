@@ -2,6 +2,7 @@ import net.rubygrapefruit.plugins.app.Versions
 
 plugins {
     id("net.rubygrapefruit.kmp.base-lib")
+    id("net.rubygrapefruit.bootstrap.release")
 }
 
 group = Versions.libs.group
@@ -20,4 +21,8 @@ library {
         implementation(Versions.test.coordinates)
         implementation(project(":file-fixtures"))
     }
+}
+
+release {
+    description = "A Kotlin multiplatform library for accessing the file system."
 }

@@ -2,6 +2,7 @@ import net.rubygrapefruit.plugins.app.Versions
 
 plugins {
     id("net.rubygrapefruit.kmp.base-lib")
+    id("net.rubygrapefruit.bootstrap.release")
 }
 
 group = Versions.libs.group
@@ -20,4 +21,8 @@ library {
         api(project(":file-io"))
         api(project(":cli-args"))
     }
+}
+
+release {
+    description = "A small framework to help implement CLI applications using Kotlin multiplatform."
 }

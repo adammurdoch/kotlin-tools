@@ -1,6 +1,6 @@
 # Kotlin tools CLI application library
 
-A small framework to help implement a CLI application using Kotlin multiplatform.
+A small framework to help implement CLI applications using Kotlin multiplatform.
 
 Targets:
 - JVM 11+

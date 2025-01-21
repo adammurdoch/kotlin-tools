@@ -50,13 +50,12 @@
 - Installer
 - Release
   - Fix version update to locate existing `release { }` block
+  - Automatically update test app
   - Verify no VCS changes
   - Validate tag, release, publication, etc. does not exist
   - Validate description has been specified
-  - Create git tag
+  - Push current branch when pushing git tag
   - Run check?
-  - Create Github release
-    - Mark milestone as prerelease on Github 
   - Verify usable from Maven central
   - Release a suite of libraries "atomically"
     - Single tag

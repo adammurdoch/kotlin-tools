@@ -14,5 +14,6 @@ These plugins are not intended to be used outside of this repository.
 - Run `./gradlew release -Drelease.type=final` for a final release
   - Don't include `-Drelease.type` for a milestone release
 - Publish release on Maven Central
+- Update and run test consumer app in `verification`
 - Commit build script updates and push
 - Update Github release

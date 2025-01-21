@@ -11,6 +11,7 @@ class JvmLibraryPlugin: Plugin<Project> {
         target.run {
             plugins.apply("java-library")
             plugins.apply(JvmBasePlugin::class.java)
+
             group = Versions.libs.group
         }
     }

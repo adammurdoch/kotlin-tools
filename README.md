@@ -1,6 +1,6 @@
 # Kotlin tools
 
-Kotlin tools is a collection of useful tools for developing Kotlin applications.
+Kotlin tools is a collection of useful tools for developing Kotlin applications and libraries.
 
 ## Gradle Plugins
 
@@ -19,8 +19,8 @@ Kotlin tools includes several Kotlin multiplatform libraries:
 - [`file-io`](libs/file-io/): Extends [Kotlinx IO](https://github.com/Kotlin/kotlinx-io) to add further file system capabilities.
 - [`file-fixtures`](libs/file-fixtures): Helps write tests that access the file system.
 - [`process`](libs/process): Provides APIs to fork processes.
-- [`cli-args`](libs/cli-args): Parses CLI arguments.
-- [`cli-app`](libs/cli-app): A small framework for implementing a CLI application, including parsing CLI arguments.
+- [`cli-args`](libs/cli-args): A lightweight CLI argument parser.
+- [`cli-app`](libs/cli-app): A small framework to simplify implementing a CLI application, including parsing CLI arguments.
 
 ## Repository layout
 

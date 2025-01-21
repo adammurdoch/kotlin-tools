@@ -6,8 +6,8 @@ plugins {
 application {
     entryPoint = "sample.main"
     common {
-        implementation("net.rubygrapefruit.libs:cli-app:1.0")
-        implementation("net.rubygrapefruit.libs:file-io:1.0")
-        implementation("net.rubygrapefruit.libs:store:1.0")
+        implementation("net.rubygrapefruit:cli-app:1.0")
+        implementation("net.rubygrapefruit:file-io:1.0")
+        implementation("net.rubygrapefruit:store:1.0")
     }
 }

@@ -4,6 +4,6 @@ plugins {
 
 application {
     dependencies {
-        implementation("net.rubygrapefruit.libs:cli-app:1.0")
+        implementation("net.rubygrapefruit:cli-app:1.0")
     }
 }

@@ -125,7 +125,7 @@ val generateResource = tasks.register("generateVersionResource") {
             }
 
             object Libraries {
-                val group = "net.rubygrapefruit.libs"
+                val group = "net.rubygrapefruit"
                 
                 fun coordinates(lib: String) = group + ":" + lib + ":1.0"
             }

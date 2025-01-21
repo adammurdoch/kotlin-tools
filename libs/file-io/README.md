@@ -1,6 +1,12 @@
-# file-io
+# Kotlin tools file IO
 
-A Kotlin multiplatform library for accessing the file system. Supports JVM, macOS, Linux and Windows.
+A Kotlin multiplatform library for accessing the file system.
+
+Targets:
+- JVM 11+
+- MacOS x64 and arm64
+- Windows x64
+- Linux x64
 
 The entry point is `FileSystem`
 

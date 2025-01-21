@@ -1,6 +1,12 @@
-# store
+# Kotlin tools store
 
-A Kotlin multiplatform library for storing various kinds of indexed data in the filesystem. Supports JVM, macOS, Linux and Windows.
+A Kotlin multiplatform library for storing various kinds of indexed data in the filesystem.
+
+Targets:
+- JVM 11+
+- MacOS x64 and arm64
+- Windows x64
+- Linux x64
 
 Supported data
 

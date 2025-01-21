@@ -1,6 +1,12 @@
-# CLI argument parser
+# Kotlin tools CLI argument parser
 
-A lightweight CLI argument parser for Kotlin, targeting JVM 11+, macOS, Linux and Windows.
+A lightweight CLI argument parser for Kotlin multiplatform.
+
+Targets:
+- JVM 11+
+- MacOS x64 and arm64
+- Windows x64
+- Linux x64
 
 This library has no dependencies and can be used stand-alone.
 However, it is intended to be used with the [cli-app](../cli-app) library, which adds more capabilities to help implement a CLI application using Kotlin.
@@ -18,4 +24,4 @@ Features:
     - Optional, required and multi-value parameters. 
 - Actions
     - Arbitrary nesting of actions.
-    - Use options or positional parameters, or a mix.
+    - Define actions using options or positional parameters, or a mix.

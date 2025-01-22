@@ -16,7 +16,7 @@ import kotlin.io.path.readText
 import kotlin.io.path.relativeTo
 
 class Generator {
-    val renderer = MarkdownRenderer.builder().build();
+    private val renderer = MarkdownRenderer.builder().build();
 
     fun generate(sourceFiles: List<Path>, outputFile: Path, outputDir: Path) {
         val sourceInfo = parse(sourceFiles)
@@ -48,7 +48,8 @@ class Generator {
                 }
 
                 override fun visit(text: Text) {
-                    val pattern = Pattern.compile("\\(([^)]+)\\)")
+                    println("${outputFile.file.name}: $text")
+                    val pattern = Pattern.compile("\\[\\[([^]]+)]]")
                     val matcher = pattern.matcher(text.literal)
                     var prev: Node? = null
                     var pos = 0
@@ -62,6 +63,7 @@ class Generator {
                         }
 
                         val destination = matcher.group(1)
+                        println("${outputFile.file.name}: link: $destination")
                         val link = Link()
                         val target = mapLink(destination)
                         link.destination = target.first

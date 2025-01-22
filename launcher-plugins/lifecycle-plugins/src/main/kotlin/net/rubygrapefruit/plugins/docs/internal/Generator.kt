@@ -7,9 +7,9 @@ class Generator {
     private val transformer = Transformer()
     private val renderer = MarkdownRenderer()
 
-    fun generate(sourceFiles: List<Path>, outputFile: Path, outputDir: Path) {
+    fun generate(sourceFiles: List<Path>, variables: Map<String, String>, outputFile: Path, outputDir: Path) {
         val sourceInfo = parser.parse(sourceFiles)
-        val outputFiles = transformer.transform(sourceInfo, outputFile, outputDir)
+        val outputFiles = transformer.transform(sourceInfo, variables, outputFile, outputDir)
         renderer.render(outputFiles)
     }
 }

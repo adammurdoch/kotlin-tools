@@ -4,10 +4,9 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.provider.MapProperty
+import org.gradle.api.tasks.*
 import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.TaskAction
 
 abstract class GenerateDocs : DefaultTask() {
     @get:OutputFile
@@ -19,8 +18,11 @@ abstract class GenerateDocs : DefaultTask() {
     @get:InputFiles
     abstract val sourceFiles: ConfigurableFileCollection
 
+    @get:Input
+    abstract val variables: MapProperty<String, String>
+
     @TaskAction
     fun generate() {
-        Generator().generate(sourceFiles.map { it.toPath() }, outputFile.get().asFile.toPath(), outputDir.get().asFile.toPath())
+        Generator().generate(sourceFiles.map { it.toPath() }, variables.get(), outputFile.get().asFile.toPath(), outputDir.get().asFile.toPath())
     }
 }

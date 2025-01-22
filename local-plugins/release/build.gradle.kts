@@ -10,7 +10,7 @@ gradlePlugin {
     plugins {
         create("release") {
             id = "net.rubygrapefruit.bootstrap.release"
-            implementationClass = "net.rubygrapefruit.plugins.release.ReleasePlugin"
+            implementationClass = "net.rubygrapefruit.plugins.release.internal.ReleasePlugin"
         }
     }
 }

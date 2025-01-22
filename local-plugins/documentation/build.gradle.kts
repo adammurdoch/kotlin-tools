@@ -13,7 +13,7 @@ dependencies {
 gradlePlugin {
     plugins {
         create("docs") {
-            id = "net.rubygrapefruit.docs"
+            id = "net.rubygrapefruit.bootstrap.docs"
             implementationClass = "net.rubygrapefruit.plugins.docs.internal.DocsPlugin"
         }
     }

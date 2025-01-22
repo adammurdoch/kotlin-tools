@@ -1,9 +1,6 @@
 package net.rubygrapefruit.plugins.docs.internal
 
-import org.commonmark.node.AbstractVisitor
-import org.commonmark.node.Link
-import org.commonmark.node.Node
-import org.commonmark.node.Text
+import org.commonmark.node.*
 import java.nio.file.Path
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -35,12 +32,19 @@ class Transformer {
 
         for (outputFile in outputFiles) {
             outputFile.sourceFile.node.accept(object : AbstractVisitor() {
+
+                override fun visit(block: FencedCodeBlock) {
+                    block.literal = mapVariables(block.literal)
+                }
+
                 override fun visit(link: Link) {
                     link.destination = mapLink(link.destination).first
                 }
 
                 override fun visit(text: Text) {
-                    map(linkPattern, text) { matcher ->
+                    text.literal = mapVariables(text.literal)
+
+                    mapTextNode(linkPattern, text) { matcher ->
                         val destination = matcher.group(1).trim()
                         val link = Link()
                         val target = mapLink(destination)
@@ -57,18 +61,15 @@ class Transformer {
                         }
                         link
                     }
-                    map(varPattern, text) { matcher ->
-                        val name = matcher.group(1).trim()
-                        val value = variables[name]
-                        if (value != null) {
-                            Text(value)
-                        } else {
-                            throw IllegalArgumentException("${outputFile.sourceFile.name}: Unknown variable: $name")
-                        }
-                    }
                 }
 
-                private fun map(pattern: Pattern, text: Text, transformer: (Matcher) -> Node) {
+                private fun mapVariables(text: String): String = mapLiteral(varPattern, text) { matcher ->
+                    val name = matcher.group(1).trim()
+                    val value = variables[name]
+                    value ?: throw IllegalArgumentException("${outputFile.sourceFile.name}: Unknown variable: $name")
+                }
+
+                private fun mapTextNode(pattern: Pattern, text: Text, transformer: (Matcher) -> Node) {
                     val matcher = pattern.matcher(text.literal)
                     var prev: Node? = null
                     var pos = 0
@@ -98,6 +99,25 @@ class Transformer {
                         pos = matcher.end()
                         prev = replacement
                     }
+                }
+
+                private fun mapLiteral(pattern: Pattern, text: String, transformer: (Matcher) -> String): String {
+                    val matcher = pattern.matcher(text)
+                    var result = StringBuilder()
+                    var pos = 0
+                    while (pos < text.length) {
+                        if (!matcher.find(pos)) {
+                            result.append(text.substring(pos))
+                            break
+                        }
+
+                        val replacement = transformer(matcher)
+
+                        result.append(text.substring(pos, matcher.start()))
+                        result.append(replacement)
+                        pos = matcher.end()
+                    }
+                    return result.toString()
                 }
 
                 private fun mapLink(destination: String): Pair<String, OutputFile> {

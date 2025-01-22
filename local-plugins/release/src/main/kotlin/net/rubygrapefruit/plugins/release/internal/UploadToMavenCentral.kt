@@ -1,4 +1,4 @@
-package net.rubygrapefruit.plugins.release
+package net.rubygrapefruit.plugins.release.internal
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty

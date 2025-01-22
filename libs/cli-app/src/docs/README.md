@@ -1,14 +1,8 @@
-<!--
-  DO NOT EDIT
-  This document was generated from src/docs/README.md 
--->
-
 # Kotlin tools CLI application library
 
 A small framework to help implement CLI applications using Kotlin multiplatform.
 
 Targets:
-
 - JVM 11+
 - Browser
 - MacOS x64 and arm64
@@ -28,6 +22,6 @@ Extends the cli-args library and adds support for:
 
 ```
 dependencies {
-    implementation("net.rubygrapefruit:cli-app:0.0.1-milestone-1")
+    implementation("net.rubygrapefruit:cli-app:{{project.version}}")
 }
 ```

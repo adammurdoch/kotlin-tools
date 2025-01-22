@@ -18,6 +18,7 @@ class MarkdownRenderer {
             writer.write(
                 """
                 <!--
+                  DO NOT EDIT
                   This document was generated from ${output.sourceFile.file.relativeTo(output.file.parent)} 
                 -->
 

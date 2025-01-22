@@ -1,5 +1,6 @@
-package net.rubygrapefruit.plugins.release
+package net.rubygrapefruit.plugins.release.internal
 
+import net.rubygrapefruit.plugins.release.ReleaseExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension

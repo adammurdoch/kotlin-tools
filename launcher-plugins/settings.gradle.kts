@@ -8,4 +8,3 @@ plugins {
 
 include("native-launcher")
 include("launcher-plugins")
-include("lifecycle-plugins")

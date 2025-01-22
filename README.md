@@ -26,6 +26,7 @@ Kotlin tools includes several Kotlin multiplatform libraries:
 
 The source tree is arranged as follows:
 
+- [`bootstrap-plugins`](base-plugins/) contains Gradle plugins that are used to build the other Gradle plugins.
 - [`base-plugins`](base-plugins/) contains some of the Gradle plugins.
 - [`test-apps`](test-apps/) contains some sample applications and libraries that use the Gradle plugins.
 - [`libs`](libs/) contains some Kotlin libraries.

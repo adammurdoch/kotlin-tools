@@ -61,10 +61,6 @@ gradlePlugin {
             id = "net.rubygrapefruit.bootstrap.gradle-plugin"
             implementationClass = "net.rubygrapefruit.plugins.bootstrap.JvmGradlePlugin"
         }
-        create("release") {
-            id = "net.rubygrapefruit.bootstrap.release"
-            implementationClass = "net.rubygrapefruit.plugins.bootstrap.ReleasePlugin"
-        }
         create("settings") {
             id = "net.rubygrapefruit.bootstrap.settings"
             implementationClass = "net.rubygrapefruit.plugins.bootstrap.SettingsPlugin"

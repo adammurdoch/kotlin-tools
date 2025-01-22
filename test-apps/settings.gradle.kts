@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("../local-plugins")
     includeBuild("../base-plugins")
     includeBuild("../launcher-plugins")
 }

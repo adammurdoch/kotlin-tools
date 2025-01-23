@@ -9,17 +9,17 @@ Targets:
 - Linux x64
 
 This library has no dependencies and can be used stand-alone.
-However, it is intended to be used with the [cli-app](../cli-app) library, which adds more capabilities to help implement a CLI application using Kotlin.
+However, it is intended to be used with the [cli-app](../cli-app) library, which adds more capabilities to simplify implementing a CLI application using Kotlin.
 
 Features:
 
 - Options
   - `String`, `Boolean` and `Integer` typed arguments.
-  - Choose from a set of value
+  - Choose from a set of values
   - Custom type argument
 - Positional parameters
     - `String`, `Boolean` and `Integer` typed arguments.
-    - Choose from a set of value
+    - Choose from a set of values
     - Custom type argument
     - Optional, required and multi-value parameters. 
 - Actions

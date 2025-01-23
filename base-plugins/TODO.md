@@ -49,9 +49,10 @@
 - Refactor `DownloadRepository` to use Gradle exec service when used in a plugin.
 - Installer
 - Release
+  - Generate docs prior to release 
   - Extract description from library's README
   - Fix version update to locate existing `release { }` block
-  - Automatically update test app
+  - Automatically update test consumer app
   - Verify no VCS changes
   - Validate tag, release, publication, etc. does not exist
   - Validate description has been specified

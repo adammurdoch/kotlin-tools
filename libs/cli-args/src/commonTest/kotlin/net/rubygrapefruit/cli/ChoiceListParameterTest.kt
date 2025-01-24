@@ -25,7 +25,7 @@ class ChoiceListParameterTest : AbstractActionTest() {
     }
 
     @Test
-    fun `fails when argument is not an integer`() {
+    fun `fails when argument is not a valid choice`() {
         class Parameter : Action() {
             val param by oneOf {
                 choice(1, "1")

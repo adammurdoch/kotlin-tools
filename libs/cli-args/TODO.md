@@ -1,6 +1,7 @@
 - List option:
   - Handle missing argument
   - Handle conversion failure
+  - Usage and accepts()
 - Use Kotlinx IO types for files
 - Fixes for combining actions:
   - name-action --action when name action is not complete -> should report `--action` cannot be used with name-action 

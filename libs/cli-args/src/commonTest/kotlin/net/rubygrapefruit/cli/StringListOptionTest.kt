@@ -8,7 +8,7 @@ class StringListOptionTest : AbstractActionTest() {
     @Test
     fun `action can have option with list value`() {
         class Parameter : Action() {
-            val param by options("o", "opt")
+            val param by option("o", "opt").repeated()
         }
 
         parse(::Parameter, emptyList()) { action ->
@@ -28,7 +28,7 @@ class StringListOptionTest : AbstractActionTest() {
     @Test
     fun `option name must not start with punctuation`() {
         class Broken1 : Action() {
-            val option by options("-o")
+            val option by option("-o").repeated()
         }
         try {
             Broken1()
@@ -37,7 +37,7 @@ class StringListOptionTest : AbstractActionTest() {
             assertEquals("-o cannot be used as an option name", e.message)
         }
         class Broken2 : Action() {
-            val option by options("o", "--option")
+            val option by option("o", "--option").repeated()
         }
         try {
             Broken2()

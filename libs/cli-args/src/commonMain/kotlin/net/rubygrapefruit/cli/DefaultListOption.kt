@@ -3,7 +3,7 @@ package net.rubygrapefruit.cli
 import kotlin.reflect.KProperty
 
 internal class DefaultListOption<T : Any>(
-    private val names: List<String>,
+    names: List<String>,
     private val host: Host,
     private val converter: StringConverter<T>
 ) : ListOption<T>, NonPositional {

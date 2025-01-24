@@ -15,6 +15,10 @@ internal class DefaultNullableChoice<T : Any>(
         return owner.replace(this, RequiredChoice(choices))
     }
 
+    override fun repeated(): ListOption<T> {
+        return owner.replace(this, ChoiceList(choices))
+    }
+
     override fun getValue(thisRef: Any?, property: KProperty<*>): T? {
         return value
     }

@@ -1,7 +1,10 @@
 - List option:
-  - Handle missing argument
-  - Handle conversion failure
+  - Handle unknown option for choice
   - Usage and accepts()
+  - Require 1 or more
+- Use `repeated()` to define a list positional parameter.
+- Report multiple problems
+- Error message shows where on the command-line the problem occurred.
 - Use Kotlinx IO types for files
 - Fixes for combining actions:
   - name-action --action when name action is not complete -> should report `--action` cannot be used with name-action 

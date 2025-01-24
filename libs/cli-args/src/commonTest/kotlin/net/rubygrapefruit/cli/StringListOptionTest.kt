@@ -26,6 +26,16 @@ class StringListOptionTest : AbstractActionTest() {
     }
 
     @Test
+    fun `fails when argument not provided`() {
+        class Option : Action() {
+            val option by option("o").repeated()
+        }
+
+        parseFails(::Option, listOf("-o", "1", "-o"), "Value missing for option -o")
+        parseFails(::Option, listOf("-o", "1", "-o", "-o", "2"), "Value missing for option -o")
+    }
+
+    @Test
     fun `option name must not start with punctuation`() {
         class Broken1 : Action() {
             val option by option("-o").repeated()

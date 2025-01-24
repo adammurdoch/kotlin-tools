@@ -7,6 +7,7 @@ internal abstract class AbstractOption<T : Any>(
     protected val converter: StringConverter<T>
 ) : NonPositional {
     protected val flags = names.map { host.option(it) }
+    private val matcher = OptionMatcher(flags, host, converter)
     protected var value: T? = null
 
     override fun toString(): String {
@@ -19,22 +20,22 @@ internal abstract class AbstractOption<T : Any>(
     }
 
     override fun accept(args: List<String>, context: ParseContext): ParseResult {
-        val arg = args.first()
-        if (!flags.contains(arg)) {
-            return ParseResult.Nothing
-        }
-        if (args.size == 1 || host.isOption(args[1])) {
-            return ParseResult.Failure(1, ArgParseException("Value missing for option $arg"), expectedMore = true)
-        }
-        if (value != null) {
+        val result = matcher.match(args)
+        if (result.consumed > 0 && value != null) {
+            val arg = args.first()
             return ParseResult.Failure(1, ArgParseException("Value for option $arg already provided"))
         }
-        val result = converter.convert("option $arg", args[1])
-        if (result.isFailure) {
-            return ParseResult.Failure(2, result.exceptionOrNull() as ArgParseException)
+        return when (result) {
+            is Matcher.Nothing -> ParseResult.Nothing
+            is Matcher.Success -> {
+                value = result.value
+                ParseResult.Success(result.consumed)
+            }
+
+            is Matcher.Failure -> {
+                ParseResult.Failure(result.consumed, result.failure, result.expectedMore)
+            }
         }
-        value = result.getOrThrow()
-        return ParseResult.Two
     }
 
     override fun accepts(option: String): Boolean {

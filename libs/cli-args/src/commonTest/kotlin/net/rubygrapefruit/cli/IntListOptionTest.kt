@@ -23,4 +23,24 @@ class IntListOptionTest : AbstractActionTest() {
             assertEquals(listOf(1, 1), action.param)
         }
     }
+
+    @Test
+    fun `fails when argument not provided`() {
+        class Option : Action() {
+            val option by int().option("o").repeated()
+        }
+
+        parseFails(::Option, listOf("-o", "1", "-o"), "Value missing for option -o")
+        parseFails(::Option, listOf("-o", "1", "-o", "-o", "2"), "Value missing for option -o")
+    }
+
+    @Test
+    fun `fails when argument is not an integer`() {
+        class Option : Action() {
+            val option by int().option("o").repeated()
+        }
+
+        parseFails(::Option, listOf("-o", "123", "-o", "abc"), "Value for option -o is not an integer: abc")
+        parseFails(::Option, listOf("-o", "123", "-o", "abc", "-o", "2"), "Value for option -o is not an integer: abc")
+    }
 }

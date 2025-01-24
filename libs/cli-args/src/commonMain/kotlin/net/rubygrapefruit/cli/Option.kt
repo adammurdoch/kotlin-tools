@@ -23,3 +23,9 @@ interface NullableOption<T : Any> : Option<T?> {
      */
     fun required(): Option<T>
 }
+
+/**
+ * A named parameter of type <List<T>>.
+ */
+interface ListOption<T : Any> : Option<List<T>> {
+}

@@ -71,6 +71,10 @@ open class Action {
         return string().option(name, *names, help = help)
     }
 
+    fun options(name: String, vararg names: String, help: String? = null): ListOption<String> {
+        return string().options(name, *names, help = help)
+    }
+
     /**
      * Defines a boolean flag with the given names. See [BooleanConfigurationBuilder.flag] for more details.
      */

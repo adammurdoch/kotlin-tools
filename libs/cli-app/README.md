@@ -201,6 +201,7 @@ Like other positional parameters, by default an action is required, but you can 
 ### Multiple values
 
 Use the `parameters()` function to add a positional parameter with multiple values.
+Use the `options()` function to add a named parameter with multiple values.
 
 ### Value types
 

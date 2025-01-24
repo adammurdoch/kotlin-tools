@@ -30,6 +30,12 @@ interface ConfigurationBuilder<T : Any> {
      */
     fun option(names: List<String>, help: String? = null): NullableOption<T>
 
+    fun options(name: String, vararg names: String, help: String? = null): ListOption<T> {
+        return options(listOf(name) + names, help = help)
+    }
+
+    fun options(names: List<String>, help: String? = null): ListOption<T>
+
     /**
      * Defines a parameter with the given name and type [T].
      *

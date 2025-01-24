@@ -1,3 +1,6 @@
+- List option:
+  - Handle missing argument
+  - Handle conversion failure
 - Use Kotlinx IO types for files
 - Fixes for combining actions:
   - name-action --action when name action is not complete -> should report `--action` cannot be used with name-action 
@@ -10,9 +13,10 @@
 - Move calculation of effective usage into `AbstractActionParameter`
 - Move handling of option actions to help
 - Clean up usage types
-- Repeated `--option <value>`
 - `-<value>` option
 - Range values
+- Enum values
+- Map a parameter to a sealed type that indicates whether the value was provided or not.
 - Help
     - Allow display name for parameter to be specified, eg `--download <url>` instead of `--download <value>`
     - Don't allow `--help <action>` if there are no actions

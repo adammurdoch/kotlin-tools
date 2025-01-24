@@ -11,28 +11,28 @@ open class Action {
     private val recoverables = mutableListOf<Recoverable>()
 
     /**
-     * Allows configuration values of type [String] to be added to this action.
+     * Allows parameters of type [String] to be added to this action.
      */
     fun string(): ConfigurationBuilder<String> {
         return DefaultConfigurationBuilder(this, DefaultHost, NoOpConverter)
     }
 
     /**
-     * Allows configuration values of type [Int] to be added to this action.
+     * Allows parameters of type [Int] to be added to this action.
      */
     fun int(): ConfigurationBuilder<Int> {
         return DefaultConfigurationBuilder(this, DefaultHost, IntConverter)
     }
 
     /**
-     * Allows configuration values of type [Boolean] to be added to this action.
+     * Allows parameters of type [Boolean] to be added to this action.
      */
     fun boolean(): BooleanConfigurationBuilder {
         return DefaultBooleanConfigurationBuilder(this, DefaultHost)
     }
 
     /**
-     * Allows configuration values of type [T] to be added to this action.
+     * Allows parameters of type [T] to be added to this action.
      */
     fun <T : Any> oneOf(type: KClass<T>, builder: Choices<T>.() -> Unit): MappingConfigurationBuilder<T> {
         val choices = DefaultChoices<T>(DefaultHost)
@@ -42,14 +42,14 @@ open class Action {
     }
 
     /**
-     * Allows configuration values of type [T] to be added to this action.
+     * Allows parameters of type [T] to be added to this action.
      */
     inline fun <reified T : Any> oneOf(noinline builder: Choices<T>.() -> Unit): MappingConfigurationBuilder<T> {
         return oneOf(T::class, builder)
     }
 
     /**
-     * Allows configuration values of type [T] to be added to this action.
+     * Allows parameters of type [T] to be added to this action.
      * Uses the provided function to convert from string values to [T]
      */
     fun <T : Any> type(type: KClass<T>, converter: (String) -> ConversionResult<T>): ConfigurationBuilder<T> {
@@ -57,7 +57,7 @@ open class Action {
     }
 
     /**
-     * Allows configuration values of type [T] to be added to this action.
+     * Allows parameters of type [T] to be added to this action.
      * Uses the provided function to convert from string values to [T]
      */
     inline fun <reified T : Any> type(noinline converter: (String) -> ConversionResult<T>): ConfigurationBuilder<T> {

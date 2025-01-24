@@ -110,6 +110,37 @@ class StringOptionTest : AbstractActionTest() {
     }
 
     @Test
+    fun `can require option to be present`() {
+        class Option : Action() {
+            val option by option("o", "long-option").required()
+        }
+
+        parse(Option(), listOf("-o", "value")) { action ->
+            assertEquals("value", action.option)
+        }
+        parseFails(::Option, emptyList(), "Option --long-option not provided")
+    }
+
+    @Test
+    fun `can require multiple options to be present`() {
+        class Option : Action() {
+            val option1 by option("option-1").required()
+            val option2 by option("option-2").required()
+        }
+
+        parse(Option(), listOf("--option-1", "value 1", "--option-2", "value 2")) { action ->
+            assertEquals("value 1", action.option1)
+            assertEquals("value 2", action.option2)
+        }
+        parse(Option(), listOf("--option-2", "value 2", "--option-1", "value 1")) { action ->
+            assertEquals("value 1", action.option1)
+            assertEquals("value 2", action.option2)
+        }
+        parseFails(::Option, emptyList(), "Option --option-1 not provided")
+        parseFails(::Option, listOf("--option-1", "value 1"), "Option --option-2 not provided")
+    }
+
+    @Test
     fun `fails when flag provided instead of argument`() {
         class Option : Action() {
             val option by option("o")

@@ -3,10 +3,10 @@ package net.rubygrapefruit.cli
 internal abstract class AbstractOption<T : Any>(
     protected val names: List<String>,
     protected val help: String?,
-    private val host: Host,
+    protected val host: Host,
     protected val converter: StringConverter<T>
 ) : NonPositional {
-    private val flags = names.map { host.option(it) }
+    protected val flags = names.map { host.option(it) }
     protected var value: T? = null
 
     override fun toString(): String {

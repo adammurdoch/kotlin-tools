@@ -188,6 +188,15 @@ open class Action {
                 failure = result
             }
         }
+        for (option in options) {
+            if (failure != null) {
+                break
+            }
+            val result = option.finished(context)
+            if (result is FinishResult.Failure) {
+                failure = result
+            }
+        }
 
         return ParseResult.of(index, failure)
     }

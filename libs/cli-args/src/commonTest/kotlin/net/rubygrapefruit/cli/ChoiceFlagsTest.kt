@@ -143,6 +143,24 @@ class ChoiceFlagsTest : AbstractActionTest() {
     }
 
     @Test
+    fun `can require flags to be present`() {
+        class Option : Action() {
+            val option by oneOf {
+                choice(1, "1", "one")
+                choice(2, "two")
+            }.flags().required()
+        }
+
+        parse(Option(), listOf("--two")) { action ->
+            assertEquals(2, action.option)
+        }
+        parse(Option(), listOf("--two", "-1")) { action ->
+            assertEquals(1, action.option)
+        }
+        parseFails(::Option, emptyList(), "One of the following options must be provided: --one, --two")
+    }
+
+    @Test
     fun `name must not start with punctuation`() {
         class Broken1 : Action() {
             val sub by oneOf {

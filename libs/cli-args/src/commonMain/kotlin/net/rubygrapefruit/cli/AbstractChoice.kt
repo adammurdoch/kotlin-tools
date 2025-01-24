@@ -1,7 +1,7 @@
 package net.rubygrapefruit.cli
 
 internal abstract class AbstractChoice<T : Any>(
-    private val choices: List<ChoiceDetails<T>>,
+    protected val choices: List<ChoiceDetails<T>>,
 ) : NonPositional {
     protected var value: T? = null
 

@@ -1,7 +1,7 @@
 package net.rubygrapefruit.cli
 
 /**
- * Can add options and parameters to an [Action]
+ * Can add parameters to an [Action]
  */
 interface ConfigurationBuilder<T : Any> {
     /**
@@ -12,6 +12,7 @@ interface ConfigurationBuilder<T : Any> {
      * The option can appear anywhere in the command-line. It can appear only once.
      * Has value `null` when the option is not present in the input.
      * Use [NullableOption.whenAbsent] to use a different default.
+     * Use [NullableOption.required] to require the option to be present.
      */
     fun option(name: String, vararg names: String, help: String? = null): NullableOption<T> {
         return option(listOf(name) + names, help = help)
@@ -25,6 +26,7 @@ interface ConfigurationBuilder<T : Any> {
      * The option can appear anywhere in the command-line. It can appear only once.
      * Has value `null` when the option is not present in the input.
      * Use [NullableOption.whenAbsent] to use a different default.
+     * Use [NullableOption.required] to require the option to be present.
      */
     fun option(names: List<String>, help: String? = null): NullableOption<T>
 
@@ -32,7 +34,7 @@ interface ConfigurationBuilder<T : Any> {
      * Defines a parameter with the given name and type [T].
      *
      * The parameter must appear at a specific location in the input.
-     * Fails if the parameter is not present. Use [Parameter.whenAbsent] to allow the parameter to be missing.
+     * Fails if the parameter is not present. Use [RequiredParameter.whenAbsent] or [RequiredParameter.optional] to allow the parameter to be missing.
      */
     fun parameter(name: String, help: String? = null): RequiredParameter<T>
 
@@ -40,7 +42,8 @@ interface ConfigurationBuilder<T : Any> {
      * Defines a multi-value parameter with the given name and type `List<T>`.
      *
      * The parameter must appear at a specific location in the input.
-     * Uses an empty list if the parameter is not present in the input. Use [Parameter.whenAbsent] to use a different default.
+     * Uses an empty list if the parameter is not present in the input. Use [ListParameter.whenAbsent] to use a different default.
+     * Use [ListParameter.required] to require the parameter to be present (i.e. have at least one value)
      *
      * @param acceptOptions When `false`, does not include any options in the value. When `true`, the remainder of the input is used as the value
      */
@@ -53,6 +56,7 @@ interface MappingConfigurationBuilder<T : Any> : ConfigurationBuilder<T> {
      *
      * The flags can appear anywhere in the input. They can be specified multiple times and the last value is used.
      * Has value `null` then none of the flags is present in the input. Use [NullableOption.whenAbsent] to use a different default.
+     * Use [NullableOption.required] to require one of the flags to be present.
      *
      */
     fun flags(): NullableOption<T>

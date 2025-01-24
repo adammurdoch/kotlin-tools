@@ -6,7 +6,7 @@ import net.rubygrapefruit.store.ContentVisitor
 import net.rubygrapefruit.store.Store
 
 class StoreApp : CliApp("jvm-store-cli-app") {
-    private val command by actions {
+    private val command by action {
         action(ContentCommand(), "content", help = "Dump content")
         action(BenchmarkOneValueCommand(), "one-value", help = "Run benchmark for a single value")
         action(BenchmarkManyValuesCommand(), "many-values", help = "Run benchmark for many values")

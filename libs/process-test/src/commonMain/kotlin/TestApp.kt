@@ -10,7 +10,7 @@ import net.rubygrapefruit.io.stream.stdout
 import kotlin.system.exitProcess
 
 class TestApp : CliApp("test") {
-    private val action by actions {
+    private val action by action {
         action(PwdAction(), "pwd")
         action(EchoAction(), "echo")
         action(CountAction(), "count")

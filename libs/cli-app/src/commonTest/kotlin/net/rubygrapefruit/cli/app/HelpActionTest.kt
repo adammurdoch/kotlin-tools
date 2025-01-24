@@ -176,7 +176,7 @@ class HelpActionTest : AbstractActionTest() {
     @Test
     fun `generates help output for app with nested actions referenced by name`() {
         class App : Action() {
-            val action by actions {
+            val action by action {
                 action(Action(), "z", help = "run action z")
                 action(Action(), "action-two")
                 action(Action(), "a2", help = "run action a2")
@@ -208,7 +208,7 @@ class HelpActionTest : AbstractActionTest() {
         }
 
         class App : Action() {
-            val action by actions {
+            val action by action {
                 action(Action(), "z", help = "run action z")
                 action(Action(), "action-two")
                 action(Action(), "a2", help = "run action a2")
@@ -240,14 +240,14 @@ class HelpActionTest : AbstractActionTest() {
     @Test
     fun `generates help output for app with nested actions referenced by name and default action with nested actions`() {
         class Sub : Action() {
-            val action by actions {
+            val action by action {
                 action(Action(), "z2", help = "run action z2")
                 action(Action(), "a", help = "run action a")
             }
         }
 
         class App : Action() {
-            val action by actions {
+            val action by action {
                 action(Action(), "z", help = "run action z")
                 action(Action(), "action-two")
                 action(Action(), "a2", help = "run action a2")
@@ -277,7 +277,7 @@ class HelpActionTest : AbstractActionTest() {
     @Test
     fun `generates help output for app with nested actions referenced as options`() {
         class App : Action() {
-            val action by actions {
+            val action by action {
                 option(Action(), "z", help = "run action z")
                 option(Action(), "action-two")
                 option(Action(), "a2", help = "run action a2")
@@ -309,7 +309,7 @@ class HelpActionTest : AbstractActionTest() {
         }
 
         class App : Action() {
-            val action by actions {
+            val action by action {
                 option(Action(), "z", help = "run action z")
                 action(Sub(), help = "run main action")
                 option(Action(), "a2", help = "run action a2")

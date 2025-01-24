@@ -13,7 +13,7 @@ class NestedActionParameterAndParameterTest: AbstractActionTest() {
         }
 
         class WithSub : Action() {
-            val sub by actions {
+            val sub by action {
                 action(Sub(), "sub")
             }
         }

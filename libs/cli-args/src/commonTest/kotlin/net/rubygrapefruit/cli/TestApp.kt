@@ -1,7 +1,7 @@
 package net.rubygrapefruit.cli
 
 open class TestApp(val action: Action) : Action() {
-    val selected by actions {
+    val selected by action {
         option(HelpAction(), "help", allowAnywhere = true)
         action(action)
     }

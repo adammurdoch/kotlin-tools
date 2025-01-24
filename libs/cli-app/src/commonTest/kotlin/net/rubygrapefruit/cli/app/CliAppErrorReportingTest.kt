@@ -51,7 +51,7 @@ class CliAppErrorReportingTest {
 
         class App : CliApp("cmd") {
             val param by parameter("param1", help = "parameter 1")
-            val action by actions {
+            val action by action {
                 action(Sub(), "action")
             }
         }
@@ -79,7 +79,7 @@ class CliAppErrorReportingTest {
 
         class App : CliApp("cmd") {
             val param by parameter("param1", help = "parameter 1")
-            val action by actions {
+            val action by action {
                 action(Sub(), "action")
                 action(Sub())
             }
@@ -103,7 +103,7 @@ class CliAppErrorReportingTest {
     @Test
     fun `reports missing action for first positional`() {
         class Nested : CliApp("cmd") {
-            val action by actions {
+            val action by action {
                 action(Action(), "one")
                 action(Action(), "two", help = "run action two")
             }
@@ -128,7 +128,7 @@ class CliAppErrorReportingTest {
     fun `reports missing action for subsequent positional`() {
         class Nested : CliApp("cmd") {
             val param by parameter("param")
-            val action by actions {
+            val action by action {
                 action(Action(), "one")
                 action(Action(), "two", help = "run action two")
             }
@@ -152,7 +152,7 @@ class CliAppErrorReportingTest {
     @Test
     fun `reports unknown action for first positional`() {
         class Nested : CliApp("cmd") {
-            val action by actions {
+            val action by action {
                 action(Action(), "one")
                 action(Action(), "two", help = "run action two")
             }
@@ -177,7 +177,7 @@ class CliAppErrorReportingTest {
     fun `reports unknown action for subsequent positional`() {
         class Nested : CliApp("cmd") {
             val param by parameter("param")
-            val action by actions {
+            val action by action {
                 action(Action(), "one")
                 action(Action(), "two", help = "run action two")
             }

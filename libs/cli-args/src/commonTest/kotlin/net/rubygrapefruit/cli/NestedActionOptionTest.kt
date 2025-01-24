@@ -8,7 +8,7 @@ class NestedActionOptionTest : AbstractActionTest() {
         val sub = Action()
 
         class WithSub : Action() {
-            val sub by actions {
+            val sub by action {
                 option(sub, "sub")
             }
         }
@@ -24,7 +24,7 @@ class NestedActionOptionTest : AbstractActionTest() {
         val sub = Action()
 
         class WithSub : Action() {
-            val sub by actions {
+            val sub by action {
                 option(sub, "s")
             }
         }
@@ -41,7 +41,7 @@ class NestedActionOptionTest : AbstractActionTest() {
         val s2 = Action()
 
         class WithSub : Action() {
-            val sub by actions {
+            val sub by action {
                 option(s1, "s1")
                 option(s2, "s2")
             }
@@ -68,7 +68,7 @@ class NestedActionOptionTest : AbstractActionTest() {
         }
 
         class WithSub : Action() {
-            val sub by actions {
+            val sub by action {
                 option(Sub1(), "s1")
                 option(Sub2(), "s2")
             }
@@ -94,7 +94,7 @@ class NestedActionOptionTest : AbstractActionTest() {
         val s2 = Action()
 
         class WithSub : Action() {
-            val sub by actions {
+            val sub by action {
                 option(s1, "s1")
                 option(s2, "s2")
             }
@@ -114,7 +114,7 @@ class NestedActionOptionTest : AbstractActionTest() {
         }
 
         class WithSub : Action() {
-            val sub by actions {
+            val sub by action {
                 option(Sub1(), "s1", allowAnywhere = true)
                 option(Sub2(), "s2")
             }

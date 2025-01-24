@@ -86,7 +86,7 @@ class CompletionActionTest : AbstractActionTest() {
         }
 
         class App : Action() {
-            val action by actions {
+            val action by action {
                 action(Action(), "a1")
                 action(Nested(), "a2")
             }
@@ -106,14 +106,14 @@ class CompletionActionTest : AbstractActionTest() {
         }
 
         class Nested2: Action() {
-            val action by actions {
+            val action by action {
                 action(Nested1(), "n1")
                 action(Action(), "n2")
             }
         }
 
         class App : Action() {
-            val action by actions {
+            val action by action {
                 action(Action(), "a1")
                 action(Nested2(), "a2")
             }

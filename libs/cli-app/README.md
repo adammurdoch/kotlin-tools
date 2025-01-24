@@ -164,7 +164,7 @@ An action is an operation or subcommand that your application can run. Actions c
 ```kotlin
 class MyApp: CliApp("myapp") {
     // Define a set of actions to choose from 
-    private val action by actions {
+    private val action by action {
         action(AddItem(), "add")
         action(ListItems(), "list")
     }

@@ -9,7 +9,7 @@ class FlagAndActionTest : AbstractActionTest() {
 
         class WithSub : Action() {
             val flag by flag("flag")
-            val sub by actions {
+            val sub by action {
                 action(sub, "sub")
             }
         }
@@ -38,7 +38,7 @@ class FlagAndActionTest : AbstractActionTest() {
 
         class WithSub : Action() {
             val flag by flag("flag")
-            val sub by actions {
+            val sub by action {
                 action(Sub(), "sub")
             }
         }
@@ -71,7 +71,7 @@ class FlagAndActionTest : AbstractActionTest() {
         }
 
         class WithSub : Action() {
-            val sub by actions {
+            val sub by action {
                 action(SubAction(), "sub")
             }
         }
@@ -94,7 +94,7 @@ class FlagAndActionTest : AbstractActionTest() {
 
         class WithSub : Action() {
             val flag by flag("outer")
-            val sub by actions {
+            val sub by action {
                 action(SubAction(), "sub")
             }
         }
@@ -133,7 +133,7 @@ class FlagAndActionTest : AbstractActionTest() {
 
         class WithSub : Action() {
             val flag by flag("flag")
-            val sub by actions {
+            val sub by action {
                 action(Sub(), "sub")
             }
         }

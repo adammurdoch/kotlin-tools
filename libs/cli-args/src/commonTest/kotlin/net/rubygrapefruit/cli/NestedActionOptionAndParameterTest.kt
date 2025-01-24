@@ -9,7 +9,7 @@ class NestedActionOptionAndParameterTest : AbstractActionTest() {
         val s2 = Action()
 
         class WithSub : Action() {
-            val sub by actions {
+            val sub by action {
                 option(s1, "sub")
                 action(s2, "sub")
             }
@@ -26,7 +26,7 @@ class NestedActionOptionAndParameterTest : AbstractActionTest() {
     @Test
     fun `fails when exactly one action not provided`() {
         class WithSub : Action() {
-            val sub by actions {
+            val sub by action {
                 option(Action(), "sub")
                 action(Action(), "sub")
             }
@@ -44,7 +44,7 @@ class NestedActionOptionAndParameterTest : AbstractActionTest() {
         }
 
         class WithSub : Action() {
-            val sub by actions {
+            val sub by action {
                 option(Action(), "sub")
                 action(Sub())
             }
@@ -62,7 +62,7 @@ class NestedActionOptionAndParameterTest : AbstractActionTest() {
         val sub = Action()
 
         class WithSub : Action() {
-            val sub by actions {
+            val sub by action {
                 option(s1, "sub")
                 action(s2, "sub")
                 action(sub)
@@ -92,7 +92,7 @@ class NestedActionOptionAndParameterTest : AbstractActionTest() {
         val sub = Sub()
 
         class WithSub : Action() {
-            val sub by actions {
+            val sub by action {
                 option(s1, "sub")
                 action(s2, "sub")
                 action(sub)

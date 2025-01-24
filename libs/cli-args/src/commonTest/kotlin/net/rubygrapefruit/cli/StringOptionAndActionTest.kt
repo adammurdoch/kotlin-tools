@@ -12,7 +12,7 @@ class StringOptionAndActionTest : AbstractActionTest() {
 
         class WithSub : Action() {
             val option by option("o")
-            val sub by actions {
+            val sub by action {
                 action(sub, "sub")
             }
         }
@@ -40,7 +40,7 @@ class StringOptionAndActionTest : AbstractActionTest() {
         }
 
         class WithSub : Action() {
-            val sub by actions {
+            val sub by action {
                 action(SubAction(), "sub")
             }
         }

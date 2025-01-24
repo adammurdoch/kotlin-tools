@@ -33,7 +33,7 @@ class CliAppTest {
     @Test
     fun `can run --help action and help action when action has nested actions`() {
         class App : CliApp("cmd") {
-            val action by actions {
+            val action by action {
                 action(Action(), "action")
             }
         }

@@ -8,7 +8,7 @@ class NestedActionParameterTest : AbstractActionTest() {
         val sub = Action()
 
         class WithSub : Action() {
-            val action by actions {
+            val action by action {
                 action(sub, "sub")
             }
         }
@@ -24,7 +24,7 @@ class NestedActionParameterTest : AbstractActionTest() {
         val s2 = Action()
 
         class WithSub : Action() {
-            val action by actions {
+            val action by action {
                 action(s1, "s1")
                 action(s2, "s2")
             }
@@ -47,7 +47,7 @@ class NestedActionParameterTest : AbstractActionTest() {
         }
 
         class WithSub : Action() {
-            val action by actions {
+            val action by action {
                 action(Sub(), "sub")
             }
         }
@@ -70,7 +70,7 @@ class NestedActionParameterTest : AbstractActionTest() {
         }
 
         class WithSub : Action() {
-            val action by actions {
+            val action by action {
                 action(Sub1(), "s1")
                 action(Sub2(), "s2")
             }
@@ -98,10 +98,10 @@ class NestedActionParameterTest : AbstractActionTest() {
         val s2 = Sub()
 
         class WithSub : Action() {
-            val s1 by actions {
+            val s1 by action {
                 action(s1, "s1")
             }
-            val s2 by actions {
+            val s2 by action {
                 action(s2, "s2")
             }
         }
@@ -121,14 +121,14 @@ class NestedActionParameterTest : AbstractActionTest() {
         }
 
         class Sub2 : Action() {
-            val action by actions {
+            val action by action {
                 action(Sub1(), "nested")
                 action(Sub1(), "other")
             }
         }
 
         class WithSub : Action() {
-            val action by actions {
+            val action by action {
                 action(Sub2(), "sub")
                 action(Sub2(), "other")
             }
@@ -142,7 +142,7 @@ class NestedActionParameterTest : AbstractActionTest() {
     @Test
     fun `fails when exactly one nested action not provided`() {
         class WithSub : Action() {
-            val action by actions {
+            val action by action {
                 action(Action(), "s1")
                 action(Action(), "s2")
             }
@@ -165,14 +165,14 @@ class NestedActionParameterTest : AbstractActionTest() {
         }
 
         class Sub2 : Action() {
-            val action by actions {
+            val action by action {
                 action(Sub1(), "nested")
                 action(Sub1(), "other")
             }
         }
 
         class WithSub : Action() {
-            val action by actions {
+            val action by action {
                 action(Sub2(), "sub")
                 action(Sub2(), "other")
             }
@@ -193,7 +193,7 @@ class NestedActionParameterTest : AbstractActionTest() {
         val s1 = Action()
 
         class WithSub : Action() {
-            val action by actions {
+            val action by action {
                 action(s1, "s1")
                 action(Action(), "s2")
             }.whenAbsent(def)
@@ -212,7 +212,7 @@ class NestedActionParameterTest : AbstractActionTest() {
         val s1 = Action()
 
         class WithSub : Action() {
-            val action by actions {
+            val action by action {
                 action(s1, "s1")
                 action(Action(), "s2")
             }.optional()
@@ -229,7 +229,7 @@ class NestedActionParameterTest : AbstractActionTest() {
     @Test
     fun `fails when unknown action name provided`() {
         class WithSub : Action() {
-            val action by actions {
+            val action by action {
                 action(Action(), "s1")
                 action(Action(), "s2")
             }
@@ -249,7 +249,7 @@ class NestedActionParameterTest : AbstractActionTest() {
         val sub = Action()
 
         class WithSub : Action() {
-            val action by actions {
+            val action by action {
                 action(sub, "sub")
             }
             val flag by flag("flag", "f")
@@ -266,7 +266,7 @@ class NestedActionParameterTest : AbstractActionTest() {
         val sub = Action()
 
         class WithSub : Action() {
-            val action by actions {
+            val action by action {
                 action(sub, "sub")
             }
         }
@@ -278,7 +278,7 @@ class NestedActionParameterTest : AbstractActionTest() {
     @Test
     fun `fails when additional args provided after nested action`() {
         class WithSub : Action() {
-            val action by actions {
+            val action by action {
                 action(Action(), "sub")
             }
         }
@@ -289,7 +289,7 @@ class NestedActionParameterTest : AbstractActionTest() {
     @Test
     fun `can query usage of nested action by name`() {
         class WithSub : Action() {
-            val action by actions {
+            val action by action {
                 action(Action(), "sub")
             }
         }
@@ -301,13 +301,13 @@ class NestedActionParameterTest : AbstractActionTest() {
     @Test
     fun `can query usage of nested action of default action by name`() {
         class Sub1 : Action() {
-            val action by actions {
+            val action by action {
                 action(Action(), "sub2")
             }
         }
 
         class WithSub : Action() {
-            val action by actions {
+            val action by action {
                 action(Action(), "sub")
                 action(Sub1())
             }
@@ -321,7 +321,7 @@ class NestedActionParameterTest : AbstractActionTest() {
     @Test
     fun `name must not start with punctuation`() {
         class WithSub : Action() {
-            val action by actions {
+            val action by action {
                 action(Action(), "--sub")
             }
         }

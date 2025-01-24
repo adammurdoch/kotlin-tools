@@ -5,7 +5,7 @@ import net.rubygrapefruit.cli.ActionParameterUsage
 
 internal class MainAction(val app: CliApp, formatter: Formatter) : Action() {
     val stackTrace by flag("stack", help = "Show stack trace on failure")
-    val action by actions {
+    val action by action {
         val positional = app.usage().effective().positional.firstOrNull()
         if (positional is ActionParameterUsage) {
             option(NestedActionHelpAction(app.name, this@MainAction, formatter), "help", help = "Show usage message", allowAnywhere = true)

@@ -1,22 +1,19 @@
 package net.rubygrapefruit.cli
 
 internal abstract class AbstractOption<T : Any>(
-    protected val names: List<String>,
-    protected val help: String?,
-    protected val host: Host,
-    protected val converter: StringConverter<T>
+    protected val matcher: OptionMatcher<T>,
+    protected val help: String?
 ) : NonPositional {
-    protected val flags = names.map { host.option(it) }
-    private val matcher = OptionMatcher(flags, host, converter)
     protected var value: T? = null
 
     override fun toString(): String {
-        return "${flags.first()} <value>"
+        return "${matcher.flags.first()} <value>"
     }
 
     override fun usage(): List<OptionUsage> {
+        val flags = matcher.flags
         val usage = SingleOptionUsage(flags.joinToString(", ") { "$it <value>" }, help, flags)
-        return listOf(OptionUsage(usage.usage, help, converter.type, listOf(usage)))
+        return listOf(OptionUsage(usage.usage, help, matcher.type, listOf(usage)))
     }
 
     override fun accept(args: List<String>, context: ParseContext): ParseResult {
@@ -39,6 +36,6 @@ internal abstract class AbstractOption<T : Any>(
     }
 
     override fun accepts(option: String): Boolean {
-        return option in flags
+        return matcher.accepts(option)
     }
 }

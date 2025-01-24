@@ -7,7 +7,7 @@ internal open class DefaultConfigurationBuilder<T : Any>(
 ) : ConfigurationBuilder<T> {
     override fun option(names: List<String>, help: String?): NullableOption<T> {
         names.forEach { host.validate(it, "an option name") }
-        return owner.add(DefaultNullableOption(names, help, host, owner, converter))
+        return owner.add(DefaultNullableOption(OptionMatcher(names, host, converter), help, owner))
     }
 
     override fun parameter(name: String, help: String?): RequiredParameter<T> {

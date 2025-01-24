@@ -3,12 +3,8 @@ package net.rubygrapefruit.cli
 import kotlin.reflect.KProperty
 
 internal class DefaultListOption<T : Any>(
-    names: List<String>,
-    host: Host,
-    converter: StringConverter<T>
+    private val matcher: OptionMatcher<T>
 ) : ListOption<T>, NonPositional {
-    private val flags = names.map { host.option(it) }
-    private val matcher = OptionMatcher(flags, host, converter)
     private val value = mutableListOf<T>()
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): List<T> {
@@ -32,6 +28,6 @@ internal class DefaultListOption<T : Any>(
     }
 
     override fun accepts(option: String): Boolean {
-        return option in flags
+        return matcher.accepts(option)
     }
 }

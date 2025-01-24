@@ -3,23 +3,21 @@ package net.rubygrapefruit.cli
 import kotlin.reflect.KProperty
 
 internal class DefaultNullableOption<T : Any>(
-    names: List<String>,
+    matcher: OptionMatcher<T>,
     help: String?,
-    host: Host,
     private val owner: Action,
-    converter: StringConverter<T>,
-) : AbstractOption<T>(names, help, host, converter), NullableOption<T> {
+) : AbstractOption<T>(matcher, help), NullableOption<T> {
 
     override fun whenAbsent(default: T): Option<T> {
-        return owner.replace(this, DefaultOption(names, help, default, host, converter))
+        return owner.replace(this, DefaultOption(matcher, help, default))
     }
 
     override fun required(): Option<T> {
-        return owner.replace(this, RequiredOption(names, help, host, converter))
+        return owner.replace(this, RequiredOption(matcher, help))
     }
 
     override fun repeated(): ListOption<T> {
-        return owner.replace(this, DefaultListOption(names, host, converter))
+        return owner.replace(this, DefaultListOption(matcher))
     }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T? {

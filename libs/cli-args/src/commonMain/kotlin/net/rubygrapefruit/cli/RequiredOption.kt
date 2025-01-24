@@ -3,11 +3,9 @@ package net.rubygrapefruit.cli
 import kotlin.reflect.KProperty
 
 internal class RequiredOption<T : Any>(
-    names: List<String>,
-    help: String?,
-    host: Host,
-    converter: StringConverter<T>,
-) : AbstractOption<T>(names, help, host, converter), Option<T> {
+    matcher: OptionMatcher<T>,
+    help: String?
+) : AbstractOption<T>(matcher, help), Option<T> {
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T {
         return value!!
@@ -15,7 +13,7 @@ internal class RequiredOption<T : Any>(
 
     override fun finished(context: ParseContext): FinishResult {
         return if (value == null) {
-            val exception = ArgParseException("Option ${flags.maxBy { it.length }} not provided")
+            val exception = ArgParseException("Option ${matcher.flags.maxBy { it.length }} not provided")
             FinishResult.Failure(exception, expectedMore = true)
         } else {
             FinishResult.Success

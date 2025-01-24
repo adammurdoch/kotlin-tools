@@ -1,6 +1,6 @@
 - List option:
   - Handle unknown option for choice
-  - Usage and accepts()
+  - Usage, accepts(), completion
   - Require 1 or more
 - Use `repeated()` to define a list positional parameter.
 - Report multiple problems

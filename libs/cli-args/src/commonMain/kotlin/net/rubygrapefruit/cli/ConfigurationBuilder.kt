@@ -37,17 +37,6 @@ interface ConfigurationBuilder<T : Any> {
      * Fails if the parameter is not present. Use [RequiredParameter.whenAbsent] or [RequiredParameter.optional] to allow the parameter to be missing.
      */
     fun parameter(name: String, help: String? = null): RequiredParameter<T>
-
-    /**
-     * Defines a multi-value parameter with the given name and type `List<T>`.
-     *
-     * The parameter must appear at a specific location in the input.
-     * Uses an empty list if the parameter is not present in the input. Use [ListParameter.whenAbsent] to use a different default.
-     * Use [ListParameter.required] to require the parameter to be present (i.e. have at least one value)
-     *
-     * @param acceptOptions When `false`, does not include any options in the value. When `true`, the remainder of the input is used as the value
-     */
-    fun parameters(name: String, help: String? = null): ListParameter<T>
 }
 
 interface MappingConfigurationBuilder<T : Any> : ConfigurationBuilder<T> {

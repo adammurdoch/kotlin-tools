@@ -23,7 +23,7 @@ class StringListParameterTest : AbstractActionTest() {
     @Test
     fun `can define a default value`() {
         class Parameter : Action() {
-            val param by string().parameters("value").whenAbsent(listOf("abc"))
+            val param by string().parameter("value").repeated().whenAbsent(listOf("abc"))
         }
 
         parse(::Parameter, emptyList()) { action ->
@@ -40,7 +40,7 @@ class StringListParameterTest : AbstractActionTest() {
     @Test
     fun `can require at least one argument`() {
         class Parameter : Action() {
-            val param by string().parameters("value").required()
+            val param by string().parameter("value").repeated().required()
         }
 
         parseFails(::Parameter, emptyList(), "Parameter 'value' not provided")
@@ -68,7 +68,7 @@ class StringListParameterTest : AbstractActionTest() {
     @Test
     fun `fails when flag provided instead of required argument`() {
         class Parameter : Action() {
-            val param by string().parameters("value").required()
+            val param by string().parameter("value").repeated().required()
             val flag by flag("f", "flag")
         }
 

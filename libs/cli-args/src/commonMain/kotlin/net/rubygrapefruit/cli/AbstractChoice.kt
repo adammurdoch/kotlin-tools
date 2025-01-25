@@ -1,12 +1,12 @@
 package net.rubygrapefruit.cli
 
 internal abstract class AbstractChoice<T : Any>(
-    protected val matcher: ChoiceFlagMatcher<T>,
+    protected val matcher: ChoiceFlagMatcher<T>
 ) : NonPositional {
     protected var value: T? = null
 
     override fun usage(): List<FlagUsage> {
-        return matcher.choices.map { FlagUsage.of(it.names, it.help) }
+        return matcher.usage()
     }
 
     override fun accept(args: List<String>, context: ParseContext): ParseResult {

@@ -9,7 +9,7 @@ class CliAppTest {
     private val formatter = BufferingFormatter()
 
     @Test
-    fun `can run action`() {
+    fun `can run app with no parameters`() {
         class App : CliApp("cmd")
 
         val action = App().actionFor(emptyList(), formatter)
@@ -17,7 +17,7 @@ class CliAppTest {
     }
 
     @Test
-    fun `can run --help action`() {
+    fun `can run --help action for app with no parameters`() {
         class App : CliApp("cmd")
 
         val action = App().actionFor(listOf("--help"), formatter)
@@ -47,6 +47,20 @@ class CliAppTest {
 
             assertContains(formatter.text, "Usage: cmd action")
         }
+    }
+
+    @Test
+    fun `can run --help action when action has repeated option`() {
+        class App : CliApp("cmd") {
+            val option by option("opt").repeated()
+        }
+        val formatter = BufferingFormatter()
+        val action = App().actionFor(listOf("--help", "action"), formatter)
+        assertIs<HelpAction>(action)
+
+        action.run()
+
+        assertContains(formatter.text, "--opt")
     }
 
     @Test

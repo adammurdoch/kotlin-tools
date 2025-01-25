@@ -4,16 +4,15 @@ import kotlin.reflect.KProperty
 
 internal class DefaultNullableOption<T : Any>(
     matcher: OptionMatcher<T>,
-    help: String?,
     private val owner: Action,
-) : AbstractOption<T>(matcher, help), NullableOption<T> {
+) : AbstractOption<T>(matcher), NullableOption<T> {
 
     override fun whenAbsent(default: T): Option<T> {
-        return owner.replace(this, DefaultOption(matcher, help, default))
+        return owner.replace(this, DefaultOption(matcher, default))
     }
 
     override fun required(): Option<T> {
-        return owner.replace(this, RequiredOption(matcher, help))
+        return owner.replace(this, RequiredOption(matcher))
     }
 
     override fun repeated(): ListOption<T> {

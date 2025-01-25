@@ -16,4 +16,8 @@ internal class ChoiceFlagMatcher<T : Any>(
     override fun accepts(option: String): Boolean {
         return choices.any { it.names.contains(option) }
     }
+
+    override fun usage(): List<FlagUsage> {
+        return choices.map { FlagUsage.of(it.names, it.help) }
+    }
 }

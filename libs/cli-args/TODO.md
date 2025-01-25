@@ -34,6 +34,7 @@
     - Help for options, actions, parameters, etc
     - Help should indicate parameter is optional
     - Help for nested actions with nested actions
+    - Show required options in synopsis
 - Completion
     - Fix global flags for nested actions 
     - Include help message for each choice completion option
@@ -46,7 +47,7 @@
     - Action options
 - Escape names for completion function, actions, help, etc
 - Usage message on parse error
-    - Suggest `--help`
+    - Suggest `--help`, and special case when `help` is accidentally used instead.
     - Unknown option - show available options
     - Unknown option for sub-command - show available options
     - Unknown action provided to `help`

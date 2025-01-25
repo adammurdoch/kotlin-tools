@@ -12,7 +12,7 @@ internal class DefaultListOption<T : Any>(
     }
 
     override fun usage(): List<NonPositionalUsage> {
-        TODO("Not yet implemented")
+        return matcher.usage()
     }
 
     override fun accept(args: List<String>, context: ParseContext): ParseResult {

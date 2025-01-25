@@ -4,6 +4,7 @@ import kotlin.reflect.KClass
 
 internal class OptionMatcher<T : Any>(
     names: List<String>,
+    private val help: String?,
     private val host: Host,
     private val converter: StringConverter<T>
 ) : Matcher<T> {
@@ -28,5 +29,10 @@ internal class OptionMatcher<T : Any>(
 
     override fun accepts(option: String): Boolean {
         return option in flags
+    }
+
+    override fun usage(): List<OptionUsage> {
+        val usage = SingleOptionUsage(flags.joinToString(", ") { "$it <value>" }, help, flags)
+        return listOf(OptionUsage(usage.usage, help, converter.type, listOf(usage)))
     }
 }

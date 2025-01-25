@@ -1,8 +1,7 @@
 package net.rubygrapefruit.cli
 
 internal abstract class AbstractOption<T : Any>(
-    protected val matcher: OptionMatcher<T>,
-    protected val help: String?
+    protected val matcher: OptionMatcher<T>
 ) : NonPositional {
     protected var value: T? = null
 
@@ -11,9 +10,7 @@ internal abstract class AbstractOption<T : Any>(
     }
 
     override fun usage(): List<OptionUsage> {
-        val flags = matcher.flags
-        val usage = SingleOptionUsage(flags.joinToString(", ") { "$it <value>" }, help, flags)
-        return listOf(OptionUsage(usage.usage, help, matcher.type, listOf(usage)))
+        return matcher.usage()
     }
 
     override fun accept(args: List<String>, context: ParseContext): ParseResult {

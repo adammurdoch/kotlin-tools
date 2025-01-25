@@ -79,7 +79,7 @@ class StringListParameterTest : AbstractActionTest() {
     }
 
     @Test
-    fun `can consume remaining args`() {
+    fun `can consume remaining arguments`() {
         class Parameter : Action() {
             val param by remainder("value")
             val flag by flag("flag")
@@ -108,7 +108,7 @@ class StringListParameterTest : AbstractActionTest() {
     }
 
     @Test
-    fun `can consume remaining args including --help`() {
+    fun `can consume remaining arguments including --help`() {
         class Parameter : Action() {
             val param by remainder("value")
         }
@@ -120,6 +120,22 @@ class StringListParameterTest : AbstractActionTest() {
             val selected = action.selected
             assertIs<Parameter>(selected)
             assertEquals(listOf("a", "--help"), selected.param)
+        }
+    }
+
+    @Test
+    fun `can require at least one remaining argument to be present`() {
+        class Parameter : Action() {
+            val param by remainder("value").required()
+        }
+
+        parseFails(::Parameter, emptyList(), "Parameter 'value' not provided")
+
+        parse(::Parameter, listOf("--flag")) { action ->
+            assertEquals(listOf("--flag"), action.param)
+        }
+        parse(::Parameter, listOf("--flag", "a")) { action ->
+            assertEquals(listOf("--flag", "a"), action.param)
         }
     }
 

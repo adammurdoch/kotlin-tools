@@ -1,5 +1,6 @@
 - List option:
   - Require 1 or more
+- Consistent error message for missing parameter and missing required list parameter
 - Optional parameter usage is missing?
 - `Action.run()` runs nested actions, if present
 - Report multiple problems

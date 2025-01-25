@@ -1,6 +1,5 @@
 - List option:
   - Require 1 or more
-- Simpler implementation for `remainder()`
 - Optional parameter usage is missing?
 - `Action.run()` runs nested actions, if present
 - Report multiple problems
@@ -65,7 +64,7 @@
 - Validate at least one action or choice is defined, if no default
 - Validate choices do not contain spaces
 - Disallow conflicting flags, option and action names, choice flags
-- Disallow any positional parameters after list parameter
+- Disallow any positional parameters after string list parameter
 - File locations: dir, file, must exist
 - Color output on terminal
 - Fuzzy matching and/or suggestions

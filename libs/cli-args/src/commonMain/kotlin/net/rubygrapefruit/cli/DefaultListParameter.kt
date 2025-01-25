@@ -9,20 +9,19 @@ internal class DefaultListParameter<T : Any>(
     private val owner: Action,
     private val default: List<T>,
     private val required: Boolean,
-    private val acceptOptions: Boolean,
     private val converter: StringConverter<T>
 ) : Positional, ListParameter<T> {
     private val values = mutableListOf<T>()
 
     override fun whenAbsent(default: List<T>): Parameter<List<T>> {
-        return owner.replace(this, DefaultListParameter(name, help, host, owner, default, false, acceptOptions, converter))
+        return owner.replace(this, DefaultListParameter(name, help, host, owner, default, false, converter))
     }
 
     override fun optional(): Parameter<List<T>> {
         return if (!required) {
             this
         } else {
-            owner.replace(this, DefaultListParameter(name, help, host, owner, emptyList(), false, acceptOptions, converter))
+            owner.replace(this, DefaultListParameter(name, help, host, owner, emptyList(), false, converter))
         }
     }
 
@@ -41,7 +40,7 @@ internal class DefaultListParameter<T : Any>(
     override fun accept(args: List<String>, context: ParseContext): ParseResult {
         for (index in args.indices) {
             val arg = args[index]
-            if (!acceptOptions && host.isOption(arg)) {
+            if (host.isOption(arg)) {
                 return ParseResult.Success(index)
             }
             val result = converter.convert("parameter '$name'", arg)

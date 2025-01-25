@@ -19,7 +19,7 @@ internal class DefaultParameter<T : Any>(
     }
 
     override fun repeated(): ListParameter<T> {
-        return owner.replace(this, DefaultListParameter(name, help, host, owner, emptyList(), true, false, converter))
+        return owner.replace(this, DefaultListParameter(name, help, host, owner, emptyList(), true, converter))
     }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T {

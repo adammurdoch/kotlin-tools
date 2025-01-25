@@ -68,6 +68,29 @@ class HelpActionTest : AbstractActionTest() {
     }
 
     @Test
+    fun `generates help output for app with remainder parameter`() {
+        class App : Action() {
+            val p1 by parameter("param", help = "some value")
+            val p2 by remainder("another-param", help = "some other value")
+        }
+
+        val app = App()
+        val help = HelpAction("cmd", app, formatter)
+        help.run()
+
+        assertEquals(
+            """
+            Usage: cmd <param> <another-param>...
+            
+            Parameters:
+              <param>         some value
+              <another-param> some other value
+            
+            """.trimIndent(), formatter.text
+        )
+    }
+
+    @Test
     fun `generates help output for app with optional parameters`() {
         class App : Action() {
             val p1 by parameter("param", help = "some value").optional()

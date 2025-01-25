@@ -336,7 +336,8 @@ val samples = listOf(
     nativeUiApp,
     nativeUiApp.derive("customized") { it.launcher("App") },
 
-    jvmCliApp("cli-args-test").cliArgs("--help").allPlatforms()
+    jvmCliApp("cli-args-parameters").cliArgs("--help").allPlatforms(),
+    jvmCliApp("cli-args-options").cliArgs("--help").allPlatforms()
 )
 
 val sampleApps = samples.filterIsInstance<App>()

@@ -27,15 +27,15 @@ internal abstract class AbstractParameter<T : Any>(
             ParseResult.Nothing
         } else {
             val result = converter.convert("parameter '$name'", candidate)
-            if (result.isSuccess) {
+            if (result is StringConverter.Success) {
                 set = true
-                value = result.getOrThrow()
+                value = result.value
                 ParseResult.One
             } else if (canBeMissing) {
                 set = true
                 ParseResult.Nothing
             } else {
-                ParseResult.Failure(1, result.exceptionOrNull() as ArgParseException)
+                result.asParseResult()
             }
         }
     }

@@ -44,11 +44,11 @@ internal open class DefaultListParameter<T : Any>(
             if (!acceptOptions && host.isOption(arg)) {
                 return ParseResult.Success(index)
             }
-            val converted = converter.convert("parameter '$name'", arg)
-            if (converted.isFailure) {
-                return ParseResult.Failure(index, converted.exceptionOrNull() as ArgParseException)
+            val result = converter.convert("parameter '$name'", arg)
+            when (result) {
+                is StringConverter.Success -> values.add(result.value)
+                is StringConverter.Failure -> return ParseResult.Failure(index, ArgParseException(result.message), expectedMore = true)
             }
-            values.add(converted.getOrThrow())
         }
         return ParseResult.Success(args.size)
     }

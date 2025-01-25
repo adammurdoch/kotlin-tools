@@ -3,6 +3,8 @@ package net.rubygrapefruit.cli
 internal interface Matcher<T : Any> {
     fun match(args: List<String>): Result<T>
 
+    fun accepts(option: String): Boolean
+
     sealed class Result<out T> {
         abstract val consumed: Int
 
@@ -22,9 +24,9 @@ internal interface Matcher<T : Any> {
         }
     }
 
-    data class Failure<T>(override val consumed: Int, val failure: ArgParseException, val expectedMore: Boolean) : Result<T>() {
+    data class Failure<T>(override val consumed: Int, val message: String, val expectedMore: Boolean) : Result<T>() {
         override fun asParseResult(): ParseResult {
-            return ParseResult.Failure(consumed, failure, expectedMore)
+            return ParseResult.Failure(consumed, ArgParseException(message), expectedMore)
         }
     }
 }

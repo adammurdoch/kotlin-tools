@@ -1,8 +1,5 @@
 - List option:
-  - Merge implementations, can back by a Matcher instead
-  - Merge Matcher and StringConverter (or their results at least) 
-  - Handle unknown option for choice
-  - Usage, accepts(), completion
+  - Usage and completion
   - Require 1 or more
 - Use `repeated()` to define a list positional parameter.
 - Report multiple problems
@@ -10,7 +7,7 @@
 - Use Kotlinx IO types for files
 - Fixes for combining actions:
   - name-action --action when name action is not complete -> should report `--action` cannot be used with name-action 
-  - name-action --<action when name action is complete -> reports cannot use `--action` with "null"
+  - name-action --action when name action is complete -> reports cannot use `--action` with "null"
 - Improve error reporting when empty argument is found and not expected
 - Add some kind of integration with app plugins to supply app name
 - Fix store test apps when store directory does not exist 

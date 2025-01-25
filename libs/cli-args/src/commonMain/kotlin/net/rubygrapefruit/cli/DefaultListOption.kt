@@ -3,7 +3,7 @@ package net.rubygrapefruit.cli
 import kotlin.reflect.KProperty
 
 internal class DefaultListOption<T : Any>(
-    private val matcher: OptionMatcher<T>
+    private val matcher: Matcher<T>
 ) : ListOption<T>, NonPositional {
     private val value = mutableListOf<T>()
 

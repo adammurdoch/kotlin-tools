@@ -14,7 +14,7 @@ open class Action {
      * Allows parameters of type [String] to be added to this action.
      */
     fun string(): ConfigurationBuilder<String> {
-        return DefaultConfigurationBuilder(this, DefaultHost, NoOpConverter)
+        return DefaultConfigurationBuilder(this, DefaultHost, IdentityConverter)
     }
 
     /**

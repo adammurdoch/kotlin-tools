@@ -13,7 +13,7 @@ internal class ChoiceFlagMatcher<T : Any>(
         }
     }
 
-    fun accepts(option: String): Boolean {
+    override fun accepts(option: String): Boolean {
         return choices.any { it.names.contains(option) }
     }
 }

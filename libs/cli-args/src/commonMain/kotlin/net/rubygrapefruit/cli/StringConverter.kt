@@ -12,18 +12,34 @@ internal interface StringConverter<T : Any> {
         get() = emptyList()
 
     fun convert(displayName: String, value: String): Result<T>
+
+    sealed class Result<T : Any> {
+        abstract fun asParseResult(): ParseResult
+    }
+
+    data class Success<T : Any>(val value: T) : Result<T>() {
+        override fun asParseResult(): ParseResult {
+            return ParseResult.One
+        }
+    }
+
+    data class Failure<T : Any>(val message: String) : Result<T>() {
+        override fun asParseResult(): ParseResult {
+            return ParseResult.Failure(1, ArgParseException(message), false)
+        }
+    }
 }
 
 internal object IntConverter : StringConverter<Int> {
     override val type: KClass<Int>
         get() = Int::class
 
-    override fun convert(displayName: String, value: String): Result<Int> {
+    override fun convert(displayName: String, value: String): StringConverter.Result<Int> {
         val converted = value.toIntOrNull()
         return if (converted == null) {
-            Result.failure(ArgParseException("Value for $displayName is not an integer: $value"))
+            StringConverter.Failure("Value for $displayName is not an integer: $value")
         } else {
-            Result.success(converted)
+            StringConverter.Success(converted)
         }
     }
 }
@@ -35,21 +51,21 @@ internal object BooleanConverter : StringConverter<Boolean> {
     override val candidateValues: List<String>
         get() = listOf("yes", "no")
 
-    override fun convert(displayName: String, value: String): Result<Boolean> {
+    override fun convert(displayName: String, value: String): StringConverter.Result<Boolean> {
         return when (value) {
-            "yes" -> Result.success(true)
-            "no" -> Result.success(false)
-            else -> Result.failure(ArgParseException("Unknown value for $displayName: $value"))
+            "yes" -> StringConverter.Success(true)
+            "no" -> StringConverter.Success(false)
+            else -> StringConverter.Failure("Unknown value for $displayName: $value")
         }
     }
 }
 
-internal object NoOpConverter : StringConverter<String> {
+internal object IdentityConverter : StringConverter<String> {
     override val type: KClass<String>
         get() = String::class
 
-    override fun convert(displayName: String, value: String): Result<String> {
-        return Result.success(value)
+    override fun convert(displayName: String, value: String): StringConverter.Result<String> {
+        return StringConverter.Success(value)
     }
 }
 
@@ -57,26 +73,26 @@ internal class ChoiceConverter<T : Any>(override val type: KClass<T>, val choice
     override val candidateValues: List<String>
         get() = choices.keys.toList()
 
-    override fun convert(displayName: String, value: String): Result<T> {
+    override fun convert(displayName: String, value: String): StringConverter.Result<T> {
         val item = choices[value]
         return if (item == null) {
-            Result.failure(ArgParseException("Unknown value for $displayName: $value"))
+            StringConverter.Failure("Unknown value for $displayName: $value")
         } else {
-            Result.success(item.value)
+            StringConverter.Success(item.value)
         }
     }
 }
 
 internal class MappingConverter<T : Any>(override val type: KClass<T>, val converter: (String) -> Action.ConversionResult<T>) : StringConverter<T> {
-    override fun convert(displayName: String, value: String): Result<T> {
+    override fun convert(displayName: String, value: String): StringConverter.Result<T> {
         val result = try {
             converter(value)
         } catch (e: Throwable) {
             throw ArgParseException("Could not convert value for $displayName: $value", cause = e)
         }
         return when (result) {
-            is Action.ConversionResult.Failure -> Result.failure(ArgParseException("Value for $displayName ${result.problem}: $value"))
-            is Action.ConversionResult.Success -> Result.success(result.value)
+            is Action.ConversionResult.Failure -> StringConverter.Failure("Value for $displayName ${result.problem}: $value")
+            is Action.ConversionResult.Success -> StringConverter.Success(result.value)
         }
     }
 }

@@ -68,7 +68,7 @@ class HelpActionTest : AbstractActionTest() {
     }
 
     @Test
-    fun `generates help output for app with optional parameter`() {
+    fun `generates help output for app with optional parameters`() {
         class App : Action() {
             val p1 by parameter("param", help = "some value").optional()
             val p2 by parameter("another-param", help = "some other value").optional()
@@ -118,7 +118,7 @@ class HelpActionTest : AbstractActionTest() {
     }
 
     @Test
-    fun `generates help output for app with choice options`() {
+    fun `generates help output for app with choice flags`() {
         class App : Action() {
             val o1 by oneOf {
                 choice(1, "one", help = "select 1")
@@ -167,6 +167,29 @@ class HelpActionTest : AbstractActionTest() {
               --none <value>
               --some-option <value>               some other option
               -o <value>                          single character
+              -s <value>, --second-option <value> second option
+            
+            """.trimIndent(), formatter.text
+        )
+    }
+
+    @Test
+    fun `generates help output for app with list options`() {
+        class App : Action() {
+            val a1 by option("some-option", help = "some other option").repeated()
+            val a2 by option("s", "second-option", help = "second option").repeated()
+        }
+
+        val app = App()
+        val help = HelpAction("cmd", app, formatter)
+        help.run()
+
+        assertEquals(
+            """
+            Usage: cmd [options]
+            
+            Options:
+              --some-option <value>               some other option
               -s <value>, --second-option <value> second option
             
             """.trimIndent(), formatter.text

@@ -2,6 +2,7 @@
   - Usage and completion
   - Require 1 or more
 - Use `repeated()` to define a list positional parameter.
+- Action.run() runs nested actions, if present
 - Report multiple problems
 - Error message shows where on the command-line the problem occurred.
 - Use Kotlinx IO types for files

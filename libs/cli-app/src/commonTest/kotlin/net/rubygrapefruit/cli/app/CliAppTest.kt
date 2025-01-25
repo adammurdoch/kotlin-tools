@@ -50,10 +50,11 @@ class CliAppTest {
     }
 
     @Test
-    fun `can run --help action when action has repeated option`() {
+    fun `can run --help action when action has option`() {
         class App : CliApp("cmd") {
-            val option by option("opt").repeated()
+            val option by option("opt")
         }
+
         val formatter = BufferingFormatter()
         val action = App().actionFor(listOf("--help", "action"), formatter)
         assertIs<HelpAction>(action)

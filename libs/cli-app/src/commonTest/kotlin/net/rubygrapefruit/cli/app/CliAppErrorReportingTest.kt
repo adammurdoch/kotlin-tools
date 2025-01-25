@@ -22,6 +22,20 @@ class CliAppErrorReportingTest {
     }
 
     @Test
+    fun `cannot use help action when app has no nested actions`() {
+        class App : CliApp("cmd") {
+            val flag by flag("flag")
+        }
+
+        App().run(listOf("help"), formatter)
+        hasUsageMessage(
+            """
+            Unknown parameter: help
+        """
+        )
+    }
+
+    @Test
     fun `reports missing parameter for first positional`() {
         class App : CliApp("cmd") {
             val param by parameter("param", help = "parameter 1")

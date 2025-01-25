@@ -10,7 +10,7 @@ class ChoiceListParameterTest : AbstractActionTest() {
             val param by oneOf {
                 choice(1, "1")
                 choice(2, "two")
-            }.parameters("value")
+            }.parameter("value").repeated()
         }
 
         parse(::Parameter, emptyList()) { action ->
@@ -30,7 +30,7 @@ class ChoiceListParameterTest : AbstractActionTest() {
             val param by oneOf {
                 choice(1, "1")
                 choice(2, "two")
-            }.parameters("value")
+            }.parameter("value").repeated()
         }
 
         parseFails(::Parameter, listOf("3"), "Unknown value for parameter 'value': 3")

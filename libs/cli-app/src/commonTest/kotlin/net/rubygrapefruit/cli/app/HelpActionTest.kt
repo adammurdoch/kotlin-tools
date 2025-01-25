@@ -48,7 +48,7 @@ class HelpActionTest : AbstractActionTest() {
     fun `generates help output for app with list parameter`() {
         class App : Action() {
             val p1 by parameter("param", help = "some value")
-            val p2 by parameters("another-param", help = "some other value")
+            val p2 by parameter("another-param", help = "some other value").repeated()
         }
 
         val app = App()

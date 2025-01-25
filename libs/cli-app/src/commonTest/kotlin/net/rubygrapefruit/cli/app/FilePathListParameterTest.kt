@@ -14,7 +14,7 @@ class FilePathListParameterTest : AbstractActionTest() {
         val dir1 = files.dir("c/d")
 
         class Parameter : CliAction() {
-            val param by path().parameters("value")
+            val param by path().parameter("value").repeated()
         }
 
         parse(Parameter(), emptyList()) { action ->

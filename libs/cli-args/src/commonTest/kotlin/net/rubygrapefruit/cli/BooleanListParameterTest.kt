@@ -7,7 +7,7 @@ class BooleanListParameterTest : AbstractActionTest() {
     @Test
     fun `action can have parameter with list value`() {
         class Parameter : Action() {
-            val param by boolean().parameters("value")
+            val param by boolean().parameter("value").repeated()
         }
 
         parse(::Parameter, emptyList()) { action ->
@@ -24,7 +24,7 @@ class BooleanListParameterTest : AbstractActionTest() {
     @Test
     fun `fails when argument is not an integer`() {
         class Parameter : Action() {
-            val param by boolean().parameters("value")
+            val param by boolean().parameter("value").repeated()
         }
 
         parseFails(::Parameter, listOf("abc"), "Unknown value for parameter 'value': abc")

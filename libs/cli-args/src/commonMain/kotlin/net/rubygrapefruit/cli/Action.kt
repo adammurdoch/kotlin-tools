@@ -86,13 +86,6 @@ open class Action {
     }
 
     /**
-     * Defines a multi-value string parameter with the given name. See [ConfigurationBuilder.parameters] for more details.
-     */
-    fun parameters(name: String, help: String? = null): ListParameter<String> {
-        return string().parameters(name, help = help)
-    }
-
-    /**
      * Defines a set of actions. Use `<name> <action-args>` to invoke the action.
      *
      * Only one action can be invoked, and this must appear at a specific location in the input.

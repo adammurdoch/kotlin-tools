@@ -7,7 +7,7 @@ class IntListParameterTest : AbstractActionTest() {
     @Test
     fun `action can have parameter with list value`() {
         class Parameter : Action() {
-            val param by int().parameters("value")
+            val param by int().parameter("value").repeated()
         }
 
         parse(::Parameter, emptyList()) { action ->
@@ -24,7 +24,7 @@ class IntListParameterTest : AbstractActionTest() {
     @Test
     fun `fails when argument is not an integer`() {
         class Parameter : Action() {
-            val param by int().parameters("value")
+            val param by int().parameter("value").repeated()
         }
 
         parseFails(::Parameter, listOf("abc"), "Value for parameter 'value' is not an integer: abc")

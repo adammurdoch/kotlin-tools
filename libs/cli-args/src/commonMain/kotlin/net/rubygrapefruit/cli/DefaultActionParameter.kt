@@ -16,6 +16,10 @@ internal class DefaultActionParameter<T : Action>(
         return owner.replace(this, NullableActionParameter(actions, host))
     }
 
+    override fun repeated(): ListParameter<T> {
+        TODO("Not yet implemented")
+    }
+
     override fun whenMissing(context: ParseContext): FinishResult {
         val exception = PositionalParseException("Action not provided", resolution = "Please specify an action to run.", positional = context.positional, actions = actionInfo)
         return FinishResult.Failure(exception, expectedMore = true)

@@ -18,6 +18,10 @@ internal class DefaultParameter<T : Any>(
         return owner.replace(this, NullableParameter(name, help, host, converter))
     }
 
+    override fun repeated(): ListParameter<T> {
+        return owner.replace(this, DefaultListParameter(name, help, host, owner, emptyList(), false, false, converter))
+    }
+
     override fun getValue(thisRef: Any?, property: KProperty<*>): T {
         return value ?: throw IllegalStateException()
     }

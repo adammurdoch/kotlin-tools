@@ -159,7 +159,7 @@ You can also use the parameter name prefixed by `--no-` to explicitly disable th
 
 ### Actions
 
-An action is an operation or subcommand that your application can run. Actions can have their own parameters, options, nested actions, etc.
+An action is an operation or sub-command that your application can run. Actions can have their own parameters, options, nested actions, etc.
 
 ```kotlin
 class MyApp: CliApp("myapp") {
@@ -200,8 +200,7 @@ Like other positional parameters, by default an action is required, but you can 
 
 ### Multiple values
 
-Use the `parameters()` function to add a positional parameter with multiple values.
-Use the `repeated()` function to add a named parameter that can be repeated to produce a list.
+Use the `repeated()` function to add a named or positional parameter that can be repeated to produce a list.
 
 ### Value types
 

@@ -9,7 +9,7 @@ class CustomTypeListParameterTest : AbstractActionTest() {
     @Test
     fun `action can have typed parameter`() {
         class Parameter : Action() {
-            val param by type { ConversionResult.Success(it.uppercase()) }.parameters("value")
+            val param by type { ConversionResult.Success(it.uppercase()) }.parameter("value").repeated()
         }
 
         parse(::Parameter, listOf("abc", "def")) { action ->
@@ -26,7 +26,7 @@ class CustomTypeListParameterTest : AbstractActionTest() {
                 } else {
                     ConversionResult.Success(it)
                 }
-            }.parameters("value")
+            }.parameter("value").repeated()
         }
 
         parseFails(::Parameter, listOf("a"), "Value for parameter 'value' is too short: a")
@@ -47,7 +47,7 @@ class CustomTypeListParameterTest : AbstractActionTest() {
         class Parameter : Action() {
             val param by type<Long> {
                 throw failure
-            }.parameters("value")
+            }.parameter("value").repeated()
         }
 
         try {

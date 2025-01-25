@@ -6,7 +6,7 @@ class StringListParameterTest : AbstractActionTest() {
     @Test
     fun `action can have parameter with list value`() {
         class Parameter : Action() {
-            val param by parameters("value")
+            val param by parameter("value").repeated()
         }
 
         parse(::Parameter, emptyList()) { action ->
@@ -23,7 +23,7 @@ class StringListParameterTest : AbstractActionTest() {
     @Test
     fun `can define a default value`() {
         class Parameter : Action() {
-            val param by parameters("value").whenAbsent(listOf("abc"))
+            val param by string().parameters("value").whenAbsent(listOf("abc"))
         }
 
         parse(::Parameter, emptyList()) { action ->
@@ -40,7 +40,7 @@ class StringListParameterTest : AbstractActionTest() {
     @Test
     fun `can require at least one argument`() {
         class Parameter : Action() {
-            val param by parameters("value").required()
+            val param by string().parameters("value").required()
         }
 
         parseFails(::Parameter, emptyList(), "Parameter 'value' not provided")
@@ -56,7 +56,7 @@ class StringListParameterTest : AbstractActionTest() {
     @Test
     fun `fails when unknown flag provided with arguments`() {
         class Parameter : Action() {
-            val param by parameters("value")
+            val param by parameter("value").repeated()
         }
 
         parseFails(::Parameter, listOf("--flag"), "Unknown option: --flag")
@@ -68,7 +68,7 @@ class StringListParameterTest : AbstractActionTest() {
     @Test
     fun `fails when flag provided instead of required argument`() {
         class Parameter : Action() {
-            val param by parameters("value").required()
+            val param by string().parameters("value").required()
             val flag by flag("f", "flag")
         }
 
@@ -126,7 +126,7 @@ class StringListParameterTest : AbstractActionTest() {
     @Test
     fun `parameter name must not start with punctuation`() {
         class Broken1 : Action() {
-            val param by parameters("-p")
+            val param by parameter("-p").repeated()
         }
         try {
             Broken1()
@@ -135,7 +135,7 @@ class StringListParameterTest : AbstractActionTest() {
             assertEquals("-p cannot be used as a parameter name", e.message)
         }
         class Broken2 : Action() {
-            val param by parameters("--param")
+            val param by parameter("--param").repeated()
         }
         try {
             Broken2()

@@ -10,7 +10,7 @@ class FlagAndListParametersTest : AbstractActionTest() {
     fun `can interleave flags and arguments`() {
         class WithParams : Action() {
             val flag by flag("f1")
-            val params by parameters("value")
+            val params by parameter("value").repeated()
         }
 
         parse(WithParams(), listOf("a", "--f1", "b")) { action ->

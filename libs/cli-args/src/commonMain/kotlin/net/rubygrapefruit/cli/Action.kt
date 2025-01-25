@@ -86,6 +86,14 @@ open class Action {
     }
 
     /**
+     * Defines a list parameter that consumes the remainder of the command-line.
+     */
+    fun remainder(name: String, help: String? = null): ListParameter<String> {
+        DefaultHost.validate(name, "a parameter name")
+        return add(DefaultListParameter(name, help, DefaultHost, this, emptyList(), false, true, IdentityConverter))
+    }
+
+    /**
      * Defines a set of actions. Use `<name> <action-args>` to invoke the action.
      *
      * Only one action can be invoked, and this must appear at a specific location in the input.

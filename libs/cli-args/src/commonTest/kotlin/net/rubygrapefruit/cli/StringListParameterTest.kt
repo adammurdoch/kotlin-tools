@@ -81,7 +81,7 @@ class StringListParameterTest : AbstractActionTest() {
     @Test
     fun `can consume remaining args`() {
         class Parameter : Action() {
-            val param by string().parameters("value", acceptOptions = true)
+            val param by remainder("value")
             val flag by flag("flag")
         }
 
@@ -110,7 +110,7 @@ class StringListParameterTest : AbstractActionTest() {
     @Test
     fun `can consume remaining args including --help`() {
         class Parameter : Action() {
-            val param by string().parameters("value", acceptOptions = true)
+            val param by remainder("value")
         }
 
         parse(TestApp(Parameter()), listOf("--help")) { action ->
@@ -142,6 +142,15 @@ class StringListParameterTest : AbstractActionTest() {
             fail()
         } catch (e: IllegalArgumentException) {
             assertEquals("--param cannot be used as a parameter name", e.message)
+        }
+        class Broken3 : Action() {
+            val param by remainder("-p")
+        }
+        try {
+            Broken3()
+            fail()
+        } catch (e: IllegalArgumentException) {
+            assertEquals("-p cannot be used as a parameter name", e.message)
         }
     }
 }

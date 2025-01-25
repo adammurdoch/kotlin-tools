@@ -84,8 +84,7 @@ Hello world
 ```
 
 By default, a positional parameter is required and the app will fail when the parameter is not provided (and provide a nice error message to help the user figure out what to do next).
-You can make a parameter optional using `optional()`, in which case it will have a `null` value when the parameter is not provided,
-or `whenAbsent()`, in which case it will have a default value when the parameter is not provided.
+You can make a parameter optional using `parameter().optional()`, in which case it will have a `null` value when the parameter is not provided, or `parameter().whenAbsent()`, in which case it will have a default value when the parameter is not provided.
 
 ### Options
 
@@ -116,8 +115,8 @@ An option will have a `null` value when the option is not provided:
 Hello null
 ```
 
-You can use `whenAbsent()` to use a default value when the option is not provided.
-You can make the option required using `required()`, in which case the app will fail when the option is not provided.
+You can use `option().whenAbsent()` to use a default value when the option is not provided.
+You can make the option required using `option().required()`, in which case the app will fail when the option is not provided.
 
 ### Flags
 
@@ -200,7 +199,10 @@ Like other positional parameters, by default an action is required, but you can 
 
 ### Multiple values
 
-Use the `repeated()` function to add a named or positional parameter that can be repeated to produce a list.
+Use the `parameter().repeated()` function to add a positional parameter that can be repeated to produce a list.
+Use the `option().repeated()` function to add a named parameter that can be repeated to produce a list.
+
+Use the `remainder()` function to add a positional parameter that consumes the remainder of the command-line, including all options and flags.
 
 ### Value types
 

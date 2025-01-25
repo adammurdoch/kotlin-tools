@@ -47,7 +47,7 @@ interface ConfigurationBuilder<T : Any> {
      *
      * @param acceptOptions When `false`, does not include any options in the value. When `true`, the remainder of the input is used as the value
      */
-    fun parameters(name: String, help: String? = null, acceptOptions: Boolean = false): ListParameter<T>
+    fun parameters(name: String, help: String? = null): ListParameter<T>
 }
 
 interface MappingConfigurationBuilder<T : Any> : ConfigurationBuilder<T> {

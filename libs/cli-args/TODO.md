@@ -1,4 +1,6 @@
 - List option:
+  - Merge implementations, can back by a Matcher instead
+  - Merge Matcher and StringConverter (or their results at least) 
   - Handle unknown option for choice
   - Usage, accepts(), completion
   - Require 1 or more

@@ -7,21 +7,21 @@ import kotlin.test.fail
 class StringListOptionTest : AbstractActionTest() {
     @Test
     fun `action can have option with list value`() {
-        class Parameter : Action() {
-            val param by option("o", "opt").repeated()
+        class Option : Action() {
+            val option by option("o", "opt").repeated()
         }
 
-        parse(::Parameter, emptyList()) { action ->
-            assertEquals(emptyList(), action.param)
+        parse(::Option, emptyList()) { action ->
+            assertEquals(emptyList(), action.option)
         }
-        parse(::Parameter, listOf("-o", "abc")) { action ->
-            assertEquals(listOf("abc"), action.param)
+        parse(::Option, listOf("-o", "abc")) { action ->
+            assertEquals(listOf("abc"), action.option)
         }
-        parse(::Parameter, listOf("-o", "a", "--opt", "b", "--opt", "c")) { action ->
-            assertEquals(listOf("a", "b", "c"), action.param)
+        parse(::Option, listOf("-o", "a", "--opt", "b", "--opt", "c")) { action ->
+            assertEquals(listOf("a", "b", "c"), action.option)
         }
-        parse(::Parameter, listOf("--opt", "a", "--opt", "a")) { action ->
-            assertEquals(listOf("a", "a"), action.param)
+        parse(::Option, listOf("--opt", "a", "--opt", "a")) { action ->
+            assertEquals(listOf("a", "a"), action.option)
         }
     }
 

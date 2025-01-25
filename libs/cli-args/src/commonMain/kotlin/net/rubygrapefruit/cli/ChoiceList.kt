@@ -3,7 +3,7 @@ package net.rubygrapefruit.cli
 import kotlin.reflect.KProperty
 
 internal class ChoiceList<T : Any>(
-    private val choices: List<ChoiceDetails<T>>
+    private val choices: ChoiceFlagMatcher<T>
 ) : NonPositional, ListOption<T> {
     private val value = mutableListOf<T>()
 
@@ -12,14 +12,11 @@ internal class ChoiceList<T : Any>(
     }
 
     override fun accept(args: List<String>, context: ParseContext): ParseResult {
-        val name = args.first()
-        val result = choices.firstOrNull { it.names.contains(name) }
-        return if (result != null) {
+        val result = choices.match(args)
+        if (result is Matcher.Success) {
             value.add(result.value)
-            ParseResult.One
-        } else {
-            ParseResult.Nothing
         }
+        return result.asParseResult()
     }
 
     override fun accepts(option: String): Boolean {

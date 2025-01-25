@@ -6,21 +6,21 @@ import kotlin.test.assertEquals
 class IntListOptionTest : AbstractActionTest() {
     @Test
     fun `action can have option with list value`() {
-        class Parameter : Action() {
-            val param by int().option("o", "opt").repeated()
+        class Option : Action() {
+            val option by int().option("o", "opt").repeated()
         }
 
-        parse(::Parameter, emptyList()) { action ->
-            assertEquals(emptyList(), action.param)
+        parse(::Option, emptyList()) { action ->
+            assertEquals(emptyList(), action.option)
         }
-        parse(::Parameter, listOf("-o", "123")) { action ->
-            assertEquals(listOf(123), action.param)
+        parse(::Option, listOf("-o", "123")) { action ->
+            assertEquals(listOf(123), action.option)
         }
-        parse(::Parameter, listOf("-o", "1", "--opt", "2", "--opt", "3")) { action ->
-            assertEquals(listOf(1, 2, 3), action.param)
+        parse(::Option, listOf("-o", "1", "--opt", "2", "--opt", "3")) { action ->
+            assertEquals(listOf(1, 2, 3), action.option)
         }
-        parse(::Parameter, listOf("--opt", "1", "--opt", "1")) { action ->
-            assertEquals(listOf(1, 1), action.param)
+        parse(::Option, listOf("--opt", "1", "--opt", "1")) { action ->
+            assertEquals(listOf(1, 1), action.option)
         }
     }
 

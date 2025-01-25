@@ -7,6 +7,7 @@ internal class DefaultMappingConfigurationBuilder<T : Any>(
     private val choices: List<ChoiceDetails<T>>
 ) : DefaultConfigurationBuilder<T>(owner, host, converter), MappingConfigurationBuilder<T> {
     override fun flags(): NullableOption<T> {
-        return owner.add(DefaultNullableChoice(choices.map { choice -> ChoiceDetails(choice.value, choice.help, choice.names.map { host.option(it) }) }, owner))
+        val flags = choices.map { choice -> ChoiceDetails(choice.value, choice.help, choice.names.map { host.option(it) }) }
+        return owner.add(DefaultNullableChoice(ChoiceFlagMatcher(flags), owner))
     }
 }

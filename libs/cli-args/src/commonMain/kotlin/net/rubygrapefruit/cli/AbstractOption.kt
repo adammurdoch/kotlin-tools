@@ -22,17 +22,10 @@ internal abstract class AbstractOption<T : Any>(
             val arg = args.first()
             return ParseResult.Failure(1, ArgParseException("Value for option $arg already provided"))
         }
-        return when (result) {
-            is Matcher.Nothing -> ParseResult.Nothing
-            is Matcher.Success -> {
-                value = result.value
-                ParseResult.Success(result.consumed)
-            }
-
-            is Matcher.Failure -> {
-                ParseResult.Failure(result.consumed, result.failure, result.expectedMore)
-            }
+        if (result is Matcher.Success) {
+            value = result.value
         }
+        return result.asParseResult()
     }
 
     override fun accepts(option: String): Boolean {

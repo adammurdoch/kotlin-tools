@@ -13,9 +13,6 @@ class ChoiceListParameterTest : AbstractActionTest() {
             }.parameter("value").repeated()
         }
 
-        parse(::Parameter, emptyList()) { action ->
-            assertEquals(emptyList(), action.param)
-        }
         parse(::Parameter, listOf("1")) { action ->
             assertEquals(listOf(1), action.param)
         }

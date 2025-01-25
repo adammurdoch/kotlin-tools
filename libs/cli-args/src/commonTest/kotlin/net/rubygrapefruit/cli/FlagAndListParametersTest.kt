@@ -21,9 +21,7 @@ class FlagAndListParametersTest : AbstractActionTest() {
             assertEquals(listOf("a", "b", "c"), action.params)
             assertFalse(action.flag)
         }
-        parse(WithParams(), listOf("--f1")) { action ->
-            assertEquals(emptyList(), action.params)
-            assertTrue(action.flag)
-        }
+
+        parseFails(::WithParams, listOf("--f1"), "Parameter 'value' not provided")
     }
 }

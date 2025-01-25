@@ -10,9 +10,6 @@ class BooleanListParameterTest : AbstractActionTest() {
             val param by boolean().parameter("value").repeated()
         }
 
-        parse(::Parameter, emptyList()) { action ->
-            assertEquals(emptyList(), action.param)
-        }
         parse(::Parameter, listOf("yes")) { action ->
             assertEquals(listOf(true), action.param)
         }
@@ -22,7 +19,7 @@ class BooleanListParameterTest : AbstractActionTest() {
     }
 
     @Test
-    fun `fails when argument is not an integer`() {
+    fun `fails when argument is not a boolean`() {
         class Parameter : Action() {
             val param by boolean().parameter("value").repeated()
         }

@@ -10,9 +10,6 @@ class IntListParameterTest : AbstractActionTest() {
             val param by int().parameter("value").repeated()
         }
 
-        parse(::Parameter, emptyList()) { action ->
-            assertEquals(emptyList(), action.param)
-        }
         parse(::Parameter, listOf("123")) { action ->
             assertEquals(listOf(123), action.param)
         }

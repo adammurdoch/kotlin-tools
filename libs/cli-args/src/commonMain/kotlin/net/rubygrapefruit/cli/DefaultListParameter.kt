@@ -2,10 +2,10 @@ package net.rubygrapefruit.cli
 
 import kotlin.reflect.KProperty
 
-internal open class DefaultListParameter<T : Any>(
-    protected val name: String,
-    protected val help: String?,
-    protected val host: Host,
+internal class DefaultListParameter<T : Any>(
+    private val name: String,
+    private val help: String?,
+    private val host: Host,
     private val owner: Action,
     private val default: List<T>,
     private val required: Boolean,
@@ -15,14 +15,14 @@ internal open class DefaultListParameter<T : Any>(
     private val values = mutableListOf<T>()
 
     override fun whenAbsent(default: List<T>): Parameter<List<T>> {
-        return owner.replace(this, DefaultListParameter(name, help, host, owner, default, required, acceptOptions, converter))
+        return owner.replace(this, DefaultListParameter(name, help, host, owner, default, false, acceptOptions, converter))
     }
 
-    override fun required(): Parameter<List<T>> {
-        return if (required) {
+    override fun optional(): Parameter<List<T>> {
+        return if (!required) {
             this
         } else {
-            owner.replace(this, DefaultListParameter(name, help, host, owner, default, true, acceptOptions, converter))
+            owner.replace(this, DefaultListParameter(name, help, host, owner, emptyList(), false, acceptOptions, converter))
         }
     }
 

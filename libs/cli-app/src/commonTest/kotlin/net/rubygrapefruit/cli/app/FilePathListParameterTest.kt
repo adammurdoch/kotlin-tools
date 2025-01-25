@@ -17,9 +17,6 @@ class FilePathListParameterTest : AbstractActionTest() {
             val param by path().parameter("value").repeated()
         }
 
-        parse(Parameter(), emptyList()) { action ->
-            assertEquals(emptyList(), action.param)
-        }
         parse(Parameter(), listOf(file1.absolutePath)) { action ->
             assertEquals(listOf(file1.path), action.param)
         }

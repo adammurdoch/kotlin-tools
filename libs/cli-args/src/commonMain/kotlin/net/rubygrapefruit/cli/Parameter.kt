@@ -34,12 +34,12 @@ interface RequiredParameter<T : Any> : Parameter<T> {
  */
 interface ListParameter<T : Any> : Parameter<List<T>> {
     /**
-     * Returns a parameter that uses the given default value when this parameter is not present in the input.
+     * Returns a parameter that uses the given default value when the parameter is not present in the input.
      */
     fun whenAbsent(default: List<T>): Parameter<List<T>>
 
     /**
-     * Returns a parameter that requires at least one value.
+     * Returns a parameter that uses an empty list when the parameter is not present in the input.
      */
-    fun required(): Parameter<List<T>>
+    fun optional(): Parameter<List<T>>
 }

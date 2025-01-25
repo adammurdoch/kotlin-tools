@@ -9,9 +9,8 @@ class StringListParameterTest : AbstractActionTest() {
             val param by parameter("value").repeated()
         }
 
-        parse(::Parameter, emptyList()) { action ->
-            assertEquals(emptyList(), action.param)
-        }
+        parseFails(::Parameter, emptyList(), "Parameter 'value' not provided")
+
         parse(::Parameter, listOf("abc")) { action ->
             assertEquals(listOf("abc"), action.param)
         }
@@ -38,13 +37,14 @@ class StringListParameterTest : AbstractActionTest() {
     }
 
     @Test
-    fun `can require at least one argument`() {
+    fun `can make parameter optional`() {
         class Parameter : Action() {
-            val param by string().parameter("value").repeated().required()
+            val param by string().parameter("value").repeated().optional()
         }
 
-        parseFails(::Parameter, emptyList(), "Parameter 'value' not provided")
-
+        parse(::Parameter, emptyList()) { action ->
+            assertEquals(emptyList(), action.param)
+        }
         parse(::Parameter, listOf("abc")) { action ->
             assertEquals(listOf("abc"), action.param)
         }
@@ -66,9 +66,9 @@ class StringListParameterTest : AbstractActionTest() {
     }
 
     @Test
-    fun `fails when flag provided instead of required argument`() {
+    fun `fails when flag provided instead of argument`() {
         class Parameter : Action() {
-            val param by string().parameter("value").repeated().required()
+            val param by string().parameter("value").repeated()
             val flag by flag("f", "flag")
         }
 

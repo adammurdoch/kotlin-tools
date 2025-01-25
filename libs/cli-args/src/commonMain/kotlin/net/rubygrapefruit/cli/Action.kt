@@ -99,10 +99,10 @@ open class Action {
      * Only one action can be invoked, and this must appear at a specific location in the input.
      * Fails if an action is not present in the input. Use [RequiredParameter.whenAbsent] to use a different default or [RequiredParameter.optional] to use a `null` value.
      */
-    fun <T : Action> action(builder: Actions<T>.() -> Unit): RequiredParameter<T> {
+    fun <T : Action> action(builder: Actions<T>.() -> Unit): Parameter<T> {
         val actions = DefaultActions<T>(DefaultHost)
         builder(actions)
-        val parameter = DefaultActionParameter(actions.build(), DefaultHost, this)
+        val parameter = DefaultActionParameter(actions.build(), DefaultHost)
         positional.add(parameter)
         options.add(parameter.option)
         recoverables.addAll(parameter.recoverables)

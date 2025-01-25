@@ -1,10 +1,9 @@
 - List option:
   - Require 1 or more
 - List parameter
-  - Implement for action
   - Require 1 or more
 - Optional parameter usage is missing?
-- Action.run() runs nested actions, if present
+- `Action.run()` runs nested actions, if present
 - Report multiple problems
 - Error message shows where on the command-line the problem occurred.
 - Use Kotlinx IO types for files

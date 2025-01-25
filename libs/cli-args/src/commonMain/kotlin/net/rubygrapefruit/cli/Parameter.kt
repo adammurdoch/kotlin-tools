@@ -14,12 +14,12 @@ sealed interface Parameter<T> {
  */
 interface RequiredParameter<T : Any> : Parameter<T> {
     /**
-     * Returns a parameter that uses the given default value when this parameter is not present in the input.
+     * Returns a parameter that uses the given default value when the parameter is not present in the input.
      */
     fun whenAbsent(default: T): Parameter<T>
 
     /**
-     * Returns a parameter that has `null` value when this parameter is not present in the input.
+     * Returns a parameter that has `null` value when the parameter is not present in the input.
      */
     fun optional(): Parameter<T?>
 

@@ -196,30 +196,12 @@ class NestedActionParameterTest : AbstractActionTest() {
             val action by action {
                 action(s1, "s1")
                 action(Action(), "s2")
-            }.whenAbsent(def)
+                action(def)
+            }
         }
 
         parse(WithSub(), emptyList()) { action ->
             assertSame(def, action.action)
-        }
-        parse(WithSub(), listOf("s1")) { action ->
-            assertSame(s1, action.action)
-        }
-    }
-
-    @Test
-    fun `can define optional nested actions`() {
-        val s1 = Action()
-
-        class WithSub : Action() {
-            val action by action {
-                action(s1, "s1")
-                action(Action(), "s2")
-            }.optional()
-        }
-
-        parse(WithSub(), emptyList()) { action ->
-            assertNull(action.action)
         }
         parse(WithSub(), listOf("s1")) { action ->
             assertSame(s1, action.action)

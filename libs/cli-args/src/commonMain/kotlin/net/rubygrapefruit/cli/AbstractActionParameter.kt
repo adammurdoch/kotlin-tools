@@ -39,7 +39,6 @@ internal abstract class AbstractActionParameter<T : Action>(
     }
 
     override fun accept(args: List<String>, context: ParseContext): ParseResult {
-
         val name = args.first()
         val action = actions.named[name]
         if (action != null) {

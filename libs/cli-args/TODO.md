@@ -11,7 +11,6 @@
   - name-action --action when name action is complete -> reports cannot use `--action` with "null"
 - Improve error reporting when empty argument is found and not expected
 - Add some kind of integration with app plugins to supply app name
-- Fix store test apps when store directory does not exist 
 - Fix error message when multiple actions are provided, either as names or options or combined with default
 - Merge `NestedActionHelpAction` into `HelpAction`
 - Move calculation of effective usage into `AbstractActionParameter`
@@ -22,6 +21,7 @@
 - Enum values
 - Map a parameter to a sealed type that indicates whether the value was provided or not.
 - Help
+    - Show `<action>?` in usage when action has a default
     - Allow display name for parameter to be specified, eg `--download <url>` instead of `--download <value>`
     - Don't allow `--help <action>` if there are no actions
     - Fix help when action is not the first positional

@@ -19,7 +19,6 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation("net.rubygrapefruit:basics:0.0.1")
-                implementation("net.rubygrapefruit:stream-io:0.0.1")
             }
         }
     }

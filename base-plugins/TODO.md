@@ -48,9 +48,17 @@
     - Customisation
 - Refactor `DownloadRepository` to use Gradle exec service when used in a plugin.
 - Installer
+- Docs
+  - Generate docs that use next version, current version
+  - Reference snippets from samples
+- Samples
+  - Add task to verify samples
+  - Generate samples that use local version, next version, current version
+  - Verify samples on CI
 - Release
   - Fix coordinates in published POMs
   - Verify publications prior to upload
+  - Generate samples prior to release 
   - Generate docs prior to release 
   - Extract description from library's README
   - Fix version update to locate existing `release { }` block

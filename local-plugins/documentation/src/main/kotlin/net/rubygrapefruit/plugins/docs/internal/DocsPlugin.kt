@@ -5,7 +5,7 @@ import org.gradle.api.Project
 
 open class DocsPlugin : Plugin<Project> {
     override fun apply(target: Project) {
-        with(target) {
+        target.run {
             tasks.register("generateDocs", GenerateDocs::class.java) { task ->
                 task.sourceFiles.from(project.layout.projectDirectory.dir("src/docs").asFileTree)
                 task.variables.put("project.version", provider { project.version.toString() })

@@ -6,5 +6,6 @@ plugins {
     id("net.rubygrapefruit.bootstrap.included-build")
 }
 
+include("samples")
 include("documentation")
 include("release")

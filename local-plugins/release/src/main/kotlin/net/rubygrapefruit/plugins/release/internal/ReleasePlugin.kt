@@ -108,20 +108,25 @@ open class ReleasePlugin : Plugin<Project> {
                     }
                 }
             }
-            val uploadTasks = publications.map { p ->
-                tasks.register("upload${p.name.capitalized()}", UploadToMavenCentral::class.java) { t ->
-                    t.dependsOn("publish${p.name.capitalized()}PublicationToMavenRepository")
-                    t.groupId.set(p.groupId)
-                    t.artifactId.set(p.artifactId)
-                    t.version.set(p.version)
-                    t.userName.set(mavenCentralUsername)
-                    t.token.set(mavenCentralToken)
-                    t.repoDirectory.set(repoDir)
-                    t.tempDirectory.set(zipDir)
+
+            val uploadTask = tasks.register("upload")
+
+            afterEvaluate {
+                val uploadTasks = publications.map { p ->
+                    tasks.register("upload${p.name.capitalized()}", UploadToMavenCentral::class.java) { t ->
+                        t.dependsOn("publish${p.name.capitalized()}PublicationToMavenRepository")
+                        t.groupId.set(p.groupId)
+                        t.artifactId.set(p.artifactId)
+                        t.version.set(p.version)
+                        t.userName.set(mavenCentralUsername)
+                        t.token.set(mavenCentralToken)
+                        t.repoDirectory.set(repoDir)
+                        t.tempDirectory.set(zipDir)
+                    }
                 }
-            }
-            val uploadTask = tasks.register("upload") { t ->
-                t.dependsOn(uploadTasks)
+                uploadTask.configure { t ->
+                    t.dependsOn(uploadTasks)
+                }
             }
 
             val tagName = effectiveVersion.map { "${project.name}-v${it}" }

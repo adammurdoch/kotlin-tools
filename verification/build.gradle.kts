@@ -18,7 +18,8 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation("net.rubygrapefruit.libs:basics:0.0.1-milestone-1")
+                implementation("net.rubygrapefruit:basics:0.0.1")
+                implementation("net.rubygrapefruit:stream-io:0.0.1")
             }
         }
     }

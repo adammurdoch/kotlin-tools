@@ -49,6 +49,8 @@
 - Refactor `DownloadRepository` to use Gradle exec service when used in a plugin.
 - Installer
 - Release
+  - Fix coordinates in published POMs
+  - Verify publications prior to upload
   - Generate docs prior to release 
   - Extract description from library's README
   - Fix version update to locate existing `release { }` block

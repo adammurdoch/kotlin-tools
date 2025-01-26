@@ -17,6 +17,9 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                 multiplatformComponents.macOS {
                     executable { }
                 }
+
+                val generatedEntryPoint = "uiMain"
+
                 multiplatformComponents.eachNativeExecutable { machine, buildType, binaryFile, executable ->
                     val name = when (buildType) {
                         BuildType.Debug -> buildType.name
@@ -25,12 +28,12 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                     val default = buildType == BuildType.Debug && HostMachine.current.canBeBuilt && HostMachine.current.machine == machine
                     val dist = app.distributionContainer.add(name, default, HostMachine.current.canBuild(machine), machine, buildType, DefaultNativeUiAppDistribution::class.java)
                     dist.launcherFile.set(binaryFile)
-                    executable.entryPoint = "uiMain"
+                    executable.entryPoint = generatedEntryPoint
                 }
 
                 val generatorTask = tasks.register("nativeLauncher", NativeLauncher::class.java) {
                     it.sourceDirectory.set(layout.buildDirectory.dir("generated-main"))
-                    it.mainMethod.set("uiMain")
+                    it.entryPoint.set(generatedEntryPoint)
                     it.delegateMethod.set(app.entryPoint)
                 }
                 app.macOS {

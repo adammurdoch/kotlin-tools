@@ -12,17 +12,17 @@ abstract class NativeLauncher : DefaultTask() {
     abstract val sourceDirectory: DirectoryProperty
 
     @get:Input
-    abstract val mainMethod: Property<String>
+    abstract val entryPoint: Property<String>
 
     @get:Input
     abstract val delegateMethod: Property<String>
 
     @TaskAction
     fun generate() {
-        sourceDirectory.file("${mainMethod.get()}.kt").get().asFile.printWriter().use {
+        sourceDirectory.file("${entryPoint.get()}.kt").get().asFile.printWriter().use {
             it.println(
                 """
-                fun ${mainMethod.get()}(args: Array<String>) {
+                fun ${entryPoint.get()}(args: Array<String>) {
                     ${delegateMethod.get()}(args)
                 }
             """.trimIndent()

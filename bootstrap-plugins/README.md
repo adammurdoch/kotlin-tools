@@ -14,7 +14,7 @@ These plugins are not intended to be used outside of this repository.
 - Run `./gradlew release -Drelease.type=final` for a final release
   - Don't include `-Drelease.type` for a milestone release
 - Publish release on Maven Central via portal
-- Update and run samples: `./gradlew base-libs:basics:samples && ./gradlew -p base-libs/basics/build/samples/strings build`
+- Update and run samples: `./gradlew base-libs:basics:samples base-libs:basics:verifySamples`
 - Update README for released libraries to reference new coordinates and generate docs
 - Commit updates and push
 - Update Github release

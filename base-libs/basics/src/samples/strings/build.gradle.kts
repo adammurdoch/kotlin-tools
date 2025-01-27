@@ -1,20 +1,8 @@
 plugins {
-    kotlin("multiplatform") version "2.1.0"
-}
-
-repositories {
-    gradlePluginPortal()
+    samples.multiplatform()
 }
 
 kotlin {
-    targets {
-        jvm()
-        macosArm64 {
-            binaries {
-                executable()
-            }
-        }
-    }
     sourceSets {
         val commonMain by getting {
             dependencies {

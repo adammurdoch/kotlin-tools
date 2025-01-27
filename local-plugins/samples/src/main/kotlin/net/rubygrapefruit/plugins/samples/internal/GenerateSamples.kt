@@ -1,5 +1,6 @@
 package net.rubygrapefruit.plugins.samples.internal
 
+import net.rubygrapefruit.plugins.app.Versions
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
@@ -34,6 +35,34 @@ abstract class GenerateSamples : DefaultTask() {
                 sampleDestDir.resolve("settings.gradle.kts").writeText("")
 
                 file.copyRecursively(sampleDestDir)
+
+                val buildScript = sampleDestDir.resolve("build.gradle.kts")
+                val text = buildScript.readText()
+                var updatedText = text.replace("samples.multiplatform()", """kotlin("multiplatform").version("${Versions.kotlin.version}")""")
+
+                val multiplatform = updatedText != text
+                if (multiplatform) {
+                    updatedText = updatedText.replace(
+                        "kotlin {", """
+                        repositories {
+                            mavenCentral()
+                        }
+
+                        kotlin {
+                            targets {
+                                jvm()
+                                macosArm64 {
+                                    binaries {
+                                        executable()
+                                    }
+                                }
+                            }
+                    """.trimIndent()
+                    )
+                }
+
+                buildScript.writeText(updatedText)
+
                 samples.add(sampleDestDir)
             }
         }

@@ -23,18 +23,15 @@ open class ReleasePlugin : Plugin<Project> {
 
             val model = extensions.getByType(ComponentDetails::class.java)
 
-            val effectiveVersion = model.nextVersion.map<VersionNumber> { v: String ->
-                // Use a system property, because it is not possible to calculate the version based on the presence of the `release` task in the graph when this project
-                // is also used by a plugin (the jar for the JVM target is built at configuration time, when the `release` task is not scheduled)
-                val version = VersionNumber.of(v)
-                val releaseType = System.getProperty("release.type")
-                when (releaseType) {
-                    "final" -> version.final()
-                    null -> version.milestone()
-                    else -> throw IllegalArgumentException("Unknown release type: '$releaseType'")
-                }
+            // Use a system property, because it is not possible to calculate the version based on the presence of the `release` task in the graph when this project
+            // is also used by a plugin (the jar for the JVM target is built at configuration time, when the `release` task is not scheduled)
+            val releaseType = System.getProperty("release.type")
+            when (releaseType) {
+                "final" -> model.targetVersion.set(model.nextVersion.map { v -> VersionNumber.of(v).final() })
+                null -> {} // ignore
+                else -> throw IllegalArgumentException("Unknown release type: '$releaseType'")
             }
-            model.targetVersion.set(effectiveVersion)
+            val effectiveVersion = model.targetVersion
 
             val releaseDir = layout.buildDirectory.dir("release")
 

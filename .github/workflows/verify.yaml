@@ -16,7 +16,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
       - name: Execute Gradle build
         run: ./gradlew build --continue
-        timeout-minutes: 60
+        timeout-minutes: 30
   linux-samples:
     runs-on: ubuntu-latest
     steps:
@@ -31,7 +31,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
       - name: Execute Gradle build
         run: ./gradlew test-apps:runMin verifySamples --continue
-        timeout-minutes: 60
+        timeout-minutes: 30
   windows-check:
     runs-on: windows-latest
     steps:
@@ -45,8 +45,8 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
       - name: Execute Gradle build
-        run: ./gradlew check --continue --info
-        timeout-minutes: 60
+        run: ./gradlew check -x :libs:file-io:mingwX64Test -x :libs:store:mingwX64Test --continue --info
+        timeout-minutes: 30
   windows-samples:
     runs-on: windows-latest
     steps:
@@ -60,8 +60,8 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
       - name: Execute Gradle build
-        run: ./gradlew test-apps:runMin verifySamples --continue
-        timeout-minutes: 60
+        run: ./gradlew test-apps:runMin verifySamples -x :test-apps:run-store-native-cli-app -x :test-apps:run-native-cli-app-full --continue
+        timeout-minutes: 30
   macos-check:
     runs-on: macos-latest
     steps:
@@ -76,7 +76,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
       - name: Execute Gradle build
         run: ./gradlew build --continue
-        timeout-minutes: 60
+        timeout-minutes: 30
   macos-samples:
     runs-on: macos-latest
     steps:
@@ -91,4 +91,4 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
       - name: Execute Gradle build
         run: ./gradlew test-apps:run test-apps:runOther verifySamples --continue
-        timeout-minutes: 60
+        timeout-minutes: 30

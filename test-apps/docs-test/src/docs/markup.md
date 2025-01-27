@@ -12,4 +12,6 @@ list:
 * [[tutorial.md]]
 * [[markup.md]]
 
-variables: {{project.version}}
+variables:
+* {{project.version}}
+* {{project.coordinates}}

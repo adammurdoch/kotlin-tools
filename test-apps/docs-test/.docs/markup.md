@@ -17,4 +17,7 @@ list:
 * [Tutorial](tutorial.md)
 * [markup.md](markup.md)
 
-variables: 1.2
+variables:
+
+* 1\.2
+* test-apps:docs-test:1.2

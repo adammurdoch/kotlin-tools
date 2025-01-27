@@ -34,7 +34,7 @@ To use, declare a dependency on cli-app:
 
 ```
 dependencies {
-    implementation("net.rubygrapefruit:cli-app:0.0.1")
+    implementation("{{project.coordinates}}")
 }
 ```
 

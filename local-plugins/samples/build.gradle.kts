@@ -17,4 +17,5 @@ gradlePlugin {
 
 dependencies {
     implementation(gradleTestKit())
+    implementation(project(":model"))
 }

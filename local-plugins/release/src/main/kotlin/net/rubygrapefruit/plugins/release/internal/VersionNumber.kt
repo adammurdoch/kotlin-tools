@@ -31,11 +31,19 @@ internal class VersionNumber private constructor(private val components: List<In
 
     fun final() = VersionNumber(components, null)
 
-    fun next(): VersionNumber {
+    fun nextMilestone(): VersionNumber {
         return if (qualifier == null) {
             VersionNumber(components.dropLast(1) + (components.last() + 1), Qualifier("milestone", 1))
         } else {
             VersionNumber(components, Qualifier("milestone", qualifier.number + 1))
+        }
+    }
+
+    fun released(): VersionNumber {
+        return if (qualifier == null) {
+            this
+        } else {
+            VersionNumber(components.dropLast(1) + (components.last() - 1), null)
         }
     }
 

@@ -4,13 +4,14 @@ import net.rubygrapefruit.plugins.app.Versions
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.*
 import java.io.File
 
 abstract class GenerateSamples : DefaultTask() {
+    @get:Input
+    abstract val coordinates: Property<String>
+
     @get:InputFiles
     abstract val sourceDirectory: DirectoryProperty
 
@@ -60,6 +61,7 @@ abstract class GenerateSamples : DefaultTask() {
                     """.trimIndent()
                     )
                 }
+                updatedText = updatedText.replace("samples.coordinates()", """"${coordinates.get()}"""")
 
                 buildScript.writeText(updatedText)
 

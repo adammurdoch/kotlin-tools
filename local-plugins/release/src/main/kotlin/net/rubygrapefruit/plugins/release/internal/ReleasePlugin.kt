@@ -1,5 +1,8 @@
 package net.rubygrapefruit.plugins.release.internal
 
+import net.rubygrapefruit.plugins.lifecycle.ComponentDetails
+import net.rubygrapefruit.plugins.lifecycle.Coordinates
+import net.rubygrapefruit.plugins.lifecycle.internal.LifecyclePlugin
 import net.rubygrapefruit.plugins.release.ReleaseExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -17,6 +20,7 @@ open class ReleasePlugin : Plugin<Project> {
         target.run {
             target.plugins.apply("maven-publish")
             target.plugins.apply("signing")
+            target.plugins.apply(LifecyclePlugin::class.java)
 
             val model = extensions.create("release", ReleaseExtension::class.java)
             model.nextVersion.convention("0.0.1-milestone-1")
@@ -35,8 +39,10 @@ open class ReleasePlugin : Plugin<Project> {
 
             version = ProjectVersion(effectiveVersion)
 
+            val componentModel = extensions.getByType(ComponentDetails::class.java)
+            componentModel.releaseCoordinates.set(effectiveVersion.map { Coordinates(group.toString(), name, it.released().toString()) })
+
             val releaseDir = layout.buildDirectory.dir("release")
-            val zipDir = releaseDir.map { it.dir("zips") }
 
             // Maven repo does not use a lazy property, so use an eager values here
             val repoDir = releaseDir.map { it.dir("repo") }.get()
@@ -121,7 +127,7 @@ open class ReleasePlugin : Plugin<Project> {
                         t.userName.set(mavenCentralUsername)
                         t.token.set(mavenCentralToken)
                         t.repoDirectory.set(repoDir)
-                        t.tempDirectory.set(zipDir)
+                        t.tempDirectory.set(releaseDir.map { it.dir("upload") })
                     }
                 }
                 uploadTask.configure { t ->
@@ -152,7 +158,7 @@ open class ReleasePlugin : Plugin<Project> {
 
             val updateVersion = tasks.register("updateVersion", UpdateVersion::class.java) { t ->
                 t.mustRunAfter(tag)
-                t.nextVersion.set(effectiveVersion.map { it.next() })
+                t.nextVersion.set(effectiveVersion.map { it.nextMilestone() })
                 t.buildFile.set(buildFile)
             }
 

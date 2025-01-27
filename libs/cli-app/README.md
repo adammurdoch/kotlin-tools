@@ -29,7 +29,7 @@ An application is similar to a function: it takes some parameters as input and d
 The cli-app library supports two types of parameters:
 
 - *Positional parameters*, which are those identified by their position on the command-line. For example, `cp src dest` takes two positional parameters with values `src` and `dest` respectively.
-- *Named parameters*, which are those identified by a name with some special prefix. For example, `java -classpath some.jar my.Class` takes a named parameter called `classpath` with value `some.jar`. It also takes a positional parameter with value `my.Class`. 
+- *Named parameters*, which are those identified by a name with some special prefix. For example, `java -classpath some.jar my.Class` takes a named parameter called `classpath` with value `some.jar`. It also takes a positional parameter with value `my.Class`.
 
 Each parameter takes a value. The cli-app library supports parameter values of various types, such as `String`, `Boolean` or `Int`. It also supports actions, or "sub-commands" as a value. For example, `git commit -m "bug fixes"` takes a `commit` action with a named parameter. An action can have its own parameters, including actions.
 
@@ -76,7 +76,7 @@ class MyApp: CliApp("myapp") {
 }
 ```
 
-You pass the parameter value to the application by adding the value on the command-line: 
+You pass the parameter value to the application by adding the value on the command-line:
 
 ```
 > myapp world

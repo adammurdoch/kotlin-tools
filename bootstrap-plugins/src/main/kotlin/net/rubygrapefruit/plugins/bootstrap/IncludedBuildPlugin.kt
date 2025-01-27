@@ -11,7 +11,6 @@ class IncludedBuildPlugin : Plugin<Settings> {
             gradle.rootProject { project ->
                 project.run {
                     plugins.apply("lifecycle-base")
-                    val includedBuilds = target.gradle.includedBuilds
                     tasks.named("clean") {
                         it.dependsOnChildren("clean", target, project)
                     }
@@ -26,6 +25,15 @@ class IncludedBuildPlugin : Plugin<Settings> {
                     }
                     tasks.register("release") {
                         it.dependsOnChildren("release", target, project)
+                    }
+                    tasks.register("docs") {
+                        it.dependsOnChildren("docs", target, project)
+                    }
+                    tasks.register("samples") {
+                        it.dependsOnChildren("samples", target, project)
+                    }
+                    tasks.register("verifySamples") {
+                        it.dependsOnChildren("verifySamples", target, project)
                     }
                 }
             }

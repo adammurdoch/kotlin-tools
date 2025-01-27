@@ -7,4 +7,4 @@ Try the [[tutorial.md]] or see the [[reference.md]] for details.
 
 ## Usage
 
-The latest version is {{project.version}}.
+The latest version is {{component.version}}.

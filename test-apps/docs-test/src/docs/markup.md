@@ -13,5 +13,5 @@ list:
 * [[markup.md]]
 
 variables:
-* {{project.version}}
-* {{project.coordinates}}
+* {{component.version}}
+* {{component.coordinates}}

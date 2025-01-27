@@ -1,6 +1,6 @@
-package net.rubygrapefruit.plugins.release.internal
+package net.rubygrapefruit.plugins.lifecycle.internal
 
-import net.rubygrapefruit.plugins.lifecycle.internal.VersionNumber
+import net.rubygrapefruit.plugins.lifecycle.VersionNumber
 import org.gradle.api.provider.Provider
 
 internal class ProjectVersion(val version: Provider<VersionNumber>) {

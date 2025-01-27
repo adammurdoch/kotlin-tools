@@ -11,14 +11,14 @@ abstract class SamplesPlugin : Plugin<Project> {
         target.run {
             plugins.apply(ComponentLifecyclePlugin::class.java)
 
-            val componentModel = extensions.getByType(ComponentDetails::class.java)
+            val component = extensions.getByType(ComponentDetails::class.java)
 
             val model = extensions.create("samples", SamplesExtension::class.java)
             model.samplesDirectory.convention(layout.projectDirectory.dir("src/samples"))
 
             val samples = tasks.register("samples", GenerateSamples::class.java) { t ->
                 t.sourceDirectory.set(model.samplesDirectory)
-                t.coordinates.set(componentModel.releaseCoordinates.map { it.formatted })
+                t.coordinates.set(component.releaseCoordinates.map { it.formatted })
                 t.outputDirectory.set(layout.buildDirectory.dir("samples"))
                 t.manifest.set(layout.buildDirectory.file("samples-manifest.txt"))
             }

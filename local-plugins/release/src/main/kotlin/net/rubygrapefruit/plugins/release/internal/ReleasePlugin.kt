@@ -1,9 +1,8 @@
 package net.rubygrapefruit.plugins.release.internal
 
 import net.rubygrapefruit.plugins.lifecycle.ComponentDetails
-import net.rubygrapefruit.plugins.lifecycle.Coordinates
+import net.rubygrapefruit.plugins.lifecycle.VersionNumber
 import net.rubygrapefruit.plugins.lifecycle.internal.ComponentLifecyclePlugin
-import net.rubygrapefruit.plugins.lifecycle.internal.VersionNumber
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
@@ -23,7 +22,6 @@ open class ReleasePlugin : Plugin<Project> {
             target.plugins.apply(ComponentLifecyclePlugin::class.java)
 
             val model = extensions.getByType(ComponentDetails::class.java)
-            model.nextVersion.convention("0.0.1-milestone-1")
 
             val effectiveVersion = model.nextVersion.map<VersionNumber> { v: String ->
                 // Use a system property, because it is not possible to calculate the version based on the presence of the `release` task in the graph when this project
@@ -36,10 +34,7 @@ open class ReleasePlugin : Plugin<Project> {
                     else -> throw IllegalArgumentException("Unknown release type: '$releaseType'")
                 }
             }
-
-            version = ProjectVersion(effectiveVersion)
-
-            model.releaseCoordinates.set(effectiveVersion.map { Coordinates(group.toString(), name, it.released().toString()) })
+            model.targetVersion.set(effectiveVersion)
 
             val releaseDir = layout.buildDirectory.dir("release")
 

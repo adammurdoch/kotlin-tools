@@ -1,4 +1,4 @@
-package net.rubygrapefruit.plugins.lifecycle.internal
+package net.rubygrapefruit.plugins.lifecycle
 
 class VersionNumber private constructor(private val components: List<Int>, private val qualifier: Qualifier?) {
     companion object {

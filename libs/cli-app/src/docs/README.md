@@ -34,7 +34,7 @@ To use, declare a dependency on cli-app:
 
 ```
 dependencies {
-    implementation("{{project.coordinates}}")
+    implementation("{{component.coordinates}}")
 }
 ```
 

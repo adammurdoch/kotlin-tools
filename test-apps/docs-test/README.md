@@ -11,4 +11,4 @@ Try the [Tutorial](.docs/tutorial.md) or see the [Reference](.docs/reference.md)
 
 ## Usage
 
-The latest version is 1.2.
+The latest version is 0.0.0.

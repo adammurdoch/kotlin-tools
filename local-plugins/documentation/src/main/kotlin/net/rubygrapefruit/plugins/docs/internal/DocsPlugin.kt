@@ -10,12 +10,12 @@ open class DocsPlugin : Plugin<Project> {
         target.run {
             plugins.apply(ComponentLifecyclePlugin::class.java)
 
-            val componentModel = extensions.getByType(ComponentDetails::class.java)
+            val component = extensions.getByType(ComponentDetails::class.java)
 
             tasks.register("docs", GenerateDocs::class.java) { task ->
                 task.sourceFiles.from(project.layout.projectDirectory.dir("src/docs").asFileTree)
-                task.variables.put("project.version", componentModel.releaseCoordinates.map { it.version })
-                task.variables.put("project.coordinates", componentModel.releaseCoordinates.map { it.formatted })
+                task.variables.put("component.version", component.releaseCoordinates.map { it.version })
+                task.variables.put("component.coordinates", component.releaseCoordinates.map { it.formatted })
                 task.outputFile.set(project.layout.projectDirectory.file("README.md"))
                 task.outputDir.set(project.layout.projectDirectory.dir(".docs"))
             }

@@ -19,5 +19,5 @@ list:
 
 variables:
 
-* 1\.2
-* test-apps:docs-test:1.2
+* 0\.0.0
+* test-apps:docs-test:0.0.0

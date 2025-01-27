@@ -1,6 +1,6 @@
 package net.rubygrapefruit.plugins.release.internal
 
-import net.rubygrapefruit.plugins.lifecycle.internal.VersionNumber
+import net.rubygrapefruit.plugins.lifecycle.VersionNumber
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property

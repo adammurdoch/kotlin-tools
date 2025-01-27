@@ -12,7 +12,8 @@ abstract class ComponentLifecyclePlugin : Plugin<Project> {
             val model = extensions.create("component", ComponentDetails::class.java)
             model.nextVersion.convention("0.0.1-milestone-1")
             model.targetVersion.convention(model.nextVersion.map { v -> VersionNumber.of(v).milestone() })
-            model.releaseCoordinates.set(model.targetVersion.map { v -> Coordinates(group.toString(), name, v.released().toString()) })
+            model.targetCoordinates.set(model.targetVersion.map { v -> Coordinates(group.toString(), name, v.version) })
+            model.releaseCoordinates.set(model.targetVersion.map { v -> Coordinates(group.toString(), name, v.released().version) })
 
             version = ProjectVersion(model.targetVersion)
         }

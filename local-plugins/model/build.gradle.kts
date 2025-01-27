@@ -4,4 +4,6 @@ plugins {
     id("net.rubygrapefruit.bootstrap.gradle-plugin")
 }
 
-group = Versions.plugins.group
+dependencies {
+    testImplementation(Versions.test.coordinates)
+}

@@ -16,7 +16,12 @@ interface ComponentDetails {
     val targetVersion: Property<VersionNumber>
 
     /**
-     * The target release coordinates.
+     * The coordinates of the version being built.
+     */
+    val targetCoordinates: Property<Coordinates>
+
+    /**
+     * The coordinates of the most recent release.
      */
     val releaseCoordinates: Property<Coordinates>
 }

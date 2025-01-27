@@ -9,7 +9,7 @@ class VersionNumber private constructor(private val components: List<Int>, priva
                 throw IllegalArgumentException("Cannot parse version: '$value'")
             }
             val parts = match.groupValues[1].split('.').map { it.toInt() }
-            val qualifier = if (match.groupValues.size > 2) {
+            val qualifier = if (match.groupValues[3].isNotEmpty()) {
                 Qualifier(match.groupValues[4], match.groupValues[5].toInt())
             } else {
                 null
@@ -17,6 +17,16 @@ class VersionNumber private constructor(private val components: List<Int>, priva
             return VersionNumber(parts, qualifier)
         }
     }
+
+    val version: String
+        get() {
+            val str = components.joinToString(".")
+            return if (qualifier != null) {
+                "$str-${qualifier.name}-${qualifier.number}"
+            } else {
+                str
+            }
+        }
 
     val prerelease: Boolean get() = qualifier != null
 
@@ -42,18 +52,15 @@ class VersionNumber private constructor(private val components: List<Int>, priva
     fun released(): VersionNumber {
         return if (qualifier == null) {
             this
+        } else if (components.last() == 0) {
+            VersionNumber(components, null)
         } else {
             VersionNumber(components.dropLast(1) + (components.last() - 1), null)
         }
     }
 
     override fun toString(): String {
-        val str = components.joinToString(".")
-        return if (qualifier != null) {
-            "$str-${qualifier.name}-${qualifier.number}"
-        } else {
-            str
-        }
+        return version
     }
 
     private class Qualifier(val name: String, val number: Int)

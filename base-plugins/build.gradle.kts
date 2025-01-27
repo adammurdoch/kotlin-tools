@@ -5,8 +5,6 @@ plugins {
     kotlin("plugin.serialization")
 }
 
-group = Versions.plugins.group
-
 dependencies {
     implementation(Versions.libs.coordinates("basics"))
     implementation(Versions.libs.coordinates("bytecode"))

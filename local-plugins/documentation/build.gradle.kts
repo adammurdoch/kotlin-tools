@@ -4,8 +4,6 @@ plugins {
     id("net.rubygrapefruit.bootstrap.gradle-plugin")
 }
 
-group = Versions.plugins.group
-
 gradlePlugin {
     plugins {
         create("docs") {

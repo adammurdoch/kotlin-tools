@@ -23,7 +23,7 @@ internal abstract class UpdateVersion : DefaultTask() {
         val pattern = Regex("nextVersion\\s*=\\s*\"([^\"]+)\"")
         val match = pattern.find(text)
         val updatedText = if (match != null) {
-            text.replaceRange(match.groups[1]!!.range, nextVersion.get().toString())
+            text.replaceRange(match.groups[1]!!.range, nextVersion.get().version)
         } else {
             text + """
 

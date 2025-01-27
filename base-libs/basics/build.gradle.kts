@@ -4,7 +4,7 @@ plugins {
     id("net.rubygrapefruit.bootstrap.release")
 }
 
-release {
+component {
     description = "A collection of general purpose utilities for Kotlin multiplatform"
     nextVersion = "0.0.2-milestone-1"
 }

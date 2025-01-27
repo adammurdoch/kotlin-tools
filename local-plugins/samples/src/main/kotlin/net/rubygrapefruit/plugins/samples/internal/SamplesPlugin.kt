@@ -1,7 +1,7 @@
 package net.rubygrapefruit.plugins.samples.internal
 
 import net.rubygrapefruit.plugins.lifecycle.ComponentDetails
-import net.rubygrapefruit.plugins.lifecycle.internal.LifecyclePlugin
+import net.rubygrapefruit.plugins.lifecycle.internal.ComponentLifecyclePlugin
 import net.rubygrapefruit.plugins.samples.SamplesExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -9,7 +9,7 @@ import org.gradle.api.Project
 abstract class SamplesPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.run {
-            plugins.apply(LifecyclePlugin::class.java)
+            plugins.apply(ComponentLifecyclePlugin::class.java)
 
             val componentModel = extensions.getByType(ComponentDetails::class.java)
 

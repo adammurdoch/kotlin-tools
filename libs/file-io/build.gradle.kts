@@ -23,6 +23,6 @@ library {
     }
 }
 
-release {
+component {
     description = "A Kotlin multiplatform library for accessing the file system."
 }

@@ -1,14 +1,14 @@
 package net.rubygrapefruit.plugins.docs.internal
 
 import net.rubygrapefruit.plugins.lifecycle.ComponentDetails
-import net.rubygrapefruit.plugins.lifecycle.internal.LifecyclePlugin
+import net.rubygrapefruit.plugins.lifecycle.internal.ComponentLifecyclePlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 open class DocsPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.run {
-            plugins.apply(LifecyclePlugin::class.java)
+            plugins.apply(ComponentLifecyclePlugin::class.java)
 
             val componentModel = extensions.getByType(ComponentDetails::class.java)
 

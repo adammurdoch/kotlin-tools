@@ -1,6 +1,6 @@
-package net.rubygrapefruit.plugins.release.internal
+package net.rubygrapefruit.plugins.lifecycle.internal
 
-internal class VersionNumber private constructor(private val components: List<Int>, private val qualifier: Qualifier?) {
+class VersionNumber private constructor(private val components: List<Int>, private val qualifier: Qualifier?) {
     companion object {
         fun of(value: String): VersionNumber {
             val pattern = Regex("(\\d+(\\.\\d+)*)(-(\\w+)-(\\d+))?")

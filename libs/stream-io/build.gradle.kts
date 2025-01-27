@@ -22,7 +22,7 @@ library {
     }
 }
 
-release {
+component {
     description = "A Kotlin multiplatform library for binary and text IO."
     nextVersion = "0.0.2-milestone-1"
 }

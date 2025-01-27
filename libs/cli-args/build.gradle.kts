@@ -18,6 +18,6 @@ library {
     }
 }
 
-release {
+component {
     description = "A lightweight CLI argument parser for Kotlin multiplatform."
 }

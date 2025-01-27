@@ -24,6 +24,6 @@ library {
     }
 }
 
-release {
+component {
     description = "A small framework to help implement CLI applications using Kotlin multiplatform."
 }

@@ -33,7 +33,7 @@ abstract class SamplesPlugin : Plugin<Project> {
         dirName: String,
         model: SamplesExtension,
         builder: (GenerateSamples) -> Unit = {}
-    ): TaskProvider<VerifySamples?> {
+    ): TaskProvider<VerifySamples> {
         val samples = tasks.register(taskName, GenerateSamples::class.java) { t ->
             t.sourceDirectory.set(model.samplesDirectory)
             t.outputDirectory.set(layout.buildDirectory.dir(dirName))

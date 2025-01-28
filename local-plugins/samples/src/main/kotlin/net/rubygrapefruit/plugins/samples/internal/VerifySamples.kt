@@ -1,5 +1,6 @@
 package net.rubygrapefruit.plugins.samples.internal
 
+import kotlinx.serialization.json.Json
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputFile
@@ -13,11 +14,11 @@ abstract class VerifySamples : DefaultTask() {
 
     @TaskAction
     fun verify() {
-        val samples = manifest.get().asFile.readLines().map { File(it) }
+        val samples = Json.decodeFromString<List<SampleDetails>>(manifest.get().asFile.readText())
         for (sample in samples) {
-            println("Verifying '$sample'")
+            println("Verifying sample '${sample.name}'")
             GradleRunner.create()
-                .withProjectDir(sample)
+                .withProjectDir(File(sample.dir))
                 .withArguments("build")
                 .forwardOutput()
                 .build()

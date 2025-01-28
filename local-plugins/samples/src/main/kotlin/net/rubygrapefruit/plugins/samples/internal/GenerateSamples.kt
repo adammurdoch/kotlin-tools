@@ -1,5 +1,6 @@
 package net.rubygrapefruit.plugins.samples.internal
 
+import kotlinx.serialization.json.Json
 import net.rubygrapefruit.plugins.app.Versions
 import net.rubygrapefruit.plugins.lifecycle.Coordinates
 import org.gradle.api.DefaultTask
@@ -7,7 +8,6 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
-import java.io.File
 
 abstract class GenerateSamples : DefaultTask() {
     @get:Input
@@ -31,11 +31,12 @@ abstract class GenerateSamples : DefaultTask() {
         val outputDirectory = outputDirectory.get().asFile
         outputDirectory.deleteRecursively()
 
-        val samples = mutableListOf<File>()
+        val samples = mutableListOf<SampleDetails>()
 
         for (file in sourceDirectory.get().asFile.listFiles()) {
             if (file.isDirectory) {
-                println("Generating sample '${file.name}'")
+                val sampleName = file.name.toString()
+                println("Generating sample '$sampleName'")
                 val sampleDestDir = outputDirectory.resolve(file.name)
                 sampleDestDir.mkdirs()
                 sampleDestDir.resolve("settings.gradle.kts").writeText("")
@@ -48,7 +49,8 @@ abstract class GenerateSamples : DefaultTask() {
 
                 val localRepo = repositoryPath.orNull
                 if (localRepo != null) {
-                    updatedText = updatedText.replace("kotlin {", """
+                    updatedText = updatedText.replace(
+                        "kotlin {", """
                         repositories {
                             maven {
                                 url = file("$localRepo").toURI()
@@ -56,7 +58,8 @@ abstract class GenerateSamples : DefaultTask() {
                         }
                         
                         kotlin {
-                    """.trimIndent())
+                    """.trimIndent()
+                    )
                 }
 
                 val multiplatform = updatedText != text
@@ -83,10 +86,11 @@ abstract class GenerateSamples : DefaultTask() {
 
                 buildScript.writeText(updatedText)
 
-                samples.add(sampleDestDir)
+                val sample = SampleDetails(sampleDestDir.absolutePath, sampleName)
+                samples.add(sample)
             }
         }
 
-        manifest.get().asFile.writeText(samples.joinToString("\n"))
+        manifest.get().asFile.writeText(Json.encodeToString(samples))
     }
 }

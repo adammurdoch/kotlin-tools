@@ -1,6 +1,7 @@
 package net.rubygrapefruit.plugins.samples.internal
 
 import net.rubygrapefruit.plugins.app.Versions
+import net.rubygrapefruit.plugins.lifecycle.Coordinates
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
@@ -10,7 +11,11 @@ import java.io.File
 
 abstract class GenerateSamples : DefaultTask() {
     @get:Input
-    abstract val coordinates: Property<String>
+    abstract val coordinates: Property<Coordinates>
+
+    @get:Input
+    @get:Optional
+    abstract val repositoryPath: Property<String>
 
     @get:InputFiles
     abstract val sourceDirectory: DirectoryProperty
@@ -41,6 +46,19 @@ abstract class GenerateSamples : DefaultTask() {
                 val text = buildScript.readText()
                 var updatedText = text.replace("samples.multiplatform()", """kotlin("multiplatform").version("${Versions.kotlin.version}")""")
 
+                val localRepo = repositoryPath.orNull
+                if (localRepo != null) {
+                    updatedText = updatedText.replace("kotlin {", """
+                        repositories {
+                            maven {
+                                url = file("$localRepo").toURI()
+                            }
+                        }
+                        
+                        kotlin {
+                    """.trimIndent())
+                }
+
                 val multiplatform = updatedText != text
                 if (multiplatform) {
                     updatedText = updatedText.replace(
@@ -61,7 +79,7 @@ abstract class GenerateSamples : DefaultTask() {
                     """.trimIndent()
                     )
                 }
-                updatedText = updatedText.replace("samples.coordinates()", """"${coordinates.get()}"""")
+                updatedText = updatedText.replace("samples.coordinates()", """"${coordinates.get().formatted}"""")
 
                 buildScript.writeText(updatedText)
 

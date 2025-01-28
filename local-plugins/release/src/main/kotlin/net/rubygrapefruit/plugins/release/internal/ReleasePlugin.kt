@@ -109,6 +109,10 @@ open class ReleasePlugin : Plugin<Project> {
             val uploadTask = tasks.register("upload")
 
             afterEvaluate {
+                val publishTasks = publications.map { p -> "publish${p.name.capitalized()}PublicationToMavenRepository" }
+                model.repository.builtBy(publishTasks)
+                model.repository.from(repoDir)
+
                 val uploadTasks = publications.map { p ->
                     tasks.register("upload${p.name.capitalized()}", UploadToMavenCentral::class.java) { t ->
                         t.dependsOn("publish${p.name.capitalized()}PublicationToMavenRepository")

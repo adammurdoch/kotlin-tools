@@ -4,6 +4,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.initialization.Settings
+import org.gradle.api.tasks.TaskContainer
 
 class IncludedBuildPlugin : Plugin<Settings> {
     override fun apply(target: Settings) {
@@ -20,23 +21,20 @@ class IncludedBuildPlugin : Plugin<Settings> {
                     tasks.named("assemble") {
                         it.dependsOnChildren("assemble", target, project)
                     }
-                    tasks.register("dist") {
-                        it.dependsOnChildren("dist", target, project)
-                    }
-                    tasks.register("release") {
-                        it.dependsOnChildren("release", target, project)
-                    }
-                    tasks.register("docs") {
-                        it.dependsOnChildren("docs", target, project)
-                    }
-                    tasks.register("samples") {
-                        it.dependsOnChildren("samples", target, project)
-                    }
-                    tasks.register("verifySamples") {
-                        it.dependsOnChildren("verifySamples", target, project)
-                    }
+                    tasks.lifecycle("dist", target, project)
+                    tasks.lifecycle("release", target, project)
+                    tasks.lifecycle("docs", target, project)
+                    tasks.lifecycle("samples", target, project)
+                    tasks.lifecycle("verifySamples", target, project)
+                    tasks.lifecycle("localSamples", target, project)
                 }
             }
+        }
+    }
+
+    private fun TaskContainer.lifecycle(name: String, target: Settings, project: Project) {
+        register(name) {
+            it.dependsOnChildren(name, target, project)
         }
     }
 

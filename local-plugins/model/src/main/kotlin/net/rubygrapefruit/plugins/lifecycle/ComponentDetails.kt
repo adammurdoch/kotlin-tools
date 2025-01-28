@@ -1,5 +1,6 @@
 package net.rubygrapefruit.plugins.lifecycle
 
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.provider.Property
 
 interface ComponentDetails {
@@ -24,4 +25,6 @@ interface ComponentDetails {
      * The coordinates of the most recent release.
      */
     val releaseCoordinates: Property<Coordinates>
+
+    val repository: ConfigurableFileCollection
 }

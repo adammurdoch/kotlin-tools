@@ -1,3 +1,4 @@
+- Handle app fails with exception with no message
 - List option:
   - Require 1 or more
 - Consistent error message for missing parameter and missing required list parameter

@@ -20,10 +20,12 @@ abstract class SamplesPlugin : Plugin<Project> {
             samplesVariant("samples", "samples", model) { t ->
                 t.coordinates.set(component.releaseCoordinates)
             }
-            samplesVariant("localSamples", "local-samples", model) { t ->
+            val verify = samplesVariant("localSamples", "local-samples", model) { t ->
                 t.coordinates.set(component.targetCoordinates)
-                t.dependsOn(component.repository)
                 t.repositoryPath.set(component.repository.elements.map { it.first().asFile.absolutePath })
+            }
+            verify.configure { t ->
+                t.dependsOn(component.repository)
             }
         }
     }

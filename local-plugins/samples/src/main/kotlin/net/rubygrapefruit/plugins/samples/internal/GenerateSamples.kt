@@ -91,6 +91,9 @@ abstract class GenerateSamples : DefaultTask() {
             }
         }
 
-        manifest.get().asFile.writeText(Json.encodeToString(samples))
+        val json = Json {
+            prettyPrint = true
+        }
+        manifest.get().asFile.writeText(json.encodeToString(samples))
     }
 }

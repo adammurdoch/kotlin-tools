@@ -18,6 +18,9 @@ abstract class ComponentCoordinates : DefaultTask() {
 
     @TaskAction
     fun generate() {
-        outputFile.get().asFile.writeText(Json.encodeToString(coordinates.get()))
+        val json = Json {
+            prettyPrint = true
+        }
+        outputFile.get().asFile.writeText(json.encodeToString(coordinates.get()))
     }
 }

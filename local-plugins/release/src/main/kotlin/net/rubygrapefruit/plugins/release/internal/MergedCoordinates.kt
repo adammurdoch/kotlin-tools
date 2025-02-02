@@ -18,10 +18,13 @@ abstract class MergedCoordinates : DefaultTask() {
 
     @TaskAction
     fun generate() {
+        val json = Json {
+            prettyPrint = true
+        }
         val coordinates = inputFiles.files.map { file ->
-            Json.decodeFromString<Coordinates>(file.readText())
+            json.decodeFromString<Coordinates>(file.readText())
         }
         println("Coordinates: $coordinates")
-        outputFile.get().asFile.writeText(Json.encodeToString(coordinates))
+        outputFile.get().asFile.writeText(json.encodeToString(coordinates))
     }
 }

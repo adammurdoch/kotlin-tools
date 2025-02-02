@@ -5,12 +5,14 @@ import net.rubygrapefruit.plugins.lifecycle.VersionNumber
 import net.rubygrapefruit.plugins.lifecycle.internal.ComponentLifecyclePlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.attributes.Usage
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 import org.gradle.internal.extensions.stdlib.capitalized
 import org.gradle.jvm.tasks.Jar
 import org.gradle.plugins.signing.SigningExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import java.nio.file.Path
 import kotlin.io.path.isDirectory
 
@@ -69,10 +71,40 @@ open class ReleasePlugin : Plugin<Project> {
                 }
             }
 
+            val coordinates = tasks.register("outgoingCoordinates", ComponentCoordinates::class.java) { t ->
+                t.coordinates.set(model.targetCoordinates)
+                t.outputFile.set(layout.buildDirectory.file("component-coordinates.json"))
+            }
+            configurations.consumable("outgoingCoordinates") { c ->
+                c.attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, "coordinates"))
+                c.outgoing.artifact(coordinates)
+            }
+            val incoming = configurations.create("incomingCoordinates") { c ->
+                c.isCanBeConsumed = false
+                c.attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, "coordinates"))
+            }
+            tasks.register("incomingCoordinates", MergedCoordinates::class.java) { t ->
+                val view = incoming.incoming.artifactView { v ->
+                    v.lenient(true)
+                }.files
+                t.inputFiles.from(view)
+                t.outputFile.set(layout.buildDirectory.file("incoming-coordinates.json"))
+            }
+            afterEvaluate {
+                val kotlinModel = extensions.getByType(KotlinMultiplatformExtension::class.java)
+                for (target in kotlinModel.targets) {
+                    val superConfig = configurations.findByName(target.runtimeElementsConfigurationName)
+                    if (superConfig != null) {
+                        incoming.extendsFrom(superConfig)
+                    }
+                }
+            }
+
             tasks.withType(PublishToMavenRepository::class.java).configureEach { t ->
                 t.mustRunAfter(preTask)
             }
 
+            // Need a Javadoc jar for the JVM target
             val javadocJar = tasks.register("javadocJar", Jar::class.java) { t ->
                 t.archiveClassifier.set("javadoc")
             }

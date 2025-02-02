@@ -2,11 +2,12 @@ package net.rubygrapefruit.plugins.lifecycle
 
 import java.io.Serializable
 
-class Coordinates(
+@kotlinx.serialization.Serializable
+data class Coordinates(
     val groupId: String,
     val artifactId: String,
     val version: String
-): Serializable {
+) : Serializable {
     val formatted: String
         get() = "$groupId:$artifactId:$version"
 }

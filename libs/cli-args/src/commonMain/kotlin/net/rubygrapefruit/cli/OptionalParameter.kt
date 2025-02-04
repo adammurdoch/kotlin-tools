@@ -22,6 +22,6 @@ internal class OptionalParameter<T : Any>(
     }
 
     override fun start(context: ParseContext): ParseState {
-        return OptionalParameterParseState(this, context, host, converter, default)
+        return ParameterParseState(this, context, host, false, default, converter)
     }
 }

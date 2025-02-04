@@ -31,6 +31,6 @@ internal class DefaultParameter<T : Any>(
     }
 
     override fun start(context: ParseContext): ParseState {
-        return ParameterParseState(this, context, host, converter)
+        return ParameterParseState(this, context, host, true, null, converter)
     }
 }

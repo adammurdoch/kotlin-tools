@@ -21,6 +21,6 @@ internal class NullableParameter<T : Any>(
     }
 
     override fun start(context: ParseContext): ParseState {
-        return OptionalParameterParseState(this, context, host, converter, null)
+        return ParameterParseState(this, context, host, false, null, converter)
     }
 }

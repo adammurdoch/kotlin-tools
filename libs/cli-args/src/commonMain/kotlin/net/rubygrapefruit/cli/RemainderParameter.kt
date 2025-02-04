@@ -3,7 +3,7 @@ package net.rubygrapefruit.cli
 import kotlin.reflect.KProperty
 
 internal class RemainderParameter(
-    private val name: String,
+    val name: String,
     private val help: String?,
     private val required: Boolean,
     private val owner: Action
@@ -41,5 +41,14 @@ internal class RemainderParameter(
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): List<String> {
         return values
+    }
+
+    fun values(values: List<String>) {
+        this.values.clear()
+        this.values.addAll(values)
+    }
+
+    fun start(): ParseState {
+        return RemainderParseState(this, required)
     }
 }

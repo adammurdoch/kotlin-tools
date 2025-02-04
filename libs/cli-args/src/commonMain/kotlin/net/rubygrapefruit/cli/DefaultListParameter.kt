@@ -3,7 +3,7 @@ package net.rubygrapefruit.cli
 import kotlin.reflect.KProperty
 
 internal class DefaultListParameter<T : Any>(
-    private val name: String,
+    val name: String,
     private val help: String?,
     private val host: Host,
     private val owner: Action,
@@ -62,5 +62,14 @@ internal class DefaultListParameter<T : Any>(
         } else {
             FinishResult.Success
         }
+    }
+
+    fun start(): ParseState {
+        return ListParameterParseState(this, default, required, host, converter)
+    }
+
+    fun values(values: List<T>) {
+        this.values.clear()
+        this.values.addAll(values)
     }
 }

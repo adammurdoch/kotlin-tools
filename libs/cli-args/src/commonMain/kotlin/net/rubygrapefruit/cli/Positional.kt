@@ -1,6 +1,6 @@
 package net.rubygrapefruit.cli
 
-internal interface Positional: HasPositionalUsage {
+internal interface Positional : HasPositionalUsage {
     fun usage(name: String): ActionUsage?
 
     /**

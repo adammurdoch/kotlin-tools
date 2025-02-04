@@ -1,14 +1,15 @@
 package net.rubygrapefruit.cli
 
 internal abstract class AbstractParameter<T : Any>(
-    protected val name: String,
+    val name: String,
     protected val help: String?,
     private val canBeMissing: Boolean,
     protected val host: Host,
-    private val converter: StringConverter<T>
+    protected val converter: StringConverter<T>
 ) : Positional {
     private var set = false
     protected var value: T? = null
+        private set
 
     protected open val usage
         get() = "<$name>"
@@ -42,5 +43,10 @@ internal abstract class AbstractParameter<T : Any>(
 
     override fun canAcceptMore(): Boolean {
         return !set
+    }
+
+    fun value(value: T?) {
+        set = true
+        this.value = value
     }
 }

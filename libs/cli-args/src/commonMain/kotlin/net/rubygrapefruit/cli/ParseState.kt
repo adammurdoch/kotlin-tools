@@ -42,5 +42,6 @@ internal interface ParseState {
     sealed interface FinishResult
 
     data class FinishSuccess(val apply: () -> Unit) : FinishResult
-    data class FinishFailure(val message: String) : FinishResult
+
+    data class FinishFailure(val message: String, val resolution: String? = null, val positional: List<PositionalUsage> = emptyList()) : FinishResult
 }

@@ -104,7 +104,6 @@ open class Action {
         builder(actions)
         val parameter = DefaultActionParameter(actions.build(), DefaultHost)
         positional.add(parameter)
-        options.add(parameter.option)
         recoverables.addAll(parameter.recoverables)
         return parameter
     }

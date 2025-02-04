@@ -4,7 +4,8 @@ internal open class OptionParseState<T : Any>(
     protected val target: AbstractOption<T>,
     private val matcher: OptionMatcher<T>
 ) : ParseState {
-    private var value: T? = null
+    protected var value: T? = null
+        private set
 
     override fun parseNextValue(args: List<String>): ParseState.Result {
         val result = matcher.match(args)

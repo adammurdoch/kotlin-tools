@@ -22,4 +22,8 @@ internal class DefaultNullableOption<T : Any>(
     override fun getValue(thisRef: Any?, property: KProperty<*>): T? {
         return value
     }
+
+    fun start(context: ParseContext): ParseState {
+        return OptionalOptionParseState(this, matcher, null)
+    }
 }

@@ -18,4 +18,8 @@ internal class RequiredOption<T : Any>(
             FinishResult.Success
         }
     }
+
+    fun start(context: ParseContext): ParseState {
+        return OptionParseState(this, matcher)
+    }
 }

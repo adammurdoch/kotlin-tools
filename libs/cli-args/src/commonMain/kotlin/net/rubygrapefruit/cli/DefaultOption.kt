@@ -9,4 +9,8 @@ internal class DefaultOption<T : Any>(
     override fun getValue(thisRef: Any?, property: KProperty<*>): T {
         return value ?: default
     }
+
+    fun start(context: ParseContext): ParseState {
+        return OptionalOptionParseState(this, matcher, default)
+    }
 }

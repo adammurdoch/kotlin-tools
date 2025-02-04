@@ -4,11 +4,11 @@ internal class OneOfParseState(initialStates: List<ParseState>) : ParseState {
     private val states = initialStates.toMutableList()
     private val results = mutableListOf<() -> Unit>()
 
-    override fun parseNextValue(args: List<String>, context: ParseContext): ParseState.Result {
+    override fun parseNextValue(args: List<String>): ParseState.Result {
         var index = 0
         while (index < states.size) {
             val state = states[index]
-            val result = state.parseNextValue(args, context)
+            val result = state.parseNextValue(args)
             when (result) {
                 is ParseState.Success -> {
                     results.add(result.apply)
@@ -32,10 +32,10 @@ internal class OneOfParseState(initialStates: List<ParseState>) : ParseState {
         return ParseState.Nothing
     }
 
-    override fun endOfInput(context: ParseContext): ParseState.FinishResult {
+    override fun endOfInput(): ParseState.FinishResult {
         while (states.isNotEmpty()) {
             val state = states.removeFirst()
-            val result = state.endOfInput(context)
+            val result = state.endOfInput()
             when (result) {
                 is ParseState.FinishSuccess -> results.add(result.apply)
                 is ParseState.FinishFailure -> return result

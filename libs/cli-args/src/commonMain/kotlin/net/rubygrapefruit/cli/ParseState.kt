@@ -7,12 +7,12 @@ internal interface ParseState {
     /**
      * Attempts to parse the next value from the given inputs.
      */
-    fun parseNextValue(args: List<String>, context: ParseContext): Result
+    fun parseNextValue(args: List<String>): Result
 
     /**
      * Attempts to parse the end of the input.
      */
-    fun endOfInput(context: ParseContext): FinishResult
+    fun endOfInput(): FinishResult
 
     sealed interface Result
 
@@ -37,11 +37,22 @@ internal interface ParseState {
      * Recognized a value but has failed and will not match any more inputs.
      * The state should be discarded.
      */
-    data class Failure(val recognized: Int, val message: String) : Result
+    data class Failure(
+        val recognized: Int,
+        val message: String,
+        val resolution: String? = null,
+        val positional: List<PositionalUsage> = emptyList(),
+        val actions: List<NamedNestedActionUsage> = emptyList()
+    ) : Result
 
     sealed interface FinishResult
 
     data class FinishSuccess(val apply: () -> Unit) : FinishResult
 
-    data class FinishFailure(val message: String, val resolution: String? = null, val positional: List<PositionalUsage> = emptyList()) : FinishResult
+    data class FinishFailure(
+        val message: String,
+        val resolution: String? = null,
+        val positional: List<PositionalUsage> = emptyList(),
+        val actions: List<NamedNestedActionUsage> = emptyList()
+    ) : FinishResult
 }

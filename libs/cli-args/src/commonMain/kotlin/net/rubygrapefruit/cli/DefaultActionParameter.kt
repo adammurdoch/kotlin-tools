@@ -9,7 +9,7 @@ internal class DefaultActionParameter<T : Action>(
     private var actionName: String? = null
     private var selected: T? = null
 
-    protected val actionInfo
+    val actionInfo
         get() = actions.named.map { NamedNestedActionUsage(it.key, it.value.help, it.value.value.usage()) }
 
     val recoverables: List<Recoverable> = actions.options.mapNotNull { if (it.value.allowAnywhere) AllowAnywhereOption(it.key, it.value) else null }
@@ -63,10 +63,10 @@ internal class DefaultActionParameter<T : Action>(
             return actions.default.value.maybeParse(args, nestedContext)
         }
 
-        if (host.isOption(name)) {
-            return ParseResult.Nothing
+        return if (host.isOption(name)) {
+            ParseResult.Nothing
         } else {
-            return ParseResult.Failure(1, PositionalParseException("Unknown action: $name", positional = context.positional, actions = actionInfo))
+            ParseResult.Failure(1, PositionalParseException("Unknown action: $name", positional = context.positional, actions = actionInfo))
         }
     }
 
@@ -121,7 +121,11 @@ internal class DefaultActionParameter<T : Action>(
         }
     }
 
-    private class NameUsage(val name: String) : HasPositionalUsage {
+    fun start(context: ParseContext): ParseState {
+        return ActionParameterParseState(this, context, actions, host)
+    }
+
+    class NameUsage(val name: String) : HasPositionalUsage {
         override fun usage(): PositionalUsage {
             return LiteralUsage(name, null)
         }

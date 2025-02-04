@@ -24,7 +24,7 @@ internal class NullableParameter<T : Any>(
         return FinishResult.Success
     }
 
-    fun start(): ParseState {
-        return OptionalParameterParseState(this, host, converter, null)
+    fun start(context: ParseContext): ParseState {
+        return OptionalParameterParseState(this, context, host, converter, null)
     }
 }

@@ -2,10 +2,11 @@ package net.rubygrapefruit.cli
 
 internal open class ParameterParseState<T : Any>(
     protected val target: AbstractParameter<T>,
+    private val context: ParseContext,
     private val host: Host,
     private val converter: StringConverter<T>
 ) : ParseState {
-    override fun parseNextValue(args: List<String>, context: ParseContext): ParseState.Result {
+    override fun parseNextValue(args: List<String>): ParseState.Result {
         val candidate = args.first()
         return if (host.isOption(candidate)) {
             ParseState.Nothing
@@ -21,7 +22,7 @@ internal open class ParameterParseState<T : Any>(
         }
     }
 
-    override fun endOfInput(context: ParseContext): ParseState.FinishResult {
+    override fun endOfInput(): ParseState.FinishResult {
         return ParseState.FinishFailure(
             "Parameter '${target.name}' not provided",
             resolution = "Please provide a value for parameter '${target.name}'.",

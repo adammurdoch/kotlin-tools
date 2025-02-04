@@ -1,4 +1,6 @@
 - Handle app fails with exception with no message
+- Remove duplication in OneOf and Sequence parse states
+- Replace usages of host with context in parse states
 - List option:
   - Require 1 or more
 - Consistent error message for missing parameter and missing required list parameter

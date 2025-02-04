@@ -9,7 +9,7 @@ internal class ListParameterParseState<T : Any>(
 ) : ParseState {
     private val values = mutableListOf<T>()
 
-    override fun parseNextValue(args: List<String>, context: ParseContext): ParseState.Result {
+    override fun parseNextValue(args: List<String>): ParseState.Result {
         val candidate = args.first()
         return if (host.isOption(candidate)) {
             ParseState.Nothing
@@ -26,7 +26,7 @@ internal class ListParameterParseState<T : Any>(
         }
     }
 
-    override fun endOfInput(context: ParseContext): ParseState.FinishResult {
+    override fun endOfInput(): ParseState.FinishResult {
         return if (required && values.isEmpty()) {
             ParseState.FinishFailure("Parameter '${target.name}' not provided")
         } else {

@@ -19,7 +19,7 @@ internal class RequiredChoiceFlag<T : Any>(
         }
     }
 
-    fun start(context: ParseContext): ParseState {
+    override fun start(context: ParseContext): ParseState {
         return ChoiceFlagParseState(this, matcher)
     }
 }

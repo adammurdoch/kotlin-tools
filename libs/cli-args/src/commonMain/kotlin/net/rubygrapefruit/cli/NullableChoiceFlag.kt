@@ -23,7 +23,7 @@ internal class NullableChoiceFlag<T : Any>(
         return value
     }
 
-    fun start(context: ParseContext): ParseState {
+    override fun start(context: ParseContext): ParseState {
         return OptionalChoiceFlagParseState(this, matcher, null)
     }
 }

@@ -26,4 +26,13 @@ internal class DefaultListOption<T : Any>(
     override fun accepts(option: String): Boolean {
         return matcher.accepts(option)
     }
+
+    fun value(value: List<T>) {
+        this.value.clear()
+        this.value.addAll(value)
+    }
+
+    override fun start(context: ParseContext): ParseState {
+        return ListOptionParseState(this, matcher)
+    }
 }

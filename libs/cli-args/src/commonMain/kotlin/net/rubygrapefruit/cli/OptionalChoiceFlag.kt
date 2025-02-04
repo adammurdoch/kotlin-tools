@@ -11,7 +11,7 @@ internal class OptionalChoiceFlag<T : Any>(
         return value ?: default
     }
 
-    fun start(context: ParseContext): ParseState {
+    override fun start(context: ParseContext): ParseState {
         return OptionalChoiceFlagParseState(this, matcher, default)
     }
 }

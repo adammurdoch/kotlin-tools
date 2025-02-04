@@ -52,4 +52,12 @@ internal class DefaultFlag private constructor(
     override fun accepts(option: String): Boolean {
         return enableFlags.contains(option) || disableFlags.contains(option)
     }
+
+    fun value(value: Boolean) {
+        this.value = value
+    }
+
+    override fun start(context: ParseContext): ParseState {
+        return FlagParseState(this, enableFlags, disableFlags, value)
+    }
 }

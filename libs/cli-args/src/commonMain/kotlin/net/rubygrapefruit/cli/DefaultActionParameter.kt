@@ -38,6 +38,10 @@ internal class DefaultActionParameter<T : Action>(
         override fun accepts(option: String): Boolean {
             return actions.options.containsKey(option)
         }
+
+        override fun start(context: ParseContext): ParseState {
+            TODO("Not yet implemented")
+        }
     }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T {

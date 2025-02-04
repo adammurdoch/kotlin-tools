@@ -23,7 +23,7 @@ internal class DefaultNullableOption<T : Any>(
         return value
     }
 
-    fun start(context: ParseContext): ParseState {
+    override fun start(context: ParseContext): ParseState {
         return OptionalOptionParseState(this, matcher, null)
     }
 }

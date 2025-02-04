@@ -10,7 +10,7 @@ internal class DefaultOption<T : Any>(
         return value ?: default
     }
 
-    fun start(context: ParseContext): ParseState {
+    override fun start(context: ParseContext): ParseState {
         return OptionalOptionParseState(this, matcher, default)
     }
 }

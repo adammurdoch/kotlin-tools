@@ -143,67 +143,44 @@ open class Action {
     }
 
     internal fun maybeParse(args: List<String>, parent: ParseContext): ParseResult {
-        val pending = this.positional.toMutableList()
         val context = parent.withOptions(options)
 
+        var state = state(context) {}
         var index = 0
-        var failure: FinishResult.Failure? = null
-        while (index in args.indices && failure == null) {
-            val current = args.subList(index, args.size)
-            var recognized = false
-            for (option in context.options) {
-                val result = option.accept(current, context)
-                if (result.recognized > 0 || result.failure != null) {
-                    if (result is ParseResult.Failure) {
-                        failure = result.asFinishResult()
-                    }
-                    index += result.recognized
-                    recognized = true
-                    break
+        while (index < args.size) {
+            val result = state.parseNextValue(args.subList(index, args.size))
+            when (result) {
+                is ParseState.Success -> {
+                    result.apply()
+                    return ParseResult.Success(index + result.consumed)
                 }
-            }
-            if (recognized) {
-                continue
-            }
 
-            if (pending.isNotEmpty()) {
-                val positional = pending.first()
-                val result = positional.accept(current, context)
-                val finished = !positional.canAcceptMore()
-                if (finished) {
-                    pending.removeFirst()
+                is ParseState.Failure -> {
+                    return ParseResult.Failure(index + result.recognized, result.exception, false)
                 }
-                if (result.recognized > 0 || result.failure != null || finished) {
-                    if (result is ParseResult.Failure) {
-                        failure = result.asFinishResult()
-                    }
-                    index += result.recognized
-                    continue
+
+                is ParseState.Nothing -> {
+                    return ParseResult.Success(index)
                 }
-            }
 
-            // Did not recognize anything
-            break
-        }
-
-        while (failure == null && pending.isNotEmpty()) {
-            val positional = pending.removeFirst()
-            val result = positional.finished(context)
-            if (result is FinishResult.Failure) {
-                failure = result
-            }
-        }
-        for (option in options) {
-            if (failure != null) {
-                break
-            }
-            val result = option.finished(context)
-            if (result is FinishResult.Failure) {
-                failure = result
+                is ParseState.Continue -> {
+                    state = result.state
+                    index += result.consumed
+                }
             }
         }
 
-        return ParseResult.of(index, failure)
+        val result = state.endOfInput()
+        return when (result) {
+            is ParseState.FinishSuccess -> {
+                result.apply()
+                ParseResult.Success(args.size)
+            }
+
+            is ParseState.FinishFailure -> {
+                ParseResult.Failure(args.size, result.exception, false)
+            }
+        }
     }
 
     private fun attemptToRecover(args: List<String>, original: ParseResult, host: Host, parent: ParseContext): Result {

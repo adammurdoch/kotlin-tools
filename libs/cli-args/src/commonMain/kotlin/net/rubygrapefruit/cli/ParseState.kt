@@ -43,7 +43,16 @@ internal interface ParseState {
         val resolution: String? = null,
         val positional: List<PositionalUsage> = emptyList(),
         val actions: List<NamedNestedActionUsage> = emptyList()
-    ) : Result
+    ) : Result {
+        val exception: ArgParseException
+            get() {
+                return if (resolution == null) {
+                    ArgParseException(message)
+                } else {
+                    PositionalParseException(message, resolution = resolution, positional = positional, actions = actions)
+                }
+            }
+    }
 
     sealed interface FinishResult
 
@@ -56,5 +65,14 @@ internal interface ParseState {
         val actions: List<NamedNestedActionUsage> = emptyList()
     ) : FinishResult {
         fun toResult() = Failure(0, message = message, resolution = resolution, positional = positional, actions = actions)
+
+        val exception: ArgParseException
+            get() {
+                return if (resolution == null) {
+                    ArgParseException(message)
+                } else {
+                    PositionalParseException(message, resolution = resolution, positional = positional, actions = actions)
+                }
+            }
     }
 }

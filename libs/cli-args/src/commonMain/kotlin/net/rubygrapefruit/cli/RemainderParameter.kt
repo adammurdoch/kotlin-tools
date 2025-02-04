@@ -22,23 +22,6 @@ internal class RemainderParameter(
         return if (required) this else owner.replace(this, RemainderParameter(name, help, true, owner))
     }
 
-    override fun accept(args: List<String>, context: ParseContext): ParseResult {
-        values.addAll(args)
-        return ParseResult.Success(args.size)
-    }
-
-    override fun canAcceptMore(): Boolean {
-        return true
-    }
-
-    override fun finished(context: ParseContext): FinishResult {
-        return if (required && values.isEmpty()) {
-            FinishResult.Failure(ArgParseException("Parameter '$name' not provided"), expectedMore = true)
-        } else {
-            FinishResult.Success
-        }
-    }
-
     override fun getValue(thisRef: Any?, property: KProperty<*>): List<String> {
         return values
     }

@@ -8,7 +8,7 @@ internal class OptionalParameter<T : Any>(
     private val default: T,
     host: Host,
     converter: StringConverter<T>
-) : AbstractParameter<T>(name, help, true, host, converter), Parameter<T> {
+) : AbstractParameter<T>(name, help, host, converter), Parameter<T> {
 
     override val usage: String
         get() = "<$name>?"
@@ -19,10 +19,6 @@ internal class OptionalParameter<T : Any>(
 
     override fun usage(): PositionalUsage {
         return usage(Cardinality.Optional)
-    }
-
-    override fun finished(context: ParseContext): FinishResult {
-        return FinishResult.Success
     }
 
     override fun start(context: ParseContext): ParseState {

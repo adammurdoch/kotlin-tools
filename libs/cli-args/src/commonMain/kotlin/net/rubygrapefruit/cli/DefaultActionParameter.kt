@@ -22,19 +22,6 @@ internal class DefaultActionParameter<T : Action>(
         override val inheritable: Boolean
             get() = false
 
-        override fun accept(args: List<String>, context: ParseContext): ParseResult {
-            val name = args.first()
-            val action = actions.options[name]
-            if (action == null) {
-                return ParseResult.Nothing
-            } else {
-                if (selected != null) {
-                    return ParseResult.Failure(0, ArgParseException("Cannot use option $name with $actionName"))
-                }
-                return parseAction("option $name", action, args, context)
-            }
-        }
-
         override fun accepts(option: String): Boolean {
             return actions.options.containsKey(option)
         }
@@ -48,32 +35,6 @@ internal class DefaultActionParameter<T : Action>(
         return selected ?: throw IllegalStateException()
     }
 
-    override fun accept(args: List<String>, context: ParseContext): ParseResult {
-        val name = args.first()
-        val action = actions.named[name]
-        if (action != null) {
-            if (selected != null) {
-                return ParseResult.Failure(0, ArgParseException("Cannot use action '$name' with $actionName"))
-            }
-            val nestedContext = context.nested(this, listOf(NameUsage(name)) + action.value.positional())
-            return parseAction("action '$name'", action, args, nestedContext)
-        }
-        if (this.selected != null) {
-            return ParseResult.Nothing
-        }
-        if (actions.default != null) {
-            this.selected = actions.default.value
-            val nestedContext = context.nested(this, actions.default.value.positional())
-            return actions.default.value.maybeParse(args, nestedContext)
-        }
-
-        return if (host.isOption(name)) {
-            ParseResult.Nothing
-        } else {
-            ParseResult.Failure(1, PositionalParseException("Unknown action: $name", positional = context.positional, actions = actionInfo))
-        }
-    }
-
     private fun parseAction(
         name: String,
         action: ActionDetails<T>,
@@ -84,10 +45,6 @@ internal class DefaultActionParameter<T : Action>(
         this.selected = action.value
         val result = action.value.maybeParse(args.drop(1), context)
         return result.prepend(1)
-    }
-
-    override fun canAcceptMore(): Boolean {
-        return selected == null
     }
 
     override fun usage(): PositionalUsage {
@@ -106,23 +63,6 @@ internal class DefaultActionParameter<T : Action>(
         }
 
         return null
-    }
-
-    override fun finished(context: ParseContext): FinishResult {
-        return when {
-            selected != null -> FinishResult.Success
-            actions.default != null -> {
-                selected = actions.default.value
-                val nestedContext = context.nested(this, actions.default.value.positional())
-                actions.default.value.maybeParse(emptyList(), nestedContext).asFinishResult()
-            }
-
-            else -> {
-                val exception =
-                    PositionalParseException("Action not provided", resolution = "Please specify an action to run.", positional = context.positional, actions = actionInfo)
-                FinishResult.Failure(exception, expectedMore = true)
-            }
-        }
     }
 
     fun value(action: T) {

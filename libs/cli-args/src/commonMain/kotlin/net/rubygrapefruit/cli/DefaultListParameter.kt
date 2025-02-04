@@ -37,33 +37,6 @@ internal class DefaultListParameter<T : Any>(
         return null
     }
 
-    override fun accept(args: List<String>, context: ParseContext): ParseResult {
-        for (index in args.indices) {
-            val arg = args[index]
-            if (host.isOption(arg)) {
-                return ParseResult.Success(index)
-            }
-            val result = converter.convert("parameter '$name'", arg)
-            when (result) {
-                is StringConverter.Success -> values.add(result.value)
-                is StringConverter.Failure -> return ParseResult.Failure(index, ArgParseException(result.message), expectedMore = true)
-            }
-        }
-        return ParseResult.Success(args.size)
-    }
-
-    override fun canAcceptMore(): Boolean {
-        return true
-    }
-
-    override fun finished(context: ParseContext): FinishResult {
-        return if (required && values.isEmpty()) {
-            FinishResult.Failure(ArgParseException("Parameter '$name' not provided"), expectedMore = true)
-        } else {
-            FinishResult.Success
-        }
-    }
-
     override fun start(context: ParseContext): ParseState {
         return ListParameterParseState(this, default, required, host, converter)
     }

@@ -15,14 +15,6 @@ internal class DefaultListOption<T : Any>(
         return matcher.usage()
     }
 
-    override fun accept(args: List<String>, context: ParseContext): ParseResult {
-        val result = matcher.match(args)
-        if (result is Matcher.Success) {
-            value.add(result.value)
-        }
-        return result.asParseResult()
-    }
-
     override fun accepts(option: String): Boolean {
         return matcher.accepts(option)
     }

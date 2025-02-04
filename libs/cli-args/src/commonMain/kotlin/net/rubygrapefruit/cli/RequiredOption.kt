@@ -10,15 +10,6 @@ internal class RequiredOption<T : Any>(
         return value!!
     }
 
-    override fun finished(context: ParseContext): FinishResult {
-        return if (value == null) {
-            val exception = ArgParseException("Option ${matcher.flags.maxBy { it.length }} not provided")
-            FinishResult.Failure(exception, expectedMore = true)
-        } else {
-            FinishResult.Success
-        }
-    }
-
     override fun start(context: ParseContext): ParseState {
         return OptionParseState(this, matcher)
     }

@@ -7,7 +7,7 @@ internal class OptionalChoiceFlagParseState<T : Any>(
 ) : ChoiceFlagParseState<T>(target, matcher) {
     override fun endOfInput(): ParseState.FinishResult {
         return ParseState.FinishSuccess {
-            target.value(defaultValue)
+            target.value(value ?: defaultValue)
         }
     }
 }

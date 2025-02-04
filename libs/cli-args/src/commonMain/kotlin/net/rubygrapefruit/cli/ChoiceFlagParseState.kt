@@ -4,7 +4,8 @@ internal open class ChoiceFlagParseState<T : Any>(
     protected val target: AbstractChoiceFlag<T>,
     private val matcher: ChoiceFlagMatcher<T>
 ) : ParseState {
-    private var value: T? = null
+    protected var value: T? = null
+        private set
 
     override fun parseNextValue(args: List<String>): ParseState.Result {
         val result = matcher.match(args)

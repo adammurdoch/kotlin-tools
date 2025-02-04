@@ -155,7 +155,7 @@ open class Action {
                 }
 
                 is ParseState.Failure -> {
-                    return ParseResult.Failure(index + result.recognized, result.exception, false)
+                    return ParseResult.Failure(index + result.recognized, result.exception, true)
                 }
 
                 is ParseState.Nothing -> {
@@ -177,7 +177,7 @@ open class Action {
             }
 
             is ParseState.FinishFailure -> {
-                ParseResult.Failure(args.size, result.exception, false)
+                ParseResult.Failure(args.size, result.exception, true)
             }
         }
     }

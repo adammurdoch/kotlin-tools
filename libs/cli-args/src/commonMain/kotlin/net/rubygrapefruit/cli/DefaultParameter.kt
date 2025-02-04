@@ -8,7 +8,7 @@ internal class DefaultParameter<T : Any>(
     host: Host,
     private val owner: Action,
     converter: StringConverter<T>
-) : AbstractParameter<T>(name, help, false, host, converter), RequiredParameter<T> {
+) : AbstractParameter<T>(name, help, host, converter), RequiredParameter<T> {
 
     override fun whenAbsent(default: T): Parameter<T> {
         return owner.replace(this, OptionalParameter(name, help, default, host, converter))
@@ -28,11 +28,6 @@ internal class DefaultParameter<T : Any>(
 
     override fun usage(): PositionalUsage {
         return usage(Cardinality.Required)
-    }
-
-    override fun finished(context: ParseContext): FinishResult {
-        val exception = PositionalParseException("Parameter '$name' not provided", resolution = "Please provide a value for parameter '$name'.", positional = context.positional)
-        return FinishResult.Failure(exception, expectedMore = true)
     }
 
     override fun start(context: ParseContext): ParseState {

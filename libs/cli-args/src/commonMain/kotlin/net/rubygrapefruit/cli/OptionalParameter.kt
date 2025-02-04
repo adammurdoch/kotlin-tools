@@ -10,6 +10,9 @@ internal class OptionalParameter<T : Any>(
     converter: StringConverter<T>
 ) : AbstractParameter<T>(name, help, true, host, converter), Parameter<T> {
 
+    override val usage: String
+        get() = "<$name>?"
+
     override fun getValue(thisRef: Any?, property: KProperty<*>): T {
         return value ?: default
     }

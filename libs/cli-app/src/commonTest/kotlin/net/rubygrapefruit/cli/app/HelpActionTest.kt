@@ -95,6 +95,7 @@ class HelpActionTest : AbstractActionTest() {
         class App : Action() {
             val p1 by parameter("param", help = "some value").optional()
             val p2 by parameter("another-param", help = "some other value").optional()
+            val p3 by parameter("default-param", help = "has default value").whenAbsent("default")
         }
 
         val app = App()
@@ -103,11 +104,12 @@ class HelpActionTest : AbstractActionTest() {
 
         assertEquals(
             """
-            Usage: cmd <param>? <another-param>?
+            Usage: cmd <param>? <another-param>? <default-param>?
             
             Parameters:
               <param>         some value
               <another-param> some other value
+              <default-param> has default value
             
             """.trimIndent(), formatter.text
         )

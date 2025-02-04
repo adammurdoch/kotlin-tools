@@ -54,5 +54,7 @@ internal interface ParseState {
         val resolution: String? = null,
         val positional: List<PositionalUsage> = emptyList(),
         val actions: List<NamedNestedActionUsage> = emptyList()
-    ) : FinishResult
+    ) : FinishResult {
+        fun toResult() = Failure(0, message = message, resolution = resolution, positional = positional, actions = actions)
+    }
 }

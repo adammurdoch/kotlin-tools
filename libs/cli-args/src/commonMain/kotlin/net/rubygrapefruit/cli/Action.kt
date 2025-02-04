@@ -139,7 +139,7 @@ open class Action {
     }
 
     internal fun state(context: ParseContext, consumer: (Action) -> Unit): ParseState {
-        return ActionParseState(context, this, consumer)
+        return ActionParseState(context, this, options, positional, consumer)
     }
 
     internal fun maybeParse(args: List<String>, parent: ParseContext): ParseResult {

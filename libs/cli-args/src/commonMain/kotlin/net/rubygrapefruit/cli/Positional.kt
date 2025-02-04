@@ -3,6 +3,8 @@ package net.rubygrapefruit.cli
 internal interface Positional : HasPositionalUsage {
     fun usage(name: String): ActionUsage?
 
+    fun start(context: ParseContext): ParseState
+
     /**
      * Attempt to parse the given arguments, returning number of arguments consumed.
      *

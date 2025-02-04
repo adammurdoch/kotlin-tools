@@ -138,6 +138,10 @@ open class Action {
         }
     }
 
+    internal fun state(context: ParseContext, consumer: (Action) -> Unit): ParseState {
+        return ActionParseState(context, this, consumer)
+    }
+
     internal fun maybeParse(args: List<String>, parent: ParseContext): ParseResult {
         val pending = this.positional.toMutableList()
         val context = parent.withOptions(options)

@@ -20,4 +20,8 @@ internal abstract class AbstractChoice<T : Any>(
     override fun accepts(option: String): Boolean {
         return matcher.accepts(option)
     }
+
+    fun value(value: T?) {
+        this.value = value
+    }
 }

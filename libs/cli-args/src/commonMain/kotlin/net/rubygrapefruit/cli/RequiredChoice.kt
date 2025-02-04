@@ -18,4 +18,8 @@ internal class RequiredChoice<T : Any>(
             FinishResult.Success
         }
     }
+
+    fun start(context: ParseContext): ParseState {
+        return ChoiceFlagParseState(this, matcher)
+    }
 }

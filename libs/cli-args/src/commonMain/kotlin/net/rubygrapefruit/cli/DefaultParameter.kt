@@ -35,7 +35,7 @@ internal class DefaultParameter<T : Any>(
         return FinishResult.Failure(exception, expectedMore = true)
     }
 
-    fun start(context: ParseContext): ParseState {
+    override fun start(context: ParseContext): ParseState {
         return ParameterParseState(this, context, host, converter)
     }
 }

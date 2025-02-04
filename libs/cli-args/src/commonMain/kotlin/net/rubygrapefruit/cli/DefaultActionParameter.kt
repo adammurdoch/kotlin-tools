@@ -121,7 +121,11 @@ internal class DefaultActionParameter<T : Action>(
         }
     }
 
-    fun start(context: ParseContext): ParseState {
+    fun value(action: T) {
+        selected = action
+    }
+
+    override fun start(context: ParseContext): ParseState {
         return ActionParameterParseState(this, context, actions, host)
     }
 

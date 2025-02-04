@@ -13,7 +13,7 @@ internal class ActionParameterParseState<T : Action>(
         val action = actions.named[name]
         if (action != null) {
             val nestedContext = context.nested(target, listOf(NameUsage(name)) + action.value.positional())
-            return ParseState.Continue(1, ActionParseState(nestedContext, action.value))
+            return ParseState.Continue(1, stateFor(action.value, nestedContext))
         }
 
         if (host.isOption(name)) {
@@ -22,7 +22,7 @@ internal class ActionParameterParseState<T : Action>(
 
         if (actions.default != null) {
             val nestedContext = context.nested(target, actions.default.value.positional())
-            return ParseState.Continue(0, ActionParseState(nestedContext, actions.default.value))
+            return ParseState.Continue(0, stateFor(actions.default.value, nestedContext))
         }
 
         return ParseState.Failure(1, "Unknown action: $name", positional = context.positional, actions = target.actionInfo)
@@ -31,19 +31,16 @@ internal class ActionParameterParseState<T : Action>(
     override fun endOfInput(): ParseState.FinishResult {
         return if (actions.default != null) {
             val nestedContext = context.nested(target, actions.default.value.positional())
-            ActionParseState(nestedContext, actions.default.value).endOfInput()
+            stateFor(actions.default.value, nestedContext).endOfInput()
         } else {
             ParseState.FinishFailure("Action not provided", resolution = "Please specify an action to run.", positional = context.positional, actions = target.actionInfo)
         }
     }
 
-    private class ActionParseState(private val context: ParseContext, private val action: Action) : ParseState {
-        override fun parseNextValue(args: List<String>): ParseState.Result {
-            TODO("Not yet implemented")
-        }
-
-        override fun endOfInput(): ParseState.FinishResult {
-            TODO("Not yet implemented")
+    private fun stateFor(action: T, nestedContext: ParseContext): ParseState {
+        return action.state(nestedContext) {
+            target.value(action)
         }
     }
+
 }

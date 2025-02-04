@@ -48,7 +48,7 @@ internal class RemainderParameter(
         this.values.addAll(values)
     }
 
-    fun start(): ParseState {
+    override fun start(context: ParseContext): ParseState {
         return RemainderParseState(this, required)
     }
 }

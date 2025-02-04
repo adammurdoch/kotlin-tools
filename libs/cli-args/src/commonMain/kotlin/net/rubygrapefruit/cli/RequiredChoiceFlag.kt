@@ -2,12 +2,12 @@ package net.rubygrapefruit.cli
 
 import kotlin.reflect.KProperty
 
-internal class RequiredChoice<T : Any>(
+internal class RequiredChoiceFlag<T : Any>(
     choices: ChoiceFlagMatcher<T>,
-) : AbstractChoice<T>(choices), Option<T> {
+) : AbstractChoiceFlag<T>(choices), Option<T> {
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        return value!!
+        return value ?: throw IllegalStateException()
     }
 
     override fun finished(context: ParseContext): FinishResult {

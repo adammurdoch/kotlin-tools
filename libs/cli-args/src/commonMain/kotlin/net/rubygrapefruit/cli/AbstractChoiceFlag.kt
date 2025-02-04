@@ -1,6 +1,6 @@
 package net.rubygrapefruit.cli
 
-internal abstract class AbstractChoice<T : Any>(
+internal abstract class AbstractChoiceFlag<T : Any>(
     protected val matcher: ChoiceFlagMatcher<T>
 ) : NonPositional {
     protected var value: T? = null

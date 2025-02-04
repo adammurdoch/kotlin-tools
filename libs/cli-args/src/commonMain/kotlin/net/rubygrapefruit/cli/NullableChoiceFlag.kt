@@ -2,17 +2,17 @@ package net.rubygrapefruit.cli
 
 import kotlin.reflect.KProperty
 
-internal class DefaultNullableChoice<T : Any>(
+internal class NullableChoiceFlag<T : Any>(
     choices: ChoiceFlagMatcher<T>,
     private val owner: Action
-) : AbstractChoice<T>(choices), NullableOption<T> {
+) : AbstractChoiceFlag<T>(choices), NullableOption<T> {
 
     override fun whenAbsent(default: T): Option<T> {
-        return owner.replace(this, DefaultChoice(matcher, default))
+        return owner.replace(this, OptionalChoiceFlag(matcher, default))
     }
 
     override fun required(): Option<T> {
-        return owner.replace(this, RequiredChoice(matcher))
+        return owner.replace(this, RequiredChoiceFlag(matcher))
     }
 
     override fun repeated(): ListOption<T> {
@@ -21,5 +21,9 @@ internal class DefaultNullableChoice<T : Any>(
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T? {
         return value
+    }
+
+    fun start(context: ParseContext): ParseState {
+        return OptionalChoiceFlagParseState(this, matcher, null)
     }
 }

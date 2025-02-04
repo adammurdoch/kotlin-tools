@@ -1,7 +1,7 @@
 package net.rubygrapefruit.cli
 
 internal open class ChoiceFlagParseState<T : Any>(
-    private val target: AbstractChoice<T>,
+    protected val target: AbstractChoiceFlag<T>,
     private val matcher: ChoiceFlagMatcher<T>
 ) : ParseState {
     private var value: T? = null

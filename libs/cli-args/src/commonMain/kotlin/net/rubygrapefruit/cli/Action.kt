@@ -161,7 +161,6 @@ open class Action {
                 }
 
                 is ParseState.Failure -> {
-                    result.collect(hints)
                     var recognized = index + result.recognized
                     return attemptToRecover(args, recognized, result.exception, result.expectedMore, hints.merge(), DefaultHost, context)
                 }
@@ -201,12 +200,6 @@ open class Action {
 
     private fun ParseState.Success.collect(actions: MutableList<() -> Unit>, hints: MutableList<FailureHint>) {
         actions.add(apply)
-        if (hint != null) {
-            hints.add(hint)
-        }
-    }
-
-    private fun ParseState.Failure.collect(hints: MutableList<FailureHint>) {
         if (hint != null) {
             hints.add(hint)
         }

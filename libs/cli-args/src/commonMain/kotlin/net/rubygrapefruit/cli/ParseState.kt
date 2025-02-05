@@ -25,15 +25,7 @@ internal interface ParseState {
      * Parsing has recognized a value and will not match any more inputs.
      * The state should be discarded and the given function called to apply the result of parsing.
      */
-    data class Success(val consumed: Int, val hint: FailureHint? = null, val apply: () -> Unit) : Result {
-        fun withHint(hint: FailureHint?): Success {
-            return if (hint == null && this.hint == null) {
-                this
-            } else {
-                Success(consumed, hint, apply)
-            }
-        }
-    }
+    data class Success(val consumed: Int, val hint: FailureHint? = null, val apply: () -> Unit) : Result
 
     /**
      * Parsing has recognized a value and can continue parsing more values.
@@ -51,8 +43,7 @@ internal interface ParseState {
         val resolution: String? = null,
         val positional: List<PositionalUsage> = emptyList(),
         val actions: List<NamedNestedActionUsage> = emptyList(),
-        val expectedMore: Boolean = false,
-        val hint: FailureHint? = null
+        val expectedMore: Boolean = false
     ) : Result {
         val exception: ArgParseException
             get() {
@@ -62,14 +53,6 @@ internal interface ParseState {
                     PositionalParseException(message, resolution = resolution ?: message, positional = positional, actions = actions)
                 }
             }
-
-        fun withHint(hint: FailureHint?): Failure {
-            return if (hint == null && this.hint == null) {
-                this
-            } else {
-                Failure(recognized, message, resolution, positional, actions, expectedMore, hint)
-            }
-        }
     }
 
     sealed interface FinishResult

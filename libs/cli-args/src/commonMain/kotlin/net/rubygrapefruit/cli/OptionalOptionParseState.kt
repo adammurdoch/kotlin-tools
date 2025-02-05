@@ -7,7 +7,7 @@ internal class OptionalOptionParseState<T : Any>(
 ) : OptionParseState<T>(target, matcher) {
     override fun endOfInput(): ParseState.FinishResult {
         return ParseState.FinishSuccess {
-            target.value(value ?: defaultValue)
+            target.value(defaultValue)
         }
     }
 }

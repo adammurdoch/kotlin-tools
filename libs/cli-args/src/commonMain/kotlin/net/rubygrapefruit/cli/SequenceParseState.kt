@@ -1,8 +1,7 @@
 package net.rubygrapefruit.cli
 
-internal class SequenceParseState(initialStates: List<ParseState>) : ParseState {
+internal class SequenceParseState(initialStates: List<ParseState>) : AbstractCollectingParseState() {
     private val states = initialStates.toMutableList()
-    private val results = mutableListOf<() -> Unit>()
 
     override fun parseNextValue(args: List<String>): ParseState.Result {
         val state = states.firstOrNull()
@@ -13,11 +12,11 @@ internal class SequenceParseState(initialStates: List<ParseState>) : ParseState 
             return when (result) {
                 is ParseState.Success -> {
                     states.removeFirst()
-                    results.add(result.apply)
+                    collect(result)
                     if (states.isNotEmpty()) {
                         ParseState.Continue(result.consumed, this)
                     } else {
-                        ParseState.Success(result.consumed, collectActions())
+                        ParseState.Success(result.consumed, collectHints(), collectActions())
                     }
                 }
 
@@ -34,23 +33,6 @@ internal class SequenceParseState(initialStates: List<ParseState>) : ParseState 
     }
 
     override fun endOfInput(): ParseState.FinishResult {
-        while (states.isNotEmpty()) {
-            val state = states.removeFirst()
-            val result = state.endOfInput()
-            when (result) {
-                is ParseState.FinishSuccess -> results.add(result.apply)
-                is ParseState.FinishFailure -> return result
-            }
-        }
-        return ParseState.FinishSuccess(collectActions())
-    }
-
-    private fun collectActions(): () -> Unit {
-        val actions = results.toList()
-        return {
-            for (action in actions) {
-                action()
-            }
-        }
+        return finish(states)
     }
 }

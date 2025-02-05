@@ -34,7 +34,6 @@ internal sealed class ParseResult {
 
         override val failure: ArgParseException?
             get() = null
-
     }
 
     /**
@@ -43,13 +42,14 @@ internal sealed class ParseResult {
     data class Success(override val recognized: Int) : ParseResult() {
         override val failure: ArgParseException?
             get() = null
-
     }
 
     /**
      * Failed, possibly by consuming nothing.
      */
-    data class Failure(override val recognized: Int, override val failure: ArgParseException, val expectedMore: Boolean = false) : ParseResult() {
-
-    }
+    data class Failure(
+        override val recognized: Int,
+        override val failure: ArgParseException,
+        val expectedMore: Boolean = false
+    ) : ParseResult()
 }

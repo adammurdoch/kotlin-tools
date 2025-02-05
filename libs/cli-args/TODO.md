@@ -1,4 +1,5 @@
 - Handle app fails with exception with no message
+- Test repeated option from nested action
 - Remove duplication in OneOf, Sequence and Action parse states
 - Replace usages of host with context in parse states
 - Remove inheritance of options

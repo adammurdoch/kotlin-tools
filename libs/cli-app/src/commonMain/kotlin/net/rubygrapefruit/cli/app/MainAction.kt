@@ -20,9 +20,7 @@ internal class MainAction(val app: CliApp, formatter: Formatter) : Action() {
 
     fun actionFor(args: List<String>): Action {
         val result = maybeParse(args)
-        return if (action is HelpAction) {
-            action
-        } else if (result is Result.Failure) {
+        return if (result is Result.Failure) {
             throw result.failure
         } else {
             action

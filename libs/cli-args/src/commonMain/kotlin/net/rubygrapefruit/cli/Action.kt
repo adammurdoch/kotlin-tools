@@ -211,7 +211,7 @@ open class Action {
             index++
         }
 
-        if (hint != null) {
+        if (hint != null && recognized < args.size) {
             val failure = hint.map(args.subList(recognized, args.size))
             if (failure != null) {
                 return Result.Failure(failure.exception)

@@ -110,6 +110,19 @@ class StringOptionTest : AbstractActionTest() {
     }
 
     @Test
+    fun `fails when multiple options and argument not provided`() {
+        class Option : Action() {
+            val option1 by option("o1")
+            val option2 by option("o2")
+        }
+
+        parseFails(::Option, listOf("--o1"), "Value missing for option --o1")
+        parseFails(::Option, listOf("--o1", "a", "--o2"), "Value missing for option --o2")
+        parseFails(::Option, listOf("--o2", "a", "--o1"), "Value missing for option --o1")
+        parseFails(::Option, listOf("--o1", "--o2"), "Value missing for option --o1")
+    }
+
+    @Test
     fun `can require option to be present`() {
         class Option : Action() {
             val option by option("o", "long-option").required()
@@ -167,10 +180,13 @@ class StringOptionTest : AbstractActionTest() {
     @Test
     fun `fails when option is present multiple times`() {
         class Option : Action() {
-            val option by option("o")
+            val option by option("o", "long")
         }
 
         parseFails(::Option, listOf("-o", "1", "-o", "2"), "Value for option -o already provided")
+        parseFails(::Option, listOf("-o", "1", "-o"), "Value for option -o already provided")
+        parseFails(::Option, listOf("--long", "1", "-o", "2"), "Value for option -o already provided")
+        parseFails(::Option, listOf("-o", "1", "--long", "2"), "Value for option --long already provided")
     }
 
     @Test

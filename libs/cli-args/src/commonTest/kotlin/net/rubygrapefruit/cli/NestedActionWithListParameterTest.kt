@@ -3,7 +3,7 @@ package net.rubygrapefruit.cli
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class NestedActionAndListParameterTest : AbstractActionTest() {
+class NestedActionWithListParameterTest : AbstractActionTest() {
     @Test
     fun `action can consume remaining args`() {
         class Parameter : Action() {

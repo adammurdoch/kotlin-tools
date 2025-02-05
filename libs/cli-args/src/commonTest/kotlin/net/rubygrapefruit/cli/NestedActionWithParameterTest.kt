@@ -4,7 +4,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
-class NestedActionParameterAndParameterTest: AbstractActionTest() {
+class NestedActionWithParameterTest: AbstractActionTest() {
     @Test
     fun `fails when nested action parameters not provided`() {
         class Sub : Action() {

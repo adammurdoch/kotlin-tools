@@ -2,7 +2,7 @@
 - Test repeated option from nested action
 - Replace usages of host with context in parse states
 - Remove inheritance of options
-- Split out recovering parse state implementation
+- Split out recovery logic into a parse state implementation
 - Distinguish between failure due to missing value vs semantic issue (currently uses `expectedMore`)
 - List option:
   - Require 1 or more

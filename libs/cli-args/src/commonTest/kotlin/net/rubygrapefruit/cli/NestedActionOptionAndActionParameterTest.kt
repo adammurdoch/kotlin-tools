@@ -2,7 +2,7 @@ package net.rubygrapefruit.cli
 
 import kotlin.test.*
 
-class NestedActionOptionAndParameterTest : AbstractActionTest() {
+class NestedActionOptionAndActionParameterTest : AbstractActionTest() {
     @Test
     fun `action can mix parameter and option nested actions`() {
         val s1 = Action()

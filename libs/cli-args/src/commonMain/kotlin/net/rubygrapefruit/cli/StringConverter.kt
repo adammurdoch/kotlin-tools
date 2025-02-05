@@ -13,21 +13,11 @@ internal interface StringConverter<T : Any> {
 
     fun convert(displayName: String, value: String): Result<T>
 
-    sealed class Result<T : Any> {
-        abstract fun asParseResult(): ParseResult
-    }
+    sealed class Result<T : Any>
 
-    data class Success<T : Any>(val value: T) : Result<T>() {
-        override fun asParseResult(): ParseResult {
-            return ParseResult.One
-        }
-    }
+    data class Success<T : Any>(val value: T) : Result<T>()
 
-    data class Failure<T : Any>(val message: String) : Result<T>() {
-        override fun asParseResult(): ParseResult {
-            return ParseResult.Failure(1, ArgParseException(message), false)
-        }
-    }
+    data class Failure<T : Any>(val message: String) : Result<T>()
 }
 
 internal object IntConverter : StringConverter<Int> {

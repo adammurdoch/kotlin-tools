@@ -129,19 +129,14 @@ open class Action {
      */
     fun maybeParse(args: List<String>): Result {
         val context = DefaultContext(positional, emptyList())
-        val result = maybeParse(args, context)
-        return if (result.recognized != args.size || result.failure != null) {
-            attemptToRecover(args, result, DefaultHost, context)
-        } else {
-            Result.Success
-        }
+        return maybeParse(args, context)
     }
 
     internal fun state(context: ParseContext, consumer: (Action) -> Unit): ParseState {
         return ActionParseState(context, this, options, positional, consumer)
     }
 
-    internal fun maybeParse(args: List<String>, parent: ParseContext): ParseResult {
+    internal fun maybeParse(args: List<String>, parent: ParseContext): Result {
         val context = parent.withOptions(options)
 
         var state = state(context) {}
@@ -151,16 +146,23 @@ open class Action {
             val result = state.parseNextValue(current)
             when (result) {
                 is ParseState.Success -> {
-                    result.apply()
-                    return ParseResult.Success(index + result.consumed)
+                    var consumed = index + result.consumed
+                    return if (consumed == args.size) {
+                        result.apply()
+                        Result.Success
+                    } else {
+                        result.apply()
+                        attemptToRecover(args, consumed, null, false, result.hint, DefaultHost, context)
+                    }
                 }
 
                 is ParseState.Failure -> {
-                    return ParseResult.Failure(index + result.recognized, result.exception, expectedMore = result.expectedMore)
+                    var recognized = index + result.recognized
+                    return attemptToRecover(args, recognized, result.exception, result.expectedMore, result.hint, DefaultHost, context)
                 }
 
                 is ParseState.Nothing -> {
-                    return ParseResult.Success(index)
+                    attemptToRecover(args, index, null, false, null, DefaultHost, context)
                 }
 
                 is ParseState.Continue -> {
@@ -174,20 +176,28 @@ open class Action {
         return when (result) {
             is ParseState.FinishSuccess -> {
                 result.apply()
-                ParseResult.Success(args.size)
+                Result.Success
             }
 
             is ParseState.FinishFailure -> {
-                ParseResult.Failure(args.size, result.exception, expectedMore = true)
+                attemptToRecover(args, args.size, result.exception, true, null, DefaultHost, context)
             }
         }
     }
 
-    private fun attemptToRecover(args: List<String>, original: ParseResult, host: Host, parent: ParseContext): Result {
+    private fun attemptToRecover(
+        args: List<String>,
+        recognized: Int,
+        failure: ArgParseException?,
+        expectedMore: Boolean,
+        hint: FailureHint?,
+        host: Host,
+        parent: ParseContext
+    ): Result {
         val context = parent.withOptions(options)
 
         // Allow an option to recover from parse failure by attempting to do a "recovery" parse from where parsing stopped
-        var index = original.recognized
+        var index = recognized
         while (index in args.indices) {
             val current = args.subList(index, args.size)
             for (option in recoverables) {
@@ -201,14 +211,21 @@ open class Action {
             index++
         }
 
+        if (hint != null) {
+            val failure = hint.map(args.subList(recognized, args.size))
+            if (failure != null) {
+                return Result.Failure(failure.exception)
+            }
+        }
+
         // Determine the parse failure to report
-        val arg = args.getOrNull(original.recognized)
-        val originalFailure = original.failure
+        val arg = args.getOrNull(recognized)
+        val originalFailure = failure
         val failure = when {
             // Parsing stopped on an unknown option
             arg != null && host.isOption(arg) -> {
                 // Throw away the failure if parsing expected more but stopped on an unknown option
-                val failure = if (original is ParseResult.Failure && original.expectedMore && !context.options.any { it.accepts(arg) }) {
+                val failure = if (originalFailure != null && expectedMore && !context.options.any { it.accepts(arg) }) {
                     null
                 } else {
                     originalFailure

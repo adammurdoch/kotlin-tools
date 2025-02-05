@@ -1,9 +1,7 @@
 - Handle app fails with exception with no message
 - Test repeated option from nested action
-- Remove duplication in OneOf, Sequence and Action parse states
 - Replace usages of host with context in parse states
 - Remove inheritance of options
-- Replace ParseResult with ParseState.Result
 - Split out recovering parse state implementation
 - Distinguish between failure due to missing value vs semantic issue (currently uses `expectedMore`)
 - List option:

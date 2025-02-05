@@ -61,7 +61,7 @@ internal class DefaultActionParameter<T : Action>(
             } else if (args.firstOrNull() == this.name) {
                 action = option.value
                 val result = option.value.maybeParse(args.drop(1), context)
-                result.failure == null
+                result is Action.Result.Success
             } else {
                 false
             }

@@ -11,7 +11,7 @@ internal class ListOptionParseState<T : Any>(
         return when (result) {
             is Matcher.Success -> {
                 values.add(result.value)
-                ParseState.Continue(result.consumed, this)
+                ParseState.Continue(result.consumed, this, null) {}
             }
 
             is Matcher.Nothing -> ParseState.Nothing

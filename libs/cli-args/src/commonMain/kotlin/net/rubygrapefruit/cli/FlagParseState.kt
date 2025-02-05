@@ -12,10 +12,12 @@ internal class FlagParseState(
         val arg = args.first()
         return if (enableFlags.contains(arg)) {
             value = true
-            ParseState.Continue(1, this)
+            // Keep going to allow the value to be overridden by a later flag
+            ParseState.Continue(1, this, null) {}
         } else if (disableFlags.contains(arg)) {
             value = false
-            ParseState.Continue(1, this)
+            // Keep going to allow the value to be overridden by a later flag
+            ParseState.Continue(1, this, null) {}
         } else {
             ParseState.Nothing
         }

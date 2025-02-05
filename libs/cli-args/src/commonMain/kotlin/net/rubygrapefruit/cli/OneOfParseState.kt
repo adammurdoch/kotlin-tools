@@ -10,23 +10,21 @@ internal class OneOfParseState(initialStates: List<ParseState>) : AbstractCollec
             val result = state.parseNextValue(args)
             when (result) {
                 is ParseState.Success -> {
-                    collect(result)
                     states.removeAt(index)
                     return if (states.isNotEmpty()) {
-                        ParseState.Continue(result.consumed, this)
+                        ParseState.Continue(result.consumed, this, result.hint, result.apply)
                     } else {
-                        ParseState.Success(result.consumed, collectHints(), collectActions())
+                        result
                     }
                 }
 
                 is ParseState.Continue -> {
                     states[index] = result.state
-                    return ParseState.Continue(result.consumed, this)
+                    return ParseState.Continue(result.consumed, this, result.hint, result.apply)
                 }
 
                 is ParseState.Failure -> {
-                    collect(result)
-                    return result.withHint(collectHints())
+                    return result
                 }
 
                 is ParseState.Nothing -> index++

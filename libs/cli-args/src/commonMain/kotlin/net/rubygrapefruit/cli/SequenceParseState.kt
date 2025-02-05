@@ -12,23 +12,19 @@ internal class SequenceParseState(initialStates: List<ParseState>) : AbstractCol
             return when (result) {
                 is ParseState.Success -> {
                     states.removeFirst()
-                    collect(result)
                     if (states.isNotEmpty()) {
-                        ParseState.Continue(result.consumed, this)
+                        ParseState.Continue(result.consumed, this, result.hint, result.apply)
                     } else {
-                        ParseState.Success(result.consumed, collectHints(), collectActions())
+                        result
                     }
                 }
 
                 is ParseState.Continue -> {
                     states[0] = result.state
-                    ParseState.Continue(result.consumed, this)
+                    ParseState.Continue(result.consumed, this, result.hint, result.apply)
                 }
 
-                is ParseState.Failure -> {
-                    collect(result)
-                    result.withHint(collectHints())
-                }
+                is ParseState.Failure -> result
 
                 is ParseState.Nothing -> result
             }

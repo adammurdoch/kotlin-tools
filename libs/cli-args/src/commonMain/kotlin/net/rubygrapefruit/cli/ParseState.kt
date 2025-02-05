@@ -39,7 +39,7 @@ internal interface ParseState {
      * Parsing has recognized a value and can continue parsing more values.
      * The state should be replaced by the given state to parse the next value.
      */
-    data class Continue(val consumed: Int, val state: ParseState) : Result
+    data class Continue(val consumed: Int, val state: ParseState, val hint: FailureHint? = null, val apply: () -> Unit) : Result
 
     /**
      * Recognized a value but has failed and will not match any more inputs.

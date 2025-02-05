@@ -18,7 +18,7 @@ internal class ListParameterParseState<T : Any>(
             when (result) {
                 is StringConverter.Success -> {
                     values.add(result.value)
-                    ParseState.Continue(1, this)
+                    ParseState.Continue(1, this, null) {}
                 }
 
                 is StringConverter.Failure -> ParseState.Failure(1, result.message)

@@ -132,40 +132,46 @@ open class Action {
         return maybeParse(args, context)
     }
 
-    internal fun state(context: ParseContext, consumer: (Action) -> Unit): ParseState {
-        return ActionParseState(context, this, options, positional, consumer)
+    internal fun state(context: ParseContext): ParseState {
+        return ActionParseState(context, this, options, positional)
     }
 
     internal fun maybeParse(args: List<String>, parent: ParseContext): Result {
         val context = parent.withOptions(options)
+        val actions = mutableListOf<() -> Unit>()
+        val hints = mutableListOf<FailureHint>()
 
-        var state = state(context) {}
+        var state = state(context)
         var index = 0
         while (index < args.size) {
             val current = args.subList(index, args.size)
             val result = state.parseNextValue(current)
             when (result) {
                 is ParseState.Success -> {
+                    result.collect(actions, hints)
                     var consumed = index + result.consumed
                     return if (consumed == args.size) {
-                        result.apply()
+                        actions.run()
                         Result.Success
                     } else {
-                        result.apply()
-                        attemptToRecover(args, consumed, null, false, result.hint, DefaultHost, context)
+                        // Should not need this but currently required by Recoverable
+                        actions.run()
+                        attemptToRecover(args, consumed, null, false, hints.merge(), DefaultHost, context)
                     }
                 }
 
                 is ParseState.Failure -> {
+                    result.collect(hints)
                     var recognized = index + result.recognized
-                    return attemptToRecover(args, recognized, result.exception, result.expectedMore, result.hint, DefaultHost, context)
+                    return attemptToRecover(args, recognized, result.exception, result.expectedMore, hints.merge(), DefaultHost, context)
                 }
 
                 is ParseState.Nothing -> {
-                    attemptToRecover(args, index, null, false, null, DefaultHost, context)
+                    attemptToRecover(args, index, null, false, hints.merge(), DefaultHost, context)
                 }
 
                 is ParseState.Continue -> {
+                    result.collect(actions, hints)
                     state = result.state
                     index += result.consumed
                 }
@@ -181,6 +187,51 @@ open class Action {
 
             is ParseState.FinishFailure -> {
                 attemptToRecover(args, args.size, result.exception, true, null, DefaultHost, context)
+            }
+        }
+    }
+
+    private fun ParseState.Continue.collect(actions: MutableList<() -> Unit>, hints: MutableList<FailureHint>) {
+        actions.add(apply)
+        if (hint != null) {
+            hints.add(hint)
+        }
+    }
+
+    private fun ParseState.Success.collect(actions: MutableList<() -> Unit>, hints: MutableList<FailureHint>) {
+        actions.add(apply)
+        if (hint != null) {
+            hints.add(hint)
+        }
+    }
+
+    private fun ParseState.Failure.collect(hints: MutableList<FailureHint>) {
+        if (hint != null) {
+            hints.add(hint)
+        }
+    }
+
+    private fun List<() -> Unit>.run() {
+        forEach { it() }
+    }
+
+    private fun List<FailureHint>.merge(): FailureHint? {
+        return if (isEmpty()) {
+            null
+        } else if (size == 1) {
+            first()
+        } else {
+            val hints = toList()
+            object : FailureHint {
+                override fun map(args: List<String>): ParseState.Failure? {
+                    for (hint in hints) {
+                        val failure = hint.map(args)
+                        if (failure != null) {
+                            return failure
+                        }
+                    }
+                    return null
+                }
             }
         }
     }

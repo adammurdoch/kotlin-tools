@@ -1,5 +1,6 @@
 - Handle app fails with exception with no message
 - Test repeated option from nested action
+- Don't run actions when successful but extra inputs
 - Replace usages of host with context in parse states
 - Remove inheritance of options
 - Split out recovery logic into a parse state implementation

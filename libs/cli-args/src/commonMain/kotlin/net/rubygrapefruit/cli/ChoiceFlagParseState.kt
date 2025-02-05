@@ -13,7 +13,7 @@ internal open class ChoiceFlagParseState<T : Any>(
             is Matcher.Success -> {
                 value = result.value
                 // Keep going to allow the value to be overridden by a later flag
-                ParseState.Continue(result.consumed, this)
+                ParseState.Continue(result.consumed, this, null) {}
             }
 
             is Matcher.Nothing -> ParseState.Nothing

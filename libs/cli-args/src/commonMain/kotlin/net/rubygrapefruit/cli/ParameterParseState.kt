@@ -3,14 +3,13 @@ package net.rubygrapefruit.cli
 internal class ParameterParseState<T : Any>(
     private val target: AbstractParameter<T>,
     private val context: ParseContext,
-    private val host: Host,
     private val required: Boolean,
     private val defaultValue: T?,
     private val converter: StringConverter<T>
 ) : ParseState {
     override fun parseNextValue(args: List<String>): ParseState.Result {
         val candidate = args.first()
-        return if (host.isOption(candidate)) {
+        return if (context.isOption(candidate)) {
             ParseState.Nothing
         } else {
             val result = converter.convert("parameter '${target.name}'", candidate)

@@ -6,9 +6,8 @@ internal class OptionalParameter<T : Any>(
     name: String,
     help: String?,
     private val default: T,
-    host: Host,
     converter: StringConverter<T>
-) : AbstractParameter<T>(name, help, host, converter), Parameter<T> {
+) : AbstractParameter<T>(name, help, converter), Parameter<T> {
 
     override val usage: String
         get() = "<$name>?"
@@ -22,6 +21,6 @@ internal class OptionalParameter<T : Any>(
     }
 
     override fun start(context: ParseContext): ParseState {
-        return ParameterParseState(this, context, host, false, default, converter)
+        return ParameterParseState(this, context, false, default, converter)
     }
 }

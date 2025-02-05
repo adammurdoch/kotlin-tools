@@ -102,7 +102,7 @@ open class Action {
     fun <T : Action> action(builder: Actions<T>.() -> Unit): Parameter<T> {
         val actions = DefaultActions<T>(DefaultHost)
         builder(actions)
-        val parameter = DefaultActionParameter(actions.build(), DefaultHost)
+        val parameter = DefaultActionParameter(actions.build())
         positional.add(parameter)
         recoverables.addAll(parameter.recoverables)
         return parameter
@@ -128,7 +128,7 @@ open class Action {
      * Configures this object from the given arguments.
      */
     fun maybeParse(args: List<String>): Result {
-        val context = DefaultContext(positional, emptyList())
+        val context = DefaultContext(DefaultHost, positional, emptyList())
         return maybeParse(args, context)
     }
 

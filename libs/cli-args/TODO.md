@@ -1,6 +1,5 @@
 - Handle app fails with exception with no message
 - Don't run actions when successful but extra inputs
-- Replace usages of host with context in parse states
 - Split out recovery logic into a parse state implementation
 - Distinguish between failure due to missing value vs semantic issue (currently uses `expectedMore`)
 - List option:

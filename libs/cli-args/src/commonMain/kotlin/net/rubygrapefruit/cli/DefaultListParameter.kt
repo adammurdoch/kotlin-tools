@@ -5,7 +5,6 @@ import kotlin.reflect.KProperty
 internal class DefaultListParameter<T : Any>(
     val name: String,
     private val help: String?,
-    private val host: Host,
     private val owner: Action,
     private val default: List<T>,
     private val required: Boolean,
@@ -14,14 +13,14 @@ internal class DefaultListParameter<T : Any>(
     private val values = mutableListOf<T>()
 
     override fun whenAbsent(default: List<T>): Parameter<List<T>> {
-        return owner.replace(this, DefaultListParameter(name, help, host, owner, default, false, converter))
+        return owner.replace(this, DefaultListParameter(name, help, owner, default, false, converter))
     }
 
     override fun optional(): Parameter<List<T>> {
         return if (!required) {
             this
         } else {
-            owner.replace(this, DefaultListParameter(name, help, host, owner, emptyList(), false, converter))
+            owner.replace(this, DefaultListParameter(name, help, owner, emptyList(), false, converter))
         }
     }
 
@@ -38,7 +37,7 @@ internal class DefaultListParameter<T : Any>(
     }
 
     override fun start(context: ParseContext): ParseState {
-        return ListParameterParseState(this, default, required, host, converter)
+        return ListParameterParseState(this, context, default, required, converter)
     }
 
     fun values(values: List<T>) {

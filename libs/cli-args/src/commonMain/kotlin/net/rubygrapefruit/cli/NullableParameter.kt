@@ -5,9 +5,8 @@ import kotlin.reflect.KProperty
 internal class NullableParameter<T : Any>(
     name: String,
     help: String?,
-    host: Host,
     converter: StringConverter<T>
-) : AbstractParameter<T>(name, help, host, converter), Parameter<T?> {
+) : AbstractParameter<T>(name, help, converter), Parameter<T?> {
 
     override val usage: String
         get() = "<$name>?"
@@ -21,6 +20,6 @@ internal class NullableParameter<T : Any>(
     }
 
     override fun start(context: ParseContext): ParseState {
-        return ParameterParseState(this, context, host, false, null, converter)
+        return ParameterParseState(this, context, false, null, converter)
     }
 }

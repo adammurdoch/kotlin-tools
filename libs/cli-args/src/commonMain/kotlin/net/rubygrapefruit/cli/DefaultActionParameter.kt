@@ -3,8 +3,7 @@ package net.rubygrapefruit.cli
 import kotlin.reflect.KProperty
 
 internal class DefaultActionParameter<T : Action>(
-    private val actions: ActionSet<T>,
-    private val host: Host
+    private val actions: ActionSet<T>
 ) : Positional, Parameter<T> {
     private var action: T? = null
 
@@ -40,7 +39,7 @@ internal class DefaultActionParameter<T : Action>(
     }
 
     override fun start(context: ParseContext): ParseState {
-        return ActionParameterParseState(this, context, actions, host)
+        return ActionParameterParseState(this, context, actions)
     }
 
     class NameUsage(val name: String) : HasPositionalUsage {

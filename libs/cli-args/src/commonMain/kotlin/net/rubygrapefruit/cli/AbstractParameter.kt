@@ -3,7 +3,6 @@ package net.rubygrapefruit.cli
 internal abstract class AbstractParameter<T : Any>(
     val name: String,
     protected val help: String?,
-    protected val host: Host,
     protected val converter: StringConverter<T>
 ) : Positional {
     private var set = false

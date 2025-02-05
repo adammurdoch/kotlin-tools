@@ -5,8 +5,7 @@ import net.rubygrapefruit.cli.DefaultActionParameter.NameUsage
 internal class ActionParameterParseState<T : Action>(
     private val target: DefaultActionParameter<T>,
     private val context: ParseContext,
-    private val actions: ActionSet<T>,
-    private val host: Host
+    private val actions: ActionSet<T>
 ) : ParseState {
     override fun parseNextValue(args: List<String>): ParseState.Result {
         val name = args.first()
@@ -29,7 +28,7 @@ internal class ActionParameterParseState<T : Action>(
             }
         }
 
-        if (host.isOption(name)) {
+        if (context.isOption(name)) {
             return ParseState.Nothing
         }
 

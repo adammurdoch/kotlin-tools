@@ -2,16 +2,16 @@ package net.rubygrapefruit.cli
 
 internal class ListParameterParseState<T : Any>(
     private val target: DefaultListParameter<T>,
+    private val context: ParseContext,
     private val default: List<T>,
     private val required: Boolean,
-    private val host: Host,
     private val converter: StringConverter<T>
 ) : ParseState {
     private val values = mutableListOf<T>()
 
     override fun parseNextValue(args: List<String>): ParseState.Result {
         val candidate = args.first()
-        return if (host.isOption(candidate)) {
+        return if (context.isOption(candidate)) {
             ParseState.Nothing
         } else {
             val result = converter.convert("parameter '${target.name}'", candidate)

@@ -5,21 +5,20 @@ import kotlin.reflect.KProperty
 internal class DefaultParameter<T : Any>(
     name: String,
     help: String?,
-    host: Host,
     private val owner: Action,
     converter: StringConverter<T>
-) : AbstractParameter<T>(name, help, host, converter), RequiredParameter<T> {
+) : AbstractParameter<T>(name, help, converter), RequiredParameter<T> {
 
     override fun whenAbsent(default: T): Parameter<T> {
-        return owner.replace(this, OptionalParameter(name, help, default, host, converter))
+        return owner.replace(this, OptionalParameter(name, help, default, converter))
     }
 
     override fun optional(): Parameter<T?> {
-        return owner.replace(this, NullableParameter(name, help, host, converter))
+        return owner.replace(this, NullableParameter(name, help, converter))
     }
 
     override fun repeated(): ListParameter<T> {
-        return owner.replace(this, DefaultListParameter(name, help, host, owner, emptyList(), true, converter))
+        return owner.replace(this, DefaultListParameter(name, help, owner, emptyList(), true, converter))
     }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T {
@@ -31,6 +30,6 @@ internal class DefaultParameter<T : Any>(
     }
 
     override fun start(context: ParseContext): ParseState {
-        return ParameterParseState(this, context, host, true, null, converter)
+        return ParameterParseState(this, context, true, null, converter)
     }
 }

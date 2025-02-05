@@ -25,9 +25,12 @@ internal class SequenceParseState(initialStates: List<ParseState>) : AbstractCol
                     ParseState.Continue(result.consumed, this)
                 }
 
-                is ParseState.Failure, ParseState.Nothing -> {
-                    result
+                is ParseState.Failure -> {
+                    collect(result)
+                    result.withHint(collectHints())
                 }
+
+                is ParseState.Nothing -> result
             }
         }
     }

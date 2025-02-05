@@ -15,20 +15,28 @@ internal abstract class AbstractCollectingParseState : ParseState {
         }
     }
 
+    protected fun collect(result: ParseState.Failure) {
+        if (result.hint != null) {
+            pendingHints.add(result.hint)
+        }
+    }
+
     protected fun collectHints(): FailureHint? {
-        return if (pendingHints.isEmpty()) {
-            null
-        } else {
-            val hints = pendingHints.toList()
-            object : FailureHint {
-                override fun map(args: List<String>): ParseState.Failure? {
-                    for (hint in hints) {
-                        val failure = hint.map(args)
-                        if (failure != null) {
-                            return failure
+        return when (pendingHints.size) {
+            0 -> null
+            1 -> pendingHints[0]
+            else -> {
+                val hints = pendingHints.toList()
+                object : FailureHint {
+                    override fun map(args: List<String>): ParseState.Failure? {
+                        for (hint in hints) {
+                            val failure = hint.map(args)
+                            if (failure != null) {
+                                return failure
+                            }
                         }
+                        return null
                     }
-                    return null
                 }
             }
         }

@@ -39,7 +39,10 @@ internal class ActionParseState<T : Action>(
                 ParseState.Continue(positionalResult.consumed, this)
             }
 
-            is ParseState.Failure -> positionalResult
+            is ParseState.Failure -> {
+                collect(positionalResult)
+                positionalResult.withHint(collectHints())
+            }
 
             is ParseState.Continue -> {
                 positional = positionalResult.state
@@ -51,7 +54,7 @@ internal class ActionParseState<T : Action>(
                 val finishResult = endOfInput()
                 when (finishResult) {
                     is ParseState.FinishFailure -> finishResult.toResult()
-                    is ParseState.FinishSuccess -> ParseState.Success(0, null, finishResult.apply)
+                    is ParseState.FinishSuccess -> ParseState.Success(0, collectHints(), finishResult.apply)
                 }
             }
         }

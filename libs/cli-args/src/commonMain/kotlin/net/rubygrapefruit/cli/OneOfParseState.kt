@@ -24,7 +24,11 @@ internal class OneOfParseState(initialStates: List<ParseState>) : AbstractCollec
                     return ParseState.Continue(result.consumed, this)
                 }
 
-                is ParseState.Failure -> return result
+                is ParseState.Failure -> {
+                    collect(result)
+                    return result.withHint(collectHints())
+                }
+
                 is ParseState.Nothing -> index++
             }
         }

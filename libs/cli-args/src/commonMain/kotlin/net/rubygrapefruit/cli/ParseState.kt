@@ -43,7 +43,8 @@ internal interface ParseState {
         val resolution: String? = null,
         val positional: List<PositionalUsage> = emptyList(),
         val actions: List<NamedNestedActionUsage> = emptyList(),
-        val expectedMore: Boolean = false
+        val expectedMore: Boolean = false,
+        val hint: FailureHint? = null
     ) : Result {
         val exception: ArgParseException
             get() {
@@ -53,6 +54,14 @@ internal interface ParseState {
                     PositionalParseException(message, resolution = resolution ?: message, positional = positional, actions = actions)
                 }
             }
+
+        fun withHint(hint: FailureHint?): Result {
+            return if (hint == null && this.hint == null) {
+                this
+            } else {
+                Failure(recognized, message, resolution, positional, actions, expectedMore, hint)
+            }
+        }
     }
 
     sealed interface FinishResult

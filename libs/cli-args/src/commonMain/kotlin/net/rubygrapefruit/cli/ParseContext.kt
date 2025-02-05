@@ -26,6 +26,6 @@ internal class DefaultContext(
         val newPositional = items.toMutableList()
         newPositional.removeAt(index)
         newPositional.addAll(index, replacement)
-        return DefaultContext(newPositional, options.filter { it.inheritable })
+        return DefaultContext(newPositional, options)
     }
 }

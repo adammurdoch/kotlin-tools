@@ -6,7 +6,4 @@ internal interface NonPositional {
     fun start(context: ParseContext): ParseState
 
     fun accepts(option: String): Boolean
-
-    val inheritable: Boolean
-        get() = true
 }

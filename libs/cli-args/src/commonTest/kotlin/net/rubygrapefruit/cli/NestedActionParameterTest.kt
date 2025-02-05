@@ -188,7 +188,7 @@ class NestedActionParameterTest : AbstractActionTest() {
     }
 
     @Test
-    fun `can provide default action`() {
+    fun `can provide unnamed action to use when none provided`() {
         val def = Action()
         val s1 = Action()
 
@@ -281,7 +281,7 @@ class NestedActionParameterTest : AbstractActionTest() {
     }
 
     @Test
-    fun `can query usage of nested action of default action by name`() {
+    fun `can query usage of nested action of unnamed action by name`() {
         class Sub1 : Action() {
             val action by action {
                 action(Action(), "sub2")

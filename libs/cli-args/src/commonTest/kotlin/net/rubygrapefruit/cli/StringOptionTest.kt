@@ -190,6 +190,18 @@ class StringOptionTest : AbstractActionTest() {
     }
 
     @Test
+    fun `fails when multiple options and option is present multiple times`() {
+        class Option : Action() {
+            val option1 by option("o")
+            val option2 by option("p")
+        }
+
+        println("-> START TEST")
+        parseFails(::Option, listOf("-o", "1", "-o", "2", "-p", "3"), "Value for option -o already provided")
+        parseFails(::Option, listOf("-o", "1", "-p", "2", "-o", "3"), "Value for option -o already provided")
+    }
+
+    @Test
     fun `option name must not start with punctuation`() {
         class Broken1 : Action() {
             val option by option("-o")

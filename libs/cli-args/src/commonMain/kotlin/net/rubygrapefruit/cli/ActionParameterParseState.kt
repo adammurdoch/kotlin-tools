@@ -39,7 +39,15 @@ internal class ActionParameterParseState<T : Action>(
     override fun endOfInput(): ParseState.FinishResult {
         return if (actions.default != null) {
             val nestedContext = context.nested(target, actions.default.value.positional())
-            stateFor(actions.default.value, nestedContext).endOfInput()
+            val result = stateFor(actions.default.value, nestedContext).endOfInput()
+            return if (result is ParseState.FinishSuccess) {
+                ParseState.FinishSuccess {
+                    result.apply()
+                    target.value(actions.default.value)
+                }
+            } else {
+                result
+            }
         } else {
             ParseState.FinishFailure("Action not provided", resolution = "Please specify an action to run.", positional = context.positional, actions = target.actionInfo)
         }

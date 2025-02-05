@@ -181,12 +181,13 @@ open class Action {
         val result = state.endOfInput()
         return when (result) {
             is ParseState.FinishSuccess -> {
-                result.apply()
+                actions.add(result.apply)
+                actions.run()
                 Result.Success
             }
 
             is ParseState.FinishFailure -> {
-                attemptToRecover(args, args.size, result.exception, true, null, DefaultHost, context)
+                attemptToRecover(args, args.size, result.exception, true, hints.merge(), DefaultHost, context)
             }
         }
     }

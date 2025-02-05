@@ -12,12 +12,13 @@ internal open class ChoiceFlagParseState<T : Any>(
         return when (result) {
             is Matcher.Success -> {
                 value = result.value
+                // Keep going to allow the value to be overridden by a later flag
                 ParseState.Continue(result.consumed, this)
             }
 
             is Matcher.Nothing -> ParseState.Nothing
 
-            is Matcher.Failure -> ParseState.Failure(result.consumed, result.message)
+            is Matcher.Failure -> result.toParseState()
         }
     }
 

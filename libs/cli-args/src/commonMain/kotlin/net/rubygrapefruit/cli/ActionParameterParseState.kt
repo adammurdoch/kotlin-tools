@@ -10,7 +10,7 @@ internal class ActionParameterParseState<T : Action>(
 ) : ParseState {
     override fun parseNextValue(args: List<String>): ParseState.Result {
         val name = args.first()
-        val action = actions.named[name]
+        val action = actions.named[name] ?: actions.options[name]
         if (action != null) {
             val nestedContext = context.nested(target, listOf(NameUsage(name)) + action.value.positional())
             return ParseState.Continue(1, stateFor(action.value, nestedContext))

@@ -39,5 +39,7 @@ internal interface Matcher<T : Any> {
         override fun asParseResult(): ParseResult {
             return ParseResult.Failure(consumed, ArgParseException(message), expectedMore)
         }
+
+        fun toParseState() = ParseState.Failure(consumed, message, expectedMore = expectedMore)
     }
 }

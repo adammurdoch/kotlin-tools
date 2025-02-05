@@ -16,7 +16,7 @@ internal class ListOptionParseState<T : Any>(
 
             is Matcher.Nothing -> ParseState.Nothing
 
-            is Matcher.Failure -> ParseState.Failure(result.consumed, result.message)
+            is Matcher.Failure -> result.toParseState()
         }
     }
 

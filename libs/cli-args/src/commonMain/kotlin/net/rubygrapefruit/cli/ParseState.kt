@@ -42,7 +42,8 @@ internal interface ParseState {
         val message: String,
         val resolution: String? = null,
         val positional: List<PositionalUsage> = emptyList(),
-        val actions: List<NamedNestedActionUsage> = emptyList()
+        val actions: List<NamedNestedActionUsage> = emptyList(),
+        val expectedMore: Boolean = false
     ) : Result {
         val exception: ArgParseException
             get() {
@@ -64,7 +65,7 @@ internal interface ParseState {
         val positional: List<PositionalUsage> = emptyList(),
         val actions: List<NamedNestedActionUsage> = emptyList()
     ) : FinishResult {
-        fun toResult() = Failure(0, message = message, resolution = resolution, positional = positional, actions = actions)
+        fun toResult() = Failure(0, message = message, resolution = resolution, positional = positional, actions = actions, expectedMore = true)
 
         val exception: ArgParseException
             get() {

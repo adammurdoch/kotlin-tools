@@ -105,6 +105,21 @@ class NestedActionOptionTest : AbstractActionTest() {
     }
 
     @Test
+    fun `fails when action present multiple times`() {
+        val s1 = Action()
+        val s2 = Action()
+
+        class WithSub : Action() {
+            val sub by action {
+                option(s1, "s1")
+                option(s2, "s2")
+            }
+        }
+
+        parseFails(::WithSub, listOf("--s1", "--s1"), "Cannot use option --s1 multiple times")
+    }
+
+    @Test
     fun `can declare a nested option that can be used even when there a parse error`() {
         class Sub1 : Action()
 

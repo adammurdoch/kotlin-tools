@@ -32,14 +32,27 @@ class NestedActionOptionAndParameterTest : AbstractActionTest() {
             }
         }
 
+        parseFails(::WithSub, emptyList(), "Action not provided")
         parseFails(::WithSub, listOf("--sub", "sub"), "Cannot use action 'sub' with option --sub")
         parseFails(::WithSub, listOf("sub", "--sub"), "Cannot use option --sub with action 'sub'")
-        parseFails(::WithSub, listOf("sub", "sub"), "Unknown parameter: sub")
+    }
+
+    @Test
+    fun `fails when action present multiple times`() {
+        class WithSub : Action() {
+            val sub by action {
+                option(Action(), "sub")
+                action(Action(), "sub")
+            }
+        }
+
+        parseFails(::WithSub, listOf("sub", "sub"), "Cannot use action 'sub' multiple times")
+        parseFails(::WithSub, listOf("--sub", "--sub"), "Cannot use option --sub multiple times")
     }
 
     @Test
     fun `fails when exactly one action not provided and unnamed action specified`() {
-        class Sub: Action() {
+        class Sub : Action() {
             val param by parameter("param")
         }
 

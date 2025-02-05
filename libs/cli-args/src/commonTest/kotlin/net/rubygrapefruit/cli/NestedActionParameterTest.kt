@@ -155,7 +155,7 @@ class NestedActionParameterTest : AbstractActionTest() {
             assertIs<ActionParameterUsage>(e.positional[0])
             assertEquals(2, e.actions.size)
         }
-        parseFails(::WithSub, listOf("s1", "s2"), "Unknown parameter: s2")
+        parseFails(::WithSub, listOf("s1", "s2"), "Cannot use action 's2' with action 's1'")
     }
 
     @Test

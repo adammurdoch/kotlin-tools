@@ -6,10 +6,6 @@ internal sealed class ParseResult {
 
     abstract val failure: ArgParseException?
 
-    abstract fun prepend(count: Int): ParseResult
-
-    abstract fun asFinishResult(): FinishResult
-
     companion object {
         fun of(count: Int, failure: FinishResult.Failure?): ParseResult {
             return if (failure != null) {
@@ -39,13 +35,6 @@ internal sealed class ParseResult {
         override val failure: ArgParseException?
             get() = null
 
-        override fun prepend(count: Int): Success {
-            return Success(count)
-        }
-
-        override fun asFinishResult(): FinishResult {
-            return FinishResult.Success
-        }
     }
 
     /**
@@ -55,25 +44,12 @@ internal sealed class ParseResult {
         override val failure: ArgParseException?
             get() = null
 
-        override fun prepend(count: Int): Success {
-            return Success(this.recognized + count)
-        }
-
-        override fun asFinishResult(): FinishResult {
-            return FinishResult.Success
-        }
     }
 
     /**
      * Failed, possibly by consuming nothing.
      */
     data class Failure(override val recognized: Int, override val failure: ArgParseException, val expectedMore: Boolean = false) : ParseResult() {
-        override fun prepend(count: Int): Failure {
-            return Failure(this.recognized + count, this.failure, this.expectedMore)
-        }
 
-        override fun asFinishResult(): FinishResult.Failure {
-            return FinishResult.Failure(failure, expectedMore)
-        }
     }
 }

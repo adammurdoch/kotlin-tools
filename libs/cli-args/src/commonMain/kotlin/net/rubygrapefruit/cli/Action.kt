@@ -147,7 +147,8 @@ open class Action {
         var state = state(context) {}
         var index = 0
         while (index < args.size) {
-            val result = state.parseNextValue(args.subList(index, args.size))
+            val current = args.subList(index, args.size)
+            val result = state.parseNextValue(current)
             when (result) {
                 is ParseState.Success -> {
                     result.apply()

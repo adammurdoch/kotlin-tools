@@ -2,7 +2,9 @@
 - Remove duplication in OneOf, Sequence and Action parse states
 - Replace usages of host with context in parse states
 - Remove inheritance of options
-- Distinguish between failure due to missing value vs semantic issue
+- Replace ParseResult with ParseState.Result
+- Split out recovering parse state implementation
+- Distinguish between failure due to missing value vs semantic issue (currently uses `expectedMore`)
 - List option:
   - Require 1 or more
 - Consistent error message for missing parameter and missing required list parameter

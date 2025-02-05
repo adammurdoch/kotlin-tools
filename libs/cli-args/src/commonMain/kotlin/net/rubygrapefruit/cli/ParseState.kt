@@ -47,10 +47,10 @@ internal interface ParseState {
     ) : Result {
         val exception: ArgParseException
             get() {
-                return if (resolution == null) {
+                return if (positional.isEmpty()) {
                     ArgParseException(message)
                 } else {
-                    PositionalParseException(message, resolution = resolution, positional = positional, actions = actions)
+                    PositionalParseException(message, resolution = resolution ?: message, positional = positional, actions = actions)
                 }
             }
     }

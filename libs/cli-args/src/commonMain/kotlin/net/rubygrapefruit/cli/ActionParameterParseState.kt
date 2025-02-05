@@ -16,13 +16,13 @@ internal class ActionParameterParseState<T : Action>(
             return ParseState.Continue(1, stateFor(action.first, action.second.value, nestedContext))
         }
 
-        if (host.isOption(name)) {
-            return ParseState.Nothing
-        }
-
         if (actions.default != null) {
             val nestedContext = context.nested(target, actions.default.value.positional())
             return ParseState.Continue(0, stateFor(null, actions.default.value, nestedContext))
+        }
+
+        if (host.isOption(name)) {
+            return ParseState.Nothing
         }
 
         return ParseState.Failure(1, "Unknown action: $name", positional = context.positional, actions = target.actionInfo)

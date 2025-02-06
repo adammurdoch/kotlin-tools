@@ -128,7 +128,7 @@ open class Action {
      * Configures this object from the given arguments.
      */
     fun maybeParse(args: List<String>): Result {
-        val context = DefaultContext(DefaultHost, positional, emptyList())
+        val context = DefaultContext(DefaultHost, positional)
         return maybeParse(args, context)
     }
 
@@ -270,7 +270,7 @@ open class Action {
             // Parsing stopped on an unknown option
             arg != null && host.isOption(arg) -> {
                 // Throw away the failure if parsing expected more but stopped on an unknown option
-                val failure = if (originalFailure != null && expectedMore && !context.options.any { it.accepts(arg) }) {
+                val failure = if (originalFailure != null && expectedMore && !options.any { it.accepts(arg) }) {
                     null
                 } else {
                     originalFailure

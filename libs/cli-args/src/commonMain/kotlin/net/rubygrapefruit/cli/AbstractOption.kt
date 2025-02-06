@@ -4,6 +4,7 @@ internal abstract class AbstractOption<T : Any>(
     protected val matcher: OptionMatcher<T>
 ) : NonPositional {
     protected var value: T? = null
+        private set
 
     override fun toString(): String {
         return "${matcher.flags.first()} <value>"

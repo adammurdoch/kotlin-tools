@@ -5,7 +5,6 @@ internal abstract class AbstractParameter<T : Any>(
     protected val help: String?,
     protected val converter: StringConverter<T>
 ) : Positional {
-    private var set = false
     protected var value: T? = null
         private set
 
@@ -21,7 +20,6 @@ internal abstract class AbstractParameter<T : Any>(
     }
 
     fun value(value: T?) {
-        set = true
         this.value = value
     }
 }

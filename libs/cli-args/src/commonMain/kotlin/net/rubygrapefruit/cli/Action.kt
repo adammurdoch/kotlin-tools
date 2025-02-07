@@ -133,7 +133,7 @@ open class Action {
     }
 
     internal fun state(context: ParseContext): ParseState {
-        return ActionParseState(context, this, options, positional)
+        return ActionParseState(context, options, positional)
     }
 
     internal fun maybeParse(args: List<String>, parent: ParseContext): Result {
@@ -156,7 +156,7 @@ open class Action {
                     } else {
                         // Should not need this but currently required by Recoverable
                         actions.run()
-                        attemptToRecover(args, consumed, null, false, hints.merge(), DefaultHost, context)
+                        attemptToRecover(args, consumed, null, false, hints.merge(), DefaultHost, result.context ?: context)
                     }
                 }
 
@@ -282,7 +282,7 @@ open class Action {
             originalFailure != null -> originalFailure
 
             // Parsing stopped on a positional parameter
-            else -> ArgParseException("Unknown parameter: $arg")
+            else -> PositionalParseException("Unknown parameter: $arg", resolution = "Too many arguments provided: $arg", positional = context.positional)
         }
         return Result.Failure(failure)
     }

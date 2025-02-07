@@ -1,13 +1,13 @@
 package net.rubygrapefruit.cli
 
-internal class ActionParseState<T : Action>(
+internal class ActionParseState(
     private val context: ParseContext,
-    private val action: T,
     namedParameters: List<NonPositional>,
     positionalParameters: List<Positional>
 ) : AbstractCollectingParseState() {
     private var named: ParseState = OneOfParseState(namedParameters.map { it.start(context) })
     private var positional: ParseState = SequenceParseState(positionalParameters.map { it.start(context) })
+    private var parsedContext = context
 
     override fun parseNextValue(args: List<String>): ParseState.Result {
         val namedResult = named.parseNextValue(args)
@@ -33,6 +33,7 @@ internal class ActionParseState<T : Action>(
         return when (positionalResult) {
             is ParseState.Success -> {
                 positional = NothingParseState
+                parsedContext = positionalResult.context ?: context
                 ParseState.Continue(positionalResult.consumed, this, positionalResult.hint, positionalResult.apply)
             }
 
@@ -48,7 +49,7 @@ internal class ActionParseState<T : Action>(
                 val finishResult = endOfInput()
                 when (finishResult) {
                     is ParseState.FinishFailure -> finishResult.toResult()
-                    is ParseState.FinishSuccess -> ParseState.Success(0, null, finishResult.apply)
+                    is ParseState.FinishSuccess -> ParseState.Success(0, null, parsedContext, finishResult.apply)
                 }
             }
         }

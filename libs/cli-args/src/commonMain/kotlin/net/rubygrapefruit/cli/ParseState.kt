@@ -25,7 +25,7 @@ internal interface ParseState {
      * Parsing has recognized a value and will not match any more inputs.
      * The state should be discarded and the given function called to apply the result of parsing.
      */
-    data class Success(val consumed: Int, val hint: FailureHint? = null, val apply: () -> Unit) : Result
+    data class Success(val consumed: Int, val hint: FailureHint? = null, val context: ParseContext? = null, val apply: () -> Unit) : Result
 
     /**
      * Parsing has recognized a value and can continue parsing more values.

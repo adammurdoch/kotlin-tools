@@ -30,7 +30,9 @@ class CliAppErrorReportingTest {
         App().run(listOf("help"), formatter)
         hasUsageMessage(
             """
-            Unknown parameter: help
+            Too many arguments provided: help
+
+            Usage: cmd
         """
         )
     }
@@ -110,6 +112,26 @@ class CliAppErrorReportingTest {
             Parameters:
               <param1> parameter 1
               <param2> parameter 2
+        """
+        )
+    }
+
+    @Test
+    fun `reports additional parameter`() {
+        class App : CliApp("cmd") {
+            val param by parameter("param", help = "parameter 1")
+            val param2 by parameter("no-help")
+        }
+
+        App().run(listOf("a", "b", "c"), formatter)
+        hasUsageMessage(
+            """
+            Too many arguments provided: c
+            
+            Usage: cmd <param> <no-help>
+            
+            Parameters:
+              <param> parameter 1
         """
         )
     }

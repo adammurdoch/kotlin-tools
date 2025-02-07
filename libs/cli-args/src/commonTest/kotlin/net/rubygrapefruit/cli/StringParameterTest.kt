@@ -33,12 +33,7 @@ class StringParameterTest : AbstractActionTest() {
             val param by parameter("value")
         }
 
-        parseFails(::Parameter, emptyList()) { e ->
-            assertIs<PositionalParseException>(e)
-            assertEquals("Parameter 'value' not provided", e.message)
-            assertEquals(1, e.positional.size)
-            assertIs<ParameterUsage>(e.positional[0])
-        }
+        parseFails(::Parameter, emptyList(), "Parameter 'value' not provided", "<param>")
     }
 
     @Test
@@ -48,7 +43,7 @@ class StringParameterTest : AbstractActionTest() {
             val p2 by parameter("a2")
         }
 
-        parseFails(::Parameter, listOf("abc"), "Parameter 'a2' not provided")
+        parseFails(::Parameter, listOf("abc"), "Parameter 'a2' not provided", "<param>", "<param>")
     }
 
     @Test
@@ -134,8 +129,9 @@ class StringParameterTest : AbstractActionTest() {
             val flag by flag("f", "flag")
         }
 
-        parseFails(::Parameter, listOf("--flag"), "Parameter 'value' not provided")
-        parseFails(::Parameter, listOf("-f"), "Parameter 'value' not provided")
+        parseFails(::Parameter, listOf("--flag"), "Parameter 'value' not provided", "<param>")
+        parseFails(::Parameter, listOf("-f"), "Parameter 'value' not provided", "<param>")
+        // Prefer reporting an unknown option
         parseFails(::Parameter, listOf("--unknown"), "Unknown option: --unknown")
         parseFails(::Parameter, listOf("-u"), "Unknown option: -u")
     }
@@ -178,7 +174,7 @@ class StringParameterTest : AbstractActionTest() {
             val param by parameter("value")
         }
 
-        parseFails(::Parameter, listOf("1", "2"), "Unknown parameter: 2")
+        parseFails(::Parameter, listOf("1", "2"), "Unknown parameter: 2", "<param>")
     }
 
     @Test
@@ -187,7 +183,7 @@ class StringParameterTest : AbstractActionTest() {
             val param by parameter("value").whenAbsent("value")
         }
 
-        parseFails(::Parameter, listOf("1", "2"), "Unknown parameter: 2")
+        parseFails(::Parameter, listOf("1", "2"), "Unknown parameter: 2", "<param>")
     }
 
     @Test
@@ -196,7 +192,7 @@ class StringParameterTest : AbstractActionTest() {
             val param by parameter("value").optional()
         }
 
-        parseFails(::Parameter, listOf("1", "2"), "Unknown parameter: 2")
+        parseFails(::Parameter, listOf("1", "2"), "Unknown parameter: 2", "<param>")
     }
 
     @Test

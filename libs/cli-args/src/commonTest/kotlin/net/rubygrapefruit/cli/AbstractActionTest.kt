@@ -24,6 +24,30 @@ abstract class AbstractActionTest {
         parseFails(factory, args) { e -> assertEquals(message, e.message) }
     }
 
+    /**
+     * Expects parsing fails with a problem with a positional parameter.
+     */
+    fun parseFails(factory: () -> Action, args: List<String>, message: String, vararg usage: String, verification: (PositionalParseException) -> Unit = {}) {
+        parseFails(factory, args) { e ->
+            assertIs<PositionalParseException>(e)
+            assertEquals(message, e.message)
+            assertEquals(usage.size, e.positional.size)
+            for (index in usage.indices) {
+                val expected = usage[index]
+                val actual = e.positional[index]
+                if (expected == "<param>") {
+                    assertIs<ParameterUsage>(actual)
+                } else if (expected == "<action>") {
+                    assertIs<ActionParameterUsage>(actual)
+                } else {
+                    assertIs<LiteralUsage>(actual)
+                    assertEquals(expected, actual.name)
+                }
+            }
+            verification(e)
+        }
+    }
+
     fun parseFails(factory: () -> Action, args: List<String>, verification: (ArgParseException) -> Unit) {
         val action1 = factory()
         try {

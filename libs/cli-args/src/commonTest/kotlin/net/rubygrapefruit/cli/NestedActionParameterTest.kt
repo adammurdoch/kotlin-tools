@@ -148,11 +148,7 @@ class NestedActionParameterTest : AbstractActionTest() {
             }
         }
 
-        parseFails(::WithSub, emptyList()) { e ->
-            assertIs<PositionalParseException>(e)
-            assertEquals("Action not provided", e.message)
-            assertEquals(1, e.positional.size)
-            assertIs<ActionParameterUsage>(e.positional[0])
+        parseFails(::WithSub, emptyList(), "Action not provided", "<action>") { e ->
             assertEquals(2, e.actions.size)
         }
         parseFails(::WithSub, listOf("s1", "s2"), "Cannot use action 's2' with action 's1'")
@@ -178,13 +174,7 @@ class NestedActionParameterTest : AbstractActionTest() {
             }
         }
 
-        parseFails(::WithSub, listOf("sub")) { e ->
-            assertIs<PositionalParseException>(e)
-            assertEquals("Action not provided", e.message)
-            assertEquals(2, e.positional.size)
-            assertIs<LiteralUsage>(e.positional[0])
-            assertIs<ActionParameterUsage>(e.positional[1])
-        }
+        parseFails(::WithSub, listOf("sub"), "Action not provided", "sub", "<action>")
     }
 
     @Test
@@ -217,11 +207,7 @@ class NestedActionParameterTest : AbstractActionTest() {
             }
         }
 
-        parseFails(::WithSub, listOf("thing")) { e ->
-            assertIs<PositionalParseException>(e)
-            assertEquals("Unknown action: thing", e.message)
-            assertEquals(1, e.positional.size)
-            assertIs<ActionParameterUsage>(e.positional[0])
+        parseFails(::WithSub, listOf("thing"), "Unknown action: thing", "<action>") { e ->
             assertEquals(2, e.actions.size)
         }
     }

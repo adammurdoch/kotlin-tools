@@ -35,11 +35,7 @@ internal class ParameterParseState<T : Any>(
 
     override fun endOfInput(): ParseState.FinishResult {
         return if (required) {
-            ParseState.FinishFailure(
-                "Parameter '${target.name}' not provided",
-                resolution = "Please provide a value for parameter '${target.name}'.",
-                positional = context.positional
-            )
+            missingParameter(target.name, context)
         } else {
             ParseState.FinishSuccess {
                 target.value(defaultValue)

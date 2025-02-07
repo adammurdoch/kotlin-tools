@@ -6,7 +6,7 @@ import kotlin.reflect.KClass
  * An action that can be configured using command-line arguments.
  */
 open class Action {
-    private val options = mutableListOf<NonPositional>()
+    private val options = mutableListOf<Named>()
     private val positional = mutableListOf<Positional>()
     private val recoverables = mutableListOf<Recoverable>()
 
@@ -298,7 +298,7 @@ open class Action {
         return positional.firstOrNull()?.usage(name)
     }
 
-    internal fun <T : NonPositional> add(option: T): T {
+    internal fun <T : Named> add(option: T): T {
         options.add(option)
         return option
     }
@@ -308,7 +308,7 @@ open class Action {
         return param
     }
 
-    internal fun <T : NonPositional> replace(option: NonPositional, newOption: T): T {
+    internal fun <T : Named> replace(option: Named, newOption: T): T {
         options[options.indexOf(option)] = newOption
         return newOption
     }

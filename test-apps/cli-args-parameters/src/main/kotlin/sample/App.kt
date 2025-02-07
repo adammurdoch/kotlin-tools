@@ -7,7 +7,7 @@ class App : CliApp("cli-args-test") {
     private val choice by oneOf {
         choice(1, "one", help = "Option one")
         choice(2, "two", help = "Option two")
-    }.parameter("choice").optional()
+    }.parameter("choice", help = "Choice option").optional()
     private val repeated by parameter("list", help = "Repeated option").repeated()
 
     override fun run() {

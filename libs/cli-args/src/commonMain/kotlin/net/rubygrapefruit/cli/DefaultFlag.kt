@@ -7,7 +7,7 @@ internal class DefaultFlag private constructor(
     private val disableFlags: List<String>,
     private val help: String?,
     default: Boolean
-) : NonPositional, Flag {
+) : Named, Flag {
     private var value: Boolean = default
 
     override val enableUsage: String

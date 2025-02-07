@@ -3,7 +3,7 @@ package net.rubygrapefruit.cli
 internal sealed interface ParseContext {
     val positional: List<PositionalUsage>
 
-    fun withOptions(options: List<NonPositional>): ParseContext
+    fun withOptions(options: List<Named>): ParseContext
 
     fun nested(positional: Positional, replacement: List<HasPositionalUsage>): ParseContext
 
@@ -21,7 +21,7 @@ internal class DefaultContext(
         return host.isOption(flag)
     }
 
-    override fun withOptions(options: List<NonPositional>): ParseContext {
+    override fun withOptions(options: List<Named>): ParseContext {
         return DefaultContext(host, items)
     }
 

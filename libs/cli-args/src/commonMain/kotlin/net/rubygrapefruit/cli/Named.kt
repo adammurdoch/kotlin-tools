@@ -1,6 +1,9 @@
 package net.rubygrapefruit.cli
 
-internal interface NonPositional {
+/**
+ * A named parameter.
+ */
+internal interface Named {
     fun usage(): List<NonPositionalUsage>
 
     fun start(context: ParseContext): ParseState

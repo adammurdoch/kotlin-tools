@@ -2,7 +2,7 @@ package net.rubygrapefruit.cli
 
 internal abstract class AbstractOption<T : Any>(
     protected val matcher: OptionMatcher<T>
-) : NonPositional {
+) : Named {
     protected var value: T? = null
         private set
 

@@ -60,6 +60,25 @@ class CliAppErrorReportingTest {
     }
 
     @Test
+    fun `reports missing list parameter for first positional`() {
+        class App : CliApp("cmd") {
+            val param by parameter("param", help = "parameter 1").repeated()
+        }
+
+        App().run(emptyList(), formatter)
+        hasUsageMessage(
+            """
+            Please provide a value for parameter 'param'.
+
+            Usage: cmd <param>...
+
+            Parameters:
+              <param> parameter 1
+        """
+        )
+    }
+
+    @Test
     fun `reports missing parameter for first positional of nested action`() {
         class Sub : Action() {
             val param by parameter("param2", help = "parameter 2")

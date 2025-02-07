@@ -2,7 +2,7 @@ package net.rubygrapefruit.cli
 
 internal class ActionParseState(
     private val context: ParseContext,
-    namedParameters: List<NonPositional>,
+    namedParameters: List<Named>,
     positionalParameters: List<Positional>
 ) : AbstractCollectingParseState() {
     private var named: ParseState = OneOfParseState(namedParameters.map { it.start(context) })

@@ -5,7 +5,6 @@
 - Distinguish between failure due to missing value vs semantic issue (currently uses `expectedMore`)
 - List option:
   - Require 1 or more
-- Consistent error message for missing parameter and missing required list parameter
 - `Action.run()` runs nested actions, if present
 - Report multiple problems
 - Error message shows where on the command-line the problem occurred.

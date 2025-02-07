@@ -28,7 +28,7 @@ internal class ListParameterParseState<T : Any>(
 
     override fun endOfInput(): ParseState.FinishResult {
         return if (required && values.isEmpty()) {
-            ParseState.FinishFailure("Parameter '${target.name}' not provided")
+            missingParameter(target.name, context)
         } else {
             val result = if (values.isNotEmpty()) values else default
             ParseState.FinishSuccess {

@@ -9,7 +9,7 @@ class StringListParameterTest : AbstractActionTest() {
             val param by parameter("value").repeated()
         }
 
-        parseFails(::Parameter, emptyList(), "Parameter 'value' not provided")
+        parseFails(::Parameter, emptyList(), "Parameter 'value' not provided", "<param>")
 
         parse(::Parameter, listOf("abc")) { action ->
             assertEquals(listOf("abc"), action.param)
@@ -72,8 +72,8 @@ class StringListParameterTest : AbstractActionTest() {
             val flag by flag("f", "flag")
         }
 
-        parseFails(::Parameter, listOf("-f"), "Parameter 'value' not provided")
-        parseFails(::Parameter, listOf("--flag"), "Parameter 'value' not provided")
+        parseFails(::Parameter, listOf("-f"), "Parameter 'value' not provided", "<param>")
+        parseFails(::Parameter, listOf("--flag"), "Parameter 'value' not provided", "<param>")
         parseFails(::Parameter, listOf("-u"), "Unknown option: -u")
         parseFails(::Parameter, listOf("--unknown"), "Unknown option: --unknown")
     }
@@ -129,7 +129,7 @@ class StringListParameterTest : AbstractActionTest() {
             val param by remainder("value").required()
         }
 
-        parseFails(::Parameter, emptyList(), "Parameter 'value' not provided")
+        parseFails(::Parameter, emptyList(), "Parameter 'value' not provided", "<param>")
 
         parse(::Parameter, listOf("--flag")) { action ->
             assertEquals(listOf("--flag"), action.param)

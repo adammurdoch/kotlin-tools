@@ -4,7 +4,7 @@ import kotlin.reflect.KProperty
 
 internal class DefaultListOption<T : Any>(
     private val matcher: Matcher<T>
-) : ListOption<T>, NonPositional {
+) : ListOption<T>, Named {
     private val value = mutableListOf<T>()
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): List<T> {

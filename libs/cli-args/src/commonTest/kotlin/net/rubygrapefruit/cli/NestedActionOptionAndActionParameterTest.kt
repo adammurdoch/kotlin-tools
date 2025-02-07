@@ -25,16 +25,22 @@ class NestedActionOptionAndActionParameterTest : AbstractActionTest() {
 
     @Test
     fun `fails when exactly one action not provided`() {
+        class Parameter: Action() {
+            val param by parameter("param")
+        }
         class WithSub : Action() {
             val sub by action {
-                option(Action(), "sub")
-                action(Action(), "sub")
+                option(Parameter(), "sub")
+                action(Parameter(), "sub")
+                action(Parameter(), "sub2")
             }
         }
 
         parseFails(::WithSub, emptyList(), "Action not provided")
-        parseFails(::WithSub, listOf("--sub", "sub"), "Cannot use action 'sub' with option --sub")
+        parseFails(::WithSub, listOf("--sub", "p", "sub"), "Cannot use action 'sub' with option --sub")
         parseFails(::WithSub, listOf("sub", "--sub"), "Cannot use option --sub with action 'sub'")
+        parseFails(::WithSub, listOf("sub", "p", "--sub"), "Cannot use option --sub with action 'sub'")
+        parseFails(::WithSub, listOf("sub", "p", "sub2"), "Cannot use action 'sub2' with action 'sub'")
     }
 
     @Test

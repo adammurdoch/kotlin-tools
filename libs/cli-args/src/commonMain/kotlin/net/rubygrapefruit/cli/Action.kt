@@ -167,7 +167,9 @@ open class Action {
         return newParam
     }
 
-    internal fun positional(): List<Positional> = state.positional
+    internal fun nestedContext(context: ParseContext, positional: Positional, prefix: List<HasPositionalUsage>): ParseContext {
+        return context.nested(positional, prefix + state.positional)
+    }
 
     private interface State {
         val positional: List<Positional>

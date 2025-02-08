@@ -9,22 +9,20 @@ internal class ActionParameterParseState<T : Action>(
 ) : ParseState {
     override fun parseNextValue(args: List<String>): ParseState.Result {
         val name = args.first()
-        val action = actions.lookup(name)
-        if (action != null) {
-            val nestedContext = context.nested(target, listOf(NameUsage(name)) + action.second.value.positional())
-            return ParseState.Continue(
-                1,
-                stateFor(action.second.value, nestedContext),
-                ActionHint(action.first, actions),
-            ) {
-                target.value(action.second.value)
+        val selected = actions.lookup(name)
+        if (selected != null) {
+            val action = selected.second.value
+            val nestedContext = action.nestedContext(context, target, listOf(NameUsage(name)))
+            return ParseState.Continue(1, action.state(nestedContext), ActionHint(selected.first, actions)) {
+                target.value(action)
             }
         }
 
         if (actions.default != null) {
-            val nestedContext = context.nested(target, actions.default.value.positional())
-            return ParseState.Continue(0, stateFor(actions.default.value, nestedContext), null) {
-                target.value(actions.default.value)
+            val action = actions.default.value
+            val nestedContext = action.nestedContext(context, target, emptyList())
+            return ParseState.Continue(0, action.state(nestedContext), null) {
+                target.value(action)
             }
         }
 
@@ -37,12 +35,13 @@ internal class ActionParameterParseState<T : Action>(
 
     override fun endOfInput(): ParseState.FinishResult {
         return if (actions.default != null) {
-            val nestedContext = context.nested(target, actions.default.value.positional())
-            val result = stateFor(actions.default.value, nestedContext).endOfInput()
+            val action = actions.default.value
+            val nestedContext = action.nestedContext(context, target, emptyList())
+            val result = action.state(nestedContext).endOfInput()
             return if (result is ParseState.FinishSuccess) {
                 ParseState.FinishSuccess {
                     result.apply()
-                    target.value(actions.default.value)
+                    target.value(action)
                 }
             } else {
                 result
@@ -50,10 +49,6 @@ internal class ActionParameterParseState<T : Action>(
         } else {
             ParseState.FinishFailure("Action not provided", resolution = "Please specify an action to run.", positional = context.positional, actions = target.actionInfo)
         }
-    }
-
-    private fun stateFor(action: T, nestedContext: ParseContext): ParseState {
-        return action.state(nestedContext)
     }
 
     private class ActionHint(private val selected: String, private val actions: ActionSet<*>) : FailureHint {

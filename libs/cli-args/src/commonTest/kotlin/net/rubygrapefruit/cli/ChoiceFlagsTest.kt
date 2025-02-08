@@ -162,27 +162,35 @@ class ChoiceFlagsTest : AbstractActionTest() {
 
     @Test
     fun `name must not start with punctuation`() {
-        class Broken1 : Action() {
-            val sub by oneOf {
+        try {
+            Action().oneOf {
                 choice(1, "--one")
             }.flags()
-        }
-        try {
-            Broken1()
             fail()
         } catch (e: IllegalArgumentException) {
             assertEquals("--one cannot be used as a choice name", e.message)
         }
-        class Broken2 : Action() {
-            val sub by oneOf {
+        try {
+            Action().oneOf {
                 choice(1, "one", "-1")
             }.flags()
-        }
-        try {
-            Broken2()
             fail()
         } catch (e: IllegalArgumentException) {
             assertEquals("-1 cannot be used as a choice name", e.message)
+        }
+    }
+
+    @Test
+    fun `names must be unique`() {
+        val action = Action()
+        action.option("o", "option")
+        try {
+            action.oneOf {
+                choice(1, "o", "1")
+            }.flags()
+            fail()
+        } catch (e: IllegalArgumentException) {
+            assertEquals("-o is used by another parameter", e.message)
         }
     }
 }

@@ -218,14 +218,14 @@ class StringOptionTest : AbstractActionTest() {
     }
 
     @Test
-    fun `option names must be unique`() {
+    fun `names must be unique`() {
         val action = Action()
         action.option("o", "option")
         try {
             action.option("o")
             fail()
         } catch (e: IllegalArgumentException) {
-            assertEquals("-o is used by another option", e.message)
+            assertEquals("-o is used by another parameter", e.message)
         }
     }
 }

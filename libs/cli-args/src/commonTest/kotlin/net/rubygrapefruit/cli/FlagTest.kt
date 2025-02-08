@@ -150,23 +150,29 @@ class FlagTest : AbstractActionTest() {
 
     @Test
     fun `name must not start with punctuation`() {
-        class Broken1 : Action() {
-            val flag by flag("-f")
-        }
         try {
-            Broken1()
+            Action().flag("-f")
             fail()
         } catch (e: IllegalArgumentException) {
             assertEquals("-f cannot be used as a flag name", e.message)
         }
-        class Broken2 : Action() {
-            val flag by flag("f", "--flag")
-        }
         try {
-            Broken2()
+            Action().flag("f", "--flag")
             fail()
         } catch (e: IllegalArgumentException) {
             assertEquals("--flag cannot be used as a flag name", e.message)
+        }
+    }
+
+    @Test
+    fun `names must be unique`() {
+        val action = Action()
+        action.option("o", "option")
+        try {
+            action.flag("o")
+            fail()
+        } catch (e: IllegalArgumentException) {
+            assertEquals("-o is used by another parameter", e.message)
         }
     }
 }

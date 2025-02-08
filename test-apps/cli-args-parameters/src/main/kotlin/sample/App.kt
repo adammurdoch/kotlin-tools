@@ -3,12 +3,12 @@ package sample
 import net.rubygrapefruit.cli.app.CliApp
 
 class App : CliApp("cli-args-test") {
-    private val param by parameter("param", help = "Some parameter")
+    private val param by parameter("required", help = "Required parameter")
     private val choice by oneOf {
         choice(1, "one", help = "Option one")
         choice(2, "two", help = "Option two")
-    }.parameter("choice", help = "Choice option").optional()
-    private val repeated by parameter("list", help = "Repeated option").repeated()
+    }.parameter("choice", help = "Optional choice parameter").optional()
+    private val repeated by int().parameter("list", help = "Repeated int parameter").repeated()
 
     override fun run() {
         println("flag: $param")

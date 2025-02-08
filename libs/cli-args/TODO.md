@@ -1,6 +1,6 @@
 - Handle app fails with exception with no message
-- Required option + unknown parameter -> reports missing option 
-- Don't run side effects when successful but extra inputs
+- Required option + unknown parameter -> reports missing option
+- Don't run side effects when successful but there are extra inputs
 - Split out recovery logic into a parse state implementation
 - Distinguish between failure due to missing value vs semantic issue (currently uses `expectedMore`)
 - List option:
@@ -62,6 +62,7 @@
 - Validate names do not contain spaces
 - Validate at least one action or choice is defined, if no default
 - Validate choices do not contain spaces
+- Check for conflicting options in nested actions
 - Disallow conflicting flags, option and action names, choice flags
 - Disallow any positional parameters after string list parameter
 - File locations: dir, file, must exist

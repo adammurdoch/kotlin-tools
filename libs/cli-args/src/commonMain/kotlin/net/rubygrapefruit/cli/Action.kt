@@ -193,7 +193,7 @@ open class Action {
             val newMarkers = param.markers
             for (marker in newMarkers) {
                 if (markers.contains(marker)) {
-                    throw IllegalArgumentException("$marker is used by another option")
+                    throw IllegalArgumentException("$marker is used by another parameter")
                 }
             }
             markers.addAll(newMarkers)

@@ -356,7 +356,7 @@ open class Action {
                     }
 
                     is ParseState.Failure, is ParseState.Nothing -> {
-                        null
+                        return null
                     }
                 }
             }

@@ -49,21 +49,40 @@ internal class DefaultActionParameter<T : Action>(
     }
 
     private inner class AllowAnywhereOption(val name: String, val option: ActionDetails<T>) : Recoverable {
+        override fun maybeRecover(context: ParseContext): ParseState {
+            return if (action == option.value) {
+                FinishedState
+            } else {
+                RecoveryState(name, option.value, this@DefaultActionParameter, context)
+            }
+        }
+    }
 
-        override fun toString(): String {
-            return name
+    private class RecoveryState<T : Action>(val name: String, val action: T, val target: DefaultActionParameter<T>, val context: ParseContext) : ParseState {
+        override fun parseNextValue(args: List<String>): ParseState.Result {
+            val arg = args.first()
+            return if (arg == name) {
+                val nestedContext = action.nestedContext(context, target, listOf(NameUsage(name)))
+                return ParseState.Continue(1, action.state(nestedContext)) {
+                    target.value(action)
+                }
+            } else {
+                ParseState.Nothing
+            }
         }
 
-        override fun maybeRecover(args: List<String>, context: ParseContext): Boolean {
-            return if (action == option.value) {
-                true
-            } else if (args.firstOrNull() == this.name) {
-                action = option.value
-                val result = option.value.maybeParse(args.drop(1), context)
-                result is Action.Result.Success
-            } else {
-                false
-            }
+        override fun endOfInput(): ParseState.FinishResult {
+            return ParseState.FinishSuccess {}
+        }
+    }
+
+    private object FinishedState : ParseState {
+        override fun parseNextValue(args: List<String>): ParseState.Result {
+            return ParseState.Success(0) {}
+        }
+
+        override fun endOfInput(): ParseState.FinishResult {
+            return ParseState.FinishSuccess {}
         }
     }
 }

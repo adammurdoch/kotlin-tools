@@ -120,7 +120,7 @@ class NestedActionOptionTest : AbstractActionTest() {
     }
 
     @Test
-    fun `can declare a nested option that can be used even when there a parse error`() {
+    fun `can declare a nested action that can be used to recover from a parse error`() {
         class Sub1 : Action()
 
         class Sub2 : Action() {
@@ -185,6 +185,63 @@ class NestedActionOptionTest : AbstractActionTest() {
         }
         parse(WithSub(), listOf("unknown", "--s1")) { action ->
             assertIs<Sub1>(action.sub)
+        }
+    }
+
+    @Test
+    fun `recovery action can have parameters`() {
+        class Sub1 : Action() {
+            val param by parameter("param")
+        }
+
+        class Sub2 : Action() {
+            val p1 by parameter("p1")
+            val p2 by parameter("p2")
+        }
+
+        class WithSub : Action() {
+            val sub by action {
+                option(Sub1(), "s1", allowAnywhere = true)
+                option(Sub2(), "s2")
+            }
+        }
+
+        parse(WithSub(), listOf("--s1", "p")) { action ->
+            val sub = action.sub
+            assertIs<Sub1>(sub)
+            assertEquals("p", sub.param)
+        }
+        parse(WithSub(), listOf("--s1", "p", "--unknown")) { action ->
+            val sub = action.sub
+            assertIs<Sub1>(sub)
+            assertEquals("p", sub.param)
+        }
+        parse(WithSub(), listOf("--unknown", "--s1", "p")) { action ->
+            val sub = action.sub
+            assertIs<Sub1>(sub)
+            assertEquals("p", sub.param)
+        }
+        parse(WithSub(), listOf("--unknown", "--s1", "p", "unknown")) { action ->
+            val sub = action.sub
+            assertIs<Sub1>(sub)
+            assertEquals("p", sub.param)
+        }
+        parse(WithSub(), listOf("--s2", "--s1", "p")) { action ->
+            val sub = action.sub
+            assertIs<Sub1>(sub)
+            assertEquals("p", sub.param)
+        }
+        parseFails(::WithSub, listOf("--s1"), "Parameter 'param' not provided", "--s1", "<param>")
+        parseFails(::WithSub, listOf("unknown", "--s1"), "Parameter 'param' not provided", "--s1", "<param>")
+        parse(WithSub(), listOf("--s1", "--s1", "p")) { action ->
+            val sub = action.sub
+            assertIs<Sub1>(sub)
+            assertEquals("p", sub.param)
+        }
+        parse(WithSub(), listOf("--s1", "p", "--s1", "ignore")) { action ->
+            val sub = action.sub
+            assertIs<Sub1>(sub)
+            assertEquals("p", sub.param)
         }
     }
 }

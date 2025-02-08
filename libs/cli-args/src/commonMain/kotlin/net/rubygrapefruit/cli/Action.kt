@@ -126,17 +126,13 @@ open class Action {
      */
     fun maybeParse(args: List<String>): Result {
         val context = DefaultContext(DefaultHost, state.positional)
-        return maybeParse(args, context)
+        val result = state.maybeParse(args, context)
+        state = Finished(state.positional, state.usage())
+        return result
     }
 
     internal fun state(context: ParseContext): ParseState {
         return state.parseState(context)
-    }
-
-    internal fun maybeParse(args: List<String>, parent: ParseContext): Result {
-        val result = state.maybeParse(args, parent)
-        state = Finished(state.positional, state.usage())
-        return result
     }
 
     fun usage(): ActionUsage {
@@ -252,17 +248,17 @@ open class Action {
                         } else {
                             // Should not need this but currently required by Recoverable
                             actions.run()
-                            attemptToRecover(args, consumed, null, false, hints.merge(), DefaultHost, result.context ?: context)
+                            attemptToRecover(args, consumed, null, false, hints.merge(), DefaultHost, result.context ?: context, context)
                         }
                     }
 
                     is ParseState.Failure -> {
                         var recognized = index + result.recognized
-                        return attemptToRecover(args, recognized, result.exception, result.expectedMore, hints.merge(), DefaultHost, context)
+                        return attemptToRecover(args, recognized, result.exception, result.expectedMore, hints.merge(), DefaultHost, context, context)
                     }
 
                     is ParseState.Nothing -> {
-                        attemptToRecover(args, index, null, false, hints.merge(), DefaultHost, context)
+                        attemptToRecover(args, index, null, false, hints.merge(), DefaultHost, context, context)
                     }
 
                     is ParseState.Continue -> {
@@ -282,7 +278,7 @@ open class Action {
                 }
 
                 is ParseState.FinishFailure -> {
-                    attemptToRecover(args, args.size, result.exception, true, hints.merge(), DefaultHost, context)
+                    attemptToRecover(args, args.size, result.exception, true, hints.merge(), DefaultHost, context, context)
                 }
             }
         }
@@ -294,19 +290,18 @@ open class Action {
             expectedMore: Boolean,
             hint: FailureHint?,
             host: Host,
-            parent: ParseContext
+            context: ParseContext,
+            recoveryContext: ParseContext
         ): Result {
-            val context = parent.withOptions(options)
-
             // Allow an option to recover from parse failure by attempting to do a "recovery" parse from where parsing stopped
             var index = recognized
             while (index in args.indices) {
                 val current = args.subList(index, args.size)
                 for (option in recoverables) {
-                    val result = option.maybeRecover(current, context)
-                    if (result) {
-                        // Don't attempt to keep parsing
-                        return Result.Success
+                    val state = option.maybeRecover(recoveryContext)
+                    val result = complete(state, current)
+                    if (result != null) {
+                        return result
                     }
                 }
                 // Skip this argument and attempt to recover on next argument
@@ -344,6 +339,40 @@ open class Action {
             return Result.Failure(failure)
         }
 
+        private fun complete(state: ParseState, args: List<String>): Result? {
+            var currentState = state
+            for (index in args.indices) {
+                val current = args.subList(index, args.size)
+                val result = currentState.parseNextValue(current)
+                when (result) {
+                    is ParseState.Success -> {
+                        result.apply()
+                        return Result.Success
+                    }
+
+                    is ParseState.Continue -> {
+                        result.apply()
+                        currentState = result.state
+                    }
+
+                    is ParseState.Failure, is ParseState.Nothing -> {
+                        null
+                    }
+                }
+            }
+
+            val result = currentState.endOfInput()
+            return when (result) {
+                is ParseState.FinishSuccess -> {
+                    result.apply()
+                    Result.Success
+                }
+
+                is ParseState.FinishFailure -> {
+                    Result.Failure(result.exception)
+                }
+            }
+        }
 
         private fun ParseState.Continue.collect(actions: MutableList<() -> Unit>, hints: MutableList<FailureHint>) {
             actions.add(apply)

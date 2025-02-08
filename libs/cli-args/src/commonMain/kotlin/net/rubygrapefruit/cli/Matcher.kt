@@ -4,15 +4,12 @@ package net.rubygrapefruit.cli
  * Matches one or more arguments to produce a value of type [T].
  */
 internal interface Matcher<T : Any> {
+    val markers: List<String>
+
     /**
      * Attempts to match the given arguments.
      */
     fun match(args: List<String>): Result<T>
-
-    /**
-     * Would this matcher accept the given argument?
-     */
-    fun accepts(option: String): Boolean
 
     fun usage(): List<NonPositionalUsage>
 

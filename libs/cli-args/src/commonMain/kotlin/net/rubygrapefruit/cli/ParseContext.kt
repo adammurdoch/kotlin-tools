@@ -18,7 +18,7 @@ internal class DefaultContext(
         get() = items.map { it.usage() }
 
     override fun isOption(flag: String): Boolean {
-        return host.isOption(flag)
+        return host.isMarker(flag)
     }
 
     override fun withOptions(options: List<Named>): ParseContext {

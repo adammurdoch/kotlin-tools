@@ -8,16 +8,16 @@ internal class OptionMatcher<T : Any>(
     private val host: Host,
     private val converter: StringConverter<T>
 ) : Matcher<T> {
-    val flags = names.map { host.option(it) }
+    override val markers = names.map { host.marker(it) }
 
     val type: KClass<*> get() = converter.type
 
     override fun match(args: List<String>): Matcher.Result<T> {
         val arg = args.first()
-        if (!flags.contains(arg)) {
+        if (!markers.contains(arg)) {
             return Matcher.Nothing()
         }
-        if (args.size == 1 || host.isOption(args[1])) {
+        if (args.size == 1 || host.isMarker(args[1])) {
             return Matcher.Failure(1, "Value missing for option $arg", expectedMore = true)
         }
         val result = converter.convert("option $arg", args[1])
@@ -27,12 +27,8 @@ internal class OptionMatcher<T : Any>(
         }
     }
 
-    override fun accepts(option: String): Boolean {
-        return option in flags
-    }
-
     override fun usage(): List<OptionUsage> {
-        val usage = SingleOptionUsage(flags.joinToString(", ") { "$it <value>" }, help, flags)
+        val usage = SingleOptionUsage(markers.joinToString(", ") { "$it <value>" }, help, markers)
         return listOf(OptionUsage(usage.usage, help, converter.type, listOf(usage)))
     }
 }

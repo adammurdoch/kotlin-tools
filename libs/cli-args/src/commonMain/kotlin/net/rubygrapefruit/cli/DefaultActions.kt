@@ -15,7 +15,7 @@ internal class DefaultActions<T : Action>(private val host: Host) : Action.Actio
     }
 
     override fun option(action: T, name: String, help: String?, allowAnywhere: Boolean) {
-        options[host.option(name)] = ActionDetails(action, help, allowAnywhere)
+        options[host.marker(name)] = ActionDetails(action, help, allowAnywhere)
     }
 
     fun build() = ActionSet(options.toMap(), parameters.toMap(), default)

@@ -7,6 +7,7 @@ import kotlin.reflect.KClass
  */
 open class Action {
     private val options = mutableListOf<Named>()
+    private val markers = mutableListOf<String>()
     private val positional = mutableListOf<Positional>()
     private val recoverables = mutableListOf<Recoverable>()
 
@@ -268,9 +269,9 @@ open class Action {
         val originalFailure = failure
         val failure = when {
             // Parsing stopped on an unknown option
-            arg != null && host.isOption(arg) -> {
+            arg != null && host.isMarker(arg) -> {
                 // Throw away the failure if parsing expected more but stopped on an unknown option
-                val failure = if (originalFailure != null && expectedMore && !options.any { it.accepts(arg) }) {
+                val failure = if (originalFailure != null && expectedMore && !options.any { it.markers.contains(arg) }) {
                     null
                 } else {
                     originalFailure
@@ -298,9 +299,16 @@ open class Action {
         return positional.firstOrNull()?.usage(name)
     }
 
-    internal fun <T : Named> add(option: T): T {
-        options.add(option)
-        return option
+    internal fun <T : Named> add(param: T): T {
+        val newMarkers = param.markers
+        for (marker in newMarkers) {
+            if (markers.contains(marker)) {
+                throw IllegalArgumentException("$marker is used by another option")
+            }
+        }
+        markers.addAll(newMarkers)
+        options.add(param)
+        return param
     }
 
     internal fun <T : Positional> add(param: T): T {
@@ -308,9 +316,9 @@ open class Action {
         return param
     }
 
-    internal fun <T : Named> replace(option: Named, newOption: T): T {
-        options[options.indexOf(option)] = newOption
-        return newOption
+    internal fun <T : Named> replace(param: Named, newParam: T): T {
+        options[options.indexOf(param)] = newParam
+        return newParam
     }
 
     internal fun <T : Positional> replace(param: Positional, newParam: T): T {

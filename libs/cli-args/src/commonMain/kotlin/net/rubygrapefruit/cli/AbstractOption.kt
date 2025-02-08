@@ -6,16 +6,15 @@ internal abstract class AbstractOption<T : Any>(
     protected var value: T? = null
         private set
 
+    override val markers: List<String>
+        get() = matcher.markers
+
     override fun toString(): String {
-        return "${matcher.flags.first()} <value>"
+        return "${matcher.markers.first()} <value>"
     }
 
     override fun usage(): List<OptionUsage> {
         return matcher.usage()
-    }
-
-    override fun accepts(option: String): Boolean {
-        return matcher.accepts(option)
     }
 
     fun value(value: T?) {

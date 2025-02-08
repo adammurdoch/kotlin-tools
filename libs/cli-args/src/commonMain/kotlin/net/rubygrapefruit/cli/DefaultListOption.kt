@@ -7,16 +7,15 @@ internal class DefaultListOption<T : Any>(
 ) : ListOption<T>, Named {
     private val value = mutableListOf<T>()
 
+    override val markers: List<String>
+        get() = matcher.markers
+
     override fun getValue(thisRef: Any?, property: KProperty<*>): List<T> {
         return value
     }
 
     override fun usage(): List<NonPositionalUsage> {
         return matcher.usage()
-    }
-
-    override fun accepts(option: String): Boolean {
-        return matcher.accepts(option)
     }
 
     fun value(value: List<T>) {

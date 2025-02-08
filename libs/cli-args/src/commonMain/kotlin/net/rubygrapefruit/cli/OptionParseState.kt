@@ -20,7 +20,7 @@ internal open class OptionParseState<T : Any>(
     }
 
     override fun endOfInput(): ParseState.FinishResult {
-        return ParseState.FinishFailure("Option ${matcher.flags.maxBy { it.length }} not provided")
+        return ParseState.FinishFailure("Option ${matcher.markers.maxBy { it.length }} not provided")
     }
 
     override fun map(args: List<String>): ParseState.Failure? {

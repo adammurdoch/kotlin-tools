@@ -4,19 +4,19 @@ internal interface Host {
     @Throws(IllegalArgumentException::class)
     fun validate(name: String, description: String)
 
-    fun option(name: String): String
+    fun marker(name: String): String
 
-    fun isOption(flag: String): Boolean
+    fun isMarker(flag: String): Boolean
 }
 
 internal object DefaultHost : Host {
     override fun validate(name: String, description: String) {
-        if (isOption(name)) {
+        if (isMarker(name)) {
             throw IllegalArgumentException("$name cannot be used as $description")
         }
     }
 
-    override fun option(name: String): String {
+    override fun marker(name: String): String {
         return if (name.length == 1) {
             "-$name"
         } else {
@@ -24,7 +24,7 @@ internal object DefaultHost : Host {
         }
     }
 
-    override fun isOption(flag: String): Boolean {
+    override fun isMarker(flag: String): Boolean {
         return flag.startsWith("-")
     }
 }

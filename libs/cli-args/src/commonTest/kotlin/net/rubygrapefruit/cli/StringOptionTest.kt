@@ -203,23 +203,29 @@ class StringOptionTest : AbstractActionTest() {
 
     @Test
     fun `option name must not start with punctuation`() {
-        class Broken1 : Action() {
-            val option by option("-o")
-        }
         try {
-            Broken1()
+            Action().option("-o")
             fail()
         } catch (e: IllegalArgumentException) {
             assertEquals("-o cannot be used as an option name", e.message)
         }
-        class Broken2 : Action() {
-            val option by option("o", "--option")
-        }
         try {
-            Broken2()
+            Action().option("o", "--option")
             fail()
         } catch (e: IllegalArgumentException) {
             assertEquals("--option cannot be used as an option name", e.message)
+        }
+    }
+
+    @Test
+    fun `option names must be unique`() {
+        val action = Action()
+        action.option("o", "option")
+        try {
+            action.option("o")
+            fail()
+        } catch (e: IllegalArgumentException) {
+            assertEquals("-o is used by another option", e.message)
         }
     }
 }

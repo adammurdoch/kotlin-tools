@@ -6,12 +6,11 @@ internal abstract class AbstractChoiceFlag<T : Any>(
     protected var value: T? = null
         private set
 
+    override val markers: List<String>
+        get() = matcher.markers
+
     override fun usage(): List<FlagUsage> {
         return matcher.usage()
-    }
-
-    override fun accepts(option: String): Boolean {
-        return matcher.accepts(option)
     }
 
     fun value(value: T?) {

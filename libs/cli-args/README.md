@@ -17,6 +17,7 @@ Features:
   - `String`, `Boolean` and `Integer` typed arguments.
   - Choose from a set of values
   - Custom type argument
+  - Required, optional, multi-value options.
 - Positional parameters
     - `String`, `Boolean` and `Integer` typed arguments.
     - Choose from a set of values

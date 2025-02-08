@@ -5,7 +5,7 @@
 - Distinguish between failure due to missing value vs semantic issue (currently uses `expectedMore`)
 - List option:
   - Require 1 or more
-- `Action.run()` runs nested actions, if present
+- `Action.run()` runs nested actions, if present? Downside: IDEA marks the action field as unused
 - Report multiple problems
 - Error message shows where on the command-line the problem occurred.
 - Use Kotlinx IO types for files
@@ -57,10 +57,8 @@
     - Option value badly formed
     - Parameter value badly formed
     - Option value missing
-    - Multiple actions specified, eg multiple args, multiple options, etc.
 - Allow actions to calculate the set of options dynamically
   - For example, action is constructed with a list of enum _types_
-- Handle required list parameter with default value - disallow? succeed if absent and default provided?
 - Validate names do not contain spaces
 - Validate at least one action or choice is defined, if no default
 - Validate choices do not contain spaces

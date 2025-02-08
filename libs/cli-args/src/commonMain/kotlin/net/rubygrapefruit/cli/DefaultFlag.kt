@@ -13,10 +13,13 @@ internal class DefaultFlag private constructor(
     override val enableUsage: String
         get() = enableFlags.first()
 
+    override val markers: List<String>
+        get() = enableFlags + disableFlags
+
     constructor(names: List<String>, disableOptions: Boolean, help: String?, host: Host, default: Boolean) :
             this(
-                names.map { host.option(it) },
-                if (disableOptions) names.mapNotNull { if (it.length == 1) null else host.option("no-$it") } else emptyList(),
+                names.map { host.marker(it) },
+                if (disableOptions) names.mapNotNull { if (it.length == 1) null else host.marker("no-$it") } else emptyList(),
                 help,
                 default
             )
@@ -34,10 +37,6 @@ internal class DefaultFlag private constructor(
         val disableUsage = if (disableFlags.isNotEmpty()) listOf(SingleOptionUsage(disableFlags.joinToString(", "), null, disableFlags)) else emptyList()
         val usage = (enableFlags + disableFlags).joinToString(", ")
         return listOf(FlagUsage(usage, help, enableUsage + disableUsage))
-    }
-
-    override fun accepts(option: String): Boolean {
-        return enableFlags.contains(option) || disableFlags.contains(option)
     }
 
     fun value(value: Boolean) {

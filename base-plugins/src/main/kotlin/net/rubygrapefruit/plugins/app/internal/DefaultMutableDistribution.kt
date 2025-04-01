@@ -48,8 +48,8 @@ abstract class DefaultMutableDistribution @Inject constructor(
     @get:Inject
     abstract val providers: ProviderFactory
 
-    override fun taskName(base: String): String {
-        return taskName(name, base)
+    override fun taskName(baseName: String): String {
+        return taskName(name, baseName)
     }
 
     override fun buildDirName(baseName: String): String {

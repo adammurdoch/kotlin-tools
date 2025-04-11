@@ -61,3 +61,9 @@ gradlePlugin {
         }
     }
 }
+
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xmulti-dollar-interpolation")
+    }
+}

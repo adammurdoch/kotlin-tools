@@ -5,7 +5,10 @@
 - Native library allows generated common source
 - UI apps pass CLI args to main function
 - JVM apps option to define JVM args when launching JVM
+- JVM app use Application Class Data Sharing
 - JVM UI cli option to log to stdout
+- Fix `$JAVA_DEBUG` with embedded JVM dist
+- Debug JVM UI app
 - MacOS UI redirect to log file
 - Native apps discover `main()` function with or without args, and fix samples
 - Validate app main class and entry point names

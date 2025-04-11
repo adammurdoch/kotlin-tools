@@ -81,7 +81,8 @@ Builds a command-line application implemented in Kotlin/JVM.
 Expects that the application uses the JVM module system.
 
 - The distribution contains the jars for the application and a launcher script. 
-  This script requires that a compatible JVM can be found on the machine's `$PATH`. 
+  This script requires that a compatible JVM can be found on the machine's `$PATH`, unless one of the plugin below is also used.
+- The launcher script starts the application in the debugger when `$JVM_DEBUG` is set to a non-empty string
 - Adds `application { }` block, see below for the available settings.
 - Automatically determines the application main class.
 - Generates a `module-info`.

@@ -228,8 +228,8 @@ open class Action {
             return ActionParseState(context, options, positional)
         }
 
-        override fun maybeParse(args: List<String>, parent: ParseContext): Result {
-            val context = parent.withOptions(options)
+        override fun maybeParse(args: List<String>, parentContext: ParseContext): Result {
+            val context = parentContext.withOptions(options)
             val actions = mutableListOf<() -> Unit>()
             val hints = mutableListOf<FailureHint>()
 
@@ -241,7 +241,7 @@ open class Action {
                 when (result) {
                     is ParseState.Success -> {
                         result.collect(actions, hints)
-                        var consumed = index + result.consumed
+                        val consumed = index + result.consumed
                         return if (consumed == args.size) {
                             actions.run()
                             Result.Success
@@ -253,7 +253,7 @@ open class Action {
                     }
 
                     is ParseState.Failure -> {
-                        var recognized = index + result.recognized
+                        val recognized = index + result.recognized
                         return attemptToRecover(args, recognized, result.exception, result.expectedMore, hints.merge(), DefaultHost, context, context)
                     }
 

@@ -4,17 +4,12 @@ import sample.calc.Failure
 import sample.calc.Parser
 import sample.calc.Success
 import sample.system.getSystemInfo
-import java.awt.Color
-import java.awt.Dimension
-import java.awt.GraphicsEnvironment
-import java.awt.GridBagConstraints
-import java.awt.GridBagLayout
-import java.awt.Insets
+import java.awt.*
 import javax.swing.*
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 
-fun main() {
+fun main(args: Array<String>) {
     val frame = JFrame("Test App")
     frame.size = Dimension(600, 500)
     frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
@@ -85,6 +80,8 @@ fun main() {
             }
         }
     })
+
+    input.text = args.joinToString(" ")
 
     val screenBounds = GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.defaultConfiguration.bounds
     val x = (screenBounds.width - screenBounds.x - frame.width) / 2 + screenBounds.x

@@ -7,4 +7,5 @@ plugins {
 }
 
 include("native-launcher")
+include("native-jvm-launcher")
 include("launcher-plugins")

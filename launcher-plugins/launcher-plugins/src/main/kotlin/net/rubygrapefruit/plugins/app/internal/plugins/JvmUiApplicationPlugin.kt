@@ -45,7 +45,7 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                         it.isCanBeResolved = true
                         it.isCanBeConsumed = false
                     }
-                    dependencies.add(nativeBinary.name, "net.rubygrapefruit.plugins:native-launcher:1.0-dev")
+                    dependencies.add(nativeBinary.name, "net.rubygrapefruit.plugins:native-jvm-launcher:1.0-dev")
 
                     val launcherTask = tasks.register(taskName("nativeLauncher"), NativeUiLauncher::class.java) {
                         it.inputFile.set(layout.file(nativeBinary.elements.map { it.first().asFile }))

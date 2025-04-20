@@ -8,7 +8,10 @@ fun main() {
         val appId = NSBundle.mainBundle.bundleIdentifier ?: "app"
         println("Starting application '$appId'")
 
-        redirectStdoutAndErr(appId)
+        val terminal = isatty(STDOUT_FILENO) == 1
+        if (!terminal) {
+            redirectStdoutAndErr(appId)
+        }
 
         println("Application id: $appId")
         println("Current dir: ${getCurrentDir()}")
@@ -16,8 +19,7 @@ fun main() {
         val bundlePath = NSBundle.mainBundle.bundlePath
         println("Bundle path: $bundlePath")
 
-        val configFilePath = "$bundlePath/Contents/Resources/launcher.conf"
-        val lines = readConfigFile(configFilePath)
+        val lines = readConfigFile("$bundlePath/Contents/Resources/launcher.conf")
         val appDisplayName = lines[0]
         val icon = lines[1]
 
@@ -32,7 +34,7 @@ fun main() {
 
         val args = listOf(launcher, "-Xdock:name=$appDisplayName", "-Xdock:icon=$bundlePath/Contents/Resources/$icon", "-Dapple.laf.useScreenMenuBar=true", "--module", mainClass)
         execv(args.first(), (args.map { it.cstr.ptr } + listOf(null)).toCValues())
-        failed("Could not launch app")
+        failed("Could not launch app using $launcher")
     }
 }
 
@@ -42,7 +44,7 @@ private fun redirectStdoutAndErr(appId: String) {
     val logsDir = "$homeDir/Library/Logs/$appId"
     if (mkdir(logsDir, S_IRWXU.convert()) == -1) {
         if (errno != EEXIST) {
-            failed("Could not create log directory")
+            failed("Could not create log directory at $logsDir")
         }
     }
     val logFilePath = "$logsDir/$appId.log"
@@ -64,7 +66,7 @@ private fun readConfigFile(configFilePath: String): List<String> {
     return memScoped {
         val configFile = fopen(configFilePath, "r")
         if (configFile == null) {
-            failed("Could not read launcher config file")
+            failed("Could not read launcher config file at '$configFilePath'")
         }
         try {
             val size = 1024 * 4

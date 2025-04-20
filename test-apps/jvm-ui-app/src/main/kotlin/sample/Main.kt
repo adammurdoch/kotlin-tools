@@ -4,12 +4,7 @@ import sample.calc.Failure
 import sample.calc.Parser
 import sample.calc.Success
 import sample.system.getSystemInfo
-import java.awt.Color
-import java.awt.Dimension
-import java.awt.GraphicsEnvironment
-import java.awt.GridBagConstraints
-import java.awt.GridBagLayout
-import java.awt.Insets
+import java.awt.*
 import javax.swing.*
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener

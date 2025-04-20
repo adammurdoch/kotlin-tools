@@ -3,7 +3,7 @@ import platform.Foundation.NSBundle
 import platform.posix.*
 
 @OptIn(ExperimentalForeignApi::class)
-fun main() {
+fun main(args: Array<String>) {
     memScoped {
         val appId = NSBundle.mainBundle.bundleIdentifier ?: "app"
         println("Starting application '$appId'")
@@ -32,7 +32,14 @@ fun main() {
         println("App display name: $appDisplayName")
         println("Main class: $mainClass")
 
-        val args = listOf(launcher, "-Xdock:name=$appDisplayName", "-Xdock:icon=$bundlePath/Contents/Resources/$icon", "-Dapple.laf.useScreenMenuBar=true", "--module", mainClass)
+        val args = listOf(
+            launcher,
+            "-Xdock:name=$appDisplayName",
+            "-Xdock:icon=$bundlePath/Contents/Resources/$icon",
+            "-Dapple.laf.useScreenMenuBar=true",
+            "--module",
+            mainClass
+        ) + args
         execv(args.first(), (args.map { it.cstr.ptr } + listOf(null)).toCValues())
         failed("Could not launch app using $launcher")
     }

@@ -8,9 +8,10 @@ plugins {
 group = Versions.plugins.group
 
 application {
-    macOS()
-    common {
-        implementation(project(":native-launcher"))
+    macOS {
+        dependencies {
+            implementation(project(":native-launcher"))
+        }
     }
 }
 

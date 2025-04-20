@@ -37,6 +37,9 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                     it.delegateMethod.set(app.entryPoint)
                 }
                 app.macOS {
+                    dependencies {
+                        implementation("net.rubygrapefruit.plugins:native-launcher:1.0-dev")
+                    }
                     generatedSource.add(generatorTask.flatMap { it.sourceDirectory })
                 }
             }

@@ -10,7 +10,11 @@ abstract class DefaultNativeComponent @Inject constructor(
 ) : NativeComponent<Dependencies> {
 
     override fun dependencies(config: Dependencies.() -> Unit) {
-        TODO("Not yet implemented")
+        sourceSets.withSourceSet(mainSourceSetName) { mainSourceSet, _ ->
+            mainSourceSet.dependencies {
+                KotlinHandlerBackedDependencies(this).config()
+            }
+        }
     }
 
     fun attach() {

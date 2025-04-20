@@ -22,7 +22,10 @@ abstract class NativeLauncher : DefaultTask() {
         sourceDirectory.file("${entryPoint.get()}.kt").get().asFile.printWriter().use {
             it.println(
                 """
+                import net.rubygrapefruit.plugins.app.launcher.setupLogging
+ 
                 fun ${entryPoint.get()}(args: Array<String>) {
+                    setupLogging()
                     ${delegateMethod.get()}(args)
                 }
             """.trimIndent()

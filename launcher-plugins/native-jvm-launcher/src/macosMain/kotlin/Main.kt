@@ -7,12 +7,8 @@ import platform.posix.*
 @OptIn(ExperimentalForeignApi::class)
 fun main(args: Array<String>) {
     memScoped {
-        val appId = NSBundle.mainBundle.bundleIdentifier ?: "app"
-        println("Starting application '$appId'")
+        setupLogging()
 
-        setupLogging(appId)
-
-        println("Application id: $appId")
         println("Current dir: ${getCurrentDir()}")
 
         val bundlePath = NSBundle.mainBundle.bundlePath

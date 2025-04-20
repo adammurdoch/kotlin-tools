@@ -4,13 +4,17 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.pointed
 import kotlinx.cinterop.toKString
+import platform.Foundation.NSBundle
 import platform.posix.*
 
+fun setupLogging() {
+    val appId = NSBundle.mainBundle.bundleIdentifier ?: "app"
+    println("Starting application '$appId'")
 
-fun setupLogging(appId: String) {
     val terminal = isatty(STDOUT_FILENO) == 1
     if (!terminal) {
         redirectStdoutAndErr(appId)
+        println("Application id: $appId")
     }
 }
 

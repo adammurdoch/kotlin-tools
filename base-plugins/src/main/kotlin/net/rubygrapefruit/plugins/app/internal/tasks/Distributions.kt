@@ -36,8 +36,9 @@ abstract class Distributions : DefaultTask() {
     @TaskAction
     fun report() {
         if (!all.get()) {
-            println("Installed into ${defaultDistribution.get().outputs.imageDirectory.get()}")
-            val launcher = defaultDistribution.get().outputs.launcherFile.get().asFile.toPath()
+            val distribution = defaultDistribution.get()
+            println("Installed into ${distribution.outputs.imageDirectory.get()}")
+            val launcher = distribution.outputs.launcherFile.get().asFile.toPath()
             println("Run using: $launcher")
         }
     }

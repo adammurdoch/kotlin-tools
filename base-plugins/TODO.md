@@ -1,11 +1,16 @@
 
 # TODO
 
+- CLI application installer
+  - Copy image to install directory
+  - Garbage-collect old versions
+  - Install release distribution
+  - Configurable install location
 - Native UI app allows generated common source
 - Native library allows generated common source
 - JVM apps option to define JVM args when launching JVM
 - JVM app use Application Class Data Sharing
-- Fix `$JAVA_DEBUG` with embedded JVM dist
+- Fix `$JAVA_DEBUG` with embedded JVM dist, generated JVM does not have the debugging protocol available
 - Debug JVM UI app
 - Native apps discover `main()` function with or without args, and fix samples
 - Validate app main class and entry point names
@@ -31,7 +36,7 @@
 - Libraries in this repo should target Java 11?
 - Enable CC
 - Add `run` task for apps
-- Add `install` task for apps
+- Add `install` task for UI apps and servers
 - Support KMP app that targets native + jvm + browser + node
 - Use `--launcher` instead of `--add-modules` with `jlink`
 - Convert automatic modules to real modules prior to using with `jlink`
@@ -47,7 +52,6 @@
 - Add functional tests for plugins.
     - Customisation
 - Refactor `DownloadRepository` to use Gradle exec service when used in a plugin.
-- Installer
 - Docs
   - Generate docs that use next version, current version
   - Reference snippets from samples

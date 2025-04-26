@@ -30,6 +30,7 @@ Builds a command-line application implemented in Kotlin multiplatform that targe
 - Adds Linux and Windows x64 targets and macOS x64 and arm64 targets.
 - Adds `unixMain` and `unixTest` source sets for Kotlin code that is shared by macOS and Linux targets.
 - Adds an `application { }` block, see below for the available settings.
+- Add `dist` and `install` tasks.
 
 This uses the `net.rubygrapefruit.native.base-cli-app` plugin and adds the targets. 
 
@@ -39,6 +40,7 @@ Builds a UI application implemented in Kotlin multiplatform that targets native 
 
 - Adds macOS x64 and arm64 targets.
 - Adds an `application { }` block, see below for the available settings.
+- Add `dist` task.
 
 ### `net.rubygrapefruit.native.base-cli-app`
 
@@ -70,14 +72,14 @@ Does not define any targets, these have to be explicitly defined.
 
 ### `net.rubygrapefruit.jvm.lib`
 
-Builds a library implemented in Kotlin/JVM.
+Builds a library implemented using Kotlin/JVM.
 
 - Adds `library { }` block, see below for the available settings.
 - Generates a `module-info`.
 
 ### `net.rubygrapefruit.jvm.cli-app`
 
-Builds a command-line application implemented in Kotlin/JVM.
+Builds a command-line application implemented using Kotlin/JVM.
 Expects that the application uses the JVM module system.
 
 - The distribution contains the jars for the application and a launcher script. 
@@ -86,6 +88,7 @@ Expects that the application uses the JVM module system.
 - Adds `application { }` block, see below for the available settings.
 - Automatically determines the application main class.
 - Generates a `module-info`.
+- Add `dist` and `install` tasks.
 
 ### `net.rubygrapefruit.jvm.embedded-jvm`
 
@@ -99,21 +102,20 @@ instead of using a launcher script. Uses `graalvm` to create the native binary.
 
 ### `net.rubygrapefruit.jvm.ui-app`
 
-Builds a desktop UI application implemented in Kotlin/JVM and that presents a Swing or JavaFX UI.
+Builds a desktop UI application implemented using Kotlin/JVM and that presents a Swing or JavaFX UI.
 Expects that the application uses the JVM module system.
 
 - Creates a debug (unsigned) macOS application bundle and a release (signed and notarized) application bundle
 - Includes an embedded JVM in the application bundle
 - Provides an application icon, default location is `src/main/Icon1024.png`
-- Use `dist` task to build the debug application bundle
-- Use `dist --release` to build the release application bundle
 - Adds `application { }` block, see below for the available settings.
+- Use `dist` task to build the debug application bundle.
 
 ## Gradle plugins
 
 ### `net.rubygrapefruit.gradle-plugin`
 
-A convention plugin for implementing Gradle plugins in Kotlin/JVM.
+A convention plugin for implementing Gradle plugins using Kotlin/JVM.
 
 - Adds dependencies and repository definitions so that a fixed version of Kotlin (currently 2.0.0) is used to compile the plugin.
 - Targets Java 11.

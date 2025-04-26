@@ -7,7 +7,7 @@ import org.gradle.api.provider.SetProperty
 
 interface NativeApplication : Application, MultiPlatformComponent<Dependencies> {
     /**
-     * The entry point for the application.
+     * The main entry point for the application.
      */
     val entryPoint: Property<String>
 

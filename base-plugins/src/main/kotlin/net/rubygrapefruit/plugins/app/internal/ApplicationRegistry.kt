@@ -24,6 +24,7 @@ open class ApplicationRegistry(private val project: Project) {
 
         app.distributionContainer.each {
             val imageBaseDirName = app.distributionContainer.distribution.map {
+                // This distribution is the development distribution
                 if (this == it) {
                     "dist"
                 } else {

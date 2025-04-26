@@ -10,6 +10,7 @@ class JvmCliApplicationPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             plugins.apply(JvmApplicationBasePlugin::class.java)
+            plugins.apply(CliApplicationBasePlugin::class.java)
             applications.withApp<DefaultJvmCliApplication> { app ->
                 app.attach()
 

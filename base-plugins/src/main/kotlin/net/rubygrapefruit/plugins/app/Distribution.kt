@@ -17,20 +17,20 @@ interface Distribution {
     val imageDirectory: DirectoryProperty
 
     /**
-     * The outputs for this distribution
+     * The outputs for this distribution.
      */
     val outputs: Outputs
 
     interface Outputs {
         /**
-         * The final distribution image. You can use this to use the distribution from other tasks, e.g. an `install` or `zip` task
+         * The final distribution image. You can use this to use the distribution from other tasks, for example, an `install` or `zip` task
          */
         val imageDirectory: Provider<Directory>
 
         /**
          * The launcher file in the distribution image. You can use this to use the launcher from other tasks, e.g. a `run` task.
          *
-         * Has no value when this distribution cannot be run on this host machine.
+         * This property has no value when this distribution cannot be run on this host machine.
          */
         val launcherFile: Provider<RegularFile>
     }

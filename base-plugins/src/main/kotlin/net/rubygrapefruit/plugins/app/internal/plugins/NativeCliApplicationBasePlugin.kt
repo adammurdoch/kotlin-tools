@@ -8,11 +8,11 @@ import net.rubygrapefruit.plugins.app.internal.multiplatformComponents
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
-open class NativeBaseCliApplicationPlugin : Plugin<Project> {
+open class NativeCliApplicationBasePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
-            plugins.apply(ApplicationBasePlugin::class.java)
+            plugins.apply(CliApplicationBasePlugin::class.java)
 
             applications.withApp<DefaultNativeCliApplication> { app ->
                 app.attach()

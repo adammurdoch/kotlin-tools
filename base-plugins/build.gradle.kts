@@ -41,7 +41,7 @@ gradlePlugin {
         }
         create("native-base-cli-app") {
             id = "net.rubygrapefruit.native.base-cli-app"
-            implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.NativeBaseCliApplicationPlugin"
+            implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.NativeCliApplicationBasePlugin"
         }
         create("native-cli-app") {
             id = "net.rubygrapefruit.native.cli-app"

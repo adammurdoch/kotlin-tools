@@ -27,6 +27,7 @@ open class CliApplicationBasePlugin : Plugin<Project> {
                     task.targetImageDirectory.set(installation.imageDirectory)
                     task.targetLauncherLink.set(installation.launcherFile)
                 }
+                installation.imageOutputDirectory.set(install.flatMap { it.targetImageDirectory })
                 installation.launcherOutputFile.set(install.flatMap { it.targetLauncherLink })
             }
         }

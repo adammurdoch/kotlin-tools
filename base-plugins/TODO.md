@@ -2,14 +2,15 @@
 # TODO
 
 - CLI application installer
-  - Copy image to install directory
-  - Garbage-collect old versions
+  - Copy to content-addressed image location, garbage-collect old versions
   - Install release distribution
   - Configurable install location
+  - Add tests
 - Native UI app allows generated common source
 - Native library allows generated common source
 - JVM apps option to define JVM args when launching JVM
 - JVM app use Application Class Data Sharing
+- JVM app adds stub that checks current JVM version for no-jvm distribution
 - Fix `$JAVA_DEBUG` with embedded JVM dist, generated JVM does not have the debugging protocol available
 - Debug JVM UI app
 - Native apps discover `main()` function with or without args, and fix samples
@@ -22,7 +23,7 @@
 - Fix `.bat` to work from any directory via a link
   - Or replace with binary launcher
 - Figure out why `tasks.registering` is broken for embedded JVM task
-- Add test for alternate distributions, e.g `noJvm`
+- Add tests for alternate distributions, e.g `noJvm` distribution
 - UI app `dist` task should fail on non-mac host machines
 - Don't include `.bat` script for non-windows embedded JVM, or replace with binary launcher
 - Improve failure for `dist` task when nothing can be built

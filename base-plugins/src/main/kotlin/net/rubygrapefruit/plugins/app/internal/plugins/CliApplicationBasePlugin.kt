@@ -14,8 +14,11 @@ open class CliApplicationBasePlugin : Plugin<Project> {
             applications.withApp<Application> { app ->
                 tasks.register("install", Install::class.java) { task ->
                     task.description = "Installs the application"
-                    task.launcher.set(app.distribution.flatMap { it.outputs.launcherFile })
-                    task.linkDir.set(File(System.getProperty("user.home"), "bin/links"))
+                    task.sourceImageDirectory.set(app.distribution.flatMap { it.outputs.imageDirectory })
+                    task.sourceLauncher.set(app.distribution.flatMap { it.outputs.launcherFile })
+                    val targetDirectory = File(System.getProperty("user.home"), "bin")
+                    task.targetImageDirectory.fileProvider(app.appName.map { targetDirectory.resolve("images/${it}") })
+                    task.targetLinkDirectory.set(targetDirectory.resolve("links"))
                 }
             }
         }

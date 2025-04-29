@@ -3,11 +3,7 @@ package net.rubygrapefruit.plugins.app.internal
 import net.rubygrapefruit.plugins.app.Distribution
 import net.rubygrapefruit.strings.capitalized
 import org.gradle.api.file.Directory
-import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFile
-import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import javax.inject.Inject
@@ -15,8 +11,7 @@ import javax.inject.Inject
 
 abstract class DefaultMutableDistribution @Inject constructor(
     override val name: String,
-    override val canBuildOnHostMachine: Boolean,
-    factory: ObjectFactory,
+    override val canBuildOnHostMachine: Boolean
 ) : Distribution, MutableDistribution {
     companion object {
         fun taskName(distName: String, taskName: String): String {
@@ -31,14 +26,6 @@ abstract class DefaultMutableDistribution @Inject constructor(
         override val launcherFile: Provider<RegularFile>
             get() = launcherOutputFile
     }
-
-    override val launcherFile: RegularFileProperty = factory.fileProperty()
-
-    override val launcherFilePath: Property<String> = factory.property(String::class.java)
-
-    override val imageOutputDirectory: DirectoryProperty = factory.directoryProperty()
-
-    override val launcherOutputFile: RegularFileProperty = factory.fileProperty()
 
     override val effectiveLauncherFilePath: Provider<String>
         get() {

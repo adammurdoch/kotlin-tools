@@ -15,7 +15,16 @@ interface Application {
     val distributions: Provider<List<Distribution>>
 
     /**
-     * The debug distribution for this application to use on the current machine, if any.
+     * The development distribution for this application to use on the current machine, if any.
+     *
+     * Has no value when no distribution of the application can be built on the current machine.
      */
     val distribution: Provider<Distribution>
+
+    /**
+     * The local installation of this application on the current machine, if any.
+     *
+     * Has no value when the application cannot be installed on the current machine, for example, when it cannot be built for or run on the current machine.
+     */
+    val localInstallation: Provider<Installation>
 }

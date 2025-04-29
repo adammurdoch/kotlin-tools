@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 abstract class Install : DefaultTask() {
     @get:Internal
-    abstract val targetLinkDirectory: RegularFileProperty
+    abstract val targetLauncherLink: RegularFileProperty
 
     @get:OutputDirectory
     abstract val targetImageDirectory: DirectoryProperty
@@ -36,11 +36,11 @@ abstract class Install : DefaultTask() {
             spec.into(targetDir)
         }
 
-        val linkDir = targetLinkDirectory.get().asFile.toPath()
+        val link = targetLauncherLink.get().asFile.toPath()
+        val linkDir = link.parent
         val launcher = sourceLauncher.get().asFile.toPath()
         val launcherRelativePath = srcDir.relativize(launcher)
         val targetLauncher = linkDir.relativize(targetDir.resolve(launcherRelativePath))
-        val link = linkDir.resolve(launcher.fileName)
         Files.deleteIfExists(link)
         Files.createSymbolicLink(link, targetLauncher)
 

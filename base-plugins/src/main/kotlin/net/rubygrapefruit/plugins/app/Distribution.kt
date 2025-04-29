@@ -5,6 +5,9 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
 
+/**
+ * Represents an image of the application that can be installed somewhere. Some distributions can also be executed.
+ */
 interface Distribution {
     /**
      * An identifier for this distribution.
@@ -23,12 +26,12 @@ interface Distribution {
 
     interface Outputs {
         /**
-         * The final distribution image. You can use this to use the distribution from other tasks, for example, an `install` or `zip` task
+         * The final distribution image. You can use this to use the distribution as input to tasks, for example, an `install` or `archive` task
          */
         val imageDirectory: Provider<Directory>
 
         /**
-         * The launcher file in the distribution image. You can use this to use the launcher from other tasks, e.g. a `run` task.
+         * The launcher file in the distribution image. You can use this to use the launcher as input to tasks, for example, a `run` task.
          *
          * This property has no value when this distribution cannot be run on this host machine.
          */

@@ -8,7 +8,7 @@
   - Add tests
 - Native UI app allows generated common source
 - Native library allows generated common source
-- JVM apps option to define JVM args when launching JVM
+- JVM app option to define JVM args when launching JVM
 - JVM app use Application Class Data Sharing
 - JVM app adds stub that checks current JVM version for no-jvm distribution
 - Fix `$JAVA_DEBUG` with embedded JVM dist, generated JVM does not have the debugging protocol available

@@ -3,6 +3,7 @@ import net.rubygrapefruit.machine.info.Architecture.Arm64
 import net.rubygrapefruit.machine.info.Architecture.X64
 import net.rubygrapefruit.machine.info.Machine
 import net.rubygrapefruit.strings.capitalized
+import org.gradle.kotlin.dsl.support.serviceOf
 import java.io.ByteArrayOutputStream
 import kotlin.io.path.createDirectory
 
@@ -379,9 +380,10 @@ tasks.register("generate") {
 
 val runTasks = sampleApps.associateWith { app ->
     tasks.register("run-${app.name}") {
+        val exec = project.serviceOf<ExecOperations>()
         dependsOn(app.distTask)
         doLast {
-            run(app, app.mainDist)
+            run(app, app.mainDist, exec)
         }
     }
 }
@@ -389,9 +391,10 @@ val runTasks = sampleApps.associateWith { app ->
 val runOtherTasks = sampleApps.map { app ->
     val runTasks = app.otherDists.map { dist ->
         tasks.register("run-${app.name}-${dist.distTaskName}") {
+            val exec = project.serviceOf<ExecOperations>()
             dependsOn(app.distTask(dist))
             doLast {
-                run(app, dist)
+                run(app, dist, exec)
             }
         }
     }
@@ -418,9 +421,10 @@ tasks.register("showDistributions") {
 
 val openTasks = uiApps.map { app ->
     tasks.register("open-${app.name}") {
+        val exec = project.serviceOf<ExecOperations>()
         dependsOn(":${app.name}:dist")
         doLast {
-            exec {
+            exec.exec {
                 commandLine(app.openCommandLine)
             }
         }
@@ -431,7 +435,7 @@ tasks.register("open") {
     dependsOn(openTasks)
 }
 
-fun run(app: App, dist: AppDistribution) {
+fun run(app: App, dist: AppDistribution, exec: ExecOperations) {
     val distDir = app.distDir(dist)
     println("Dist dir: $distDir")
     if (!distDir.isDirectory) {
@@ -451,7 +455,7 @@ fun run(app: App, dist: AppDistribution) {
     println("Dist size: " + distDir.directorySize().formatSize())
     if (nativeBinary != null && Machine.thisMachine.isMacOS) {
         val str = ByteArrayOutputStream()
-        exec {
+        exec.exec {
             commandLine("otool", "-hv", nativeBinary)
             standardOutput = str
         }
@@ -470,7 +474,7 @@ fun run(app: App, dist: AppDistribution) {
     val cliCommandLine = app.cliCommandLine(dist)
     if (cliCommandLine != null) {
         val str = ByteArrayOutputStream()
-        exec {
+        exec.exec {
             commandLine(cliCommandLine)
             standardOutput = str
         }

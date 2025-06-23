@@ -31,23 +31,9 @@ val config = configurations.create("testBinary") {
  */
 val testApp = config.elements.map { elements -> elements.first().asFile.absolutePath }
 val outFile = layout.buildDirectory.file("generated-src/commonTest/kotlin/net/rubygrapefruit/process/TestApp.kt")
-val generateResource = tasks.register("generateTestResource") {
-    outputs.file(outFile)
-    inputs.property("path", testApp)
-    doLast {
-        outFile.get().asFile.writeText(
-            """
-            package net.rubygrapefruit.process
-            
-            /*
-             * THIS IS A GENERATED FILE. DO NOT EDIT.
-             */
-            object TestApp {
-                val path = "${testApp.get().replace("\\", "\\\\")}"
-            }
-        """.trimIndent()
-        )
-    }
+val generateResource = tasks.register("generateTestResource", GenerateTestResource::class.java) {
+    outputFile = outFile
+    testPath = testApp
 }
 
 kotlin {
@@ -56,4 +42,28 @@ kotlin {
 
 dependencies {
     add("testBinary", project(":process-test"))
+}
+
+abstract class GenerateTestResource : DefaultTask() {
+    @get:Input
+    abstract val testPath: Property<String>
+
+    @get:OutputFile
+    abstract val outputFile: RegularFileProperty
+
+    @TaskAction
+    fun generate() {
+        outputFile.get().asFile.writeText(
+            """
+            package net.rubygrapefruit.process
+            
+            /*
+             * THIS IS A GENERATED FILE. DO NOT EDIT.
+             */
+            object TestApp {
+                val path = "${testPath.get().replace("\\", "\\\\")}"
+            }
+        """.trimIndent()
+        )
+    }
 }

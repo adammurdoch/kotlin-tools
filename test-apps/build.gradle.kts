@@ -383,7 +383,7 @@ val runTasks = sampleApps.associateWith { app ->
         val exec = project.serviceOf<ExecOperations>()
         dependsOn(app.distTask)
         doLast {
-            run(app, app.mainDist, exec)
+            Runner().run(app, app.mainDist, exec)
         }
     }
 }
@@ -394,7 +394,7 @@ val runOtherTasks = sampleApps.map { app ->
             val exec = project.serviceOf<ExecOperations>()
             dependsOn(app.distTask(dist))
             doLast {
-                run(app, dist, exec)
+                Runner().run(app, dist, exec)
             }
         }
     }
@@ -435,59 +435,76 @@ tasks.register("open") {
     dependsOn(openTasks)
 }
 
-fun run(app: App, dist: AppDistribution, exec: ExecOperations) {
-    val distDir = app.distDir(dist)
-    println("Dist dir: $distDir")
-    if (!distDir.isDirectory) {
-        throw IllegalStateException("Application distribution directory $distDir does not exist.")
-    }
-    val cliLauncher = app.cliLauncher(dist)
-    println("CLI launcher: ${cliLauncher?.relativeTo(distDir)}")
-    if (cliLauncher != null && !cliLauncher.isFile) {
-        throw IllegalStateException("Application launcher $cliLauncher does not exist.")
-    }
-    val nativeBinary = app.nativeBinary(dist)
-    println("Native binary: ${nativeBinary?.relativeTo(distDir)}")
-    if (nativeBinary != null && !nativeBinary.isFile) {
-        // Can be non-null when CLI launcher is null, for example, embedded JVM app with launcher script
-        throw IllegalStateException("Application binary $nativeBinary does not exist.")
-    }
-    println("Dist size: " + distDir.directorySize().formatSize())
-    if (nativeBinary != null && Machine.thisMachine.isMacOS) {
-        val str = ByteArrayOutputStream()
-        exec.exec {
-            commandLine("otool", "-hv", nativeBinary)
-            standardOutput = str
+class Runner {
+    fun run(app: App, dist: AppDistribution, exec: ExecOperations) {
+        val distDir = app.distDir(dist)
+        println("Dist dir: $distDir")
+        if (!distDir.isDirectory) {
+            throw IllegalStateException("Application distribution directory $distDir does not exist.")
         }
-        val arch = str.toString().lines()[3].split(Regex("\\s+"))[1]
-        println("Binary: $arch")
-        val expected = when (dist.nature.expectedArchitecture) {
-            X64 -> "X86_64"
-            Arm64 -> "ARM64"
-            null -> null
+        val cliLauncher = app.cliLauncher(dist)
+        println("CLI launcher: ${cliLauncher?.relativeTo(distDir)}")
+        if (cliLauncher != null && !cliLauncher.isFile) {
+            throw IllegalStateException("Application launcher $cliLauncher does not exist.")
         }
+        val nativeBinary = app.nativeBinary(dist)
+        println("Native binary: ${nativeBinary?.relativeTo(distDir)}")
+        if (nativeBinary != null && !nativeBinary.isFile) {
+            // Can be non-null when CLI launcher is null, for example, embedded JVM app with launcher script
+            throw IllegalStateException("Application binary $nativeBinary does not exist.")
+        }
+        println("Dist size: " + distDir.directorySize().formatSize())
+        if (nativeBinary != null && Machine.thisMachine.isMacOS) {
+            val str = ByteArrayOutputStream()
+            exec.exec {
+                commandLine("otool", "-hv", nativeBinary)
+                standardOutput = str
+            }
+            val arch = str.toString().lines()[3].split(Regex("\\s+"))[1]
+            println("Binary: $arch")
+            val expected = when (dist.nature.expectedArchitecture) {
+                X64 -> "X86_64"
+                Arm64 -> "ARM64"
+                null -> null
+            }
 
-        if (expected != null && arch != expected) {
-            throw IllegalStateException("Unexpected binary architecture: $arch, expected: $expected")
+            if (expected != null && arch != expected) {
+                throw IllegalStateException("Unexpected binary architecture: $arch, expected: $expected")
+            }
+        }
+        val cliCommandLine = app.cliCommandLine(dist)
+        if (cliCommandLine != null) {
+            val str = ByteArrayOutputStream()
+            exec.exec {
+                commandLine(cliCommandLine)
+                standardOutput = str
+            }
+            println()
+            println("----")
+            print(str)
+            println("----")
+            if (app.expectedOutput != null && !str.toString().contains(app.expectedOutput)) {
+                throw IllegalStateException("Unexpected application output")
+            }
+        } else {
+            println()
+            println("(no CLI)")
         }
     }
-    val cliCommandLine = app.cliCommandLine(dist)
-    if (cliCommandLine != null) {
-        val str = ByteArrayOutputStream()
-        exec.exec {
-            commandLine(cliCommandLine)
-            standardOutput = str
+
+    fun File.directorySize(): Long {
+        var size: Long = 0
+        for (file in this.walkBottomUp()) {
+            if (file.isFile) {
+                size += file.length()
+            }
         }
-        println()
-        println("----")
-        print(str)
-        println("----")
-        if (app.expectedOutput != null && !str.toString().contains(app.expectedOutput)) {
-            throw IllegalStateException("Unexpected application output")
-        }
-    } else {
-        println()
-        println("(no CLI)")
+        return size
+    }
+
+    fun Long.formatSize(): String {
+        val mb = this.toBigDecimal().setScale(2) / (1000 * 1000).toBigDecimal()
+        return "$mb MB"
     }
 }
 
@@ -515,18 +532,3 @@ fun macOsUiApp(name: String): UiBaseApp {
 fun jvmLib(name: String) = BaseLib(name, projectDir, listOf("main"))
 
 fun kmpLib(name: String, sourceSets: List<String> = listOf("commonMain")) = BaseLib(name, projectDir, sourceSets)
-
-fun File.directorySize(): Long {
-    var size: Long = 0
-    for (file in this.walkBottomUp()) {
-        if (file.isFile) {
-            size += file.length()
-        }
-    }
-    return size
-}
-
-fun Long.formatSize(): String {
-    val mb = this.toBigDecimal().setScale(2) / (1000 * 1000).toBigDecimal()
-    return "$mb MB"
-}

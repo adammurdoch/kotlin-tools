@@ -2,6 +2,7 @@ package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.internal.DefaultMutableInstallation
 import net.rubygrapefruit.plugins.app.internal.MutableApplication
+import net.rubygrapefruit.plugins.app.internal.MutableDistribution
 import net.rubygrapefruit.plugins.app.internal.applications
 import net.rubygrapefruit.plugins.app.internal.tasks.Install
 import org.gradle.api.Plugin
@@ -15,12 +16,13 @@ open class CliApplicationBasePlugin : Plugin<Project> {
             applications.withApp<MutableApplication> { app ->
                 val installation = objects.newInstance(DefaultMutableInstallation::class.java)
                 app.localInstallation.set(installation)
+                app.installations.add(app.localInstallation)
 
                 val targetDirectory = File(System.getProperty("user.home"), "bin")
-                installation.imageDirectory.fileProvider(app.appName.map { name -> targetDirectory.resolve("images/$name") })
+                installation.installDirectory.fileProvider(app.appName.map { name -> targetDirectory.resolve("images/$name") })
                 installation.launcherFile.fileProvider(app.distribution.flatMap { dist ->
-                    dist.outputs.launcherFile.map { launcher ->
-                        targetDirectory.resolve("links/${launcher.asFile.name}")
+                    (dist as MutableDistribution).effectiveLauncherFilePath.map { path ->
+                        targetDirectory.resolve("links/${path.substringAfterLast("/")}")
                     }
                 })
 
@@ -28,7 +30,7 @@ open class CliApplicationBasePlugin : Plugin<Project> {
                     task.description = "Installs the application"
                     task.sourceImageDirectory.set(app.distribution.flatMap { it.outputs.imageDirectory })
                     task.sourceLauncher.set(app.distribution.flatMap { it.outputs.launcherFile })
-                    task.targetImageDirectory.set(installation.imageDirectory)
+                    task.targetImageDirectory.set(installation.installDirectory)
                     task.targetLauncherLink.set(installation.launcherFile)
                 }
                 installation.imageOutputDirectory.set(install.flatMap { it.targetImageDirectory })

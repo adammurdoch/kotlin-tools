@@ -3,16 +3,16 @@
 
 - Configuration cache support
   - Clean build
-  - `showApplication`
+  - Refactor reporting to query dist and install task locations, rather than assume a particular configuration
 - Share logic between `dist` and `install` to report where an image is installed and how to run it.
   - Probe the $PATH and report that app can be run in short form?
+  - Use relative paths?
 - CLI application installer
   - Copy to content-addressed image location, garbage-collect old versions
   - Install release distribution
   - Configurable installation location
   - Allow app-specific installation actions to be contributed, for example, generating a completion script
   - Add tests
-  - Include install information in `showApplication` output
 - Native UI app allows generated common source
 - Native library allows generated common source
 - JVM app option to define JVM args when launching JVM

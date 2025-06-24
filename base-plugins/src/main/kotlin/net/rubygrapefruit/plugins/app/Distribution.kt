@@ -26,7 +26,7 @@ interface Distribution {
 
     interface Outputs {
         /**
-         * The final distribution image. You can use this to use the distribution as input to tasks, for example, an `install` or `archive` task
+         * The final distribution image. You can use this to use the distribution as input to tasks, for example, an `install` or `zip` task
          */
         val imageDirectory: Provider<Directory>
 

@@ -61,7 +61,7 @@ open class ApplicationRegistry(private val project: Project) {
         }
 
         project.tasks.register("showApplication", ShowApplication::class.java) { task ->
-            task.app.set(app)
+            task.app.set(project.provider { app.metadata() })
         }
 
         for (builder in whenAppSet) {

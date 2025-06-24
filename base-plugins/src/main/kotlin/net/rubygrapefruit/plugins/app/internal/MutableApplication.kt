@@ -3,6 +3,7 @@ package net.rubygrapefruit.plugins.app.internal
 import net.rubygrapefruit.plugins.app.Application
 import net.rubygrapefruit.plugins.app.Distribution
 import net.rubygrapefruit.plugins.app.Installation
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 
@@ -17,6 +18,5 @@ interface MutableApplication : Application {
 
     override val localInstallation: Property<Installation>
 
-    override val installations: Provider<List<Installation>>
-        get() = localInstallation.map { listOf(it) }
+    override val installations: ListProperty<Installation>
 }

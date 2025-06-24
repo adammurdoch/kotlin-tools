@@ -80,6 +80,8 @@ class UiApplicationBasePlugin : Plugin<Project> {
                             t.notarizationProfileName.set(app.notarizationProfileName)
                         }
                     }
+
+                    app.installations.empty()
                 }
             }
         }

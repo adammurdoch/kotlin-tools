@@ -90,5 +90,5 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
       - name: Execute Gradle build
-        run: ./gradlew test-apps:run test-apps:runOther verifySamples --continue
+        run: ./gradlew test-apps:smokeTest verifySamples --continue
         timeout-minutes: 30

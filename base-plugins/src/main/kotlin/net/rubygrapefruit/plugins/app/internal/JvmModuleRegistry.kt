@@ -36,7 +36,7 @@ abstract class JvmModuleRegistry(
             it.outputFile.set(project.layout.buildDirectory.file("jvm/module-info.txt"))
         }
 
-        val decoded = requires.map { it.outputFile.get().asFile.inputStream().use { Json.decodeFromStream<Modules>(it) } }
+        val decoded = requires.flatMap { it.outputFile }.map<Modules> { it.asFile.inputStream().use { Json.decodeFromStream<Modules>(it) } }
         // TODO - should use convention
         module.requiresTransitive.set(decoded.map { it.transitive })
         module.requires.set(decoded.map { it.requires })
@@ -47,9 +47,9 @@ abstract class JvmModuleRegistry(
             it.mainClassesFile.set(project.layout.buildDirectory.file("jvm/main-classes.txt"))
         }
         // TODO - should use convention
-        module.exports.set(exports.map { it.packagesFile.get().asFile.readLines() })
+        module.exports.set(exports.flatMap { it.packagesFile }.map<List<String>> { it.asFile.readLines() })
         if (jvmApplication != null) {
-            jvmApplication.mainClass.convention(exports.map { it.mainClassesFile.get().asFile.readText().trim() })
+            jvmApplication.mainClass.convention(exports.flatMap { it.mainClassesFile }.map<String> { it.asFile.readText().trim() })
         }
 
         val moduleTask = project.tasks.register("moduleInfo", JvmModuleInfo::class.java) {

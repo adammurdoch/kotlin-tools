@@ -403,11 +403,11 @@ val runOtherTasks = sampleApps.map { app ->
     }
 }
 
-tasks.register("runOther") {
+val runOther = tasks.register("runOther") {
     dependsOn(runOtherTasks)
 }
 
-tasks.register("run") {
+val run = tasks.register("run") {
     dependsOn(runTasks.values)
 }
 
@@ -415,8 +415,12 @@ tasks.register("runMin") {
     dependsOn(runTasks.filterKeys { it.allPlatforms }.values)
 }
 
-tasks.register("showApplication") {
+val showApplication = tasks.register("showApplication") {
     dependsOn(sampleApps.map { ":${it.name}:showApplication" })
+}
+
+tasks.register("smokeTest") {
+    dependsOn(run, runOther, showApplication)
 }
 
 val openTasks = uiApps.map { app ->

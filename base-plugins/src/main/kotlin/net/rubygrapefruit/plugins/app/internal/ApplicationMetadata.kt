@@ -35,7 +35,7 @@ internal fun Application.metadata(): ApplicationMetadata {
         val targetMachine = if (dist is HasTargetMachine) dist.targetMachine else null
         val buildType = if (dist is HasTargetMachine) dist.buildType else null
         val hasEmbeddedJvm = dist is HasEmbeddedJvm
-        val imageDir = dist.imageDirectory.get()
+        val imageDir = dist.imageOutputDirectory.get()
         DistributionMetadata(
             dist.name,
             dist.canBuildOnHostMachine,
@@ -51,8 +51,8 @@ internal fun Application.metadata(): ApplicationMetadata {
     val defaultDistribution = distribution.get()
     val mappedInstallations = installations.get().filterIsInstance<MutableInstallation>().map { installation ->
         InstallationMetadata(
-            installation.installDirectory.get().asFile,
-            installation.launcherFile.get().asFile
+            installation.imageOutputDirectory.get().asFile,
+            installation.launcherOutputFile.get().asFile
         )
     }
     return ApplicationMetadata(

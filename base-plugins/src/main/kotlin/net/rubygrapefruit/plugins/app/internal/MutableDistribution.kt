@@ -23,11 +23,20 @@ interface MutableDistribution : BuildableDistribution {
      */
     val launcherFilePath: Property<String>
 
+    /**
+     * The root dir + launcher file path
+     */
+    val effectiveLauncherFilePath: Provider<String>
+
+    /**
+     * Output from the dist task.
+     */
     val imageOutputDirectory: DirectoryProperty
 
+    /**
+     * Output from the dist task.
+     */
     val launcherOutputFile: RegularFileProperty
-
-    val effectiveLauncherFilePath: Provider<String>
 
     fun taskName(baseName: String): String
 

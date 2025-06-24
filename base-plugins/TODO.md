@@ -1,9 +1,6 @@
 
 # TODO
 
-- Configuration cache support
-  - Clean build
-  - Refactor reporting to query dist and install task locations, rather than assume a particular configuration
 - Share logic between `dist` and `install` to report where an image is installed and how to run it.
   - Probe the $PATH and report that app can be run in short form?
   - Use relative paths?

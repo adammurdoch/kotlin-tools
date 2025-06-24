@@ -8,7 +8,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 
-abstract class ShowDistributions : DefaultTask() {
+abstract class ShowApplication : DefaultTask() {
     @get:Internal
     abstract val app: Property<Application>
 
@@ -54,6 +54,17 @@ abstract class ShowDistributions : DefaultTask() {
 
             val imageDirectory = distribution.imageOutputDirectory.get()
             val launcher = imageDirectory.file(distribution.effectiveLauncherFilePath.get())
+
+            println("Image dir: $imageDirectory")
+            println("Launcher path: $launcher")
+        }
+
+        println()
+        println("Installations:")
+        val installations = app.installations.get()
+        for (installation in installations) {
+            val imageDirectory = installation.outputs.imageDirectory.get()
+            val launcher = installation.outputs.launcherFile.get()
 
             println("Image dir: $imageDirectory")
             println("Launcher path: $launcher")

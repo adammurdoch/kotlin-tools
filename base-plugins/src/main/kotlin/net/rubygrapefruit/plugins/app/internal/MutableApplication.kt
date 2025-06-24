@@ -16,4 +16,7 @@ interface MutableApplication : Application {
         get() = distributionContainer.distribution
 
     override val localInstallation: Property<Installation>
+
+    override val installations: Provider<List<Installation>>
+        get() = localInstallation.map { listOf(it) }
 }

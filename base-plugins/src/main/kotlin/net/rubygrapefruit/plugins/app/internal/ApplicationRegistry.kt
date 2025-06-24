@@ -2,7 +2,7 @@ package net.rubygrapefruit.plugins.app.internal
 
 import net.rubygrapefruit.plugins.app.Application
 import net.rubygrapefruit.plugins.app.internal.tasks.Distributions
-import net.rubygrapefruit.plugins.app.internal.tasks.ShowDistributions
+import net.rubygrapefruit.plugins.app.internal.tasks.ShowApplication
 import org.gradle.api.Project
 
 open class ApplicationRegistry(private val project: Project) {
@@ -19,7 +19,9 @@ open class ApplicationRegistry(private val project: Project) {
 
         project.tasks.register("dist", Distributions::class.java) { task ->
             task.defaultDistribution.set(app.distribution.map { dist -> DefaultDistributionOutputs(dist.outputs.imageDirectory, dist.outputs.launcherFile) })
-            task.allDistributions.set(app.distributions.map { dists -> dists.filterIsInstance<BuildableDistribution>().map { dist -> DefaultDistributionOutputs(dist.outputs.imageDirectory, dist.outputs.launcherFile) } })
+            task.allDistributions.set(app.distributions.map { dists ->
+                dists.filterIsInstance<BuildableDistribution>().map { dist -> DefaultDistributionOutputs(dist.outputs.imageDirectory, dist.outputs.launcherFile) }
+            })
         }
 
         app.distributionContainer.each {
@@ -58,7 +60,7 @@ open class ApplicationRegistry(private val project: Project) {
             }
         }
 
-        project.tasks.register("showDistributions", ShowDistributions::class.java) { task ->
+        project.tasks.register("showApplication", ShowApplication::class.java) { task ->
             task.app.set(app)
         }
 

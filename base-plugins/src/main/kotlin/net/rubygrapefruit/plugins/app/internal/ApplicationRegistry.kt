@@ -18,8 +18,8 @@ open class ApplicationRegistry(private val project: Project) {
         app.appName.convention(project.name)
 
         project.tasks.register("dist", Distributions::class.java) { task ->
-            task.defaultDistribution.set(app.distribution.map { it as BuildableDistribution })
-            task.allDistributions.set(app.distributions.map { it.filterIsInstance<BuildableDistribution>() })
+            task.defaultDistribution.set(app.distribution.map { dist -> DefaultDistributionOutputs(dist.outputs.imageDirectory, dist.outputs.launcherFile) })
+            task.allDistributions.set(app.distributions.map { dists -> dists.filterIsInstance<BuildableDistribution>().map { dist -> DefaultDistributionOutputs(dist.outputs.imageDirectory, dist.outputs.launcherFile) } })
         }
 
         app.distributionContainer.each {
@@ -37,8 +37,9 @@ open class ApplicationRegistry(private val project: Project) {
             rootDirPath.convention(".")
 
             distTask.configure { t ->
+                val canBuild = canBuildOnHostMachine
                 t.onlyIf {
-                    canBuildOnHostMachine
+                    canBuild
                 }
                 t.description = "Builds the distribution image"
                 t.group = "Distribution"
@@ -47,7 +48,9 @@ open class ApplicationRegistry(private val project: Project) {
             }
 
             imageOutputDirectory.set(distTask.flatMap { t -> t.imageDirectory })
-            launcherOutputFile.set(distTask.flatMap { t -> t.imageDirectory.map { it.file(effectiveLauncherFilePath.get()) } })
+
+            val launcherPath = effectiveLauncherFilePath
+            launcherOutputFile.set(distTask.flatMap { t -> t.imageDirectory.map { it.file(launcherPath.get()) } })
         }
         app.distributionContainer.eachOfType<HasDistributionImage> {
             distTask.configure { t ->

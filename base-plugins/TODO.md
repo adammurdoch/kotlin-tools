@@ -1,7 +1,13 @@
 
 # TODO
 
-- Share logic between `dist` and `install` to report where an image is installed and how to run it.
+- Add `dist --release`
+  - define release build for native cli app
+  - define release build for jvm ui app
+  - `showApplication` should show release dist
+  - add tests
+- `showApplication` should show launcher type for UI apps
+- Share logic between `dist`, `install` and `showApplication` to report where an image is installed and how to run it.
   - Probe the $PATH and report that app can be run in short form?
   - Use relative paths?
 - CLI application installer
@@ -21,7 +27,6 @@
 - Validate app main class and entry point names
 - Add something like `testing { kotlinTest() }`
 - Fix `desktop { }` does not add targets, but for example `jvm { }` does.
-- Add `dist --release`
 - Add an "app bundle" plugin, which will include other apps as JVM resources
 - Split app code signing and notarization into separate tasks
 - Fix `.bat` to work from any directory via a link
@@ -39,7 +44,6 @@
 - Move dependency declarations into library and application blocks
     - UI applications 
 - Libraries in this repo should target Java 11?
-- Enable CC
 - Add `run` task for apps
 - Add `install` task for UI apps and servers
 - Support KMP app that targets native + jvm + browser + node

@@ -19,7 +19,14 @@ interface Application {
      *
      * Has no value when no distribution of the application can be built on the current machine.
      */
-    val distribution: Provider<Distribution>
+    val devDistribution: Provider<Distribution>
+
+    /**
+     * A release distribution for this application to use on the current machine, if any. The release distribution may be the same as the [devDistribution].
+     *
+     * Has no value when no distribution of the application can be built on the current machine.
+     */
+    val releaseDistribution: Provider<Distribution>
 
     /**
      * An installation of the development distribution for this application on the current machine, if any.

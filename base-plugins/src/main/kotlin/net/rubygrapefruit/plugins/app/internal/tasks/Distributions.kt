@@ -14,20 +14,30 @@ abstract class Distributions : DefaultTask() {
     @get:Internal
     abstract val all: Property<Boolean>
 
+    @get:Option(option = "release", description = "Builds release distribution")
     @get:Internal
-    abstract val defaultDistribution: Property<Distribution.Outputs>
+    abstract val release: Property<Boolean>
+
+    @get:Internal
+    abstract val devDistribution: Property<Distribution.Outputs>
+
+    @get:Internal
+    abstract val releaseDistribution: Property<Distribution.Outputs>
 
     @get:Internal
     abstract val allDistributions: SetProperty<Distribution.Outputs>
 
     init {
         all.convention(false)
+        release.convention(false)
         dependsOn(object : Callable<Any> {
             override fun call(): Any {
                 return if (all.get()) {
                     allDistributions.map { it.map { it.imageDirectory } }
+                } else if (release.get()) {
+                    releaseDistribution.map { it.imageDirectory }
                 } else {
-                    defaultDistribution.map { it.imageDirectory }
+                    devDistribution.map { it.imageDirectory }
                 }
             }
         })
@@ -36,7 +46,7 @@ abstract class Distributions : DefaultTask() {
     @TaskAction
     fun report() {
         if (!all.get()) {
-            val distribution = defaultDistribution.get()
+            val distribution = if (release.get()) releaseDistribution.get() else devDistribution.get()
             println("Installed into ${distribution.imageDirectory.get()}")
             val launcher = distribution.launcherFile.get().asFile.toPath()
             println("Run using: $launcher")

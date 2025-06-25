@@ -8,7 +8,8 @@ import java.io.File
 
 internal class ApplicationMetadata(
     val appName: String,
-    val distribution: DistributionMetadata?,
+    val devDistribution: DistributionMetadata?,
+    val releaseDistribution: DistributionMetadata?,
     val distributions: List<DistributionMetadata>,
     val installations: List<InstallationMetadata>
 )
@@ -48,7 +49,8 @@ internal fun Application.metadata(): ApplicationMetadata {
             imageDir.file(dist.effectiveLauncherFilePath.get()).asFile
         )
     }
-    val defaultDistribution = distribution.get()
+    val devDistribution = devDistribution.get()
+    val releaseDistribution = releaseDistribution.get()
     val mappedInstallations = installations.get().filterIsInstance<MutableInstallation>().map { installation ->
         InstallationMetadata(
             installation.imageOutputDirectory.get().asFile,
@@ -57,7 +59,8 @@ internal fun Application.metadata(): ApplicationMetadata {
     }
     return ApplicationMetadata(
         appName.get(),
-        if (defaultDistribution != null) distributionsById[defaultDistribution] else null,
+        if (devDistribution != null) distributionsById[devDistribution] else null,
+        if (releaseDistribution != null) distributionsById[releaseDistribution] else null,
         distributionsById.values.toList(),
         mappedInstallations
     )

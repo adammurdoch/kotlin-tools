@@ -39,6 +39,7 @@ class NativeBinaryJvmLauncherPlugin : Plugin<Project> {
                         null,
                         default,
                         default,
+                        default,
                         machine,
                         BuildType.Release,
                         DefaultHasLauncherExecutableDistribution::class.java

@@ -13,8 +13,11 @@ interface MutableApplication : Application {
     override val distributions: Provider<List<Distribution>>
         get() = distributionContainer.distributions
 
-    override val distribution: Provider<Distribution>
-        get() = distributionContainer.distribution
+    override val devDistribution: Provider<Distribution>
+        get() = distributionContainer.dev
+
+    override val releaseDistribution: Provider<Distribution>
+        get() = distributionContainer.release
 
     override val localInstallation: Property<Installation>
 

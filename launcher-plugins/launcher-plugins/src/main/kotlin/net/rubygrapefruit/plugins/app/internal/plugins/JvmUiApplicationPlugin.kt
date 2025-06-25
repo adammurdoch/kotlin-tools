@@ -30,6 +30,7 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                         "unsignedRelease",
                         canBuild,
                         canBuild,
+                        canBuild,
                         machine,
                         BuildType.Release,
                         DefaultJvmUiAppDistribution::class.java

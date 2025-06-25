@@ -29,10 +29,12 @@ class NativeTargetsContainer(
             }
 
             val hostCanBuildTarget = HostMachine.current.canBuild(machine)
+            val defaultMachine = hostCanBuildTarget && HostMachine.current.canBeBuilt && HostMachine.current.machine == machine
             val executable = DefaultNativeExecutable(machine, buildType, hostCanBuildTarget, objects)
             val distribution = distributions.add(
                 buildType.name,
-                hostCanBuildTarget && HostMachine.current.canBeBuilt && HostMachine.current.machine == machine && (buildType == BuildType.Debug || buildTypes.size == 1),
+                defaultMachine && (buildType == BuildType.Debug || buildTypes.size == 1),
+                defaultMachine && (buildType == BuildType.Release || buildTypes.size == 1),
                 canBuildOnThisHost && hostCanBuildTarget,
                 machine,
                 buildType,

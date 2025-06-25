@@ -20,7 +20,7 @@ open class CliApplicationBasePlugin : Plugin<Project> {
 
                 val targetDirectory = File(System.getProperty("user.home"), "bin")
                 installation.installDirectory.fileProvider(app.appName.map { name -> targetDirectory.resolve("images/$name") })
-                installation.launcherFile.fileProvider(app.distribution.flatMap { dist ->
+                installation.launcherFile.fileProvider(app.devDistribution.flatMap { dist ->
                     (dist as MutableDistribution).effectiveLauncherFilePath.map { path ->
                         targetDirectory.resolve("links/${path.substringAfterLast("/")}")
                     }
@@ -28,8 +28,8 @@ open class CliApplicationBasePlugin : Plugin<Project> {
 
                 val install = tasks.register("install", Install::class.java) { task ->
                     task.description = "Installs the application"
-                    task.sourceImageDirectory.set(app.distribution.flatMap { it.outputs.imageDirectory })
-                    task.sourceLauncher.set(app.distribution.flatMap { it.outputs.launcherFile })
+                    task.sourceImageDirectory.set(app.devDistribution.flatMap { it.outputs.imageDirectory })
+                    task.sourceLauncher.set(app.devDistribution.flatMap { it.outputs.launcherFile })
                     task.targetImageDirectory.set(installation.installDirectory)
                     task.targetLauncherLink.set(installation.launcherFile)
                 }

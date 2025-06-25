@@ -18,14 +18,15 @@ open class ApplicationRegistry(private val project: Project) {
         app.appName.convention(project.name)
 
         project.tasks.register("dist", Distributions::class.java) { task ->
-            task.defaultDistribution.set(app.distribution.map { dist -> DefaultDistributionOutputs(dist.outputs.imageDirectory, dist.outputs.launcherFile) })
+            task.devDistribution.set(app.devDistribution.map { dist -> DefaultDistributionOutputs(dist.outputs.imageDirectory, dist.outputs.launcherFile) })
+            task.releaseDistribution.set(app.releaseDistribution.map { dist -> DefaultDistributionOutputs(dist.outputs.imageDirectory, dist.outputs.launcherFile) })
             task.allDistributions.set(app.distributions.map { dists ->
                 dists.filterIsInstance<BuildableDistribution>().map { dist -> DefaultDistributionOutputs(dist.outputs.imageDirectory, dist.outputs.launcherFile) }
             })
         }
 
         app.distributionContainer.each {
-            val imageBaseDirName = app.distributionContainer.distribution.map {
+            val imageBaseDirName = app.distributionContainer.dev.map {
                 // This distribution is the development distribution
                 if (this == it) {
                     "dist"

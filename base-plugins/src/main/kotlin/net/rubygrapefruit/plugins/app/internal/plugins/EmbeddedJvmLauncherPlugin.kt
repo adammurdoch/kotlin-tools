@@ -37,6 +37,7 @@ open class EmbeddedJvmLauncherPlugin : Plugin<Project> {
                         "embeddedJvm",
                         true,
                         true,
+                        true,
                         HostMachine.current.machine,
                         BuildType.Release,
                         DefaultHasEmbeddedJvmAndLauncherScriptsDistribution::class.java

@@ -1,10 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal.tasks
 
-import net.rubygrapefruit.plugins.app.Distribution
 import net.rubygrapefruit.plugins.app.internal.ApplicationMetadata
 import net.rubygrapefruit.plugins.app.internal.DistributionMetadata
-import net.rubygrapefruit.plugins.app.internal.HasLauncherExecutable
-import net.rubygrapefruit.plugins.app.internal.HasLauncherScripts
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Internal
@@ -17,16 +14,18 @@ internal abstract class ShowApplication : DefaultTask() {
     @TaskAction
     fun report() {
         val app = app.get()
-        val defaultDist = app.distribution
+        val devDist = app.devDistribution
+        val releaseDist = app.releaseDistribution
 
         println("Application: ${app.appName}")
         println()
 
         val comparator = Comparator.comparingInt<DistributionMetadata> {
             when {
-                it == defaultDist -> 1
-                it.canBuildOnHostMachine -> 2
-                else -> 3
+                it == devDist -> 1
+                it == releaseDist -> 2
+                it.canBuildOnHostMachine -> 3
+                else -> 4
             }
         }.thenBy { dist -> dist.name }
 
@@ -38,8 +37,11 @@ internal abstract class ShowApplication : DefaultTask() {
             if (!(distribution.canBuildOnHostMachine)) {
                 print(" (not buildable)")
             }
-            if (distribution == defaultDist) {
+            if (distribution == devDist) {
                 print(" (DEFAULT)")
+            }
+            if (distribution == releaseDist) {
+                print(" (release)")
             }
             println()
             if (distribution.targetMachine != null) {

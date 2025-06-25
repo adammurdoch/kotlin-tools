@@ -17,7 +17,9 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
 
     val distributions: Provider<List<Distribution>> = providers.provider { distContainer.all }
 
-    val distribution: Property<Distribution> = objects.property(Distribution::class.java)
+    val dev: Property<Distribution> = objects.property(Distribution::class.java)
+
+    val release: Property<Distribution> = objects.property(Distribution::class.java)
 
     /**
      * Adds a platform independent distribution.
@@ -25,7 +27,7 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
     fun <T : MutableDistribution> add(name: String, isDefault: Boolean, type: Class<T>): T {
         val distTask = tasks.register(DefaultMutableDistribution.taskName(name, "dist"), DistributionImage::class.java)
         val dist = objects.newInstance(type, name, HostMachine.current.canBeBuilt, distTask)
-        addDist(dist, isDefault)
+        addDist(dist, isDefault, isDefault)
         return dist
     }
 
@@ -34,7 +36,8 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
      */
     fun <T : MutableDistribution> add(
         baseName: String?,
-        isDefault: Boolean,
+        isDev: Boolean,
+        isRelease: Boolean,
         canBuildForHostMachine: Boolean,
         targetMachine: NativeMachine,
         buildType: BuildType,
@@ -49,14 +52,17 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
         }
         val distTask = tasks.register(DefaultMutableDistribution.taskName(name, "dist"), taskType)
         val dist = objects.newInstance(type, name, canBuildForHostMachine, targetMachine, buildType, distTask)
-        addDist(dist, isDefault)
+        addDist(dist, isDev, isRelease)
         return dist
     }
 
-    private fun addDist(dist: MutableDistribution, isDefault: Boolean) {
+    private fun addDist(dist: MutableDistribution, isDev: Boolean, isRelease: Boolean) {
         distContainer.add(dist)
-        if (isDefault && dist.canBuildOnHostMachine) {
-            distribution.set(dist)
+        if (isDev && dist.canBuildOnHostMachine) {
+            dev.set(dist)
+        }
+        if (isRelease && dist.canBuildOnHostMachine) {
+            release.set(dist)
         }
     }
 

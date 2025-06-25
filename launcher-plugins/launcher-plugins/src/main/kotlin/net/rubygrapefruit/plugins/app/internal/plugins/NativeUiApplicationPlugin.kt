@@ -25,8 +25,16 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                         BuildType.Debug -> buildType.name
                         BuildType.Release -> "unsignedRelease"
                     }
-                    val default = buildType == BuildType.Debug && HostMachine.current.canBeBuilt && HostMachine.current.machine == machine
-                    val dist = app.distributionContainer.add(name, default, HostMachine.current.canBuild(machine), machine, buildType, DefaultNativeUiAppDistribution::class.java)
+                    val thisMachine = HostMachine.current.canBeBuilt && HostMachine.current.machine == machine
+                    val dist = app.distributionContainer.add(
+                        name,
+                        buildType == BuildType.Debug && thisMachine,
+                        buildType == BuildType.Release && thisMachine,
+                        HostMachine.current.canBuild(machine),
+                        machine,
+                        buildType,
+                        DefaultNativeUiAppDistribution::class.java
+                    )
                     dist.launcherFile.set(binaryFile)
                     executable.entryPoint = generatedEntryPoint
                 }

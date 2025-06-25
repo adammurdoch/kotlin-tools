@@ -4,9 +4,10 @@
 - Add `dist --release`
   - use noJvm as the dev release for JVM CLI apps? 
   - add tests
+- Add `install --release`
+  - Split tasks so that usage information can be displayed when install is up to date
 - Simplify dev and release dist paths and task names
 - `showApplication` should show launcher type for UI apps
-- Add `install --release`
 - Share logic between `dist`, `install` and `showApplication` to report where an image is installed and how to run it.
   - Probe the $PATH and report that app can be run in short form?
   - Use relative paths?

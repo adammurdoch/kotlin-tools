@@ -4,7 +4,7 @@ import net.rubygrapefruit.plugins.app.internal.DefaultMutableInstallation
 import net.rubygrapefruit.plugins.app.internal.MutableApplication
 import net.rubygrapefruit.plugins.app.internal.MutableDistribution
 import net.rubygrapefruit.plugins.app.internal.applications
-import net.rubygrapefruit.plugins.app.internal.tasks.Install
+import net.rubygrapefruit.plugins.app.internal.tasks.InstallDistribution
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import java.io.File
@@ -26,10 +26,10 @@ open class CliApplicationBasePlugin : Plugin<Project> {
                     }
                 })
 
-                val install = tasks.register("install", Install::class.java) { task ->
+                val install = tasks.register("install", InstallDistribution::class.java) { task ->
                     task.description = "Installs the application"
-                    task.sourceImageDirectory.set(app.devDistribution.flatMap { it.outputs.imageDirectory })
-                    task.sourceLauncher.set(app.devDistribution.flatMap { it.outputs.launcherFile })
+                    task.devDistribution.set(app.devDistribution.map { it.outputs })
+                    task.releaseDistribution.set(app.releaseDistribution.map { it.outputs })
                     task.targetImageDirectory.set(installation.installDirectory)
                     task.targetLauncherLink.set(installation.launcherFile)
                 }

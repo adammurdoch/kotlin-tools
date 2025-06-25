@@ -14,7 +14,7 @@ abstract class Distributions : DefaultTask() {
     @get:Internal
     abstract val all: Property<Boolean>
 
-    @get:Option(option = "release", description = "Builds release distribution")
+    @get:Option(option = "release", description = "Builds the release distribution")
     @get:Internal
     abstract val release: Property<Boolean>
 

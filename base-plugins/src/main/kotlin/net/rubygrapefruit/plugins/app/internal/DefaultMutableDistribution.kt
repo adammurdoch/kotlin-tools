@@ -19,13 +19,7 @@ abstract class DefaultMutableDistribution @Inject constructor(
         }
     }
 
-    override val outputs: Distribution.Outputs = object : Distribution.Outputs {
-        override val imageDirectory: Provider<Directory>
-            get() = imageOutputDirectory
-
-        override val launcherFile: Provider<RegularFile>
-            get() = launcherOutputFile
-    }
+    override val outputs: Distribution.Outputs = DefaultDistributionOutputs(imageOutputDirectory, launcherOutputFile)
 
     override val effectiveLauncherFilePath: Provider<String>
         get() {

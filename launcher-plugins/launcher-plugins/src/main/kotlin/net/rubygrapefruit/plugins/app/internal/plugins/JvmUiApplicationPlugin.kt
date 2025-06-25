@@ -28,8 +28,8 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                     val canBuild = HostMachine.current.canBeBuilt && HostMachine.current.machine == machine
                     app.distributionContainer.add(
                         "unsignedRelease",
-                        canBuild,
-                        canBuild,
+                        true,
+                        false,
                         canBuild,
                         machine,
                         BuildType.Release,

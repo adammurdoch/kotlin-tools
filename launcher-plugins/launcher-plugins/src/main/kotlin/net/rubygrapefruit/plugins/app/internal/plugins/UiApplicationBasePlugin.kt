@@ -66,7 +66,7 @@ class UiApplicationBasePlugin : Plugin<Project> {
                         val releaseDist = app.distributionContainer.add(
                             "release",
                             false,
-                            false,
+                            true,
                             canBuildOnHostMachine,
                             targetMachine,
                             buildType,

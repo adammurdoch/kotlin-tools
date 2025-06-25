@@ -25,11 +25,10 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                         BuildType.Debug -> buildType.name
                         BuildType.Release -> "unsignedRelease"
                     }
-                    val thisMachine = HostMachine.current.canBeBuilt && HostMachine.current.machine == machine
                     val dist = app.distributionContainer.add(
                         name,
-                        buildType == BuildType.Debug && thisMachine,
-                        buildType == BuildType.Release && thisMachine,
+                        buildType == BuildType.Debug,
+                        false,
                         HostMachine.current.canBuild(machine),
                         machine,
                         buildType,

@@ -24,20 +24,29 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
     /**
      * Adds a platform independent distribution.
      */
-    fun <T : MutableDistribution> add(name: String, isDefault: Boolean, type: Class<T>): T {
+    fun <T : MutableDistribution> add(name: String, isMainDist: Boolean, type: Class<T>): T {
         val distTask = tasks.register(DefaultMutableDistribution.taskName(name, "dist"), DistributionImage::class.java)
-        val dist = objects.newInstance(type, name, HostMachine.current.canBeBuilt, distTask)
-        addDist(dist, isDefault, isDefault)
+        val buildable = HostMachine.current.canBeBuilt
+        val dist = objects.newInstance(type, name, buildable, distTask)
+        addDist(dist, isMainDist, isMainDist)
         return dist
     }
 
     /**
      * Adds a platform-dependent distribution.
+     *
+     * Distribution will not be considered buildable if the Kotlin target cannot be built on the host or if the tooling cannot run on this host.
+     * Distribution will be considered the dev distribution if it can be built, targets the host, and is a developer distribution.
+     * Distribution will be considered the release distribution if it can be built, targets the host, and is a developer distribution.
+     *
+     * @param isDevDist Is the distribution a developer distribution?
+     * @param isReleaseDist Is the distribution a release distribution?
+     * @param canBuildForHostMachine Can the tooling for this distribution run on this host?
      */
     fun <T : MutableDistribution> add(
         baseName: String?,
-        isDev: Boolean,
-        isRelease: Boolean,
+        isDevDist: Boolean,
+        isReleaseDist: Boolean,
         canBuildForHostMachine: Boolean,
         targetMachine: NativeMachine,
         buildType: BuildType,
@@ -51,7 +60,10 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
             }
         }
         val distTask = tasks.register(DefaultMutableDistribution.taskName(name, "dist"), taskType)
-        val dist = objects.newInstance(type, name, canBuildForHostMachine, targetMachine, buildType, distTask)
+        val buildable = HostMachine.current.canBeBuilt && HostMachine.current.canBuild(targetMachine) && canBuildForHostMachine
+        val isDev = isDevDist && HostMachine.current.machine == targetMachine
+        val isRelease = isReleaseDist && HostMachine.current.machine == targetMachine
+        val dist = objects.newInstance(type, name, buildable, targetMachine, buildType, distTask)
         addDist(dist, isDev, isRelease)
         return dist
     }

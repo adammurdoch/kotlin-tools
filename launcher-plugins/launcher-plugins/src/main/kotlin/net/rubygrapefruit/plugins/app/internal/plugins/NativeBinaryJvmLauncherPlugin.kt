@@ -37,8 +37,8 @@ class NativeBinaryJvmLauncherPlugin : Plugin<Project> {
                     val default = machine == HostMachine.current.machine
                     val dist = app.distributionContainer.add(
                         null,
-                        default,
-                        default,
+                        true,
+                        true,
                         default,
                         machine,
                         BuildType.Release,

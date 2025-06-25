@@ -30,7 +30,7 @@ sealed class HostMachine {
     open fun exeName(name: String) = name
 
     /**
-     * Can this host machine build binaries for the given target machine.
+     * Can this host machine build binaries for the given target machine?
      */
     open fun canBuild(target: NativeMachine): Boolean {
         return when (target) {

@@ -13,7 +13,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
       - name: Execute Gradle build
         run: ./gradlew build --continue
         timeout-minutes: 30
@@ -28,7 +28,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
       - name: Execute Gradle build
         run: ./gradlew test-apps:runMin verifySamples --continue
         timeout-minutes: 30
@@ -43,7 +43,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
       - name: Execute Gradle build
         run: ./gradlew check -x :libs:file-io:mingwX64Test -x :libs:store:mingwX64Test --continue --info
         timeout-minutes: 30
@@ -58,7 +58,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
       - name: Execute Gradle build
         run: ./gradlew test-apps:runMin verifySamples -x :test-apps:run-store-native-cli-app -x :test-apps:run-native-cli-app-full --continue
         timeout-minutes: 30
@@ -73,7 +73,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
       - name: Execute Gradle build
         run: ./gradlew build --continue
         timeout-minutes: 30
@@ -88,7 +88,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
       - name: Execute Gradle build
         run: ./gradlew test-apps:smokeTest verifySamples --continue
         timeout-minutes: 30

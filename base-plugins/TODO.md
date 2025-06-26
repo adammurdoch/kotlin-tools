@@ -6,6 +6,7 @@
   - add tests
 - Add `install --release`
   - Split tasks so that usage information can be displayed when install is up to date
+  - add tests
 - Simplify dev and release dist paths and task names
 - `showApplication` should show launcher type for UI apps
 - Share logic between `dist`, `install` and `showApplication` to report where an image is installed and how to run it.
@@ -13,7 +14,6 @@
   - Use relative paths?
 - CLI application installer
   - Copy to content-addressed image location, garbage-collect old versions
-  - Install release distribution
   - Configurable installation location
   - Allow app-specific installation actions to be contributed, for example, generating a completion script
   - Add tests

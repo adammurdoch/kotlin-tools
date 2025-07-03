@@ -1,6 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.BuildType
+import net.rubygrapefruit.plugins.app.NativeMachine
 import net.rubygrapefruit.plugins.app.internal.*
 import net.rubygrapefruit.plugins.app.internal.tasks.NativeLauncher
 import org.gradle.api.Plugin
@@ -38,16 +39,18 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                     executable.entryPoint = generatedEntryPoint
                 }
 
-                val generatorTask = tasks.register("nativeLauncher", NativeLauncher::class.java) {
-                    it.sourceDirectory.set(layout.buildDirectory.dir("generated-main"))
-                    it.entryPoint.set(generatedEntryPoint)
-                    it.delegateMethod.set(app.entryPoint)
+                for (machine in listOf(NativeMachine.MacOSArm64, NativeMachine.MacOSX64)) {
+                    val generatorTask = tasks.register("nativeLauncher${machine.kotlinTarget}", NativeLauncher::class.java) {
+                        it.sourceDirectory.set(layout.buildDirectory.dir("generated-main/${machine.kotlinTarget}"))
+                        it.entryPoint.set(generatedEntryPoint)
+                        it.delegateMethod.set(app.entryPoint)
+                    }
+                    project.kotlin.targets.getByName(machine.kotlinTarget).compilations.getByName("main").defaultSourceSet.kotlin.srcDir(generatorTask.flatMap { it.sourceDirectory })
                 }
                 app.macOS {
                     dependencies {
                         implementation("net.rubygrapefruit.plugins:native-launcher:1.0-dev")
                     }
-                    generatedSource.add(generatorTask.flatMap { it.sourceDirectory })
                 }
             }
 

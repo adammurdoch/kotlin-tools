@@ -1,4 +1,4 @@
-- Handle app fails with exception with no message
+- Handle case where app fails with exception with no message
 - Required option + unknown parameter -> reports missing option
 - Don't run side effects when successful but there are extra inputs
 - Split out recovery logic into a parse state implementation
@@ -17,9 +17,10 @@
 - Move handling of option actions to help
 - Clean up and test usage types
 - `-<value>` option
+- Optional argument for option
 - Range values
 - Enum values
-- Map a parameter to a sealed type that indicates whether the value was provided or not.
+- Map a parameter to a sealed result type that indicates where the value comes from, eg a default, explicit, the literal used, etc
 - Help
     - Show `<action>?` in usage when action has a default
     - Allow display name for parameter to be specified, eg `--download <url>` instead of `--download <value>`
@@ -46,17 +47,20 @@
     - Options with parameter, file and non-file
     - Directory options and parameters
     - Action options
+    - Bash completion: https://mill-build.org/blog/14-bash-zsh-completion.html
 - Escape names for completion function, actions, help, etc
 - Usage message on parse error
     - Suggest `--help`, and special case when `help` is accidentally used instead.
     - Unknown option - show available options
     - Unknown option for sub-command - show available options
     - Unknown action provided to `help`
+    - Unknown option - if expecting an action, check if option belongs to action and give hint to use action 
     - Argument not provided
     - Too many arguments
     - Option value badly formed
     - Parameter value badly formed
     - Option value missing
+    - `-x` used instead of `--x`
 - Allow actions to calculate the set of options dynamically
   - For example, action is constructed with a list of enum _types_
 - Validate names do not contain spaces
@@ -68,3 +72,6 @@
 - File locations: dir, file, must exist
 - Color output on terminal
 - Fuzzy matching and/or suggestions
+  - Unknown action
+  - Unknown option or value
+  - Unknown file/directory

@@ -3,6 +3,7 @@
 
 - Add `versions` as a project extension
 - Java 23 and 24 support
+- Fail on duplicate `main()` functions
 - Add `dist --release`
   - use noJvm as the dev release for JVM CLI apps? 
   - add tests

@@ -10,7 +10,7 @@ object Constants {
     val coroutines = "1.10.2"
     val dateTime = "0.7.1"
     val io = "0.8.0"
-    val ksp = "2.2.0-2.0.2"
+    val ksp = "2.3.2"
     val java = 17
     val pluginsJava = 11
 

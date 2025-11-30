@@ -10,6 +10,7 @@ import org.gradle.api.Project
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
+import kotlin.math.max
 
 class KmpBaseLibraryPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -44,9 +45,17 @@ class KmpBaseLibraryPlugin : Plugin<Project> {
                 val classesDir = files(compilation.compileTaskProvider.flatMap { (it as KotlinJvmCompile).destinationDirectory })
 
                 val moduleInfoCp = extensions.getByType(JvmModuleRegistry::class.java)
-                    .inspectClassPathsFor(lib.module, null, classesDir, apiClasspath, runtimeClasspath).moduleInfoClasspath
+                    .inspectClassPathsFor(lib.module, null, classesDir, apiClasspath, runtimeClasspath)
+                    .moduleInfoClasspath
                 tasks.named("jvmJar", Jar::class.java) {
                     it.from(moduleInfoCp)
+                }
+
+                jvmTarget.testRuns.configureEach { testRun ->
+                    // Run tests in parallel
+                    testRun.executionTask.configure { jvmTest ->
+                        jvmTest.maxParallelForks = max(1, Runtime.getRuntime().availableProcessors() / 3)
+                    }
                 }
             }
         }

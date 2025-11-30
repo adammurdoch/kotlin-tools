@@ -45,6 +45,8 @@ class JvmApplicationBasePlugin : Plugin<Project> {
 
                 app.runtimeModulePath.from(jarTask.map { it.archiveFile })
                 app.runtimeModulePath.from(runtimeModulePath.map { it.outputDirectory.asFileTree.matching { it.include("*.jar") } })
+
+                JvmConventionsPlugin.parallelTests(this)
             }
         }
     }

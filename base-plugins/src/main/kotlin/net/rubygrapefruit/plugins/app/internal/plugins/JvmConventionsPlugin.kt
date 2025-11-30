@@ -6,7 +6,9 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.testing.Test
 import org.gradle.jvm.toolchain.JavaLanguageVersion
+import kotlin.math.max
 
 class JvmConventionsPlugin : Plugin<Project> {
     companion object {
@@ -32,6 +34,13 @@ class JvmConventionsPlugin : Plugin<Project> {
             project.dependencies.constraints.add(apiConfiguration, "org.jetbrains:annotations") {
                 it.version { it.require("16.0.3") }
                 it.because("Automatic module name is not defined for earlier versions")
+            }
+        }
+
+        fun parallelTests(project: Project) {
+            // Run tests in parallel
+            project.tasks.named("test", Test::class.java) {
+                it.maxParallelForks = max(1, Runtime.getRuntime().availableProcessors() / 3)
             }
         }
     }

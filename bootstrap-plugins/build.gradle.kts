@@ -1,10 +1,13 @@
+import net.rubygrapefruit.plugins.stage0.BuildConstants
+
 plugins {
+    id("net.rubygrapefruit.plugins.stage0.gradle-plugin")
     id("org.jetbrains.kotlin.jvm").version("2.2.21")
     id("java-gradle-plugin")
 }
 
 object Constants {
-    val kotlin = "2.2.21"
+    val kotlin = BuildConstants.kotlin.version
     val serializationPlugin = "2.2.21"
     val serializationLibrary = "1.9.0"
     val coroutines = "1.10.2"

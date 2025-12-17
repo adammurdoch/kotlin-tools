@@ -12,6 +12,8 @@ buildscript {
     }
 }
 
+group = "stage0"
+
 gradlePlugin {
     plugins {
         create("buildConstantsPlugin") {
@@ -40,9 +42,9 @@ abstract class GenerateSource : DefaultTask() {
     @TaskAction
     fun generate() {
         val document = JToml.jToml().read(versionsFile.get().asFile)
-        val version = document.get("kotlin.version")
-        if (version == null || version.isPrimitive.not()) {
-            throw IllegalArgumentException("Unexpected 'kotlin.version' property: $version")
+        val kotlinVersion = document.get("kotlin.version")
+        if (kotlinVersion == null || kotlinVersion.isPrimitive.not()) {
+            throw IllegalArgumentException("Unexpected 'kotlin.version' property: $kotlinVersion")
         }
 
         val outputDir = outputDirectory.get().asFile.toPath()
@@ -60,8 +62,12 @@ abstract class GenerateSource : DefaultTask() {
                 println("    public static final KotlinConstants kotlin = new KotlinConstants();")
                 println("    public static class KotlinConstants {")
                 print("        public final String version = \"")
-                print(version.asPrimitive().asString())
+                print(kotlinVersion.asPrimitive().asString())
                 println("\";")
+                println("    }")
+                println("    public static final Stage0Constants stage0 = new Stage0Constants();")
+                println("    public static class Stage0Constants {")
+                println("        public final String buildConstantsCoordinates = \"stage0:build-constants-plugin:0.0\";")
                 println("    }")
                 println("}")
                 flush()

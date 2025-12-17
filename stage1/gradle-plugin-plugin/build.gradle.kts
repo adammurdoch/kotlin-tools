@@ -5,8 +5,12 @@ plugins {
     id("java-gradle-plugin")
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
-    implementation(BuildConstants.stage0.buildConstantsCoordinates)
+    implementation(BuildConstants.kotlin.pluginCoordinates + ":" + BuildConstants.kotlin.version)
 }
 
 gradlePlugin {

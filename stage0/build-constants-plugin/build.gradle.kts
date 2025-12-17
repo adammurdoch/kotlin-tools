@@ -42,10 +42,11 @@ abstract class GenerateSource : DefaultTask() {
     @TaskAction
     fun generate() {
         val document = JToml.jToml().read(versionsFile.get().asFile)
-        val kotlinVersion = document.get("kotlin.version")
-        if (kotlinVersion == null || kotlinVersion.isPrimitive.not()) {
-            throw IllegalArgumentException("Unexpected 'kotlin.version' property: $kotlinVersion")
+        val kotlinSection = document.get("kotlin")
+        if (kotlinSection == null || !kotlinSection.isTable) {
+            throw IllegalArgumentException("Unexpected 'kotlin' table: $kotlinSection")
         }
+        val kotlinTable = kotlinSection.asTable()
 
         val outputDir = outputDirectory.get().asFile.toPath()
         val packageName = "net.rubygrapefruit.plugins.stage0"
@@ -61,9 +62,16 @@ abstract class GenerateSource : DefaultTask() {
                 println("public class BuildConstants {")
                 println("    public static final KotlinConstants kotlin = new KotlinConstants();")
                 println("    public static class KotlinConstants {")
-                print("        public final String version = \"")
-                print(kotlinVersion.asPrimitive().asString())
-                println("\";")
+                for (key in kotlinTable.keys()) {
+                    val value = kotlinTable.get(key)
+                    if (value != null && value.isPrimitive && value.asPrimitive().isString) {
+                        print("        public final String ")
+                        print(key.last())
+                        print(" = \"")
+                        print(value.asPrimitive().asString())
+                        println("\";")
+                    }
+                }
                 println("    }")
                 println("    public static final Stage0Constants stage0 = new Stage0Constants();")
                 println("    public static class Stage0Constants {")

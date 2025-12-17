@@ -1,2 +1,3 @@
 [kotlin]
 version = "2.2.21"
+pluginCoordinates = "org.jetbrains.kotlin:kotlin-gradle-plugin"

@@ -1,1 +1,1 @@
-include("plugins")
+include("build-constants-plugin")

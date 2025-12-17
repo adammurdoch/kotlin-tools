@@ -14,9 +14,9 @@ buildscript {
 
 gradlePlugin {
     plugins {
-        create("gradlePluginPlugin") {
-            id = "net.rubygrapefruit.plugins.stage0.gradle-plugin"
-            implementationClass = "net.rubygrapefruit.plugins.stage0.GradlePluginPlugin"
+        create("buildConstantsPlugin") {
+            id = "net.rubygrapefruit.plugins.stage0.build-constants"
+            implementationClass = "net.rubygrapefruit.plugins.stage0.BuildConstantsPlugin"
         }
     }
 }

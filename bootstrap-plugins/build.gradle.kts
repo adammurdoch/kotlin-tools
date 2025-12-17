@@ -1,7 +1,7 @@
 import net.rubygrapefruit.plugins.stage0.BuildConstants
 
 plugins {
-    id("net.rubygrapefruit.plugins.stage0.gradle-plugin")
+    id("net.rubygrapefruit.plugins.stage0.build-constants")
     id("org.jetbrains.kotlin.jvm").version("2.2.21")
     id("java-gradle-plugin")
 }

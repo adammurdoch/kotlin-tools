@@ -26,19 +26,27 @@ coordinatesBase = "org.gradle.toolchains:foojay-resolver"
 
 [serialization.plugin]
 version = "2.2.21"
+id = "org.jetbrains.kotlin.plugin.serialization"
 coordinatesBase = "org.jetbrains.kotlin:kotlin-serialization"
 
 [serialization.library]
 version = "1.9.0"
+coordinatesBase = "org.jetbrains.kotlinx:kotlinx-serialization-core"
+
+[serialization.library.json]
+coordinatesBase = "org.jetbrains.kotlinx:kotlinx-serialization-json"
 
 [coroutines]
 version = "1.10.2"
+coordinatesBase = "org.jetbrains.kotlinx:kotlinx-coroutines-core"
 
 [dateTime]
 version = "0.7.1"
+coordinatesBase = "org.jetbrains.kotlinx:kotlinx-datetime"
 
 [io]
 version = "0.8.0"
+coordinatesBase = "org.jetbrains.kotlinx:kotlinx-io-core"
 
 [ksp]
 version = "2.3.3"

@@ -113,30 +113,30 @@ val generateResource = tasks.register("generateVersionResource") {
 
             object Serialization {
                 val version = "${buildConstants.serialization.library.version}"
-                val coordinates = "org.jetbrains.kotlinx:kotlinx-serialization-core:${buildConstants.serialization.library.version}"
+                val coordinates = "${buildConstants.serialization.library.coordinates}"
                 val pluginCoordinates = "${buildConstants.serialization.plugin.coordinates}"
-                val pluginId = "org.jetbrains.kotlin.plugin.serialization"
+                val pluginId = "${buildConstants.serialization.plugin.id}"
                 val json = SerializationJson
             }
             
             object SerializationJson {
                 val version = "${buildConstants.serialization.library.version}"
-                val coordinates = "org.jetbrains.kotlinx:kotlinx-serialization-json:${buildConstants.serialization.library.version}"
+                val coordinates = "${buildConstants.serialization.library.json.coordinates}"
             }
 
             object Coroutines {
                 val version = "${buildConstants.coroutines.version}"
-                val coordinates = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${buildConstants.coroutines.version}"
+                val coordinates = "${buildConstants.coroutines.coordinates}"
             }
 
             object DateTime {
                 val version = "${buildConstants.dateTime.version}"
-                val coordinates = "org.jetbrains.kotlinx:kotlinx-datetime:${buildConstants.dateTime.version}"
+                val coordinates = "${buildConstants.dateTime.coordinates}"
             }
 
             object IO {
                 val version = "${buildConstants.io.version}"
-                val coordinates = "org.jetbrains.kotlinx:kotlinx-io-core:${buildConstants.io.version}"
+                val coordinates = "${buildConstants.io.coordinates}"
             }
 
             object Ksp {

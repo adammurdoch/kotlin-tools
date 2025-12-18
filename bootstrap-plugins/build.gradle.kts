@@ -4,11 +4,6 @@ plugins {
 }
 
 object Constants {
-    val dateTime = "0.7.1"
-    val io = "0.8.0"
-    val java = 17
-    val pluginsJava = 11
-
     val pluginsGroup = "net.rubygrapefruit.plugins"
 }
 
@@ -26,7 +21,7 @@ dependencies {
 }
 
 kotlin {
-    jvmToolchain(Constants.pluginsJava)
+    jvmToolchain(buildConstants.plugins.jvm.version)
 }
 
 gradlePlugin {
@@ -81,7 +76,7 @@ val generateResource = tasks.register("generateVersionResource") {
                 val dateTime = DateTime
                 val io = IO
                 val ksp = Ksp
-                val java = ${Constants.java}
+                val java = ${buildConstants.libs.jvm.version}
                 val plugins = Plugins
                 val libs = Libraries
             }
@@ -93,12 +88,12 @@ val generateResource = tasks.register("generateVersionResource") {
 
             object KotlinTest {
                 val version = "${buildConstants.kotlin.version}"
-                val coordinates = "org.jetbrains.kotlin:kotlin-test:" + version
+                val coordinates = "${buildConstants.kotlin.test.coordinates}"
                 val junit = KotlinTestJunit
             }
 
             object KotlinTestJunit {
-                val coordinates = "org.jetbrains.kotlin:kotlin-test-junit:${buildConstants.kotlin.version}"
+                val coordinates = "${buildConstants.kotlin.test.junit.coordinates}"
             }
             
             object Plugins {
@@ -135,8 +130,8 @@ val generateResource = tasks.register("generateVersionResource") {
             }
 
             object DateTime {
-                val version = "${Constants.dateTime}"
-                val coordinates = "org.jetbrains.kotlinx:kotlinx-datetime:${Constants.dateTime}"
+                val version = "${buildConstants.dateTime.version}"
+                val coordinates = "org.jetbrains.kotlinx:kotlinx-datetime:${buildConstants.dateTime.version}"
             }
 
             object IO {
@@ -146,9 +141,9 @@ val generateResource = tasks.register("generateVersionResource") {
 
             object Ksp {
                 val version = "${buildConstants.ksp.version}"
-                val coordinates = "com.google.devtools.ksp:symbol-processing-api:${buildConstants.ksp.version}"
-                val pluginCoordinates = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:${buildConstants.ksp.version}"
-                val pluginId = "com.google.devtools.ksp"
+                val coordinates = "${buildConstants.ksp.library.coordinates}"
+                val pluginCoordinates = "${buildConstants.ksp.plugin.coordinates}"
+                val pluginId = "${buildConstants.ksp.plugin.id}"
             }
         """.trimIndent()
         )

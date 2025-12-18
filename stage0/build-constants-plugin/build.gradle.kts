@@ -84,20 +84,26 @@ abstract class GenerateSource : DefaultTask() {
         for (key in keys) {
             val value = container.get(key)!!
             if (value.isPrimitive) {
-                val primitiveValue = value.asPrimitive().asString()
+                val primitiveValue = value.asPrimitive()
                 val name = key.last()
                 print(prefix)
                 if (name == "coordinatesBase") {
                     print("public final String coordinates = \"")
-                    print(primitiveValue)
+                    print(primitiveValue.asString())
                     print(":")
                     print(version)
                     println("\";")
+                } else if (primitiveValue.isInteger) {
+                    print("public final int ")
+                    print(name)
+                    print(" = ")
+                    print(primitiveValue.asInteger())
+                    println(";")
                 } else {
                     print("public final String ")
                     print(name)
                     print(" = \"")
-                    print(primitiveValue)
+                    print(primitiveValue.asString())
                     println("\";")
                 }
             } else if (value.isTable) {

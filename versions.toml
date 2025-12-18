@@ -4,6 +4,12 @@ version = "2.2.21"
 [kotlin.plugin]
 coordinatesBase = "org.jetbrains.kotlin:kotlin-gradle-plugin"
 
+[kotlin.test]
+coordinatesBase = "org.jetbrains.kotlin:kotlin-test"
+
+[kotlin.test.junit]
+coordinatesBase = "org.jetbrains.kotlin:kotlin-test-junit"
+
 [plugins.jvm]
 version = 11
 
@@ -28,7 +34,7 @@ version = "1.9.0"
 [coroutines]
 version = "1.10.2"
 
-[datetime]
+[dateTime]
 version = "0.7.1"
 
 [io]
@@ -36,3 +42,10 @@ version = "0.8.0"
 
 [ksp]
 version = "2.3.3"
+
+[ksp.library]
+coordinatesBase = "com.google.devtools.ksp:symbol-processing-api"
+
+[ksp.plugin]
+id = "com.google.devtools.ksp"
+coordinatesBase = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin"

@@ -27,9 +27,9 @@ repositories {
 }
 
 dependencies {
-    api(buildConstants.kotlin.pluginCoordinates)
+    api(buildConstants.kotlin.plugin.coordinates)
     api(Constants.serializationPluginCoordinates)
-    implementation("org.gradle.toolchains:foojay-resolver:0.9.0")
+    implementation(buildConstants.foojay.plugin.coordinates)
 }
 
 kotlin {
@@ -95,7 +95,7 @@ val generateResource = tasks.register("generateVersionResource") {
 
             object Kotlin {
                 val version = "${buildConstants.kotlin.version}"
-                val pluginCoordinates = "${buildConstants.kotlin.pluginCoordinates}"
+                val pluginCoordinates = "${buildConstants.kotlin.plugin.coordinates}"
             }
 
             object KotlinTest {

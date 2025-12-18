@@ -1,6 +1,7 @@
 pluginManagement {
     includeBuild("../stage0")
     includeBuild("../stage1")
+    includeBuild("../stage2")
 }
 
 plugins {

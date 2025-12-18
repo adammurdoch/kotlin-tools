@@ -1,4 +1,6 @@
 import io.github.wasabithumb.jtoml.JToml
+import io.github.wasabithumb.jtoml.value.table.TomlTable
+import org.gradle.internal.extensions.stdlib.capitalized
 import java.io.PrintWriter
 import kotlin.io.path.bufferedWriter
 import kotlin.io.path.createDirectories
@@ -13,6 +15,12 @@ buildscript {
 }
 
 group = "stage0"
+
+java {
+    toolchain {
+        version = JavaVersion.VERSION_17
+    }
+}
 
 gradlePlugin {
     plugins {
@@ -42,11 +50,6 @@ abstract class GenerateSource : DefaultTask() {
     @TaskAction
     fun generate() {
         val document = JToml.jToml().read(versionsFile.get().asFile)
-        val kotlinSection = document.get("kotlin")
-        if (kotlinSection == null || !kotlinSection.isTable) {
-            throw IllegalArgumentException("Unexpected 'kotlin' table: $kotlinSection")
-        }
-        val kotlinTable = kotlinSection.asTable()
 
         val outputDir = outputDirectory.get().asFile.toPath()
         val packageName = "net.rubygrapefruit.plugins.stage0"
@@ -61,32 +64,7 @@ abstract class GenerateSource : DefaultTask() {
                 println()
                 println("public class BuildConstants {")
                 println("    public static final BuildConstants constants = new BuildConstants();")
-                println()
-                println("    public final KotlinConstants kotlin = new KotlinConstants();")
-                println("    public static class KotlinConstants {")
-                val keys = kotlinTable.keys().filter { it.last() == "version" } + kotlinTable.keys().filter { it.last() != "version" }
-                for (key in keys) {
-                    val value = kotlinTable.get(key)
-                    if (value == null || !value.isPrimitive) {
-                        continue
-                    }
-                    val primitiveValue = value.asPrimitive()
-                    if (primitiveValue.isString) {
-                        val name = key.last()
-                        if (name == "pluginCoordinatesBase") {
-                            print("        public final String pluginCoordinates = \"")
-                            print(primitiveValue.asString())
-                            println(":\" + version;")
-                        } else {
-                            print("        public final String ")
-                            print(name)
-                            print(" = \"")
-                            print(primitiveValue.asString())
-                            println("\";")
-                        }
-                    }
-                }
-                println("    }")
+                constants(document.asTable(), "    ", null)
                 println()
                 println("    public final Stage0Constants stage0 = new Stage0Constants();")
                 println("    public static class Stage0Constants {")
@@ -94,6 +72,54 @@ abstract class GenerateSource : DefaultTask() {
                 println("    }")
                 println("}")
                 flush()
+            }
+        }
+    }
+
+    private fun PrintWriter.constants(container: TomlTable, prefix: String, parentVersion: String?) {
+        val versionKeys = container.keys(false).filter { it.last() == "version" }
+        val versionKey = versionKeys.firstOrNull()
+        val version = if (versionKey != null) container.get(versionKey)!!.asPrimitive().asString() else parentVersion
+        val keys = versionKeys + container.keys(false).filter { it.last() != "version" }
+        for (key in keys) {
+            val value = container.get(key)!!
+            if (value.isPrimitive) {
+                val primitiveValue = value.asPrimitive().asString()
+                val name = key.last()
+                print(prefix)
+                if (name == "coordinatesBase") {
+                    print("public final String coordinates = \"")
+                    print(primitiveValue)
+                    print(":")
+                    print(version)
+                    println("\";")
+                } else {
+                    print("public final String ")
+                    print(name)
+                    print(" = \"")
+                    print(primitiveValue)
+                    println("\";")
+                }
+            } else if (value.isTable) {
+                val table = value.asTable()
+                val varName = key.last()
+                val className = varName.capitalized() + "Constants"
+                println()
+                print(prefix)
+                print("public final ")
+                print(className)
+                print(" ")
+                print(varName)
+                print(" = new ")
+                print(className)
+                println("();")
+                print(prefix)
+                print("public static class ")
+                print(className)
+                println(" {")
+                constants(table, "$prefix    ", version)
+                print(prefix)
+                println("}")
             }
         }
     }

@@ -1,3 +1,13 @@
 [kotlin]
 version = "2.2.21"
-pluginCoordinatesBase = "org.jetbrains.kotlin:kotlin-gradle-plugin"
+
+[kotlin.plugin]
+coordinatesBase = "org.jetbrains.kotlin:kotlin-gradle-plugin"
+
+[foojay.plugin]
+version = "0.9.0"
+id = "org.gradle.toolchains.foojay-resolver-convention"
+coordinatesBase = "org.gradle.toolchains:foojay-resolver"
+
+[plugins.jvm]
+version = 17

@@ -4,17 +4,10 @@ plugins {
 }
 
 object Constants {
-    val serializationPlugin = "2.2.21"
-    val serializationLibrary = "1.9.0"
-    val coroutines = "1.10.2"
     val dateTime = "0.7.1"
     val io = "0.8.0"
-    val ksp = "2.3.3"
     val java = 17
     val pluginsJava = 11
-
-    val serializationPluginCoordinates
-        get() = "org.jetbrains.kotlin:kotlin-serialization:${serializationPlugin}"
 
     val pluginsGroup = "net.rubygrapefruit.plugins"
 }
@@ -28,7 +21,7 @@ repositories {
 
 dependencies {
     api(buildConstants.kotlin.plugin.coordinates)
-    api(Constants.serializationPluginCoordinates)
+    api(buildConstants.serialization.plugin.coordinates)
     implementation(buildConstants.foojay.plugin.coordinates)
 }
 
@@ -109,7 +102,7 @@ val generateResource = tasks.register("generateVersionResource") {
             }
             
             object Plugins {
-                val java = ${Constants.pluginsJava}
+                val java = ${buildConstants.plugins.jvm.version}
                 val group = "${Constants.pluginsGroup}"
                 val version = "0.1-dev"
                 val basePluginsCoordinates = group + ":base-plugins:" + version
@@ -124,21 +117,21 @@ val generateResource = tasks.register("generateVersionResource") {
             }
 
             object Serialization {
-                val version = "${Constants.serializationPlugin}"
-                val coordinates = "org.jetbrains.kotlinx:kotlinx-serialization-core:${Constants.serializationLibrary}"
-                val pluginCoordinates = "${Constants.serializationPluginCoordinates}"
+                val version = "${buildConstants.serialization.library.version}"
+                val coordinates = "org.jetbrains.kotlinx:kotlinx-serialization-core:${buildConstants.serialization.library.version}"
+                val pluginCoordinates = "${buildConstants.serialization.plugin.coordinates}"
                 val pluginId = "org.jetbrains.kotlin.plugin.serialization"
                 val json = SerializationJson
             }
             
             object SerializationJson {
-                val version = "${Constants.serializationLibrary}"
-                val coordinates = "org.jetbrains.kotlinx:kotlinx-serialization-json:${Constants.serializationLibrary}"
+                val version = "${buildConstants.serialization.library.version}"
+                val coordinates = "org.jetbrains.kotlinx:kotlinx-serialization-json:${buildConstants.serialization.library.version}"
             }
 
             object Coroutines {
-                val version = "${Constants.coroutines}"
-                val coordinates = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Constants.coroutines}"
+                val version = "${buildConstants.coroutines.version}"
+                val coordinates = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${buildConstants.coroutines.version}"
             }
 
             object DateTime {
@@ -147,14 +140,14 @@ val generateResource = tasks.register("generateVersionResource") {
             }
 
             object IO {
-                val version = "${Constants.io}"
-                val coordinates = "org.jetbrains.kotlinx:kotlinx-io-core:${Constants.io}"
+                val version = "${buildConstants.io.version}"
+                val coordinates = "org.jetbrains.kotlinx:kotlinx-io-core:${buildConstants.io.version}"
             }
 
             object Ksp {
-                val version = "${Constants.ksp}"
-                val coordinates = "com.google.devtools.ksp:symbol-processing-api:${Constants.ksp}"
-                val pluginCoordinates = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:${Constants.ksp}"
+                val version = "${buildConstants.ksp.version}"
+                val coordinates = "com.google.devtools.ksp:symbol-processing-api:${buildConstants.ksp.version}"
+                val pluginCoordinates = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:${buildConstants.ksp.version}"
                 val pluginId = "com.google.devtools.ksp"
             }
         """.trimIndent()

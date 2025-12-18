@@ -4,10 +4,35 @@ version = "2.2.21"
 [kotlin.plugin]
 coordinatesBase = "org.jetbrains.kotlin:kotlin-gradle-plugin"
 
+[plugins.jvm]
+version = 11
+
+[apps.jvm]
+version = 17
+
+[libs.jvm]
+version = 17
+
 [foojay.plugin]
 version = "0.9.0"
 id = "org.gradle.toolchains.foojay-resolver-convention"
 coordinatesBase = "org.gradle.toolchains:foojay-resolver"
 
-[plugins.jvm]
-version = 17
+[serialization.plugin]
+version = "2.2.21"
+coordinatesBase = "org.jetbrains.kotlin:kotlin-serialization"
+
+[serialization.library]
+version = "1.9.0"
+
+[coroutines]
+version = "1.10.2"
+
+[datetime]
+version = "0.7.1"
+
+[io]
+version = "0.8.0"
+
+[ksp]
+version = "2.3.3"

@@ -29,6 +29,10 @@ gradlePlugin {
             id = "net.rubygrapefruit.plugins.stage0.build-constants"
             implementationClass = "net.rubygrapefruit.plugins.stage0.BuildConstantsPlugin"
         }
+        create("settingsPlugin") {
+            id = "net.rubygrapefruit.plugins.stage0.settings"
+            implementationClass = "net.rubygrapefruit.plugins.stage0.SettingsPlugin"
+        }
     }
 }
 
@@ -65,7 +69,9 @@ abstract class GenerateSource : DefaultTask() {
                     typedFieldDecl("constants", "public static final", "BuildConstants")
                     constants(document.asTable(), null)
                     stage(0) {
-                        stringFieldDecl("buildConstantsCoordinates", "public final", "stage0:build-constants-plugin:0.0")
+                        typedConstants("buildConstants") {
+                            stringFieldDecl("coordinates", "public final", "stage0:build-constants-plugins:0.0")
+                        }
                     }
                     stage(1) {
                         stringFieldDecl("pluginsGroup", "public final", "stage1")
@@ -95,9 +101,7 @@ abstract class GenerateSource : DefaultTask() {
             } else if (value.isTable) {
                 val table = value.asTable()
                 val varName = key.last()
-                val className = varName.capitalized() + "Constants"
-                typedFieldDecl(varName, "public final", className)
-                classDecl(className, "public static") {
+                typedConstants(varName) {
                     constants(table, version)
                 }
             }
@@ -105,14 +109,18 @@ abstract class GenerateSource : DefaultTask() {
     }
 
     private fun Generator.stage(number: Int, body: Generator.() -> Unit) {
-        val className = "Stage$number"
-        typedFieldDecl("stage$number", "public final", className)
+        typedConstants("stage$number", body)
+    }
+
+    private fun Generator.typedConstants(varName: String, body: Generator.() -> Unit) {
+        val className = varName.capitalized() + "Constants"
+        typedFieldDecl(varName, "public final", className)
         classDecl(className, "public static", body)
     }
 
     private class Generator(writer: Writer) {
         private val writer = PrintWriter(writer)
-        private var indent = 0;
+        private var indent = 0
 
         fun generate(body: Generator.() -> Unit) {
             writer.println("// Generated file - do not edit")

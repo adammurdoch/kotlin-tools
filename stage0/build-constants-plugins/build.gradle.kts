@@ -29,10 +29,6 @@ gradlePlugin {
             id = "net.rubygrapefruit.plugins.stage0.build-constants"
             implementationClass = "net.rubygrapefruit.plugins.stage0.BuildConstantsPlugin"
         }
-        create("settingsPlugin") {
-            id = "net.rubygrapefruit.plugins.stage0.settings"
-            implementationClass = "net.rubygrapefruit.plugins.stage0.SettingsPlugin"
-        }
     }
 }
 
@@ -71,6 +67,7 @@ abstract class GenerateSource : DefaultTask() {
                     stage(0) {
                         typedConstants("buildConstants") {
                             stringFieldDecl("coordinates", "public final", "stage0:build-constants-plugins:0.0")
+                            stringFieldDecl("pluginId", "public final", "net.rubygrapefruit.plugins.stage0.build-constants")
                         }
                     }
                     stage(1) {

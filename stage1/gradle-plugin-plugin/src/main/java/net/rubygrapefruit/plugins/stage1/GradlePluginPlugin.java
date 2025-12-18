@@ -13,6 +13,7 @@ public class GradlePluginPlugin implements Plugin<Project> {
     public void apply(@NotNull Project target) {
         target.getPlugins().apply("org.jetbrains.kotlin.jvm");
         target.getPlugins().apply("java-gradle-plugin");
+        target.getPlugins().apply(BuildConstants.constants.stage0.buildConstants.pluginId);
 
         target.getRepositories().mavenCentral();
 

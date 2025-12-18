@@ -2,7 +2,7 @@ import net.rubygrapefruit.plugins.stage0.BuildConstants
 
 plugins {
     id("net.rubygrapefruit.plugins.stage0.build-constants")
-    id("net.rubygrapefruit.plugins.stage1.gradle-plugin-plugin")
+    id("net.rubygrapefruit.plugins.stage1.gradle-plugin")
 }
 
 object Constants {
@@ -17,7 +17,8 @@ object Constants {
     val pluginsJava = 11
 
     val kotlinPluginCoordinates
-        get() = "${BuildConstants.kotlin.pluginCoordinates}:${kotlin}"
+        get() = BuildConstants.kotlin.pluginCoordinates
+
     val serializationPluginCoordinates
         get() = "org.jetbrains.kotlin:kotlin-serialization:${serializationPlugin}"
 

@@ -62,14 +62,26 @@ abstract class GenerateSource : DefaultTask() {
                 println("public class BuildConstants {")
                 println("    public static final KotlinConstants kotlin = new KotlinConstants();")
                 println("    public static class KotlinConstants {")
-                for (key in kotlinTable.keys()) {
+                val keys = kotlinTable.keys().filter { it.last() == "version" } + kotlinTable.keys().filter { it.last() != "version" }
+                for (key in keys) {
                     val value = kotlinTable.get(key)
-                    if (value != null && value.isPrimitive && value.asPrimitive().isString) {
-                        print("        public final String ")
-                        print(key.last())
-                        print(" = \"")
-                        print(value.asPrimitive().asString())
-                        println("\";")
+                    if (value == null || !value.isPrimitive) {
+                        continue
+                    }
+                    val primitiveValue = value.asPrimitive()
+                    if (primitiveValue.isString) {
+                        val name = key.last()
+                        if (name == "pluginCoordinatesBase") {
+                            print("        public final String pluginCoordinates = \"")
+                            print(primitiveValue.asString())
+                            println(":\" + version;")
+                        } else {
+                            print("        public final String ")
+                            print(name)
+                            print(" = \"")
+                            print(primitiveValue.asString())
+                            println("\";")
+                        }
                     }
                 }
                 println("    }")

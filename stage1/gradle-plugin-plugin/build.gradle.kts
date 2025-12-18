@@ -10,13 +10,13 @@ repositories {
 }
 
 dependencies {
-    implementation(BuildConstants.kotlin.pluginCoordinates + ":" + BuildConstants.kotlin.version)
+    implementation(BuildConstants.kotlin.pluginCoordinates)
 }
 
 gradlePlugin {
     plugins {
         create("gradlePluginPlugin") {
-            id = "net.rubygrapefruit.plugins.stage1.gradle-plugin-plugin"
+            id = "net.rubygrapefruit.plugins.stage1.gradle-plugin"
             implementationClass = "net.rubygrapefruit.plugins.stage1.GradlePluginPlugin"
         }
     }

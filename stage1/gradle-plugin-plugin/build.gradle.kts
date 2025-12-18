@@ -1,5 +1,3 @@
-import net.rubygrapefruit.plugins.stage0.BuildConstants
-
 plugins {
     id("net.rubygrapefruit.plugins.stage0.build-constants")
     id("java-gradle-plugin")
@@ -10,7 +8,7 @@ repositories {
 }
 
 dependencies {
-    implementation(BuildConstants.kotlin.pluginCoordinates)
+    implementation(buildConstants.kotlin.pluginCoordinates)
 }
 
 gradlePlugin {

@@ -60,7 +60,9 @@ abstract class GenerateSource : DefaultTask() {
                 println("package $packageName;")
                 println()
                 println("public class BuildConstants {")
-                println("    public static final KotlinConstants kotlin = new KotlinConstants();")
+                println("    public static final BuildConstants constants = new BuildConstants();")
+                println()
+                println("    public final KotlinConstants kotlin = new KotlinConstants();")
                 println("    public static class KotlinConstants {")
                 val keys = kotlinTable.keys().filter { it.last() == "version" } + kotlinTable.keys().filter { it.last() != "version" }
                 for (key in keys) {
@@ -85,7 +87,8 @@ abstract class GenerateSource : DefaultTask() {
                     }
                 }
                 println("    }")
-                println("    public static final Stage0Constants stage0 = new Stage0Constants();")
+                println()
+                println("    public final Stage0Constants stage0 = new Stage0Constants();")
                 println("    public static class Stage0Constants {")
                 println("        public final String buildConstantsCoordinates = \"stage0:build-constants-plugin:0.0\";")
                 println("    }")

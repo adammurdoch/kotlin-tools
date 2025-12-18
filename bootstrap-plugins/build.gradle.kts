@@ -1,12 +1,9 @@
-import net.rubygrapefruit.plugins.stage0.BuildConstants
-
 plugins {
     id("net.rubygrapefruit.plugins.stage0.build-constants")
     id("net.rubygrapefruit.plugins.stage1.gradle-plugin")
 }
 
 object Constants {
-    val kotlin = BuildConstants.kotlin.version
     val serializationPlugin = "2.2.21"
     val serializationLibrary = "1.9.0"
     val coroutines = "1.10.2"
@@ -15,9 +12,6 @@ object Constants {
     val ksp = "2.3.3"
     val java = 17
     val pluginsJava = 11
-
-    val kotlinPluginCoordinates
-        get() = BuildConstants.kotlin.pluginCoordinates
 
     val serializationPluginCoordinates
         get() = "org.jetbrains.kotlin:kotlin-serialization:${serializationPlugin}"
@@ -33,7 +27,7 @@ repositories {
 }
 
 dependencies {
-    api(Constants.kotlinPluginCoordinates)
+    api(buildConstants.kotlin.pluginCoordinates)
     api(Constants.serializationPluginCoordinates)
     implementation("org.gradle.toolchains:foojay-resolver:0.9.0")
 }
@@ -100,18 +94,18 @@ val generateResource = tasks.register("generateVersionResource") {
             }
 
             object Kotlin {
-                val version = "${Constants.kotlin}"
-                val pluginCoordinates = "${Constants.kotlinPluginCoordinates}"
+                val version = "${buildConstants.kotlin.version}"
+                val pluginCoordinates = "${buildConstants.kotlin.pluginCoordinates}"
             }
 
             object KotlinTest {
-                val version = "${Constants.kotlin}"
+                val version = "${buildConstants.kotlin.version}"
                 val coordinates = "org.jetbrains.kotlin:kotlin-test:" + version
                 val junit = KotlinTestJunit
             }
 
             object KotlinTestJunit {
-                val coordinates = "org.jetbrains.kotlin:kotlin-test-junit:${Constants.kotlin}"
+                val coordinates = "org.jetbrains.kotlin:kotlin-test-junit:${buildConstants.kotlin.version}"
             }
             
             object Plugins {

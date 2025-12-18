@@ -8,5 +8,6 @@ import org.jetbrains.annotations.NotNull;
 public class BuildConstantsPlugin implements Plugin<Project> {
     @Override
     public void apply(@NotNull Project target) {
+        target.getExtensions().create("buildConstants", BuildConstants.class);
     }
 }

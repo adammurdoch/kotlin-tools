@@ -2,6 +2,7 @@ import io.github.wasabithumb.jtoml.JToml
 import io.github.wasabithumb.jtoml.value.table.TomlTable
 import org.gradle.internal.extensions.stdlib.capitalized
 import java.io.PrintWriter
+import java.io.Writer
 import kotlin.io.path.bufferedWriter
 import kotlin.io.path.createDirectories
 
@@ -58,25 +59,23 @@ abstract class GenerateSource : DefaultTask() {
 
         val sourceFile = packageDir.resolve("BuildConstants.java")
         sourceFile.bufferedWriter().use { writer ->
-            PrintWriter(writer).run {
-                println("// Generated file - do not edit")
-                println("package $packageName;")
-                println()
-                println("public class BuildConstants {")
-                println("    public static final BuildConstants constants = new BuildConstants();")
-                constants(document.asTable(), "    ", null)
-                println()
-                println("    public final Stage0Constants stage0 = new Stage0Constants();")
-                println("    public static class Stage0Constants {")
-                println("        public final String buildConstantsCoordinates = \"stage0:build-constants-plugin:0.0\";")
-                println("    }")
-                println("}")
-                flush()
+            Generator(writer).generate {
+                packageDecl(packageName)
+                classDecl("BuildConstants", "public") {
+                    typedFieldDecl("constants", "public static final", "BuildConstants")
+                    constants(document.asTable(), null)
+                    stage(0) {
+                        stringFieldDecl("buildConstantsCoordinates", "public final", "stage0:build-constants-plugin:0.0")
+                    }
+                    stage(1) {
+                        stringFieldDecl("pluginsGroup", "public final", "stage1")
+                    }
+                }
             }
         }
     }
 
-    private fun PrintWriter.constants(container: TomlTable, prefix: String, parentVersion: String?) {
+    private fun Generator.constants(container: TomlTable, parentVersion: String?) {
         val versionKeys = container.keys(false).filter { it.last() == "version" }
         val versionKey = versionKeys.firstOrNull()
         val version = if (versionKey != null) container.get(versionKey)!!.asPrimitive().asString() else parentVersion
@@ -86,47 +85,112 @@ abstract class GenerateSource : DefaultTask() {
             if (value.isPrimitive) {
                 val primitiveValue = value.asPrimitive()
                 val name = key.last()
-                print(prefix)
                 if (name == "coordinatesBase") {
-                    print("public final String coordinates = \"")
-                    print(primitiveValue.asString())
-                    print(":")
-                    print(version)
-                    println("\";")
+                    stringFieldDecl("coordinates", "public final", "${primitiveValue.asString()}:$version")
                 } else if (primitiveValue.isInteger) {
-                    print("public final int ")
-                    print(name)
-                    print(" = ")
-                    print(primitiveValue.asInteger())
-                    println(";")
+                    intFieldDecl(name, "public final", primitiveValue.asInteger())
                 } else {
-                    print("public final String ")
-                    print(name)
-                    print(" = \"")
-                    print(primitiveValue.asString())
-                    println("\";")
+                    stringFieldDecl(name, "public final", primitiveValue.asString())
                 }
             } else if (value.isTable) {
                 val table = value.asTable()
                 val varName = key.last()
                 val className = varName.capitalized() + "Constants"
-                println()
-                print(prefix)
-                print("public final ")
-                print(className)
-                print(" ")
-                print(varName)
-                print(" = new ")
-                print(className)
-                println("();")
-                print(prefix)
-                print("public static class ")
-                print(className)
-                println(" {")
-                constants(table, "$prefix    ", version)
-                print(prefix)
-                println("}")
+                typedFieldDecl(varName, "public final", className)
+                classDecl(className, "public static") {
+                    constants(table, version)
+                }
             }
+        }
+    }
+
+    private fun Generator.stage(number: Int, body: Generator.() -> Unit) {
+        val className = "Stage$number"
+        typedFieldDecl("stage$number", "public final", className)
+        classDecl(className, "public static", body)
+    }
+
+    private class Generator(writer: Writer) {
+        private val writer = PrintWriter(writer)
+        private var indent = 0;
+
+        fun generate(body: Generator.() -> Unit) {
+            writer.println("// Generated file - do not edit")
+            body()
+            writer.flush()
+        }
+
+        fun packageDecl(name: String) {
+            appendLine {
+                print("package ")
+                print(name)
+                print(";")
+            }
+        }
+
+        fun classDecl(name: String, modifiers: String, body: Generator.() -> Unit) {
+            appendLine {
+                print(modifiers)
+                print(" class ")
+                print(name)
+                print(" {")
+            }
+            indent++
+            body()
+            indent--
+            appendLine {
+                print("}")
+            }
+        }
+
+        fun stringFieldDecl(name: String, modifiers: String, value: String) {
+            appendLine {
+                print(modifiers)
+                print(" String ")
+                print(name)
+                print(" = \"")
+                print(value)
+                print("\";")
+            }
+        }
+
+        fun intFieldDecl(name: String, modifiers: String, value: Int) {
+            appendLine {
+                print(modifiers)
+                print(" int ")
+                print(name)
+                print(" = ")
+                print(value)
+                print(";")
+            }
+        }
+
+        // type field = new type();
+        fun typedFieldDecl(name: String, modifiers: String, type: String) {
+            appendLine {
+                print(modifiers)
+                print(" ")
+                print(type)
+                print(" ")
+                print(name)
+                print(" = new ")
+                print(type)
+                print("();")
+            }
+        }
+
+        fun appendLine(body: PrintWriter.() -> Unit) {
+            append {
+                repeat(indent) {
+                    print("    ")
+                }
+                body()
+                println()
+            }
+        }
+
+        fun append(body: PrintWriter.() -> Unit) {
+            writer.body()
         }
     }
 }

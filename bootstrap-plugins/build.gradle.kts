@@ -10,7 +10,6 @@ object Constants {
 group = Constants.pluginsGroup
 
 repositories {
-    mavenCentral()
     gradlePluginPortal()
 }
 
@@ -20,41 +19,14 @@ dependencies {
     implementation(buildConstants.foojay.plugin.coordinates)
 }
 
-kotlin {
-    jvmToolchain(buildConstants.plugins.jvm.version)
-}
-
-gradlePlugin {
-    plugins {
-        create("jvm-base") {
-            id = "net.rubygrapefruit.bootstrap.jvm-base"
-            implementationClass = "net.rubygrapefruit.plugins.bootstrap.JvmBasePlugin"
-        }
-        create("jvm-lib") {
-            id = "net.rubygrapefruit.bootstrap.jvm.lib"
-            implementationClass = "net.rubygrapefruit.plugins.bootstrap.JvmLibraryPlugin"
-        }
-        create("jni-lib") {
-            id = "net.rubygrapefruit.bootstrap.jni.lib"
-            implementationClass = "net.rubygrapefruit.plugins.bootstrap.JniLibraryPlugin"
-        }
-        create("kmp-lib") {
-            id = "net.rubygrapefruit.bootstrap.kmp.lib"
-            implementationClass = "net.rubygrapefruit.plugins.bootstrap.KmpLibraryPlugin"
-        }
-        create("gradle-plugin") {
-            id = "net.rubygrapefruit.bootstrap.gradle-plugin"
-            implementationClass = "net.rubygrapefruit.plugins.bootstrap.JvmGradlePlugin"
-        }
-        create("settings") {
-            id = "net.rubygrapefruit.bootstrap.settings"
-            implementationClass = "net.rubygrapefruit.plugins.bootstrap.SettingsPlugin"
-        }
-        create("included-builds") {
-            id = "net.rubygrapefruit.bootstrap.included-build"
-            implementationClass = "net.rubygrapefruit.plugins.bootstrap.IncludedBuildPlugin"
-        }
-    }
+pluginBundle {
+    plugin("net.rubygrapefruit.bootstrap.jvm-base", "net.rubygrapefruit.plugins.bootstrap.JvmBasePlugin")
+    plugin("net.rubygrapefruit.bootstrap.jvm.lib", "net.rubygrapefruit.plugins.bootstrap.JvmLibraryPlugin")
+    plugin("net.rubygrapefruit.bootstrap.jni.lib", "net.rubygrapefruit.plugins.bootstrap.JniLibraryPlugin")
+    plugin("net.rubygrapefruit.bootstrap.kmp.lib", "net.rubygrapefruit.plugins.bootstrap.KmpLibraryPlugin")
+    plugin("net.rubygrapefruit.bootstrap.gradle-plugin", "net.rubygrapefruit.plugins.bootstrap.JvmGradlePlugin")
+    plugin("net.rubygrapefruit.bootstrap.settings", "net.rubygrapefruit.plugins.bootstrap.SettingsPlugin")
+    plugin("net.rubygrapefruit.bootstrap.included-build", "net.rubygrapefruit.plugins.bootstrap.IncludedBuildPlugin")
 }
 
 val outFile = layout.buildDirectory.file("generated-src/main/kotlin/net/rubygrapefruit/plugins/app/Versions.kt")

@@ -9,6 +9,7 @@ repositories {
 
 dependencies {
     implementation(buildConstants.kotlin.plugin.coordinates)
+    implementation(buildConstants.stage0.buildConstantsCoordinates)
 }
 
 gradlePlugin {

@@ -19,6 +19,10 @@ public class SettingsPlugin implements Plugin<Settings> {
 
         target.getGradle().rootProject(project -> {
             project.getPlugins().apply("lifecycle-base");
+            project.getBuildscript().getRepositories().mavenCentral();
+            project.getBuildscript().getDependencies().add("classpath", BuildConstants.constants.kotlin.plugin.coordinates);
+            project.getBuildscript().getDependencies().add("classpath", BuildConstants.constants.serialization.plugin.coordinates);
+
             addTask(project, "build");
             addTask(project, "assemble");
             addTask(project, "check");

@@ -1,11 +1,13 @@
 import net.rubygrapefruit.plugins.app.Versions
 
 plugins {
-    id("net.rubygrapefruit.bootstrap.gradle-plugin")
+    id("net.rubygrapefruit.bootstrap.jvm.lib")
     id("net.rubygrapefruit.stage2.serialization")
 }
 
 dependencies {
-    testImplementation(Versions.test.coordinates)
+    implementation(gradleApi())
+    implementation(Versions.kotlin.pluginCoordinates)
     implementation(Versions.serialization.json.coordinates)
+    testImplementation(Versions.test.coordinates)
 }

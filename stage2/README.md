@@ -7,4 +7,6 @@ Gradle plugin plugin
     - Extends stage 1 plugin to allow source from another project
 Serialization plugin
 Settings plugin
+    - Extends stage 1 plugin
 Included build plugin
+    - Adds lifecycle tasks

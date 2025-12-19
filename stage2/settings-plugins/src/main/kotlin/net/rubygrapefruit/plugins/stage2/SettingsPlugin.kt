@@ -9,13 +9,8 @@ class SettingsPlugin : Plugin<Settings> {
     override fun apply(target: Settings) {
         target.run {
             plugins.apply(BuildConstants.constants.stage1.plugins.settings.id)
-            plugins.apply(BuildConstants.constants.foojay.plugin.id)
             gradle.rootProject { project ->
                 project.run {
-                    buildscript.repositories.mavenCentral()
-                    buildscript.dependencies.add("classpath", BuildConstants.constants.kotlin.plugin.coordinates)
-                    buildscript.dependencies.add("classpath", BuildConstants.constants.serialization.plugin.coordinates)
-
                     // For commonization
                     repositories.mavenCentral()
                 }

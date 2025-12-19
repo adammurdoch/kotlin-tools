@@ -9,4 +9,5 @@ Plugins implemented in Java that provide basic support for Gradle plugins implem
   - Sets up target Kotlin and JVM versions.
 - Settings plugin
   - Sets up Java toolchains
+  - Adds Kotlin and serialization plugins to root project classpath 
   - Adds lifecycle tasks

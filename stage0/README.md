@@ -1,7 +1,7 @@
 Stage 0
 -------
 
-Plugins implemented in Java and that provide:
+Plugins implemented in Java:
 
-- Access to build constants
-- Support for implementing Gradle plugins in Java
+- Build constants: provides access to build constants
+- Java Gradle plugin: support for implementing Gradle plugins in Java

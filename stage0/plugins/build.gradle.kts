@@ -70,7 +70,7 @@ abstract class GenerateSource : DefaultTask() {
                     constants(document.asTable(), null)
                     stage(0) {
                         typedConstants("buildConstants") {
-                            stringFieldDecl("coordinates", "public final", "stage0:build-constants-plugins:0.0")
+                            stringFieldDecl("coordinates", "public final", "stage0:plugins:0.0")
                             stringFieldDecl("pluginId", "public final", "net.rubygrapefruit.plugins.stage0.build-constants")
                         }
                     }

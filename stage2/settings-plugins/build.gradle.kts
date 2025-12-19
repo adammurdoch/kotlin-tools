@@ -8,6 +8,7 @@ repositories {
 
 dependencies {
     implementation(buildConstants.foojay.plugin.coordinates)
+    implementation(buildConstants.stage1.plugins.settings.coordinates)
 }
 
 pluginBundle {

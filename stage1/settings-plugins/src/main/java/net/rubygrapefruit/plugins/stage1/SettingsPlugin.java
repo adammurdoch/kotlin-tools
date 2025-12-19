@@ -18,6 +18,7 @@ public class SettingsPlugin implements Plugin<Settings> {
         target.getPlugins().apply(BuildConstants.constants.foojay.plugin.id);
 
         target.getGradle().rootProject(project -> {
+            project.getPlugins().apply("lifecycle-base");
             addTask(project, "build");
             addTask(project, "assemble");
             addTask(project, "check");
@@ -25,7 +26,7 @@ public class SettingsPlugin implements Plugin<Settings> {
     }
 
     private static void addTask(Project project, String taskName) {
-        project.getTasks().register(taskName, task -> task.dependsOn((Callable<List<Task>>) () -> {
+        project.getTasks().named(taskName, task -> task.dependsOn((Callable<List<Task>>) () -> {
             List<Task> result = new ArrayList<>();
             for (Project subproject : project.getSubprojects()) {
                 Task subprojectTask = subproject.getTasks().findByName(taskName);

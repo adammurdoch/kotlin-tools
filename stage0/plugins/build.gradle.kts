@@ -77,9 +77,13 @@ abstract class GenerateSource : DefaultTask() {
                     stage(1) {
                         typedConstants("plugins") {
                             stringFieldDecl("group", "public final", "stage1")
-                            stringFieldDecl("coordinates", "public final", "stage1:gradle-plugin-plugin:0.0")
                             typedConstants("gradlePlugin") {
+                                stringFieldDecl("coordinates", "public final", "stage1:gradle-plugin-plugin:0.0")
                                 stringFieldDecl("id", "public final", "net.rubygrapefruit.stage1.gradle-plugin")
+                            }
+                            typedConstants("settings") {
+                                stringFieldDecl("coordinates", "public final", "stage1:settings-plugins:0.0")
+                                stringFieldDecl("id", "public final", "net.rubygrapefruit.stage1.settings")
                             }
                         }
                     }

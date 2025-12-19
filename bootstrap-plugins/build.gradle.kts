@@ -119,8 +119,3 @@ val generateResource = tasks.register("generateVersionResource") {
 kotlin {
     sourceSets.getByName("main").kotlin.srcDirs(generateResource.map { outFile.get().asFile.parentFile })
 }
-
-for (task in listOf("dist", "docs", "samples", "verifySamples", "localSamples", "release")) {
-    project.tasks.register(task) {
-    }
-}

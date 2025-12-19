@@ -3,5 +3,6 @@ pluginManagement {
 }
 
 plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version("0.9.0")
+    id("net.rubygrapefruit.stage2.settings")
+    id("net.rubygrapefruit.stage2.included-build")
 }

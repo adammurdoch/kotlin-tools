@@ -90,6 +90,14 @@ abstract class GenerateSource : DefaultTask() {
                             }
                         }
                     }
+                    typedConstants("production") {
+                        typedConstants("plugins") {
+                            stringFieldDecl("group", "public final", "net.rubygrapefruit.plugins")
+                        }
+                        typedConstants("bootstrapPlugins") {
+                            stringFieldDecl("coordinates", "public final", "net.rubygrapefruit.plugins:bootstrap-plugins:0.0")
+                        }
+                    }
                 }
             }
         }

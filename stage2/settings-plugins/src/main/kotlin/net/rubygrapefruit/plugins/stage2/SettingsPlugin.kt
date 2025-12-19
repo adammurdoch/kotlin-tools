@@ -13,6 +13,7 @@ class SettingsPlugin : Plugin<Settings> {
                 project.run {
                     buildscript.repositories.mavenCentral()
                     buildscript.dependencies.add("classpath", BuildConstants.constants.kotlin.plugin.coordinates)
+                    buildscript.dependencies.add("classpath", BuildConstants.constants.serialization.plugin.coordinates)
 
                     // For commonization
                     repositories.mavenCentral()

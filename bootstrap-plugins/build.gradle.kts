@@ -2,11 +2,7 @@ plugins {
     id("net.rubygrapefruit.plugins.stage2.gradle-plugin")
 }
 
-object Constants {
-    val pluginsGroup = "net.rubygrapefruit.plugins"
-}
-
-group = Constants.pluginsGroup
+group = buildConstants.production.plugins.group
 
 repositories {
     gradlePluginPortal()
@@ -68,7 +64,7 @@ val generateResource = tasks.register("generateVersionResource") {
             
             object Plugins {
                 val java = ${buildConstants.plugins.jvm.version}
-                val group = "${Constants.pluginsGroup}"
+                val group = "${buildConstants.production.plugins.group}"
                 val version = "0.1-dev"
                 val basePluginsCoordinates = group + ":base-plugins:" + version
                 val bootstrapPluginCoordinates = group + ":bootstrap-plugins:" + version

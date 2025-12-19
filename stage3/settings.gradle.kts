@@ -6,6 +6,11 @@ plugins {
     id("net.rubygrapefruit.plugins.stage1.settings")
 }
 
-include("bootstrap-plugins")
+downgrade("bootstrap-plugins")
+downgrade("local-plugins/model")
 
-project(":bootstrap-plugins").buildFileName = "../../bootstrap-plugins/build.gradle.kts"
+fun downgrade(path: String) {
+    val name = path.substringAfterLast('/')
+    include(name)
+    project(":$name").buildFileName = "../../$path/build.gradle.kts"
+}

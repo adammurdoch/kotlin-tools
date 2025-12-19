@@ -1,16 +1,5 @@
-import net.rubygrapefruit.plugins.app.Versions
-
 plugins {
-    id("net.rubygrapefruit.bootstrap.gradle-plugin")
-}
-
-gradlePlugin {
-    plugins {
-        create("docs") {
-            id = "net.rubygrapefruit.bootstrap.docs"
-            implementationClass = "net.rubygrapefruit.plugins.docs.internal.DocsPlugin"
-        }
-    }
+    id("net.rubygrapefruit.plugins.stage2.gradle-plugin")
 }
 
 dependencies {
@@ -18,3 +7,6 @@ dependencies {
     implementation(project(":model"))
 }
 
+pluginBundle {
+    plugin("net.rubygrapefruit.bootstrap.docs", "net.rubygrapefruit.plugins.docs.internal.DocsPlugin")
+}

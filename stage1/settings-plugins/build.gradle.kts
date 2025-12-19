@@ -1,6 +1,6 @@
 plugins {
-    id("net.rubygrapefruit.plugins.stage0.build-constants")
-    id("net.rubygrapefruit.plugins.stage0.java-gradle-plugin")
+    id("net.rubygrapefruit.stage0.build-constants")
+    id("net.rubygrapefruit.stage0.java-gradle-plugin")
 }
 
 repositories {
@@ -15,7 +15,7 @@ dependencies {
 gradlePlugin {
     plugins {
         create("settingsPlugin") {
-            id = "net.rubygrapefruit.plugins.stage1.settings"
+            id = "net.rubygrapefruit.stage1.settings"
             implementationClass = "net.rubygrapefruit.plugins.stage1.SettingsPlugin"
         }
     }

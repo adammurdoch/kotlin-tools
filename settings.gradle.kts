@@ -3,7 +3,7 @@ pluginManagement {
     includeBuild("base-plugins")
 }
 plugins {
-    id("net.rubygrapefruit.plugins.stage2.included-build")
+    id("net.rubygrapefruit.stage2.included-build")
 }
 
 includeBuild("bootstrap-plugins")

@@ -6,7 +6,7 @@ pluginManagement {
 }
 plugins {
     id("net.rubygrapefruit.kotlin-base")
-    id("net.rubygrapefruit.plugins.stage2.included-build")
+    id("net.rubygrapefruit.stage2.included-build")
 }
 
 for (f in rootDir.listFiles()) {

@@ -1,6 +1,6 @@
 plugins {
-    id("net.rubygrapefruit.plugins.stage0.build-constants")
-    id("net.rubygrapefruit.plugins.stage0.java-gradle-plugin")
+    id("net.rubygrapefruit.stage0.build-constants")
+    id("net.rubygrapefruit.stage0.java-gradle-plugin")
 }
 
 group = buildConstants.stage1.plugins.group

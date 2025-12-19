@@ -2,7 +2,7 @@ pluginManagement {
     includeBuild("../stage1")
 }
 plugins {
-    id("net.rubygrapefruit.plugins.stage1.settings")
+    id("net.rubygrapefruit.stage1.settings")
 }
 
 include("plugins")

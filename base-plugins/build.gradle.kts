@@ -2,7 +2,7 @@ import net.rubygrapefruit.plugins.app.Versions
 
 plugins {
     id("net.rubygrapefruit.bootstrap.gradle-plugin")
-    id("net.rubygrapefruit.plugins.stage2.serialization")
+    id("net.rubygrapefruit.stage2.serialization")
 }
 
 dependencies {

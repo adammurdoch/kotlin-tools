@@ -26,11 +26,11 @@ java {
 gradlePlugin {
     plugins {
         create("buildConstantsPlugin") {
-            id = "net.rubygrapefruit.plugins.stage0.build-constants"
+            id = "net.rubygrapefruit.stage0.build-constants"
             implementationClass = "net.rubygrapefruit.plugins.stage0.BuildConstantsPlugin"
         }
         create("JavaGradlePlugin") {
-            id = "net.rubygrapefruit.plugins.stage0.java-gradle-plugin"
+            id = "net.rubygrapefruit.stage0.java-gradle-plugin"
             implementationClass = "net.rubygrapefruit.plugins.stage0.JavaGradlePluginPlugin"
         }
     }
@@ -71,7 +71,7 @@ abstract class GenerateSource : DefaultTask() {
                     stage(0) {
                         typedConstants("buildConstants") {
                             stringFieldDecl("coordinates", "public final", "stage0:plugins:0.0")
-                            stringFieldDecl("pluginId", "public final", "net.rubygrapefruit.plugins.stage0.build-constants")
+                            stringFieldDecl("pluginId", "public final", "net.rubygrapefruit.stage0.build-constants")
                         }
                     }
                     stage(1) {
@@ -79,14 +79,14 @@ abstract class GenerateSource : DefaultTask() {
                             stringFieldDecl("group", "public final", "stage1")
                             stringFieldDecl("coordinates", "public final", "stage1:gradle-plugin-plugin:0.0")
                             typedConstants("gradlePlugin") {
-                                stringFieldDecl("id", "public final", "net.rubygrapefruit.plugins.stage1.gradle-plugin")
+                                stringFieldDecl("id", "public final", "net.rubygrapefruit.stage1.gradle-plugin")
                             }
                         }
                     }
                     stage(2) {
                         typedConstants("plugins") {
                             typedConstants("gradlePlugin") {
-                                stringFieldDecl("id", "public final", "net.rubygrapefruit.plugins.stage2.gradle-plugin")
+                                stringFieldDecl("id", "public final", "net.rubygrapefruit.stage2.gradle-plugin")
                             }
                         }
                     }

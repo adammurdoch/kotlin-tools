@@ -1,5 +1,5 @@
 plugins {
-    id("net.rubygrapefruit.plugins.stage2.gradle-plugin")
+    id("net.rubygrapefruit.stage2.gradle-plugin")
 }
 
 repositories {

@@ -2,6 +2,10 @@ plugins {
     id("net.rubygrapefruit.plugins.stage2.gradle-plugin")
 }
 
+repositories {
+    gradlePluginPortal()
+}
+
 dependencies {
     implementation("org.commonmark:commonmark:0.22.0")
     implementation(project(":model"))

@@ -3,6 +3,10 @@ plugins {
     id("net.rubygrapefruit.plugins.stage2.serialization")
 }
 
+repositories {
+    gradlePluginPortal()
+}
+
 dependencies {
     implementation(project(":model"))
     implementation(buildConstants.serialization.library.json.coordinates)

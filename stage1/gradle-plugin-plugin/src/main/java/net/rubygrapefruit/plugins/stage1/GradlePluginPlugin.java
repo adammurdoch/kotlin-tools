@@ -20,6 +20,8 @@ public class GradlePluginPlugin implements Plugin<Project> {
         KotlinProjectExtension kotlin = target.getExtensions().getByType(KotlinProjectExtension.class);
         kotlin.jvmToolchain(BuildConstants.constants.plugins.jvm.version);
 
+        target.getDependencies().add("implementation", BuildConstants.constants.stage0.buildConstants.coordinates);
+
         GradlePluginDevelopmentExtension pluginDevExtension = target.getExtensions().getByType(GradlePluginDevelopmentExtension.class);
         target.getExtensions().create("pluginBundle", PluginBundle.class, pluginDevExtension);
     }

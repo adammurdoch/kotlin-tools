@@ -1,10 +1,6 @@
 plugins {
     id("net.rubygrapefruit.plugins.stage0.build-constants")
-    id("java-gradle-plugin")
-}
-
-repositories {
-    mavenCentral()
+    id("net.rubygrapefruit.plugins.stage0.java-gradle-plugin")
 }
 
 dependencies {

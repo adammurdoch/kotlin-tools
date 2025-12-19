@@ -19,7 +19,7 @@ group = "stage0"
 
 java {
     toolchain {
-        version = JavaVersion.VERSION_17
+        languageVersion = JavaLanguageVersion.of(11)
     }
 }
 
@@ -28,6 +28,10 @@ gradlePlugin {
         create("buildConstantsPlugin") {
             id = "net.rubygrapefruit.plugins.stage0.build-constants"
             implementationClass = "net.rubygrapefruit.plugins.stage0.BuildConstantsPlugin"
+        }
+        create("JavaGradlePlugin") {
+            id = "net.rubygrapefruit.plugins.stage0.java-gradle-plugin"
+            implementationClass = "net.rubygrapefruit.plugins.stage0.JavaGradlePluginPlugin"
         }
     }
 }

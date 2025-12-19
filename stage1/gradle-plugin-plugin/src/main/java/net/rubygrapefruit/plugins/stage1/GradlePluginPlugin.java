@@ -5,7 +5,6 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.plugin.devel.GradlePluginDevelopmentExtension;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension;
 
 @SuppressWarnings("unused")
 public class GradlePluginPlugin implements Plugin<Project> {

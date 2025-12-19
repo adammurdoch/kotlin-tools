@@ -24,8 +24,8 @@ pluginBundle {
     plugin("net.rubygrapefruit.bootstrap.jni.lib", "net.rubygrapefruit.plugins.bootstrap.JniLibraryPlugin")
     plugin("net.rubygrapefruit.bootstrap.kmp.lib", "net.rubygrapefruit.plugins.bootstrap.KmpLibraryPlugin")
     plugin("net.rubygrapefruit.bootstrap.gradle-plugin", "net.rubygrapefruit.plugins.bootstrap.JvmGradlePlugin")
-    plugin("net.rubygrapefruit.bootstrap.settings", "net.rubygrapefruit.plugins.bootstrap.SettingsPlugin")
-    plugin("net.rubygrapefruit.bootstrap.included-build", "net.rubygrapefruit.plugins.bootstrap.IncludedBuildPlugin")
+//    plugin("net.rubygrapefruit.bootstrap.settings", "net.rubygrapefruit.plugins.bootstrap.SettingsPlugin")
+//    plugin("net.rubygrapefruit.bootstrap.included-build", "net.rubygrapefruit.plugins.bootstrap.IncludedBuildPlugin")
 }
 
 val outFile = layout.buildDirectory.file("generated-src/main/kotlin/net/rubygrapefruit/plugins/app/Versions.kt")

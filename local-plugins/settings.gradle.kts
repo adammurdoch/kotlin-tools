@@ -1,9 +1,10 @@
 pluginManagement {
+    includeBuild("../stage2")
     includeBuild("../bootstrap-plugins")
 }
 plugins {
-    id("net.rubygrapefruit.bootstrap.settings")
-    id("net.rubygrapefruit.bootstrap.included-build")
+    id("net.rubygrapefruit.plugins.stage2.settings")
+    id("net.rubygrapefruit.plugins.stage2.included-build")
 }
 
 include("model")

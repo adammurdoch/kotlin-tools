@@ -75,7 +75,20 @@ abstract class GenerateSource : DefaultTask() {
                         }
                     }
                     stage(1) {
-                        stringFieldDecl("pluginsGroup", "public final", "stage1")
+                        typedConstants("plugins") {
+                            stringFieldDecl("group", "public final", "stage1")
+                            stringFieldDecl("coordinates", "public final", "stage1:gradle-plugin-plugin:0.0")
+                            typedConstants("gradlePlugin") {
+                                stringFieldDecl("id", "public final", "net.rubygrapefruit.plugins.stage1.gradle-plugin")
+                            }
+                        }
+                    }
+                    stage(2) {
+                        typedConstants("plugins") {
+                            typedConstants("gradlePlugin") {
+                                stringFieldDecl("id", "public final", "net.rubygrapefruit.plugins.stage2.gradle-plugin")
+                            }
+                        }
                     }
                 }
             }

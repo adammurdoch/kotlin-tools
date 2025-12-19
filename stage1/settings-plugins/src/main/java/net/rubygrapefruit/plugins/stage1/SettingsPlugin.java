@@ -25,17 +25,15 @@ public class SettingsPlugin implements Plugin<Settings> {
     }
 
     private static void addTask(Project project, String taskName) {
-        project.getTasks().register(taskName, task -> {
-            task.dependsOn((Callable<List<Task>>) () -> {
-                List<Task> result = new ArrayList<>();
-                for (Project subproject : project.getSubprojects()) {
-                    Task subprojectTask = subproject.getTasks().findByName(taskName);
-                    if (subprojectTask != null) {
-                        result.add(subprojectTask);
-                    }
+        project.getTasks().register(taskName, task -> task.dependsOn((Callable<List<Task>>) () -> {
+            List<Task> result = new ArrayList<>();
+            for (Project subproject : project.getSubprojects()) {
+                Task subprojectTask = subproject.getTasks().findByName(taskName);
+                if (subprojectTask != null) {
+                    result.add(subprojectTask);
                 }
-                return result;
-            });
-        });
+            }
+            return result;
+        }));
     }
 }

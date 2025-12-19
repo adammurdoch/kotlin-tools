@@ -11,14 +11,8 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension;
 public class GradlePluginPlugin implements Plugin<Project> {
     @Override
     public void apply(@NotNull Project target) {
-        target.getPlugins().apply("org.jetbrains.kotlin.jvm");
+        target.getPlugins().apply(JvmBasePlugin.class);
         target.getPlugins().apply("java-gradle-plugin");
-        target.getPlugins().apply(BuildConstants.constants.stage0.buildConstants.pluginId);
-
-        target.getRepositories().mavenCentral();
-
-        KotlinProjectExtension kotlin = target.getExtensions().getByType(KotlinProjectExtension.class);
-        kotlin.jvmToolchain(BuildConstants.constants.plugins.jvm.version);
 
         target.getDependencies().add("implementation", BuildConstants.constants.stage0.buildConstants.coordinates);
 

@@ -1,5 +1,5 @@
 plugins {
-    id("net.rubygrapefruit.plugins.stage1.gradle-plugin")
+    id("net.rubygrapefruit.plugins.stage2.gradle-plugin")
 }
 
 object Constants {

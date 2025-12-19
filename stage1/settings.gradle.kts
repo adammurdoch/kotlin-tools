@@ -6,3 +6,4 @@ plugins {
 }
 
 include("gradle-plugin-plugin")
+include("settings-plugins")

@@ -8,7 +8,7 @@ import org.gradle.api.initialization.Settings
 class SettingsPlugin : Plugin<Settings> {
     override fun apply(target: Settings) {
         target.run {
-            plugins.apply("org.gradle.toolchains.foojay-resolver-convention")
+            plugins.apply(BuildConstants.constants.foojay.plugin.id)
             gradle.rootProject { project ->
                 project.run {
                     buildscript.repositories.mavenCentral()

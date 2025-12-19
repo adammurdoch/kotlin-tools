@@ -2,7 +2,7 @@ pluginManagement {
     includeBuild("../stage1")
 }
 plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version ("1.0.0")
+    id("net.rubygrapefruit.plugins.stage1.settings")
 }
 
 include("plugins")

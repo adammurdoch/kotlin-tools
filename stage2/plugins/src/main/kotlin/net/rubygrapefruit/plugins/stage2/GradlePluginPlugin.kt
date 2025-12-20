@@ -3,8 +3,6 @@ package net.rubygrapefruit.plugins.stage2
 import net.rubygrapefruit.plugins.stage0.BuildConstants
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
-import java.io.File
 
 @Suppress("unused")
 class GradlePluginPlugin : Plugin<Project> {
@@ -14,19 +12,7 @@ class GradlePluginPlugin : Plugin<Project> {
 
             group = BuildConstants.constants.production.plugins.group
 
-            val sourceDirProvider = provider {
-                val targetFile = file("target.txt")
-                if (targetFile.exists()) {
-                    val targetProjectDir = targetFile.readText().trim()
-                    val sourceDir = file("$targetProjectDir/src/main/kotlin")
-                    require(sourceDir.isDirectory)
-                    sourceDir
-                } else {
-                    emptyList<File>()
-                }
-            }
-            val kotlin = extensions.getByType(KotlinProjectExtension::class.java)
-            kotlin.sourceSets.getByName("main").kotlin.srcDir(sourceDirProvider)
+            applySourceFromTargetProject()
         }
     }
 }

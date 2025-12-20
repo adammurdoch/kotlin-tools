@@ -1,16 +1,19 @@
 pluginManagement {
-    includeBuild("../stage1")
     includeBuild("../stage2")
 }
 plugins {
-    id("net.rubygrapefruit.plugins.stage1.settings")
+    id("net.rubygrapefruit.stage2.settings")
 }
 
-downgrade("bootstrap-plugins")
+downgrade("bootstrap-plugins/build-constants")
+downgrade("bootstrap-plugins/settings-plugins")
 downgrade("local-plugins/model")
 
 fun downgrade(path: String) {
     val name = path.substringAfterLast('/')
     include(name)
-    project(":$name").buildFileName = "../../$path/build.gradle.kts"
+    val project = project(":$name")
+    project.projectDir = file(path)
+    val sourceBuildScript = file("../$path/build.gradle.kts")
+    project.buildFileName = sourceBuildScript.relativeTo(project.projectDir).path
 }

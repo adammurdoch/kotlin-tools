@@ -6,6 +6,7 @@ import net.rubygrapefruit.plugins.app.Versions
 import org.gradle.api.Plugin
 import org.gradle.api.initialization.Settings
 
+@Suppress("unused")
 class KotlinBasePlugin : Plugin<Settings> {
     override fun apply(target: Settings) {
         target.run {

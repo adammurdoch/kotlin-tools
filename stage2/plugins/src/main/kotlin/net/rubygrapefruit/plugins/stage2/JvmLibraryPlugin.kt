@@ -11,6 +11,8 @@ class JvmLibraryPlugin: Plugin<Project> {
             plugins.apply(BuildConstants.constants.stage1.plugins.jvmBase.id)
 
             group = BuildConstants.constants.production.libraries.group
+
+            applySourceFromTargetProject()
         }
     }
 }

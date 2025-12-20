@@ -107,9 +107,6 @@ abstract class GenerateSource : DefaultTask() {
                         typedConstants("settingsPlugins") {
                             stringFieldDecl("coordinates", "public final", "net.rubygrapefruit.plugins:settings-plugins:0.0")
                         }
-                        typedConstants("bootstrapPlugins") {
-                            stringFieldDecl("coordinates", "public final", "net.rubygrapefruit.plugins:bootstrap-plugins:0.0")
-                        }
                         typedConstants("buildConstants") {
                             stringFieldDecl("coordinates", "public final", "net.rubygrapefruit:build-constants:0.0")
                         }

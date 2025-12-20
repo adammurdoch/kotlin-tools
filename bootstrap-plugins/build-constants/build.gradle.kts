@@ -63,7 +63,6 @@ abstract class GenerateSource : DefaultTask() {
                 val group = "${buildConstants.production.plugins.group}"
                 val version = "0.1-dev"
                 val basePluginsCoordinates = group + ":base-plugins:" + version
-                val bootstrapPluginCoordinates = group + ":bootstrap-plugins:" + version
                 val launcherPluginCoordinates = group + ":launcher-plugins:" + version
             }
 

@@ -18,7 +18,7 @@ class GradlePluginPlugin : Plugin<Project> {
             repositories.gradlePluginPortal()
 
             JvmConventionsPlugin.javaVersion(this, Versions.plugins.java)
-            dependencies.add("implementation", Versions.plugins.bootstrapPluginCoordinates)
+            dependencies.add("implementation", Versions.libs.coordinates("build-constants"))
             dependencies.add("implementation", Versions.plugins.basePluginsCoordinates)
         }
     }

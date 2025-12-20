@@ -8,7 +8,7 @@ repositories {
 }
 
 dependencies {
-    implementation(buildConstants.kotlin.plugin.coordinates)
+    api(buildConstants.kotlin.plugin.coordinates)
     implementation(buildConstants.production.settingsPlugins.coordinates)
     implementation(buildConstants.production.buildConstants.coordinates)
     implementation(buildConstants.production.basics.coordinates)

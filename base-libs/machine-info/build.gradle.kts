@@ -1,5 +1,5 @@
 plugins {
-    id("net.rubygrapefruit.bootstrap.jvm.lib")
+    id("net.rubygrapefruit.stage2.jvm.lib")
 }
 
 dependencies {

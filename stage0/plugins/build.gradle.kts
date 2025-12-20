@@ -88,6 +88,10 @@ abstract class GenerateSource : DefaultTask() {
                                 stringFieldDecl("coordinates", "public final", "stage1:settings-plugins:0.0")
                                 stringFieldDecl("id", "public final", "net.rubygrapefruit.stage1.settings")
                             }
+                            typedConstants("includedBuild") {
+                                stringFieldDecl("coordinates", "public final", "stage1:settings-plugins:0.0")
+                                stringFieldDecl("id", "public final", "net.rubygrapefruit.stage1.included-build")
+                            }
                         }
                     }
                     stage(2) {

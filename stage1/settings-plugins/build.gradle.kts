@@ -14,9 +14,13 @@ dependencies {
 
 gradlePlugin {
     plugins {
-        create("settingsPlugin") {
+        create("settings") {
             id = buildConstants.stage1.plugins.settings.id
             implementationClass = "net.rubygrapefruit.plugins.stage1.SettingsPlugin"
+        }
+        create("includedBuild") {
+            id = buildConstants.stage1.plugins.includedBuild.id
+            implementationClass = "net.rubygrapefruit.plugins.stage1.IncludedBuildPlugin"
         }
     }
 }

@@ -4,6 +4,12 @@ plugins {
     id("net.rubygrapefruit.bootstrap.release")
 }
 
+library {
+    jvm {
+        targetJvmVersion = 11
+    }
+}
+
 component {
     description = "A collection of general purpose utilities for Kotlin multiplatform"
     nextVersion = "0.0.2-milestone-1"

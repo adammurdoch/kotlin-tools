@@ -5,6 +5,7 @@ import net.rubygrapefruit.plugins.app.Versions
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
+@Suppress("unused")
 class GradlePluginPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
@@ -19,7 +20,6 @@ class GradlePluginPlugin : Plugin<Project> {
 
             JvmConventionsPlugin.javaVersion(this, Versions.plugins.java)
             dependencies.add("implementation", Versions.libs.coordinates("build-constants"))
-            dependencies.add("implementation", Versions.plugins.basePluginsCoordinates)
         }
     }
 }

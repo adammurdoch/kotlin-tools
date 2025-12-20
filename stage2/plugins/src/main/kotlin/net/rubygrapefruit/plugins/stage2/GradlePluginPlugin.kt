@@ -12,7 +12,7 @@ class GradlePluginPlugin : Plugin<Project> {
 
             group = BuildConstants.constants.production.plugins.group
 
-            applySourceFromTargetProject()
+            applyKotlinSourceFromTargetProject()
         }
     }
 }

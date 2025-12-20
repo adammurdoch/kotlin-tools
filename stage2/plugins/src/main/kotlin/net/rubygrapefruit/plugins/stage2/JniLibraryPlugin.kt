@@ -12,14 +12,18 @@ import org.gradle.jvm.toolchain.JavaLanguageVersion
 class JniLibraryPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            pluginManager.apply("java-library")
+            plugins.apply("java-library")
+            plugins.apply(BuildConstants.constants.stage0.buildConstants.pluginId)
 
             repositories.mavenCentral()
 
             group = BuildConstants.constants.production.libraries.group
 
+            val extension = extensions.create("library", JavaLibrary::class.java)
+            extension.targetJavaVersion.convention(BuildConstants.constants.libs.jvm.version)
+
             val java = extensions.getByType(JavaPluginExtension::class.java)
-            java.toolchain.languageVersion.set(JavaLanguageVersion.of(BuildConstants.constants.plugins.jvm.version))
+            java.toolchain.languageVersion.set(extension.targetJavaVersion.map { JavaLanguageVersion.of(it) })
 
             val compile = tasks.withType(JavaCompile::class.java).named("compileJava") {
                 it.options.headerOutputDirectory.set(layout.buildDirectory.dir("headers"))

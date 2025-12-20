@@ -4,7 +4,7 @@ import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import java.io.File
 
-internal fun Project.applySourceFromTargetProject() {
+internal fun Project.applyKotlinSourceFromTargetProject() {
     val sourceDirProvider = provider {
         val targetFile = file("target.txt")
         if (targetFile.exists()) {

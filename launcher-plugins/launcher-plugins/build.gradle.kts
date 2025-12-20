@@ -7,6 +7,7 @@ plugins {
 group = Versions.plugins.group
 
 dependencies {
+    api(Versions.plugins.basePluginsCoordinates)
     implementation(Versions.libs.coordinates("download"))
 }
 

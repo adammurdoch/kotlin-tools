@@ -38,11 +38,11 @@ gradlePlugin {
 
 val generateSource = tasks.register("generateConstants", GenerateSource::class.java) {
     versionsFile = file("../../versions.toml")
-    outputDirectory = layout.buildDirectory.dir("generated-source/Constants.java")
+    outputDirectory = layout.buildDirectory.dir("generated-source/main/java")
 }
 
 sourceSets.main.configure {
-    java.srcDir(generateSource.map { it.outputDirectory })
+    java.srcDir(generateSource.flatMap { it.outputDirectory })
 }
 
 abstract class GenerateSource : DefaultTask() {
@@ -101,8 +101,23 @@ abstract class GenerateSource : DefaultTask() {
                         typedConstants("plugins") {
                             stringFieldDecl("group", "public final", "net.rubygrapefruit.plugins")
                         }
+                        typedConstants("libraries") {
+                            stringFieldDecl("group", "public final", "net.rubygrapefruit")
+                        }
                         typedConstants("bootstrapPlugins") {
                             stringFieldDecl("coordinates", "public final", "net.rubygrapefruit.plugins:bootstrap-plugins:0.0")
+                        }
+                        typedConstants("buildConstants") {
+                            stringFieldDecl("coordinates", "public final", "net.rubygrapefruit:build-constants:0.0")
+                        }
+                        typedConstants("basics") {
+                            stringFieldDecl("coordinates", "public final", "net.rubygrapefruit:basics:0.0")
+                        }
+                        typedConstants("bytecode") {
+                            stringFieldDecl("coordinates", "public final", "net.rubygrapefruit:bytecode:0.0")
+                        }
+                        typedConstants("machineInfo") {
+                            stringFieldDecl("coordinates", "public final", "net.rubygrapefruit:machine-info:0.0")
                         }
                     }
                 }

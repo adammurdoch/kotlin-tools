@@ -9,7 +9,7 @@ repositories {
 
 dependencies {
     implementation(gradleTestKit())
-    implementation(buildConstants.production.bootstrapPlugins.coordinates)
+    implementation(buildConstants.production.buildConstants.coordinates)
     implementation(project(":model"))
 }
 

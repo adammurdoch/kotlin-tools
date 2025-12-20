@@ -1,15 +1,20 @@
-import net.rubygrapefruit.plugins.app.Versions
-
 plugins {
-    id("net.rubygrapefruit.bootstrap.gradle-plugin")
+    id("net.rubygrapefruit.stage2.gradle-plugin")
     id("net.rubygrapefruit.stage2.serialization")
 }
 
+repositories {
+    gradlePluginPortal()
+}
+
 dependencies {
-    implementation(Versions.libs.coordinates("basics"))
-    implementation(Versions.libs.coordinates("bytecode"))
-    implementation(Versions.libs.coordinates("machine-info"))
-    testImplementation(Versions.test.coordinates)
+    implementation(buildConstants.kotlin.plugin.coordinates)
+    implementation(buildConstants.production.bootstrapPlugins.coordinates)
+    implementation(buildConstants.production.buildConstants.coordinates)
+    implementation(buildConstants.production.basics.coordinates)
+    implementation(buildConstants.production.bytecode.coordinates)
+    implementation(buildConstants.production.machineInfo.coordinates)
+    testImplementation(buildConstants.kotlin.test.coordinates)
 }
 
 gradlePlugin {

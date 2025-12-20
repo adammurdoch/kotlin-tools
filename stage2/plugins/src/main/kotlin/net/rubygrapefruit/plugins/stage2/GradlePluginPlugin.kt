@@ -12,6 +12,8 @@ class GradlePluginPlugin : Plugin<Project> {
         target.run {
             plugins.apply(BuildConstants.constants.stage1.plugins.gradlePlugin.id)
 
+            group = BuildConstants.constants.production.plugins.group
+
             val sourceDirProvider = provider {
                 val targetFile = file("target.txt")
                 if (targetFile.exists()) {

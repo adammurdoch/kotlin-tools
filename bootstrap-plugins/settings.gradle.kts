@@ -8,3 +8,4 @@ plugins {
 }
 
 include("build-constants")
+include("settings-plugins")

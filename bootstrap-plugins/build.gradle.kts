@@ -2,13 +2,8 @@ plugins {
     id("net.rubygrapefruit.stage2.gradle-plugin")
 }
 
-repositories {
-    gradlePluginPortal()
-}
-
 dependencies {
     api(buildConstants.kotlin.plugin.coordinates)
-    implementation(buildConstants.foojay.plugin.coordinates)
     implementation(project(":build-constants"))
 }
 

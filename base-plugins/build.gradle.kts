@@ -9,7 +9,7 @@ repositories {
 
 dependencies {
     implementation(buildConstants.kotlin.plugin.coordinates)
-    implementation(buildConstants.production.bootstrapPlugins.coordinates)
+    implementation(buildConstants.production.settingsPlugins.coordinates)
     implementation(buildConstants.production.buildConstants.coordinates)
     implementation(buildConstants.production.basics.coordinates)
     implementation(buildConstants.production.bytecode.coordinates)
@@ -17,53 +17,15 @@ dependencies {
     testImplementation(buildConstants.kotlin.test.coordinates)
 }
 
-gradlePlugin {
-    plugins {
-        create("settings") {
-            id = "net.rubygrapefruit.kotlin-base"
-            implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.KotlinBasePlugin"
-        }
-        create("plugin") {
-            id = "net.rubygrapefruit.gradle-plugin"
-            implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.GradlePluginPlugin"
-        }
-        create("kmp-base-lib") {
-            id = "net.rubygrapefruit.kmp.base-lib"
-            implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.KmpBaseLibraryPlugin"
-        }
-        create("kmp-lib") {
-            id = "net.rubygrapefruit.kmp.lib"
-            implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.KmpLibraryPlugin"
-        }
-        create("native-lib") {
-            id = "net.rubygrapefruit.native.desktop-lib"
-            implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.NativeDesktopLibraryPlugin"
-        }
-        create("native-base-cli-app") {
-            id = "net.rubygrapefruit.native.base-cli-app"
-            implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.NativeCliApplicationBasePlugin"
-        }
-        create("native-cli-app") {
-            id = "net.rubygrapefruit.native.cli-app"
-            implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.NativeCliApplicationPlugin"
-        }
-        create("jvm-lib") {
-            id = "net.rubygrapefruit.jvm.lib"
-            implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.JvmLibraryPlugin"
-        }
-        create("jvm-cli-app") {
-            id = "net.rubygrapefruit.jvm.cli-app"
-            implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.JvmCliApplicationPlugin"
-        }
-        create("embedded-jvm") {
-            id = "net.rubygrapefruit.jvm.embedded-jvm"
-            implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.EmbeddedJvmLauncherPlugin"
-        }
-    }
-}
-
-kotlin {
-    compilerOptions {
-        freeCompilerArgs.add("-Xmulti-dollar-interpolation")
-    }
+pluginBundle {
+    plugin("net.rubygrapefruit.kotlin-base", "net.rubygrapefruit.plugins.app.internal.plugins.KotlinBasePlugin")
+    plugin("net.rubygrapefruit.gradle-plugin", "net.rubygrapefruit.plugins.app.internal.plugins.GradlePluginPlugin")
+    plugin("net.rubygrapefruit.kmp.base-lib", "net.rubygrapefruit.plugins.app.internal.plugins.KmpBaseLibraryPlugin")
+    plugin("net.rubygrapefruit.kmp.lib", "net.rubygrapefruit.plugins.app.internal.plugins.KmpLibraryPlugin")
+    plugin("net.rubygrapefruit.native.desktop-lib", "net.rubygrapefruit.plugins.app.internal.plugins.NativeDesktopLibraryPlugin")
+    plugin("net.rubygrapefruit.native.base-cli-app", "net.rubygrapefruit.plugins.app.internal.plugins.NativeCliApplicationBasePlugin")
+    plugin("net.rubygrapefruit.native.cli-app", "net.rubygrapefruit.plugins.app.internal.plugins.NativeCliApplicationPlugin")
+    plugin("net.rubygrapefruit.jvm.lib", "net.rubygrapefruit.plugins.app.internal.plugins.JvmLibraryPlugin")
+    plugin("net.rubygrapefruit.jvm.cli-app", "net.rubygrapefruit.plugins.app.internal.plugins.JvmCliApplicationPlugin")
+    plugin("net.rubygrapefruit.jvm.embedded-jvm", "net.rubygrapefruit.plugins.app.internal.plugins.EmbeddedJvmLauncherPlugin")
 }

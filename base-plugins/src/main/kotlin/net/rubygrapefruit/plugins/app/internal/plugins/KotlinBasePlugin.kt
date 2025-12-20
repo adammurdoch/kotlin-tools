@@ -1,7 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.internal.settingsPluginApplied
-import net.rubygrapefruit.plugins.bootstrap.SettingsPlugin
+import net.rubygrapefruit.plugins.SettingsPlugin
 import net.rubygrapefruit.plugins.app.Versions
 import org.gradle.api.Plugin
 import org.gradle.api.initialization.Settings

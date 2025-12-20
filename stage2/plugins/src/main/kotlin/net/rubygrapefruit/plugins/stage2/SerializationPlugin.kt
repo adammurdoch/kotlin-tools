@@ -7,6 +7,10 @@ import org.gradle.api.Project
 @Suppress("unused")
 class SerializationPlugin : Plugin<Project> {
     override fun apply(target: Project) {
-        target.plugins.apply(BuildConstants.constants.serialization.plugin.id)
+        target.run {
+            plugins.apply(BuildConstants.constants.serialization.plugin.id)
+
+            dependencies.add("implementation", BuildConstants.constants.serialization.library.json.coordinates)
+        }
     }
 }

@@ -9,7 +9,6 @@ dependencies {
     implementation(Versions.libs.coordinates("basics"))
     implementation(Versions.libs.coordinates("bytecode"))
     implementation(Versions.libs.coordinates("machine-info"))
-    implementation(Versions.serialization.json.coordinates)
     testImplementation(Versions.test.coordinates)
 }
 

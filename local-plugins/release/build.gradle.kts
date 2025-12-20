@@ -10,7 +10,6 @@ repositories {
 dependencies {
     implementation(project(":model"))
     implementation(buildConstants.kotlin.plugin.coordinates)
-    implementation(buildConstants.serialization.library.json.coordinates)
 }
 
 pluginBundle {

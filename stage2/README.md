@@ -6,6 +6,7 @@ Plugins implemented in Kotlin that allow libraries and Gradle plugins implemente
 Gradle plugin plugin
     - Extends stage 1 plugin to allow source from another project
 Serialization plugin
+    - Also adds JSON as an implementation dependency
 Settings plugin
     - Extends stage 1 plugin
 Included build plugin

@@ -81,6 +81,9 @@ abstract class GenerateSource : DefaultTask() {
                                 stringFieldDecl("coordinates", "public final", "stage1:gradle-plugin-plugin:0.0")
                                 stringFieldDecl("id", "public final", "net.rubygrapefruit.stage1.gradle-plugin")
                             }
+                            typedConstants("jvmBase") {
+                                stringFieldDecl("id", "public final", "net.rubygrapefruit.stage1.jvm.base")
+                            }
                             typedConstants("settings") {
                                 stringFieldDecl("coordinates", "public final", "stage1:settings-plugins:0.0")
                                 stringFieldDecl("id", "public final", "net.rubygrapefruit.stage1.settings")

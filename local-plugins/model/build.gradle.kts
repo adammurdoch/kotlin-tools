@@ -8,6 +8,5 @@ plugins {
 dependencies {
     implementation(gradleApi())
     implementation(Versions.kotlin.pluginCoordinates)
-    implementation(Versions.serialization.json.coordinates)
     testImplementation(Versions.test.coordinates)
 }

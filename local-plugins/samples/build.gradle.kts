@@ -9,7 +9,6 @@ repositories {
 
 dependencies {
     implementation(gradleTestKit())
-    implementation(buildConstants.serialization.library.json.coordinates)
     implementation(buildConstants.production.bootstrapPlugins.coordinates)
     implementation(project(":model"))
 }

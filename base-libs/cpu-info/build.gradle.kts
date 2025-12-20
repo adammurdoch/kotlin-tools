@@ -1,3 +1,3 @@
 plugins {
-    id("net.rubygrapefruit.bootstrap.jni.lib")
+    id("net.rubygrapefruit.stage2.jni.lib")
 }

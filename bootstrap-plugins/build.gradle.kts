@@ -8,6 +8,6 @@ dependencies {
 }
 
 pluginBundle {
-    plugin("net.rubygrapefruit.bootstrap.jni.lib", "net.rubygrapefruit.plugins.bootstrap.JniLibraryPlugin")
-    plugin("net.rubygrapefruit.bootstrap.kmp.lib", "net.rubygrapefruit.plugins.bootstrap.KmpLibraryPlugin")
+//    plugin("net.rubygrapefruit.bootstrap.jni.lib", "net.rubygrapefruit.plugins.bootstrap.JniLibraryPlugin")
+//    plugin("net.rubygrapefruit.bootstrap.kmp.lib", "net.rubygrapefruit.plugins.bootstrap.KmpLibraryPlugin")
 }

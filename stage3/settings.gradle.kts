@@ -15,20 +15,17 @@ projects {
 }
 
 fun projects(config: ProjectBuilder.() -> Unit) {
-    val builder = ProjectBuilder()
+    val builder = ProjectBuilder(settings.settingsDir)
     builder.config()
 
     val projects = mutableListOf<DowngradedProject>()
 
-    builder.projects.forEach { path ->
-        val name = path.substringAfterLast('/')
-        include(name)
-        val project = project(":$name")
-        project.projectDir = file(path)
-        val sourceProjectDir = file("../$path")
-        val sourceBuildScript = sourceProjectDir.resolve("build.gradle.kts")
+    builder.projects.forEach { spec ->
+        include(spec.name)
+        val project = project(":${spec.name}")
+        project.projectDir = spec.projectDir
+        val sourceBuildScript = spec.sourceProjectDir.resolve("build.gradle.kts")
         project.buildFileName = sourceBuildScript.relativeTo(project.projectDir).path
-        projects.add(DowngradedProject(project.projectDir, sourceProjectDir))
     }
 
     gradle.rootProject {
@@ -45,12 +42,14 @@ fun projects(config: ProjectBuilder.() -> Unit) {
     }
 }
 
-class ProjectBuilder {
-    val projects = mutableListOf<String>()
+class ProjectBuilder(val settingsDir: File) {
+    val projects = mutableListOf<DowngradedProject>()
 
-    fun downgrade(path: String) {
-        projects.add(path)
+    fun downgrade(path: String, name: String = path.substringAfterLast('/')) {
+        val projectDir = settingsDir.resolve(path)
+        val sourceProjectDir = settingsDir.resolve("../$path")
+        projects.add(DowngradedProject(name, projectDir, sourceProjectDir))
     }
 }
 
-class DowngradedProject(val projectDir: File, val sourceProjectDir: File)
+class DowngradedProject(val name: String, val projectDir: File, val sourceProjectDir: File)

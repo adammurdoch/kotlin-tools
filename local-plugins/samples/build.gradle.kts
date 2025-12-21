@@ -5,7 +5,7 @@ plugins {
 
 dependencies {
     implementation(gradleTestKit())
-    implementation(buildConstants.production.buildConstants.coordinates)
+    implementation(project(":build-constants"))
     implementation(project(":model"))
 }
 

@@ -1,1 +1,1 @@
-../../../bootstrap-plugins/build-constants
+../../../local-plugins/build-constants

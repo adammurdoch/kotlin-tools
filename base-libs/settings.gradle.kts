@@ -1,6 +1,5 @@
 pluginManagement {
     includeBuild("../stage2")
-    includeBuild("../bootstrap-plugins")
     includeBuild("../local-plugins")
 }
 plugins {

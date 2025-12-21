@@ -5,8 +5,8 @@ plugins {
     id("net.rubygrapefruit.stage2.settings")
 }
 
-downgrade("bootstrap-plugins/build-constants")
-downgrade("bootstrap-plugins/settings-plugins")
+downgrade("local-plugins/build-constants")
+downgrade("local-plugins/settings-plugins")
 downgrade("local-plugins/model")
 
 fun downgrade(path: String) {

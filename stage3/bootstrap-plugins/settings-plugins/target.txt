@@ -1,1 +1,1 @@
-../../../bootstrap-plugins/settings-plugins
+../../../local-plugins/settings-plugins

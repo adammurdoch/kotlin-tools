@@ -12,7 +12,10 @@ class GradlePluginPlugin : Plugin<Project> {
 
             group = BuildConstants.constants.production.plugins.group
 
-            applyKotlinSourceFromTargetProject()
+            val hasTarget= applyKotlinSourceFromTargetProject()
+            if (hasTarget) {
+                group = "stage3"
+            }
         }
     }
 }

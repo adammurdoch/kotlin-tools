@@ -1,5 +1,6 @@
 pluginManagement {
     includeBuild("../stage2")
+    includeBuild("../stage3")
 }
 plugins {
     id("net.rubygrapefruit.stage2.settings")

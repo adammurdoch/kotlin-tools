@@ -3,10 +3,6 @@ plugins {
     id("net.rubygrapefruit.stage2.serialization")
 }
 
-repositories {
-    gradlePluginPortal()
-}
-
 dependencies {
     implementation(gradleTestKit())
     implementation(buildConstants.production.buildConstants.coordinates)

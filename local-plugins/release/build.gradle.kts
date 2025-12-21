@@ -3,13 +3,9 @@ plugins {
     id("net.rubygrapefruit.stage2.serialization")
 }
 
-repositories {
-    gradlePluginPortal()
-}
-
 dependencies {
-    implementation(project(":model"))
     implementation(buildConstants.kotlin.plugin.coordinates)
+    implementation(project(":model"))
 }
 
 pluginBundle {

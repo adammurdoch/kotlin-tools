@@ -11,4 +11,5 @@ include("settings-plugins")
 gradle.rootProject {
     tasks.register("assemble")
     tasks.register("check")
+    tasks.register("verifySamples")
 }

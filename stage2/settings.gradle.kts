@@ -8,3 +8,4 @@ plugins {
 
 include("plugins")
 include("settings-plugins")
+include("stage-dsl-plugins")

@@ -22,10 +22,7 @@ class JvmLibraryPlugin : Plugin<Project> {
                 it.languageVersion.set(extension.targetJvmVersion.map { JavaLanguageVersion.of(it) })
             }
 
-            val hasTarget = applyKotlinSourceFromTargetProject()
-            if (hasTarget) {
-                group = "stage3"
-            }
+            applyKotlinSourceFromTargetProject()
         }
     }
 }

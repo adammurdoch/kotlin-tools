@@ -7,3 +7,8 @@ plugins {
 
 include("gradle-plugin-plugin")
 include("settings-plugins")
+
+gradle.rootProject {
+    tasks.register("assemble")
+    tasks.register("check")
+}

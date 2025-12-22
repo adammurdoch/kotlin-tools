@@ -21,8 +21,6 @@ class JvmLibraryPlugin : Plugin<Project> {
             kotlin.jvmToolchain {
                 it.languageVersion.set(extension.targetJvmVersion.map { JavaLanguageVersion.of(it) })
             }
-
-            applyKotlinSourceFromTargetProject()
         }
     }
 }

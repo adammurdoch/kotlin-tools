@@ -11,8 +11,6 @@ class GradlePluginPlugin : Plugin<Project> {
             plugins.apply(BuildConstants.constants.stage1.plugins.gradlePlugin.id)
 
             group = BuildConstants.constants.production.plugins.group
-
-            applyKotlinSourceFromTargetProject()
         }
     }
 }

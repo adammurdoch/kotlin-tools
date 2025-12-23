@@ -4,7 +4,7 @@ import kotlin.io.path.writeText
 
 plugins {
     id("net.rubygrapefruit.stage2.jvm.lib")
-    id("net.rubygrapefruit.bootstrap.release")
+    
 }
 
 library {

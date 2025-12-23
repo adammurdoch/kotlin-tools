@@ -6,6 +6,7 @@ import net.rubygrapefruit.plugins.samples.SamplesExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.internal.extensions.stdlib.capitalized
 
 abstract class SamplesPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -42,7 +43,7 @@ abstract class SamplesPlugin : Plugin<Project> {
             t.manifest.set(layout.buildDirectory.file("${dirName}-manifest.txt"))
             builder(t)
         }
-        return tasks.register("verify${taskName.capitalize()}", VerifySamples::class.java) { t ->
+        return tasks.register("verify${taskName.capitalized()}", VerifySamples::class.java) { t ->
             t.manifest.set(samples.flatMap { it.manifest })
         }
     }

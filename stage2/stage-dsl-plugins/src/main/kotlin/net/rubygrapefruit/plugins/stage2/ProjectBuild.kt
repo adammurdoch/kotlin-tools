@@ -1,10 +1,13 @@
 package net.rubygrapefruit.plugins.stage2
 
 import org.gradle.api.initialization.Settings
+import org.gradle.api.provider.ListProperty
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import java.io.File
 
 abstract class ProjectBuilder(private val settings: Settings) {
+    internal abstract val projects: ListProperty<DowngradedProject>
+
     fun upgrade(path: String, name: String = path.substringAfterLast('/')) {
         downgrade(path, name)
     }
@@ -17,11 +20,10 @@ abstract class ProjectBuilder(private val settings: Settings) {
     }
 
     private fun add(spec: DowngradedProject) {
+        projects.add(spec)
         settings.include(spec.name)
         val project = settings.project(spec.path)
         project.projectDir = spec.projectDir
-        val sourceBuildScript = spec.sourceProjectDir.resolve("build.gradle.kts")
-        project.buildFileName = sourceBuildScript.relativeTo(project.projectDir).path
 
         settings.gradle.rootProject { rootProject ->
             rootProject.project(spec.path) { p ->

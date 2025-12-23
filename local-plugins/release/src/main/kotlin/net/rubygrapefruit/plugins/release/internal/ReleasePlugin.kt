@@ -91,11 +91,13 @@ open class ReleasePlugin : Plugin<Project> {
                 t.outputFile.set(layout.buildDirectory.file("incoming-coordinates.json"))
             }
             afterEvaluate {
-                val kotlinModel = extensions.getByType(KotlinMultiplatformExtension::class.java)
-                for (target in kotlinModel.targets) {
-                    val superConfig = configurations.findByName(target.runtimeElementsConfigurationName)
-                    if (superConfig != null) {
-                        incoming.extendsFrom(superConfig)
+                val kotlinModel = extensions.findByType(KotlinMultiplatformExtension::class.java)
+                if (kotlinModel != null) {
+                    for (target in kotlinModel.targets) {
+                        val superConfig = configurations.findByName(target.runtimeElementsConfigurationName)
+                        if (superConfig != null) {
+                            incoming.extendsFrom(superConfig)
+                        }
                     }
                 }
             }

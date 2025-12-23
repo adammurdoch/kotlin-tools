@@ -9,8 +9,8 @@ plugins {
 }
 
 projects {
-    upgrade("stage2/plugins")
-    upgrade("stage2/settings-plugins", "stage2-settings-plugins")
+//    upgrade("stage2/plugins")
+//    upgrade("stage2/settings-plugins", "stage2-settings-plugins")
     downgrade("local-plugins/build-constants")
     downgrade("local-plugins/settings-plugins")
     downgrade("local-plugins/model")

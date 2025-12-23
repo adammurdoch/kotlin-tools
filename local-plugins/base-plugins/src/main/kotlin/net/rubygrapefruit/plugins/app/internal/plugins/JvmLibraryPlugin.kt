@@ -4,14 +4,11 @@ import net.rubygrapefruit.plugins.app.JvmLibrary
 import net.rubygrapefruit.plugins.app.Versions
 import net.rubygrapefruit.plugins.app.internal.DefaultJvmLibrary
 import net.rubygrapefruit.plugins.app.internal.JvmModuleRegistry
-import net.rubygrapefruit.plugins.app.internal.jvmKotlin
 import net.rubygrapefruit.plugins.app.internal.toModuleName
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSetContainer
-import org.gradle.api.tasks.testing.Test
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import kotlin.math.max
 
 class JvmLibraryPlugin : Plugin<Project> {
     override fun apply(target: Project) {

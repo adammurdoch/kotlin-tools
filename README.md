@@ -4,7 +4,7 @@ Kotlin tools is a collection of useful tools for developing Kotlin applications 
 
 ## Gradle Plugins
 
-Kotlin tools includes several [Gradle plugins](base-plugins/) to help simplify building applications and libraries using Kotlin, including Kotlin multiplatform.
+Kotlin tools includes several [Gradle plugins](local-plugins/base-plugins/) to help simplify building applications and libraries using Kotlin, including Kotlin multiplatform.
 
 - Build CLI applications implemented using Kotlin/JVM, optionally building native executables.
 - Build CLI applications implemented using Kotlin native.
@@ -26,8 +26,7 @@ Kotlin tools includes several Kotlin multiplatform libraries:
 
 The source tree is arranged as follows:
 
-- [`local-plugins`](base-plugins/) contains Gradle plugins that are used to build the other Gradle plugins. 
+- [`local-plugins`](local-plugins/) contains Gradle plugins that are used to build the other Gradle plugins. 
   - Also contains some Kotlin libraries. These are located in a separate directory as they are also used by the Gradle plugins.
-- [`base-plugins`](base-plugins/) contains some of the Gradle plugins.
 - [`test-apps`](test-apps/) contains some sample applications and libraries that use the Gradle plugins.
 - [`libs`](libs/) contains some Kotlin libraries.

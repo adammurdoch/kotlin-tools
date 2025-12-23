@@ -13,4 +13,5 @@ pluginBundle {
     plugin("net.rubygrapefruit.stage2.serialization", "net.rubygrapefruit.plugins.stage2.SerializationPlugin")
     plugin("net.rubygrapefruit.stage2.jni.lib", "net.rubygrapefruit.plugins.stage2.JniLibraryPlugin")
     plugin("net.rubygrapefruit.stage2.kmp.lib", "net.rubygrapefruit.plugins.stage2.KmpLibraryPlugin")
+    plugin("net.rubygrapefruit.stage2.release", "net.rubygrapefruit.plugins.stage2.NoOpReleasePlugin")
 }

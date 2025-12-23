@@ -17,7 +17,9 @@ abstract class StageDslPlugin : Plugin<Settings> {
                             val buildScript = spec.projectDir.resolve("build.gradle.kts")
                             buildScript.parentFile.mkdirs()
                             val scriptContent = sourceBuildScript.readText()
-                            val modified = scriptContent.replace("id(\"net.rubygrapefruit.bootstrap.release\")", "")
+                            val modified = scriptContent
+                                .replace("id(\"net.rubygrapefruit.bootstrap.release\")", "id(\"net.rubygrapefruit.stage2.release\")")
+                                .replace("id(\"net.rubygrapefruit.bootstrap.samples\")", "/* id(\"net.rubygrapefruit.bootstrap.samples\") */")
                             buildScript.writeText(modified)
                         }
                     }

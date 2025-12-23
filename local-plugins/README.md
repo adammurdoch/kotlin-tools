@@ -2,6 +2,11 @@
 
 Gradle plugins that can build the Kotlin tools plugins and the JVM libraries that they use as dependencies.
 
+These libraries are pre-alpha.
+
+- [`bytecode`](bytecode/): A library to read and write JVM bytecode
+- [`machine-info`](machine-info/): A library to inspect the host machine.
+
 ## Releasing
 
 - Create and upload GPG signing key, see https://central.sonatype.org/publish/requirements/gpg/

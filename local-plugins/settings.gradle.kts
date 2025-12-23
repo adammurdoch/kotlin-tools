@@ -9,6 +9,9 @@ plugins {
 
 include("build-constants")
 include("basics")
+include("bytecode")
+include("machine-info")
+include("cpu-info")
 include("settings-plugins")
 include("model")
 include("samples")

@@ -6,7 +6,3 @@ plugins {
     id("net.rubygrapefruit.stage2.settings")
     id("net.rubygrapefruit.stage2.included-build")
 }
-
-include("bytecode")
-include("machine-info")
-include("cpu-info")

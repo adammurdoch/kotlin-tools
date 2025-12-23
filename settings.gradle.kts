@@ -7,7 +7,6 @@ plugins {
 }
 
 includeBuild("local-plugins")
-includeBuild("base-libs")
 includeBuild("base-plugins")
 includeBuild("libs")
 includeBuild("launcher-plugins")

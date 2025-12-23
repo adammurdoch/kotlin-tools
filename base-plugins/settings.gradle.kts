@@ -6,4 +6,4 @@ plugins {
     id("net.rubygrapefruit.stage2.included-build")
 }
 
-includeBuild("../base-libs")
+includeBuild("../local-plugins")

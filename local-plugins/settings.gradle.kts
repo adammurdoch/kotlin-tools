@@ -8,6 +8,7 @@ plugins {
 }
 
 include("build-constants")
+include("basics")
 include("settings-plugins")
 include("model")
 include("samples")

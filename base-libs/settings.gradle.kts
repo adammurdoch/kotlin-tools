@@ -7,7 +7,6 @@ plugins {
     id("net.rubygrapefruit.stage2.included-build")
 }
 
-include("basics")
 include("bytecode")
 include("machine-info")
 include("cpu-info")

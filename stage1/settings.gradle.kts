@@ -9,6 +9,7 @@ include("gradle-plugin-plugin")
 include("settings-plugins")
 
 gradle.rootProject {
+    tasks.register("clean")
     tasks.register("assemble")
     tasks.register("check")
     tasks.register("verifySamples")

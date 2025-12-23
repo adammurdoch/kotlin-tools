@@ -9,11 +9,11 @@ repositories {
 
 dependencies {
     api(buildConstants.kotlin.plugin.coordinates)
-    implementation(buildConstants.production.settingsPlugins.coordinates)
-    implementation(buildConstants.production.buildConstants.coordinates)
-    implementation(buildConstants.production.basics.coordinates)
-    implementation(buildConstants.production.bytecode.coordinates)
-    implementation(buildConstants.production.machineInfo.coordinates)
+    implementation(project(":settings-plugins"))
+    implementation(project(":build-constants"))
+    implementation(project(":basics"))
+    implementation(project(":bytecode"))
+    implementation(project(":machine-info"))
     testImplementation(buildConstants.kotlin.test.coordinates)
 }
 

@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     implementation(buildConstants.kotlin.plugin.coordinates)
+    implementation(project(":plugins"))
 }
 
 pluginBundle {

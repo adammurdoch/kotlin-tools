@@ -9,11 +9,14 @@ plugins {
 }
 
 projects {
-//    upgrade("stage2/plugins")
-//    upgrade("stage2/settings-plugins", "stage2-settings-plugins")
     downgrade("local-plugins/build-constants")
     downgrade("local-plugins/settings-plugins")
     downgrade("local-plugins/model")
     downgrade("local-plugins/release")
     downgrade("local-plugins/samples")
+    downgrade("local-plugins/basics")
+    downgrade("local-plugins/cpu-info")
+    downgrade("local-plugins/machine-info")
+    downgrade("local-plugins/bytecode")
+    downgrade("local-plugins/base-plugins")
 }

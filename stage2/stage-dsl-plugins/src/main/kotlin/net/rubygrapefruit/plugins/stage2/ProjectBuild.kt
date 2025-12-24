@@ -8,14 +8,9 @@ import org.gradle.api.tasks.SourceSetContainer
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import java.io.File
-import kotlin.jvm.java
 
 abstract class ProjectBuilder(private val settings: Settings) {
     internal abstract val projects: ListProperty<DowngradedProject>
-
-    fun upgrade(path: String, name: String = path.substringAfterLast('/')) {
-        downgrade(path, name)
-    }
 
     fun downgrade(path: String, name: String = path.substringAfterLast('/')) {
         val settingsDir = settings.settingsDir

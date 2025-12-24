@@ -7,5 +7,4 @@ plugins {
 
 includeBuild("local-plugins")
 includeBuild("libs")
-includeBuild("launcher-plugins")
 includeBuild("test-apps")

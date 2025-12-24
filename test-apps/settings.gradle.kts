@@ -1,7 +1,6 @@
 pluginManagement {
     includeBuild("../stage2")
     includeBuild("../local-plugins")
-    includeBuild("../launcher-plugins")
 }
 plugins {
     id("net.rubygrapefruit.kotlin-base")

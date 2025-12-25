@@ -1,11 +1,10 @@
 import net.rubygrapefruit.plugins.app.BuildType
-import net.rubygrapefruit.plugins.app.Versions
 
 plugins {
     id("net.rubygrapefruit.native.base-cli-app")
 }
 
-group = Versions.plugins.group
+group = versions.plugins.group
 
 application {
     macOS {

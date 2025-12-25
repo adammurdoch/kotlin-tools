@@ -9,7 +9,7 @@ import org.gradle.api.Project
 class GradlePluginPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            checkSettingsPluginApplied()
+            applyBasePlugin()
 
             plugins.apply("java-gradle-plugin")
             plugins.apply("org.jetbrains.kotlin.jvm")

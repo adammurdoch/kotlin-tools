@@ -8,7 +8,7 @@ import org.gradle.api.Project
 class LibraryBasePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            checkSettingsPluginApplied()
+            applyBasePlugin()
 
             repositories.mavenCentral()
 

@@ -1,25 +1,23 @@
-import net.rubygrapefruit.plugins.app.Versions
-
 plugins {
     id("net.rubygrapefruit.kmp.base-lib")
 }
 
-group = Versions.libs.group
+group = versions.libs.group
 
 library {
     jvm {
-        targetJvmVersion = Versions.plugins.java
+        targetJvmVersion = versions.plugins.java
         module.name = "net.rubygrapefruit.store"
     }
     nativeDesktop()
     common {
         api(project(":file-io"))
-        api(Versions.serialization.coordinates)
+        api(versions.serialization.coordinates)
         implementation(project(":stream-io"))
-        implementation(Versions.serialization.json.coordinates)
+        implementation(versions.serialization.json.coordinates)
     }
     test {
-        implementation(Versions.test.coordinates)
+        implementation(versions.test.coordinates)
         implementation(project(":file-fixtures"))
     }
 }

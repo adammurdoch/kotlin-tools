@@ -1,11 +1,10 @@
-import net.rubygrapefruit.plugins.app.Versions
 import net.rubygrapefruit.plugins.app.internal.HostMachine
 
 plugins {
     id("net.rubygrapefruit.kmp.base-lib")
 }
 
-group = Versions.libs.group
+group = versions.libs.group
 
 library {
     nativeDesktop()
@@ -14,7 +13,7 @@ library {
         implementation(project(":stream-io"))
     }
     test {
-        implementation(Versions.test.coordinates)
+        implementation(versions.test.coordinates)
         implementation(project(":file-fixtures"))
     }
 }

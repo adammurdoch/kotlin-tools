@@ -1,22 +1,20 @@
-import net.rubygrapefruit.plugins.app.Versions
-
 plugins {
     id("net.rubygrapefruit.kmp.base-lib")
 }
 
-group = Versions.libs.group
+group = versions.libs.group
 
 library {
     jvm {
-        targetJvmVersion = Versions.plugins.java
+        targetJvmVersion = versions.plugins.java
         module.name = "net.rubygrapefruit.file_fixtures"
         dependencies {
-            api(Versions.test.junit.coordinates)
+            api(versions.test.junit.coordinates)
         }
     }
     nativeDesktop()
     common {
-        api(Versions.test.coordinates)
+        api(versions.test.coordinates)
         api(project(":file-io"))
     }
 }

@@ -1,14 +1,12 @@
-import net.rubygrapefruit.plugins.app.Versions
-
 plugins {
     id("net.rubygrapefruit.gradle-plugin")
 }
 
-group = Versions.plugins.group
+group = versions.plugins.group
 
 dependencies {
-    api(Versions.plugins.basePluginsCoordinates)
-    implementation(Versions.libs.coordinates("download"))
+    api(project(":base-plugins"))
+    implementation(versions.libs.coordinates("download"))
 }
 
 gradlePlugin {

@@ -1,12 +1,16 @@
+import net.rubygrapefruit.plugins.app.Versions
+
 plugins {
-    id("net.rubygrapefruit.stage2.kmp.lib")
+    id("net.rubygrapefruit.kmp.lib")
     id("net.rubygrapefruit.bootstrap.samples")
     id("net.rubygrapefruit.bootstrap.release")
 }
 
+group = Versions.libs.group
+
 library {
     jvm {
-        targetJvmVersion = buildConstants.plugins.jvm.version
+        targetJavaVersion = Versions.plugins.java
     }
 }
 

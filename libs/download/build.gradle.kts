@@ -10,7 +10,7 @@ library {
     module.name = "net.rubygrapefruit.tools.download"
     // TODO - this should not be required
     module.requires.add("machine.info")
-    targetJavaVersion = Versions.plugins.java
+    targetJvmVersion = Versions.plugins.java
     dependencies {
         implementation(Versions.libs.coordinates("machine-info"))
     }

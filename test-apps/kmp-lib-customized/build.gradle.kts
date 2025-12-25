@@ -5,6 +5,6 @@ plugins {
 library {
     jvm {
         module.name = "sample.calc"
-        targetJavaVersion = 11
+        targetJvmVersion = 11
     }
 }

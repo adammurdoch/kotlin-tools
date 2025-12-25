@@ -4,5 +4,5 @@ plugins {
 
 library {
     module.name = "sample.system"
-    targetJavaVersion = 11
+    targetJvmVersion = 11
 }

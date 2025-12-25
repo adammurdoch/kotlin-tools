@@ -22,8 +22,8 @@ class JvmApplicationBasePlugin : Plugin<Project> {
             applications.withApp<MutableJvmApplication> { app ->
                 app.module.name.convention(app.appName.map(::toModuleName))
 
-                app.targetJavaVersion.convention(Versions.java)
-                JvmConventionsPlugin.javaVersion(this, app.targetJavaVersion)
+                app.targetJvmVersion.convention(Versions.java)
+                JvmConventionsPlugin.javaVersion(this, app.targetJvmVersion)
                 JvmConventionsPlugin.addApiConstraints(this, "implementation")
 
                 val jarTask = tasks.named("jar", Jar::class.java)

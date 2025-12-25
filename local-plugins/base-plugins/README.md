@@ -135,7 +135,7 @@ A convention plugin for implementing Gradle plugins using Kotlin/JVM.
 - Adds `application { }` block
   - `application.mainClass` - defaults to main class determined by inspecting the bytecode
   - `application.module.name` - defaults to the application name
-  - `application.targetJavaVersion` - defaults to 17
+  - `application.targetJvmVersion` - defaults to 17
   - `application.dependencies { }` - production dependencies
   - `application.test { }` - test dependencies
 
@@ -146,7 +146,7 @@ A convention plugin for implementing Gradle plugins using Kotlin/JVM.
   - `library.module.exports` 
   - `library.module.requires` - calculated from compile (implementation) dependencies 
   - `library.module.requiresTransitive` - calculated from the API dependencies
-  - `library.targetJavaVersion` - defaults to 17
+  - `library.targetJvmVersion` - defaults to 17
   - `library.dependencies { }` - production dependencies
   - `library.test { }` - test dependencies
 

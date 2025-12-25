@@ -21,7 +21,7 @@ class NativeBinaryJvmLauncherPlugin : Plugin<Project> {
                     launcherFile.set(layout.buildDirectory.file("native-binary/launcher"))
                     module.set(app.module.name)
                     mainClass.set(app.mainClass)
-                    javaVersion.set(app.targetJavaVersion)
+                    javaVersion.set(app.targetJvmVersion)
                     modulePath.from(app.runtimeModulePath)
                 }
 

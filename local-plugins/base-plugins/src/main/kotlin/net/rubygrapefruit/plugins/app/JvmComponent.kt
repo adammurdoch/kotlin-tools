@@ -7,9 +7,9 @@ import org.gradle.api.tasks.Nested
 
 interface JvmComponent<D: Dependencies> {
     /**
-     * The target Java version for this component.
+     * The target JVM version for this component.
      */
-    val targetJavaVersion: Property<Int>
+    val targetJvmVersion: Property<Int>
 
     /**
      * The Java module for this component.

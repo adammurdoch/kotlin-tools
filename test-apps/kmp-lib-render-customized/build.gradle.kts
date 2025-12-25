@@ -5,7 +5,7 @@ plugins {
 library {
     jvm {
         module.name = "sample.render"
-        targetJavaVersion = 11
+        targetJvmVersion = 11
     }
     desktop {
         dependencies {

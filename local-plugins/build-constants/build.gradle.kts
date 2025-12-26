@@ -64,17 +64,21 @@ abstract class GenerateSource : DefaultTask() {
             }
             
             object Plugins {
-                val java = ${buildConstants.plugins.jvm.version}
+                val jvm = PluginsJvm
                 val group = "${buildConstants.production.plugins.group}"
                 val version = "0.1-dev"
                 val basePluginsCoordinates = group + ":base-plugins:" + version
                 val launcherPluginCoordinates = group + ":launcher-plugins:" + version
             }
+            
+            object PluginsJvm {
+                val version = ${buildConstants.plugins.jvm.version}
+            }
 
             object Libraries {
-                val group = "net.rubygrapefruit"
+                val group = "${buildConstants.libs.group}"
                 
-                fun coordinates(lib: String) = group + ":" + lib + ":1.0"
+                fun coordinates(lib: String) = group + ":" + lib + ":0.0"
             }
 
             object Serialization {

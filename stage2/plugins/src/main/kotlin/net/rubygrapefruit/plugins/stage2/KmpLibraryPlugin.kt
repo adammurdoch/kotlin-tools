@@ -12,6 +12,7 @@ class KmpLibraryPlugin : Plugin<Project> {
         target.run {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
             plugins.apply(BuildConstants.constants.stage0.buildConstants.pluginId)
+            extensions.add("versions", BuildConstants.constants)
 
             repositories.mavenCentral()
 

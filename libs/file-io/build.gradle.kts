@@ -7,7 +7,7 @@ group = versions.libs.group
 
 library {
     jvm {
-        targetJvmVersion = versions.plugins.java
+        targetJvmVersion = versions.plugins.jvm.version
         module.name = "net.rubygrapefruit.file_io"
     }
     nativeDesktop()

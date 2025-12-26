@@ -1,6 +1,5 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
-import net.rubygrapefruit.plugins.app.internal.checkSettingsPluginApplied
 import net.rubygrapefruit.plugins.app.Versions
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -18,7 +17,7 @@ class GradlePluginPlugin : Plugin<Project> {
             repositories.mavenCentral()
             repositories.gradlePluginPortal()
 
-            JvmConventionsPlugin.javaVersion(this, Versions.plugins.java)
+            JvmConventionsPlugin.javaVersion(this, Versions.plugins.jvm.version)
             dependencies.add("implementation", Versions.libs.coordinates("build-constants"))
         }
     }

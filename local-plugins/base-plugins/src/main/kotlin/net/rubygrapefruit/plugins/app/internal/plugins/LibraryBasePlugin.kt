@@ -1,7 +1,6 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.internal.MultiPlatformComponentRegistry
-import net.rubygrapefruit.plugins.app.internal.checkSettingsPluginApplied
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 

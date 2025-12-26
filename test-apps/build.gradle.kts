@@ -5,7 +5,7 @@ import net.rubygrapefruit.machine.info.Machine
 import net.rubygrapefruit.strings.capitalized
 import org.gradle.kotlin.dsl.support.serviceOf
 import java.io.ByteArrayOutputStream
-import kotlin.io.path.createDirectory
+import kotlin.io.path.createDirectories
 
 sealed class Sample(val name: String, val baseDir: File) {
     val dir = baseDir.resolve(name)
@@ -207,7 +207,7 @@ open class BaseApp(
     otherDists: List<AppDistribution>,
     srcDirName: String,
     allPlatforms: Boolean,
-    invocation: AppInvocation = AppInvocation(listOf("1", "+", "2"), "Expression: (1) + (2)")
+    invocation: AppInvocation
 ) :
     App(name, baseDir, mainDist, otherDists, srcDirName, allPlatforms, invocation) {
 
@@ -223,25 +223,38 @@ open class BaseApp(
         }
         return DerivedApp(name, derivedFrom, baseDir, AppDistribution(NativeBinaryCliApp(name, "build/dist", host.architecture)), otherDists, "commonMain", false)
     }
-
-    fun allPlatforms(): BaseApp {
-        return BaseApp(name, baseDir, mainDist, otherDists, srcDirName, true, invocation)
-    }
-
-    fun cliArgs(vararg args: String): BaseApp {
-        return BaseApp(name, baseDir, mainDist, otherDists, srcDirName, allPlatforms, AppInvocation(args.toList(), null))
-    }
 }
+
+sealed class AppBuilder {
+    val cliArgs = mutableListOf<String>()
+    var expectedOutput: String? = null
+
+    fun cliArgs(vararg args: String) {
+        cliArgs.clear()
+        cliArgs.addAll(args)
+    }
+
+    fun expectedOutput(text: String) {
+        expectedOutput = text
+    }
+
+    fun toInvocation() = AppInvocation(cliArgs, expectedOutput)
+}
+
+class JvmAppBuilder : AppBuilder()
+class NativeAppBuilder : AppBuilder()
 
 class JvmBaseApp(
     name: String,
     baseDir: File,
-) : BaseApp(name, baseDir, AppDistribution(JvmLauncherScripts(name, false)), emptyList(), "main", true)
+    invocation: AppInvocation
+) : BaseApp(name, baseDir, AppDistribution(JvmLauncherScripts(name, false)), emptyList(), "main", true, invocation)
 
 class NativeBaseApp(
     name: String,
     baseDir: File,
-) : BaseApp(name, baseDir, AppDistribution(NativeBinaryCliApp(name, "build/dist", Arm64)), emptyList(), "commonMain", true)
+    invocation: AppInvocation
+) : BaseApp(name, baseDir, AppDistribution(NativeBinaryCliApp(name, "build/dist", Arm64)), emptyList(), "commonMain", true, invocation)
 
 class UiBaseApp(
     name: String,
@@ -249,7 +262,7 @@ class UiBaseApp(
     srcDirName: String,
     mainDist: AppDistribution = AppDistribution(UiApp(name.capitalized(), "build/dist", Machine.thisMachine.architecture)),
     otherDists: List<AppDistribution> = emptyList()
-) : BaseApp(name, baseDir, mainDist, otherDists, srcDirName, false)
+) : BaseApp(name, baseDir, mainDist, otherDists, srcDirName, false, AppInvocation(emptyList(), null))
 
 class DerivedApp(
     name: String,
@@ -261,10 +274,6 @@ class DerivedApp(
     allPlatforms: Boolean,
 ) :
     App(name, baseDir, mainDist, otherDists, srcDirName, allPlatforms, derivedFrom.invocation), DerivedSample {
-
-    fun allPlatforms(): DerivedApp {
-        return DerivedApp(name, derivedFrom, baseDir, mainDist, otherDists, srcDirName, true)
-    }
 
     override val derivedSrcDirs: List<DerivedSrcDir>
         get() = listOf(DerivedSrcDir(derivedFrom.srcDir, srcDir))
@@ -282,9 +291,16 @@ class DerivedLib(name: String, override val derivedFrom: BaseLib, baseDir: File)
         get() = derivedFrom.sourceSets.map { DerivedSrcDir(derivedFrom.dir.resolve("src/$it/kotlin"), dir.resolve("src/$it/kotlin")) }
 }
 
-val jvmCliMinApp = jvmCliApp("jvm-cli-app-min").cliArgs("hello", "world")
+val jvmCliMinApp = jvmCliApp("jvm-cli-app-min") {
+    cliArgs("hello", "world")
+    expectedOutput("args: hello, world")
+}
 
-val jvmCliApp = jvmCliApp("jvm-cli-app")
+val jvmCliApp = jvmCliApp("jvm-cli-app") {
+    cliArgs("1", "+", "2")
+    expectedOutput("Expression: (1) + (2)")
+}
+
 val jvmUiApp = jvmUiApp("jvm-ui-app")
 val jvmLib = jvmLib("jvm-lib")
 val kmpLib = kmpLib("kmp-lib")
@@ -293,9 +309,13 @@ val kmpLibRender = kmpLib("kmp-lib-render", listOf("desktopMain", "jvmMain", "mi
 val nativeCliApp = jvmCliApp.deriveNative("native-cli-app")
 val nativeUiApp = macOsUiApp("native-ui-app")
 
-val jvmCliFullApp = jvmCliApp("jvm-cli-app-full").cliArgs("list")
+val jvmCliFullApp = jvmCliApp("jvm-cli-app-full") {
+    cliArgs("list")
+}
 
-val jvmCliStoreApp = jvmCliApp("store-jvm-cli-app").cliArgs("content", "build/test")
+val jvmCliStoreApp = jvmCliApp("store-jvm-cli-app") {
+    cliArgs("content", "build/test")
+}
 
 val samples = listOf(
     jvmLib,
@@ -311,35 +331,41 @@ val samples = listOf(
 
     kmpLib("kmp-lib-generated-source"),
 
-    jvmCliApp.allPlatforms(),
-    jvmCliApp.derive("customized") { it.launcher("app") }.allPlatforms(),
-    jvmCliApp.derive("embedded") { it.embedded() }.allPlatforms(),
-    jvmCliApp.derive("embedded-customized") { it.embedded().launcher("app") }.allPlatforms(),
-    jvmCliApp.derive("native-binary") { it.native() }.allPlatforms(),
-    jvmCliApp.derive("native-binary-customized") { it.native().launcher("app") }.allPlatforms(),
+    jvmCliApp,
+    jvmCliApp.derive("customized") { it.launcher("app") },
+    jvmCliApp.derive("embedded") { it.embedded() },
+    jvmCliApp.derive("embedded-customized") { it.embedded().launcher("app") },
+    jvmCliApp.derive("native-binary") { it.native() },
+    jvmCliApp.derive("native-binary-customized") { it.native().launcher("app") },
+    jvmCliApp.derive("java11"),
+    jvmCliApp.derive("java25"),
 
-    jvmCliMinApp.allPlatforms(),
-    jvmCliFullApp.allPlatforms(),
-    jvmCliStoreApp.allPlatforms(),
-    jvmCliApp("jvm-cli-app-generated-source").cliArgs().allPlatforms(),
+    jvmCliMinApp,
+    jvmCliFullApp,
+    jvmCliStoreApp,
+    jvmCliApp("jvm-cli-app-generated-source") {
+        expectedOutput("Generated app class")
+    },
 
     jvmUiApp,
     jvmUiApp.derive("customized") { it.launcher("App") },
 
-    nativeCliApp.allPlatforms(),
-    nativeCliApp.derive("customized") { it.launcher("app") }.allPlatforms(),
-    nativeCliApp("native-cli-app-generated-source").cliArgs().allPlatforms(),
+    nativeCliApp,
+    nativeCliApp.derive("customized") { it.launcher("app") },
+    nativeCliApp("native-cli-app-generated-source") {
+        expectedOutput("Generated common app class")
+    },
 
-    jvmCliMinApp.deriveNative("native-cli-app-min").allPlatforms(),
-    jvmCliFullApp.deriveNative("native-cli-app-full").allPlatforms(),
-    jvmCliStoreApp.deriveNative("store-native-cli-app").allPlatforms(),
+    jvmCliMinApp.deriveNative("native-cli-app-min"),
+    jvmCliFullApp.deriveNative("native-cli-app-full"),
+    jvmCliStoreApp.deriveNative("store-native-cli-app"),
 
     nativeUiApp,
     nativeUiApp.derive("customized") { it.launcher("App") },
 
-    jvmCliApp("cli-args-parameters").cliArgs("--help").allPlatforms(),
-    jvmCliApp("cli-args-options").cliArgs("--help").allPlatforms(),
-    jvmCliApp("cli-args-actions").cliArgs("--help").allPlatforms()
+    jvmCliApp("cli-args-parameters") { cliArgs("--help") },
+    jvmCliApp("cli-args-options") { cliArgs("--help") },
+    jvmCliApp("cli-args-actions") { cliArgs("--help") }
 )
 
 val sampleApps = samples.filterIsInstance<App>()
@@ -362,7 +388,7 @@ val generators = derivedSamples.map { sample ->
                 srcDir.origin.walkTopDown().forEach { file ->
                     val destFile = srcDir.target.resolve(file.relativeTo(srcDir.origin))
                     if (file.isDirectory) {
-                        destFile.toPath().createDirectory()
+                        destFile.toPath().createDirectories()
                     } else if (file.isFile) {
                         destFile.parentFile.mkdirs()
                         val text = file.readText()
@@ -512,14 +538,18 @@ class Runner {
     }
 }
 
-fun jvmCliApp(name: String): JvmBaseApp {
-    return JvmBaseApp(name, projectDir)
+fun jvmCliApp(name: String, config: JvmAppBuilder.() -> Unit = {}): JvmBaseApp {
+    val builder = JvmAppBuilder()
+    builder.config()
+    return JvmBaseApp(name, projectDir, builder.toInvocation())
 }
 
 fun jvmUiApp(name: String) = UiBaseApp(name, projectDir, "main")
 
-fun nativeCliApp(name: String): NativeBaseApp {
-    return NativeBaseApp(name, projectDir)
+fun nativeCliApp(name: String, config: NativeAppBuilder.() -> Unit = {}): NativeBaseApp {
+    val builder = NativeAppBuilder()
+    builder.config()
+    return NativeBaseApp(name, projectDir, builder.toInvocation())
 }
 
 fun macOsUiApp(name: String): UiBaseApp {

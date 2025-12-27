@@ -14,4 +14,5 @@ dependencies {
 pluginBundle {
     plugin("net.rubygrapefruit.stage2.settings", "net.rubygrapefruit.plugins.stage2.SettingsPlugin")
     plugin("net.rubygrapefruit.stage2.included-build", "net.rubygrapefruit.plugins.stage2.IncludedBuildPlugin")
+    plugin("net.rubygrapefruit.stage2.test-apps", "net.rubygrapefruit.plugins.stage2.TestAppsPlugin")
 }

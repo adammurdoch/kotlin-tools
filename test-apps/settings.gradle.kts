@@ -5,11 +5,8 @@ pluginManagement {
 plugins {
     id("net.rubygrapefruit.kotlin-base")
     id("net.rubygrapefruit.stage2.included-build")
+    id("net.rubygrapefruit.stage2.test-apps")
 }
 
-for (f in rootDir.listFiles()) {
-    val ignore = listOf(".gradle", ".kotlin", "gradle", "kotlin-js-store")
-    if (f.isDirectory && !ignore.contains(f.name)) {
-        include(f.name)
-    }
+samples {
 }

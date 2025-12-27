@@ -144,8 +144,7 @@ sealed class App(
     val srcDirName: String,
     val allPlatforms: Boolean,
     val invocation: AppInvocation,
-) :
-    Sample(name, baseDir) {
+) : Sample(name, baseDir) {
 
     val srcDir = dir.resolve("src/$srcDirName/kotlin")
 
@@ -190,39 +189,6 @@ sealed class App(
     } else {
         null
     }
-
-    abstract val derivedFrom: BaseApp
-
-    fun derive(suffix: String, builder: (AppNature) -> AppNature = { it }): DerivedApp {
-        val sampleName = "$name-$suffix"
-        val newNature = builder(mainDist.nature.launcher(sampleName))
-        return DerivedApp(sampleName, derivedFrom, baseDir, AppDistribution(newNature), emptyList(), srcDirName, allPlatforms)
-    }
-}
-
-open class BaseApp(
-    name: String,
-    baseDir: File,
-    mainDist: AppDistribution,
-    otherDists: List<AppDistribution>,
-    srcDirName: String,
-    allPlatforms: Boolean,
-    invocation: AppInvocation
-) :
-    App(name, baseDir, mainDist, otherDists, srcDirName, allPlatforms, invocation) {
-
-    override val derivedFrom: BaseApp
-        get() = this
-
-    fun deriveNative(name: String): DerivedApp {
-        val host = Machine.thisMachine
-        val otherDists = if (host.isMacOS && host.architecture == Arm64) {
-            listOf(AppDistribution(NativeBinaryCliApp(name, "build/dist-images/macosX64Debug", X64), "macosX64DebugDist"))
-        } else {
-            emptyList()
-        }
-        return DerivedApp(name, derivedFrom, baseDir, AppDistribution(NativeBinaryCliApp(name, "build/dist", host.architecture)), otherDists, "commonMain", false)
-    }
 }
 
 sealed class AppBuilder {
@@ -244,17 +210,101 @@ sealed class AppBuilder {
 class JvmAppBuilder : AppBuilder()
 class NativeAppBuilder : AppBuilder()
 
+sealed class AppNatureBuilder {
+    private var launcher: String? = null
+
+    fun launcher(name: String) {
+        launcher = name
+    }
+
+    open fun build(nature: AppNature): AppNature {
+        val launcher = launcher
+        return if (launcher != null) {
+            nature.launcher(launcher)
+        } else {
+            nature
+        }
+    }
+}
+
+class JvmAppNatureBuilder : AppNatureBuilder() {
+    private var embedded = false
+    private var native = false
+
+    fun embedded() {
+        embedded = true
+    }
+
+    fun native() {
+        native = true
+    }
+
+    fun jvm(version: Int) {
+    }
+
+    override fun build(nature: AppNature): AppNature {
+        val nature = super.build(nature)
+        return if (embedded) {
+            nature.embedded()
+        } else if (native) {
+            nature.native()
+        } else {
+            nature
+        }
+    }
+}
+
+class UiAppNatureBuilder : AppNatureBuilder()
+class NativeAppNatureBuilder : AppNatureBuilder()
+
 class JvmBaseApp(
     name: String,
     baseDir: File,
     invocation: AppInvocation
-) : BaseApp(name, baseDir, AppDistribution(JvmLauncherScripts(name, false)), emptyList(), "main", true, invocation)
+) : App(name, baseDir, AppDistribution(JvmLauncherScripts(name, false)), emptyList(), "main", true, invocation) {
+    fun derive(suffix: String, config: JvmAppNatureBuilder.() -> Unit): DerivedApp {
+        val sampleName = "$name-$suffix"
+        val builder = JvmAppNatureBuilder()
+        builder.launcher(sampleName)
+        builder.config()
+        val newNature = builder.build(mainDist.nature)
+        return DerivedApp(sampleName, this, baseDir, AppDistribution(newNature), emptyList(), srcDirName, allPlatforms)
+    }
+
+    fun deriveNative(name: String): DerivedNativeApp {
+        val host = Machine.thisMachine
+        val otherDists = if (host.isMacOS && host.architecture == Arm64) {
+            listOf(AppDistribution(NativeBinaryCliApp(name, "build/dist-images/macosX64Debug", X64), "macosX64DebugDist"))
+        } else {
+            emptyList()
+        }
+        return DerivedNativeApp(name, this, baseDir, AppDistribution(NativeBinaryCliApp(name, "build/dist", host.architecture)), otherDists, "commonMain", false)
+    }
+}
 
 class NativeBaseApp(
     name: String,
     baseDir: File,
     invocation: AppInvocation
-) : BaseApp(name, baseDir, AppDistribution(NativeBinaryCliApp(name, "build/dist", Arm64)), emptyList(), "commonMain", true, invocation)
+) : App(name, baseDir, AppDistribution(NativeBinaryCliApp(name, "build/dist", Arm64)), emptyList(), "commonMain", true, invocation)
+
+class DerivedNativeApp(
+    name: String,
+    derivedFrom: App,
+    baseDir: File,
+    mainDist: AppDistribution,
+    otherDists: List<AppDistribution>,
+    srcDirName: String,
+    allPlatforms: Boolean,
+) : DerivedApp(name, derivedFrom, baseDir, mainDist, otherDists, srcDirName, allPlatforms) {
+    fun derive(suffix: String, config: NativeAppNatureBuilder.() -> Unit): DerivedNativeApp {
+        val builder = NativeAppNatureBuilder()
+        builder.config()
+        val sampleName = "$name-$suffix"
+        val newNature = builder.build(mainDist.nature)
+        return DerivedNativeApp(sampleName, derivedFrom, baseDir, AppDistribution(newNature), emptyList(), srcDirName, allPlatforms)
+    }
+}
 
 class UiBaseApp(
     name: String,
@@ -262,18 +312,25 @@ class UiBaseApp(
     srcDirName: String,
     mainDist: AppDistribution = AppDistribution(UiApp(name.capitalized(), "build/dist", Machine.thisMachine.architecture)),
     otherDists: List<AppDistribution> = emptyList()
-) : BaseApp(name, baseDir, mainDist, otherDists, srcDirName, false, AppInvocation(emptyList(), null))
+) : App(name, baseDir, mainDist, otherDists, srcDirName, false, AppInvocation(emptyList(), null)) {
+    fun derive(suffix: String, config: UiAppNatureBuilder.() -> Unit): DerivedApp {
+        val builder = UiAppNatureBuilder()
+        builder.config()
+        val sampleName = "$name-$suffix"
+        val newNature = builder.build(mainDist.nature)
+        return DerivedApp(sampleName, this, baseDir, AppDistribution(newNature), emptyList(), srcDirName, allPlatforms)
+    }
+}
 
-class DerivedApp(
+open class DerivedApp(
     name: String,
-    override val derivedFrom: BaseApp,
+    override val derivedFrom: App,
     baseDir: File,
     mainDist: AppDistribution,
     otherDists: List<AppDistribution>,
     srcDirName: String,
     allPlatforms: Boolean,
-) :
-    App(name, baseDir, mainDist, otherDists, srcDirName, allPlatforms, derivedFrom.invocation), DerivedSample {
+) : App(name, baseDir, mainDist, otherDists, srcDirName, allPlatforms, derivedFrom.invocation), DerivedSample {
 
     override val derivedSrcDirs: List<DerivedSrcDir>
         get() = listOf(DerivedSrcDir(derivedFrom.srcDir, srcDir))
@@ -332,13 +389,29 @@ val samples = listOf(
     kmpLib("kmp-lib-generated-source"),
 
     jvmCliApp,
-    jvmCliApp.derive("customized") { it.launcher("app") },
-    jvmCliApp.derive("embedded") { it.embedded() },
-    jvmCliApp.derive("embedded-customized") { it.embedded().launcher("app") },
-    jvmCliApp.derive("native-binary") { it.native() },
-    jvmCliApp.derive("native-binary-customized") { it.native().launcher("app") },
-    jvmCliApp.derive("java11"),
-    jvmCliApp.derive("java25"),
+    jvmCliApp.derive("customized") {
+        launcher("app")
+    },
+    jvmCliApp.derive("embedded") {
+        embedded()
+    },
+    jvmCliApp.derive("embedded-customized") {
+        embedded()
+        launcher("app")
+    },
+    jvmCliApp.derive("native-binary") {
+        native()
+    },
+    jvmCliApp.derive("native-binary-customized") {
+        native()
+        launcher("app")
+    },
+    jvmCliApp.derive("java11") {
+        jvm(11)
+    },
+    jvmCliApp.derive("java25") {
+        jvm(24)
+    },
 
     jvmCliMinApp,
     jvmCliFullApp,
@@ -348,10 +421,14 @@ val samples = listOf(
     },
 
     jvmUiApp,
-    jvmUiApp.derive("customized") { it.launcher("App") },
+    jvmUiApp.derive("customized") {
+        launcher("App")
+    },
 
     nativeCliApp,
-    nativeCliApp.derive("customized") { it.launcher("app") },
+    nativeCliApp.derive("customized") {
+        launcher("app")
+    },
     nativeCliApp("native-cli-app-generated-source") {
         expectedOutput("Generated common app class")
     },
@@ -361,7 +438,7 @@ val samples = listOf(
     jvmCliStoreApp.deriveNative("store-native-cli-app"),
 
     nativeUiApp,
-    nativeUiApp.derive("customized") { it.launcher("App") },
+    nativeUiApp.derive("customized") { launcher("App") },
 
     jvmCliApp("cli-args-parameters") { cliArgs("--help") },
     jvmCliApp("cli-args-options") { cliArgs("--help") },
@@ -429,11 +506,11 @@ val runOtherTasks = sampleApps.map { app ->
     }
 }
 
-val runOther = tasks.register("runOther") {
+val runOther: TaskProvider<Task> = tasks.register("runOther") {
     dependsOn(runOtherTasks)
 }
 
-val run = tasks.register("run") {
+val run: TaskProvider<Task> = tasks.register("run") {
     dependsOn(runTasks.values)
 }
 
@@ -441,7 +518,7 @@ tasks.register("runMin") {
     dependsOn(runTasks.filterKeys { it.allPlatforms }.values)
 }
 
-val showApplication = tasks.register("showApplication") {
+val showApplication: TaskProvider<Task> = tasks.register("showApplication") {
     dependsOn(sampleApps.map { ":${it.name}:showApplication" })
 }
 

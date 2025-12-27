@@ -9,4 +9,5 @@ plugins {
 }
 
 samples {
+    jvmCliApp("jvm-cli-app")
 }

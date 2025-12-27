@@ -1,14 +1,12 @@
 package net.rubygrapefruit.plugins.stage2
 
-abstract class SamplesRegistry {
-    fun samples(config: Builder.() -> Unit) {
-        val builder = DefaultBuilder()
-        builder.config()
+import org.gradle.api.initialization.Settings
+
+abstract class SamplesRegistry(private val settings: Settings) {
+    fun jvmCliApp(name: String): JvmCliApp {
+        return JvmCliApp(name)
     }
 
-    interface Builder {
-    }
-
-    private class DefaultBuilder : Builder {
+    internal fun validate() {
     }
 }

@@ -5,28 +5,40 @@ import org.gradle.api.initialization.Settings
 abstract class SamplesRegistry(private val settings: Settings) : SampleContainer {
     private val samples = mutableListOf<Sample>()
 
-    fun jvmLib(name: String): JvmLib {
-        return add(JvmLib(name, this))
+    fun jvmLib(name: String, config: JvmLibBuilder.() -> Unit = {}): JvmLib {
+        val builder = JvmLibBuilder(name, this)
+        builder.config()
+        return builder.register()
     }
 
-    fun kmpLib(name: String): KmpLib {
-        return add(KmpLib(name, this))
+    fun kmpLib(name: String, config: KmpLibBuilder.() -> Unit = {}): KmpLib {
+        val builder = KmpLibBuilder(name, this)
+        builder.config()
+        return builder.register()
     }
 
     fun jvmCliApp(name: String, config: JvmCliAppBuilder.() -> Unit = {}): JvmCliApp {
-        return add(JvmCliApp(name, this))
+        val builder = JvmCliAppBuilder(name, this)
+        builder.config()
+        return builder.register()
     }
 
     fun nativeCliApp(name: String, config: NativeCliAppBuilder.() -> Unit = {}): NativeCliApp {
-        return add(NativeCliApp(name, this))
+        val builder = NativeCliAppBuilder(name, this)
+        builder.config()
+        return builder.register()
     }
 
-    fun jvmUiApp(name: String): JvmUiApp {
-        return add(JvmUiApp(name, this))
+    fun jvmUiApp(name: String, config: JvmUiAppBuilder.() -> Unit = {}): JvmUiApp {
+        val builder = JvmUiAppBuilder(name, this)
+        builder.config()
+        return builder.register()
     }
 
-    fun nativeUiApp(name: String): NativeUiApp {
-        return add(NativeUiApp(name, this))
+    fun nativeUiApp(name: String, config: NativeUiAppBuilder.() -> Unit = {}): NativeUiApp {
+        val builder = NativeUiAppBuilder(name, this)
+        builder.config()
+        return builder.register()
     }
 
     override fun <T : Sample> add(sample: T): T {

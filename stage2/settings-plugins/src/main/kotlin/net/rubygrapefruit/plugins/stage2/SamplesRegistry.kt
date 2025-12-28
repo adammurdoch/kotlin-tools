@@ -1,6 +1,7 @@
 package net.rubygrapefruit.plugins.stage2
 
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.initialization.Settings
 
 abstract class SamplesRegistry(private val settings: Settings) : SampleContainer {
@@ -61,8 +62,10 @@ abstract class SamplesRegistry(private val settings: Settings) : SampleContainer
         for (sample in samples) {
             rootProject.project(":${sample.name}") { project ->
                 project.tasks.register("verifySample") { task ->
-                    task.doLast {
-                        sample.verify()
+                    when (sample) {
+                        is Lib -> sample.verifyLib(task)
+                        is CliApp -> sample.verifyCliApp(task)
+                        is UiApp -> sample.verifyUiApp(task)
                     }
                 }
             }
@@ -74,25 +77,25 @@ abstract class SamplesRegistry(private val settings: Settings) : SampleContainer
             task.dependsOn(tasks)
         }
     }
-
 }
 
-private fun Sample.verify() {
-    when(this) {
-        is CliApp -> verifyCliApp()
-        is Lib -> verifyLib()
-        is UiApp -> verifyUiApp()
+private fun CliApp.verifyCliApp(task: Task) {
+    task.dependsOn(":$name:${distribution.distTask}")
+    task.doLast {
+        println("CLI app: $name")
     }
 }
 
-private fun CliApp.verifyCliApp() {
-    println("CLI app: $name")
+private fun Lib.verifyLib(task: Task) {
+    task.dependsOn(":$name:build")
+    task.doLast {
+        println("Lib: $name")
+    }
 }
 
-private fun Lib.verifyLib() {
-    println("Lib: $name")
-}
-
-private fun UiApp.verifyUiApp() {
-    println("UI app: $name")
+private fun UiApp.verifyUiApp(task: Task) {
+    task.dependsOn(":$name:${distribution.distTask}")
+    task.doLast {
+        println("UI app: $name")
+    }
 }

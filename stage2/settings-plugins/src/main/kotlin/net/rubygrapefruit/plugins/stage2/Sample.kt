@@ -10,14 +10,26 @@ class JvmLib internal constructor(override val name: String) : Lib
 
 class KmpLib internal constructor(override val name: String) : Lib
 
-sealed interface CliApp : Sample
+sealed interface CliApp : Sample {
+    val distribution: CliAppDistribution
+}
 
-class JvmCliApp internal constructor(override val name: String) : CliApp
+class JvmCliApp internal constructor(override val name: String) : CliApp {
+    override val distribution = CliAppDistribution("dist")
+}
 
-class NativeCliApp internal constructor(override val name: String) : CliApp
+class NativeCliApp internal constructor(override val name: String) : CliApp {
+    override val distribution = CliAppDistribution("dist")
+}
 
-sealed interface UiApp : Sample
+sealed interface UiApp : Sample {
+    val distribution: UiAppDistribution
+}
 
-class JvmUiApp internal constructor(override val name: String) : UiApp
+class JvmUiApp internal constructor(override val name: String) : UiApp {
+    override val distribution = UiAppDistribution("dist")
+}
 
-class NativeUiApp internal constructor(override val name: String) : UiApp
+class NativeUiApp internal constructor(override val name: String) : UiApp {
+    override val distribution = UiAppDistribution("dist")
+}

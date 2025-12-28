@@ -5,7 +5,7 @@ pluginManagement {
 plugins {
     id("net.rubygrapefruit.kotlin-base")
     id("net.rubygrapefruit.stage2.included-build")
-    id("net.rubygrapefruit.stage2.test-apps")
+    id("net.rubygrapefruit.bootstrap.test-apps")
 }
 
 samples {

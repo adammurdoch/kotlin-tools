@@ -1,4 +1,4 @@
-package net.rubygrapefruit.plugins.stage2
+package net.rubygrapefruit.plugins.internal
 
 import org.gradle.api.Project
 import org.gradle.api.Task

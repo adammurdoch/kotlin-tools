@@ -1,4 +1,4 @@
-package net.rubygrapefruit.plugins.stage2
+package net.rubygrapefruit.plugins.internal
 
 sealed interface Sample {
     val name: String

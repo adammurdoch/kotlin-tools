@@ -1,3 +1,3 @@
-package net.rubygrapefruit.plugins.stage2
+package net.rubygrapefruit.plugins.internal
 
 class UiAppDistribution(val distTask: String)

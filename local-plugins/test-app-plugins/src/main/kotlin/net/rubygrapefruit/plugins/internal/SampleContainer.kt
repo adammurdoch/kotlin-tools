@@ -1,4 +1,4 @@
-package net.rubygrapefruit.plugins.stage2
+package net.rubygrapefruit.plugins.internal
 
 internal interface SampleContainer {
     fun <T : Sample> add(sample: T): T

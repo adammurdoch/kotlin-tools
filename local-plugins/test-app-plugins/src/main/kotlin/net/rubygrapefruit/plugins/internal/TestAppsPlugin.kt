@@ -1,4 +1,4 @@
-package net.rubygrapefruit.plugins.stage2
+package net.rubygrapefruit.plugins.internal
 
 import org.gradle.api.Plugin
 import org.gradle.api.initialization.Settings

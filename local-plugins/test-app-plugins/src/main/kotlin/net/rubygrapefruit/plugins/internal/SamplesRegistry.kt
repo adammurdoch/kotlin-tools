@@ -1,7 +1,6 @@
 package net.rubygrapefruit.plugins.internal
 
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.initialization.Settings
 
 abstract class SamplesRegistry(private val settings: Settings) : SampleContainer {
@@ -59,43 +58,62 @@ abstract class SamplesRegistry(private val settings: Settings) : SampleContainer
             }
         }
 
-        for (sample in samples) {
-            rootProject.project(":${sample.name}") { project ->
-                project.tasks.register("verifySample") { task ->
-                    when (sample) {
-                        is Lib -> sample.verifyLib(task)
-                        is CliApp -> sample.verifyCliApp(task)
-                        is UiApp -> sample.verifyUiApp(task)
-                    }
+        val sampleTasks = samples.map { sample -> sample.verify(rootProject) }
+
+        rootProject.tasks.register("verifySample") { task ->
+            task.dependsOn(sampleTasks.map { it.verifyTaskName })
+        }
+        rootProject.tasks.register("verifyOtherDistributions") { task ->
+            task.dependsOn(sampleTasks.flatMap { it.otherTaskNames })
+        }
+    }
+}
+
+private fun Sample.verify(rootProject: Project): SampleTasks {
+    val project = rootProject.project(":${name}")
+    return when (this) {
+        is Lib -> verifyLib(project)
+        is App -> verifyApp(project)
+    }
+}
+
+private fun App.verifyApp(project: Project): SampleTasks {
+    project.tasks.register("verifySample") { task ->
+        task.dependsOn(distribution.distTask)
+        task.doLast {
+            verify(this, distribution)
+        }
+    }
+    if (otherDistributions.isNotEmpty()) {
+        project.tasks.register("verifyOtherDistributions") { task ->
+            for (distribution in otherDistributions) {
+                task.dependsOn(distribution.distTask)
+                task.doLast {
+                    verify(this, distribution)
                 }
             }
         }
+        return SampleTasks(":$name:verifySample", listOf(":$name:verifyOtherDistributions"))
+    } else {
+        return SampleTasks(":$name:verifySample", emptyList())
+    }
+}
 
-        val tasks = samples.map { ":${it.name}:verifySample" }
+private fun verify(app: App, distribution: AppDistribution) {
+    when (app) {
+        is CliApp -> println("CLI app: ${app.name} dist: ${distribution.distTask}")
+        is UiApp -> println("UI app: ${app.name} dist: ${distribution.distTask}")
+    }
+}
 
-        rootProject.tasks.register("verifySample") { task ->
-            task.dependsOn(tasks)
+private fun Lib.verifyLib(project: Project): SampleTasks {
+    project.tasks.register("verifySample") { task ->
+        task.dependsOn("build")
+        task.doLast {
+            println("Lib: $name")
         }
     }
+    return SampleTasks(":$name:verifySample", emptyList())
 }
 
-private fun CliApp.verifyCliApp(task: Task) {
-    task.dependsOn(":$name:${distribution.distTask}")
-    task.doLast {
-        println("CLI app: $name")
-    }
-}
-
-private fun Lib.verifyLib(task: Task) {
-    task.dependsOn(":$name:build")
-    task.doLast {
-        println("Lib: $name")
-    }
-}
-
-private fun UiApp.verifyUiApp(task: Task) {
-    task.dependsOn(":$name:${distribution.distTask}")
-    task.doLast {
-        println("UI app: $name")
-    }
-}
+private class SampleTasks(val verifyTaskName: String, val otherTaskNames: List<String>)

@@ -8,8 +8,8 @@ abstract class TestAppsPlugin : Plugin<Settings> {
     override fun apply(target: Settings) {
         target.run {
             val extension = extensions.create("samples", SamplesRegistry::class.java, target)
-            target.gradle.rootProject {
-                extension.validate()
+            target.gradle.rootProject { rootProject ->
+                extension.applyTo(rootProject)
             }
         }
     }

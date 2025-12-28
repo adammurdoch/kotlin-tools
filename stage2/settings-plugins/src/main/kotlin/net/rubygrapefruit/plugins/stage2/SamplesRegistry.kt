@@ -1,5 +1,6 @@
 package net.rubygrapefruit.plugins.stage2
 
+import org.gradle.api.Project
 import org.gradle.api.initialization.Settings
 
 abstract class SamplesRegistry(private val settings: Settings) : SampleContainer {
@@ -47,14 +48,51 @@ abstract class SamplesRegistry(private val settings: Settings) : SampleContainer
         return sample
     }
 
-    internal fun validate() {
+    internal fun applyTo(rootProject: Project) {
         for (f in settings.rootDir.listFiles()) {
             val ignore = listOf(".gradle", ".kotlin", "gradle", "kotlin-js-store", "build")
             if (f.isDirectory && !ignore.contains(f.name)) {
                 if (samples.find { it.name == f.name } == null) {
-                    throw IllegalStateException("Sample $f is not declared")
+                    throw IllegalStateException("Sample in $f is not declared")
                 }
             }
         }
+
+        for (sample in samples) {
+            rootProject.project(":${sample.name}") { project ->
+                project.tasks.register("verifySample") { task ->
+                    task.doLast {
+                        sample.verify()
+                    }
+                }
+            }
+        }
+
+        val tasks = samples.map { ":${it.name}:verifySample" }
+
+        rootProject.tasks.register("verifySample") { task ->
+            task.dependsOn(tasks)
+        }
     }
+
+}
+
+private fun Sample.verify() {
+    when(this) {
+        is CliApp -> verifyCliApp()
+        is Lib -> verifyLib()
+        is UiApp -> verifyUiApp()
+    }
+}
+
+private fun CliApp.verifyCliApp() {
+    println("CLI app: $name")
+}
+
+private fun Lib.verifyLib() {
+    println("Lib: $name")
+}
+
+private fun UiApp.verifyUiApp() {
+    println("UI app: $name")
 }

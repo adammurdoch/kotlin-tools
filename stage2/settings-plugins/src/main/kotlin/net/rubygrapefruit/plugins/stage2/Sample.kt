@@ -4,14 +4,20 @@ sealed interface Sample {
     val name: String
 }
 
-class JvmLib internal constructor(override val name: String) : Sample
+sealed interface Lib : Sample
 
-class KmpLib internal constructor(override val name: String) : Sample
+class JvmLib internal constructor(override val name: String) : Lib
 
-class JvmCliApp internal constructor(override val name: String) : Sample
+class KmpLib internal constructor(override val name: String) : Lib
 
-class NativeCliApp internal constructor(override val name: String) : Sample
+sealed interface CliApp : Sample
 
-class JvmUiApp internal constructor(override val name: String) : Sample
+class JvmCliApp internal constructor(override val name: String) : CliApp
 
-class NativeUiApp internal constructor(override val name: String) : Sample
+class NativeCliApp internal constructor(override val name: String) : CliApp
+
+sealed interface UiApp : Sample
+
+class JvmUiApp internal constructor(override val name: String) : UiApp
+
+class NativeUiApp internal constructor(override val name: String) : UiApp

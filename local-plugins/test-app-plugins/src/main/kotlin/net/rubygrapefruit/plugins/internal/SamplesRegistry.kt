@@ -113,10 +113,19 @@ private fun verify(app: App, distribution: AppDistribution) {
     if (!distribution.distDir.isDirectory()) {
         throw IllegalStateException("Distribution directory ${distribution.distDir} does not exist")
     }
-    if (distribution is CliAppDistribution) {
-        println("Run: ${distribution.invocation.commandLine}")
-        if (!distribution.invocation.launcher.isRegularFile()) {
-            throw IllegalStateException("Launcher file ${distribution.invocation.launcher} does not exist")
+    when (distribution) {
+        is CliAppDistribution -> {
+            println("Run: ${distribution.invocation.commandLine}")
+            if (!distribution.invocation.launcher.isRegularFile()) {
+                throw IllegalStateException("Launcher file ${distribution.invocation.launcher} does not exist")
+            }
+        }
+
+        is UiAppDistribution -> {
+            println("Launcher: ${distribution.launcher}")
+            if (!distribution.launcher.isRegularFile()) {
+                throw IllegalStateException("Launcher file ${distribution.launcher} does not exist")
+            }
         }
     }
 }

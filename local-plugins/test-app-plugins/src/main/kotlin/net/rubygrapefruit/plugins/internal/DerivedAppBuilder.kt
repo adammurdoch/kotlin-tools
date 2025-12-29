@@ -63,3 +63,33 @@ class DerivedNativeCliAppBuilder internal constructor(
         return NativeCliApp(name, sampleDir, launcher, owner.cliArgs.toList())
     }
 }
+
+sealed class DerivedUiAppBuilder : DerivedAppBuilder() {
+    protected var launcher: String? = null
+
+    fun launcher(name: String) {
+        launcher = name
+    }
+}
+
+class DerivedJvmUiAppBuilder internal constructor(
+    private val name: String,
+    private val container: SampleContainer
+) : DerivedUiAppBuilder() {
+    override fun register(): JvmUiApp {
+        return container.add(name) { name, sampleDir ->
+            JvmUiApp(name, sampleDir, launcher)
+        }
+    }
+}
+
+class DerivedNativeUiAppBuilder internal constructor(
+    private val name: String,
+    private val container: SampleContainer
+) : DerivedUiAppBuilder() {
+    override fun register(): NativeUiApp {
+        return container.add(name) { name, sampleDir ->
+            NativeUiApp(name, sampleDir, launcher)
+        }
+    }
+}

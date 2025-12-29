@@ -63,17 +63,19 @@ class NativeCliApp internal constructor(override val name: String, sampleDir: Pa
 
 sealed interface UiApp : App
 
-class JvmUiApp internal constructor(override val name: String, sampleDir: Path) : UiApp {
-    override val distribution = UiAppDistribution("dist", sampleDir.resolve("build/dist"))
+class JvmUiApp internal constructor(override val name: String, sampleDir: Path, launcher: String?) : UiApp {
+    override val distribution = UiAppDistribution.of(name, "dist", sampleDir.resolve("build/dist"), launcher)
 
     override val otherDistributions: List<UiAppDistribution>
         get() = emptyList()
 }
 
-class NativeUiApp internal constructor(override val name: String, sampleDir: Path) : UiApp {
-    override val distribution = UiAppDistribution("dist", sampleDir.resolve("build/dist"))
+class NativeUiApp internal constructor(override val name: String, sampleDir: Path, launcher: String?) : UiApp {
+    override val distribution = UiAppDistribution.of(name, "dist", sampleDir.resolve("build/dist"), launcher)
 
-    override val otherDistributions: List<UiAppDistribution> = nativeDistributions(sampleDir, ::UiAppDistribution)
+    override val otherDistributions: List<UiAppDistribution> = nativeDistributions(sampleDir) { distTask, distDir ->
+        UiAppDistribution.of(name, distTask, distDir, launcher)
+    }
 }
 
 private fun <T : AppDistribution> nativeDistributions(sampleDir: Path, factory: (String, Path) -> T): List<T> {

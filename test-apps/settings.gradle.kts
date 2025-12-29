@@ -92,10 +92,14 @@ samples {
     }
 
     jvmUiApp("jvm-ui-app") {
-        derive("jvm-ui-app-customized")
+        derive("jvm-ui-app-customized") {
+            launcher("App")
+        }
     }
 
     nativeUiApp("native-ui-app") {
-        derive("native-ui-app-customized")
+        derive("native-ui-app-customized") {
+            launcher("App")
+        }
     }
 }

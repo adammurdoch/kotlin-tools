@@ -13,7 +13,7 @@ class JvmCliAppBuilder internal constructor(
     private val container: SampleContainer
 ) : CliAppBuilder() {
     fun derive(name: String, config: DerivedJvmCliAppBuilder.() -> Unit) {
-        container.add(JvmCliApp(name))
+        container.add(name, ::JvmCliApp)
     }
 
     fun deriveNative(name: String, config: DerivedNativeCliAppBuilder.() -> Unit = {}) {
@@ -23,7 +23,7 @@ class JvmCliAppBuilder internal constructor(
     }
 
     internal fun register(): JvmCliApp {
-        return container.add(JvmCliApp(name))
+        return container.add(name, ::JvmCliApp)
     }
 }
 
@@ -32,10 +32,10 @@ class NativeCliAppBuilder internal constructor(
     private val container: SampleContainer
 ) : CliAppBuilder() {
     fun derive(name: String, config: DerivedNativeCliAppBuilder.() -> Unit) {
-        container.add(NativeCliApp(name))
+        container.add(name, ::NativeCliApp)
     }
 
     internal fun register(): NativeCliApp {
-        return container.add(NativeCliApp(name))
+        return container.add(name, ::NativeCliApp)
     }
 }

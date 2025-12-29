@@ -2,6 +2,8 @@ package net.rubygrapefruit.plugins.internal
 
 import org.gradle.api.Project
 import org.gradle.api.initialization.Settings
+import java.nio.file.Path
+import kotlin.io.path.isDirectory
 
 abstract class SamplesRegistry(private val settings: Settings) : SampleContainer {
     private val samples = mutableListOf<Sample>()
@@ -42,7 +44,9 @@ abstract class SamplesRegistry(private val settings: Settings) : SampleContainer
         return builder.register()
     }
 
-    override fun <T : Sample> add(sample: T): T {
+    override fun <T : Sample> add(name: String, factory: (String, Path) -> T): T {
+        val sampleDir = settings.rootDir.resolve(name).toPath()
+        val sample = factory(name, sampleDir)
         samples.add(sample)
         settings.include(sample.name)
         return sample
@@ -103,6 +107,10 @@ private fun verify(app: App, distribution: AppDistribution) {
     when (app) {
         is CliApp -> println("CLI app: ${app.name} dist: ${distribution.distTask}")
         is UiApp -> println("UI app: ${app.name} dist: ${distribution.distTask}")
+    }
+    println("Dist dir: ${distribution.distDir}")
+    if (!(distribution.distDir.isDirectory())) {
+        throw IllegalStateException("Distribution directory ${distribution.distDir} does not exist")
     }
 }
 

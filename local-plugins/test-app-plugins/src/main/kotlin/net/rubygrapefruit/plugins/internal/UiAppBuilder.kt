@@ -7,11 +7,11 @@ class JvmUiAppBuilder internal constructor(
     private val container: SampleContainer
 ) : UiAppBuilder() {
     fun derive(name: String) {
-        container.add(JvmUiApp(name))
+        container.add(name, ::JvmUiApp)
     }
 
     internal fun register(): JvmUiApp {
-        return container.add(JvmUiApp(name))
+        return container.add(name, ::JvmUiApp)
     }
 }
 
@@ -20,10 +20,10 @@ class NativeUiAppBuilder internal constructor(
     private val container: SampleContainer
 ) : UiAppBuilder() {
     fun derive(name: String) {
-        container.add(NativeUiApp(name))
+        container.add(name, ::NativeUiApp)
     }
 
     internal fun register(): NativeUiApp {
-        return container.add(NativeUiApp(name))
+        return container.add(name, ::NativeUiApp)
     }
 }

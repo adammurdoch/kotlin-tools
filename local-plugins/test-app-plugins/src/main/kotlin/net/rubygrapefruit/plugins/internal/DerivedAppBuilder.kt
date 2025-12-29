@@ -25,10 +25,10 @@ class DerivedNativeCliAppBuilder internal constructor(
     }
 
     fun derive(name: String, config: DerivedNativeCliAppBuilder.() -> Unit = {}) {
-        container.add(NativeCliApp(name))
+        container.add(name, ::NativeCliApp)
     }
 
     internal fun register(): NativeCliApp {
-        return container.add(NativeCliApp(name))
+        return container.add(name, ::NativeCliApp)
     }
 }

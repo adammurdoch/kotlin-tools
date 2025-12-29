@@ -7,11 +7,11 @@ class JvmLibBuilder internal constructor(
     private val container: SampleContainer
 ) : LibBuilder() {
     fun derive(name: String) {
-        container.add(JvmLib(name))
+        container.add(name, ::JvmLib)
     }
 
     internal fun register(): JvmLib {
-        return container.add(JvmLib(name))
+        return container.add(name, ::JvmLib)
     }
 }
 
@@ -20,10 +20,10 @@ class KmpLibBuilder internal constructor(
     private val container: SampleContainer
 ) : LibBuilder() {
     fun derive(name: String) {
-        container.add(KmpLib(name))
+        container.add(name, ::KmpLib)
     }
 
     internal fun register(): KmpLib {
-        return container.add(KmpLib(name))
+        return container.add(name, ::KmpLib)
     }
 }

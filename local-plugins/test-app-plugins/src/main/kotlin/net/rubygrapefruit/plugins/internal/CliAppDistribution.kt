@@ -8,6 +8,10 @@ sealed interface AppDistribution {
     val distDir: Path
 }
 
-class CliAppDistribution(override val distTask: String, override val distDir: Path) : AppDistribution
+class CliAppDistribution(
+    override val distTask: String,
+    override val distDir: Path,
+    val invocation: CliAppInvocation
+) : AppDistribution
 
 class UiAppDistribution(override val distTask: String, override val distDir: Path) : AppDistribution

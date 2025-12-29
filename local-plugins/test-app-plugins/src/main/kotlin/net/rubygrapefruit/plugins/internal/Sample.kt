@@ -28,17 +28,37 @@ sealed interface App : Sample {
 
 sealed interface CliApp : App
 
-class JvmCliApp internal constructor(override val name: String, sampleDir: Path) : CliApp {
-    override val distribution = CliAppDistribution("dist", sampleDir.resolve("build/dist"))
+class JvmCliApp internal constructor(override val name: String, sampleDir: Path, launcher: String?, args: List<String>) : CliApp {
+    override val distribution: CliAppDistribution
 
     override val otherDistributions: List<CliAppDistribution>
         get() = emptyList()
+
+    init {
+        val distDir = sampleDir.resolve("build/dist")
+        distribution = CliAppDistribution(
+            "dist",
+            distDir,
+            ScriptInvocation(distDir.resolve(launcher ?: name), args)
+        )
+    }
 }
 
-class NativeCliApp internal constructor(override val name: String, sampleDir: Path) : CliApp {
-    override val distribution = CliAppDistribution("dist", sampleDir.resolve("build/dist"))
+class NativeCliApp internal constructor(override val name: String, sampleDir: Path, launcher: String?, args: List<String>) : CliApp {
+    override val distribution: CliAppDistribution
 
-    override val otherDistributions: List<CliAppDistribution> = nativeDistributions(sampleDir, ::CliAppDistribution)
+    override val otherDistributions: List<CliAppDistribution> = nativeDistributions(sampleDir) { distTask, distDir ->
+        CliAppDistribution(distTask, distDir, BinaryInvocation(distDir.resolve(launcher ?: name), args))
+    }
+
+    init {
+        val distDir = sampleDir.resolve("build/dist")
+        distribution = CliAppDistribution(
+            "dist",
+            distDir,
+            BinaryInvocation(distDir.resolve(launcher ?: name), args)
+        )
+    }
 }
 
 sealed interface UiApp : App

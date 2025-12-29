@@ -4,6 +4,7 @@ import org.gradle.api.Project
 import org.gradle.api.initialization.Settings
 import java.nio.file.Path
 import kotlin.io.path.isDirectory
+import kotlin.io.path.isRegularFile
 
 abstract class SamplesRegistry(private val settings: Settings) : SampleContainer {
     private val samples = mutableListOf<Sample>()
@@ -109,8 +110,14 @@ private fun verify(app: App, distribution: AppDistribution) {
         is UiApp -> println("UI app: ${app.name} dist: ${distribution.distTask}")
     }
     println("Dist dir: ${distribution.distDir}")
-    if (!(distribution.distDir.isDirectory())) {
+    if (!distribution.distDir.isDirectory()) {
         throw IllegalStateException("Distribution directory ${distribution.distDir} does not exist")
+    }
+    if (distribution is CliAppDistribution) {
+        println("Run: ${distribution.invocation.commandLine}")
+        if (!distribution.invocation.launcher.isRegularFile()) {
+            throw IllegalStateException("Launcher file ${distribution.invocation.launcher} does not exist")
+        }
     }
 }
 

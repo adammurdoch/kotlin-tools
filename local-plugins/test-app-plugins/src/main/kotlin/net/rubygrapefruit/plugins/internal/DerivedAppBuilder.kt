@@ -1,10 +1,20 @@
 package net.rubygrapefruit.plugins.internal
 
+import java.nio.file.Path
+
 sealed class DerivedAppBuilder {
+    internal abstract fun register(): Sample
 }
 
-class DerivedJvmCliAppBuilder : DerivedAppBuilder() {
+class DerivedJvmCliAppBuilder internal constructor(
+    private val name: String,
+    private val owner: CliAppBuilder,
+    private val container: SampleContainer
+) : DerivedAppBuilder() {
+    private var launcher: String? = null
+
     fun launcher(name: String) {
+        launcher = name
     }
 
     fun requiresJvm(version: Int) {
@@ -15,20 +25,41 @@ class DerivedJvmCliAppBuilder : DerivedAppBuilder() {
 
     fun nativeBinaries() {
     }
+
+    override fun register(): JvmCliApp {
+        return container.add(name) { name, sampleDir ->
+            JvmCliApp(name, sampleDir, launcher, owner.cliArgs.toList())
+        }
+    }
 }
 
 class DerivedNativeCliAppBuilder internal constructor(
     private val name: String,
+    private val owner: CliAppBuilder,
     private val container: SampleContainer
 ) : DerivedAppBuilder() {
+    private val derived = mutableListOf<DerivedAppBuilder>()
+    private var launcher: String? = null
+
     fun launcher(name: String) {
+        launcher = name
     }
 
     fun derive(name: String, config: DerivedNativeCliAppBuilder.() -> Unit = {}) {
-        container.add(name, ::NativeCliApp)
+        val builder = DerivedNativeCliAppBuilder(name, owner, container)
+        builder.config()
+        derived.add(builder)
     }
 
-    internal fun register(): NativeCliApp {
-        return container.add(name, ::NativeCliApp)
+    override fun register(): NativeCliApp {
+        val app = container.add(name, ::create)
+        for (builder in derived) {
+            builder.register()
+        }
+        return app
+    }
+
+    private fun create(name: String, sampleDir: Path): NativeCliApp {
+        return NativeCliApp(name, sampleDir, launcher, owner.cliArgs.toList())
     }
 }

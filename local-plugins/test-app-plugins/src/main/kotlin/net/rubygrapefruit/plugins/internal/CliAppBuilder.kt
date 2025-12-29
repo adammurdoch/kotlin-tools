@@ -1,7 +1,13 @@
 package net.rubygrapefruit.plugins.internal
 
+import java.nio.file.Path
+
 sealed class CliAppBuilder {
+    internal val cliArgs = mutableListOf<String>()
+
     fun cliArgs(vararg args: String) {
+        cliArgs.clear()
+        cliArgs.addAll(args)
     }
 
     fun expectedOutput(text: String) {
@@ -12,18 +18,30 @@ class JvmCliAppBuilder internal constructor(
     private val name: String,
     private val container: SampleContainer
 ) : CliAppBuilder() {
+    private val derived = mutableListOf<DerivedAppBuilder>()
+
     fun derive(name: String, config: DerivedJvmCliAppBuilder.() -> Unit) {
-        container.add(name, ::JvmCliApp)
+        val builder = DerivedJvmCliAppBuilder(name, this, container)
+        builder.config()
+        derived.add(builder)
     }
 
     fun deriveNative(name: String, config: DerivedNativeCliAppBuilder.() -> Unit = {}) {
-        val builder = DerivedNativeCliAppBuilder(name, container)
+        val builder = DerivedNativeCliAppBuilder(name, this, container)
         builder.config()
-        builder.register()
+        derived.add(builder)
     }
 
     internal fun register(): JvmCliApp {
-        return container.add(name, ::JvmCliApp)
+        val app = container.add(name, ::create)
+        for (builder in derived) {
+            builder.register()
+        }
+        return app
+    }
+
+    private fun create(name: String, sampleDir: Path): JvmCliApp {
+        return JvmCliApp(name, sampleDir, null, cliArgs.toList())
     }
 }
 
@@ -31,11 +49,23 @@ class NativeCliAppBuilder internal constructor(
     private val name: String,
     private val container: SampleContainer
 ) : CliAppBuilder() {
+    private val derived = mutableListOf<DerivedAppBuilder>()
+
     fun derive(name: String, config: DerivedNativeCliAppBuilder.() -> Unit) {
-        container.add(name, ::NativeCliApp)
+        val builder = DerivedNativeCliAppBuilder(name, this, container)
+        builder.config()
+        derived.add(builder)
     }
 
     internal fun register(): NativeCliApp {
-        return container.add(name, ::NativeCliApp)
+        val app = container.add(name, ::create)
+        for (builder in derived) {
+            builder.register()
+        }
+        return app
+    }
+
+    private fun create(name: String, sampleDir: Path): NativeCliApp {
+        return NativeCliApp(name, sampleDir, null, cliArgs.toList())
     }
 }

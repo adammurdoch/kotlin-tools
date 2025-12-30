@@ -46,7 +46,8 @@ class JvmCliApp internal constructor(
         distribution = CliAppDistribution(
             "dist",
             distDir,
-            ScriptInvocation(distDir.resolve(launcher ?: name), args, jvmVersion ?: 17, expectedOutput)
+            null,
+            ScriptInvocation(distDir.resolve(launcher ?: name), args, jvmVersion ?: 17, expectedOutput),
         )
     }
 }
@@ -61,33 +62,29 @@ class NativeCliApp internal constructor(
     override val distribution: CliAppDistribution
 
     override val otherDistributions: List<CliAppDistribution> = nativeDistributions(sampleDir) { distTask, distDir ->
-        CliAppDistribution(distTask, distDir, BinaryInvocation(distDir.resolve(launcher ?: name), args, expectedOutput))
+        CliAppDistribution.ofBinary(name, distTask, distDir, launcher, args, expectedOutput, Machine.thisMachine.architecture)
     }
 
     init {
         val distDir = sampleDir.resolve("build/dist")
-        distribution = CliAppDistribution(
-            "dist",
-            distDir,
-            BinaryInvocation(distDir.resolve(launcher ?: name), args, expectedOutput)
-        )
+        distribution = CliAppDistribution.ofBinary(name, "dist", distDir, launcher, args, expectedOutput, Machine.thisMachine.architecture)
     }
 }
 
 sealed interface UiApp : App
 
 class JvmUiApp internal constructor(override val name: String, sampleDir: Path, launcher: String?) : UiApp {
-    override val distribution = UiAppDistribution.of(name, "dist", sampleDir.resolve("build/dist"), launcher)
+    override val distribution = UiAppDistribution.of(name, "dist", sampleDir.resolve("build/dist"), launcher, Machine.thisMachine.architecture)
 
     override val otherDistributions: List<UiAppDistribution>
         get() = emptyList()
 }
 
 class NativeUiApp internal constructor(override val name: String, sampleDir: Path, launcher: String?) : UiApp {
-    override val distribution = UiAppDistribution.of(name, "dist", sampleDir.resolve("build/dist"), launcher)
+    override val distribution = UiAppDistribution.of(name, "dist", sampleDir.resolve("build/dist"), launcher, Machine.thisMachine.architecture)
 
     override val otherDistributions: List<UiAppDistribution> = nativeDistributions(sampleDir) { distTask, distDir ->
-        UiAppDistribution.of(name, distTask, distDir, launcher)
+        UiAppDistribution.of(name, distTask, distDir, launcher, Machine.thisMachine.architecture)
     }
 }
 

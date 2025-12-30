@@ -116,10 +116,22 @@ private fun verify(app: App, distribution: AppDistribution, toolchainService: Ja
         is CliApp -> println("CLI app: ${app.name} dist: ${distribution.distTask}")
         is UiApp -> println("UI app: ${app.name} dist: ${distribution.distTask}")
     }
+
     println("Dist dir: ${distribution.distDir}")
     if (!distribution.distDir.isDirectory()) {
         throw IllegalStateException("Distribution directory ${distribution.distDir} does not exist")
     }
+
+    val binaries = distribution.binaries
+    if (binaries != null) {
+        for (path in binaries.binaries) {
+            println("Binary: $path (${binaries.architecture})")
+            if (!path.isRegularFile()) {
+                throw IllegalStateException("Binary ${path} does not exist")
+            }
+        }
+    }
+
     when (distribution) {
         is CliAppDistribution -> {
             if (!distribution.invocation.launcher.isRegularFile()) {
@@ -137,17 +149,20 @@ private fun verify(app: App, distribution: AppDistribution, toolchainService: Ja
                 null
             }
             val outputStream = ByteArrayOutputStream()
-            execOperations.exec {
+            val result = execOperations.exec {
                 it.commandLine(commandLine)
                 if (javaHome != null) {
                     it.environment("JAVA_HOME", javaHome.absolutePath)
                 }
                 it.standardOutput = outputStream
+                it.errorOutput = outputStream
+                it.isIgnoreExitValue = true
             }
             val outputText = outputStream.toString(Charsets.UTF_8)
             println("----")
             println(outputText)
             println("----")
+            result.assertNormalExitValue()
 
             val expectedOutput = distribution.invocation.expectedOutput
             if (expectedOutput != null && !outputText.contains(expectedOutput)) {

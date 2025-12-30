@@ -41,7 +41,7 @@ class JvmCliAppBuilder internal constructor(
     }
 
     private fun create(name: String, sampleDir: Path): JvmCliApp {
-        return JvmCliApp(name, sampleDir, null, cliArgs.toList())
+        return JvmCliApp(name, sampleDir, null, cliArgs.toList(), null)
     }
 }
 

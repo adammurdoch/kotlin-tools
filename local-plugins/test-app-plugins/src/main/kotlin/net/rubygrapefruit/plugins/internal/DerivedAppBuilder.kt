@@ -12,12 +12,14 @@ class DerivedJvmCliAppBuilder internal constructor(
     private val container: SampleContainer
 ) : DerivedAppBuilder() {
     private var launcher: String? = null
+    private var jvmVersion: Int? = null
 
     fun launcher(name: String) {
         launcher = name
     }
 
     fun requiresJvm(version: Int) {
+        jvmVersion = version
     }
 
     fun embeddedJvm() {
@@ -28,7 +30,7 @@ class DerivedJvmCliAppBuilder internal constructor(
 
     override fun register(): JvmCliApp {
         return container.add(name) { name, sampleDir ->
-            JvmCliApp(name, sampleDir, launcher, owner.cliArgs.toList())
+            JvmCliApp(name, sampleDir, launcher, owner.cliArgs.toList(), jvmVersion)
         }
     }
 }

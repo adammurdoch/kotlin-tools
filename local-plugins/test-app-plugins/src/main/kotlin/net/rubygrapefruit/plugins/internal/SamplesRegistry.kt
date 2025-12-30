@@ -2,6 +2,9 @@ package net.rubygrapefruit.plugins.internal
 
 import org.gradle.api.Project
 import org.gradle.api.initialization.Settings
+import org.gradle.internal.extensions.core.serviceOf
+import org.gradle.jvm.toolchain.JavaLanguageVersion
+import org.gradle.jvm.toolchain.JavaToolchainService
 import java.nio.file.Path
 import kotlin.io.path.isDirectory
 import kotlin.io.path.isRegularFile
@@ -83,10 +86,11 @@ private fun Sample.verify(rootProject: Project): SampleTasks {
 }
 
 private fun App.verifyApp(project: Project): SampleTasks {
+    val toolchainService = project.serviceOf<JavaToolchainService>()
     project.tasks.register("verifySample") { task ->
         task.dependsOn(distribution.distTask)
         task.doLast {
-            verify(this, distribution)
+            verify(this, distribution, toolchainService)
         }
     }
     if (otherDistributions.isNotEmpty()) {
@@ -94,7 +98,7 @@ private fun App.verifyApp(project: Project): SampleTasks {
             for (distribution in otherDistributions) {
                 task.dependsOn(distribution.distTask)
                 task.doLast {
-                    verify(this, distribution)
+                    verify(this, distribution, toolchainService)
                 }
             }
         }
@@ -104,7 +108,7 @@ private fun App.verifyApp(project: Project): SampleTasks {
     }
 }
 
-private fun verify(app: App, distribution: AppDistribution) {
+private fun verify(app: App, distribution: AppDistribution, toolchainService: JavaToolchainService) {
     when (app) {
         is CliApp -> println("CLI app: ${app.name} dist: ${distribution.distTask}")
         is UiApp -> println("UI app: ${app.name} dist: ${distribution.distTask}")
@@ -116,6 +120,12 @@ private fun verify(app: App, distribution: AppDistribution) {
     when (distribution) {
         is CliAppDistribution -> {
             println("Run: ${distribution.invocation.commandLine}")
+            if (distribution.invocation is ScriptInvocation && distribution.invocation.jvmVersion != null) {
+                val java = toolchainService.launcherFor {
+                    it.languageVersion.set(JavaLanguageVersion.of(distribution.invocation.jvmVersion))
+                }.get().metadata.installationPath.asFile
+                println("Java home: $java")
+            }
             if (!distribution.invocation.launcher.isRegularFile()) {
                 throw IllegalStateException("Launcher file ${distribution.invocation.launcher} does not exist")
             }

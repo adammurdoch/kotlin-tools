@@ -28,7 +28,7 @@ sealed interface App : Sample {
 
 sealed interface CliApp : App
 
-class JvmCliApp internal constructor(override val name: String, sampleDir: Path, launcher: String?, args: List<String>) : CliApp {
+class JvmCliApp internal constructor(override val name: String, sampleDir: Path, launcher: String?, args: List<String>, jvmVersion: Int?) : CliApp {
     override val distribution: CliAppDistribution
 
     override val otherDistributions: List<CliAppDistribution>
@@ -39,7 +39,7 @@ class JvmCliApp internal constructor(override val name: String, sampleDir: Path,
         distribution = CliAppDistribution(
             "dist",
             distDir,
-            ScriptInvocation(distDir.resolve(launcher ?: name), args)
+            ScriptInvocation(distDir.resolve(launcher ?: name), args, jvmVersion ?: 17)
         )
     }
 }

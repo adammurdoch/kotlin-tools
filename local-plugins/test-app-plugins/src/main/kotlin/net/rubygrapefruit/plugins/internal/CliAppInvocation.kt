@@ -11,7 +11,8 @@ sealed interface CliAppInvocation {
 
 class ScriptInvocation(
     val script: Path,
-    val args: List<String>
+    val args: List<String>,
+    val jvmVersion: Int?
 ) : CliAppInvocation {
     override val launcher: Path
         get() = script

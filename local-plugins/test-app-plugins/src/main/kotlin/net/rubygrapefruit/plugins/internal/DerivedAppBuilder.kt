@@ -1,5 +1,6 @@
 package net.rubygrapefruit.plugins.internal
 
+import net.rubygrapefruit.machine.info.Machine
 import java.nio.file.Path
 
 sealed class DerivedAppBuilder {
@@ -39,13 +40,24 @@ class DerivedJvmCliAppBuilder internal constructor(
     override fun register(): JvmCliApp {
         return container.add(name) { name, sampleDir ->
             val distDir = sampleDir.resolve("build/dist")
-            val invocation = when {
-                embedded -> ScriptInvocation.of(name, distDir, launcher, owner.cliArgs.toList(), owner.expectedOutput)
-                native -> BinaryInvocation.of(name, distDir, launcher, owner.cliArgs.toList(), owner.expectedOutput)
-                else -> ScriptInvocationWithInstalledJvm.of(name, distDir, launcher, owner.cliArgs.toList(), owner.expectedOutput, jvmVersion)
-            }
-            val distribution = CliAppDistribution("dist", distDir, null, invocation)
+            val distribution = when {
+                embedded -> {
+                    val invocation = ScriptInvocation.of(name, distDir, launcher, owner.cliArgs.toList(), owner.expectedOutput)
+                    val binaries = AppDistribution.Binaries(Machine.thisMachine.architecture, listOf(distDir.resolve("jvm/bin/java")))
+                    CliAppDistribution("dist", distDir, binaries, invocation)
+                }
 
+                native -> {
+                    val invocation = BinaryInvocation.of(name, distDir, launcher, owner.cliArgs.toList(), owner.expectedOutput)
+                    val binaries = AppDistribution.Binaries(Machine.thisMachine.architecture, listOf(invocation.binary))
+                    CliAppDistribution("dist", distDir, binaries, invocation)
+                }
+
+                else -> {
+                    val invocation = ScriptInvocationWithInstalledJvm.of(name, distDir, launcher, owner.cliArgs.toList(), owner.expectedOutput, jvmVersion)
+                    CliAppDistribution("dist", distDir, null, invocation)
+                }
+            }
             JvmCliApp(name, distribution)
         }
     }

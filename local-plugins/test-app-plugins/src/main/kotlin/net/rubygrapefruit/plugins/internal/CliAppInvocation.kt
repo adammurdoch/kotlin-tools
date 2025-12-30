@@ -4,15 +4,21 @@ import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 
 sealed interface CliAppInvocation {
+    /**
+     * The file that is used to run the app.
+     */
     val launcher: Path
 
     val commandLine: List<String>
+
+    val expectedOutput: String?
 }
 
 class ScriptInvocation(
     val script: Path,
     val args: List<String>,
-    val jvmVersion: Int?
+    val jvmVersion: Int?,
+    override val expectedOutput: String?
 ) : CliAppInvocation {
     override val launcher: Path
         get() = script
@@ -23,7 +29,8 @@ class ScriptInvocation(
 
 class BinaryInvocation(
     val binary: Path,
-    val args: List<String>
+    val args: List<String>,
+    override val expectedOutput: String?
 ) : CliAppInvocation {
     override val launcher: Path
         get() = binary

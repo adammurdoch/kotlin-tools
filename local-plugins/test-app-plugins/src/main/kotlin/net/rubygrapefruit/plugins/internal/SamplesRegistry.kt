@@ -6,6 +6,7 @@ import org.gradle.internal.extensions.core.serviceOf
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.process.ExecOperations
+import java.io.ByteArrayOutputStream
 import java.nio.file.Path
 import kotlin.io.path.isDirectory
 import kotlin.io.path.isRegularFile
@@ -135,11 +136,22 @@ private fun verify(app: App, distribution: AppDistribution, toolchainService: Ja
             } else {
                 null
             }
+            val outputStream = ByteArrayOutputStream()
             execOperations.exec {
                 it.commandLine(commandLine)
                 if (javaHome != null) {
                     it.environment("JAVA_HOME", javaHome.absolutePath)
                 }
+                it.standardOutput = outputStream
+            }
+            val outputText = outputStream.toString(Charsets.UTF_8)
+            println("----")
+            println(outputText)
+            println("----")
+
+            val expectedOutput = distribution.invocation.expectedOutput
+            if (expectedOutput != null && !outputText.contains(expectedOutput)) {
+                throw IllegalStateException("Expected text '$expectedOutput' not found in output.")
             }
         }
 

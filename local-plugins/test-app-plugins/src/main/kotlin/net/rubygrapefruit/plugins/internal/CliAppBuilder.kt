@@ -4,6 +4,8 @@ import java.nio.file.Path
 
 sealed class CliAppBuilder {
     internal val cliArgs = mutableListOf<String>()
+    internal var expectedOutput: String? = null
+        private set
 
     fun cliArgs(vararg args: String) {
         cliArgs.clear()
@@ -11,6 +13,7 @@ sealed class CliAppBuilder {
     }
 
     fun expectedOutput(text: String) {
+        expectedOutput = text
     }
 }
 
@@ -41,7 +44,7 @@ class JvmCliAppBuilder internal constructor(
     }
 
     private fun create(name: String, sampleDir: Path): JvmCliApp {
-        return JvmCliApp(name, sampleDir, null, cliArgs.toList(), null)
+        return JvmCliApp(name, sampleDir, null, cliArgs.toList(), null, expectedOutput)
     }
 }
 
@@ -66,6 +69,6 @@ class NativeCliAppBuilder internal constructor(
     }
 
     private fun create(name: String, sampleDir: Path): NativeCliApp {
-        return NativeCliApp(name, sampleDir, null, cliArgs.toList())
+        return NativeCliApp(name, sampleDir, null, cliArgs.toList(), expectedOutput)
     }
 }

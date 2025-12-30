@@ -28,7 +28,14 @@ sealed interface App : Sample {
 
 sealed interface CliApp : App
 
-class JvmCliApp internal constructor(override val name: String, sampleDir: Path, launcher: String?, args: List<String>, jvmVersion: Int?) : CliApp {
+class JvmCliApp internal constructor(
+    override val name: String,
+    sampleDir: Path,
+    launcher: String?,
+    args: List<String>,
+    jvmVersion: Int?,
+    expectedOutput: String?
+) : CliApp {
     override val distribution: CliAppDistribution
 
     override val otherDistributions: List<CliAppDistribution>
@@ -39,16 +46,22 @@ class JvmCliApp internal constructor(override val name: String, sampleDir: Path,
         distribution = CliAppDistribution(
             "dist",
             distDir,
-            ScriptInvocation(distDir.resolve(launcher ?: name), args, jvmVersion ?: 17)
+            ScriptInvocation(distDir.resolve(launcher ?: name), args, jvmVersion ?: 17, expectedOutput)
         )
     }
 }
 
-class NativeCliApp internal constructor(override val name: String, sampleDir: Path, launcher: String?, args: List<String>) : CliApp {
+class NativeCliApp internal constructor(
+    override val name: String,
+    sampleDir: Path,
+    launcher: String?,
+    args: List<String>,
+    expectedOutput: String?
+) : CliApp {
     override val distribution: CliAppDistribution
 
     override val otherDistributions: List<CliAppDistribution> = nativeDistributions(sampleDir) { distTask, distDir ->
-        CliAppDistribution(distTask, distDir, BinaryInvocation(distDir.resolve(launcher ?: name), args))
+        CliAppDistribution(distTask, distDir, BinaryInvocation(distDir.resolve(launcher ?: name), args, expectedOutput))
     }
 
     init {
@@ -56,7 +69,7 @@ class NativeCliApp internal constructor(override val name: String, sampleDir: Pa
         distribution = CliAppDistribution(
             "dist",
             distDir,
-            BinaryInvocation(distDir.resolve(launcher ?: name), args)
+            BinaryInvocation(distDir.resolve(launcher ?: name), args, expectedOutput)
         )
     }
 }

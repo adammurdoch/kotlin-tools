@@ -32,7 +32,7 @@ class DerivedJvmCliAppBuilder internal constructor(
 
     override fun register(): JvmCliApp {
         return container.add(name) { name, sampleDir ->
-            JvmCliApp(name, sampleDir, launcher, owner.cliArgs.toList(), jvmVersion)
+            JvmCliApp(name, sampleDir, launcher, owner.cliArgs.toList(), jvmVersion, owner.expectedOutput)
         }
     }
 }
@@ -64,7 +64,7 @@ class DerivedNativeCliAppBuilder internal constructor(
     }
 
     private fun create(name: String, sampleDir: Path): NativeCliApp {
-        return NativeCliApp(name, sampleDir, launcher, owner.cliArgs.toList())
+        return NativeCliApp(name, sampleDir, launcher, owner.cliArgs.toList(), owner.expectedOutput)
     }
 }
 

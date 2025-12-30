@@ -36,15 +36,11 @@ class JvmCliAppBuilder internal constructor(
     }
 
     internal fun register(): JvmCliApp {
-        val app = container.add(name, ::create)
+        val app = DerivedJvmCliAppBuilder(name, this, container).register()
         for (builder in derived) {
             builder.register()
         }
         return app
-    }
-
-    private fun create(name: String, sampleDir: Path): JvmCliApp {
-        return JvmCliApp(name, sampleDir, null, cliArgs.toList(), null, expectedOutput)
     }
 }
 

@@ -14,10 +14,9 @@ sealed interface CliAppInvocation {
     val expectedOutput: String?
 }
 
-class ScriptInvocation(
+sealed class AbstractScriptInvocation(
     val script: Path,
     val args: List<String>,
-    val jvmVersion: Int?,
     override val expectedOutput: String?
 ) : CliAppInvocation {
     override val launcher: Path
@@ -25,6 +24,31 @@ class ScriptInvocation(
 
     override val commandLine: List<String>
         get() = listOf(script.absolutePathString()) + args
+}
+
+class ScriptInvocation(
+    script: Path,
+    args: List<String>,
+    expectedOutput: String?
+) : AbstractScriptInvocation(script, args, expectedOutput) {
+    companion object {
+        fun of(name: String, distDir: Path, launcher: String?, args: List<String>, expectedOutput: String?): ScriptInvocation {
+            return ScriptInvocation(distDir.resolve(launcher ?: name), args, expectedOutput)
+        }
+    }
+}
+
+class ScriptInvocationWithInstalledJvm(
+    script: Path,
+    args: List<String>,
+    expectedOutput: String?,
+    val jvmVersion: Int
+) : AbstractScriptInvocation(script, args, expectedOutput) {
+    companion object {
+        fun of(name: String, distDir: Path, launcher: String?, args: List<String>, expectedOutput: String?, jvmVersion: Int?): ScriptInvocationWithInstalledJvm {
+            return ScriptInvocationWithInstalledJvm(distDir.resolve(launcher ?: name), args, expectedOutput, jvmVersion ?: 17)
+        }
+    }
 }
 
 class BinaryInvocation(
@@ -37,4 +61,10 @@ class BinaryInvocation(
 
     override val commandLine: List<String>
         get() = listOf(binary.absolutePathString()) + args
+
+    companion object {
+        fun of(name: String, distDir: Path, launcher: String?, args: List<String>, expectedOutput: String?): BinaryInvocation {
+            return BinaryInvocation(distDir.resolve(launcher ?: name), args, expectedOutput)
+        }
+    }
 }

@@ -1,5 +1,8 @@
 package net.rubygrapefruit.plugins.internal
 
+import net.rubygrapefruit.machine.info.Architecture
+import net.rubygrapefruit.machine.info.Architecture.Arm64
+import net.rubygrapefruit.machine.info.Architecture.X64
 import org.gradle.api.Project
 import org.gradle.api.initialization.Settings
 import org.gradle.internal.extensions.core.serviceOf
@@ -8,6 +11,7 @@ import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.process.ExecOperations
 import java.io.ByteArrayOutputStream
 import java.nio.file.Path
+import kotlin.io.path.absolutePathString
 import kotlin.io.path.isDirectory
 import kotlin.io.path.isRegularFile
 
@@ -127,7 +131,11 @@ private fun verify(app: App, distribution: AppDistribution, toolchainService: Ja
         for (path in binaries.binaries) {
             println("Binary: $path (${binaries.architecture})")
             if (!path.isRegularFile()) {
-                throw IllegalStateException("Binary ${path} does not exist")
+                throw IllegalStateException("Binary $path does not exist")
+            }
+            val architecture = path.architecture(execOperations)
+            if (architecture != binaries.architecture) {
+                throw IllegalStateException("Unexpected architecture for binary $path: $architecture")
             }
         }
     }
@@ -139,7 +147,7 @@ private fun verify(app: App, distribution: AppDistribution, toolchainService: Ja
             }
             val commandLine = distribution.invocation.commandLine
             println("Run: ${commandLine.joinToString(" ")}")
-            val javaHome = if (distribution.invocation is ScriptInvocation && distribution.invocation.jvmVersion != null) {
+                val javaHome = if (distribution.invocation is ScriptInvocationWithInstalledJvm) {
                 val java = toolchainService.launcherFor {
                     it.languageVersion.set(JavaLanguageVersion.of(distribution.invocation.jvmVersion))
                 }.get().metadata.installationPath.asFile
@@ -176,6 +184,20 @@ private fun verify(app: App, distribution: AppDistribution, toolchainService: Ja
                 throw IllegalStateException("Launcher file ${distribution.launcher} does not exist")
             }
         }
+    }
+}
+
+private fun Path.architecture(execOperations: ExecOperations): Architecture {
+    val str = ByteArrayOutputStream()
+    execOperations.exec {
+        it.commandLine("otool", "-hv", absolutePathString())
+        it.standardOutput = str
+    }
+    val arch = str.toString().lines()[3].split(Regex("\\s+"))[1]
+    return when (arch) {
+        "X86_64" -> X64
+        "ARM64" -> Arm64
+        else -> throw IllegalArgumentException("Unexpected architecture: $arch")
     }
 }
 

@@ -30,8 +30,8 @@ class CliAppDistribution(
             expectedOutput: String?,
             architecture: Architecture
         ): CliAppDistribution {
-            val binary = distDir.resolve(launcher ?: name)
-            return CliAppDistribution(distTask, distDir, AppDistribution.Binaries(architecture, listOf(binary)), BinaryInvocation(binary, args, expectedOutput))
+            val invocation = BinaryInvocation.of(name, distDir, launcher, args, expectedOutput)
+            return CliAppDistribution(distTask, distDir, AppDistribution.Binaries(architecture, listOf(invocation.binary)), invocation)
         }
     }
 }
@@ -43,10 +43,16 @@ class UiAppDistribution(
     val launcher: Path
 ) : AppDistribution {
     companion object {
-        fun of(name: String, distTask: String, sampleDir: Path, launcher: String?, architecture: Architecture): UiAppDistribution {
+        fun of(name: String, distTask: String, distDir: Path, launcher: String?, architecture: Architecture, otherBinaries: List<String> = emptyList()): UiAppDistribution {
             val binName = (launcher ?: name).capitalized()
-            val launcher = sampleDir.resolve("${binName}.app/Contents/MacOS/$binName")
-            return UiAppDistribution(distTask, sampleDir, AppDistribution.Binaries(architecture, listOf(launcher)), launcher)
+            val contentsDir = distDir.resolve("${binName}.app/Contents")
+            val launcher = contentsDir.resolve("MacOS/$binName")
+            return UiAppDistribution(
+                distTask,
+                distDir,
+                AppDistribution.Binaries(architecture, listOf(launcher) + otherBinaries.map { contentsDir.resolve(it) }),
+                launcher
+            )
         }
     }
 }

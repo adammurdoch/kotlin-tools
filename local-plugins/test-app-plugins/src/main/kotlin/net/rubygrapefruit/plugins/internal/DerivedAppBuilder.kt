@@ -13,6 +13,8 @@ class DerivedJvmCliAppBuilder internal constructor(
 ) : DerivedAppBuilder() {
     private var launcher: String? = null
     private var jvmVersion: Int? = null
+    private var embedded = false
+    private var native = false
 
     fun launcher(name: String) {
         launcher = name
@@ -24,15 +26,27 @@ class DerivedJvmCliAppBuilder internal constructor(
 
     fun embeddedJvm() {
         jvmVersion = null
+        embedded = true
+        native = false
     }
 
     fun nativeBinaries() {
         jvmVersion = null
+        embedded = false
+        native = true
     }
 
     override fun register(): JvmCliApp {
         return container.add(name) { name, sampleDir ->
-            JvmCliApp(name, sampleDir, launcher, owner.cliArgs.toList(), jvmVersion, owner.expectedOutput)
+            val distDir = sampleDir.resolve("build/dist")
+            val invocation = when {
+                embedded -> ScriptInvocation.of(name, distDir, launcher, owner.cliArgs.toList(), owner.expectedOutput)
+                native -> BinaryInvocation.of(name, distDir, launcher, owner.cliArgs.toList(), owner.expectedOutput)
+                else -> ScriptInvocationWithInstalledJvm.of(name, distDir, launcher, owner.cliArgs.toList(), owner.expectedOutput, jvmVersion)
+            }
+            val distribution = CliAppDistribution("dist", distDir, null, invocation)
+
+            JvmCliApp(name, distribution)
         }
     }
 }

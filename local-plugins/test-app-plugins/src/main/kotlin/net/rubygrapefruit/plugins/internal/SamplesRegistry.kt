@@ -74,11 +74,17 @@ abstract class SamplesRegistry(private val settings: Settings) : SampleContainer
 
         val sampleTasks = samples.map { sample -> sample.verify(rootProject) }
 
-        rootProject.tasks.register("verifySample") { task ->
+        val verifySample = rootProject.tasks.register("verifySample") { task ->
             task.dependsOn(sampleTasks.map { it.verifyTaskName })
         }
-        rootProject.tasks.register("verifyOtherDistributions") { task ->
+        val verifyOther = rootProject.tasks.register("verifyOtherDistributions") { task ->
             task.dependsOn(sampleTasks.flatMap { it.otherTaskNames })
+        }
+        rootProject.tasks.register("smokeTest") {
+            it.dependsOn(verifySample, verifyOther)
+        }
+        rootProject.tasks.register("minTest") {
+            it.dependsOn(verifySample)
         }
     }
 }

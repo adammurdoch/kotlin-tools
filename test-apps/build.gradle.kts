@@ -4,7 +4,6 @@ import net.rubygrapefruit.machine.info.Architecture.X64
 import net.rubygrapefruit.machine.info.Machine
 import net.rubygrapefruit.strings.capitalized
 import org.gradle.kotlin.dsl.support.serviceOf
-import java.io.ByteArrayOutputStream
 import kotlin.io.path.createDirectories
 
 sealed class Sample(val name: String, val baseDir: File) {
@@ -481,49 +480,8 @@ tasks.register("generate") {
     dependsOn(generators)
 }
 
-val runTasks = sampleApps.associateWith { app ->
-    tasks.register("run-${app.name}") {
-        val exec = project.serviceOf<ExecOperations>()
-        dependsOn(app.distTask)
-        doLast {
-            Runner().run(app, app.mainDist, exec)
-        }
-    }
-}
-
-val runOtherTasks = sampleApps.map { app ->
-    val runTasks = app.otherDists.map { dist ->
-        tasks.register("run-${app.name}-${dist.distTaskName}") {
-            val exec = project.serviceOf<ExecOperations>()
-            dependsOn(app.distTask(dist))
-            doLast {
-                Runner().run(app, dist, exec)
-            }
-        }
-    }
-    tasks.register("run-other-${app.name}") {
-        dependsOn(runTasks)
-    }
-}
-
-val runOther: TaskProvider<Task> = tasks.register("runOther") {
-    dependsOn(runOtherTasks)
-}
-
-val run: TaskProvider<Task> = tasks.register("run") {
-    dependsOn(runTasks.values)
-}
-
-tasks.register("runMin") {
-    dependsOn(runTasks.filterKeys { it.allPlatforms }.values)
-}
-
 val showApplication: TaskProvider<Task> = tasks.register("showApplication") {
     dependsOn(sampleApps.map { ":${it.name}:showApplication" })
-}
-
-tasks.register("smokeTest") {
-    dependsOn(run, runOther, showApplication)
 }
 
 val openTasks = uiApps.map { app ->
@@ -540,79 +498,6 @@ val openTasks = uiApps.map { app ->
 
 tasks.register("open") {
     dependsOn(openTasks)
-}
-
-class Runner {
-    fun run(app: App, dist: AppDistribution, exec: ExecOperations) {
-        val distDir = app.distDir(dist)
-        println("Dist dir: $distDir")
-        if (!distDir.isDirectory) {
-            throw IllegalStateException("Application distribution directory $distDir does not exist.")
-        }
-        val cliLauncher = app.cliLauncher(dist)
-        println("CLI launcher: ${cliLauncher?.relativeTo(distDir)}")
-        if (cliLauncher != null && !cliLauncher.isFile) {
-            throw IllegalStateException("Application launcher $cliLauncher does not exist.")
-        }
-        val nativeBinary = app.nativeBinary(dist)
-        println("Native binary: ${nativeBinary?.relativeTo(distDir)}")
-        if (nativeBinary != null && !nativeBinary.isFile) {
-            // Can be non-null when CLI launcher is null, for example, embedded JVM app with launcher script
-            throw IllegalStateException("Application binary $nativeBinary does not exist.")
-        }
-        println("Dist size: " + distDir.directorySize().formatSize())
-        if (nativeBinary != null && Machine.thisMachine.isMacOS) {
-            val str = ByteArrayOutputStream()
-            exec.exec {
-                commandLine("otool", "-hv", nativeBinary)
-                standardOutput = str
-            }
-            val arch = str.toString().lines()[3].split(Regex("\\s+"))[1]
-            println("Binary: $arch")
-            val expected = when (dist.nature.expectedArchitecture) {
-                X64 -> "X86_64"
-                Arm64 -> "ARM64"
-                null -> null
-            }
-
-            if (expected != null && arch != expected) {
-                throw IllegalStateException("Unexpected binary architecture: $arch, expected: $expected")
-            }
-        }
-        val cliCommandLine = app.cliCommandLine(dist)
-        if (cliCommandLine != null) {
-            val str = ByteArrayOutputStream()
-            exec.exec {
-                commandLine(cliCommandLine)
-                standardOutput = str
-            }
-            println()
-            println("----")
-            print(str)
-            println("----")
-            if (app.expectedOutput != null && !str.toString().contains(app.expectedOutput)) {
-                throw IllegalStateException("Unexpected application output")
-            }
-        } else {
-            println()
-            println("(no CLI)")
-        }
-    }
-
-    fun File.directorySize(): Long {
-        var size: Long = 0
-        for (file in this.walkBottomUp()) {
-            if (file.isFile) {
-                size += file.length()
-            }
-        }
-        return size
-    }
-
-    fun Long.formatSize(): String {
-        val mb = this.toBigDecimal().setScale(2) / (1000 * 1000).toBigDecimal()
-        return "$mb MB"
-    }
 }
 
 fun jvmCliApp(name: String, config: JvmAppBuilder.() -> Unit = {}): JvmBaseApp {

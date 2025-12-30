@@ -23,9 +23,11 @@ class DerivedJvmCliAppBuilder internal constructor(
     }
 
     fun embeddedJvm() {
+        jvmVersion = null
     }
 
     fun nativeBinaries() {
+        jvmVersion = null
     }
 
     override fun register(): JvmCliApp {

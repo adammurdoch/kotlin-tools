@@ -5,6 +5,7 @@ import org.gradle.api.initialization.Settings
 import org.gradle.internal.extensions.core.serviceOf
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
+import org.gradle.process.ExecOperations
 import java.nio.file.Path
 import kotlin.io.path.isDirectory
 import kotlin.io.path.isRegularFile
@@ -87,10 +88,11 @@ private fun Sample.verify(rootProject: Project): SampleTasks {
 
 private fun App.verifyApp(project: Project): SampleTasks {
     val toolchainService = project.serviceOf<JavaToolchainService>()
+    val execOperations = project.serviceOf<ExecOperations>()
     project.tasks.register("verifySample") { task ->
         task.dependsOn(distribution.distTask)
         task.doLast {
-            verify(this, distribution, toolchainService)
+            verify(this, distribution, toolchainService, execOperations)
         }
     }
     if (otherDistributions.isNotEmpty()) {
@@ -98,7 +100,7 @@ private fun App.verifyApp(project: Project): SampleTasks {
             for (distribution in otherDistributions) {
                 task.dependsOn(distribution.distTask)
                 task.doLast {
-                    verify(this, distribution, toolchainService)
+                    verify(this, distribution, toolchainService, execOperations)
                 }
             }
         }
@@ -108,7 +110,7 @@ private fun App.verifyApp(project: Project): SampleTasks {
     }
 }
 
-private fun verify(app: App, distribution: AppDistribution, toolchainService: JavaToolchainService) {
+private fun verify(app: App, distribution: AppDistribution, toolchainService: JavaToolchainService, execOperations: ExecOperations) {
     when (app) {
         is CliApp -> println("CLI app: ${app.name} dist: ${distribution.distTask}")
         is UiApp -> println("UI app: ${app.name} dist: ${distribution.distTask}")
@@ -119,15 +121,25 @@ private fun verify(app: App, distribution: AppDistribution, toolchainService: Ja
     }
     when (distribution) {
         is CliAppDistribution -> {
-            println("Run: ${distribution.invocation.commandLine}")
-            if (distribution.invocation is ScriptInvocation && distribution.invocation.jvmVersion != null) {
+            if (!distribution.invocation.launcher.isRegularFile()) {
+                throw IllegalStateException("Launcher file ${distribution.invocation.launcher} does not exist")
+            }
+            val commandLine = distribution.invocation.commandLine
+            println("Run: ${commandLine.joinToString(" ")}")
+            val javaHome = if (distribution.invocation is ScriptInvocation && distribution.invocation.jvmVersion != null) {
                 val java = toolchainService.launcherFor {
                     it.languageVersion.set(JavaLanguageVersion.of(distribution.invocation.jvmVersion))
                 }.get().metadata.installationPath.asFile
                 println("Java home: $java")
+                java
+            } else {
+                null
             }
-            if (!distribution.invocation.launcher.isRegularFile()) {
-                throw IllegalStateException("Launcher file ${distribution.invocation.launcher} does not exist")
+            execOperations.exec {
+                it.commandLine(commandLine)
+                if (javaHome != null) {
+                    it.environment("JAVA_HOME", javaHome.absolutePath)
+                }
             }
         }
 

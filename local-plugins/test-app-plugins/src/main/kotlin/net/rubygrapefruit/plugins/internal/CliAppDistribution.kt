@@ -1,6 +1,7 @@
 package net.rubygrapefruit.plugins.internal
 
 import net.rubygrapefruit.machine.info.Architecture
+import net.rubygrapefruit.machine.info.Machine
 import org.gradle.internal.extensions.stdlib.capitalized
 import java.nio.file.Path
 
@@ -10,6 +11,9 @@ sealed interface AppDistribution {
     val distDir: Path
 
     val binaries: Binaries?
+
+    val canBuild: Boolean
+        get() = true
 
     class Binaries(val architecture: Architecture, val binaries: List<Path>)
 }
@@ -40,6 +44,7 @@ class UiAppDistribution(
     override val distTask: String,
     override val distDir: Path,
     override val binaries: AppDistribution.Binaries,
+    override val canBuild: Boolean,
     val launcher: Path
 ) : AppDistribution {
     companion object {
@@ -51,6 +56,7 @@ class UiAppDistribution(
                 distTask,
                 distDir,
                 AppDistribution.Binaries(architecture, listOf(launcher) + otherBinaries.map { contentsDir.resolve(it) }),
+                Machine.thisMachine.isMacOS,
                 launcher
             )
         }

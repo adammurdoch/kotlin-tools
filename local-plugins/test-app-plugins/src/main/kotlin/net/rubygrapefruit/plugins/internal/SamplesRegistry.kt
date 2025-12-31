@@ -4,6 +4,7 @@ import net.rubygrapefruit.machine.info.Architecture
 import net.rubygrapefruit.machine.info.Architecture.Arm64
 import net.rubygrapefruit.machine.info.Architecture.X64
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.initialization.Settings
 import org.gradle.internal.extensions.core.serviceOf
 import org.gradle.jvm.toolchain.JavaLanguageVersion
@@ -101,23 +102,30 @@ private fun App.verifyApp(project: Project): SampleTasks {
     val toolchainService = project.serviceOf<JavaToolchainService>()
     val execOperations = project.serviceOf<ExecOperations>()
     project.tasks.register("verifySample") { task ->
-        task.dependsOn(distribution.distTask)
-        task.doLast {
-            verify(this, distribution, toolchainService, execOperations)
-        }
+        applyToTask(distribution, task, toolchainService, execOperations)
     }
     if (otherDistributions.isNotEmpty()) {
         project.tasks.register("verifyOtherDistributions") { task ->
             for (distribution in otherDistributions) {
-                task.dependsOn(distribution.distTask)
-                task.doLast {
-                    verify(this, distribution, toolchainService, execOperations)
-                }
+                applyToTask(distribution, task, toolchainService, execOperations)
             }
         }
         return SampleTasks(":$name:verifySample", listOf(":$name:verifyOtherDistributions"))
     } else {
         return SampleTasks(":$name:verifySample", emptyList())
+    }
+}
+
+private fun App.applyToTask(distribution: AppDistribution, task: Task, toolchainService: JavaToolchainService, execOperations: ExecOperations) {
+    if (!distribution.canBuild) {
+        task.doLast {
+            println("App ${name} not buildable")
+        }
+        return
+    }
+    task.dependsOn(distribution.distTask)
+    task.doLast {
+        verify(this, distribution, toolchainService, execOperations)
     }
 }
 
@@ -153,7 +161,7 @@ private fun verify(app: App, distribution: AppDistribution, toolchainService: Ja
             }
             val commandLine = distribution.invocation.commandLine
             println("Run: ${commandLine.joinToString(" ")}")
-                val javaHome = if (distribution.invocation is ScriptInvocationWithInstalledJvm) {
+            val javaHome = if (distribution.invocation is ScriptInvocationWithInstalledJvm) {
                 val java = toolchainService.launcherFor {
                     it.languageVersion.set(JavaLanguageVersion.of(distribution.invocation.jvmVersion))
                 }.get().metadata.installationPath.asFile

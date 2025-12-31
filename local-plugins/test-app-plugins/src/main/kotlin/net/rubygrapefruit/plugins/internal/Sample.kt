@@ -7,13 +7,15 @@ import java.nio.file.Path
 
 sealed interface Sample {
     val name: String
+
+    val sourceTree: SourceTree
 }
 
 sealed interface Lib : Sample
 
-class JvmLib internal constructor(override val name: String, sampleDir: Path) : Lib
+class JvmLib internal constructor(override val name: String, override val sourceTree: SourceTree) : Lib
 
-class KmpLib internal constructor(override val name: String, sampleDir: Path) : Lib
+class KmpLib internal constructor(override val name: String, override val sourceTree: SourceTree) : Lib
 
 sealed interface App : Sample {
     /**
@@ -31,7 +33,8 @@ sealed interface CliApp : App
 
 class JvmCliApp internal constructor(
     override val name: String,
-    override val distribution: CliAppDistribution
+    override val distribution: CliAppDistribution,
+    override val sourceTree: SourceTree
 ) : CliApp {
     override val otherDistributions: List<CliAppDistribution>
         get() = emptyList()
@@ -42,7 +45,8 @@ class NativeCliApp internal constructor(
     sampleDir: Path,
     launcher: String?,
     args: List<String>,
-    expectedOutput: String?
+    expectedOutput: String?,
+    override val sourceTree: SourceTree
 ) : CliApp {
     override val distribution: CliAppDistribution
 
@@ -58,7 +62,12 @@ class NativeCliApp internal constructor(
 
 sealed interface UiApp : App
 
-class JvmUiApp internal constructor(override val name: String, sampleDir: Path, launcher: String?) : UiApp {
+class JvmUiApp internal constructor(
+    override val name: String,
+    sampleDir: Path,
+    launcher: String?,
+    override val sourceTree: SourceTree
+) : UiApp {
     override val distribution = UiAppDistribution.of(
         name,
         "dist",
@@ -72,7 +81,12 @@ class JvmUiApp internal constructor(override val name: String, sampleDir: Path, 
         get() = emptyList()
 }
 
-class NativeUiApp internal constructor(override val name: String, sampleDir: Path, launcher: String?) : UiApp {
+class NativeUiApp internal constructor(
+    override val name: String,
+    sampleDir: Path,
+    launcher: String?,
+    override val sourceTree: SourceTree
+) : UiApp {
     override val distribution = UiAppDistribution.of(name, "dist", sampleDir.resolve("build/dist"), launcher, Machine.thisMachine.architecture)
 
     override val otherDistributions: List<UiAppDistribution> = nativeDistributions(sampleDir) { distTask, distDir, architecture ->

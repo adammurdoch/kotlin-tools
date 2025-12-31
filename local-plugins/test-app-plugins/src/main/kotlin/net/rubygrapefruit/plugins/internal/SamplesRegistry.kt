@@ -73,6 +73,13 @@ abstract class SamplesRegistry(private val settings: Settings) : SampleContainer
             }
         }
 
+        rootProject.tasks.register("generateSamples") { task ->
+            val samples = samples.toList()
+            task.doLast {
+                generateSamples(samples)
+            }
+        }
+
         val sampleTasks = samples.map { sample -> sample.verify(rootProject) }
 
         val verifySample = rootProject.tasks.register("verifySample") { task ->
@@ -98,16 +105,27 @@ private fun Sample.verify(rootProject: Project): SampleTasks {
     }
 }
 
+private fun Lib.verifyLib(project: Project): SampleTasks {
+    project.tasks.register("verifySample") { task ->
+        task.dependsOn("build")
+        task.doLast {
+            println("Lib: $name")
+            verify(sourceTree)
+        }
+    }
+    return SampleTasks(":$name:verifySample", emptyList())
+}
+
 private fun App.verifyApp(project: Project): SampleTasks {
     val toolchainService = project.serviceOf<JavaToolchainService>()
     val execOperations = project.serviceOf<ExecOperations>()
     project.tasks.register("verifySample") { task ->
-        applyToTask(distribution, task, toolchainService, execOperations)
+        applyVerificationToTask(distribution, task, toolchainService, execOperations)
     }
     if (otherDistributions.isNotEmpty()) {
         project.tasks.register("verifyOtherDistributions") { task ->
             for (distribution in otherDistributions) {
-                applyToTask(distribution, task, toolchainService, execOperations)
+                applyVerificationToTask(distribution, task, toolchainService, execOperations)
             }
         }
         return SampleTasks(":$name:verifySample", listOf(":$name:verifyOtherDistributions"))
@@ -116,10 +134,10 @@ private fun App.verifyApp(project: Project): SampleTasks {
     }
 }
 
-private fun App.applyToTask(distribution: AppDistribution, task: Task, toolchainService: JavaToolchainService, execOperations: ExecOperations) {
+private fun App.applyVerificationToTask(distribution: AppDistribution, task: Task, toolchainService: JavaToolchainService, execOperations: ExecOperations) {
     if (!distribution.canBuild) {
         task.doLast {
-            println("App ${name} not buildable")
+            println("App $name not buildable")
         }
         return
     }
@@ -134,6 +152,8 @@ private fun verify(app: App, distribution: AppDistribution, toolchainService: Ja
         is CliApp -> println("CLI app: ${app.name} dist: ${distribution.distTask}")
         is UiApp -> println("UI app: ${app.name} dist: ${distribution.distTask}")
     }
+
+    verify(app.sourceTree)
 
     println("Dist dir: ${distribution.distDir}")
     if (!distribution.distDir.isDirectory()) {
@@ -201,6 +221,15 @@ private fun verify(app: App, distribution: AppDistribution, toolchainService: Ja
     }
 }
 
+private fun verify(sourceTree: SourceTree) {
+    for (dir in sourceTree.dirs) {
+        println("Source dir: $dir")
+        if (!dir.isDirectory()) {
+            throw IllegalStateException("Source directory $dir does not exist")
+        }
+    }
+}
+
 private fun Path.architecture(execOperations: ExecOperations): Architecture {
     val str = ByteArrayOutputStream()
     execOperations.exec {
@@ -215,14 +244,12 @@ private fun Path.architecture(execOperations: ExecOperations): Architecture {
     }
 }
 
-private fun Lib.verifyLib(project: Project): SampleTasks {
-    project.tasks.register("verifySample") { task ->
-        task.dependsOn("build")
-        task.doLast {
-            println("Lib: $name")
+private fun generateSamples(samples: List<Sample>) {
+    for (sample in samples) {
+        if (sample.sourceTree is GeneratedSourceDir) {
+            println("Generate ${sample.name}")
         }
     }
-    return SampleTasks(":$name:verifySample", emptyList())
 }
 
 private class SampleTasks(val verifyTaskName: String, val otherTaskNames: List<String>)

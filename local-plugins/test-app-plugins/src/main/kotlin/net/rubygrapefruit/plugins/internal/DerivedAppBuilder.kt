@@ -1,17 +1,15 @@
 package net.rubygrapefruit.plugins.internal
 
 import net.rubygrapefruit.machine.info.Machine
-import java.nio.file.Path
 
-sealed class DerivedAppBuilder {
-    internal abstract fun register(): Sample
+sealed class DerivedCliAppBuilder {
+    internal abstract fun register(cliArgs: List<String>, expectedOutput: String?, derivedFrom: SourceTree?): Sample
 }
 
 class DerivedJvmCliAppBuilder internal constructor(
     private val name: String,
-    private val owner: CliAppBuilder,
     private val container: SampleContainer
-) : DerivedAppBuilder() {
+) : DerivedCliAppBuilder() {
     private var launcher: String? = null
     private var jvmVersion: Int? = null
     private var embedded = false
@@ -37,38 +35,38 @@ class DerivedJvmCliAppBuilder internal constructor(
         native = true
     }
 
-    override fun register(): JvmCliApp {
+    override fun register(cliArgs: List<String>, expectedOutput: String?, derivedFrom: SourceTree?): JvmCliApp {
         return container.add(name) { name, sampleDir ->
             val distDir = sampleDir.resolve("build/dist")
             val distribution = when {
                 embedded -> {
-                    val invocation = ScriptInvocation.of(name, distDir, launcher, owner.cliArgs.toList(), owner.expectedOutput)
+                    val invocation = ScriptInvocation.of(name, distDir, launcher, cliArgs, expectedOutput)
                     val binaries = AppDistribution.Binaries(Machine.thisMachine.architecture, listOf(distDir.resolve("jvm/bin/java")))
                     CliAppDistribution("dist", distDir, binaries, invocation)
                 }
 
                 native -> {
-                    val invocation = BinaryInvocation.of(name, distDir, launcher, owner.cliArgs.toList(), owner.expectedOutput)
+                    val invocation = BinaryInvocation.of(name, distDir, launcher, cliArgs, expectedOutput)
                     val binaries = AppDistribution.Binaries(Machine.thisMachine.architecture, listOf(invocation.binary))
                     CliAppDistribution("dist", distDir, binaries, invocation)
                 }
 
                 else -> {
-                    val invocation = ScriptInvocationWithInstalledJvm.of(name, distDir, launcher, owner.cliArgs.toList(), owner.expectedOutput, jvmVersion)
+                    val invocation = ScriptInvocationWithInstalledJvm.of(name, distDir, launcher, cliArgs, expectedOutput, jvmVersion)
                     CliAppDistribution("dist", distDir, null, invocation)
                 }
             }
-            JvmCliApp(name, distribution)
+            val sourceDir = derivedFrom.derive(sampleDir.resolve("src/main"))
+            JvmCliApp(name, distribution, sourceDir)
         }
     }
 }
 
 class DerivedNativeCliAppBuilder internal constructor(
     private val name: String,
-    private val owner: CliAppBuilder,
     private val container: SampleContainer
-) : DerivedAppBuilder() {
-    private val derived = mutableListOf<DerivedAppBuilder>()
+) : DerivedCliAppBuilder() {
+    private val derived = mutableListOf<DerivedCliAppBuilder>()
     private var launcher: String? = null
 
     fun launcher(name: String) {
@@ -76,25 +74,24 @@ class DerivedNativeCliAppBuilder internal constructor(
     }
 
     fun derive(name: String, config: DerivedNativeCliAppBuilder.() -> Unit = {}) {
-        val builder = DerivedNativeCliAppBuilder(name, owner, container)
+        val builder = DerivedNativeCliAppBuilder(name, container)
         builder.config()
         derived.add(builder)
     }
 
-    override fun register(): NativeCliApp {
-        val app = container.add(name, ::create)
+    override fun register(cliArgs: List<String>, expectedOutput: String?, derivedFrom: SourceTree?): NativeCliApp {
+        val app = container.add(name) { name, sampleDir ->
+            val sourceDir = derivedFrom.derive(sampleDir.resolve("src/commonMain"))
+            NativeCliApp(name, sampleDir, launcher, cliArgs, expectedOutput, sourceDir)
+        }
         for (builder in derived) {
-            builder.register()
+            builder.register(cliArgs, expectedOutput, app.sourceTree)
         }
         return app
     }
-
-    private fun create(name: String, sampleDir: Path): NativeCliApp {
-        return NativeCliApp(name, sampleDir, launcher, owner.cliArgs.toList(), owner.expectedOutput)
-    }
 }
 
-sealed class DerivedUiAppBuilder : DerivedAppBuilder() {
+sealed class DerivedUiAppBuilder {
     protected var launcher: String? = null
 
     fun launcher(name: String) {
@@ -106,9 +103,10 @@ class DerivedJvmUiAppBuilder internal constructor(
     private val name: String,
     private val container: SampleContainer
 ) : DerivedUiAppBuilder() {
-    override fun register(): JvmUiApp {
+    fun register(derivedFrom: SourceTree?): JvmUiApp {
         return container.add(name) { name, sampleDir ->
-            JvmUiApp(name, sampleDir, launcher)
+            val sourceDir = derivedFrom.derive(sampleDir.resolve("src/main"))
+            JvmUiApp(name, sampleDir, launcher, sourceDir)
         }
     }
 }
@@ -117,9 +115,10 @@ class DerivedNativeUiAppBuilder internal constructor(
     private val name: String,
     private val container: SampleContainer
 ) : DerivedUiAppBuilder() {
-    override fun register(): NativeUiApp {
+    fun register(derivedFrom: SourceTree?): NativeUiApp {
         return container.add(name) { name, sampleDir ->
-            NativeUiApp(name, sampleDir, launcher)
+            val sourceDir = derivedFrom.derive(sampleDir.resolve("src/macosMain"))
+            NativeUiApp(name, sampleDir, launcher, sourceDir)
         }
     }
 }

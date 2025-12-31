@@ -6,7 +6,7 @@ class JvmUiAppBuilder internal constructor(
     private val name: String,
     private val container: SampleContainer
 ) : UiAppBuilder() {
-    private val derived = mutableListOf<DerivedAppBuilder>()
+    private val derived = mutableListOf<DerivedJvmUiAppBuilder>()
 
     fun derive(name: String, config: DerivedJvmUiAppBuilder.() -> Unit = {}) {
         val builder = DerivedJvmUiAppBuilder(name, container)
@@ -16,10 +16,10 @@ class JvmUiAppBuilder internal constructor(
 
     internal fun register(): JvmUiApp {
         val app = container.add(name) { name, sampleDir ->
-            JvmUiApp(name, sampleDir, null)
+            JvmUiApp(name, sampleDir, null, OriginSourceDir(sampleDir.resolve("src/main")))
         }
         for (builder in derived) {
-            builder.register()
+            builder.register(app.sourceTree)
         }
         return app
     }
@@ -29,7 +29,7 @@ class NativeUiAppBuilder internal constructor(
     private val name: String,
     private val container: SampleContainer
 ) : UiAppBuilder() {
-    private val derived = mutableListOf<DerivedAppBuilder>()
+    private val derived = mutableListOf<DerivedNativeUiAppBuilder>()
 
     fun derive(name: String, config: DerivedNativeUiAppBuilder.() -> Unit = {}) {
         val builder = DerivedNativeUiAppBuilder(name, container)
@@ -39,10 +39,10 @@ class NativeUiAppBuilder internal constructor(
 
     internal fun register(): NativeUiApp {
         val app = container.add(name) { name, sampleDir ->
-            NativeUiApp(name, sampleDir, null)
+            NativeUiApp(name, sampleDir, null, OriginSourceDir(sampleDir.resolve("src/macosMain")))
         }
         for (builder in derived) {
-            builder.register()
+            builder.register(app.sourceTree)
         }
         return app
     }

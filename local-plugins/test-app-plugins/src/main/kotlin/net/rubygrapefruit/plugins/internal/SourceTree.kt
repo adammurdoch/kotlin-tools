@@ -3,28 +3,46 @@ package net.rubygrapefruit.plugins.internal
 import java.nio.file.Path
 
 sealed interface SourceTree {
-    val origin: OriginSourceDir
-
     val dirs: List<Path>
+
+    fun derive(srcDir: Path): SourceTree
 }
 
-class OriginSourceDir(val srcDir: Path) : SourceTree {
-    override val origin: OriginSourceDir
-        get() = this
+object NoSourceDirs : SourceTree {
+    override val dirs: List<Path>
+        get() = emptyList()
 
+    override fun derive(srcDir: Path): SourceTree {
+        throw IllegalStateException()
+    }
+}
+
+sealed interface SourceDir : SourceTree {
+    val srcDir: Path
+}
+
+class OriginSourceDir(override val srcDir: Path) : SourceDir {
     override val dirs: List<Path>
         get() = listOf(srcDir)
+
+    override fun derive(srcDir: Path): SourceTree {
+        return GeneratedSourceDir(srcDir, this)
+    }
 }
 
-class GeneratedSourceDir(val srcDir: Path, override val origin: OriginSourceDir) : SourceTree {
+class GeneratedSourceDir(override val srcDir: Path, val origin: OriginSourceDir) : SourceDir {
     override val dirs: List<Path>
         get() = listOf(srcDir)
+
+    override fun derive(srcDir: Path): SourceTree {
+        return GeneratedSourceDir(srcDir, origin)
+    }
 }
 
-fun  SourceTree?.derive(srcDir: Path): SourceTree {
+fun SourceTree?.derive(srcDir: Path): SourceTree {
     return if (this == null) {
         OriginSourceDir(srcDir)
     } else {
-        GeneratedSourceDir(srcDir, origin)
+        derive(srcDir)
     }
 }

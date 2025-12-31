@@ -13,7 +13,9 @@ samples {
         derive("jvm-lib-customized")
     }
 
-    jvmLib("jvm-lib-generated-source")
+    jvmLib("jvm-lib-generated-source") {
+        noSourceDirs()
+    }
 
     jvmLib("docs-test")
 
@@ -25,11 +27,15 @@ samples {
         derive("kmp-lib-render-customized")
     }
 
-    kmpLib("kmp-lib-generated-source")
+    kmpLib("kmp-lib-generated-source") {
+        noSourceDirs()
+    }
 
     kmpLib("native-lib")
 
-    kmpLib("native-lib-generated-source")
+    kmpLib("native-lib-generated-source") {
+        noSourceDirs()
+    }
 
     jvmCliApp("jvm-cli-app-min") {
         cliArgs("hello", "world")

@@ -1,6 +1,22 @@
 package net.rubygrapefruit.plugins.internal
 
-sealed class LibBuilder
+import java.nio.file.Path
+
+sealed class LibBuilder {
+    protected var sourceDirs = true
+
+    fun noSourceDirs() {
+        sourceDirs = false
+    }
+
+    protected fun sourceTree(sampleDir: Path, path: String): SourceTree {
+        return if (sourceDirs) {
+            OriginSourceDir(sampleDir.resolve(path))
+        } else {
+            NoSourceDirs
+        }
+    }
+}
 
 class JvmLibBuilder internal constructor(
     private val name: String,
@@ -14,7 +30,8 @@ class JvmLibBuilder internal constructor(
 
     internal fun register(): JvmLib {
         val lib = container.add(name) { name, sampleDir ->
-            JvmLib(name, OriginSourceDir(sampleDir.resolve("src/main")))
+            val sourceTree = sourceTree(sampleDir, "src/main")
+            JvmLib(name, sourceTree)
         }
         for (name in derived) {
             container.add(name) { name, sampleDir ->
@@ -37,7 +54,8 @@ class KmpLibBuilder internal constructor(
 
     internal fun register(): KmpLib {
         val lib = container.add(name) { name, sampleDir ->
-            KmpLib(name, OriginSourceDir(sampleDir.resolve("src/commonMain")))
+            val sourceTree = sourceTree(sampleDir, "src/commonMain")
+            KmpLib(name, sourceTree)
         }
         for (name in derived) {
             container.add(name) { name, sampleDir ->

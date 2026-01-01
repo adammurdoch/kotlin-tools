@@ -3,15 +3,16 @@ package net.rubygrapefruit.plugins.internal
 import net.rubygrapefruit.machine.info.Architecture
 import net.rubygrapefruit.machine.info.Architecture.Arm64
 import net.rubygrapefruit.machine.info.Architecture.X64
+import net.rubygrapefruit.machine.info.Machine
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.initialization.Settings
 import org.gradle.internal.extensions.core.serviceOf
-import org.gradle.internal.impldep.bsh.commands.dir
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.process.ExecOperations
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.isDirectory
@@ -168,9 +169,11 @@ private fun verify(app: App, distribution: AppDistribution, toolchainService: Ja
             if (!path.isRegularFile()) {
                 throw IllegalStateException("Binary $path does not exist")
             }
-            val architecture = path.architecture(execOperations)
-            if (architecture != binaries.architecture) {
-                throw IllegalStateException("Unexpected architecture for binary $path: $architecture")
+            if (Machine.thisMachine.isMacOS) {
+                val architecture = path.architecture(execOperations)
+                if (architecture != binaries.architecture) {
+                    throw IllegalStateException("Unexpected architecture for binary $path: $architecture")
+                }
             }
         }
     }
@@ -182,11 +185,11 @@ private fun verify(app: App, distribution: AppDistribution, toolchainService: Ja
             }
             val commandLine = distribution.invocation.commandLine
             println("Run: ${commandLine.joinToString(" ")}")
-            val javaHome = if (distribution.invocation is ScriptInvocationWithInstalledJvm) {
+            val javaBinDir = if (distribution.invocation is ScriptInvocationWithInstalledJvm) {
                 val java = toolchainService.launcherFor {
                     it.languageVersion.set(JavaLanguageVersion.of(distribution.invocation.jvmVersion))
-                }.get().metadata.installationPath.asFile
-                println("Java home: $java")
+                }.get().executablePath.asFile.parentFile.toPath()
+                println("Java bin dir: $java")
                 java
             } else {
                 null
@@ -194,8 +197,8 @@ private fun verify(app: App, distribution: AppDistribution, toolchainService: Ja
             val outputStream = ByteArrayOutputStream()
             val result = execOperations.exec {
                 it.commandLine(commandLine)
-                if (javaHome != null) {
-                    it.environment("JAVA_HOME", javaHome.absolutePath)
+                if (javaBinDir != null) {
+                    it.environment("PATH", javaBinDir.absolutePathString() + File.pathSeparatorChar + System.getenv("PATH"))
                 }
                 it.standardOutput = outputStream
                 it.errorOutput = outputStream

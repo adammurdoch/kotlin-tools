@@ -1,5 +1,6 @@
 package net.rubygrapefruit.plugins.internal
 
+import net.rubygrapefruit.machine.info.Machine
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 
@@ -33,7 +34,8 @@ class ScriptInvocation(
 ) : AbstractScriptInvocation(script, args, expectedOutput) {
     companion object {
         fun of(name: String, distDir: Path, launcher: String?, args: List<String>, expectedOutput: String?): ScriptInvocation {
-            return ScriptInvocation(distDir.resolve(launcher ?: name), args, expectedOutput)
+            val scriptPath = Machine.thisMachine.scriptName(launcher ?: name)
+            return ScriptInvocation(distDir.resolve(scriptPath), args, expectedOutput)
         }
     }
 }
@@ -46,7 +48,8 @@ class ScriptInvocationWithInstalledJvm(
 ) : AbstractScriptInvocation(script, args, expectedOutput) {
     companion object {
         fun of(name: String, distDir: Path, launcher: String?, args: List<String>, expectedOutput: String?, jvmVersion: Int?): ScriptInvocationWithInstalledJvm {
-            return ScriptInvocationWithInstalledJvm(distDir.resolve(launcher ?: name), args, expectedOutput, jvmVersion ?: 17)
+            val scriptPath = Machine.thisMachine.scriptName(launcher ?: name)
+            return ScriptInvocationWithInstalledJvm(distDir.resolve(scriptPath), args, expectedOutput, jvmVersion ?: 17)
         }
     }
 }
@@ -64,7 +67,8 @@ class BinaryInvocation(
 
     companion object {
         fun of(name: String, distDir: Path, launcher: String?, args: List<String>, expectedOutput: String?): BinaryInvocation {
-            return BinaryInvocation(distDir.resolve(launcher ?: name), args, expectedOutput)
+            val binPath = Machine.thisMachine.executableName(launcher ?: name)
+            return BinaryInvocation(distDir.resolve(binPath), args, expectedOutput)
         }
     }
 }

@@ -41,7 +41,8 @@ class DerivedJvmCliAppBuilder internal constructor(
             val distribution = when {
                 embedded -> {
                     val invocation = ScriptInvocation.of(name, distDir, launcher, cliArgs, expectedOutput)
-                    val binaries = AppDistribution.Binaries(Machine.thisMachine.architecture, listOf(distDir.resolve("jvm/bin/java")))
+                    val javaLauncher = distDir.resolve(Machine.thisMachine.executableName("jvm/bin/java"))
+                    val binaries = AppDistribution.Binaries(Machine.thisMachine.architecture, listOf(javaLauncher))
                     CliAppDistribution("dist", distDir, binaries, invocation)
                 }
 

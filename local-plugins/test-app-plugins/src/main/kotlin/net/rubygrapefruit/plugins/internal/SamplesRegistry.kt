@@ -14,6 +14,7 @@ import org.gradle.process.ExecOperations
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.nio.file.Path
+import java.security.MessageDigest
 import kotlin.io.path.*
 
 abstract class SamplesRegistry(private val settings: Settings) : SampleContainer {
@@ -224,17 +225,33 @@ private fun verify(app: App, distribution: AppDistribution, toolchainService: Ja
 }
 
 private fun verify(sample: Sample, sourceTree: SourceTree) {
-    val dirs = mutableListOf<Path>()
-    sourceTree.visit { dirs.add(it.srcDir) }
+    val dirs = mutableListOf<SourceDir>()
+    sourceTree.visit { dirs.add(it) }
     if (dirs.isEmpty()) {
         println("No source dirs")
         return
     }
     var hasSrcDir = false
     for (dir in dirs) {
-        if (dir.isDirectory()) {
-            println("Source dir: $dir")
+        if (dir.srcDir.isDirectory()) {
+            println("Source dir: ${dir.srcDir}")
             hasSrcDir = true
+        }
+        if (dir is GeneratedSourceDir) {
+            dir.visitContents({ source, dest ->
+                if (!dest.exists()) {
+                    throw IllegalStateException("Source file missing, maybe regenerate samples: $dest")
+                }
+                if (source.isRegularFile()) {
+                    val srcHash = source.hash()
+                    val destHash = dest.hash()
+                    if (!srcHash.contentEquals(destHash)) {
+                        throw IllegalStateException("Source file has incorrect content, maybe regenerate samples: $dest")
+                    }
+                }
+            }, { path ->
+                throw IllegalStateException("Unexpected file in source dir, maybe regenerate samples: $path")
+            })
         }
     }
     if (!hasSrcDir) {
@@ -261,32 +278,46 @@ private fun generateSamples(samples: List<Sample>) {
     for (sample in samples) {
         sample.sourceTree.visit { srcDir ->
             if (srcDir is GeneratedSourceDir && srcDir.origin.srcDir.isDirectory()) {
-                val sourceDir = srcDir.origin.srcDir
-                val destDir = srcDir.srcDir
-                println("Generate ${sample.name} $destDir from $sourceDir")
-                val files = mutableListOf<Path>()
-                sourceDir.walk(PathWalkOption.INCLUDE_DIRECTORIES).forEach { source ->
-                    val dest = srcDir.srcDir.resolve(source.relativeTo(sourceDir))
-                    files.add(dest)
+                srcDir.visitContents({ source, dest ->
                     if (source.isRegularFile()) {
                         source.copyTo(dest, overwrite = true)
                     } else {
                         dest.createDirectories()
                     }
-                }
-
-                val toDelete = mutableListOf<Path>()
-                destDir.walk(PathWalkOption.INCLUDE_DIRECTORIES).forEach { dest ->
-                    if (!files.contains(dest) && (dest.isDirectory() || dest.name.endsWith(".kt"))) {
-                        toDelete.add(0, dest)
-                    }
-                }
-                for (path in toDelete) {
+                }, { path ->
                     path.deleteIfExists()
-                }
+                })
             }
         }
     }
+}
+
+@OptIn(ExperimentalPathApi::class)
+private fun GeneratedSourceDir.visitContents(action: (Path, Path) -> Unit, extraAction: (Path) -> Unit) {
+    val sourceDir = origin.srcDir
+    val destDir = srcDir
+    val files = mutableListOf<Path>()
+    sourceDir.walk(PathWalkOption.INCLUDE_DIRECTORIES).forEach { source ->
+        val dest = srcDir.resolve(source.relativeTo(sourceDir))
+        files.add(dest)
+        action(source, dest)
+    }
+
+    val extra = mutableListOf<Path>()
+    destDir.walk(PathWalkOption.INCLUDE_DIRECTORIES).forEach { dest ->
+        if (!files.contains(dest) && (dest.isDirectory() || dest.name.endsWith(".kt"))) {
+            extra.add(0, dest)
+        }
+    }
+    for (path in extra) {
+        extraAction(path)
+    }
+}
+
+private fun Path.hash(): ByteArray {
+    val digest = MessageDigest.getInstance("SHA-256")
+    digest.update(readBytes())
+    return digest.digest()
 }
 
 private class SampleTasks(val verifyTaskName: String, val otherTaskNames: List<String>)

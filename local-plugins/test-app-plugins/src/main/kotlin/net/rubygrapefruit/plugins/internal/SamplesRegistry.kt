@@ -7,6 +7,7 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.initialization.Settings
 import org.gradle.internal.extensions.core.serviceOf
+import org.gradle.internal.impldep.bsh.commands.dir
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.process.ExecOperations
@@ -110,7 +111,7 @@ private fun Lib.verifyLib(project: Project): SampleTasks {
         task.dependsOn("build")
         task.doLast {
             println("Lib: $name")
-            verify(sourceTree)
+            verify(this, sourceTree)
         }
     }
     return SampleTasks(":$name:verifySample", emptyList())
@@ -153,7 +154,7 @@ private fun verify(app: App, distribution: AppDistribution, toolchainService: Ja
         is UiApp -> println("UI app: ${app.name} dist: ${distribution.distTask}")
     }
 
-    verify(app.sourceTree)
+    verify(app, app.sourceTree)
 
     println("Dist dir: ${distribution.distDir}")
     if (!distribution.distDir.isDirectory()) {
@@ -221,12 +222,20 @@ private fun verify(app: App, distribution: AppDistribution, toolchainService: Ja
     }
 }
 
-private fun verify(sourceTree: SourceTree) {
+private fun verify(sample: Sample, sourceTree: SourceTree) {
+    if (sourceTree.dirs.isEmpty()) {
+        println("No source dirs")
+        return
+    }
+    var hasSrcDir = false
     for (dir in sourceTree.dirs) {
-        println("Source dir: $dir")
-        if (!dir.isDirectory()) {
-            throw IllegalStateException("Source directory $dir does not exist")
+        if (dir.isDirectory()) {
+            println("Source dir: $dir")
+            hasSrcDir = true
         }
+    }
+    if (!hasSrcDir) {
+        throw IllegalStateException("Sample ${sample.name} does not contain any source directories.")
     }
 }
 

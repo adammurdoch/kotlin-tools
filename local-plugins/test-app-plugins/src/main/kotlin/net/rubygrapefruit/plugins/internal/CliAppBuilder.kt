@@ -57,7 +57,7 @@ class NativeCliAppBuilder internal constructor(
 
     internal fun register(): NativeCliApp {
         val app = container.add(name) { name, sampleDir ->
-            val sourceDir = OriginSourceDir(sampleDir.resolve("src/commonMain"))
+            val sourceDir = OriginSourceDir(sampleDir, "src/commonMain")
             NativeCliApp(name, sampleDir, null, cliArgs.toList(), expectedOutput, sourceDir)
         }
         for (builder in derived) {

@@ -16,7 +16,7 @@ class JvmUiAppBuilder internal constructor(
 
     internal fun register(): JvmUiApp {
         val app = container.add(name) { name, sampleDir ->
-            JvmUiApp(name, sampleDir, null, OriginSourceDir(sampleDir.resolve("src/main")))
+            JvmUiApp(name, sampleDir, null, OriginSourceDir(sampleDir, "src/main"))
         }
         for (builder in derived) {
             builder.register(app.sourceTree)
@@ -39,7 +39,7 @@ class NativeUiAppBuilder internal constructor(
 
     internal fun register(): NativeUiApp {
         val app = container.add(name) { name, sampleDir ->
-            NativeUiApp(name, sampleDir, null, OriginSourceDir(sampleDir.resolve("src/macosMain")))
+            NativeUiApp(name, sampleDir, null, OriginSourceDir(sampleDir, "src/macosMain"))
         }
         for (builder in derived) {
             builder.register(app.sourceTree)

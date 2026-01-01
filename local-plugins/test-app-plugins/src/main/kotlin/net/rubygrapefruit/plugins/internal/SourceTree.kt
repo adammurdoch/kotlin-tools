@@ -3,71 +3,72 @@ package net.rubygrapefruit.plugins.internal
 import java.nio.file.Path
 
 sealed interface SourceTree {
-    val dirs: List<Path>
-
-    fun derive(srcDir: Path): SourceTree
-
     fun generatedInto(sampleDir: Path): SourceTree
+
+    fun generatedInto(sampleDir: Path, path: String): SourceTree
+
+    fun visit(visitor: (SourceDir) -> Unit)
 }
 
 object NoSourceDirs : SourceTree {
-    override val dirs: List<Path>
-        get() = emptyList()
-
-    override fun derive(srcDir: Path): SourceTree {
-        throw IllegalStateException()
-    }
-
     override fun generatedInto(sampleDir: Path): SourceTree {
         return this
     }
+
+    override fun generatedInto(sampleDir: Path, path: String): SourceTree {
+        return this
+    }
+
+    override fun visit(visitor: (SourceDir) -> Unit) {
+    }
 }
 
-sealed interface SourceDir : SourceTree {
-    val srcDir: Path
+sealed class SourceDir : SourceTree {
+    abstract val srcDir: Path
 
-    override abstract fun generatedInto(sampleDir: Path): SourceDir
+    abstract override fun generatedInto(sampleDir: Path): SourceDir
+
+    override fun visit(visitor: (SourceDir) -> Unit) {
+        visitor(this)
+    }
 }
 
-class OriginSourceDir(val sampleDir: Path, val path: String) : SourceDir {
+class OriginSourceDir(val sampleDir: Path, val path: String) : SourceDir() {
     override val srcDir: Path
         get() = sampleDir.resolve(path)
 
-    override val dirs: List<Path>
-        get() = listOf(srcDir)
-
-    override fun derive(srcDir: Path): SourceTree {
-        return GeneratedSourceDir(srcDir, this)
+    override fun generatedInto(sampleDir: Path): SourceDir {
+        return generatedInto(sampleDir, path)
     }
 
-    override fun generatedInto(sampleDir: Path): SourceDir {
-        return GeneratedSourceDir(sampleDir, this)
+    override fun generatedInto(sampleDir: Path, path: String): SourceDir {
+        return GeneratedSourceDir(sampleDir.resolve(path), this)
     }
 }
 
-class GeneratedSourceDir(override val srcDir: Path, val origin: OriginSourceDir) : SourceDir {
-    override val dirs: List<Path>
-        get() = listOf(srcDir)
-
-    override fun derive(srcDir: Path): SourceTree {
-        return GeneratedSourceDir(srcDir, origin)
-    }
-
+class GeneratedSourceDir(override val srcDir: Path, val origin: OriginSourceDir) : SourceDir() {
     override fun generatedInto(sampleDir: Path): SourceDir {
         return origin.generatedInto(sampleDir)
+    }
+
+    override fun generatedInto(sampleDir: Path, path: String): SourceTree {
+        return origin.generatedInto(sampleDir, path)
     }
 }
 
 class CandidateSourceDirs(val srcDirs: List<SourceDir>) : SourceTree {
-    override val dirs: List<Path>
-        get() = srcDirs.flatMap { it.dirs }
+    override fun generatedInto(sampleDir: Path): SourceTree {
+        return CandidateSourceDirs(srcDirs.map { it.generatedInto(sampleDir) })
+    }
 
-    override fun derive(srcDir: Path): SourceTree {
+    override fun generatedInto(sampleDir: Path, path: String): SourceTree {
         throw IllegalStateException()
     }
 
-    override fun generatedInto(sampleDir: Path): SourceTree {
-        return CandidateSourceDirs(srcDirs.map { it.generatedInto(sampleDir) })
+    override fun visit(visitor: (SourceDir) -> Unit) {
+        for (sourceDir in srcDirs) {
+            sourceDir.visit(visitor)
+        }
     }
 }
 
@@ -75,6 +76,6 @@ fun SourceTree?.generatedInto(sampleDir: Path, path: String): SourceTree {
     return if (this == null) {
         OriginSourceDir(sampleDir, path)
     } else {
-        generatedInto(sampleDir)
+        generatedInto(sampleDir, path)
     }
 }

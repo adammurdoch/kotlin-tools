@@ -226,12 +226,14 @@ private fun verify(app: App, distribution: AppDistribution, toolchainService: Ja
 }
 
 private fun verify(sample: Sample, sourceTree: SourceTree) {
-    if (sourceTree.dirs.isEmpty()) {
+    val dirs = mutableListOf<Path>()
+    sourceTree.visit { dirs.add(it.srcDir) }
+    if (dirs.isEmpty()) {
         println("No source dirs")
         return
     }
     var hasSrcDir = false
-    for (dir in sourceTree.dirs) {
+    for (dir in dirs) {
         if (dir.isDirectory()) {
             println("Source dir: $dir")
             hasSrcDir = true
@@ -258,8 +260,10 @@ private fun Path.architecture(execOperations: ExecOperations): Architecture {
 
 private fun generateSamples(samples: List<Sample>) {
     for (sample in samples) {
-        if (sample.sourceTree is GeneratedSourceDir) {
-            println("Generate ${sample.name}")
+        sample.sourceTree.visit { srcDir ->
+            if (srcDir is GeneratedSourceDir && srcDir.origin.srcDir.isDirectory()) {
+                println("Generate ${sample.name} ${srcDir.srcDir} from ${srcDir.origin.srcDir}")
+            }
         }
     }
 }

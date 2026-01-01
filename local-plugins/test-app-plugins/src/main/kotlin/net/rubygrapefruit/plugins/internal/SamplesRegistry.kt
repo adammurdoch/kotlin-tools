@@ -14,9 +14,7 @@ import org.gradle.process.ExecOperations
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.nio.file.Path
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.isDirectory
-import kotlin.io.path.isRegularFile
+import kotlin.io.path.*
 
 abstract class SamplesRegistry(private val settings: Settings) : SampleContainer {
     private val samples = mutableListOf<Sample>()
@@ -258,11 +256,34 @@ private fun Path.architecture(execOperations: ExecOperations): Architecture {
     }
 }
 
+@OptIn(ExperimentalPathApi::class)
 private fun generateSamples(samples: List<Sample>) {
     for (sample in samples) {
         sample.sourceTree.visit { srcDir ->
             if (srcDir is GeneratedSourceDir && srcDir.origin.srcDir.isDirectory()) {
-                println("Generate ${sample.name} ${srcDir.srcDir} from ${srcDir.origin.srcDir}")
+                val sourceDir = srcDir.origin.srcDir
+                val destDir = srcDir.srcDir
+                println("Generate ${sample.name} $destDir from $sourceDir")
+                val files = mutableListOf<Path>()
+                sourceDir.walk(PathWalkOption.INCLUDE_DIRECTORIES).forEach { source ->
+                    val dest = srcDir.srcDir.resolve(source.relativeTo(sourceDir))
+                    files.add(dest)
+                    if (source.isRegularFile()) {
+                        source.copyTo(dest, overwrite = true)
+                    } else {
+                        dest.createDirectories()
+                    }
+                }
+
+                val toDelete = mutableListOf<Path>()
+                destDir.walk(PathWalkOption.INCLUDE_DIRECTORIES).forEach { dest ->
+                    if (!files.contains(dest) && (dest.isDirectory() || dest.name.endsWith(".kt"))) {
+                        toDelete.add(0, dest)
+                    }
+                }
+                for (path in toDelete) {
+                    path.deleteIfExists()
+                }
             }
         }
     }

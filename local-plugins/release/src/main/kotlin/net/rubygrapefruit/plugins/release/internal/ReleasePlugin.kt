@@ -9,9 +9,11 @@ import org.gradle.api.attributes.Usage
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
+import org.gradle.internal.extensions.core.serviceOf
 import org.gradle.internal.extensions.stdlib.capitalized
 import org.gradle.jvm.tasks.Jar
 import org.gradle.plugins.signing.SigningExtension
+import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import java.nio.file.Path
 import kotlin.io.path.isDirectory
@@ -168,11 +170,12 @@ open class ReleasePlugin : Plugin<Project> {
 
             val tag = tasks.register("gitTag") { t ->
                 t.mustRunAfter(uploadTask)
+                val execOperations = target.serviceOf<ExecOperations>()
                 t.doLast {
-                    exec { e ->
+                    execOperations.exec { e ->
                         e.commandLine("git", "tag", tagName.get())
                     }
-                    exec { e ->
+                    execOperations.exec { e ->
                         e.commandLine("git", "push", "origin", tagName.get())
                     }
                 }

@@ -1,6 +1,7 @@
 package net.rubygrapefruit.plugins.internal
 
 import net.rubygrapefruit.machine.info.Machine
+import net.rubygrapefruit.plugins.stage0.BuildConstants
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 
@@ -49,7 +50,7 @@ class ScriptInvocationWithInstalledJvm(
     companion object {
         fun of(name: String, distDir: Path, launcher: String?, args: List<String>, expectedOutput: String?, jvmVersion: Int?): ScriptInvocationWithInstalledJvm {
             val scriptPath = Machine.thisMachine.scriptName(launcher ?: name)
-            return ScriptInvocationWithInstalledJvm(distDir.resolve(scriptPath), args, expectedOutput, jvmVersion ?: 17)
+            return ScriptInvocationWithInstalledJvm(distDir.resolve(scriptPath), args, expectedOutput, jvmVersion ?: BuildConstants.constants.apps.jvm.version)
         }
     }
 }

@@ -58,7 +58,7 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
         if (jvm == null) {
             val lib = factory.newInstance(DefaultJvmLibrary::class.java, "jvmMain")
             lib.module.name.convention(toModuleName(project.name))
-            lib.targetJvmVersion.convention(Versions.java)
+            lib.targetJvmVersion.convention(Versions.libs.jvm.version)
             jvm = lib
             // This can call back to query JVM object
             componentRegistry.jvm(lib.targetJvmVersion)

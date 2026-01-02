@@ -14,7 +14,7 @@ coordinatesBase = "org.jetbrains.kotlin:kotlin-test-junit"
 version = 11
 
 [apps.jvm]
-version = 17
+version = 21
 
 [libs]
 group = "net.rubygrapefruit"

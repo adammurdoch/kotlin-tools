@@ -47,7 +47,6 @@ class JvmConventionsPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         with(target) {
-            javaVersion(this, Versions.java)
             extensions.create("jvmModules", JvmModuleRegistry::class.java)
         }
     }

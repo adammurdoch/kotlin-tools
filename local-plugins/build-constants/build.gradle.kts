@@ -43,9 +43,9 @@ abstract class GenerateSource : DefaultTask() {
                 val dateTime = DateTime
                 val io = IO
                 val ksp = Ksp
-                val java = ${buildConstants.libs.jvm.version}
                 val plugins = Plugins
                 val libs = Libraries
+                val apps = Applications
             }
 
             object Kotlin {
@@ -76,9 +76,22 @@ abstract class GenerateSource : DefaultTask() {
             }
 
             object Libraries {
+                val jvm = LibrariesJvm
                 val group = "${buildConstants.libs.group}"
                 
                 fun coordinates(lib: String) = group + ":" + lib + ":0.0"
+            }
+            
+            object LibrariesJvm {
+                val version = ${buildConstants.libs.jvm.version}
+            }
+            
+            object Applications {
+                val jvm = ApplicationsJvm
+            }
+            
+            object ApplicationsJvm {
+                val version = ${buildConstants.apps.jvm.version}
             }
 
             object Serialization {

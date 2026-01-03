@@ -6,7 +6,7 @@ group = versions.libs.group
 
 library {
     jvm {
-        targetJvmVersion = versions.plugins.jvm.version
+        targetJvmVersion = 11
         module.name = "net.rubygrapefruit.file_fixtures"
         dependencies {
             api(versions.test.junit.coordinates)

@@ -161,14 +161,29 @@ abstract class GenerateSource : DefaultTask() {
     }
 
     private fun Generator.typedConstants(varName: String, body: Generator.() -> Unit) {
-        val className = varName.capitalized() + "Constants"
+        val className = className(varName.capitalized())
         typedFieldDecl(varName, "public final", className)
         classDecl(className, "public static", body)
+    }
+
+    private fun Generator.className(name: String): String {
+        if (!classNames.contains(name)) {
+            return name
+        }
+        var counter = 1
+        while (true) {
+            val nameWithSuffix = "$name$counter"
+            if (!classNames.contains(nameWithSuffix)) {
+                return nameWithSuffix
+            }
+            counter++
+        }
     }
 
     private class Generator(writer: Writer) {
         private val writer = PrintWriter(writer)
         private var indent = 0
+        val classNames = mutableSetOf<String>()
 
         fun generate(body: Generator.() -> Unit) {
             writer.println("// Generated file - do not edit")
@@ -185,6 +200,9 @@ abstract class GenerateSource : DefaultTask() {
         }
 
         fun classDecl(name: String, modifiers: String, body: Generator.() -> Unit) {
+            if (!classNames.add(name)) {
+                throw IllegalArgumentException("Duplicate class '$name'")
+            }
             appendLine {
                 print(modifiers)
                 print(" class ")

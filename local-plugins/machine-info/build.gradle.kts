@@ -3,7 +3,7 @@ plugins {
 }
 
 library {
-    targetJvmVersion = buildConstants.plugins.jvm.version
+    targetJvmVersion = 11
 }
 
 dependencies {

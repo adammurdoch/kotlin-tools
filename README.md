@@ -27,6 +27,6 @@ Kotlin tools includes several Kotlin multiplatform libraries:
 The source tree is arranged as follows:
 
 - [`local-plugins`](local-plugins/) contains Gradle plugins that are used to build the other Gradle plugins. 
-  - Also contains some Kotlin libraries. These are located in a separate directory as they are also used by the Gradle plugins.
-- [`test-apps`](test-apps/) contains some sample applications and libraries that use the Gradle plugins.
+  - Also contains some Kotlin libraries that are used by the Gradle plugins.
 - [`libs`](libs/) contains some Kotlin libraries.
+- [`test-apps`](test-apps/) contains some sample applications and libraries that use the Gradle plugins.

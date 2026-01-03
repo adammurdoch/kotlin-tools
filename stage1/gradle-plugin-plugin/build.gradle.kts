@@ -16,7 +16,7 @@ gradlePlugin {
             id = buildConstants.stage1.plugins.gradlePlugin.id
             implementationClass = "net.rubygrapefruit.plugins.stage1.GradlePluginPlugin"
         }
-        create("jvmLibrary") {
+        create("jvmBase") {
             id = buildConstants.stage1.plugins.jvmBase.id
             implementationClass = "net.rubygrapefruit.plugins.stage1.JvmBasePlugin"
         }

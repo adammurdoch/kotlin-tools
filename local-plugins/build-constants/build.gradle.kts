@@ -3,17 +3,16 @@ import kotlin.io.path.createDirectories
 import kotlin.io.path.writeText
 
 plugins {
-    id("net.rubygrapefruit.stage2.jvm.lib")
     id("net.rubygrapefruit.bootstrap.base-jvm-lib")
     id("net.rubygrapefruit.bootstrap.release")
 }
 
-library {
-    targetJvmVersion = buildConstants.plugins.jvm.version
-}
-
 val generateSource: TaskProvider<GenerateSource> = tasks.register("generateConstants", GenerateSource::class.java) {
     outputDirectory = layout.buildDirectory.dir("generated-src/main/kotlin")
+}
+
+library {
+    targetJvmVersion = buildConstants.plugins.jvm.version
 }
 
 kotlin {

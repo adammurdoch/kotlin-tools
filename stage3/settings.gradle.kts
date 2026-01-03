@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("../stage0")
     includeBuild("../stage1")
     includeBuild("../stage2")
 }
@@ -19,5 +20,6 @@ projects {
     downgrade("local-plugins/machine-info")
     downgrade("local-plugins/bytecode")
     downgrade("local-plugins/base-plugins")
-    downgrade("local-plugins/convention-plugins")
 }
+
+include("convention-plugins")

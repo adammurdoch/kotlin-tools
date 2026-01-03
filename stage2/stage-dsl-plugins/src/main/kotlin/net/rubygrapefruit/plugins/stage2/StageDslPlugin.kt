@@ -19,6 +19,7 @@ abstract class StageDslPlugin : Plugin<Settings> {
                             val scriptContent = sourceBuildScript.readText()
                             val modified = scriptContent
                                 .replace("id(\"net.rubygrapefruit.kmp.lib\")", "id(\"net.rubygrapefruit.stage2.kmp.lib\")")
+                                .replace("id(\"net.rubygrapefruit.bootstrap.base-jvm-lib\")", "id(\"net.rubygrapefruit.stage2.jvm.lib\")")
                                 .replace("id(\"net.rubygrapefruit.bootstrap.release\")", "id(\"net.rubygrapefruit.stage2.release\")")
                                 .replace("id(\"net.rubygrapefruit.bootstrap.samples\")", "/* id(\"net.rubygrapefruit.bootstrap.samples\") */")
                             buildScript.writeText(modified)

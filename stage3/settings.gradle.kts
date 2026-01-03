@@ -19,4 +19,5 @@ projects {
     downgrade("local-plugins/machine-info")
     downgrade("local-plugins/bytecode")
     downgrade("local-plugins/base-plugins")
+    downgrade("local-plugins/convention-plugins")
 }

@@ -9,19 +9,8 @@ dependencies {
     implementation(versions.libs.coordinates("download"))
 }
 
-gradlePlugin {
-    plugins {
-        create("native-binary") {
-            id = "net.rubygrapefruit.jvm.native-binary"
-            implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.NativeBinaryJvmLauncherPlugin"
-        }
-        create("jvm-ui-app") {
-            id = "net.rubygrapefruit.jvm.ui-app"
-            implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.JvmUiApplicationPlugin"
-        }
-        create("native-ui-app") {
-            id = "net.rubygrapefruit.native.ui-app"
-            implementationClass = "net.rubygrapefruit.plugins.app.internal.plugins.NativeUiApplicationPlugin"
-        }
-    }
+pluginBundle {
+    plugin("net.rubygrapefruit.jvm.native-binary", "net.rubygrapefruit.plugins.app.internal.plugins.NativeBinaryJvmLauncherPlugin")
+    plugin("net.rubygrapefruit.jvm.ui-app", "net.rubygrapefruit.plugins.app.internal.plugins.JvmUiApplicationPlugin")
+    plugin("net.rubygrapefruit.native.ui-app", "net.rubygrapefruit.plugins.app.internal.plugins.NativeUiApplicationPlugin")
 }

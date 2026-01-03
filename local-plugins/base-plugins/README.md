@@ -118,9 +118,10 @@ Expects that the application uses the JVM module system.
 A convention plugin for implementing Gradle plugins using Kotlin/JVM.
 
 - Adds dependencies and repository definitions so that a fixed version of Kotlin (currently 2.0.0) is used to compile the plugin.
-- Targets Java 11.
+- Targets Java 17.
 - Adds `versions` extension
 - Adds a dependency on these plugins, so their API can be used in other plugins.
+- Adds a `pluginBundle { }` block.
 
 ## Common application settings for all targets
 

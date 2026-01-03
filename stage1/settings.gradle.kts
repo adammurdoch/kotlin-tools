@@ -5,7 +5,7 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version ("1.0.0")
 }
 
-include("gradle-plugin-plugin")
+include("plugins")
 include("settings-plugins")
 
 gradle.rootProject {

@@ -12,5 +12,7 @@ dependencies {
 }
 
 pluginBundle {
-    plugin("net.rubygrapefruit.bootstrap.base-jvm-lib", "net.rubygrapefruit.plugins.convention.BaseJvmLibraryPlugin")
+    plugin("net.rubygrapefruit.convention.base-jvm-lib", "net.rubygrapefruit.plugins.convention.BaseJvmLibraryPlugin")
+    plugin("net.rubygrapefruit.convention.build-jvm-lib", "net.rubygrapefruit.plugins.convention.BuildJvmLibraryPlugin")
+    plugin("net.rubygrapefruit.convention.jvm-lib", "net.rubygrapefruit.plugins.convention.ConventionJvmLibraryPlugin")
 }

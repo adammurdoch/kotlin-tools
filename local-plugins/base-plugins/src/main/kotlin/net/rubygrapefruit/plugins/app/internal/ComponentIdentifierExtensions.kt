@@ -8,6 +8,6 @@ internal fun ComponentIdentifier.stringId(): String {
     return when (this) {
         is ModuleComponentIdentifier -> "module:${group}:${module}"
         is ProjectComponentIdentifier -> "project:${buildTreePath}"
-        else -> throw UnsupportedOperationException()
+        else -> "opaque:$displayName"
     }
 }

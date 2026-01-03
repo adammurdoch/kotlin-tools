@@ -7,10 +7,11 @@ Gradle plugin plugin
     - Produces releasable plugins
     - Extends stage 1 plugin
 Jvm library plugin
-    - Produces releasable JVM libraries
-    - Adds a DSL
+    - Produces non-releasable JVM libraries
+    - Adds a DSL that is compatible with the production JVM library plugin
 KMP library plugin
     - Produces releasable KMP libraries that target JVM, macOS, Linux, Windows and the browser
+    - Should be reworked to produce non-releasable KMP libraries 
 JNI library plugin
     - Produces releasable Java + native libraries
 Serialization plugin
@@ -20,6 +21,6 @@ Settings plugin
 Included build plugin
     - Adds lifecycle tasks
 Stage 3 DSL plugin
-    - Provides a DSL used by stage 3
+    - Provides a DSL used by stage 3 to build copies of releasable projects that can be used at build time
 
 These plugins are not released and are intended to be used only by this build.

@@ -12,10 +12,8 @@ class JvmLibraryPlugin : Plugin<Project> {
         target.run {
             plugins.apply(BuildConstants.constants.stage1.plugins.jvmBase.id)
 
-            group = BuildConstants.constants.production.libraries.group
-
             val extension = extensions.create("library", JvmLibrary::class.java)
-            extension.targetJvmVersion.convention(BuildConstants.constants.libs.jvm.version)
+            extension.targetJvmVersion.convention(BuildConstants.constants.plugins.jvm.version)
 
             val kotlin = extensions.getByType(KotlinProjectExtension::class.java)
             kotlin.jvmToolchain {

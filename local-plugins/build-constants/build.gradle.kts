@@ -3,7 +3,7 @@ import kotlin.io.path.createDirectories
 import kotlin.io.path.writeText
 
 plugins {
-    id("net.rubygrapefruit.bootstrap.base-jvm-lib")
+    id("net.rubygrapefruit.convention.build-jvm-lib")
     id("net.rubygrapefruit.bootstrap.release")
 }
 

@@ -8,7 +8,7 @@ library {
     module.name = "net.rubygrapefruit.tools.download"
     // TODO - this should not be required
     module.requires.add("machine.info")
-    targetJvmVersion = versions.plugins.jvm.version
+    targetJvmVersion = 11
     dependencies {
         implementation(versions.libs.coordinates("machine-info"))
     }

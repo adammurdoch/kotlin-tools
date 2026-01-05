@@ -1,20 +1,26 @@
 package net.rubygrapefruit.parse
 
+import kotlin.test.assertIs
+
 abstract class AbstractParseTest {
     fun matches(parser: Parser<CharStream, Unit>, input: String, config: CharParseFixture.() -> Unit = {}) {
-        TODO()
+        val result = parser.parse(input)
+        assertIs<ParseResult.Success<Unit>>(result)
     }
 
     fun doesNotMatch(parser: Parser<CharStream, Unit>, input: String, config: CharParseFixture.() -> Unit = {}) {
-        TODO()
+        val result = parser.parse(input)
+        assertIs<ParseResult.Fail>(result)
     }
 
     fun matches(parser: Parser<ByteStream, Unit>, vararg input: Byte, config: ByteParseFixture.() -> Unit = {}) {
-        TODO()
+        val result = parser.parse(input)
+        assertIs<ParseResult.Success<Unit>>(result)
     }
 
     fun doesNotMatch(parser: Parser<ByteStream, Unit>, vararg input: Byte, config: ByteParseFixture.() -> Unit = {}) {
-        TODO()
+        val result = parser.parse(input)
+        assertIs<ParseResult.Fail>(result)
     }
 
     interface CharParseFixture

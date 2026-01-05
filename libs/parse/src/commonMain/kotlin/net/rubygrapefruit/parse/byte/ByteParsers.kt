@@ -3,8 +3,15 @@ package net.rubygrapefruit.parse.byte
 import net.rubygrapefruit.parse.Parser
 
 /**
- * Returns a parser that matches the given sequence of bytes. Does not produce a value.
+ * Returns a parser that matches the given sequence of bytes. Does not produce a result.
  */
 fun literal(vararg bytes: Byte): Parser<ByteInput, Unit> {
-    return ByteLiteralParser(bytes)
+    return ByteLiteralParser(bytes, Unit)
+}
+
+/**
+ * Returns a parser that matches the given sequence of bytes and produces the given result.
+ */
+fun <OUT> literal(vararg bytes: Byte, result: OUT): Parser<ByteInput, OUT> {
+    return ByteLiteralParser(bytes, result)
 }

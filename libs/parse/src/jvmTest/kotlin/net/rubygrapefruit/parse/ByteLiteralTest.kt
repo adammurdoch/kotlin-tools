@@ -3,7 +3,7 @@ package net.rubygrapefruit.parse
 import net.rubygrapefruit.parse.byte.literal
 import kotlin.test.Test
 
-class ByteLiteralTest: AbstractParseTest() {
+class ByteLiteralTest : AbstractParseTest() {
     @Test
     fun `matches single byte literal`() {
         val parser = literal(0x1)
@@ -18,6 +18,13 @@ class ByteLiteralTest: AbstractParseTest() {
 
         // extra
         doesNotMatch(parser, 0x1, 0x2)
+    }
+
+    @Test
+    fun `matches single byte literal and produces result`() {
+        val parser = literal(0x1, result = "one")
+
+        matches(parser, 0x1, expected = "one")
     }
 
     @Test
@@ -39,5 +46,12 @@ class ByteLiteralTest: AbstractParseTest() {
 
         // extra
         doesNotMatch(parser, 0x1, 0x2, 0x3)
+    }
+
+    @Test
+    fun `matches multi-byte literal and produces result`() {
+        val parser = literal(0x1, 0x2, result = "one-two")
+
+        matches(parser, 0x1, 0x2, expected = "one-two")
     }
 }

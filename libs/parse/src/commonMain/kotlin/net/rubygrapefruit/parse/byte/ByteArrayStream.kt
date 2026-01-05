@@ -1,6 +1,6 @@
 package net.rubygrapefruit.parse.byte
 
-internal class ByteArrayInput(val bytes: ByteArray) : ByteInput {
+internal class ByteArrayStream(val bytes: ByteArray) : ByteStream {
     override val length: Int
         get() = bytes.size
 

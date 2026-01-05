@@ -1,4 +1,7 @@
 package net.rubygrapefruit.parse.char
 
-interface CharStream {
+import net.rubygrapefruit.parse.Input
+
+internal interface CharStream : Input {
+    fun next(index: Int): Char
 }

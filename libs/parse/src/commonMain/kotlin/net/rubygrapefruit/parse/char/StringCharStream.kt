@@ -1,6 +1,6 @@
 package net.rubygrapefruit.parse.char
 
-internal class StringInput(val text: String) : CharInput {
+internal class StringCharStream(val text: String) : CharStream {
     override val length: Int
         get() = text.length
 

@@ -1,5 +1,9 @@
 package net.rubygrapefruit.parse
 
+import net.rubygrapefruit.parse.byte.ByteStream
+import net.rubygrapefruit.parse.byte.parse
+import net.rubygrapefruit.parse.char.CharStream
+import net.rubygrapefruit.parse.char.parse
 import kotlin.test.assertIs
 
 abstract class AbstractParseTest {

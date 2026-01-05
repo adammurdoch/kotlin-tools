@@ -1,7 +1,8 @@
-package net.rubygrapefruit.parse
+package net.rubygrapefruit.parse.byte
 
-import net.rubygrapefruit.parse.byte.ByteArrayInput
-import net.rubygrapefruit.parse.byte.ByteInput
+import net.rubygrapefruit.parse.ConsumingParser
+import net.rubygrapefruit.parse.ParseResult
+import net.rubygrapefruit.parse.Parser
 
 /**
  * Attempts to parse the given input. Fails when the parser cannot match the entire input.
@@ -9,5 +10,5 @@ import net.rubygrapefruit.parse.byte.ByteInput
 fun <OUT> Parser<ByteStream, OUT>.parse(input: ByteArray): ParseResult<OUT> {
     @Suppress("UNCHECKED_CAST")
     val parser = this as ConsumingParser<ByteInput, OUT>
-    return parse(parser, ByteArrayInput(input))
+    return net.rubygrapefruit.parse.parse(parser, ByteArrayInput(input))
 }

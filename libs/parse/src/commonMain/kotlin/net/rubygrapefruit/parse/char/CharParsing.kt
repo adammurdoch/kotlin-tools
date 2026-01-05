@@ -1,7 +1,8 @@
-package net.rubygrapefruit.parse
+package net.rubygrapefruit.parse.char
 
-import net.rubygrapefruit.parse.char.CharInput
-import net.rubygrapefruit.parse.char.StringInput
+import net.rubygrapefruit.parse.ConsumingParser
+import net.rubygrapefruit.parse.ParseResult
+import net.rubygrapefruit.parse.Parser
 
 /**
  * Attempts to parse the given input. Fails when the parser cannot match the entire input.
@@ -9,5 +10,5 @@ import net.rubygrapefruit.parse.char.StringInput
 fun <OUT> Parser<CharStream, OUT>.parse(input: String): ParseResult<OUT> {
     @Suppress("UNCHECKED_CAST")
     val parser = this as ConsumingParser<CharInput, OUT>
-    return parse(parser, StringInput(input))
+    return net.rubygrapefruit.parse.parse(parser, StringInput(input))
 }

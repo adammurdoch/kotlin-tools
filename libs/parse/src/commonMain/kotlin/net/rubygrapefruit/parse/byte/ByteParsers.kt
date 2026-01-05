@@ -1,6 +1,6 @@
-package net.rubygrapefruit.parse
+package net.rubygrapefruit.parse.byte
 
-import net.rubygrapefruit.parse.byte.ByteLiteralParser
+import net.rubygrapefruit.parse.Parser
 
 /**
  * Returns a parser that matches the given sequence of bytes. Does not produce a value.

@@ -1,6 +1,5 @@
 package net.rubygrapefruit.parse.byte
 
-import net.rubygrapefruit.parse.ByteStream
 import net.rubygrapefruit.parse.ConsumingParser
 import net.rubygrapefruit.parse.Parser
 

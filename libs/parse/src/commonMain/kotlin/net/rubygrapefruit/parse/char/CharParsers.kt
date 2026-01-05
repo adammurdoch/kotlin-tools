@@ -1,6 +1,6 @@
-package net.rubygrapefruit.parse
+package net.rubygrapefruit.parse.char
 
-import net.rubygrapefruit.parse.char.CharLiteralParser
+import net.rubygrapefruit.parse.Parser
 
 /**
  * Returns a parser that matches the given text. Does not produce a value.

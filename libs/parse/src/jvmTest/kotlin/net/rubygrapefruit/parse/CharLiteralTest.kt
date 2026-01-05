@@ -1,5 +1,6 @@
 package net.rubygrapefruit.parse
 
+import net.rubygrapefruit.parse.char.literal
 import kotlin.test.Test
 
 class CharLiteralTest : AbstractParseTest() {

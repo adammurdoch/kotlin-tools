@@ -6,7 +6,7 @@ import kotlin.test.Test
 class ByteLiteralTest : AbstractParseTest() {
     @Test
     fun `matches single byte literal`() {
-        val parser = literal(0x1)
+        val parser = literal(byteArrayOf(0x1))
 
         matches(parser, 0x1)
 
@@ -29,14 +29,14 @@ class ByteLiteralTest : AbstractParseTest() {
 
     @Test
     fun `matches single byte literal and produces result`() {
-        val parser = literal(0x1, result = "one")
+        val parser = literal(byteArrayOf(0x1), result = "one")
 
         matches(parser, 0x1, expected = "one")
     }
 
     @Test
     fun `matches multi-byte literal`() {
-        val parser = literal(0x1, 0x2)
+        val parser = literal(byteArrayOf(0x1, 0x2))
 
         matches(parser, 0x1, 0x2)
 
@@ -74,7 +74,7 @@ class ByteLiteralTest : AbstractParseTest() {
 
     @Test
     fun `matches multi-byte literal and produces result`() {
-        val parser = literal(0x1, 0x2, result = "one-two")
+        val parser = literal(byteArrayOf(0x1, 0x2), "one-two")
 
         matches(parser, 0x1, 0x2, expected = "one-two")
     }

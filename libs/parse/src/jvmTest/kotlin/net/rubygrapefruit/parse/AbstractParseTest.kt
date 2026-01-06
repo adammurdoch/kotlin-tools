@@ -33,7 +33,7 @@ abstract class AbstractParseTest {
         result2.assertIsSuccess(expected)
     }
 
-    fun doesNotMatch(parser: Parser<CharInput, Unit>, input: String, config: CharParseFailureFixture.() -> Unit = {}) {
+    fun doesNotMatch(parser: Parser<CharInput, *>, input: String, config: CharParseFailureFixture.() -> Unit = {}) {
         val fixture = DefaultCharParseFailureFixture()
         fixture.config()
 
@@ -62,7 +62,7 @@ abstract class AbstractParseTest {
         result2.assertIsSuccess(expected)
     }
 
-    fun doesNotMatch(parser: Parser<ByteInput, Unit>, vararg input: Byte, config: ByteParseFailureFixture.() -> Unit = {}) {
+    fun doesNotMatch(parser: Parser<ByteInput, *>, vararg input: Byte, config: ByteParseFailureFixture.() -> Unit = {}) {
         val fixture = DefaultByteParseFailureFixture()
         fixture.config()
 
@@ -72,7 +72,7 @@ abstract class AbstractParseTest {
 
     private fun <T> ParseResult<*, T>.assertIsSuccess(expected: T) {
         assertIs<ParseResult.Success<T>>(this)
-        assertEquals(expected, value)
+        assertEquals(expected, value, "unexpected value")
     }
 
     private fun ParseResult<CharPosition, *>.assertIsFail(offset: Int, line: Int, col: Int, message: String) {
@@ -90,7 +90,7 @@ abstract class AbstractParseTest {
     }
 
     interface CharParseFailureFixture {
-        fun failAt(offset: Int, line: Int, col: Int)
+        fun failAt(offset: Int, line: Int = 1, col: Int = offset + 1)
 
         fun expect(text: String)
 
@@ -116,7 +116,7 @@ abstract class AbstractParseTest {
         }
 
         fun message(): String {
-            return "expected ${expect.joinToString(", ")}"
+            return "Expected ${expect.joinToString(", ")}"
         }
     }
 
@@ -143,7 +143,7 @@ abstract class AbstractParseTest {
         }
 
         fun message(): String {
-            return "expected ${expect.joinToString(", ")}"
+            return "Expected ${expect.joinToString(", ")}"
         }
     }
 

@@ -2,15 +2,14 @@ package net.rubygrapefruit.parse.char
 
 import net.rubygrapefruit.parse.ParseResult
 import net.rubygrapefruit.parse.Parser
-import net.rubygrapefruit.parse.PullParser
+import net.rubygrapefruit.parse.compile
 import net.rubygrapefruit.parse.parse
 
 /**
  * Attempts to parse the given input. Fails when the parser cannot match the entire input.
  */
 fun <OUT> Parser<CharInput, OUT>.parse(input: String): ParseResult<CharPosition, OUT> {
-    @Suppress("UNCHECKED_CAST")
-    val parser = this as PullParser<CharStream, OUT>
+    val parser = compile<CharStream, OUT>()
     return parse(parser, StringCharStream(input))
 }
 
@@ -19,7 +18,6 @@ fun <OUT> Parser<CharInput, OUT>.parse(input: String): ParseResult<CharPosition,
  * Fails when the parser cannot match the entire input.
  */
 fun <OUT> Parser<CharInput, OUT>.pushParser(): CharPushParser<OUT> {
-    @Suppress("UNCHECKED_CAST")
-    val parser = this as PullParser<CharStream, OUT>
+    val parser = compile<CharStream, OUT>()
     return DefaultCharPushParser(parser)
 }

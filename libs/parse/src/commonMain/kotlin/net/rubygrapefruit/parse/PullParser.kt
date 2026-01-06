@@ -13,7 +13,7 @@ internal interface PullParser<in IN, out OUT> {
     class Matched<IN, OUT>(val count: Int, val value: OUT) : Finished<IN, OUT>
 
     // Parser stopped matching
-    class Failed<IN, OUT>(val index: Int, val message: String) : Finished<IN, OUT>
+    class Failed<IN, OUT>(val index: Int, val expected: List<String>) : Finished<IN, OUT>
 
     // Parser requires more input
     class RequireMore<IN, OUT>(val parser: PullParser<IN, OUT>) : Result<IN, OUT>

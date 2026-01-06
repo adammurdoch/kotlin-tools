@@ -8,7 +8,7 @@ internal abstract class AbstractPushParser<POS, IN : Input<POS>, OUT>(
     protected fun inputAvailable(input: IN) {
         val currentState = state
         when (currentState) {
-            is PullParser.Matched -> state = PullParser.Failed(currentState.count, "expected end of input")
+            is PullParser.Matched -> state = PullParser.Failed(currentState.count, listOf("expected end of input"))
             is PullParser.Failed -> {}
             is PullParser.RequireMore -> state = currentState.parser.parse(input)
         }

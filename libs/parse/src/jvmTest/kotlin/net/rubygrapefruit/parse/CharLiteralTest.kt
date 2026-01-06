@@ -22,7 +22,7 @@ class CharLiteralTest : AbstractParseTest() {
 
         // extra char
         doesNotMatch(parser, "aX") {
-            failAt(1, 1, 2)
+            failAt(1)
             expectEndOfInput()
         }
 
@@ -75,7 +75,7 @@ class CharLiteralTest : AbstractParseTest() {
 
         // extra char
         doesNotMatch(parser, "abX") {
-            failAt(2, 1, 3)
+            failAt(2)
             expectEndOfInput()
         }
 

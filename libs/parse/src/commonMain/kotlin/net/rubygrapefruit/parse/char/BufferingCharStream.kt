@@ -10,6 +10,10 @@ internal class BufferingCharStream : CharStream {
         return tail.get(index)
     }
 
+    override fun posAt(index: Int): CharPosition {
+        return CharPosition(index, 1, index + 1)
+    }
+
     fun append(chars: CharArray) {
         tail = tail.append(chars)
     }

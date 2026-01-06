@@ -4,7 +4,7 @@ import net.rubygrapefruit.parse.Parser
 import net.rubygrapefruit.parse.PullParser
 
 internal class CharLiteralParser<OUT>(private val text: String, result: OUT) : Parser<CharInput, OUT>, PullParser<CharStream, OUT> {
-    private val fail = PullParser.Failed<CharStream, OUT>(0)
+    private val fail = PullParser.Failed<CharStream, OUT>(0, "expected \"$text\"")
     private val success = PullParser.Matched<CharStream, OUT>(text.length, result)
     private val requireMore = PullParser.RequireMore(this)
 
@@ -18,5 +18,9 @@ internal class CharLiteralParser<OUT>(private val text: String, result: OUT) : P
             }
         }
         return success
+    }
+
+    override fun endOfInput(input: CharStream): PullParser.Finished<CharStream, OUT> {
+        return fail
     }
 }

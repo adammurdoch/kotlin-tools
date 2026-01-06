@@ -2,7 +2,7 @@ package net.rubygrapefruit.parse.byte
 
 import net.rubygrapefruit.parse.PushParser
 
-interface BytePushParser<OUT> : PushParser<OUT> {
+interface BytePushParser<OUT> : PushParser<BytePosition, OUT> {
     /**
      * Signals that more input is available.
      */

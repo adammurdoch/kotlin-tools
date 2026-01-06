@@ -8,7 +8,7 @@ import net.rubygrapefruit.parse.parse
 /**
  * Attempts to parse the given input. Fails when the parser cannot match the entire input.
  */
-fun <OUT> Parser<CharInput, OUT>.parse(input: String): ParseResult<OUT> {
+fun <OUT> Parser<CharInput, OUT>.parse(input: String): ParseResult<CharPosition, OUT> {
     @Suppress("UNCHECKED_CAST")
     val parser = this as PullParser<CharStream, OUT>
     return parse(parser, StringCharStream(input))

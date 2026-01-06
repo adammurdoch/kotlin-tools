@@ -8,7 +8,7 @@ import net.rubygrapefruit.parse.parse
 /**
  * Attempts to parse the given input. Fails when the parser cannot match the entire input.
  */
-fun <OUT> Parser<ByteInput, OUT>.parse(input: ByteArray): ParseResult<OUT> {
+fun <OUT> Parser<ByteInput, OUT>.parse(input: ByteArray): ParseResult<BytePosition, OUT> {
     @Suppress("UNCHECKED_CAST")
     val parser = this as PullParser<ByteStream, OUT>
     return parse(parser, ArrayByteStream(input))

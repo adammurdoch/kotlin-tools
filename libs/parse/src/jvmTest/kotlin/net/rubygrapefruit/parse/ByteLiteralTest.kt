@@ -11,13 +11,20 @@ class ByteLiteralTest : AbstractParseTest() {
         matches(parser, 0x1)
 
         // missing
-        doesNotMatch(parser)
+        doesNotMatch(parser) {
+            expect("x01")
+        }
 
         // unexpected
-        doesNotMatch(parser, 0x2)
+        doesNotMatch(parser, 0x2) {
+            expect("x01")
+        }
 
         // extra
-        doesNotMatch(parser, 0x1, 0x2)
+        doesNotMatch(parser, 0x1, 0x2) {
+            failAt(1)
+            expectEndOfInput()
+        }
     }
 
     @Test
@@ -34,18 +41,35 @@ class ByteLiteralTest : AbstractParseTest() {
         matches(parser, 0x1, 0x2)
 
         // missing
-        doesNotMatch(parser)
-        doesNotMatch(parser, 0x1)
+        doesNotMatch(parser) {
+            expect("x01, x02")
+        }
+        doesNotMatch(parser, 0x1) {
+            expect("x01, x02")
+        }
 
         // unexpected
-        doesNotMatch(parser, 0x3)
-        doesNotMatch(parser, 0x3, 0x1)
-        doesNotMatch(parser, 0x3, 0x1, 0x2)
-        doesNotMatch(parser, 0x1, 0x3)
-        doesNotMatch(parser, 0x1, 0x3, 0x2)
+        doesNotMatch(parser, 0x3) {
+            expect("x01, x02")
+        }
+        doesNotMatch(parser, 0x3, 0x1) {
+            expect("x01, x02")
+        }
+        doesNotMatch(parser, 0x3, 0x1, 0x2) {
+            expect("x01, x02")
+        }
+        doesNotMatch(parser, 0x1, 0x3) {
+            expect("x01, x02")
+        }
+        doesNotMatch(parser, 0x1, 0x3, 0x2) {
+            expect("x01, x02")
+        }
 
         // extra
-        doesNotMatch(parser, 0x1, 0x2, 0x3)
+        doesNotMatch(parser, 0x1, 0x2, 0x3) {
+            failAt(2)
+            expectEndOfInput()
+        }
     }
 
     @Test

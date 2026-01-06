@@ -11,16 +11,25 @@ class CharLiteralTest : AbstractParseTest() {
         matches(parser, "a")
 
         // missing
-        doesNotMatch(parser, "")
+        doesNotMatch(parser, "") {
+            expect("\"a\"")
+        }
 
         // unexpected char
-        doesNotMatch(parser, "X")
+        doesNotMatch(parser, "X") {
+            expect("\"a\"")
+        }
 
         // extra char
-        doesNotMatch(parser, "aX")
+        doesNotMatch(parser, "aX") {
+            failAt(1, 1, 2)
+            expectEndOfInput()
+        }
 
         // incorrect case
-        doesNotMatch(parser, "A")
+        doesNotMatch(parser, "A") {
+            expect("\"a\"")
+        }
     }
 
     @Test
@@ -37,24 +46,49 @@ class CharLiteralTest : AbstractParseTest() {
         matches(parser, "ab")
 
         // missing
-        doesNotMatch(parser, "")
-        doesNotMatch(parser, "a")
-        doesNotMatch(parser, "b")
+        doesNotMatch(parser, "") {
+            expect("\"ab\"")
+        }
+        doesNotMatch(parser, "a") {
+            expect("\"ab\"")
+        }
+        doesNotMatch(parser, "b") {
+            expect("\"ab\"")
+        }
 
         // unexpected char
-        doesNotMatch(parser, "X")
-        doesNotMatch(parser, "aX")
-        doesNotMatch(parser, "Xb")
-        doesNotMatch(parser, "Xab")
-        doesNotMatch(parser, "aXb")
+        doesNotMatch(parser, "X") {
+            expect("\"ab\"")
+        }
+        doesNotMatch(parser, "aX") {
+            expect("\"ab\"")
+        }
+        doesNotMatch(parser, "Xb") {
+            expect("\"ab\"")
+        }
+        doesNotMatch(parser, "Xab") {
+            expect("\"ab\"")
+        }
+        doesNotMatch(parser, "aXb") {
+            expect("\"ab\"")
+        }
 
         // extra char
-        doesNotMatch(parser, "abX")
+        doesNotMatch(parser, "abX") {
+            failAt(2, 1, 3)
+            expectEndOfInput()
+        }
 
         // incorrect case
-        doesNotMatch(parser, "AB")
-        doesNotMatch(parser, "Ab")
-        doesNotMatch(parser, "aB")
+        doesNotMatch(parser, "AB") {
+            expect("\"ab\"")
+        }
+        doesNotMatch(parser, "Ab") {
+            expect("\"ab\"")
+        }
+        doesNotMatch(parser, "aB") {
+            expect("\"ab\"")
+        }
     }
 
     @Test

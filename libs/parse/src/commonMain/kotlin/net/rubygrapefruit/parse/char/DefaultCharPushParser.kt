@@ -6,7 +6,7 @@ import net.rubygrapefruit.parse.PullParser
 internal class DefaultCharPushParser<OUT>(parser: PullParser<CharStream, OUT>) : AbstractPushParser<CharStream, OUT>(parser), CharPushParser<OUT> {
     private val input = BufferingCharStream()
 
-    override fun parse(chars: CharArray) {
+    override fun input(chars: CharArray) {
         if (chars.isEmpty()) {
             return
         }

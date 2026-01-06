@@ -3,5 +3,8 @@ package net.rubygrapefruit.parse.byte
 import net.rubygrapefruit.parse.PushParser
 
 interface BytePushParser<OUT> : PushParser<OUT> {
-    fun parse(bytes: ByteArray)
+    /**
+     * Signals that more input is available.
+     */
+    fun input(bytes: ByteArray)
 }

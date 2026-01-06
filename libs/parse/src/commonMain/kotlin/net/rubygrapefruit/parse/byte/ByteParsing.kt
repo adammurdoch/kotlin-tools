@@ -14,6 +14,10 @@ fun <OUT> Parser<ByteInput, OUT>.parse(input: ByteArray): ParseResult<OUT> {
     return parse(parser, ArrayByteStream(input))
 }
 
+/**
+ * Creates a [BytePushParser] that will attempt to match input as it becomes available.
+ * Fails when the parser cannot match the entire input.
+ */
 fun <OUT> Parser<ByteInput, OUT>.pushParser(): BytePushParser<OUT> {
     @Suppress("UNCHECKED_CAST")
     val parser = this as PullParser<ByteStream, OUT>

@@ -19,13 +19,13 @@ abstract class AbstractParseTest {
         result.assertIsSuccess(expected)
 
         val pushParser1 = parser.pushParser()
-        pushParser1.parse(input.toCharArray())
+        pushParser1.input(input.toCharArray())
         val result1 = pushParser1.endOfInput()
         result1.assertIsSuccess(expected)
 
         val pushParser2 = parser.pushParser()
         for (index in input.indices) {
-            pushParser2.parse(charArrayOf(input[index]))
+            pushParser2.input(charArrayOf(input[index]))
         }
         val result2 = pushParser2.endOfInput()
         result2.assertIsSuccess(expected)
@@ -45,13 +45,13 @@ abstract class AbstractParseTest {
         result.assertIsSuccess(expected)
 
         val pushParser1 = parser.pushParser()
-        pushParser1.parse(input)
+        pushParser1.input(input)
         val result1 = pushParser1.endOfInput()
         result1.assertIsSuccess(expected)
 
         val pushParser2 = parser.pushParser()
         for (index in input.indices) {
-            pushParser2.parse(byteArrayOf(input[index]))
+            pushParser2.input(byteArrayOf(input[index]))
         }
         val result2 = pushParser2.endOfInput()
         result2.assertIsSuccess(expected)

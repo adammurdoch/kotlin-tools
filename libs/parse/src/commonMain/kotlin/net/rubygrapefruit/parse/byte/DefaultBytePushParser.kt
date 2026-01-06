@@ -6,7 +6,7 @@ import net.rubygrapefruit.parse.PullParser
 internal class DefaultBytePushParser<OUT>(parser: PullParser<ByteStream, OUT>) : AbstractPushParser<ByteStream, OUT>(parser), BytePushParser<OUT> {
     private val input = BufferingByteStream()
 
-    override fun parse(bytes: ByteArray) {
+    override fun input(bytes: ByteArray) {
         if (bytes.isEmpty()) {
             return
         }

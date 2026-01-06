@@ -1,8 +1,8 @@
 package net.rubygrapefruit.parse.char
 
-import net.rubygrapefruit.parse.ConsumingParser
 import net.rubygrapefruit.parse.ParseResult
 import net.rubygrapefruit.parse.Parser
+import net.rubygrapefruit.parse.PullParser
 import net.rubygrapefruit.parse.parse
 
 /**
@@ -10,6 +10,12 @@ import net.rubygrapefruit.parse.parse
  */
 fun <OUT> Parser<CharInput, OUT>.parse(input: String): ParseResult<OUT> {
     @Suppress("UNCHECKED_CAST")
-    val parser = this as ConsumingParser<CharStream, OUT>
+    val parser = this as PullParser<CharStream, OUT>
     return parse(parser, StringCharStream(input))
+}
+
+fun <OUT> Parser<CharInput, OUT>.pushParser(): CharPushParser<OUT> {
+    @Suppress("UNCHECKED_CAST")
+    val parser = this as PullParser<CharStream, OUT>
+    return DefaultCharPushParser(parser)
 }

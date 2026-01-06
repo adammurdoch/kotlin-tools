@@ -1,18 +1,19 @@
 package net.rubygrapefruit.parse.char
 
-import net.rubygrapefruit.parse.ConsumingParser
 import net.rubygrapefruit.parse.Parser
+import net.rubygrapefruit.parse.PullParser
 
-internal class CharLiteralParser<OUT>(private val text: String, result: OUT) : Parser<CharInput, OUT>, ConsumingParser<CharStream, OUT> {
-    private val fail = ConsumingParser.Result.Fail(0)
-    private val success = ConsumingParser.Result.Success(text.length, result)
+internal class CharLiteralParser<OUT>(private val text: String, result: OUT) : Parser<CharInput, OUT>, PullParser<CharStream, OUT> {
+    private val fail = PullParser.Failed<CharStream, OUT>(0)
+    private val success = PullParser.Matched<CharStream, OUT>(text.length, result)
+    private val requireMore = PullParser.RequireMore(this)
 
-    override fun parse(input: CharStream): ConsumingParser.Result<OUT> {
-        if (input.length < text.length) {
-            return fail
-        }
+    override fun parse(input: CharStream): PullParser.Result<CharStream, OUT> {
         for (index in text.indices) {
-            if (input.next(index) != text[index]) {
+            if (index >= input.length) {
+                return requireMore
+            }
+            if (input.get(index) != text[index]) {
                 return fail
             }
         }

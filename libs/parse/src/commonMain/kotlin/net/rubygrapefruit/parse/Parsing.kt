@@ -1,19 +1,21 @@
 package net.rubygrapefruit.parse
 
 internal fun <POS, IN : Input<POS>, OUT> parse(parser: PullParser<IN, OUT>, input: IN): ParseResult<POS, OUT> {
-    val result = parser.parse(input)
-    return finalResult(result, input)
+    var current = parser
+    while (true) {
+        val result = current.parse(input)
+        when (result) {
+            is PullParser.Finished -> return finalResult(result, input)
+            is PullParser.RequireMore -> current = result.parser
+        }
+    }
 }
 
 internal fun <POS, IN : Input<POS>, OUT> finalResult(result: PullParser.Result<IN, OUT>, input: IN): ParseResult<POS, OUT> {
-    val finalResult = when (result) {
-        is PullParser.Matched -> result
-        is PullParser.Failed -> result
-        is PullParser.RequireMore -> result.parser.endOfInput(input)
-    }
-    return when (finalResult) {
-        is PullParser.Matched -> ParseResult.Success(finalResult.value)
-        is PullParser.Failed -> ParseResult.Fail(input.posAt(finalResult.index), "Expected ${finalResult.expected.joinToString(", ")}")
+    return when (result) {
+        is PullParser.Matched -> ParseResult.Success(result.value)
+        is PullParser.Failed -> ParseResult.Fail(input.posAt(result.index), "Expected ${result.expected.joinToString(", ")}")
+        is PullParser.RequireMore -> throw IllegalArgumentException("Expected parsing to be finished")
     }
 }
 

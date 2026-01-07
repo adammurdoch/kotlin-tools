@@ -20,18 +20,18 @@ internal class CharLiteralParser<OUT>(private val text: String, private val resu
 
         override fun parse(input: CharStream): PullParser.Result<CharStream, NEXT> {
             for (index in text.indices) {
-                if (index >= input.length) {
-                    return requireMore
+                if (index >= input.available) {
+                    return if (input.finished) {
+                        fail
+                    } else {
+                        requireMore
+                    }
                 }
                 if (input.get(index) != text[index]) {
                     return fail
                 }
             }
             return next(success)
-        }
-
-        override fun endOfInput(input: CharStream): PullParser.Finished<CharStream, NEXT> {
-            return fail
         }
     }
 }

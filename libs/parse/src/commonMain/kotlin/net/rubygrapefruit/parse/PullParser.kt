@@ -3,8 +3,6 @@ package net.rubygrapefruit.parse
 internal interface PullParser<in IN, out OUT> {
     fun parse(input: IN): Result<IN, OUT>
 
-    fun endOfInput(input: IN): Finished<IN, OUT>
-
     sealed interface Result<in IN, out OUT>
 
     sealed interface Finished<in IN, out OUT> : Result<IN, OUT>

@@ -4,14 +4,12 @@ internal class EndOfInputParser<IN : Input<*>, OUT>(
     private val result: PullParser.Matched<IN, OUT>
 ) : PullParser<IN, OUT> {
     override fun parse(input: IN): PullParser.Result<IN, OUT> {
-        return PullParser.Failed(result.count, listOf("end of input"))
-    }
-
-    override fun endOfInput(input: IN): PullParser.Finished<IN, OUT> {
-        return if (input.length > result.count) {
+        return if (input.available > result.count) {
             PullParser.Failed(result.count, listOf("end of input"))
-        } else {
+        } else if (input.finished) {
             result
+        } else {
+            PullParser.RequireMore(this)
         }
     }
 }

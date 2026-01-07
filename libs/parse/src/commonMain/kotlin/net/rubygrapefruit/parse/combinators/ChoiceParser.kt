@@ -1,8 +1,8 @@
 package net.rubygrapefruit.parse.combinators
 
+import net.rubygrapefruit.parse.CombinatorBuilder
 import net.rubygrapefruit.parse.Input
 import net.rubygrapefruit.parse.Parser
-import net.rubygrapefruit.parse.CombinatorBuilder
 import net.rubygrapefruit.parse.PullParser
 
 internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
@@ -46,26 +46,6 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
                 val relevantFailures = failures.filter { it.index == largestIndex }
                 PullParser.Failed(largestIndex, relevantFailures.flatMap { it.expected })
             }
-        }
-
-        override fun endOfInput(input: IN): PullParser.Finished<IN, NEXT> {
-            val failures = mutableListOf<PullParser.Failed<IN, OUT>>()
-            for (choice in choices) {
-                if (choice is PullParser.RequireMore) {
-                    val nextChoice = choice.parser.endOfInput(input)
-                    when (nextChoice) {
-                        is PullParser.Matched -> {
-                            return next(nextChoice) as PullParser.Finished<IN, NEXT>
-                        }
-                        is PullParser.Failed -> failures.add(nextChoice)
-                    }
-                } else {
-                    failures.add(choice as PullParser.Failed)
-                }
-            }
-            val largestIndex = failures.maxOf { it.index }
-            val relevantFailures = failures.filter { it.index == largestIndex }
-            return PullParser.Failed(largestIndex, relevantFailures.flatMap { it.expected })
         }
     }
 }

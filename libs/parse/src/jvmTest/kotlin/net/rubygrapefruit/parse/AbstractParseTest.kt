@@ -9,7 +9,6 @@ import net.rubygrapefruit.parse.char.CharPosition
 import net.rubygrapefruit.parse.char.parse
 import net.rubygrapefruit.parse.char.pushParser
 import kotlin.test.assertEquals
-import kotlin.test.assertIs
 import kotlin.test.fail
 
 abstract class AbstractParseTest {
@@ -162,8 +161,12 @@ abstract class AbstractParseTest {
     }
 
     private fun <T> ParseResult<*, T>.assertIsSuccess(expected: T) {
-        assertIs<ParseResult.Success<T>>(this)
-        assertEquals(expected, value, "unexpected value")
+        when (this) {
+            is ParseResult.Fail -> fail("Expected parse to succeed but failed at $position with $message")
+            is ParseResult.Success -> {
+                assertEquals(expected, value, "unexpected value")
+            }
+        }
     }
 
     private fun ParseResult<CharPosition, *>.assertIsFail(offset: Int, line: Int, col: Int, message: String) {

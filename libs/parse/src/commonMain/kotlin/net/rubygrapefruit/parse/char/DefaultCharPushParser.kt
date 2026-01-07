@@ -17,6 +17,7 @@ internal class DefaultCharPushParser<OUT>(parser: PullParser<CharStream, OUT>) :
     }
 
     override fun endOfInput(): ParseResult<CharPosition, OUT> {
+        input.end()
         return endOfInput(input)
     }
 }

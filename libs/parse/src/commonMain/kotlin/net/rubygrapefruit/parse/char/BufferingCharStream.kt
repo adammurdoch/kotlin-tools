@@ -2,8 +2,10 @@ package net.rubygrapefruit.parse.char
 
 internal class BufferingCharStream : CharStream {
     private var tail = Buffer(null, 0)
+    override var finished: Boolean = false
+        private set
 
-    override val length: Int
+    override val available: Int
         get() = tail.endIndex
 
     override fun get(index: Int): Char {
@@ -16,6 +18,10 @@ internal class BufferingCharStream : CharStream {
 
     fun append(chars: CharArray) {
         tail = tail.append(chars)
+    }
+
+    fun end() {
+        finished = true
     }
 
     private class Buffer(private val previous: Buffer?, private val startIndex: Int) {

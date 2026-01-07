@@ -19,18 +19,18 @@ internal class ByteLiteralParser<OUT>(private val bytes: ByteArray, private val 
 
         override fun parse(input: ByteStream): PullParser.Result<ByteStream, NEXT> {
             for (index in bytes.indices) {
-                if (index >= input.length) {
-                    return requireMore
+                if (index >= input.available) {
+                    return if (input.finished) {
+                        PullParser.Failed(index, listOf(format(bytes[index])))
+                    } else {
+                        requireMore
+                    }
                 }
                 if (input.get(index) != bytes[index]) {
                     return PullParser.Failed(index, listOf(format(bytes[index])))
                 }
             }
             return next(success)
-        }
-
-        override fun endOfInput(input: ByteStream): PullParser.Finished<ByteStream, NEXT> {
-            return PullParser.Failed(input.length, listOf(format(bytes[input.length])))
         }
 
         private fun format(byte: Byte): String {

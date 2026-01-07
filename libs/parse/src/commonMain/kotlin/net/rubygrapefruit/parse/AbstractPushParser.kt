@@ -15,6 +15,7 @@ internal abstract class AbstractPushParser<POS, IN : Input<POS>, OUT>(
     }
 
     protected fun endOfInput(input: IN): ParseResult<POS, OUT> {
+        inputAvailable(input)
         return finalResult(state, input)
     }
 }

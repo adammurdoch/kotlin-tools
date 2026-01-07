@@ -16,6 +16,7 @@ internal class DefaultBytePushParser<OUT>(parser: PullParser<ByteStream, OUT>) :
     }
 
     override fun endOfInput(): ParseResult<BytePosition, OUT> {
+        input.end()
         return endOfInput(input)
     }
 }

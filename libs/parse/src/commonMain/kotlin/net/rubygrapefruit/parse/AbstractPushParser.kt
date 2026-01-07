@@ -6,16 +6,21 @@ internal abstract class AbstractPushParser<POS, IN : AdvancingInput<POS>, OUT>(
     private var state: ParseState<IN, OUT> = parser
 
     protected fun inputAvailable(input: IN) {
-        val currentState = state
-        when (currentState) {
-            is PullParser.Finished -> {}
-            is PullParser -> {
-                val result = currentState.parse(input)
-                when (result) {
-                    is PullParser.Finished -> state = result
-                    is PullParser.RequireMore -> {
-                        input.advance(result.advance)
-                        state = result.parser
+        while (true) {
+            val currentState = state
+            when (currentState) {
+                is PullParser.Finished -> return
+                is PullParser -> {
+                    val result = currentState.parse(input)
+                    when (result) {
+                        is PullParser.Finished -> state = result
+                        is PullParser.RequireMore -> {
+                            input.advance(result.advance)
+                            state = result.parser
+                            if (!input.finished) {
+                                break
+                            }
+                        }
                     }
                 }
             }
@@ -28,7 +33,7 @@ internal abstract class AbstractPushParser<POS, IN : AdvancingInput<POS>, OUT>(
         val currentState = state
         return when (currentState) {
             is PullParser.Finished -> finalResult(currentState, input)
-            is PullParser -> throw IllegalStateException("Expected parsing to be finished")
+            is PullParser -> throw IllegalStateException("Expected parsing to be finished, but is $currentState")
         }
     }
 }

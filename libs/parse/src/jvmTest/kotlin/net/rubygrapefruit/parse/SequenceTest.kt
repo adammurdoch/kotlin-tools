@@ -39,7 +39,7 @@ class SequenceTest : AbstractParseTest() {
 
     @Test
     fun `matches byte literals`() {
-        val parser = sequence(literal(byteArrayOf(0x1), 1), literal(byteArrayOf(0x1), 2)) { a, b -> a + b }
+        val parser = sequence(literal(byteArrayOf(0x1), 1), literal(byteArrayOf(0x2), 2)) { a, b -> a + b }
 
         parser.matches(0x1, 0x2, expected = 3)
     }

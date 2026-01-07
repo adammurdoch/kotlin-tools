@@ -18,6 +18,10 @@ internal class CharLiteralParser<OUT>(private val text: String, private val resu
         private val success = PullParser.Matched<CharStream, OUT>(text.length, result)
         private val requireMore = PullParser.RequireMore(0, this)
 
+        override fun toString(): String {
+            return "{literal text=$text}"
+        }
+
         override fun parse(input: CharStream): PullParser.Result<CharStream, NEXT> {
             for (index in text.indices) {
                 if (index >= input.available) {

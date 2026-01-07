@@ -14,7 +14,7 @@ internal class Sequence2Parser<IN, A, B, OUT>(
         return converter.convert(a) { resultA ->
             val parserB = converter.convert(b) { resultB ->
                 val result = map(resultA.value, resultB.value)
-                next(PullParser.Matched(resultA.count + resultB.count, result))
+                next(PullParser.Matched(resultB.count, result))
             }
             PullParser.RequireMore(resultA.count, parserB)
         }

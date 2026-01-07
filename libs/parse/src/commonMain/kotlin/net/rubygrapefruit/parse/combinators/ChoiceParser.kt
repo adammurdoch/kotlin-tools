@@ -2,16 +2,22 @@ package net.rubygrapefruit.parse.combinators
 
 import net.rubygrapefruit.parse.Input
 import net.rubygrapefruit.parse.Parser
-import net.rubygrapefruit.parse.ParserBuilder
+import net.rubygrapefruit.parse.CombinatorBuilder
 import net.rubygrapefruit.parse.PullParser
 
-internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>) : Parser<IN, OUT>, ParserBuilder<OUT> {
-    override fun <IN : Input<*>> build(converter: ParserBuilder.Converter<IN>): PullParser<IN, OUT> {
-        return ChoicePullParser(choices.map { PullParser.RequireMore(converter.convert(it)) })
+internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
+    override fun <IN : Input<*>, NEXT> build(converter: CombinatorBuilder.Converter<IN>, next: (PullParser.Matched<IN, OUT>) -> PullParser.Result<IN, NEXT>): PullParser<IN, NEXT> {
+        return ChoicePullParser(
+            choices.map { parser -> PullParser.RequireMore(converter.convert(parser) { matched -> matched }) },
+            next
+        )
     }
 
-    private class ChoicePullParser<IN : Input<*>, OUT>(private val choices: List<PullParser.Result<IN, OUT>>) : PullParser<IN, OUT> {
-        override fun parse(input: IN): PullParser.Result<IN, OUT> {
+    private class ChoicePullParser<IN : Input<*>, OUT, NEXT>(
+        private val choices: List<PullParser.Result<IN, OUT>>,
+        private val next: (PullParser.Matched<IN, OUT>) -> PullParser.Result<IN, NEXT>
+    ) : PullParser<IN, NEXT> {
+        override fun parse(input: IN): PullParser.Result<IN, NEXT> {
             var requireMore = false
             val nextChoices = mutableListOf<PullParser.Result<IN, OUT>>()
             for (choice in choices) {
@@ -19,7 +25,7 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
                     val nextChoice = choice.parser.parse(input)
                     when (nextChoice) {
                         is PullParser.Matched -> {
-                            return nextChoice
+                            return next(nextChoice)
                         }
 
                         is PullParser.Failed -> nextChoices.add(nextChoice)
@@ -33,7 +39,7 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
                 }
             }
             return if (requireMore) {
-                PullParser.RequireMore(ChoicePullParser(nextChoices))
+                PullParser.RequireMore(ChoicePullParser(nextChoices, next))
             } else {
                 val failures = nextChoices.filterIsInstance<PullParser.Failed<IN, OUT>>()
                 val largestIndex = failures.maxOf { it.index }
@@ -42,14 +48,16 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
             }
         }
 
-        override fun endOfInput(input: IN): PullParser.Finished<IN, OUT> {
+        override fun endOfInput(input: IN): PullParser.Finished<IN, NEXT> {
             val failures = mutableListOf<PullParser.Failed<IN, OUT>>()
             for (choice in choices) {
                 if (choice is PullParser.RequireMore) {
-                    val result = choice.parser.endOfInput(input)
-                    when (result) {
-                        is PullParser.Matched -> return result
-                        is PullParser.Failed -> failures.add(result)
+                    val nextChoice = choice.parser.endOfInput(input)
+                    when (nextChoice) {
+                        is PullParser.Matched -> {
+                            return next(nextChoice) as PullParser.Finished<IN, NEXT>
+                        }
+                        is PullParser.Failed -> failures.add(nextChoice)
                     }
                 } else {
                     failures.add(choice as PullParser.Failed)

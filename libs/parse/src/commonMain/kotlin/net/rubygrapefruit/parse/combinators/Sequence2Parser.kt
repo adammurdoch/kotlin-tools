@@ -2,38 +2,21 @@ package net.rubygrapefruit.parse.combinators
 
 import net.rubygrapefruit.parse.Input
 import net.rubygrapefruit.parse.Parser
-import net.rubygrapefruit.parse.ParserBuilder
+import net.rubygrapefruit.parse.CombinatorBuilder
 import net.rubygrapefruit.parse.PullParser
 
 internal class Sequence2Parser<IN, A, B, OUT>(
     private val a: Parser<IN, A>,
     private val b: Parser<IN, B>,
     private val map: (A, B) -> OUT
-) : Parser<IN, OUT>, ParserBuilder<OUT> {
-    override fun <IN : Input<*>> build(converter: ParserBuilder.Converter<IN>): PullParser<IN, OUT> {
-        return SequencePullParser(converter.convert(a)) { resultA ->
-            PullParser.RequireMore(SequencePullParser(converter.convert(b)) { resultB ->
-                PullParser.Matched(resultA.count + resultB.count, map(resultA.value, resultB.value))
-            })
-        }
-    }
-
-    private class SequencePullParser<IN, T, OUT>(
-        private val parser: PullParser<IN, T>,
-        private val next: (PullParser.Matched<IN, T>) -> PullParser.Result<IN, OUT>
-    ) : PullParser<IN, OUT> {
-        override fun parse(input: IN): PullParser.Result<IN, OUT> {
-            val result = parser.parse(input)
-            return when (result) {
-                is PullParser.Matched -> next(result)
-                is PullParser.Failed -> TODO()
-                is PullParser.RequireMore -> PullParser.RequireMore(this)
+) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
+    override fun <IN : Input<*>, NEXT> build(converter: CombinatorBuilder.Converter<IN>, next: (PullParser.Matched<IN, OUT>) -> PullParser.Result<IN, NEXT>): PullParser<IN, NEXT> {
+        return converter.convert(a) { resultA ->
+            val parserB = converter.convert(b) { resultB ->
+                val result = map(resultA.value, resultB.value)
+                next(PullParser.Matched(resultA.count + resultB.count, result))
             }
-        }
-
-        override fun endOfInput(input: IN): PullParser.Finished<IN, OUT> {
-            val result = parser.endOfInput(input)
-            TODO()
+            PullParser.RequireMore(parserB)
         }
     }
 }

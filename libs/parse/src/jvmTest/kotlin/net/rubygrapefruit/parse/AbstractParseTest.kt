@@ -10,6 +10,7 @@ import net.rubygrapefruit.parse.char.parse
 import net.rubygrapefruit.parse.char.pushParser
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.test.fail
 
 abstract class AbstractParseTest {
     fun Parser<CharInput, Unit>.matches(input: String) {
@@ -44,17 +45,17 @@ abstract class AbstractParseTest {
         result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.message())
 
         input.oneChunk {
-            val result = parse(input)
+            val result = pushParse(it)
             result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.message())
         }
 
         input.chunkPerChar {
-            val result = parse(input)
+            val result = pushParse(it)
             result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.message())
         }
 
         input.maybeTwoChunks {
-            val result = parse(input)
+            val result = pushParse(it)
             result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.message())
         }
     }
@@ -116,17 +117,17 @@ abstract class AbstractParseTest {
         result.assertIsFail(fixture.offset, fixture.message())
 
         input.oneChunk {
-            val result = parse(input)
+            val result = pushParse(it)
             result.assertIsFail(fixture.offset, fixture.message())
         }
 
         input.chunkPerByte {
-            val result = parse(input)
+            val result = pushParse(it)
             result.assertIsFail(fixture.offset, fixture.message())
         }
 
         input.maybeTwoChunks {
-            val result = parse(input)
+            val result = pushParse(it)
             result.assertIsFail(fixture.offset, fixture.message())
         }
     }
@@ -166,17 +167,25 @@ abstract class AbstractParseTest {
     }
 
     private fun ParseResult<CharPosition, *>.assertIsFail(offset: Int, line: Int, col: Int, message: String) {
-        assertIs<ParseResult.Fail<CharPosition>>(this)
-        assertEquals(offset, position.offset, "unexpected offset")
-        assertEquals(line, position.line, "unexpected line")
-        assertEquals(col, position.col, "unexpected column")
-        assertEquals(message, this.message)
+        when (this) {
+            is ParseResult.Success -> fail("Expected parse failure at offset $offset with message: $message")
+            is ParseResult.Fail -> {
+                assertEquals(offset, position.offset, "unexpected offset")
+                assertEquals(line, position.line, "unexpected line")
+                assertEquals(col, position.col, "unexpected column")
+                assertEquals(message, this.message)
+            }
+        }
     }
 
     private fun ParseResult<BytePosition, *>.assertIsFail(offset: Int, message: String) {
-        assertIs<ParseResult.Fail<BytePosition>>(this)
-        assertEquals(offset, position.offset, "unexpected offset")
-        assertEquals(message, this.message)
+        when (this) {
+            is ParseResult.Success -> fail("Expected parse failure at offset $offset with message: $message")
+            is ParseResult.Fail -> {
+                assertEquals(offset, position.offset, "unexpected offset")
+                assertEquals(message, this.message)
+            }
+        }
     }
 
     interface CharParseFailureFixture {

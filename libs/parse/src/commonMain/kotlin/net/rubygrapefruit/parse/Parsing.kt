@@ -12,31 +12,26 @@ internal fun <POS, IN : Input<POS>, OUT> finalResult(result: PullParser.Result<I
         is PullParser.RequireMore -> result.parser.endOfInput(input)
     }
     return when (finalResult) {
-        is PullParser.Matched -> if (finalResult.count == input.length) {
-            ParseResult.Success(finalResult.value)
-        } else {
-            ParseResult.Fail(input.posAt(finalResult.count), "Expected end of input")
-        }
-
+        is PullParser.Matched -> ParseResult.Success(finalResult.value)
         is PullParser.Failed -> ParseResult.Fail(input.posAt(finalResult.index), "Expected ${finalResult.expected.joinToString(", ")}")
     }
 }
 
 internal fun <IN : Input<*>, OUT> Parser<*, OUT>.compile(): PullParser<IN, OUT> {
-    return DefaultConverter<IN>().convert(this)
+    return DefaultConverter<IN>().convert(this) { match -> PullParser.RequireMore(EndOfInputParser(match)) }
 }
 
-private class DefaultConverter<IN : Input<*>> : ParserBuilder.Converter<IN> {
-    override fun <OUT> convert(parser: Parser<*, OUT>): PullParser<IN, OUT> {
+private class DefaultConverter<IN : Input<*>> : CombinatorBuilder.Converter<IN> {
+    override fun <OUT, NEXT> convert(parser: Parser<*, OUT>, next: (PullParser.Matched<IN, OUT>) -> PullParser.Result<IN, NEXT>): PullParser<IN, NEXT> {
         return when (parser) {
-            is PullParser<*, *> -> {
+            is ParserBuilder<*, *> -> {
                 @Suppress("UNCHECKED_CAST")
-                parser as PullParser<IN, OUT>
+                (parser as ParserBuilder<IN, OUT>).build(next)
             }
 
-            is ParserBuilder<*> -> {
+            is CombinatorBuilder<*> -> {
                 @Suppress("UNCHECKED_CAST")
-                (parser as ParserBuilder<OUT>).build(this)
+                (parser as CombinatorBuilder<OUT>).build(this, next)
             }
 
             else -> throw IllegalArgumentException("Cannot compile parser $parser with unexpected type")

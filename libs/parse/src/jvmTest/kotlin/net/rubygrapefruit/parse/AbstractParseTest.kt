@@ -20,17 +20,20 @@ abstract class AbstractParseTest {
         val result = parse(input)
         result.assertIsSuccess(expected)
 
-        val pushParser1 = pushParser()
-        pushParser1.input(input.toCharArray())
-        val result1 = pushParser1.endOfInput()
-        result1.assertIsSuccess(expected)
-
-        val pushParser2 = pushParser()
-        for (index in input.indices) {
-            pushParser2.input(charArrayOf(input[index]))
+        input.oneChunk {
+            val result = pushParse(it)
+            result.assertIsSuccess(expected)
         }
-        val result2 = pushParser2.endOfInput()
-        result2.assertIsSuccess(expected)
+
+        input.chunkPerChar {
+            val result = pushParse(it)
+            result.assertIsSuccess(expected)
+        }
+
+        input.maybeTwoChunks {
+            val result = pushParse(it)
+            result.assertIsSuccess(expected)
+        }
     }
 
     fun Parser<CharInput, *>.doesNotMatch(input: String, config: CharParseFailureFixture.() -> Unit = {}) {
@@ -39,6 +42,46 @@ abstract class AbstractParseTest {
 
         val result = parse(input)
         result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.message())
+
+        input.oneChunk {
+            val result = parse(input)
+            result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.message())
+        }
+
+        input.chunkPerChar {
+            val result = parse(input)
+            result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.message())
+        }
+
+        input.maybeTwoChunks {
+            val result = parse(input)
+            result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.message())
+        }
+    }
+
+    @JvmName("pushParseChars")
+    private fun <T> Parser<CharInput, T>.pushParse(chunks: List<CharArray>): ParseResult<CharPosition, T> {
+        val pushParser = pushParser()
+        for (chunk in chunks) {
+            pushParser.input(chunk)
+        }
+        return pushParser.endOfInput()
+    }
+
+    private fun String.oneChunk(action: (List<CharArray>) -> Unit) {
+        action(listOf(toCharArray()))
+    }
+
+    private fun String.chunkPerChar(action: (List<CharArray>) -> Unit) {
+        action(map { charArrayOf(it) })
+    }
+
+    private fun String.maybeTwoChunks(action: (List<CharArray>) -> Unit) {
+        if (length < 2) {
+            return
+        }
+        val split = length / 2
+        action(listOf(toCharArray(0, split), toCharArray(split, length)))
     }
 
     fun Parser<ByteInput, Unit>.matches(vararg input: Byte) {
@@ -49,17 +92,20 @@ abstract class AbstractParseTest {
         val result = parse(input)
         result.assertIsSuccess(expected)
 
-        val pushParser1 = pushParser()
-        pushParser1.input(input)
-        val result1 = pushParser1.endOfInput()
-        result1.assertIsSuccess(expected)
-
-        val pushParser2 = pushParser()
-        for (index in input.indices) {
-            pushParser2.input(byteArrayOf(input[index]))
+        input.oneChunk {
+            val result = pushParse(it)
+            result.assertIsSuccess(expected)
         }
-        val result2 = pushParser2.endOfInput()
-        result2.assertIsSuccess(expected)
+
+        input.chunkPerByte {
+            val result = pushParse(it)
+            result.assertIsSuccess(expected)
+        }
+
+        input.maybeTwoChunks {
+            val result = pushParse(it)
+            result.assertIsSuccess(expected)
+        }
     }
 
     fun Parser<ByteInput, *>.doesNotMatch(vararg input: Byte, config: ByteParseFailureFixture.() -> Unit = {}) {
@@ -68,6 +114,50 @@ abstract class AbstractParseTest {
 
         val result = parse(input)
         result.assertIsFail(fixture.offset, fixture.message())
+
+        input.oneChunk {
+            val result = parse(input)
+            result.assertIsFail(fixture.offset, fixture.message())
+        }
+
+        input.chunkPerByte {
+            val result = parse(input)
+            result.assertIsFail(fixture.offset, fixture.message())
+        }
+
+        input.maybeTwoChunks {
+            val result = parse(input)
+            result.assertIsFail(fixture.offset, fixture.message())
+        }
+    }
+
+    private fun ByteArray.oneChunk(action: (List<ByteArray>) -> Unit) {
+        action(listOf(this))
+    }
+
+    private fun ByteArray.chunkPerByte(action: (List<ByteArray>) -> Unit) {
+        action(map { byteArrayOf(it) })
+    }
+
+    private fun ByteArray.maybeTwoChunks(action: (List<ByteArray>) -> Unit) {
+        if (size < 2) {
+            return
+        }
+        val split = size / 2
+        val b1 = ByteArray(split)
+        copyInto(b1, 0, 0, split)
+        val b2 = ByteArray(size - split)
+        copyInto(b2, 0, split, size)
+        action(listOf(b1, b2))
+    }
+
+    @JvmName("pushParseBytes")
+    private fun <T> Parser<ByteInput, T>.pushParse(chunks: List<ByteArray>): ParseResult<BytePosition, T> {
+        val pushParser = pushParser()
+        for (chunk in chunks) {
+            pushParser.input(chunk)
+        }
+        return pushParser.endOfInput()
     }
 
     private fun <T> ParseResult<*, T>.assertIsSuccess(expected: T) {

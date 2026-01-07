@@ -1,8 +1,8 @@
 package net.rubygrapefruit.parse.combinators
 
+import net.rubygrapefruit.parse.CombinatorBuilder
 import net.rubygrapefruit.parse.Input
 import net.rubygrapefruit.parse.Parser
-import net.rubygrapefruit.parse.CombinatorBuilder
 import net.rubygrapefruit.parse.PullParser
 
 internal class Sequence2Parser<IN, A, B, OUT>(
@@ -16,7 +16,7 @@ internal class Sequence2Parser<IN, A, B, OUT>(
                 val result = map(resultA.value, resultB.value)
                 next(PullParser.Matched(resultA.count + resultB.count, result))
             }
-            PullParser.RequireMore(parserB)
+            PullParser.RequireMore(resultA.count, parserB)
         }
     }
 }

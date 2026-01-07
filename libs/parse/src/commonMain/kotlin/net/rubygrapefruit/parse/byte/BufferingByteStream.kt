@@ -1,19 +1,29 @@
 package net.rubygrapefruit.parse.byte
 
-internal class BufferingByteStream : ByteStream {
+internal class BufferingByteStream : AdvancingByteStream {
     private var tail = Buffer(null, 0)
+    private var pos = 0
+
     override var finished: Boolean = false
         private set
 
     override val available: Int
-        get() = tail.endIndex
+        get() = tail.endIndex - pos
 
     override fun get(index: Int): Byte {
-        return tail.get(index)
+        return tail.get(pos + index)
+    }
+
+    override fun posAt(index: Int): BytePosition {
+        return BytePosition(index + pos)
     }
 
     fun append(bytes: ByteArray) {
         tail = tail.append(bytes)
+    }
+
+    override fun advance(count: Int) {
+        pos += count
     }
 
     fun end() {

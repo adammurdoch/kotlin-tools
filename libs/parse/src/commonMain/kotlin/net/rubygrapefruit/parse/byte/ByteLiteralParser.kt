@@ -15,7 +15,7 @@ internal class ByteLiteralParser<OUT>(private val bytes: ByteArray, private val 
         private val next: (PullParser.Matched<ByteStream, OUT>) -> PullParser.Result<ByteStream, NEXT>
     ) : PullParser<ByteStream, NEXT> {
         private val success = PullParser.Matched<ByteStream, OUT>(bytes.size, result)
-        private val requireMore = PullParser.RequireMore(this)
+        private val requireMore = PullParser.RequireMore(0, this)
 
         override fun parse(input: ByteStream): PullParser.Result<ByteStream, NEXT> {
             for (index in bytes.indices) {

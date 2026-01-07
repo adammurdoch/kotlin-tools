@@ -1,26 +1,31 @@
 package net.rubygrapefruit.parse
 
-internal fun <POS, IN : Input<POS>, OUT> parse(parser: PullParser<IN, OUT>, input: IN): ParseResult<POS, OUT> {
+internal fun <POS, IN : AdvancingInput<POS>, OUT> parse(parser: PullParser<IN, OUT>, input: IN): ParseResult<POS, OUT> {
     var current = parser
     while (true) {
         val result = current.parse(input)
         when (result) {
             is PullParser.Finished -> return finalResult(result, input)
-            is PullParser.RequireMore -> current = result.parser
+            is PullParser.RequireMore -> {
+                if (result.advance == 0 && result.parser == current) {
+                    throw IllegalStateException("Parsing cannot proceed")
+                }
+                input.advance(result.advance)
+                current = result.parser
+            }
         }
     }
 }
 
-internal fun <POS, IN : Input<POS>, OUT> finalResult(result: PullParser.Result<IN, OUT>, input: IN): ParseResult<POS, OUT> {
+internal fun <POS, IN : Input<POS>, OUT> finalResult(result: PullParser.Finished<IN, OUT>, input: IN): ParseResult<POS, OUT> {
     return when (result) {
         is PullParser.Matched -> ParseResult.Success(result.value)
         is PullParser.Failed -> ParseResult.Fail(input.posAt(result.index), "Expected ${result.expected.joinToString(", ")}")
-        is PullParser.RequireMore -> throw IllegalArgumentException("Expected parsing to be finished")
     }
 }
 
 internal fun <IN : Input<*>, OUT> Parser<*, OUT>.compile(): PullParser<IN, OUT> {
-    return DefaultConverter<IN>().convert(this) { match -> PullParser.RequireMore(EndOfInputParser(match)) }
+    return DefaultConverter<IN>().convert(this) { match -> PullParser.RequireMore(match.count, EndOfInputParser(match)) }
 }
 
 private class DefaultConverter<IN : Input<*>> : CombinatorBuilder.Converter<IN> {

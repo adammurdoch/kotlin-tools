@@ -1,17 +1,24 @@
 package net.rubygrapefruit.parse.char
 
-internal class StringCharStream(val text: String) : CharStream {
+internal class StringCharStream(val text: String) : AdvancingCharStream {
+    private var pos = 0
+
     override val available: Int
-        get() = text.length
+        get() = text.length - pos
 
     override val finished: Boolean
         get() = true
 
     override fun get(index: Int): Char {
-        return text[index]
+        return text[index + pos]
+    }
+
+    override fun advance(count: Int) {
+        pos += count
     }
 
     override fun posAt(index: Int): CharPosition {
-        return CharPosition(index, 1, index + 1)
+        val offset = index + pos
+        return CharPosition(offset, 1, offset + 1)
     }
 }

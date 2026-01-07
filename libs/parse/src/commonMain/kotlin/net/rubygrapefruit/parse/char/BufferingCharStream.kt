@@ -1,23 +1,29 @@
 package net.rubygrapefruit.parse.char
 
-internal class BufferingCharStream : CharStream {
+internal class BufferingCharStream : AdvancingCharStream {
     private var tail = Buffer(null, 0)
+    private var pos = 0
     override var finished: Boolean = false
         private set
 
     override val available: Int
-        get() = tail.endIndex
+        get() = tail.endIndex - pos
 
     override fun get(index: Int): Char {
-        return tail.get(index)
+        return tail.get(index + pos)
     }
 
     override fun posAt(index: Int): CharPosition {
-        return CharPosition(index, 1, index + 1)
+        val offset = index + pos
+        return CharPosition(offset, 1, offset + 1)
     }
 
     fun append(chars: CharArray) {
         tail = tail.append(chars)
+    }
+
+    override fun advance(count: Int) {
+        pos += count
     }
 
     fun end() {

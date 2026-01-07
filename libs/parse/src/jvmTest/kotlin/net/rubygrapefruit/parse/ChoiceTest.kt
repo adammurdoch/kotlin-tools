@@ -1,12 +1,13 @@
 package net.rubygrapefruit.parse
 
+import net.rubygrapefruit.parse.byte.literal
 import net.rubygrapefruit.parse.char.literal
 import net.rubygrapefruit.parse.combinators.oneOf
 import kotlin.test.Test
 
 class ChoiceTest : AbstractParseTest() {
     @Test
-    fun `matches literals`() {
+    fun `matches char literals`() {
         val parser = oneOf(literal("abc", 1), literal("12", 2))
 
         parser.matches("abc", expected = 1)
@@ -17,6 +18,8 @@ class ChoiceTest : AbstractParseTest() {
             expect("\"abc\"")
             expect("\"12\"")
         }
+
+        // partial match one
         parser.doesNotMatch("ab") {
             expect("\"abc\"")
             expect("\"12\"")
@@ -34,6 +37,30 @@ class ChoiceTest : AbstractParseTest() {
         parser.doesNotMatch("12X") {
             failAt(2)
             expectEndOfInput()
+        }
+    }
+
+    @Test
+    fun `matches byte literals`() {
+        val parser = oneOf(literal(byteArrayOf(0x1, 0x2, 0x3), 1), literal(byteArrayOf(0x10, 0x11), 2))
+
+        parser.matches(0x1, 0x2, 0x3, expected = 1)
+        parser.matches(0x10, 0x11, expected = 2)
+
+        // missing
+        parser.doesNotMatch {
+            expect("x01")
+            expect("x10")
+        }
+
+        // partial match one
+        parser.doesNotMatch(0x1, 0x2) {
+            failAt(2)
+            expect("x03")
+        }
+        parser.doesNotMatch(0x10) {
+            failAt(1)
+            expect("x11")
         }
     }
 

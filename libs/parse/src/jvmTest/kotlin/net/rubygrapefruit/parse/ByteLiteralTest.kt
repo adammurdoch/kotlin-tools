@@ -42,27 +42,30 @@ class ByteLiteralTest : AbstractParseTest() {
 
         // missing
         parser.doesNotMatch {
-            expect("x01, x02")
+            expect("x01")
         }
         parser.doesNotMatch(0x1) {
-            expect("x01, x02")
+            failAt(1)
+            expect("x02")
         }
 
         // unexpected
         parser.doesNotMatch(0x3) {
-            expect("x01, x02")
+            expect("x01")
         }
         parser.doesNotMatch(0x3, 0x1) {
-            expect("x01, x02")
+            expect("x01")
         }
         parser.doesNotMatch(0x3, 0x1, 0x2) {
-            expect("x01, x02")
+            expect("x01")
         }
         parser.doesNotMatch(0x1, 0x3) {
-            expect("x01, x02")
+            failAt(1)
+            expect("x02")
         }
         parser.doesNotMatch(0x1, 0x3, 0x2) {
-            expect("x01, x02")
+            failAt(1)
+            expect("x02")
         }
 
         // extra

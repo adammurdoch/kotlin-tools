@@ -36,7 +36,7 @@ class CharLiteralTest : AbstractParseTest() {
     fun `matches single char literal and produces result`() {
         val parser = literal("a", 1)
 
-        parser.matches("a", 1)
+        parser.matches("a", expected = 1)
     }
 
     @Test
@@ -95,6 +95,6 @@ class CharLiteralTest : AbstractParseTest() {
     fun `matches multi-char literal and produces result`() {
         val parser = literal("ab", 1)
 
-        parser.matches("ab", 1)
+        parser.matches("ab", expected = 1)
     }
 }

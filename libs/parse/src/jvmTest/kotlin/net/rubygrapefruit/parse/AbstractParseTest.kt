@@ -85,7 +85,7 @@ abstract class AbstractParseTest {
 
     private fun ParseResult<BytePosition, *>.assertIsFail(offset: Int, message: String) {
         assertIs<ParseResult.Fail<BytePosition>>(this)
-        assertEquals(offset, position.offset)
+        assertEquals(offset, position.offset, "unexpected offset")
         assertEquals(message, this.message)
     }
 

@@ -6,14 +6,14 @@ import net.rubygrapefruit.parse.ParserBuilder
 import net.rubygrapefruit.parse.PullParser
 
 internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>) : Parser<IN, OUT>, ParserBuilder<OUT> {
-    override fun <IN: Input<*>> build(converter: ParserBuilder.Converter<IN, OUT>): PullParser<IN, OUT> {
+    override fun <IN : Input<*>> build(converter: ParserBuilder.Converter<IN, OUT>): PullParser<IN, OUT> {
         return ChoicePullParser(choices.map { converter.convert(it) })
     }
 
-    private class ChoicePullParser<IN: Input<*>, OUT>(private val choices: List<PullParser<IN, OUT>>) : PullParser<IN, OUT> {
+    private class ChoicePullParser<IN : Input<*>, OUT>(private val choices: List<PullParser<IN, OUT>>) : PullParser<IN, OUT> {
         override fun parse(input: IN): PullParser.Result<IN, OUT> {
             var requireMore = false
-            val expected = mutableListOf<String>()
+            val results = mutableListOf<PullParser.Result<IN, OUT>>()
             for (choice in choices) {
                 val result = choice.parse(input)
                 when (result) {
@@ -21,27 +21,36 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
                         return result
                     }
 
-                    is PullParser.Failed -> expected.addAll(result.expected)
-                    is PullParser.RequireMore -> requireMore = true
+                    is PullParser.Failed -> results.add(result)
+                    is PullParser.RequireMore -> {
+                        requireMore = true
+                        results.add(result)
+                    }
                 }
             }
             return if (requireMore) {
-                PullParser.RequireMore(this)
+                val remaining = results.filterIsInstance<PullParser.RequireMore<IN, OUT>>()
+                PullParser.RequireMore(ChoicePullParser(remaining.map { it.parser }))
             } else {
-                PullParser.Failed(0, expected)
+                val failures = results.filterIsInstance<PullParser.Failed<IN, OUT>>()
+                val largestIndex = failures.maxOf { it.index }
+                val relevantFailures = failures.filter { it.index == largestIndex }
+                PullParser.Failed(largestIndex, relevantFailures.flatMap { it.expected })
             }
         }
 
         override fun endOfInput(input: IN): PullParser.Finished<IN, OUT> {
-            val expected = mutableListOf<String>()
+            val failures = mutableListOf<PullParser.Failed<IN, OUT>>()
             for (choice in choices) {
                 val result = choice.endOfInput(input)
                 when (result) {
                     is PullParser.Matched -> return result
-                    is PullParser.Failed -> expected.addAll(result.expected)
+                    is PullParser.Failed -> failures.add(result)
                 }
             }
-            return PullParser.Failed(0, expected)
+            val largestIndex = failures.maxOf { it.index }
+            val relevantFailures = failures.filter { it.index == largestIndex }
+            return PullParser.Failed(largestIndex, relevantFailures.flatMap { it.expected })
         }
     }
 }

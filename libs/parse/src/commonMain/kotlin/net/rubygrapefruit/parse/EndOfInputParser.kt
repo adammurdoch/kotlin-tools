@@ -1,6 +1,6 @@
 package net.rubygrapefruit.parse
 
-internal class EndOfInputParser<IN, OUT>(
+internal class EndOfInputParser<IN : Input<*>, OUT>(
     private val result: PullParser.Matched<IN, OUT>
 ) : PullParser<IN, OUT> {
     override fun parse(input: IN): PullParser.Result<IN, OUT> {
@@ -8,6 +8,10 @@ internal class EndOfInputParser<IN, OUT>(
     }
 
     override fun endOfInput(input: IN): PullParser.Finished<IN, OUT> {
-        return result
+        return if (input.length > result.count) {
+            PullParser.Failed(result.count, listOf("end of input"))
+        } else {
+            result
+        }
     }
 }

@@ -8,26 +8,26 @@ class CharLiteralTest : AbstractParseTest() {
     fun `matches single char literal`() {
         val parser = literal("a")
 
-        matches(parser, "a")
+        parser.matches("a")
 
         // missing
-        doesNotMatch(parser, "") {
+        parser.doesNotMatch("") {
             expect("\"a\"")
         }
 
         // unexpected char
-        doesNotMatch(parser, "X") {
+        parser.doesNotMatch("X") {
             expect("\"a\"")
         }
 
         // extra char
-        doesNotMatch(parser, "aX") {
+        parser.doesNotMatch("aX") {
             failAt(1)
             expectEndOfInput()
         }
 
         // incorrect case
-        doesNotMatch(parser, "A") {
+        parser.doesNotMatch("A") {
             expect("\"a\"")
         }
     }
@@ -36,57 +36,57 @@ class CharLiteralTest : AbstractParseTest() {
     fun `matches single char literal and produces result`() {
         val parser = literal("a", 1)
 
-        matches(parser, "a", 1)
+        parser.matches("a", 1)
     }
 
     @Test
     fun `matches multi-char literal`() {
         val parser = literal("ab")
 
-        matches(parser, "ab")
+        parser.matches("ab")
 
         // missing
-        doesNotMatch(parser, "") {
+        parser.doesNotMatch("") {
             expect("\"ab\"")
         }
-        doesNotMatch(parser, "a") {
+        parser.doesNotMatch("a") {
             expect("\"ab\"")
         }
-        doesNotMatch(parser, "b") {
+        parser.doesNotMatch("b") {
             expect("\"ab\"")
         }
 
         // unexpected char
-        doesNotMatch(parser, "X") {
+        parser.doesNotMatch("X") {
             expect("\"ab\"")
         }
-        doesNotMatch(parser, "aX") {
+        parser.doesNotMatch("aX") {
             expect("\"ab\"")
         }
-        doesNotMatch(parser, "Xb") {
+        parser.doesNotMatch("Xb") {
             expect("\"ab\"")
         }
-        doesNotMatch(parser, "Xab") {
+        parser.doesNotMatch("Xab") {
             expect("\"ab\"")
         }
-        doesNotMatch(parser, "aXb") {
+        parser.doesNotMatch("aXb") {
             expect("\"ab\"")
         }
 
         // extra char
-        doesNotMatch(parser, "abX") {
+        parser.doesNotMatch("abX") {
             failAt(2)
             expectEndOfInput()
         }
 
         // incorrect case
-        doesNotMatch(parser, "AB") {
+        parser.doesNotMatch("AB") {
             expect("\"ab\"")
         }
-        doesNotMatch(parser, "Ab") {
+        parser.doesNotMatch("Ab") {
             expect("\"ab\"")
         }
-        doesNotMatch(parser, "aB") {
+        parser.doesNotMatch("aB") {
             expect("\"ab\"")
         }
     }
@@ -95,6 +95,6 @@ class CharLiteralTest : AbstractParseTest() {
     fun `matches multi-char literal and produces result`() {
         val parser = literal("ab", 1)
 
-        matches(parser, "ab", 1)
+        parser.matches("ab", 1)
     }
 }

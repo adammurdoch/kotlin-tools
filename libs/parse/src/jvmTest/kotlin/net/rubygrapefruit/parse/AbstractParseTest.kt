@@ -12,20 +12,20 @@ import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
 abstract class AbstractParseTest {
-    fun matches(parser: Parser<CharInput, Unit>, input: String) {
-        matches(parser, input = input, expected = Unit)
+    fun Parser<CharInput, Unit>.matches(input: String) {
+        matches(input = input, expected = Unit)
     }
 
-    fun <T> matches(parser: Parser<CharInput, T>, input: String, expected: T) {
-        val result = parser.parse(input)
+    fun <T> Parser<CharInput, T>.matches(input: String, expected: T) {
+        val result = parse(input)
         result.assertIsSuccess(expected)
 
-        val pushParser1 = parser.pushParser()
+        val pushParser1 = pushParser()
         pushParser1.input(input.toCharArray())
         val result1 = pushParser1.endOfInput()
         result1.assertIsSuccess(expected)
 
-        val pushParser2 = parser.pushParser()
+        val pushParser2 = pushParser()
         for (index in input.indices) {
             pushParser2.input(charArrayOf(input[index]))
         }
@@ -33,28 +33,28 @@ abstract class AbstractParseTest {
         result2.assertIsSuccess(expected)
     }
 
-    fun doesNotMatch(parser: Parser<CharInput, *>, input: String, config: CharParseFailureFixture.() -> Unit = {}) {
+    fun Parser<CharInput, *>.doesNotMatch(input: String, config: CharParseFailureFixture.() -> Unit = {}) {
         val fixture = DefaultCharParseFailureFixture()
         fixture.config()
 
-        val result = parser.parse(input)
+        val result = parse(input)
         result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.message())
     }
 
-    fun matches(parser: Parser<ByteInput, Unit>, vararg input: Byte) {
-        matches(parser, input = input, expected = Unit)
+    fun Parser<ByteInput, Unit>.matches(vararg input: Byte) {
+        matches(input = input, expected = Unit)
     }
 
-    fun <T> matches(parser: Parser<ByteInput, T>, vararg input: Byte, expected: T) {
-        val result = parser.parse(input)
+    fun <T> Parser<ByteInput, T>.matches(vararg input: Byte, expected: T) {
+        val result = parse(input)
         result.assertIsSuccess(expected)
 
-        val pushParser1 = parser.pushParser()
+        val pushParser1 = pushParser()
         pushParser1.input(input)
         val result1 = pushParser1.endOfInput()
         result1.assertIsSuccess(expected)
 
-        val pushParser2 = parser.pushParser()
+        val pushParser2 = pushParser()
         for (index in input.indices) {
             pushParser2.input(byteArrayOf(input[index]))
         }
@@ -62,11 +62,11 @@ abstract class AbstractParseTest {
         result2.assertIsSuccess(expected)
     }
 
-    fun doesNotMatch(parser: Parser<ByteInput, *>, vararg input: Byte, config: ByteParseFailureFixture.() -> Unit = {}) {
+    fun Parser<ByteInput, *>.doesNotMatch(vararg input: Byte, config: ByteParseFailureFixture.() -> Unit = {}) {
         val fixture = DefaultByteParseFailureFixture()
         fixture.config()
 
-        val result = parser.parse(input)
+        val result = parse(input)
         result.assertIsFail(fixture.offset, fixture.message())
     }
 

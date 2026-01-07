@@ -9,29 +9,29 @@ class ChoiceTest : AbstractParseTest() {
     fun `matches literals`() {
         val parser = oneOf(literal("abc", 1), literal("12", 2))
 
-        matches(parser, "abc", expected = 1)
-        matches(parser, "12", expected = 2)
+        parser.matches("abc", expected = 1)
+        parser.matches("12", expected = 2)
 
         // missing
-        doesNotMatch(parser, "") {
+        parser.doesNotMatch("") {
             expect("\"abc\"")
             expect("\"12\"")
         }
-        doesNotMatch(parser, "ab") {
+        parser.doesNotMatch("ab") {
             expect("\"abc\"")
             expect("\"12\"")
         }
-        doesNotMatch(parser, "1") {
+        parser.doesNotMatch("1") {
             expect("\"abc\"")
             expect("\"12\"")
         }
 
         // extra
-        doesNotMatch(parser, "abcX") {
+        parser.doesNotMatch("abcX") {
             failAt(3)
             expectEndOfInput()
         }
-        doesNotMatch(parser, "12X") {
+        parser.doesNotMatch("12X") {
             failAt(2)
             expectEndOfInput()
         }
@@ -41,10 +41,10 @@ class ChoiceTest : AbstractParseTest() {
     fun `matches literals with common prefix`() {
         val parser = oneOf(literal("abc", 1), literal("abd", 2))
 
-        matches(parser, "abc", expected = 1)
-        matches(parser, "abd", expected = 2)
+        parser.matches("abc", expected = 1)
+        parser.matches("abd", expected = 2)
 
-        doesNotMatch(parser, "ab") {
+        parser.doesNotMatch("ab") {
             expect("\"abc\"")
             expect("\"abd\"")
         }
@@ -54,9 +54,9 @@ class ChoiceTest : AbstractParseTest() {
     fun `uses result from first parser that matches`() {
         val parser = oneOf(literal("ab", 1), literal("abc", 2))
 
-        matches(parser, "ab", expected = 1)
+        parser.matches("ab", expected = 1)
 
-        doesNotMatch(parser, "abc") {
+        parser.doesNotMatch("abc") {
             failAt(2)
             expectEndOfInput()
         }

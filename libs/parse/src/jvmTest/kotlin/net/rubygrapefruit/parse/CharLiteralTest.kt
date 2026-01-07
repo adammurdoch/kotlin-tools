@@ -12,12 +12,12 @@ class CharLiteralTest : AbstractParseTest() {
 
         // missing
         parser.doesNotMatch("") {
-            expect("\"a\"")
+            expectLiteral("a")
         }
 
         // unexpected char
         parser.doesNotMatch("X") {
-            expect("\"a\"")
+            expectLiteral("a")
         }
 
         // extra char
@@ -28,7 +28,7 @@ class CharLiteralTest : AbstractParseTest() {
 
         // incorrect case
         parser.doesNotMatch("A") {
-            expect("\"a\"")
+            expectLiteral("a")
         }
     }
 
@@ -47,30 +47,30 @@ class CharLiteralTest : AbstractParseTest() {
 
         // missing
         parser.doesNotMatch("") {
-            expect("\"ab\"")
+            expectLiteral("ab")
         }
         parser.doesNotMatch("a") {
-            expect("\"ab\"")
+            expectLiteral("ab")
         }
         parser.doesNotMatch("b") {
-            expect("\"ab\"")
+            expectLiteral("ab")
         }
 
         // unexpected char
         parser.doesNotMatch("X") {
-            expect("\"ab\"")
+            expectLiteral("ab")
         }
         parser.doesNotMatch("aX") {
-            expect("\"ab\"")
+            expectLiteral("ab")
         }
         parser.doesNotMatch("Xb") {
-            expect("\"ab\"")
+            expectLiteral("ab")
         }
         parser.doesNotMatch("Xab") {
-            expect("\"ab\"")
+            expectLiteral("ab")
         }
         parser.doesNotMatch("aXb") {
-            expect("\"ab\"")
+            expectLiteral("ab")
         }
 
         // extra char
@@ -81,13 +81,13 @@ class CharLiteralTest : AbstractParseTest() {
 
         // incorrect case
         parser.doesNotMatch("AB") {
-            expect("\"ab\"")
+            expectLiteral("ab")
         }
         parser.doesNotMatch("Ab") {
-            expect("\"ab\"")
+            expectLiteral("ab")
         }
         parser.doesNotMatch("aB") {
-            expect("\"ab\"")
+            expectLiteral("ab")
         }
     }
 

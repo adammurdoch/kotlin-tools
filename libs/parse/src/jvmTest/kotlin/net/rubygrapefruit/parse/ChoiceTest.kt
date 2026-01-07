@@ -15,18 +15,18 @@ class ChoiceTest : AbstractParseTest() {
 
         // missing
         parser.doesNotMatch("") {
-            expect("\"abc\"")
-            expect("\"12\"")
+            expectLiteral("abc")
+            expectLiteral("12")
         }
 
         // partial match one
         parser.doesNotMatch("ab") {
-            expect("\"abc\"")
-            expect("\"12\"")
+            expectLiteral("abc")
+            expectLiteral("12")
         }
         parser.doesNotMatch("1") {
-            expect("\"abc\"")
-            expect("\"12\"")
+            expectLiteral("abc")
+            expectLiteral("12")
         }
 
         // extra
@@ -72,8 +72,8 @@ class ChoiceTest : AbstractParseTest() {
         parser.matches("abd", expected = 2)
 
         parser.doesNotMatch("ab") {
-            expect("\"abc\"")
-            expect("\"abd\"")
+            expectLiteral("abc")
+            expectLiteral("abd")
         }
     }
 

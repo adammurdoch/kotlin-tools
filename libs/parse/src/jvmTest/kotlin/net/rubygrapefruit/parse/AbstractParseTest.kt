@@ -184,6 +184,10 @@ abstract class AbstractParseTest {
 
         fun expect(text: String)
 
+        fun expectLiteral(text: String) {
+            expect("\"$text\"")
+        }
+
         fun expectEndOfInput() {
             expect("end of input")
         }

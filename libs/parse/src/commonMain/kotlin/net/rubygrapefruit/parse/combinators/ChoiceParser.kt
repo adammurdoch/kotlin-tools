@@ -6,7 +6,7 @@ import net.rubygrapefruit.parse.ParserBuilder
 import net.rubygrapefruit.parse.PullParser
 
 internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>) : Parser<IN, OUT>, ParserBuilder<OUT> {
-    override fun <IN : Input<*>> build(converter: ParserBuilder.Converter<IN, OUT>): PullParser<IN, OUT> {
+    override fun <IN : Input<*>> build(converter: ParserBuilder.Converter<IN>): PullParser<IN, OUT> {
         return ChoicePullParser(choices.map { PullParser.RequireMore(converter.convert(it)) })
     }
 

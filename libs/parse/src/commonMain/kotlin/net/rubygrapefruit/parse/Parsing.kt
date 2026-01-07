@@ -23,11 +23,11 @@ internal fun <POS, IN : Input<POS>, OUT> finalResult(result: PullParser.Result<I
 }
 
 internal fun <IN : Input<*>, OUT> Parser<*, OUT>.compile(): PullParser<IN, OUT> {
-    return DefaultConverter<IN, OUT>().convert(this)
+    return DefaultConverter<IN>().convert(this)
 }
 
-private class DefaultConverter<IN : Input<*>, OUT> : ParserBuilder.Converter<IN, OUT> {
-    override fun convert(parser: Parser<*, OUT>): PullParser<IN, OUT> {
+private class DefaultConverter<IN : Input<*>> : ParserBuilder.Converter<IN> {
+    override fun <OUT> convert(parser: Parser<*, OUT>): PullParser<IN, OUT> {
         return when (parser) {
             is PullParser<*, *> -> {
                 @Suppress("UNCHECKED_CAST")

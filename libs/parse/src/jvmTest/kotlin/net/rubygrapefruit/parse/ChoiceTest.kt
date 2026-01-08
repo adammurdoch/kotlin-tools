@@ -78,6 +78,34 @@ class ChoiceTest : AbstractParseTest() {
     }
 
     @Test
+    fun `matches literals where one literal is a prefix of another`() {
+        val parser = oneOf(literal("abc", 1), literal("ab", 2))
+
+        parser.matches("abc", expected = 1)
+        parser.matches("ab", expected = 2)
+
+        // missing
+        parser.doesNotMatch("") {
+            expectLiteral("abc")
+            expectLiteral("ab")
+        }
+        parser.doesNotMatch("a") {
+            expectLiteral("abc")
+            expectLiteral("ab")
+        }
+
+        // extra
+        parser.doesNotMatch("abcX") {
+            failAt(3)
+            expectEndOfInput()
+        }
+        parser.doesNotMatch("abX") {
+            failAt(2)
+            expectEndOfInput()
+        }
+    }
+
+    @Test
     fun `uses result from first parser that matches`() {
         val parser = oneOf(literal("ab", 1), literal("abc", 2))
 

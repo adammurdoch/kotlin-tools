@@ -7,7 +7,7 @@ import kotlin.test.Test
 
 class SequenceTest : AbstractParseTest() {
     @Test
-    fun `matches char literals`() {
+    fun `matches single char literals`() {
         val parser = sequence(literal("a", 1), literal("b", 2)) { a, b -> a + b }
 
         parser.matches("ab", expected = 3)
@@ -38,9 +38,37 @@ class SequenceTest : AbstractParseTest() {
     }
 
     @Test
-    fun `matches byte literals`() {
-        val parser = sequence(literal(byteArrayOf(0x1), 1), literal(byteArrayOf(0x2), 2)) { a, b -> a + b }
+    fun `matches multi-byte literals`() {
+        val parser = sequence(literal(byteArrayOf(0x1, 0x2), 1), literal(byteArrayOf(0x3, 0x4), 2)) { a, b -> a + b }
 
-        parser.matches(0x1, 0x2, expected = 3)
+        parser.matches(0x1, 0x2, 0x3, 0x4, expected = 3)
+
+        // missing
+        parser.doesNotMatch {
+            expect("x01")
+        }
+        parser.doesNotMatch(0x1) {
+            failAt(1)
+            expect("x02")
+        }
+        parser.doesNotMatch(0x1, 0x2, 0x3) {
+            failAt(3)
+            expect("x04")
+        }
+
+        // unexpected
+        parser.doesNotMatch(0x3) {
+            expect("x01")
+        }
+        parser.doesNotMatch(0x1, 0x2, 0x3, 0x1) {
+            failAt(3)
+            expect("x04")
+        }
+
+        // extra
+        parser.doesNotMatch(0x1, 0x2, 0x3, 0x4, 0x5) {
+            failAt(4)
+            expectEndOfInput()
+        }
     }
 }

@@ -1,6 +1,12 @@
 package net.rubygrapefruit.parse
 
+/**
+ * Implementations may be mutable.
+ */
 internal interface PullParser<in IN, out OUT> : ParseState<IN, OUT> {
+    /**
+     * Attempts to parse from the start of the given input.
+     */
     fun parse(input: IN): Result<IN, OUT>
 
     sealed interface Result<in IN, out OUT>

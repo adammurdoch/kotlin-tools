@@ -35,7 +35,7 @@ class SequenceOfChoiceTest : AbstractParseTest() {
     }
 
     @Test
-    fun `matches sequence of choice then literal`() {
+    fun `matches sequence of choice then literal when one choice is prefix of another`() {
         val parser = sequence(
             oneOf(
                 literal("ab", 1),
@@ -46,5 +46,14 @@ class SequenceOfChoiceTest : AbstractParseTest() {
 
         parser.matches("abbd", expected = "1.3")
         parser.matches("abd", expected = "2.3")
+
+        parser.doesNotMatch("aX") {
+            failAt(1)
+            expect("bd")
+        }
+        parser.doesNotMatch("abX") {
+            failAt(2)
+            expect("bd")
+        }
     }
 }

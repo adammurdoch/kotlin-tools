@@ -1,5 +1,5 @@
 package net.rubygrapefruit.parse
 
 internal interface ParserBuilder<IN, OUT> {
-    fun <NEXT> build(next: (PullParser.Matched<IN, OUT>) -> PullParser.Result<IN, NEXT>): PullParser<IN, NEXT>
+    fun <NEXT> build(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT>
 }

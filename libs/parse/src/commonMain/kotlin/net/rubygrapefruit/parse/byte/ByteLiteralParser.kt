@@ -1,18 +1,19 @@
 package net.rubygrapefruit.parse.byte
 
+import net.rubygrapefruit.parse.ParseContinuation
 import net.rubygrapefruit.parse.Parser
 import net.rubygrapefruit.parse.ParserBuilder
 import net.rubygrapefruit.parse.PullParser
 
 internal class ByteLiteralParser<OUT>(private val bytes: ByteArray, private val result: OUT) : Parser<ByteInput, OUT>, ParserBuilder<ByteStream, OUT> {
-    override fun <NEXT> build(next: (PullParser.Matched<ByteStream, OUT>) -> PullParser.Result<ByteStream, NEXT>): PullParser<ByteStream, NEXT> {
+    override fun <NEXT> build(next: ParseContinuation<ByteStream, OUT, NEXT>): PullParser<ByteStream, NEXT> {
         return ByteLiteralPullParser(bytes, result, next)
     }
 
     private class ByteLiteralPullParser<OUT, NEXT>(
         private val bytes: ByteArray,
         result: OUT,
-        private val next: (PullParser.Matched<ByteStream, OUT>) -> PullParser.Result<ByteStream, NEXT>
+        private val next: ParseContinuation<ByteStream, OUT, NEXT>
     ) : PullParser<ByteStream, NEXT> {
         private val success = PullParser.Matched<ByteStream, OUT>(bytes.size, result)
         private val requireMore = PullParser.RequireMore(0, this)
@@ -30,7 +31,7 @@ internal class ByteLiteralParser<OUT>(private val bytes: ByteArray, private val 
                     return PullParser.Failed(index, listOf(format(bytes[index])))
                 }
             }
-            return next(success)
+            return next.matched(success)
         }
 
         private fun format(byte: Byte): String {

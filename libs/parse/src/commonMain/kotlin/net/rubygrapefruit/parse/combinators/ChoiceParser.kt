@@ -4,20 +4,20 @@ import net.rubygrapefruit.parse.*
 import kotlin.math.min
 
 internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
-    override fun <IN : Input<*>, NEXT> build(converter: CombinatorBuilder.Converter<IN>, next: (PullParser.Matched<IN, OUT>) -> PullParser.Result<IN, NEXT>): PullParser<IN, NEXT> {
+    override fun <IN : Input<*>, NEXT> build(converter: CombinatorBuilder.Converter<IN>, next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
         return ChoicePullParser(choices, converter, next)
     }
 
     private class ChoicePullParser<IN : Input<*>, OUT, NEXT>(
         parsers: List<Parser<*, OUT>>,
         converter: CombinatorBuilder.Converter<IN>,
-        private val next: (PullParser.Matched<IN, OUT>) -> PullParser.Result<IN, NEXT>
+        private val next: ParseContinuation<IN, OUT, NEXT>
     ) : PullParser<IN, NEXT> {
         private var firstFinished = parsers.size
         private val states: MutableList<ParseState<IN, NEXT>> = parsers.mapIndexed { index, parser ->
             converter.convert(parser) { matched ->
                 firstFinished = min(index, firstFinished)
-                next(matched)
+                next.matched(matched)
             }
         }.toMutableList()
 

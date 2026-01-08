@@ -5,7 +5,7 @@ package net.rubygrapefruit.parse
  */
 internal interface PullParser<in IN, out OUT> : ParseState<IN, OUT> {
     /**
-     * Attempts to parse from the start of the given input.
+     * Attempts to parse the given inputs.
      */
     fun parse(input: IN): Result<IN, OUT>
 
@@ -22,4 +22,3 @@ internal interface PullParser<in IN, out OUT> : ParseState<IN, OUT> {
     // Move the input forward the given number of values and try again
     class RequireMore<IN, OUT>(val advance: Int, val parser: PullParser<IN, OUT>) : Result<IN, OUT>
 }
-

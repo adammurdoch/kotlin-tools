@@ -33,12 +33,12 @@ private class DefaultConverter<IN : Input<*>> : CombinatorBuilder.Converter<IN> 
         return when (parser) {
             is ParserBuilder<*, *> -> {
                 @Suppress("UNCHECKED_CAST")
-                (parser as ParserBuilder<IN, OUT>).build(next)
+                (parser as ParserBuilder<IN, OUT>).build(ParseContinuation.of(next))
             }
 
             is CombinatorBuilder<*> -> {
                 @Suppress("UNCHECKED_CAST")
-                (parser as CombinatorBuilder<OUT>).build(this, next)
+                (parser as CombinatorBuilder<OUT>).build(this, ParseContinuation.of(next))
             }
 
             else -> throw IllegalArgumentException("Cannot compile parser $parser with unexpected type")

@@ -7,7 +7,7 @@ import kotlin.test.Test
 
 class ChoiceOfSequenceTest : AbstractParseTest() {
     @Test
-    fun `matches choice of sequences`() {
+    fun `matches choice of sequences with common prefix`() {
         val parser = oneOf(
             sequence(literal("ab", 1), literal("c", 2)) { a, b -> a + b },
             sequence(literal("a", 5), literal("b", 1)) { a, b -> a + b }

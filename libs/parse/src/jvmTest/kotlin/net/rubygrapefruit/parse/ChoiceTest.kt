@@ -7,7 +7,7 @@ import kotlin.test.Test
 
 class ChoiceTest : AbstractParseTest() {
     @Test
-    fun `matches char literals`() {
+    fun `matches char literals with no common prefix`() {
         val parser = oneOf(literal("abc", 1), literal("12", 2))
 
         parser.matches("abc", expected = 1)
@@ -41,7 +41,7 @@ class ChoiceTest : AbstractParseTest() {
     }
 
     @Test
-    fun `matches byte literals`() {
+    fun `matches byte literals with no common prefix`() {
         val parser = oneOf(literal(byteArrayOf(0x1, 0x2, 0x3), 1), literal(byteArrayOf(0x10, 0x11), 2))
 
         parser.matches(0x1, 0x2, 0x3, expected = 1)

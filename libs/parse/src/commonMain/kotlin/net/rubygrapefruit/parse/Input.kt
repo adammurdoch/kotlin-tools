@@ -6,8 +6,4 @@ internal interface Input<POS> {
     val finished: Boolean
 
     fun posAt(index: Int): POS
-
-    fun mayHave(count: Int): Boolean {
-        return count <= available || !finished
-    }
 }

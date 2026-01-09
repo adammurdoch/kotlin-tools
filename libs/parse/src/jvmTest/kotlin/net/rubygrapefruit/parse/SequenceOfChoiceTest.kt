@@ -7,7 +7,7 @@ import kotlin.test.Test
 
 class SequenceOfChoiceTest : AbstractParseTest() {
     @Test
-    fun `matches sequence of choices`() {
+    fun `matches sequence of choices with no common prefix`() {
         val parser = sequence(
             oneOf(
                 literal("ab", 1),
@@ -23,6 +23,10 @@ class SequenceOfChoiceTest : AbstractParseTest() {
         parser.matches("c2", expected = "2.2")
 
         // missing
+        parser.doesNotMatch("") {
+            expectLiteral("ab")
+            expectLiteral("c")
+        }
         parser.doesNotMatch("a") {
             expectLiteral("ab")
             expectLiteral("c")
@@ -32,28 +36,44 @@ class SequenceOfChoiceTest : AbstractParseTest() {
             expectLiteral("11")
             expectLiteral("2")
         }
+
+        // unexpected
+        parser.doesNotMatch("aX") {
+            expectLiteral("ab")
+            expectLiteral("c")
+        }
+        parser.doesNotMatch("c1X") {
+            failAt(1)
+            expectLiteral("11")
+            expectLiteral("2")
+        }
     }
 
     @Test
-    fun `matches sequence of choice then literal when one choice is prefix of another`() {
+    fun `matches sequence of choice then literal when choices have common prefix`() {
         val parser = sequence(
             oneOf(
-                literal("ab", 1),
-                literal("a", 2)
+                literal("abc", 1),
+                literal("ad", 2)
             ),
-            literal("bd", 3)
+            literal("12", 3)
         ) { a, b -> "$a.$b" }
 
-        parser.matches("abbd", expected = "1.3")
-        parser.matches("abd", expected = "2.3")
+        parser.matches("abc12", expected = "1.3")
+        parser.matches("ad12", expected = "2.3")
 
-        parser.doesNotMatch("aX") {
-            failAt(1)
-            expect("bd")
+        // missing
+        parser.doesNotMatch("") {
+            expectLiteral("abc")
+            expectLiteral("ad")
         }
-        parser.doesNotMatch("abX") {
+        parser.doesNotMatch("a") {
+            expectLiteral("abc")
+            expectLiteral("ad")
+        }
+        parser.doesNotMatch("ad1") {
             failAt(2)
-            expect("bd")
+            expectLiteral("12")
         }
     }
 }

@@ -14,12 +14,13 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
         private val next: ParseContinuation<IN, OUT, NEXT>
     ) : PullParser<IN, NEXT> {
         private var firstFinished = parsers.size
-        private val states: MutableList<ParseState<IN, NEXT>> = parsers.mapIndexed { index, parser ->
+        private val states = Array<ParseState<IN, NEXT>>(parsers.size) { index ->
+            val parser = parsers[index]
             converter.convert(parser) { matched ->
                 firstFinished = min(index, firstFinished)
                 next.matched(matched)
             }
-        }.toMutableList()
+        }
 
         override fun parse(input: IN): PullParser.Result<IN, NEXT> {
             var requireMore = false

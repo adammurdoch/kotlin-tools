@@ -22,12 +22,12 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
             }
         }
 
-        override fun parse(input: IN): PullParser.Result<IN, NEXT> {
+        override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
             var requireMore = false
             for (index in states.indices) {
                 val choice = states[index]
                 if (choice is PullParser) {
-                    val nextChoice = choice.parse(input)
+                    val nextChoice = choice.parse(input, 1)
                     if (firstFinished == index) {
                         return nextChoice
                     }
@@ -44,7 +44,7 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
                 }
             }
             return if (requireMore) {
-                PullParser.RequireMore(0, this)
+                PullParser.RequireMore(1, this)
             } else {
                 val failures = states.filterIsInstance<PullParser.Failed<IN, NEXT>>()
                 val largestIndex = failures.maxOf { it.index }

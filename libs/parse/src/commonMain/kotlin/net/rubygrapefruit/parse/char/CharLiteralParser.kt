@@ -12,31 +12,33 @@ internal class CharLiteralParser<OUT>(private val text: String, private val resu
 
     private class CharLiteralPullParser<OUT, NEXT>(
         private val text: String,
-        result: OUT,
+        private val result: OUT,
         private val next: ParseContinuation<CharStream, OUT, NEXT>
     ) : PullParser<CharStream, NEXT> {
-        private val fail = PullParser.Failed<CharStream, Nothing>(0, listOf("\"$text\""))
-        private val success = PullParser.Matched<CharStream, OUT>(text.length, result)
-        private val requireMore = PullParser.RequireMore(0, this)
+        private var matched = 0
 
         override fun toString(): String {
             return "{literal text=$text}"
         }
 
-        override fun parse(input: CharStream): PullParser.Result<CharStream, NEXT> {
-            for (index in text.indices) {
-                if (index >= input.available) {
-                    return if (input.finished) {
-                        fail
+        override fun parse(input: CharStream, max: Int): PullParser.Result<CharStream, NEXT> {
+            var index = 0
+            val remaining = text.length - matched
+            while (index < remaining) {
+                if (index >= max) {
+                    return if (input.mayHave(remaining)) {
+                        matched += index
+                        PullParser.RequireMore(index, this)
                     } else {
-                        requireMore
+                        PullParser.Failed(-matched, listOf("\"$text\""))
                     }
                 }
-                if (input.get(index) != text[index]) {
-                    return fail
+                if (input.get(index) != text[matched + index]) {
+                    return PullParser.Failed(-matched, listOf("\"$text\""))
                 }
+                index++
             }
-            return next.matched(success)
+            return next.matched(index, result)
         }
     }
 }

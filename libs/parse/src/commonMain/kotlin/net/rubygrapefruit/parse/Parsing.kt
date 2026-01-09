@@ -3,7 +3,7 @@ package net.rubygrapefruit.parse
 internal fun <POS, IN : AdvancingInput<POS>, OUT> parse(parser: PullParser<IN, OUT>, input: IN): ParseResult<POS, OUT> {
     var current = parser
     while (true) {
-        val result = current.parse(input)
+        val result = current.parse(input, input.available)
         when (result) {
             is PullParser.Finished -> return finalResult(result, input)
             is PullParser.RequireMore -> {

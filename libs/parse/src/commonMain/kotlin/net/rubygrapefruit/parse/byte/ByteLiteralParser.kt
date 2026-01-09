@@ -12,26 +12,29 @@ internal class ByteLiteralParser<OUT>(private val bytes: ByteArray, private val 
 
     private class ByteLiteralPullParser<OUT, NEXT>(
         private val bytes: ByteArray,
-        result: OUT,
+        private val result: OUT,
         private val next: ParseContinuation<ByteStream, OUT, NEXT>
     ) : PullParser<ByteStream, NEXT> {
-        private val success = PullParser.Matched<ByteStream, OUT>(bytes.size, result)
-        private val requireMore = PullParser.RequireMore(0, this)
+        private var matched = 0
 
-        override fun parse(input: ByteStream): PullParser.Result<ByteStream, NEXT> {
-            for (index in bytes.indices) {
-                if (index >= input.available) {
-                    return if (input.finished) {
-                        PullParser.Failed(index, listOf(format(bytes[index])))
+        override fun parse(input: ByteStream, max: Int): PullParser.Result<ByteStream, NEXT> {
+            var index = 0
+            val remaining = bytes.size - matched
+            while (index < remaining) {
+                if (index >= max) {
+                    return if (input.mayHave(remaining)) {
+                        matched += index
+                        PullParser.RequireMore(index, this)
                     } else {
-                        requireMore
+                        PullParser.Failed(index, listOf(format(bytes[matched + index])))
                     }
                 }
-                if (input.get(index) != bytes[index]) {
-                    return PullParser.Failed(index, listOf(format(bytes[index])))
+                if (input.get(index) != bytes[matched + index]) {
+                    return PullParser.Failed(index, listOf(format(bytes[matched + index])))
                 }
+                index++
             }
-            return next.matched(success)
+            return next.matched(index, result)
         }
 
         private fun format(byte: Byte): String {

@@ -11,7 +11,7 @@ internal abstract class AbstractPushParser<POS, IN : AdvancingInput<POS>, OUT>(
             when (currentState) {
                 is PullParser.Finished -> return
                 is PullParser -> {
-                    val result = currentState.parse(input)
+                    val result = currentState.parse(input, input.available)
                     when (result) {
                         is PullParser.Finished -> state = result
                         is PullParser.RequireMore -> {

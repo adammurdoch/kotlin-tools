@@ -1,7 +1,7 @@
 package net.rubygrapefruit.parse.combinators
 
 import net.rubygrapefruit.parse.*
-import kotlin.math.max
+import kotlin.math.min
 
 internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
     override fun <IN : Input<*>, NEXT> build(converter: CombinatorBuilder.Converter<IN>, next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
@@ -25,7 +25,7 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
             var requireMore = false
-            val maxAdvance = max(max, 0)
+            val maxAdvance = min(max, 1)
             for (index in states.indices) {
                 val choice = states[index]
                 if (choice is PullParser) {
@@ -46,11 +46,17 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
                             states[index] = nextChoice.parser
                         }
                     }
-                } else if (choice is PullParser.Failed) {
-                    states[index] = PullParser.Failed(choice.index - maxAdvance, choice.expected)
                 }
             }
             return if (requireMore) {
+                if (maxAdvance > 0) {
+                    for (index in states.indices) {
+                        val choice = states[index]
+                        if (choice is PullParser.Failed) {
+                            states[index] = PullParser.Failed(choice.index - maxAdvance, choice.expected)
+                        }
+                    }
+                }
                 PullParser.RequireMore(maxAdvance, this)
             } else {
                 val failures = states.filterIsInstance<PullParser.Failed<IN, NEXT>>()

@@ -6,6 +6,8 @@ package net.rubygrapefruit.parse
 internal interface PullParser<in IN, out OUT> : ParseState<IN, OUT> {
     /**
      * Attempts to parse the given inputs, up to the given max number of values.
+     *
+     * @param max May be 0
      */
     fun parse(input: IN, max: Int): Result<IN, OUT>
 

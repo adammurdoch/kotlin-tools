@@ -18,7 +18,7 @@ internal class ByteLiteralParser<OUT>(private val bytes: ByteArray, private val 
         private var matched = 0
 
         override fun toString(): String {
-            return "{literal bytes=${bytes.map { format(it) }}}"
+            return "{literal ${bytes.map { format(it) }}}"
         }
 
         override fun parse(input: ByteStream, max: Int): PullParser.Result<ByteStream, NEXT> {

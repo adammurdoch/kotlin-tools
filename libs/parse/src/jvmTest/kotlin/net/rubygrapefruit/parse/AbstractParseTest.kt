@@ -40,20 +40,24 @@ abstract class AbstractParseTest {
         val fixture = DefaultCharParseFailureFixture()
         fixture.config()
 
+        fixture.debug("PARSE \"$input\"")
         val result = parse(input)
         result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.message())
 
         input.oneChunk {
+            fixture.debug("PARSE ONE CHUNK")
             val result = pushParse(it)
             result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.message())
         }
 
         input.chunkPerChar {
+            fixture.debug("PARSE CHUNK PER CHAR")
             val result = pushParse(it)
             result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.message())
         }
 
         input.maybeTwoChunks {
+            fixture.debug("PARSE TWO CHUNKS")
             val result = pushParse(it)
             result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.message())
         }
@@ -195,31 +199,19 @@ abstract class AbstractParseTest {
         }
     }
 
-    interface CharParseFailureFixture {
-        fun failAt(offset: Int, line: Int = 1, col: Int = offset + 1)
+    interface ParseFailureFixture {
+        fun log()
 
         fun expect(text: String)
-
-        fun expectLiteral(text: String) {
-            expect("\"$text\"")
-        }
 
         fun expectEndOfInput() {
             expect("end of input")
         }
     }
 
-    private class DefaultCharParseFailureFixture : CharParseFailureFixture {
-        var offset = 0
-        var line = 1
-        var col = 1
+    private abstract class AbstractParseFailureFixture : ParseFailureFixture {
         val expect = mutableListOf<String>()
-
-        override fun failAt(offset: Int, line: Int, col: Int) {
-            this.offset = offset
-            this.line = line
-            this.col = col
-        }
+        var log = false
 
         override fun expect(text: String) {
             expect.add(text)
@@ -228,45 +220,47 @@ abstract class AbstractParseTest {
         fun message(): String {
             return "Expected ${expect.joinToString(", ")}"
         }
-    }
-
-    interface ByteParseFailureFixture {
-        fun log()
-
-        fun failAt(offset: Int)
-
-        fun expect(text: String)
-
-        fun expectEndOfInput() {
-            expect("end of input")
-        }
-    }
-
-    private class DefaultByteParseFailureFixture : ByteParseFailureFixture {
-        var log = false
-        var offset = 0
-        val expect = mutableListOf<String>()
 
         override fun log() {
             log = true
-        }
-
-        override fun failAt(offset: Int) {
-            this.offset = offset
-        }
-
-        override fun expect(text: String) {
-            expect.add(text)
-        }
-
-        fun message(): String {
-            return "Expected ${expect.joinToString(", ")}"
         }
 
         fun debug(message: String) {
             if (log) {
                 println("-> $message")
             }
+        }
+    }
+
+    interface CharParseFailureFixture : ParseFailureFixture {
+        fun failAt(offset: Int, line: Int = 1, col: Int = offset + 1)
+
+        fun expectLiteral(text: String) {
+            expect("\"$text\"")
+        }
+    }
+
+    private class DefaultCharParseFailureFixture : AbstractParseFailureFixture(), CharParseFailureFixture {
+        var offset = 0
+        var line = 1
+        var col = 1
+
+        override fun failAt(offset: Int, line: Int, col: Int) {
+            this.offset = offset
+            this.line = line
+            this.col = col
+        }
+    }
+
+    interface ByteParseFailureFixture : ParseFailureFixture {
+        fun failAt(offset: Int)
+    }
+
+    private class DefaultByteParseFailureFixture : AbstractParseFailureFixture(), ByteParseFailureFixture {
+        var offset = 0
+
+        override fun failAt(offset: Int) {
+            this.offset = offset
         }
     }
 

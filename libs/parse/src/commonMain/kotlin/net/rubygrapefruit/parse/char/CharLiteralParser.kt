@@ -18,7 +18,7 @@ internal class CharLiteralParser<OUT>(private val text: String, private val resu
         private var matched = 0
 
         override fun toString(): String {
-            return "{literal text=$text}"
+            return "{literal \"$text\"}"
         }
 
         override fun parse(input: CharStream, max: Int): PullParser.Result<CharStream, NEXT> {

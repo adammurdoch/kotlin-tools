@@ -29,8 +29,8 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
             for (index in states.indices) {
                 val choice = states[index]
                 if (choice is PullParser) {
-                    val nextChoice = choice.parse(input, maxAdvance)
-                    if (matched[index] && index == first) {
+                    val nextChoice = parse(choice, input, maxAdvance)
+                    if (matched[index] && index == first && nextChoice !is PullParser.Failed) {
                         return nextChoice
                     }
                     when (nextChoice) {
@@ -63,6 +63,18 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
                 val largestIndex = failures.maxOf { it.index }
                 val relevantFailures = failures.filter { it.index == largestIndex }
                 PullParser.Failed(largestIndex, relevantFailures.flatMap { it.expected })
+            }
+        }
+
+        private fun parse(parser: PullParser<IN, NEXT>, input: IN, maxAdvance: Int): PullParser.Result<IN, NEXT> {
+            var current = parser
+            while (true) {
+                val result = current.parse(input, maxAdvance)
+                if (maxAdvance == 1 && result is PullParser.RequireMore && result.advance == 0) {
+                    current = result.parser
+                    continue
+                }
+                return result
             }
         }
     }

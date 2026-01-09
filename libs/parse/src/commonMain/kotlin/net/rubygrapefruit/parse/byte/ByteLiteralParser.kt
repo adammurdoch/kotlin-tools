@@ -17,16 +17,20 @@ internal class ByteLiteralParser<OUT>(private val bytes: ByteArray, private val 
     ) : PullParser<ByteStream, NEXT> {
         private var matched = 0
 
+        override fun toString(): String {
+            return "{literal bytes=${bytes.map { format(it) }}}"
+        }
+
         override fun parse(input: ByteStream, max: Int): PullParser.Result<ByteStream, NEXT> {
             var index = 0
             val remaining = bytes.size - matched
             while (index < remaining) {
                 if (index >= max) {
-                    return if (input.mayHave(remaining)) {
+                    return if (index >= input.available && input.finished) {
+                        PullParser.Failed(index, listOf(format(bytes[matched + index])))
+                    } else {
                         matched += index
                         PullParser.RequireMore(index, this)
-                    } else {
-                        PullParser.Failed(index, listOf(format(bytes[matched + index])))
                     }
                 }
                 if (input.get(index) != bytes[matched + index]) {

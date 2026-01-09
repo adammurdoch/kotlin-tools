@@ -112,20 +112,24 @@ abstract class AbstractParseTest {
         val fixture = DefaultByteParseFailureFixture()
         fixture.config()
 
+        fixture.debug("PARSE ${input.map { it.toString(16) }}")
         val result = parse(input)
         result.assertIsFail(fixture.offset, fixture.message())
 
         input.oneChunk {
+            fixture.debug("PARSE ONE CHUNK")
             val result = pushParse(it)
             result.assertIsFail(fixture.offset, fixture.message())
         }
 
         input.chunkPerByte {
+            fixture.debug("PARSE CHUNK PER BYTE")
             val result = pushParse(it)
             result.assertIsFail(fixture.offset, fixture.message())
         }
 
         input.maybeTwoChunks {
+            fixture.debug("PARSE TWO CHUNKS")
             val result = pushParse(it)
             result.assertIsFail(fixture.offset, fixture.message())
         }
@@ -227,6 +231,8 @@ abstract class AbstractParseTest {
     }
 
     interface ByteParseFailureFixture {
+        fun log()
+
         fun failAt(offset: Int)
 
         fun expect(text: String)
@@ -237,8 +243,13 @@ abstract class AbstractParseTest {
     }
 
     private class DefaultByteParseFailureFixture : ByteParseFailureFixture {
+        var log = false
         var offset = 0
         val expect = mutableListOf<String>()
+
+        override fun log() {
+            log = true
+        }
 
         override fun failAt(offset: Int) {
             this.offset = offset
@@ -250,6 +261,12 @@ abstract class AbstractParseTest {
 
         fun message(): String {
             return "Expected ${expect.joinToString(", ")}"
+        }
+
+        fun debug(message: String) {
+            if (log) {
+                println("-> $message")
+            }
         }
     }
 

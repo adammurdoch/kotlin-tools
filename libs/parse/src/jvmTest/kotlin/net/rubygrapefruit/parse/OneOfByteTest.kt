@@ -1,0 +1,33 @@
+package net.rubygrapefruit.parse
+
+import net.rubygrapefruit.parse.byte.oneOf
+import net.rubygrapefruit.parse.char.oneOf
+import kotlin.test.Test
+
+class OneOfByteTest : AbstractParseTest() {
+    @Test
+    fun `matches one of a set of bytes`() {
+        val parser = oneOf(0x1, 0x2)
+
+        parser.matches(0x1, expected = 0x1)
+        parser.matches(0x2, expected = 0x2)
+
+        // missing
+        parser.doesNotMatch {
+            expect("x01")
+            expect("x02")
+        }
+
+        // unexpected
+        parser.doesNotMatch(0x11) {
+            expect("x01")
+            expect("x02")
+        }
+
+        // extra
+        parser.doesNotMatch(0x1, 0x1) {
+            failAt(1)
+            expectEndOfInput()
+        }
+    }
+}

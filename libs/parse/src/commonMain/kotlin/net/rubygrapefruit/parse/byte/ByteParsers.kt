@@ -15,3 +15,10 @@ fun literal(bytes: ByteArray): Parser<ByteInput, Unit> {
 fun <OUT> literal(bytes: ByteArray, result: OUT): Parser<ByteInput, OUT> {
     return ByteLiteralParser(bytes, result)
 }
+
+/**
+ * Returns a parser that matches one of the given bytes and produces it as a result.
+ */
+fun oneOf(vararg bytes: Byte): Parser<ByteInput, Byte> {
+    return OneOfByteParser(bytes)
+}

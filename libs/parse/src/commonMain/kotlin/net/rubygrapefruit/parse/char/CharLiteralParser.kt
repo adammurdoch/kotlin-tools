@@ -27,14 +27,14 @@ internal class CharLiteralParser<OUT>(private val text: String, private val resu
             while (index < remaining) {
                 if (index >= max) {
                     return if (index >= input.available && input.finished) {
-                        PullParser.Failed(-matched, listOf("\"$text\""))
+                        PullParser.Failed(-matched, listOf(format(text)))
                     } else {
                         matched += index
                         PullParser.RequireMore(index, this)
                     }
                 }
                 if (input.get(index) != text[matched + index]) {
-                    return PullParser.Failed(-matched, listOf("\"$text\""))
+                    return PullParser.Failed(-matched, listOf(format(text)))
                 }
                 index++
             }

@@ -40,9 +40,5 @@ internal class ByteLiteralParser<OUT>(private val bytes: ByteArray, private val 
             }
             return next.matched(index, result)
         }
-
-        private fun format(byte: Byte): String {
-            return 'x' + byte.toString(16).padStart(2, '0')
-        }
     }
 }

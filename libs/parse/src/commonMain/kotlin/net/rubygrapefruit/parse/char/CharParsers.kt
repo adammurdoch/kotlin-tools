@@ -15,3 +15,10 @@ fun literal(text: String): Parser<CharInput, Unit> {
 fun <OUT> literal(text: String, result: OUT): Parser<CharInput, OUT> {
     return CharLiteralParser(text, result)
 }
+
+/**
+ * Returns a parser that matches one of the given characters and produces it as a result.
+ */
+fun oneOf(vararg chars: Char): Parser<CharInput, Char> {
+    return OneOfCharParser(chars)
+}

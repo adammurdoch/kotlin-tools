@@ -5,22 +5,23 @@ import kotlin.math.min
 
 internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
     override fun <IN : Input<*>, NEXT> build(converter: CombinatorBuilder.Converter<IN>, next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
-        return ChoicePullParser(choices, converter, next)
+        return ChoicePullParser(choices.map { converter.convert(it) }, next)
+    }
+
+    companion object {
+        fun <IN : Input<*>, OUT, NEXT> of(parsers: List<PullParser<IN, OUT>>, next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
+            return ChoicePullParser(parsers, next)
+        }
     }
 
     private class ChoicePullParser<IN : Input<*>, OUT, NEXT>(
-        parsers: List<Parser<*, OUT>>,
-        converter: CombinatorBuilder.Converter<IN>,
+        parsers: List<PullParser<IN, OUT>>,
         private val next: ParseContinuation<IN, OUT, NEXT>
     ) : PullParser<IN, NEXT> {
         private var first = 0
-        private val matched = BooleanArray(parsers.size)
-        private val states = Array<ParseState<IN, NEXT>>(parsers.size) { index ->
+        private val states = Array<Choice<IN, OUT, NEXT>>(parsers.size) { index ->
             val parser = parsers[index]
-            converter.convert(parser) { match ->
-                matched[index] = true
-                next.matched(match)
-            }
+            Matching(parser)
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
@@ -28,45 +29,75 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
             val maxAdvance = min(max, 1)
             for (index in states.indices) {
                 val choice = states[index]
-                if (choice is PullParser) {
-                    val nextChoice = parse(choice, input, maxAdvance)
-                    if (matched[index] && index == first && nextChoice !is PullParser.Failed) {
-                        return nextChoice
-                    }
-                    when (nextChoice) {
-                        is PullParser.Finished -> {
-                            states[index] = nextChoice
-                            if (index == first) {
-                                first++
+                when (choice) {
+                    is Matching -> {
+                        val nextChoice = parse(choice.parser, input, maxAdvance)
+                        when (nextChoice) {
+                            is PullParser.Matched -> {
+                                val result = next.matched(nextChoice)
+                                if (index == first) {
+                                    return result
+                                }
+                                when (result) {
+                                    is PullParser.Matched -> {
+                                        states[index] = Finished(result)
+                                    }
+
+                                    is PullParser.Failed -> {
+                                        states[index] = Failed(result.index, result.expected)
+                                    }
+
+                                    is PullParser.RequireMore -> {
+                                        states[index] = Continuing(result.parser)
+                                    }
+                                }
+                            }
+
+                            is PullParser.Failed -> {
+                                if (index == first) {
+                                    first++
+                                }
+                                states[index] = Failed(nextChoice.index, nextChoice.expected)
+                            }
+
+                            is PullParser.RequireMore -> {
+                                requireMore = true
+                                choice.parser = nextChoice.parser
                             }
                         }
+                    }
 
-                        is PullParser.RequireMore -> {
-                            requireMore = true
-                            states[index] = nextChoice.parser
+                    is Continuing -> {
+                        val nextChoice = parse(choice.parser, input, maxAdvance)
+                        when (nextChoice) {
+                            is PullParser.Matched -> states[index] = Finished(nextChoice)
+                            is PullParser.Failed -> states[index] = Failed(nextChoice.index, nextChoice.expected)
+                            is PullParser.RequireMore -> choice.parser = nextChoice.parser
                         }
                     }
+
+                    is Failed, is Finished -> {}
                 }
             }
             return if (requireMore) {
                 if (maxAdvance > 0) {
                     for (index in states.indices) {
                         val choice = states[index]
-                        if (choice is PullParser.Failed) {
-                            states[index] = PullParser.Failed(choice.index - maxAdvance, choice.expected)
+                        if (choice is Failed) {
+                            choice.index -= maxAdvance
                         }
                     }
                 }
                 PullParser.RequireMore(maxAdvance, this)
             } else {
-                val failures = states.filterIsInstance<PullParser.Failed<IN, NEXT>>()
+                val failures = states.filterIsInstance<Failed<IN, OUT, NEXT>>()
                 val largestIndex = failures.maxOf { it.index }
                 val relevantFailures = failures.filter { it.index == largestIndex }
                 PullParser.Failed(largestIndex, relevantFailures.flatMap { it.expected })
             }
         }
 
-        private fun parse(parser: PullParser<IN, NEXT>, input: IN, maxAdvance: Int): PullParser.Result<IN, NEXT> {
+        private fun <OUT> parse(parser: PullParser<IN, OUT>, input: IN, maxAdvance: Int): PullParser.Result<IN, OUT> {
             var current = parser
             while (true) {
                 val result = current.parse(input, maxAdvance)
@@ -78,4 +109,14 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
             }
         }
     }
+
+    private sealed class Choice<IN, OUT, NEXT>
+
+    private class Matching<IN, OUT, NEXT>(var parser: PullParser<IN, OUT>) : Choice<IN, OUT, NEXT>()
+
+    private class Continuing<IN, OUT, NEXT>(var parser: PullParser<IN, NEXT>) : Choice<IN, OUT, NEXT>()
+
+    private class Failed<IN, OUT, NEXT>(var index: Int, val expected: List<String>) : Choice<IN, OUT, NEXT>()
+
+    private class Finished<IN, OUT, NEXT>(val matching: PullParser.Matched<IN, NEXT>) : Choice<IN, OUT, NEXT>()
 }

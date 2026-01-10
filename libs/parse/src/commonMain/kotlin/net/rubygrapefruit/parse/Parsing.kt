@@ -29,16 +29,24 @@ internal fun <IN : Input<*>, OUT> Parser<*, OUT>.compile(): PullParser<IN, OUT> 
 }
 
 private class DefaultConverter<IN : Input<*>> : CombinatorBuilder.Converter<IN> {
+    override fun <OUT> convert(parser: Parser<*, OUT>): PullParser<IN, OUT> {
+        return convert(parser, ParseContinuation.of())
+    }
+
     override fun <OUT, NEXT> convert(parser: Parser<*, OUT>, next: (PullParser.Matched<IN, OUT>) -> PullParser.Result<IN, NEXT>): PullParser<IN, NEXT> {
+        return convert(parser, ParseContinuation.of(next))
+    }
+
+    override fun <OUT, NEXT> convert(parser: Parser<*, OUT>, next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
         return when (parser) {
             is ParserBuilder<*, *> -> {
                 @Suppress("UNCHECKED_CAST")
-                (parser as ParserBuilder<IN, OUT>).build(ParseContinuation.of(next))
+                (parser as ParserBuilder<IN, OUT>).build(next)
             }
 
             is CombinatorBuilder<*> -> {
                 @Suppress("UNCHECKED_CAST")
-                (parser as CombinatorBuilder<OUT>).build(this, ParseContinuation.of(next))
+                (parser as CombinatorBuilder<OUT>).build(this, next)
             }
 
             else -> throw IllegalArgumentException("Cannot compile parser $parser with unexpected type")

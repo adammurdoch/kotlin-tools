@@ -47,6 +47,14 @@ abstract class AbstractParseTest {
         val fixture = DefaultCharParseFailureFixture()
         fixture.config()
 
+        if (fixture.log) {
+            TracingParser(this).doDoesNotMatch(input, fixture)
+        } else {
+            doDoesNotMatch(input, fixture)
+        }
+    }
+
+    private fun Parser<CharInput, *>.doDoesNotMatch(input: String, fixture: DefaultCharParseFailureFixture) {
         fixture.debug("PARSE \"$input\"")
         val result = parse(input)
         result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.message())
@@ -188,16 +196,7 @@ abstract class AbstractParseTest {
         when (this) {
             is ParseResult.Fail -> fail("Expected parse to succeed but failed at $position with $message")
             is ParseResult.Success -> {
-                when {
-                    expected is List<*> && value is List<*> -> {
-                        println("-> expected: ${expected.joinToString { "$it (${it?.javaClass})" }}")
-                        println("-> value: ${value.joinToString { "$it (${it?.javaClass})" }}")
-                        println("-> expected == value: ${expected == value}")
-                        assertEquals(expected.toMutableList(), value.toMutableList(), "unexpected value")
-                    }
-
-                    else -> assertEquals(expected, value, "unexpected value")
-                }
+                assertEquals(expected, value, "unexpected value")
             }
         }
     }

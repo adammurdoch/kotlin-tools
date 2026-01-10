@@ -28,6 +28,10 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
             })
         }
 
+        override fun toString(): String {
+            return "{choice}"
+        }
+
         override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
             var requireMore = false
             val maxAdvance = min(max, 1)

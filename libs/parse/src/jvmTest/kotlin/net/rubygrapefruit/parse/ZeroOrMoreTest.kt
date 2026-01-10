@@ -31,9 +31,11 @@ class ZeroOrMoreTest : AbstractParseTest() {
         // unexpected
         parser.doesNotMatch("X") {
             expectLiteral("abc")
+            expectEndOfInput()
         }
         parser.doesNotMatch("aX") {
             expectLiteral("abc")
+            expectEndOfInput()
         }
         parser.doesNotMatch("abcaX") {
             failAt(3)

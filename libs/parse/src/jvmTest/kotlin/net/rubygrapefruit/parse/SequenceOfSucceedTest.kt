@@ -7,9 +7,9 @@ import kotlin.test.Test
 class SequenceOfSucceedTest : AbstractParseTest() {
     @Test
     fun `matches succeed then succeed`() {
-        val parser = sequence(succeed(1), succeed(2)) { a, b -> a + b }
+        val parser = sequence(succeed(1), succeed(2)) { a, b -> listOf(a,b) }
 
-        parser.matches("", expected = 3)
+        parser.matches("", expected = listOf(1, 2))
 
         // extra
         parser.doesNotMatch("X") {
@@ -19,9 +19,9 @@ class SequenceOfSucceedTest : AbstractParseTest() {
 
     @Test
     fun `matches succeed then literal`() {
-        val parser = sequence(succeed(1), literal("ab", 2)) { a, b -> a + b }
+        val parser = sequence(succeed(1), literal("ab", 2)) { a, b -> listOf(a,b) }
 
-        parser.matches("ab", expected = 3)
+        parser.matches("ab", expected = listOf(1, 2))
 
         // missing
         parser.doesNotMatch("a") {
@@ -42,9 +42,9 @@ class SequenceOfSucceedTest : AbstractParseTest() {
 
     @Test
     fun `matches literal then succeed`() {
-        val parser = sequence(literal("ab", 2), succeed(1)) { a, b -> a + b }
+        val parser = sequence(literal("ab", 1), succeed(2)) { a, b -> listOf(a,b) }
 
-        parser.matches("ab", expected = 3)
+        parser.matches("ab", expected = listOf(1, 2))
 
         // missing
         parser.doesNotMatch("a") {

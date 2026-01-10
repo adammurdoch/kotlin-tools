@@ -20,6 +20,10 @@ abstract class AbstractParseTest {
         val fixture = DefaultParseFixture()
         fixture.config()
 
+        fixture.trace(this).matches(fixture, input, expected)
+    }
+
+    private fun <T> Parser<CharInput, T>.matches(fixture: DefaultParseFixture, input: String, expected: T) {
         fixture.debug("PARSE \"$input\"")
         val result = parse(input)
         result.assertIsSuccess(expected)
@@ -47,14 +51,10 @@ abstract class AbstractParseTest {
         val fixture = DefaultCharParseFailureFixture()
         fixture.config()
 
-        if (fixture.log) {
-            TracingParser(this).doDoesNotMatch(input, fixture)
-        } else {
-            doDoesNotMatch(input, fixture)
-        }
+        fixture.trace(this).doesNotMatch(input, fixture)
     }
 
-    private fun Parser<CharInput, *>.doDoesNotMatch(input: String, fixture: DefaultCharParseFailureFixture) {
+    private fun Parser<CharInput, *>.doesNotMatch(input: String, fixture: DefaultCharParseFailureFixture) {
         fixture.debug("PARSE \"$input\"")
         val result = parse(input)
         result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.message())
@@ -140,6 +140,10 @@ abstract class AbstractParseTest {
         val fixture = DefaultByteParseFailureFixture()
         fixture.config()
 
+        fixture.trace(this).doesNotMatch(fixture = fixture, input = input)
+    }
+
+    private fun Parser<ByteInput, *>.doesNotMatch(fixture: DefaultByteParseFailureFixture, vararg input: Byte) {
         fixture.debug("PARSE ${input.map { it.toString(16) }}")
         val result = parse(input)
         result.assertIsFail(fixture.offset, fixture.message())
@@ -237,6 +241,14 @@ abstract class AbstractParseTest {
         fun debug(message: String) {
             if (log) {
                 println("-> $message")
+            }
+        }
+
+        fun <IN, OUT> trace(parser: Parser<IN, OUT>): Parser<IN, OUT> {
+            return if (log) {
+                TracingParser(parser)
+            } else {
+                parser
             }
         }
     }

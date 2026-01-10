@@ -17,10 +17,10 @@ class SequenceOfChoiceTest : AbstractParseTest() {
                 literal("11", 1),
                 literal("2", 2)
             )
-        ) { a, b -> "$a.$b" }
+        ) { a, b -> listOf(a, b) }
 
-        parser.matches("ab11", expected = "1.1")
-        parser.matches("c2", expected = "2.2")
+        parser.matches("ab11", expected = listOf(1, 1))
+        parser.matches("c2", expected = listOf(2, 2))
 
         // missing
         parser.doesNotMatch("") {
@@ -57,10 +57,10 @@ class SequenceOfChoiceTest : AbstractParseTest() {
                 literal("ad", 2)
             ),
             literal("12", 3)
-        ) { a, b -> "$a.$b" }
+        ) { a, b -> listOf(a, b) }
 
-        parser.matches("abc12", expected = "1.3")
-        parser.matches("ad12", expected = "2.3")
+        parser.matches("abc12", expected = listOf(1, 3))
+        parser.matches("ad12", expected = listOf(2, 3))
 
         // missing
         parser.doesNotMatch("") {

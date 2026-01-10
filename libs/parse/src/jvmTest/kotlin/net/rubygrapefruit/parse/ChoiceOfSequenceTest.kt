@@ -9,11 +9,11 @@ class ChoiceOfSequenceTest : AbstractParseTest() {
     @Test
     fun `matches choice of sequences with common prefix`() {
         val parser = oneOf(
-            sequence(literal("ab", 1), literal("c", 2)) { a, b -> a + b },
-            sequence(literal("a", 5), literal("b", 1)) { a, b -> a + b }
+            sequence(literal("ab", 1), literal("c", 2)) { a, b -> listOf(a, b) },
+            sequence(literal("a", 5), literal("b", 6)) { a, b -> listOf(a, b) }
         )
 
-        parser.matches("abc", expected = 3)
-        parser.matches("ab", expected = 6)
+        parser.matches("abc", expected = listOf(1, 2))
+        parser.matches("ab", expected = listOf(5, 6))
     }
 }

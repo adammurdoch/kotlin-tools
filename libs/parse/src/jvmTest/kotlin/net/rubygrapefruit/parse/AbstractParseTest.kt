@@ -16,21 +16,28 @@ abstract class AbstractParseTest {
         matches(input = input, expected = Unit)
     }
 
-    fun <T> Parser<CharInput, T>.matches(input: String, expected: T) {
+    fun <T> Parser<CharInput, T>.matches(input: String, expected: T, config: ParseFixture.() -> Unit = {}) {
+        val fixture = DefaultParseFixture()
+        fixture.config()
+
+        fixture.debug("PARSE \"$input\"")
         val result = parse(input)
         result.assertIsSuccess(expected)
 
         input.oneChunk {
+            fixture.debug("PARSE ONE CHUNK")
             val result = pushParse(it)
             result.assertIsSuccess(expected)
         }
 
         input.chunkPerChar {
+            fixture.debug("PARSE CHUNK PER CHAR")
             val result = pushParse(it)
             result.assertIsSuccess(expected)
         }
 
         input.maybeTwoChunks {
+            fixture.debug("PARSE TWO CHUNKS")
             val result = pushParse(it)
             result.assertIsSuccess(expected)
         }
@@ -199,27 +206,12 @@ abstract class AbstractParseTest {
         }
     }
 
-    interface ParseFailureFixture {
+    interface ParseFixture {
         fun log()
-
-        fun expect(text: String)
-
-        fun expectEndOfInput() {
-            expect("end of input")
-        }
     }
 
-    private abstract class AbstractParseFailureFixture : ParseFailureFixture {
-        val expect = mutableListOf<String>()
+    private open class DefaultParseFixture : ParseFixture {
         var log = false
-
-        override fun expect(text: String) {
-            expect.add(text)
-        }
-
-        fun message(): String {
-            return "Expected ${expect.joinToString(", ")}"
-        }
 
         override fun log() {
             log = true
@@ -232,6 +224,26 @@ abstract class AbstractParseTest {
         }
     }
 
+    interface ParseFailureFixture : ParseFixture {
+        fun expect(text: String)
+
+        fun expectEndOfInput() {
+            expect("end of input")
+        }
+    }
+
+    private open class DefaultParseFailureFixture : DefaultParseFixture(), ParseFailureFixture {
+        val expect = mutableListOf<String>()
+
+        override fun expect(text: String) {
+            expect.add(text)
+        }
+
+        fun message(): String {
+            return "Expected ${expect.joinToString(", ")}"
+        }
+    }
+
     interface CharParseFailureFixture : ParseFailureFixture {
         fun failAt(offset: Int, line: Int = 1, col: Int = offset + 1)
 
@@ -240,7 +252,7 @@ abstract class AbstractParseTest {
         }
     }
 
-    private class DefaultCharParseFailureFixture : AbstractParseFailureFixture(), CharParseFailureFixture {
+    private class DefaultCharParseFailureFixture : DefaultParseFailureFixture(), CharParseFailureFixture {
         var offset = 0
         var line = 1
         var col = 1
@@ -256,7 +268,7 @@ abstract class AbstractParseTest {
         fun failAt(offset: Int)
     }
 
-    private class DefaultByteParseFailureFixture : AbstractParseFailureFixture(), ByteParseFailureFixture {
+    private class DefaultByteParseFailureFixture : DefaultParseFailureFixture(), ByteParseFailureFixture {
         var offset = 0
 
         override fun failAt(offset: Int) {

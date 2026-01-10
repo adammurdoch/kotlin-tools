@@ -25,7 +25,7 @@ internal fun <POS, IN : Input<POS>, OUT> finalResult(result: PullParser.Finished
 }
 
 internal fun <IN : Input<*>, OUT> Parser<*, OUT>.compile(): PullParser<IN, OUT> {
-    return DefaultConverter<IN>().convert(this) { match -> PullParser.RequireMore(match.count, EndOfInputParser(match)) }
+    return DefaultConverter<IN>().convert(this) { match -> PullParser.RequireMore(match.count, EndOfInputParser(match.value)) }
 }
 
 private class DefaultConverter<IN : Input<*>> : CombinatorBuilder.Converter<IN> {

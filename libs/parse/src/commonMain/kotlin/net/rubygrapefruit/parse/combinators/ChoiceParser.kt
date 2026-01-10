@@ -40,7 +40,7 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
                                 }
                                 when (result) {
                                     is PullParser.Matched -> {
-                                        states[index] = Finished(result)
+                                        states[index] = Finished()
                                     }
 
                                     is PullParser.Failed -> {
@@ -70,9 +70,18 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
                     is Continuing -> {
                         val nextChoice = parse(choice.parser, input, maxAdvance)
                         when (nextChoice) {
-                            is PullParser.Matched -> states[index] = Finished(nextChoice)
+                            is PullParser.Matched -> {
+                                if (index == first) {
+                                    return nextChoice
+                                }
+                                states[index] = Finished()
+                            }
+
                             is PullParser.Failed -> states[index] = Failed(nextChoice.index, nextChoice.expected)
-                            is PullParser.RequireMore -> choice.parser = nextChoice.parser
+                            is PullParser.RequireMore -> {
+                                requireMore = true
+                                choice.parser = nextChoice.parser
+                            }
                         }
                     }
 
@@ -118,5 +127,5 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
 
     private class Failed<IN, OUT, NEXT>(var index: Int, val expected: List<String>) : Choice<IN, OUT, NEXT>()
 
-    private class Finished<IN, OUT, NEXT>(val matching: PullParser.Matched<IN, NEXT>) : Choice<IN, OUT, NEXT>()
+    private class Finished<IN, OUT, NEXT> : Choice<IN, OUT, NEXT>()
 }

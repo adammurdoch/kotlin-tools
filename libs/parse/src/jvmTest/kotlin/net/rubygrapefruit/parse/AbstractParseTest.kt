@@ -96,10 +96,19 @@ abstract class AbstractParseTest {
     }
 
     fun Parser<ByteInput, Unit>.matches(vararg input: Byte) {
-        matches(input = input, expected = Unit)
+        doMatches(input = input, expected = Unit)
+    }
+
+    fun Parser<ByteInput, List<Byte>>.matches(vararg input: Byte, expected: List<Byte>) {
+        // Compiler passes in list of Int
+        doMatches(input = input, expected = expected.map { it.toByte() })
     }
 
     fun <T> Parser<ByteInput, T>.matches(vararg input: Byte, expected: T) {
+        doMatches(input = input, expected = expected)
+    }
+
+    private fun <T> Parser<ByteInput, T>.doMatches(vararg input: Byte, expected: T) {
         val result = parse(input)
         result.assertIsSuccess(expected)
 
@@ -179,7 +188,16 @@ abstract class AbstractParseTest {
         when (this) {
             is ParseResult.Fail -> fail("Expected parse to succeed but failed at $position with $message")
             is ParseResult.Success -> {
-                assertEquals(expected, value, "unexpected value")
+                when {
+                    expected is List<*> && value is List<*> -> {
+                        println("-> expected: ${expected.joinToString { "$it (${it?.javaClass})" }}")
+                        println("-> value: ${value.joinToString { "$it (${it?.javaClass})" }}")
+                        println("-> expected == value: ${expected == value}")
+                        assertEquals(expected.toMutableList(), value.toMutableList(), "unexpected value")
+                    }
+
+                    else -> assertEquals(expected, value, "unexpected value")
+                }
             }
         }
     }

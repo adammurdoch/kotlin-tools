@@ -1,7 +1,6 @@
 package net.rubygrapefruit.parse
 
 import net.rubygrapefruit.parse.byte.oneOf
-import net.rubygrapefruit.parse.char.oneOf
 import kotlin.test.Test
 
 class OneOfByteTest : AbstractParseTest() {

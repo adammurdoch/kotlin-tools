@@ -24,6 +24,18 @@ internal fun <POS, IN : Input<POS>, OUT> finalResult(result: PullParser.Finished
     }
 }
 
+internal fun <IN, OUT> PullParser<IN, OUT>.parseZeroOrOne(input: IN, maxAdvance: Int): PullParser.Result<IN, OUT> {
+    var current = this
+    while (true) {
+        val result = current.parse(input, maxAdvance)
+        if (maxAdvance == 1 && result is PullParser.RequireMore && result.advance == 0) {
+            current = result.parser
+            continue
+        }
+        return result
+    }
+}
+
 internal fun <IN : Input<*>, OUT> Parser<*, OUT>.compile(): PullParser<IN, OUT> {
     return DefaultConverter<IN>().convert(this) { match -> PullParser.RequireMore(match.count, EndOfInputParser(match.value)) }
 }

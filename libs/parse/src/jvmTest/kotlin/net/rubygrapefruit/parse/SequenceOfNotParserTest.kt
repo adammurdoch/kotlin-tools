@@ -1,0 +1,62 @@
+package net.rubygrapefruit.parse
+
+import net.rubygrapefruit.parse.byte.literal
+import net.rubygrapefruit.parse.byte.oneOf
+import net.rubygrapefruit.parse.combinators.sequence
+import net.rubygrapefruit.parse.combinators.zeroOrMore
+import kotlin.test.Test
+
+class SequenceOfNotParserTest : AbstractParseTest() {
+    @Test
+    fun `matches not single byte literal followed by bytes`() {
+        val parser = sequence(
+            not(literal(byteArrayOf(0x1))),
+            zeroOrMore(oneOf(0x1, 0x2))
+        ) { _, b -> b }
+
+        parser.matches(expected = emptyList())
+        parser.matches(0x2, expected = listOf(0x2))
+        parser.matches(0x2, 0x1, expected = listOf(0x2, 0x1))
+
+        parser.doesNotMatch(0x1) {
+//            expect("x01")
+//            expect("x02")
+//            expectEndOfInput()
+        }
+        parser.doesNotMatch(0x1, 0x2) {
+//            expect("x01")
+//            expect("x02")
+//            expectEndOfInput()
+        }
+
+        parser.doesNotMatch(0x3) {
+            expectEndOfInput()
+            expect("x01")
+            expect("x02")
+        }
+    }
+
+    @Test
+    fun `matches not multi-byte literal followed by bytes`() {
+        val parser = sequence(
+            not(literal(byteArrayOf(0x1, 0x2))),
+            zeroOrMore(oneOf(0x1, 0x2))
+        ) { _, b -> b }
+
+        parser.matches(expected = emptyList())
+        parser.matches(0x2, expected = listOf(0x2))
+        parser.matches(0x2, 0x1, expected = listOf(0x2, 0x1))
+        parser.matches(0x1, expected = listOf(0x1))
+        parser.matches(0x1, 0x1, expected = listOf(0x1, 0x1))
+        parser.matches(0x1, 0x1, 0x2, expected = listOf(0x1, 0x1, 0x2))
+
+        parser.doesNotMatch(0x1, 0x2)
+        parser.doesNotMatch(0x1, 0x2, 0x3)
+
+        parser.doesNotMatch(0x3) {
+            expectEndOfInput()
+            expect("x01")
+            expect("x02")
+        }
+    }
+}

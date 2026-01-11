@@ -1,0 +1,45 @@
+package net.rubygrapefruit.parse
+
+import kotlin.math.min
+
+internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, Unit>, CombinatorBuilder<Unit> {
+    override fun <IN : Input<*>, NEXT> build(converter: CombinatorBuilder.Converter<IN>, next: ParseContinuation<IN, Unit, NEXT>): PullParser<IN, NEXT> {
+        return NotPullParser(converter.convert(parser), NextParser(next))
+    }
+
+    private class NotPullParser<IN, NEXT>(
+        private var predicate: PullParser<IN, Unit>,
+        private var next: PullParser<IN, NEXT>
+    ) : PullParser<IN, NEXT> {
+        private var matched = 0
+
+        override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
+            val maxAdvance = min(max, 1)
+            val checkResult = predicate.parseZeroOrOne(input, maxAdvance)
+            when (checkResult) {
+                is PullParser.Matched -> return PullParser.Failed(-matched, emptyList())
+                is PullParser.Failed -> return next.parseZeroOrOne(input, maxAdvance)
+                is PullParser.RequireMore -> {
+                    predicate = checkResult.parser
+                }
+            }
+
+            val result = next.parseZeroOrOne(input, maxAdvance)
+            when (result) {
+                is PullParser.Matched -> return result
+                is PullParser.Failed -> return result
+                is PullParser.RequireMore -> {
+                    next = result.parser
+                }
+            }
+            matched += maxAdvance
+            return PullParser.RequireMore(maxAdvance, this)
+        }
+    }
+
+    private class NextParser<IN, NEXT>(private val next: ParseContinuation<IN, Unit, NEXT>) : PullParser<IN, NEXT> {
+        override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
+            return next.matched(0, Unit)
+        }
+    }
+}

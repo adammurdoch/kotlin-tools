@@ -12,12 +12,13 @@ class CharLiteralTest : AbstractParseTest() {
 
         // missing
         parser.doesNotMatch("") {
-            expectLiteral("a")
+            // don't use expectLiteral() here, to check formatting
+            expect("\"a\"")
         }
 
         // unexpected char
         parser.doesNotMatch("X") {
-            expectLiteral("a")
+            expect("\"a\"")
         }
 
         // extra char
@@ -28,7 +29,7 @@ class CharLiteralTest : AbstractParseTest() {
 
         // incorrect case
         parser.doesNotMatch("A") {
-            expectLiteral("a")
+            expect("\"a\"")
         }
     }
 
@@ -47,30 +48,31 @@ class CharLiteralTest : AbstractParseTest() {
 
         // missing
         parser.doesNotMatch("") {
-            expectLiteral("ab")
+            // don't use expectLiteral() here, to check formatting
+            expect("\"ab\"")
         }
         parser.doesNotMatch("a") {
-            expectLiteral("ab")
+            expect("\"ab\"")
         }
         parser.doesNotMatch("b") {
-            expectLiteral("ab")
+            expect("\"ab\"")
         }
 
         // unexpected char
         parser.doesNotMatch("X") {
-            expectLiteral("ab")
+            expect("\"ab\"")
         }
         parser.doesNotMatch("aX") {
-            expectLiteral("ab")
+            expect("\"ab\"")
         }
         parser.doesNotMatch("Xb") {
-            expectLiteral("ab")
+            expect("\"ab\"")
         }
         parser.doesNotMatch("Xab") {
-            expectLiteral("ab")
+            expect("\"ab\"")
         }
         parser.doesNotMatch("aXb") {
-            expectLiteral("ab")
+            expect("\"ab\"")
         }
 
         // extra char
@@ -81,13 +83,13 @@ class CharLiteralTest : AbstractParseTest() {
 
         // incorrect case
         parser.doesNotMatch("AB") {
-            expectLiteral("ab")
+            expect("\"ab\"")
         }
         parser.doesNotMatch("Ab") {
-            expectLiteral("ab")
+            expect("\"ab\"")
         }
         parser.doesNotMatch("aB") {
-            expectLiteral("ab")
+            expect("\"ab\"")
         }
     }
 

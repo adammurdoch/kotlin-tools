@@ -17,24 +17,24 @@ class SequenceOfOneOfSetTest : AbstractParseTest() {
 
         // missing
         parser.doesNotMatch {
-            expect("x01")
-            expect("x02")
+            expectLiteral(0x1)
+            expectLiteral(0x2)
         }
         parser.doesNotMatch(0x1) {
             failAt(1)
-            expect("x10")
-            expect("x11")
+            expectLiteral(0x10)
+            expectLiteral(0x11)
         }
 
         // unexpected
         parser.doesNotMatch(0x3) {
-            expect("x01")
-            expect("x02")
+            expectLiteral(0x1)
+            expectLiteral(0x2)
         }
         parser.doesNotMatch(0x2, 0x3) {
             failAt(1)
-            expect("x10")
-            expect("x11")
+            expectLiteral(0x10)
+            expectLiteral(0x11)
         }
 
         // extra

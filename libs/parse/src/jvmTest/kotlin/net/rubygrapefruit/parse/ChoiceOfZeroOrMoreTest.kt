@@ -24,22 +24,22 @@ class ChoiceOfZeroOrMoreTest : AbstractParseTest() {
         // unexpected
         parser.doesNotMatch(0x3) {
             expectEndOfInput()
-            expect("x01")
-            expect("x02")
-            expect("x10")
-            expect("x11")
+            expectLiteral(0x1)
+            expectLiteral(0x2)
+            expectLiteral(0x10)
+            expectLiteral(0x11)
         }
         parser.doesNotMatch(0x1, 0x11) {
             failAt(1)
             expectEndOfInput()
-            expect("x01")
-            expect("x02")
+            expectLiteral(0x1)
+            expectLiteral(0x2)
         }
         parser.doesNotMatch(0x10, 0x2) {
             failAt(1)
             expectEndOfInput()
-            expect("x10")
-            expect("x11")
+            expectLiteral(0x10)
+            expectLiteral(0x11)
         }
     }
 }

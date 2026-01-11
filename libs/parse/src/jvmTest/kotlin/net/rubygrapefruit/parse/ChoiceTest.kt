@@ -49,18 +49,18 @@ class ChoiceTest : AbstractParseTest() {
 
         // missing
         parser.doesNotMatch {
-            expect("x01")
-            expect("x10")
+            expectLiteral(0x1)
+            expectLiteral(0x10)
         }
 
         // partial match one
         parser.doesNotMatch(0x1, 0x2) {
             failAt(2)
-            expect("x03")
+            expectLiteral(0x3)
         }
         parser.doesNotMatch(0x10) {
             failAt(1)
-            expect("x11")
+            expectLiteral(0x11)
         }
     }
 

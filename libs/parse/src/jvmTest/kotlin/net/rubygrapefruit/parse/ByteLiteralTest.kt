@@ -12,6 +12,7 @@ class ByteLiteralTest : AbstractParseTest() {
 
         // missing
         parser.doesNotMatch {
+            // don't use expectLiteral() here, to check formatting
             expect("x01")
         }
 
@@ -42,6 +43,7 @@ class ByteLiteralTest : AbstractParseTest() {
 
         // missing
         parser.doesNotMatch {
+            // don't use expectLiteral() here, to check formatting
             expect("x01")
         }
         parser.doesNotMatch(0x1) {

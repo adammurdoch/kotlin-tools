@@ -45,24 +45,24 @@ class SequenceTest : AbstractParseTest() {
 
         // missing
         parser.doesNotMatch {
-            expect("x01")
+            expectLiteral(0x1)
         }
         parser.doesNotMatch(0x1) {
             failAt(1)
-            expect("x02")
+            expectLiteral(0x2)
         }
         parser.doesNotMatch(0x1, 0x2, 0x3) {
             failAt(3)
-            expect("x04")
+            expectLiteral(0x4)
         }
 
         // unexpected
         parser.doesNotMatch(0x3) {
-            expect("x01")
+            expectLiteral(0x1)
         }
         parser.doesNotMatch(0x1, 0x2, 0x3, 0x1) {
             failAt(3)
-            expect("x04")
+            expectLiteral(0x4)
         }
 
         // extra

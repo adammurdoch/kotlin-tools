@@ -13,14 +13,14 @@ class OneOfByteTest : AbstractParseTest() {
 
         // missing
         parser.doesNotMatch {
-            expect("x01")
-            expect("x02")
+            expectLiteral(0x1)
+            expectLiteral(0x2)
         }
 
         // unexpected
         parser.doesNotMatch(0x11) {
-            expect("x01")
-            expect("x02")
+            expectLiteral(0x1)
+            expectLiteral(0x2)
         }
 
         // extra

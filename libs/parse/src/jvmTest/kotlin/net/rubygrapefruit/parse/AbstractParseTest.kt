@@ -295,6 +295,10 @@ abstract class AbstractParseTest {
 
     interface ByteParseFailureFixture : ParseFailureFixture {
         fun failAt(offset: Int)
+
+        fun expectLiteral(byte: Byte) {
+            expect('x' + byte.toString(16).padStart(2, '0'))
+        }
     }
 
     private class DefaultByteParseFailureFixture : DefaultParseFailureFixture(), ByteParseFailureFixture {

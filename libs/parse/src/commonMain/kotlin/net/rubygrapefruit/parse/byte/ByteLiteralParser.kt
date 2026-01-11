@@ -1,18 +1,18 @@
 package net.rubygrapefruit.parse.byte
 
-import net.rubygrapefruit.parse.ParseContinuation
-import net.rubygrapefruit.parse.Parser
-import net.rubygrapefruit.parse.ParserBuilder
-import net.rubygrapefruit.parse.PullParser
+import net.rubygrapefruit.parse.*
 
 internal class ByteLiteralParser<OUT>(private val bytes: ByteArray, private val result: OUT) : Parser<ByteInput, OUT>, ParserBuilder<ByteStream, OUT> {
+    private val expectations = bytes.map { Expectation.One(format(it)) }
+
     override fun <NEXT> build(next: ParseContinuation<ByteStream, OUT, NEXT>): PullParser<ByteStream, NEXT> {
-        return ByteLiteralPullParser(bytes, result, next)
+        return ByteLiteralPullParser(bytes, result, expectations, next)
     }
 
     private class ByteLiteralPullParser<OUT, NEXT>(
         private val bytes: ByteArray,
         private val result: OUT,
+        private val expectations: List<Expectation>,
         private val next: ParseContinuation<ByteStream, OUT, NEXT>
     ) : PullParser<ByteStream, NEXT> {
         private var matched = 0
@@ -27,14 +27,14 @@ internal class ByteLiteralParser<OUT>(private val bytes: ByteArray, private val 
             while (index < remaining) {
                 if (index >= max) {
                     return if (index >= input.available && input.finished) {
-                        PullParser.Failed(index, listOf(format(bytes[matched + index])))
+                        PullParser.Failed(index, expectations[matched + index])
                     } else {
                         matched += index
                         PullParser.RequireMore(index, this)
                     }
                 }
                 if (input.get(index) != bytes[matched + index]) {
-                    return PullParser.Failed(index, listOf(format(bytes[matched + index])))
+                    return PullParser.Failed(index, expectations[matched + index])
                 }
                 index++
             }

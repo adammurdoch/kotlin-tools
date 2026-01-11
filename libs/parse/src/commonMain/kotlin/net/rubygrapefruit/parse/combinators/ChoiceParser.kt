@@ -71,7 +71,7 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
                 val failures = states.filterIsInstance<PullParser.Failed<IN, NEXT>>()
                 val largestIndex = failures.maxOf { it.index }
                 val relevantFailures = failures.filter { it.index == largestIndex }
-                PullParser.Failed(largestIndex, relevantFailures.flatMap { it.expected }.distinct().sorted())
+                PullParser.Failed(largestIndex, Expectation.OneOf(relevantFailures.map { it.expected }))
             }
         }
     }

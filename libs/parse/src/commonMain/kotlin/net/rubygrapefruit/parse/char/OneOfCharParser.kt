@@ -1,20 +1,23 @@
 package net.rubygrapefruit.parse.char
 
-import net.rubygrapefruit.parse.ParseContinuation
-import net.rubygrapefruit.parse.Parser
-import net.rubygrapefruit.parse.ParserBuilder
-import net.rubygrapefruit.parse.PullParser
+import net.rubygrapefruit.parse.*
 
 internal class OneOfCharParser(private val chars: CharArray) : Parser<CharInput, Char>, ParserBuilder<CharStream, Char> {
+    private val expectation = Expectation.OneOf(chars.map { Expectation.One(format(it)) })
+
     override fun <NEXT> build(next: ParseContinuation<CharStream, Char, NEXT>): PullParser<CharStream, NEXT> {
-        return OneOfCharPullParser(chars, next)
+        return OneOfCharPullParser(chars, expectation, next)
     }
 
-    private class OneOfCharPullParser<NEXT>(private val chars: CharArray, private val next: ParseContinuation<CharStream, Char, NEXT>) : PullParser<CharStream, NEXT> {
+    private class OneOfCharPullParser<NEXT>(
+        private val chars: CharArray,
+        private val expectation: Expectation,
+        private val next: ParseContinuation<CharStream, Char, NEXT>
+    ) : PullParser<CharStream, NEXT> {
         override fun parse(input: CharStream, max: Int): PullParser.Result<CharStream, NEXT> {
             return if (max == 0) {
                 if (input.finished) {
-                    PullParser.Failed(0, chars.map { format(it) })
+                    PullParser.Failed(0, expectation)
                 } else {
                     PullParser.RequireMore(0, this)
                 }
@@ -23,7 +26,7 @@ internal class OneOfCharParser(private val chars: CharArray) : Parser<CharInput,
                 if (chars.contains(ch)) {
                     next.matched(1, ch)
                 } else {
-                    PullParser.Failed(0, chars.map { format(it) })
+                    PullParser.Failed(0, expectation)
                 }
             }
         }

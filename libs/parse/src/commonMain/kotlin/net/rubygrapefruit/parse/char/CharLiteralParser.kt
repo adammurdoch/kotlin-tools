@@ -1,19 +1,19 @@
 package net.rubygrapefruit.parse.char
 
-import net.rubygrapefruit.parse.ParseContinuation
-import net.rubygrapefruit.parse.Parser
-import net.rubygrapefruit.parse.ParserBuilder
-import net.rubygrapefruit.parse.PullParser
+import net.rubygrapefruit.parse.*
 
 internal class CharLiteralParser<OUT>(private val text: String, private val result: OUT) : Parser<CharInput, OUT>, ParserBuilder<CharStream, OUT> {
+    private val expectation = Expectation.One(format(text))
+
     override fun <NEXT> build(next: ParseContinuation<CharStream, OUT, NEXT>): PullParser<CharStream, NEXT> {
-        return CharLiteralPullParser(text, result, next)
+        return CharLiteralPullParser(text, result, expectation, next)
     }
 
     private class CharLiteralPullParser<OUT, NEXT>(
         private val text: String,
         private val result: OUT,
-        private val next: ParseContinuation<CharStream, OUT, NEXT>
+        private val expectation: Expectation,
+        private val next: ParseContinuation<CharStream, OUT, NEXT>,
     ) : PullParser<CharStream, NEXT> {
         private var matched = 0
 
@@ -27,14 +27,14 @@ internal class CharLiteralParser<OUT>(private val text: String, private val resu
             while (index < remaining) {
                 if (index >= max) {
                     return if (index >= input.available && input.finished) {
-                        PullParser.Failed(-matched, listOf(format(text)))
+                        PullParser.Failed(-matched, expectation)
                     } else {
                         matched += index
                         PullParser.RequireMore(index, this)
                     }
                 }
                 if (input.get(index) != text[matched + index]) {
-                    return PullParser.Failed(-matched, listOf(format(text)))
+                    return PullParser.Failed(-matched, expectation)
                 }
                 index++
             }

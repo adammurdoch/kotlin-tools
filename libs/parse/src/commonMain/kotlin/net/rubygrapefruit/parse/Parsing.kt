@@ -20,7 +20,11 @@ internal fun <POS, IN : AdvancingInput<POS>, OUT> parse(parser: PullParser<IN, O
 internal fun <POS, IN : Input<POS>, OUT> finalResult(result: PullParser.Finished<IN, OUT>, input: IN): ParseResult<POS, OUT> {
     return when (result) {
         is PullParser.Matched -> ParseResult.Success(result.value)
-        is PullParser.Failed -> ParseResult.Fail(input.posAt(result.index), "Expected ${result.expected.joinToString(", ")}")
+        is PullParser.Failed -> {
+            val expected = mutableSetOf<String>()
+            result.expected.accept(expected::add)
+            ParseResult.Fail(input.posAt(result.index), "Expected ${expected.sorted().joinToString(", ")}")
+        }
     }
 }
 

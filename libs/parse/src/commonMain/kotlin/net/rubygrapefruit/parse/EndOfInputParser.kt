@@ -9,7 +9,7 @@ internal class EndOfInputParser<IN : Input<*>, OUT>(
 
     override fun parse(input: IN, max: Int): PullParser.Result<IN, OUT> {
         return if (input.available > 0) {
-            PullParser.Failed(0, listOf("end of input"))
+            PullParser.Failed(0, Expectation.One("end of input"))
         } else if (input.finished) {
             PullParser.Matched(0, result)
         } else {

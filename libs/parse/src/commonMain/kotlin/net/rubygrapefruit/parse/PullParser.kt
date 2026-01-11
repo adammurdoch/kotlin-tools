@@ -27,7 +27,7 @@ internal interface PullParser<in IN, out OUT> : ParseState<IN, OUT> {
      *
      * @param index Relative to the start of input to [parse]. Can be negative.
      */
-    data class Failed<IN, OUT>(val index: Int, val expected: List<String>) : Finished<IN, OUT>
+    data class Failed<IN, OUT>(val index: Int, val expected: Expectation) : Finished<IN, OUT>
 
     /**
      * Move the input forward the given number of values and try again.

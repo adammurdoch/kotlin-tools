@@ -78,7 +78,6 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
 
         // missing
         parser.doesNotMatch("") {
-            log()
             expectLiteral("abc")
             expectLiteral("ad")
         }

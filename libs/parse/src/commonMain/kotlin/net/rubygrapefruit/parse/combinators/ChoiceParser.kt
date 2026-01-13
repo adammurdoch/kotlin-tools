@@ -40,6 +40,7 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
                 if (choice is PullParser) {
                     val nextChoice = choice.parseZeroOrOne(input, maxAdvance)
                     if (matched[index] && index == first && nextChoice !is PullParser.Failed) {
+                        // Could fail at the same location as other choices
                         return nextChoice
                     }
                     when (nextChoice) {

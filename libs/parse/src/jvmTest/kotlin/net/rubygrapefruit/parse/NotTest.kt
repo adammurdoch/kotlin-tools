@@ -3,7 +3,7 @@ package net.rubygrapefruit.parse
 import net.rubygrapefruit.parse.byte.literal
 import kotlin.test.Test
 
-class NotParserTest : AbstractParseTest() {
+class NotTest : AbstractParseTest() {
     @Test
     fun `matches empty input only`() {
         val parser = not(literal(byteArrayOf(0x1)))
@@ -11,10 +11,10 @@ class NotParserTest : AbstractParseTest() {
         parser.matches()
 
         parser.doesNotMatch(0x1) {
-//            expectEndOfInput()
+            expectEndOfInput()
         }
         parser.doesNotMatch(0x1, 0x2) {
-//            expectEndOfInput()
+            expectEndOfInput()
         }
         parser.doesNotMatch(0x2) {
             expectEndOfInput()

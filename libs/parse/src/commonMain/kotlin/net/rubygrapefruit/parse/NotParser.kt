@@ -17,20 +17,16 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
             val maxAdvance = min(max, 1)
             val checkResult = predicate.parseZeroOrOne(input, maxAdvance)
             when (checkResult) {
-                is PullParser.Matched -> return PullParser.Failed(-matched, Expectation.Nothing)
-                is PullParser.Failed -> return next.parseZeroOrOne(input, maxAdvance)
-                is PullParser.RequireMore -> {
-                    predicate = checkResult.parser
-                }
+                is PullParser.Matched -> return PullParser.Failed(-matched, Expectation.Nothing) // next could fail at the same location
+                is PullParser.Failed -> return PullParser.RequireMore(0, next)
+                is PullParser.RequireMore -> predicate = checkResult.parser
             }
 
             val result = next.parseZeroOrOne(input, maxAdvance)
             when (result) {
                 is PullParser.Matched -> return result
                 is PullParser.Failed -> return result
-                is PullParser.RequireMore -> {
-                    next = result.parser
-                }
+                is PullParser.RequireMore -> next = result.parser
             }
             matched += maxAdvance
             return PullParser.RequireMore(maxAdvance, this)

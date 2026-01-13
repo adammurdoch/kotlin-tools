@@ -3,7 +3,7 @@ package net.rubygrapefruit.parse.byte
 import net.rubygrapefruit.parse.*
 
 internal class OneOfByteParser(private val bytes: ByteArray) : Parser<ByteInput, Byte>, ParserBuilder<ByteStream, Byte> {
-    private val expectation = Expectation.OneOf(bytes.map { Expectation.One(format(it)) })
+    override val expectation = Expectation.OneOf(bytes.map { Expectation.One(format(it)) })
 
     override fun <NEXT> start(next: ParseContinuation<ByteStream, Byte, NEXT>): PullParser<ByteStream, NEXT> {
         return OneOfBytePullParser(bytes, expectation, next)

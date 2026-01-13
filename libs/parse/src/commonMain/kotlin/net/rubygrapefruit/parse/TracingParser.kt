@@ -10,6 +10,9 @@ internal class TracingParser<IN, OUT>(private val parser: Parser<IN, OUT>) : Par
         override val mayNotAdvanceOnMatch: Boolean
             get() = parser.mayNotAdvanceOnMatch
 
+        override val expectation: Expectation
+            get() = parser.expectation
+
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return TracingPullParser(parser.start(next))
         }

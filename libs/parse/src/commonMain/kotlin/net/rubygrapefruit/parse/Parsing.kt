@@ -60,6 +60,9 @@ private class DefaultCompiler<IN : Input<*>> : CombinatorBuilder.Compiler<IN> {
                     override val mayNotAdvanceOnMatch: Boolean
                         get() = false
 
+                    override val expectation: Expectation
+                        get() = parser.expectation
+
                     override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
                         @Suppress("UNCHECKED_CAST")
                         return (parser as ParserBuilder<IN, OUT>).start(next)

@@ -5,6 +5,9 @@ import net.rubygrapefruit.parse.*
 internal class ByteLiteralParser<OUT>(private val bytes: ByteArray, private val result: OUT) : Parser<ByteInput, OUT>, ParserBuilder<ByteStream, OUT> {
     private val expectations = bytes.map { Expectation.One(format(it)) }
 
+    override val expectation: Expectation
+        get() = expectations.first()
+
     override fun <NEXT> start(next: ParseContinuation<ByteStream, OUT, NEXT>): PullParser<ByteStream, NEXT> {
         return ByteLiteralPullParser(bytes, result, expectations, next)
     }

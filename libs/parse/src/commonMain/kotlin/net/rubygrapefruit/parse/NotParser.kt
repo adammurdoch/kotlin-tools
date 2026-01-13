@@ -11,7 +11,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
         private val parser: CompiledParser<IN, Unit>
     ) : CompiledParser<IN, Unit> {
         override fun <NEXT> start(next: ParseContinuation<IN, Unit, NEXT>): PullParser<IN, NEXT> {
-            return NotPullParser(parser.start(), NextParser(next))
+            return NotPullParser(parser.start(), next.succeed(Unit))
         }
     }
 
@@ -38,12 +38,6 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
             }
             matched += maxAdvance
             return PullParser.RequireMore(maxAdvance, this)
-        }
-    }
-
-    private class NextParser<IN, NEXT>(private val next: ParseContinuation<IN, Unit, NEXT>) : PullParser<IN, NEXT> {
-        override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
-            return next.matched(0, Unit)
         }
     }
 }

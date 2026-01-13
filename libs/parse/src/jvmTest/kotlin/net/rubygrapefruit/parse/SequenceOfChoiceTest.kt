@@ -76,4 +76,34 @@ class SequenceOfChoiceTest : AbstractParseTest() {
             expectLiteral("12")
         }
     }
+
+    @Test
+    fun `matches sequence of same choice parser`() {
+        val choice = oneOf(
+            literal("abc", 1),
+            literal("ad", 2)
+        )
+        val parser = sequence(
+            choice,
+            choice
+        ) { a, b -> listOf(a, b) }
+
+        parser.matches("abcad", expected = listOf(1, 2))
+        parser.matches("adabc", expected = listOf(2, 1))
+
+        // missing
+        parser.doesNotMatch("") {
+            expectLiteral("abc")
+            expectLiteral("ad")
+        }
+        parser.doesNotMatch("a") {
+            expectLiteral("abc")
+            expectLiteral("ad")
+        }
+        parser.doesNotMatch("ad1") {
+            failAt(2)
+            expectLiteral("abc")
+            expectLiteral("ad")
+        }
+    }
 }

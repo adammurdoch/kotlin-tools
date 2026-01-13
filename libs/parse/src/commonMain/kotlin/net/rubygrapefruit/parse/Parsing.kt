@@ -45,8 +45,12 @@ internal fun <IN : Input<*>, OUT> Parser<*, OUT>.compile(): PullParser<IN, OUT> 
 }
 
 private class DefaultCompiler<IN : Input<*>> : CombinatorBuilder.Compiler<IN> {
+    private val compiledParsers = mutableMapOf<Parser<*, *>, CompiledParser<IN, *>>()
+
     override fun <OUT> compile(parser: Parser<*, OUT>): CompiledParser<IN, OUT> {
-        return doCompile(parser)
+        val compiled = compiledParsers.getOrPut(parser) { doCompile(parser) }
+        @Suppress("UNCHECKED_CAST")
+        return compiled as CompiledParser<IN, OUT>
     }
 
     private fun <OUT> doCompile(parser: Parser<*, OUT>): CompiledParser<IN, OUT> {

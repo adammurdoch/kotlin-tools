@@ -1,19 +1,21 @@
 package net.rubygrapefruit.parse
 
-import net.rubygrapefruit.parse.byte.ByteInput
-import net.rubygrapefruit.parse.byte.BytePosition
-import net.rubygrapefruit.parse.byte.parse
-import net.rubygrapefruit.parse.byte.pushParser
-import net.rubygrapefruit.parse.char.CharInput
-import net.rubygrapefruit.parse.char.CharPosition
-import net.rubygrapefruit.parse.char.parse
-import net.rubygrapefruit.parse.char.pushParser
+import net.rubygrapefruit.parse.byte.*
+import net.rubygrapefruit.parse.char.*
 import kotlin.test.assertEquals
 import kotlin.test.fail
 
 abstract class AbstractParseTest {
     fun Parser<CharInput, Unit>.matches(input: String) {
         matches(input = input, expected = Unit)
+    }
+
+    @JvmName("expectingChars")
+    fun <T> Parser<CharInput, T>.expecting(config: CompiledParserFixture.() -> Unit) {
+        val fixture = DefaultCompiledParserFixture()
+        fixture.config()
+        val compiledParser = compile<CharStream, T>()
+        compiledParser.expecting(fixture)
     }
 
     fun <T> Parser<CharInput, T>.matches(input: String, expected: T, config: ParseFixture.() -> Unit = {}) {
@@ -101,6 +103,14 @@ abstract class AbstractParseTest {
         }
         val split = length / 2
         action(listOf(toCharArray(0, split), toCharArray(split, length)))
+    }
+
+    @JvmName("expectingBytes")
+    fun <T> Parser<ByteInput, T>.expecting(config: CompiledParserFixture.() -> Unit) {
+        val fixture = DefaultCompiledParserFixture()
+        fixture.config()
+        val compiledParser = compile<ByteStream, T>()
+        compiledParser.expecting(fixture)
     }
 
     fun Parser<ByteInput, Unit>.matches(vararg input: Byte) {
@@ -196,6 +206,11 @@ abstract class AbstractParseTest {
         return pushParser.endOfInput()
     }
 
+    private fun CompiledParser<*, *>.expecting(fixture: DefaultCompiledParserFixture) {
+        assertEquals(fixture.emptyMatch, mayNotAdvanceOnMatch)
+        assertEquals(fixture.message(), expectation.format())
+    }
+
     private fun <T> ParseResult<*, T>.assertIsSuccess(expected: T) {
         when (this) {
             is ParseResult.Fail -> fail("Expected parse to succeed but failed at $position with $message")
@@ -224,6 +239,45 @@ abstract class AbstractParseTest {
                 assertEquals(offset, position.offset, "unexpected offset")
                 assertEquals(message, this.message)
             }
+        }
+    }
+
+    interface CompiledParserFixture {
+        fun emptyMatch()
+
+        fun expect(text: String)
+
+        fun expectLiteral(text: String) {
+            expect("\"$text\"")
+        }
+    }
+
+    private class HasExpectation {
+        val expect = mutableListOf<String>()
+
+        fun expect(text: String) {
+            expect.add(text)
+        }
+
+        fun message(): String {
+            return "Expected ${expect.joinToString(", ")}"
+        }
+    }
+
+    private class DefaultCompiledParserFixture : CompiledParserFixture {
+        private val expected = HasExpectation()
+        var emptyMatch = false
+
+        override fun emptyMatch() {
+            emptyMatch = true
+        }
+
+        override fun expect(text: String) {
+            expected.expect(text)
+        }
+
+        fun message(): String {
+            return expected.message()
         }
     }
 
@@ -262,14 +316,14 @@ abstract class AbstractParseTest {
     }
 
     private open class DefaultParseFailureFixture : DefaultParseFixture(), ParseFailureFixture {
-        val expect = mutableListOf<String>()
+        val expect = HasExpectation()
 
         override fun expect(text: String) {
-            expect.add(text)
+            expect.expect(text)
         }
 
         fun message(): String {
-            return "Expected ${expect.joinToString(", ")}"
+            return expect.message()
         }
     }
 

@@ -21,11 +21,15 @@ internal fun <POS, IN : Input<POS>, OUT> finalResult(result: PullParser.Finished
     return when (result) {
         is PullParser.Matched -> ParseResult.Success(result.value)
         is PullParser.Failed -> {
-            val expected = mutableSetOf<String>()
-            result.expected.accept(expected::add)
-            ParseResult.Fail(input.posAt(result.index), "Expected ${expected.sorted().joinToString(", ")}")
+            ParseResult.Fail(input.posAt(result.index), result.expected.format())
         }
     }
+}
+
+internal fun Expectation.format(): String {
+    val expected = mutableSetOf<String>()
+    accept(expected::add)
+    return "Expected ${expected.sorted().joinToString(", ")}"
 }
 
 internal fun <IN, OUT> PullParser<IN, OUT>.parseZeroOrOne(input: IN, maxAdvance: Int): PullParser.Result<IN, OUT> {
@@ -40,8 +44,12 @@ internal fun <IN, OUT> PullParser<IN, OUT>.parseZeroOrOne(input: IN, maxAdvance:
     }
 }
 
-internal fun <IN : Input<*>, OUT> Parser<*, OUT>.compile(): PullParser<IN, OUT> {
+internal fun <IN : Input<*>, OUT> Parser<*, OUT>.start(): PullParser<IN, OUT> {
     return DefaultCompiler<IN>().compile(this).start { match -> PullParser.RequireMore(match.count, EndOfInputParser(match.value)) }
+}
+
+internal fun <IN : Input<*>, OUT> Parser<*, OUT>.compile(): CompiledParser<IN, OUT> {
+    return DefaultCompiler<IN>().compile(this)
 }
 
 private class DefaultCompiler<IN : Input<*>> : CombinatorBuilder.Compiler<IN> {

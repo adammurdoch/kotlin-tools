@@ -1,16 +1,27 @@
 package net.rubygrapefruit.parse
 
-internal class SucceedParser<IN, OUT>(private val result: OUT) : Parser<IN, OUT>, ParserBuilder<IN, OUT> {
-    override val expectation: Expectation
-        get() = Expectation.Nothing
-
-    override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
-        return SucceedPullParser(result, next)
+internal class SucceedParser<IN, OUT>(private val result: OUT) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
+    override fun <IN : Input<*>> compile(converter: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, OUT> {
+        return SucceedCompiledParser(result)
     }
 
     companion object {
         fun <IN> of(): Parser<IN, Unit> {
             return SucceedParser(Unit)
+        }
+    }
+
+    private class SucceedCompiledParser<IN, OUT>(
+        val result: OUT
+    ) : CompiledParser<IN, OUT> {
+        override val mayNotAdvanceOnMatch: Boolean
+            get() = true
+
+        override val expectation: Expectation
+            get() = Expectation.Nothing
+
+        override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
+            return SucceedPullParser(result, next)
         }
     }
 

@@ -12,6 +12,11 @@ class ChoiceOfSucceedTest : AbstractParseTest() {
             succeed(2)
         )
 
+        parser.expecting {
+            emptyMatch()
+            expectLiteral("ab")
+        }
+
         parser.matches("ab", expected = 1)
         parser.matches("", expected = 2)
 

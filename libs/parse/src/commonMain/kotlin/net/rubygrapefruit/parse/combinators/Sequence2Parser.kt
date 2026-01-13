@@ -18,6 +18,9 @@ internal class Sequence2Parser<IN, A, B, OUT>(
         private val b: CompiledParser<IN, B>,
         private val map: (A, B) -> OUT
     ) : CompiledParser<IN, OUT> {
+        override val mayNotAdvanceOnMatch: Boolean
+            get() = a.mayNotAdvanceOnMatch && b.mayNotAdvanceOnMatch
+
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return a.start { resultA ->
                 val parserB = b.start { resultB ->

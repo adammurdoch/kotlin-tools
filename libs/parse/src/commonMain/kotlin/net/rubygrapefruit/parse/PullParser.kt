@@ -1,7 +1,7 @@
 package net.rubygrapefruit.parse
 
 /**
- * Implementations may have mutable state.
+ * Implementations may have mutable state and must not be reused.
  */
 internal interface PullParser<in IN, out OUT> : ParseState<IN, OUT> {
     /**

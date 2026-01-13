@@ -5,7 +5,7 @@ import net.rubygrapefruit.parse.*
 internal class OneOfCharParser(private val chars: CharArray) : Parser<CharInput, Char>, ParserBuilder<CharStream, Char> {
     private val expectation = Expectation.OneOf(chars.map { Expectation.One(format(it)) })
 
-    override fun <NEXT> build(next: ParseContinuation<CharStream, Char, NEXT>): PullParser<CharStream, NEXT> {
+    override fun <NEXT> start(next: ParseContinuation<CharStream, Char, NEXT>): PullParser<CharStream, NEXT> {
         return OneOfCharPullParser(chars, expectation, next)
     }
 

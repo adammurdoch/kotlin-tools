@@ -5,7 +5,7 @@ import net.rubygrapefruit.parse.*
 internal class CharLiteralParser<OUT>(private val text: String, private val result: OUT) : Parser<CharInput, OUT>, ParserBuilder<CharStream, OUT> {
     private val expectation = Expectation.One(format(text))
 
-    override fun <NEXT> build(next: ParseContinuation<CharStream, OUT, NEXT>): PullParser<CharStream, NEXT> {
+    override fun <NEXT> start(next: ParseContinuation<CharStream, OUT, NEXT>): PullParser<CharStream, NEXT> {
         return CharLiteralPullParser(text, result, expectation, next)
     }
 

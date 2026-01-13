@@ -15,6 +15,9 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
     }
 
     private class ChoiceCompiledParser<IN, OUT>(private val parsers: List<CompiledParser<IN, OUT>>) : CompiledParser<IN, OUT> {
+        override val mayNotAdvanceOnMatch: Boolean
+            get() = parsers.any { it.mayNotAdvanceOnMatch }
+
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return ChoicePullParser(parsers, next)
         }

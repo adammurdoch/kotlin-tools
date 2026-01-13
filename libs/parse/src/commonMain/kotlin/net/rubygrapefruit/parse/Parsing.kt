@@ -57,9 +57,12 @@ private class DefaultCompiler<IN : Input<*>> : CombinatorBuilder.Compiler<IN> {
         return when (parser) {
             is ParserBuilder<*, *> -> {
                 object : CompiledParser<IN, OUT> {
+                    override val mayNotAdvanceOnMatch: Boolean
+                        get() = false
+
                     override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
                         @Suppress("UNCHECKED_CAST")
-                        return (parser as ParserBuilder<IN, OUT>).build(next)
+                        return (parser as ParserBuilder<IN, OUT>).start(next)
                     }
                 }
             }

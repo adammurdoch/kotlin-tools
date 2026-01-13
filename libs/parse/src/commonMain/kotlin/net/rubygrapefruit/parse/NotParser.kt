@@ -10,6 +10,9 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
     private class NotCompiledParser<IN>(
         private val parser: CompiledParser<IN, Unit>
     ) : CompiledParser<IN, Unit> {
+        override val mayNotAdvanceOnMatch: Boolean
+            get() = true
+
         override fun <NEXT> start(next: ParseContinuation<IN, Unit, NEXT>): PullParser<IN, NEXT> {
             return NotPullParser(parser.start(), next.succeed(Unit))
         }

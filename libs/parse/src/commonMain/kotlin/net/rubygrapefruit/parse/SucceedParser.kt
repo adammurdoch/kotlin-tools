@@ -1,7 +1,7 @@
 package net.rubygrapefruit.parse
 
 internal class SucceedParser<IN, OUT>(private val result: OUT) : Parser<IN, OUT>, ParserBuilder<IN, OUT> {
-    override fun <NEXT> build(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
+    override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
         return SucceedPullParser(result, next)
     }
 

@@ -1,6 +1,14 @@
 package net.rubygrapefruit.parse
 
+/**
+ * Implementations are cached and reused and so must be stateless.
+ */
 internal interface CompiledParser<IN, OUT> {
+    /**
+     * Does this parser match zero input items?
+     */
+    val mayNotAdvanceOnMatch: Boolean
+
     fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT>
 
     fun <NEXT> start(next: (PullParser.Matched<IN, OUT>) -> PullParser.Result<IN, NEXT>): PullParser<IN, NEXT> {

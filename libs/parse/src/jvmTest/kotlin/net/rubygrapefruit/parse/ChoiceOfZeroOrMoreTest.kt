@@ -13,6 +13,14 @@ class ChoiceOfZeroOrMoreTest : AbstractParseTest() {
             zeroOrMore(oneOf(0x10, 0x11))
         )
 
+        parser.expecting {
+            emptyMatch()
+            expectLiteral(0x1)
+            expectLiteral(0x2)
+            expectLiteral(0x10)
+            expectLiteral(0x11)
+        }
+
         parser.matches(expected = emptyList())
 
         parser.matches(0x1, expected = listOf(0x1))

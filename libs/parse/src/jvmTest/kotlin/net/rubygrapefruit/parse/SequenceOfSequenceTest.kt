@@ -12,6 +12,10 @@ class SequenceOfSequenceTest : AbstractParseTest() {
             sequence(literal("c", 3), literal("d", 4)) { a, b -> listOf(a, b) }
         ) { a, b -> a + b }
 
+        parser.expecting {
+            expectLiteral("a")
+        }
+
         parser.matches("abcd", expected = listOf(1, 2, 3, 4))
 
         // missing

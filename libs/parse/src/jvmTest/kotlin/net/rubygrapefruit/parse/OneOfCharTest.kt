@@ -8,6 +8,11 @@ class OneOfCharTest : AbstractParseTest() {
     fun `matches one of a set of chars`() {
         val parser = oneOf('a', 'b')
 
+        parser.expecting {
+            expectLiteral("a")
+            expectLiteral("b")
+        }
+
         parser.matches("a", expected = 'a')
         parser.matches("b", expected = 'b')
 

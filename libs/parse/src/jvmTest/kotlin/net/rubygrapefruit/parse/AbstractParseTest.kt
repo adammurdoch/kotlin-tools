@@ -11,7 +11,7 @@ abstract class AbstractParseTest {
     }
 
     @JvmName("expectingChars")
-    fun <T> Parser<CharInput, T>.expecting(config: CompiledParserFixture.() -> Unit) {
+    fun <T> Parser<*, T>.expecting(config: CompiledParserFixture.() -> Unit) {
         val fixture = DefaultCompiledParserFixture()
         fixture.config()
         val compiledParser = compile<CharStream, T>()
@@ -247,9 +247,9 @@ abstract class AbstractParseTest {
 
         fun expect(text: String)
 
-        fun expectLiteral(text: String) {
-            expect("\"$text\"")
-        }
+        fun expectLiteral(text: String)
+
+        fun expectLiteral(byte: Byte)
     }
 
     private class HasExpectation {
@@ -257,6 +257,14 @@ abstract class AbstractParseTest {
 
         fun expect(text: String) {
             expect.add(text)
+        }
+
+        fun expectLiteral(text: String) {
+            expect("\"$text\"")
+        }
+
+        fun expectLiteral(byte: Byte) {
+            expect('x' + byte.toString(16).padStart(2, '0'))
         }
 
         fun message(): String {
@@ -274,6 +282,14 @@ abstract class AbstractParseTest {
 
         override fun expect(text: String) {
             expected.expect(text)
+        }
+
+        override fun expectLiteral(text: String) {
+            expected.expectLiteral(text)
+        }
+
+        override fun expectLiteral(byte: Byte) {
+            expected.expectLiteral(byte)
         }
 
         fun message(): String {
@@ -330,15 +346,17 @@ abstract class AbstractParseTest {
     interface CharParseFailureFixture : ParseFailureFixture {
         fun failAt(offset: Int, line: Int = 1, col: Int = offset + 1)
 
-        fun expectLiteral(text: String) {
-            expect("\"$text\"")
-        }
+        fun expectLiteral(text: String)
     }
 
     private class DefaultCharParseFailureFixture : DefaultParseFailureFixture(), CharParseFailureFixture {
         var offset = 0
         var line = 1
         var col = 1
+
+        override fun expectLiteral(text: String) {
+            expect.expectLiteral(text)
+        }
 
         override fun failAt(offset: Int, line: Int, col: Int) {
             this.offset = offset
@@ -350,13 +368,15 @@ abstract class AbstractParseTest {
     interface ByteParseFailureFixture : ParseFailureFixture {
         fun failAt(offset: Int)
 
-        fun expectLiteral(byte: Byte) {
-            expect('x' + byte.toString(16).padStart(2, '0'))
-        }
+        fun expectLiteral(byte: Byte)
     }
 
     private class DefaultByteParseFailureFixture : DefaultParseFailureFixture(), ByteParseFailureFixture {
         var offset = 0
+
+        override fun expectLiteral(byte: Byte) {
+            expect.expectLiteral(byte)
+        }
 
         override fun failAt(offset: Int) {
             this.offset = offset

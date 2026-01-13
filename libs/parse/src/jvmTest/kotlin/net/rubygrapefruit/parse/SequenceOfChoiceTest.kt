@@ -19,6 +19,11 @@ class SequenceOfChoiceTest : AbstractParseTest() {
             )
         ) { a, b -> listOf(a, b) }
 
+        parser.expecting {
+            expectLiteral("ab")
+            expectLiteral("c")
+        }
+
         parser.matches("ab11", expected = listOf(1, 1))
         parser.matches("c2", expected = listOf(2, 2))
 
@@ -59,6 +64,11 @@ class SequenceOfChoiceTest : AbstractParseTest() {
             literal("12", 3)
         ) { a, b -> listOf(a, b) }
 
+        parser.expecting {
+            expectLiteral("abc")
+            expectLiteral("ad")
+        }
+
         parser.matches("abc12", expected = listOf(1, 3))
         parser.matches("ad12", expected = listOf(2, 3))
 
@@ -87,6 +97,11 @@ class SequenceOfChoiceTest : AbstractParseTest() {
             choice,
             choice
         ) { a, b -> listOf(a, b) }
+
+        parser.expecting {
+            expectLiteral("abc")
+            expectLiteral("ad")
+        }
 
         parser.matches("abcad", expected = listOf(1, 2))
         parser.matches("adabc", expected = listOf(2, 1))

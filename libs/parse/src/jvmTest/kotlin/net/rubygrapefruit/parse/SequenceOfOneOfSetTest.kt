@@ -12,6 +12,11 @@ class SequenceOfOneOfSetTest : AbstractParseTest() {
             oneOf(0x10, 0x11)
         ) { a, b -> listOf(a, b) }
 
+        parser.expecting {
+            expectLiteral(0x1)
+            expectLiteral(0x2)
+        }
+
         parser.matches(0x1, 0x11, expected = listOf(0x1, 0x11))
         parser.matches(0x2, 0x10, expected = listOf(0x2, 0x10))
 

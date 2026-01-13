@@ -8,6 +8,11 @@ class NotTest : AbstractParseTest() {
     fun `matches empty input only`() {
         val parser = not(literal(byteArrayOf(0x1)))
 
+        parser.expecting {
+            emptyMatch()
+            expectLiteral(0x1)
+        }
+
         parser.matches()
 
         parser.doesNotMatch(0x1) {

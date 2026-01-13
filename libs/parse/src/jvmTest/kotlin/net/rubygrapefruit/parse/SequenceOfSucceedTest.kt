@@ -9,6 +9,10 @@ class SequenceOfSucceedTest : AbstractParseTest() {
     fun `matches succeed then succeed`() {
         val parser = sequence(succeed(1), succeed(2)) { a, b -> listOf(a,b) }
 
+        parser.expecting {
+            emptyMatch()
+        }
+
         parser.matches("", expected = listOf(1, 2))
 
         // extra
@@ -20,6 +24,10 @@ class SequenceOfSucceedTest : AbstractParseTest() {
     @Test
     fun `matches succeed then literal`() {
         val parser = sequence(succeed(1), literal("ab", 2)) { a, b -> listOf(a,b) }
+
+        parser.expecting {
+            expectLiteral("ab")
+        }
 
         parser.matches("ab", expected = listOf(1, 2))
 
@@ -43,6 +51,10 @@ class SequenceOfSucceedTest : AbstractParseTest() {
     @Test
     fun `matches literal then succeed`() {
         val parser = sequence(literal("ab", 1), succeed(2)) { a, b -> listOf(a,b) }
+
+        parser.expecting {
+            expectLiteral("ab")
+        }
 
         parser.matches("ab", expected = listOf(1, 2))
 

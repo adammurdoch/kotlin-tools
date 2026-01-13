@@ -14,17 +14,23 @@ class SequenceOfNotParserTest : AbstractParseTest() {
             zeroOrMore(oneOf(0x1, 0x2))
         ) { _, b -> b }
 
+        parser.expecting {
+            emptyMatch()
+            expectLiteral(0x1)
+            expectLiteral(0x2)
+        }
+
         parser.matches(expected = emptyList())
         parser.matches(0x2, expected = listOf(0x2))
         parser.matches(0x2, 0x1, expected = listOf(0x2, 0x1))
 
         parser.doesNotMatch(0x1) {
-            expect("x01")
+            expectLiteral(0x1)
             expectLiteral(0x2)
             expectEndOfInput()
         }
         parser.doesNotMatch(0x1, 0x2) {
-            expect("x01")
+            expectLiteral(0x1)
             expectLiteral(0x2)
             expectEndOfInput()
         }
@@ -42,6 +48,12 @@ class SequenceOfNotParserTest : AbstractParseTest() {
             not(literal(byteArrayOf(0x1, 0x2))),
             zeroOrMore(oneOf(0x1, 0x2))
         ) { _, b -> b }
+
+        parser.expecting {
+            emptyMatch()
+            expectLiteral(0x1)
+            expectLiteral(0x2)
+        }
 
         parser.matches(expected = emptyList())
         parser.matches(0x2, expected = listOf(0x2))

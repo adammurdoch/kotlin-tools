@@ -45,25 +45,12 @@ internal fun <IN : Input<*>, OUT> Parser<*, OUT>.compile(): PullParser<IN, OUT> 
 }
 
 private class DefaultConverter<IN : Input<*>> : CombinatorBuilder.Converter<IN> {
-    override fun <OUT> builder(parser: Parser<*, OUT>): ParserBuilder<IN, OUT> {
-        return when (parser) {
-            is ParserBuilder<*, *> -> {
-                @Suppress("UNCHECKED_CAST")
-                (parser as ParserBuilder<IN, OUT>)
-            }
-
-            else -> {
-                object : ParserBuilder<IN, OUT> {
-                    override fun <NEXT> build(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
-                        return convert(parser, next)
-                    }
-                }
+    override fun <OUT> compile(parser: Parser<*, OUT>): CompiledParser<IN, OUT> {
+        return object: CompiledParser<IN, OUT> {
+            override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
+                return convert(parser, next)
             }
         }
-    }
-
-    override fun <OUT> convert(parser: Parser<*, OUT>): PullParser<IN, OUT> {
-        return convert(parser, ParseContinuation.of())
     }
 
     override fun <OUT, NEXT> convert(parser: Parser<*, OUT>, next: (PullParser.Matched<IN, OUT>) -> PullParser.Result<IN, NEXT>): PullParser<IN, NEXT> {
@@ -75,6 +62,11 @@ private class DefaultConverter<IN : Input<*>> : CombinatorBuilder.Converter<IN> 
             is ParserBuilder<*, *> -> {
                 @Suppress("UNCHECKED_CAST")
                 (parser as ParserBuilder<IN, OUT>).build(next)
+            }
+
+            is CompiledParser<*, *> -> {
+                @Suppress("UNCHECKED_CAST")
+                (parser as CompiledParser<IN, OUT>).start(next)
             }
 
             is CombinatorBuilder<*> -> {

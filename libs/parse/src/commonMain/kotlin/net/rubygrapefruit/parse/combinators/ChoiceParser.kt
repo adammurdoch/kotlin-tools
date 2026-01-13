@@ -5,24 +5,24 @@ import kotlin.math.min
 
 internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
     override fun <IN : Input<*>, NEXT> build(converter: CombinatorBuilder.Converter<IN>, next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
-        return ChoicePullParser(choices.map { converter.builder(it) }, next)
+        return ChoicePullParser(choices.map { converter.compile(it) }, next)
     }
 
     companion object {
-        fun <IN : Input<*>, OUT, NEXT> of(parsers: List<ParserBuilder<IN, OUT>>, next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
+        fun <IN : Input<*>, OUT, NEXT> of(parsers: List<CompiledParser<IN, OUT>>, next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return ChoicePullParser(parsers, next)
         }
     }
 
     private class ChoicePullParser<IN : Input<*>, OUT, NEXT>(
-        parsers: List<ParserBuilder<IN, OUT>>,
+        parsers: List<CompiledParser<IN, OUT>>,
         private val next: ParseContinuation<IN, OUT, NEXT>
     ) : PullParser<IN, NEXT> {
         private var first = 0
         private val matched = BooleanArray(parsers.size)
         private val states = Array<ParseState<IN, NEXT>>(parsers.size) { index ->
             val parser = parsers[index]
-            parser.build(ParseContinuation.of { match ->
+            parser.start(ParseContinuation.of { match ->
                 matched[index] = true
                 next.matched(match)
             })

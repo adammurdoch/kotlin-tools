@@ -4,7 +4,7 @@ import kotlin.math.min
 
 internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, Unit>, CombinatorBuilder<Unit> {
     override fun <IN : Input<*>, NEXT> build(converter: CombinatorBuilder.Converter<IN>, next: ParseContinuation<IN, Unit, NEXT>): PullParser<IN, NEXT> {
-        return NotPullParser(converter.convert(parser), NextParser(next))
+        return NotPullParser(converter.compile(parser).start(), NextParser(next))
     }
 
     private class NotPullParser<IN, NEXT>(

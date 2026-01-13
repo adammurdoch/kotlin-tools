@@ -46,7 +46,7 @@ internal fun <IN : Input<*>, OUT> Parser<*, OUT>.compile(): PullParser<IN, OUT> 
 
 private class DefaultConverter<IN : Input<*>> : CombinatorBuilder.Converter<IN> {
     override fun <OUT> compile(parser: Parser<*, OUT>): CompiledParser<IN, OUT> {
-        return object: CompiledParser<IN, OUT> {
+        return object : CompiledParser<IN, OUT> {
             override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
                 return convert(parser, next)
             }
@@ -71,7 +71,7 @@ private class DefaultConverter<IN : Input<*>> : CombinatorBuilder.Converter<IN> 
 
             is CombinatorBuilder<*> -> {
                 @Suppress("UNCHECKED_CAST")
-                (parser as CombinatorBuilder<OUT>).build(this, next)
+                (parser as CombinatorBuilder<OUT>).compile(this).start(next)
             }
 
             else -> throw IllegalArgumentException("Cannot compile parser $parser with unexpected type")

@@ -1,7 +1,7 @@
 package net.rubygrapefruit.parse
 
 internal interface CombinatorBuilder<OUT> {
-    fun <IN : Input<*>, NEXT> build(converter: Converter<IN>, next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT>
+    fun <IN : Input<*>> compile(converter: Converter<IN>): CompiledParser<IN, OUT>
 
     interface Converter<IN> {
         fun <OUT> compile(parser: Parser<*, OUT>): CompiledParser<IN, OUT>

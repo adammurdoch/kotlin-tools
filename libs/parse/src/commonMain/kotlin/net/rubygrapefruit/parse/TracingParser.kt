@@ -1,9 +1,15 @@
 package net.rubygrapefruit.parse
 
 internal class TracingParser<IN, OUT>(private val parser: Parser<IN, OUT>) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
-    override fun <IN : Input<*>, NEXT> build(converter: CombinatorBuilder.Converter<IN>, next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
-        val parser = converter.convert(parser, next)
-        return TracingPullParser(parser)
+    override fun <IN : Input<*>> compile(converter: CombinatorBuilder.Converter<IN>): CompiledParser<IN, OUT> {
+        val parser = converter.compile(parser)
+        return TracingCompiledParser(parser)
+    }
+
+    private class TracingCompiledParser<IN, OUT>(private val parser: CompiledParser<IN, OUT>) : CompiledParser<IN, OUT> {
+        override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
+            return TracingPullParser(parser.start(next))
+        }
     }
 
     private class TracingPullParser<IN, OUT>(private val parser: PullParser<IN, OUT>) : PullParser<IN, OUT> {

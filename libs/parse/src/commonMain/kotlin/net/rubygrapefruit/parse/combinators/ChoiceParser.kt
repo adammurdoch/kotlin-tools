@@ -4,17 +4,23 @@ import net.rubygrapefruit.parse.*
 import kotlin.math.min
 
 internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
-    override fun <IN : Input<*>, NEXT> build(converter: CombinatorBuilder.Converter<IN>, next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
-        return ChoicePullParser(choices.map { converter.compile(it) }, next)
+    override fun <IN : Input<*>> compile(converter: CombinatorBuilder.Converter<IN>): CompiledParser<IN, OUT> {
+        return ChoiceCompiledParser(choices.map { converter.compile(it) })
     }
 
     companion object {
-        fun <IN : Input<*>, OUT, NEXT> of(parsers: List<CompiledParser<IN, OUT>>, next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
+        fun <IN, OUT, NEXT> of(parsers: List<CompiledParser<IN, OUT>>, next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return ChoicePullParser(parsers, next)
         }
     }
 
-    private class ChoicePullParser<IN : Input<*>, OUT, NEXT>(
+    private class ChoiceCompiledParser<IN, OUT>(private val parsers: List<CompiledParser<IN, OUT>>) : CompiledParser<IN, OUT> {
+        override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
+            return ChoicePullParser(parsers, next)
+        }
+    }
+
+    private class ChoicePullParser<IN, OUT, NEXT>(
         parsers: List<CompiledParser<IN, OUT>>,
         private val next: ParseContinuation<IN, OUT, NEXT>
     ) : PullParser<IN, NEXT> {
@@ -22,10 +28,10 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
         private val matched = BooleanArray(parsers.size)
         private val states = Array<ParseState<IN, NEXT>>(parsers.size) { index ->
             val parser = parsers[index]
-            parser.start(ParseContinuation.of { match ->
+            parser.start { match ->
                 matched[index] = true
                 next.matched(match)
-            })
+            }
         }
 
         override fun toString(): String {

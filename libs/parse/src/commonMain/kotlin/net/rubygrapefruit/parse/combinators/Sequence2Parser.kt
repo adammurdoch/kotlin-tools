@@ -7,13 +7,25 @@ internal class Sequence2Parser<IN, A, B, OUT>(
     private val b: Parser<IN, B>,
     private val map: (A, B) -> OUT
 ) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
-    override fun <IN : Input<*>, NEXT> build(converter: CombinatorBuilder.Converter<IN>, next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
-        return converter.convert(a) { resultA ->
-            val parserB = converter.convert(b) { resultB ->
-                val result = map(resultA.value, resultB.value)
-                next.matched(resultB.count, result)
+    override fun <IN : Input<*>> compile(converter: CombinatorBuilder.Converter<IN>): CompiledParser<IN, OUT> {
+        val compiledA = converter.compile(a)
+        val compiledB = converter.compile(b)
+        return Sequence2CompiledParser(compiledA, compiledB, map)
+    }
+
+    private class Sequence2CompiledParser<IN, A, B, OUT>(
+        private val a: CompiledParser<IN, A>,
+        private val b: CompiledParser<IN, B>,
+        private val map: (A, B) -> OUT
+    ) : CompiledParser<IN, OUT> {
+        override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
+            return a.start { resultA ->
+                val parserB = b.start { resultB ->
+                    val result = map(resultA.value, resultB.value)
+                    next.matched(resultB.count, result)
+                }
+                PullParser.RequireMore(resultA.count, parserB)
             }
-            PullParser.RequireMore(resultA.count, parserB)
         }
     }
 }

@@ -4,7 +4,7 @@ package net.rubygrapefruit.parse
  * Returns a parser that always succeeds. Does not consume any input
  */
 fun succeed(): Parser<Any, Unit> {
-    return SucceedParser(Unit)
+    return SucceedParser.of()
 }
 
 /**

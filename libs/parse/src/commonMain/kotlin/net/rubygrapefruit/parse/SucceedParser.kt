@@ -5,6 +5,12 @@ internal class SucceedParser<IN, OUT>(private val result: OUT) : Parser<IN, OUT>
         return SucceedPullParser(result, next)
     }
 
+    companion object {
+        fun <IN> of(): Parser<IN, Unit> {
+            return SucceedParser(Unit)
+        }
+    }
+
     private class SucceedPullParser<IN, OUT, NEXT>(
         private val result: OUT,
         private val next: ParseContinuation<IN, OUT, NEXT>

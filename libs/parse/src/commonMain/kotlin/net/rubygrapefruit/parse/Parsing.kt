@@ -41,37 +41,28 @@ internal fun <IN, OUT> PullParser<IN, OUT>.parseZeroOrOne(input: IN, maxAdvance:
 }
 
 internal fun <IN : Input<*>, OUT> Parser<*, OUT>.compile(): PullParser<IN, OUT> {
-    return DefaultConverter<IN>().convert(this) { match -> PullParser.RequireMore(match.count, EndOfInputParser(match.value)) }
+    return DefaultCompiler<IN>().compile(this).start { match -> PullParser.RequireMore(match.count, EndOfInputParser(match.value)) }
 }
 
-private class DefaultConverter<IN : Input<*>> : CombinatorBuilder.Converter<IN> {
+private class DefaultCompiler<IN : Input<*>> : CombinatorBuilder.Compiler<IN> {
     override fun <OUT> compile(parser: Parser<*, OUT>): CompiledParser<IN, OUT> {
-        return object : CompiledParser<IN, OUT> {
-            override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
-                return convert(parser, next)
-            }
-        }
+        return doCompile(parser)
     }
 
-    override fun <OUT, NEXT> convert(parser: Parser<*, OUT>, next: (PullParser.Matched<IN, OUT>) -> PullParser.Result<IN, NEXT>): PullParser<IN, NEXT> {
-        return convert(parser, ParseContinuation.of(next))
-    }
-
-    override fun <OUT, NEXT> convert(parser: Parser<*, OUT>, next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
+    private fun <OUT> doCompile(parser: Parser<*, OUT>): CompiledParser<IN, OUT> {
         return when (parser) {
             is ParserBuilder<*, *> -> {
-                @Suppress("UNCHECKED_CAST")
-                (parser as ParserBuilder<IN, OUT>).build(next)
-            }
-
-            is CompiledParser<*, *> -> {
-                @Suppress("UNCHECKED_CAST")
-                (parser as CompiledParser<IN, OUT>).start(next)
+                object : CompiledParser<IN, OUT> {
+                    override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
+                        @Suppress("UNCHECKED_CAST")
+                        return (parser as ParserBuilder<IN, OUT>).build(next)
+                    }
+                }
             }
 
             is CombinatorBuilder<*> -> {
                 @Suppress("UNCHECKED_CAST")
-                (parser as CombinatorBuilder<OUT>).compile(this).start(next)
+                (parser as CombinatorBuilder<OUT>).compile(this)
             }
 
             else -> throw IllegalArgumentException("Cannot compile parser $parser with unexpected type")

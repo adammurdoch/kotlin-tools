@@ -7,7 +7,7 @@ internal class Sequence2Parser<IN, A, B, OUT>(
     private val b: Parser<IN, B>,
     private val map: (A, B) -> OUT
 ) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
-    override fun <IN : Input<*>> compile(converter: CombinatorBuilder.Converter<IN>): CompiledParser<IN, OUT> {
+    override fun <IN : Input<*>> compile(converter: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, OUT> {
         val compiledA = converter.compile(a)
         val compiledB = converter.compile(b)
         return Sequence2CompiledParser(compiledA, compiledB, map)

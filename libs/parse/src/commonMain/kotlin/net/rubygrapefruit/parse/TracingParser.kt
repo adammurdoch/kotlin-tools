@@ -1,7 +1,7 @@
 package net.rubygrapefruit.parse
 
 internal class TracingParser<IN, OUT>(private val parser: Parser<IN, OUT>) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
-    override fun <IN : Input<*>> compile(converter: CombinatorBuilder.Converter<IN>): CompiledParser<IN, OUT> {
+    override fun <IN : Input<*>> compile(converter: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, OUT> {
         val parser = converter.compile(parser)
         return TracingCompiledParser(parser)
     }

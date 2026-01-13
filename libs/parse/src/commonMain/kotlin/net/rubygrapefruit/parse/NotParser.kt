@@ -3,7 +3,7 @@ package net.rubygrapefruit.parse
 import kotlin.math.min
 
 internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, Unit>, CombinatorBuilder<Unit> {
-    override fun <IN : Input<*>> compile(converter: CombinatorBuilder.Converter<IN>): CompiledParser<IN, Unit> {
+    override fun <IN : Input<*>> compile(converter: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, Unit> {
         return NotCompiledParser(converter.compile(parser))
     }
 

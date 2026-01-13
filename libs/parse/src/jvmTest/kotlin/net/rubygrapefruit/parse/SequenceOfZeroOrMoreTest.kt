@@ -13,6 +13,12 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
             zeroOrMore(literal("ad", 2))
         ) { a, b -> a + b }
 
+        parser.expecting {
+            emptyMatch()
+            expectLiteral("abc")
+            expectLiteral("ad")
+        }
+
         parser.matches("", expected = listOf())
         parser.matches("ad", expected = listOf(2))
         parser.matches("adad", expected = listOf(2, 2))
@@ -71,6 +77,11 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
             zeroOrMore(literal("abc", 1)),
             literal("ad", 2)
         ) { a, b -> a + b }
+
+        parser.expecting {
+            expectLiteral("abc")
+            expectLiteral("ad")
+        }
 
         parser.matches("ad", expected = listOf(2))
         parser.matches("abcad", expected = listOf(1, 2))

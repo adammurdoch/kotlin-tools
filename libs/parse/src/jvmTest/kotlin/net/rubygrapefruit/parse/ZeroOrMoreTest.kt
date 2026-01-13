@@ -9,6 +9,11 @@ class ZeroOrMoreTest : AbstractParseTest() {
     fun `matches zero or more char literals`() {
         val parser = zeroOrMore(literal("abc", 1))
 
+        parser.expecting {
+            emptyMatch()
+            expectLiteral("abc")
+        }
+
         parser.matches("", expected = emptyList())
         parser.matches("abc", expected = listOf(1))
         parser.matches("abcabc", expected = listOf(1, 1))

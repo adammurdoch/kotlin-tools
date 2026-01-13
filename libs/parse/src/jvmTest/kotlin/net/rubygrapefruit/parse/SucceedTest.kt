@@ -7,6 +7,10 @@ class SucceedTest : AbstractParseTest() {
     fun `matches nothing`() {
         val parser = succeed()
 
+        parser.expecting {
+            emptyMatch()
+        }
+
         parser.matches("")
         parser.matches()
 

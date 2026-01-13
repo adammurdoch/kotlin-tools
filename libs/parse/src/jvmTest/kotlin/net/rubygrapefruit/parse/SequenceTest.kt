@@ -10,6 +10,10 @@ class SequenceTest : AbstractParseTest() {
     fun `matches single char literals`() {
         val parser = sequence(literal("a", 1), literal("b", 2)) { a, b -> listOf(a, b) }
 
+        parser.expecting {
+            expectLiteral("a")
+        }
+
         parser.matches("ab", expected = listOf(1, 2))
 
         // missing
@@ -40,6 +44,10 @@ class SequenceTest : AbstractParseTest() {
     @Test
     fun `matches multi-byte literals`() {
         val parser = sequence(literal(byteArrayOf(0x1, 0x2), 1), literal(byteArrayOf(0x3, 0x4), 2)) { a, b -> listOf(a, b) }
+
+        parser.expecting {
+            expectLiteral(0x1)
+        }
 
         parser.matches(0x1, 0x2, 0x3, 0x4, expected = listOf(1, 2))
 

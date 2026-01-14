@@ -25,14 +25,14 @@ class SequenceOfNotParserTest : AbstractParseTest() {
         parser.matches(0x2, 0x1, expected = listOf(0x2, 0x1))
 
         parser.doesNotMatch(0x1) {
+            expectEndOfInput()
             expectLiteral(0x1)
             expectLiteral(0x2)
-            expectEndOfInput()
         }
         parser.doesNotMatch(0x1, 0x2) {
+            expectEndOfInput()
             expectLiteral(0x1)
             expectLiteral(0x2)
-            expectEndOfInput()
         }
 
         parser.doesNotMatch(0x3) {
@@ -62,8 +62,16 @@ class SequenceOfNotParserTest : AbstractParseTest() {
         parser.matches(0x1, 0x1, expected = listOf(0x1, 0x1))
         parser.matches(0x1, 0x1, 0x2, expected = listOf(0x1, 0x1, 0x2))
 
-        parser.doesNotMatch(0x1, 0x2)
-        parser.doesNotMatch(0x1, 0x2, 0x3)
+        parser.doesNotMatch(0x1, 0x2) {
+            expectEndOfInput()
+            expectLiteral(0x1)
+            expectLiteral(0x2)
+        }
+        parser.doesNotMatch(0x1, 0x2, 0x3) {
+            expectEndOfInput()
+            expectLiteral(0x1)
+            expectLiteral(0x2)
+        }
 
         parser.doesNotMatch(0x3) {
             expectEndOfInput()

@@ -1,29 +1,9 @@
 package net.rubygrapefruit.parse
 
 internal fun <POS, IN : AdvancingInput<POS>, OUT> parse(parser: PullParser<IN, OUT>, input: IN): ParseResult<POS, OUT> {
-    var current = parser
-    while (true) {
-        val result = current.parse(input, input.available)
-        when (result) {
-            is PullParser.Finished -> return finalResult(result, input)
-            is PullParser.RequireMore -> {
-                if (result.advance == 0 && result.parser == current) {
-                    throw IllegalStateException("Parsing cannot proceed")
-                }
-                input.advance(result.advance)
-                current = result.parser
-            }
-        }
-    }
-}
-
-internal fun <POS, IN : Input<POS>, OUT> finalResult(result: PullParser.Finished<IN, OUT>, input: IN): ParseResult<POS, OUT> {
-    return when (result) {
-        is PullParser.Matched -> ParseResult.Success(result.value)
-        is PullParser.Failed -> {
-            ParseResult.Fail(input.posAt(result.index), result.expected.format())
-        }
-    }
+    val parser = DefaultPushParser(parser)
+    parser.inputAvailable(input)
+    return parser.endOfInput(input)
 }
 
 internal fun Expectation.format(): String {

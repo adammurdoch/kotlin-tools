@@ -11,13 +11,13 @@ internal class OneOfCharParser(private val chars: CharArray) : Parser<CharInput,
 
     private class OneOfCharPullParser<NEXT>(
         private val chars: CharArray,
-        private val expectation: Expectation,
+        override val expected: Expectation,
         private val next: ParseContinuation<CharStream, Char, NEXT>
     ) : PullParser<CharStream, NEXT> {
         override fun parse(input: CharStream, max: Int): PullParser.Result<CharStream, NEXT> {
             return if (max == 0) {
                 if (input.finished) {
-                    PullParser.Failed(0, expectation)
+                    PullParser.Failed(0, expected)
                 } else {
                     PullParser.RequireMore(0, this)
                 }
@@ -26,7 +26,7 @@ internal class OneOfCharParser(private val chars: CharArray) : Parser<CharInput,
                 if (chars.contains(ch)) {
                     next.matched(1, ch)
                 } else {
-                    PullParser.Failed(0, expectation)
+                    PullParser.Failed(0, expected)
                 }
             }
         }

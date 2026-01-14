@@ -20,6 +20,9 @@ internal class ByteLiteralParser<OUT>(private val bytes: ByteArray, private val 
     ) : PullParser<ByteStream, NEXT> {
         private var matched = 0
 
+        override val expected: Expectation
+            get() = expectations[matched]
+
         override fun toString(): String {
             return "{literal ${bytes.map { format(it) }}}"
         }

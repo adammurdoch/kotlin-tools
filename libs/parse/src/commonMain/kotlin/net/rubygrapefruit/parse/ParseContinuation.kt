@@ -11,6 +11,9 @@ internal interface ParseContinuation<IN, OUT, NEXT> {
      */
     fun succeed(result: OUT): PullParser<IN, NEXT> {
         return object : PullParser<IN, NEXT> {
+            override val expected: Expectation?
+                get() = null
+
             override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
                 return matched(0, result)
             }

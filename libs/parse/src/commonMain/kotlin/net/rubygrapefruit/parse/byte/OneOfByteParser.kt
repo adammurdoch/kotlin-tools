@@ -11,13 +11,13 @@ internal class OneOfByteParser(private val bytes: ByteArray) : Parser<ByteInput,
 
     private class OneOfBytePullParser<NEXT>(
         private val bytes: ByteArray,
-        private val expectation: Expectation,
+        override val expected: Expectation,
         private val next: ParseContinuation<ByteStream, Byte, NEXT>
     ) : PullParser<ByteStream, NEXT> {
         override fun parse(input: ByteStream, max: Int): PullParser.Result<ByteStream, NEXT> {
             return if (max == 0) {
                 if (input.finished) {
-                    PullParser.Failed(0, expectation)
+                    PullParser.Failed(0, expected)
                 } else {
                     PullParser.RequireMore(0, this)
                 }
@@ -26,7 +26,7 @@ internal class OneOfByteParser(private val bytes: ByteArray) : Parser<ByteInput,
                 if (bytes.contains(byte)) {
                     next.matched(1, byte)
                 } else {
-                    PullParser.Failed(0, expectation)
+                    PullParser.Failed(0, expected)
                 }
             }
         }

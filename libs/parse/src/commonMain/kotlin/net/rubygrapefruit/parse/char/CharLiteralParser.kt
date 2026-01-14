@@ -17,6 +17,9 @@ internal class CharLiteralParser<OUT>(private val text: String, private val resu
     ) : PullParser<CharStream, NEXT> {
         private var matched = 0
 
+        override val expected: Expectation?
+            get() = if (matched == 0) expectation else null
+
         override fun toString(): String {
             return "{literal \"$text\"}"
         }

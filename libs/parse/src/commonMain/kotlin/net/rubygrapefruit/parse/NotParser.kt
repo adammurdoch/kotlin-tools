@@ -27,6 +27,9 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
     ) : PullParser<IN, NEXT> {
         private var matched = 0
 
+        override val expected: Expectation?
+            get() = next.expected
+
         override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
             val maxAdvance = min(max, 1)
             val checkResult = predicate.parseZeroOrOne(input, maxAdvance)

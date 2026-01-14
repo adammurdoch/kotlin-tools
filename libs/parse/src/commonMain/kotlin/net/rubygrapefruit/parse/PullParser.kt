@@ -5,6 +5,11 @@ package net.rubygrapefruit.parse
  */
 internal interface PullParser<in IN, out OUT> : ParseState<IN, OUT> {
     /**
+     * What does this parser currently expect. May be `null` to indicate that the most recent non-null expectation should be used.
+     */
+    val expected: Expectation?
+
+    /**
      * Attempts to parse the given inputs, up to the given max number of values.
      *
      * @param max May be 0

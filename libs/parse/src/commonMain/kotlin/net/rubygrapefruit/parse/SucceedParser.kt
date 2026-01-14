@@ -29,6 +29,9 @@ internal class SucceedParser<IN, OUT>(private val result: OUT) : Parser<IN, OUT>
         private val result: OUT,
         private val next: ParseContinuation<IN, OUT, NEXT>
     ) : PullParser<IN, NEXT> {
+        override val expected: Expectation
+            get() = Expectation.Nothing
+
         override fun toString(): String {
             return "{succeed}"
         }

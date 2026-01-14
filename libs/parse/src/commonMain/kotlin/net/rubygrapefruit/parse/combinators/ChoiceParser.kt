@@ -38,6 +38,9 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
             }
         }
 
+        override val expected: Expectation?
+            get() = null
+
         override fun toString(): String {
             return "{choice}"
         }

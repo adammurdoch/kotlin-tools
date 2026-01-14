@@ -30,6 +30,7 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
     ) : PullParser<IN, NEXT> {
         private var first = 0
         private val matched = BooleanArray(parsers.size)
+        private var currentExpected: Expectation? = null
         private val states = Array<ParseState<IN, NEXT>>(parsers.size) { index ->
             val parser = parsers[index]
             parser.start { match ->
@@ -38,8 +39,17 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
             }
         }
 
-        override val expected: Expectation?
-            get() = null
+        override val expected: Expectation
+            get() {
+                val currentExpected = currentExpected
+                return if (currentExpected == null) {
+                    val expected = Expectation.OneOf(states.mapNotNull { if (it is PullParser) it.expected else null })
+                    this.currentExpected = expected
+                    expected
+                } else {
+                    currentExpected
+                }
+            }
 
         override fun toString(): String {
             return "{choice}"
@@ -79,6 +89,7 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
                             states[index] = PullParser.Failed(choice.index - maxAdvance, choice.expected)
                         }
                     }
+                    currentExpected = null
                 }
                 PullParser.RequireMore(maxAdvance, this)
             } else {

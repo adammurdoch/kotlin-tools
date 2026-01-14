@@ -7,15 +7,20 @@ internal interface ParseContinuation<IN, OUT, NEXT> {
     fun matched(match: PullParser.Matched<IN, OUT>): PullParser.Result<IN, NEXT>
 
     /**
-     * Returns a parser that will succeed at the start of input with the given result.
+     * Returns a parser that succeeds at the start of input with the given result.
      */
     fun succeed(result: OUT): PullParser<IN, NEXT> {
-        return object : PullParser<IN, NEXT> {
-            override val expected: Expectation?
-                get() = null
+        val state = matched(0, result)
+        return if (state is PullParser.RequireMore) {
+            state.parser
+        } else {
+            object : PullParser<IN, NEXT> {
+                override val expected: Expectation
+                    get() = Expectation.Nothing
 
-            override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
-                return matched(0, result)
+                override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
+                    return state
+                }
             }
         }
     }

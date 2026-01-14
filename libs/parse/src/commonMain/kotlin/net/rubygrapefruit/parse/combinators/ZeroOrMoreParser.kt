@@ -40,7 +40,6 @@ internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : 
                 PullParser.RequireMore(matched.count, parser)
             }
         }
-
     }
 
     private class EndSequenceCompiledParser<IN, OUT>(val result: List<OUT>) : CompiledParser<IN, List<OUT>> {

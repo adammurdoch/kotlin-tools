@@ -19,7 +19,7 @@ internal class TracingParser<IN, OUT>(private val parser: Parser<IN, OUT>) : Par
     }
 
     private class TracingPullParser<IN, OUT>(private val parser: PullParser<IN, OUT>) : PullParser<IN, OUT> {
-        override val expected: Expectation?
+        override val expected: Expectation
             get() = parser.expected
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN, OUT> {

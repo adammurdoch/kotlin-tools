@@ -19,7 +19,7 @@ internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : 
 
         override fun <NEXT> start(next: ParseContinuation<IN, List<OUT>, NEXT>): PullParser<IN, NEXT> {
             val result = mutableListOf<OUT>()
-            val empty = EndSequenceCompiledParser<IN, OUT>(result)
+            val empty = SucceedParser.compiled<IN, List<OUT>>(result)
             val nested = OptionCompiledParser(option, empty, result)
             return ChoiceParser.of(listOf(nested, empty), next)
         }
@@ -39,18 +39,6 @@ internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : 
                 val parser = ChoiceParser.of(listOf(this, empty), next)
                 PullParser.RequireMore(matched.count, parser)
             }
-        }
-    }
-
-    private class EndSequenceCompiledParser<IN, OUT>(val result: List<OUT>) : CompiledParser<IN, List<OUT>> {
-        override val mayNotAdvanceOnMatch: Boolean
-            get() = true
-
-        override val expectation: Expectation
-            get() = Expectation.Nothing
-
-        override fun <NEXT> start(next: ParseContinuation<IN, List<OUT>, NEXT>): PullParser<IN, NEXT> {
-            return SucceedParser.start(result, next)
         }
     }
 }

@@ -10,7 +10,6 @@ class NotTest : AbstractParseTest() {
 
         parser.expecting {
             emptyMatch()
-            expectLiteral(0x1)
         }
 
         parser.matches()

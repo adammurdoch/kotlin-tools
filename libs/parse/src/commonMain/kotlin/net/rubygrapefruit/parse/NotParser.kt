@@ -14,7 +14,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
             get() = true
 
         override val expectation: Expectation
-            get() = parser.expectation
+            get() = Expectation.Nothing
 
         override fun <NEXT> start(next: ParseContinuation<IN, Unit, NEXT>): PullParser<IN, NEXT> {
             return NotPullParser(parser.start(), SucceedParser.start(next))

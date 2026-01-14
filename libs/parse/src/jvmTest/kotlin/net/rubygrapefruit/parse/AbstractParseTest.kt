@@ -209,6 +209,13 @@ abstract class AbstractParseTest {
     private fun CompiledParser<*, *>.expecting(fixture: DefaultCompiledParserFixture) {
         assertEquals(fixture.emptyMatch, mayNotAdvanceOnMatch)
         assertEquals(fixture.message(), expectation.format())
+
+        val pullParser = start()
+        pullParser.expecting(fixture)
+    }
+
+    private fun PullParser<*, *>.expecting(fixture: DefaultCompiledParserFixture) {
+        assertEquals(fixture.message(), expectation.format())
     }
 
     private fun <T> ParseResult<*, T>.assertIsSuccess(expected: T) {

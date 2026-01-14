@@ -10,6 +10,10 @@ internal class SucceedParser<IN, OUT>(private val result: OUT) : Parser<IN, OUT>
             return SucceedParser(Unit)
         }
 
+        fun <IN, OUT> compiled(result: OUT): CompiledParser<IN, OUT> {
+            return SucceedCompiledParser(result)
+        }
+
         fun <IN, NEXT> start(next: ParseContinuation<IN, Unit, NEXT>): PullParser<IN, NEXT> {
             return start(Unit, next)
         }
@@ -45,7 +49,7 @@ internal class SucceedParser<IN, OUT>(private val result: OUT) : Parser<IN, OUT>
             get() = Expectation.Nothing
 
         override fun toString(): String {
-            return "{finished}"
+            return "{finished result=$result}"
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN, OUT> {

@@ -17,7 +17,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
             get() = parser.expectation
 
         override fun <NEXT> start(next: ParseContinuation<IN, Unit, NEXT>): PullParser<IN, NEXT> {
-            return NotPullParser(parser.start(), next.succeed(Unit))
+            return NotPullParser(parser.start(), SucceedParser.start(next))
         }
     }
 
@@ -26,10 +26,10 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
         private var next: PullParser<IN, NEXT>
     ) : PullParser<IN, NEXT> {
         private var matched = 0
-        private val expectedAtStart = next.expected
+        private val expectedAtStart = next.expectation
 
-        override val expected: Expectation
-            get() = next.expected
+        override val expectation: Expectation
+            get() = next.expectation
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
             val maxAdvance = min(max, 1)

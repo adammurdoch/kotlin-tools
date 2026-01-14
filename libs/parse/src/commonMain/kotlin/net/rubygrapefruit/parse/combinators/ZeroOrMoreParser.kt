@@ -50,7 +50,7 @@ internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : 
             get() = Expectation.Nothing
 
         override fun <NEXT> start(next: ParseContinuation<IN, List<OUT>, NEXT>): PullParser<IN, NEXT> {
-            return next.succeed(result)
+            return SucceedParser.start(result, next)
         }
     }
 }

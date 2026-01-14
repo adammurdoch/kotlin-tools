@@ -7,7 +7,7 @@ internal interface PullParser<in IN, out OUT> : ParseState<IN, OUT> {
     /**
      * What does this parser currently expect?
      */
-    val expected: Expectation
+    val expectation: Expectation
 
     /**
      * Attempts to parse the given inputs, up to the given max number of values.

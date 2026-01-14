@@ -9,6 +9,19 @@ internal class SucceedParser<IN, OUT>(private val result: OUT) : Parser<IN, OUT>
         fun <IN> of(): Parser<IN, Unit> {
             return SucceedParser(Unit)
         }
+
+        fun <IN, NEXT> start(next: ParseContinuation<IN, Unit, NEXT>): PullParser<IN, NEXT> {
+            return start(Unit, next)
+        }
+
+        fun <IN, OUT, NEXT> start(result: OUT, next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
+            val result = next.matched(0, result)
+            return if (result is PullParser.RequireMore) {
+                result.parser
+            } else {
+                FinishedPullParser(result)
+            }
+        }
     }
 
     private class SucceedCompiledParser<IN, OUT>(
@@ -21,23 +34,22 @@ internal class SucceedParser<IN, OUT>(private val result: OUT) : Parser<IN, OUT>
             get() = Expectation.Nothing
 
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
-            return SucceedPullParser(result, next)
+            return start(result, next)
         }
     }
 
-    private class SucceedPullParser<IN, OUT, NEXT>(
-        private val result: OUT,
-        private val next: ParseContinuation<IN, OUT, NEXT>
-    ) : PullParser<IN, NEXT> {
-        override val expected: Expectation
+    private class FinishedPullParser<IN, OUT>(
+        private val result: PullParser.Result<IN, OUT>
+    ) : PullParser<IN, OUT> {
+        override val expectation: Expectation
             get() = Expectation.Nothing
 
         override fun toString(): String {
-            return "{succeed}"
+            return "{finished}"
         }
 
-        override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
-            return next.matched(0, result)
+        override fun parse(input: IN, max: Int): PullParser.Result<IN, OUT> {
+            return result
         }
     }
 }

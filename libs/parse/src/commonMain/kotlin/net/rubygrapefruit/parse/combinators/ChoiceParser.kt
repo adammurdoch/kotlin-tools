@@ -39,11 +39,11 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
             }
         }
 
-        override val expected: Expectation
+        override val expectation: Expectation
             get() {
                 val currentExpected = currentExpected
                 return if (currentExpected == null) {
-                    val expected = Expectation.OneOf(states.mapNotNull { if (it is PullParser) it.expected else null })
+                    val expected = Expectation.OneOf(states.mapNotNull { if (it is PullParser) it.expectation else null })
                     this.currentExpected = expected
                     expected
                 } else {

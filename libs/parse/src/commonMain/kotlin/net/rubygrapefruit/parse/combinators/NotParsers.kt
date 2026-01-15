@@ -1,4 +1,6 @@
-package net.rubygrapefruit.parse
+package net.rubygrapefruit.parse.combinators
+
+import net.rubygrapefruit.parse.Parser
 
 /**
  * Returns a parser that succeeds when the given parser fails, and vice versa.

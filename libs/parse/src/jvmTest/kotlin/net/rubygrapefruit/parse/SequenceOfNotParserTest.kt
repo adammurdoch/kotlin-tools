@@ -2,6 +2,7 @@ package net.rubygrapefruit.parse
 
 import net.rubygrapefruit.parse.byte.literal
 import net.rubygrapefruit.parse.byte.oneOf
+import net.rubygrapefruit.parse.combinators.not
 import net.rubygrapefruit.parse.combinators.sequence
 import net.rubygrapefruit.parse.combinators.zeroOrMore
 import kotlin.test.Test

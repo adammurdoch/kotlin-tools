@@ -1,5 +1,6 @@
 package net.rubygrapefruit.parse
 
+import net.rubygrapefruit.parse.general.succeed
 import kotlin.test.Test
 
 class SucceedTest : AbstractParseTest() {

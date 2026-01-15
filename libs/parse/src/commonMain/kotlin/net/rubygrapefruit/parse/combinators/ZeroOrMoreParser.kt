@@ -1,6 +1,7 @@
 package net.rubygrapefruit.parse.combinators
 
 import net.rubygrapefruit.parse.*
+import net.rubygrapefruit.parse.general.SucceedParser
 
 internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : Parser<IN, List<OUT>>, CombinatorBuilder<List<OUT>> {
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, List<OUT>> {

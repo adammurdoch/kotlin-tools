@@ -2,6 +2,7 @@ package net.rubygrapefruit.parse
 
 import net.rubygrapefruit.parse.char.literal
 import net.rubygrapefruit.parse.combinators.sequence
+import net.rubygrapefruit.parse.general.succeed
 import kotlin.test.Test
 
 class SequenceOfSucceedTest : AbstractParseTest() {

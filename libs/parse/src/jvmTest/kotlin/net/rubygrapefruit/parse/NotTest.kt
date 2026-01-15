@@ -1,6 +1,7 @@
 package net.rubygrapefruit.parse
 
 import net.rubygrapefruit.parse.byte.literal
+import net.rubygrapefruit.parse.combinators.not
 import kotlin.test.Test
 
 class NotTest : AbstractParseTest() {

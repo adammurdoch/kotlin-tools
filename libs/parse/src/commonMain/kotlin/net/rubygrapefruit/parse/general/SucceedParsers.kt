@@ -1,4 +1,6 @@
-package net.rubygrapefruit.parse
+package net.rubygrapefruit.parse.general
+
+import net.rubygrapefruit.parse.Parser
 
 /**
  * Returns a parser that always succeeds. Does not consume any input

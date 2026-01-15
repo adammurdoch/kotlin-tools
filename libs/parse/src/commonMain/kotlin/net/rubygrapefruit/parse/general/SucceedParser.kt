@@ -1,4 +1,12 @@
-package net.rubygrapefruit.parse
+package net.rubygrapefruit.parse.general
+
+import net.rubygrapefruit.parse.CombinatorBuilder
+import net.rubygrapefruit.parse.CompiledParser
+import net.rubygrapefruit.parse.Expectation
+import net.rubygrapefruit.parse.Input
+import net.rubygrapefruit.parse.ParseContinuation
+import net.rubygrapefruit.parse.Parser
+import net.rubygrapefruit.parse.PullParser
 
 internal class SucceedParser<IN, OUT>(private val result: OUT) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, OUT> {

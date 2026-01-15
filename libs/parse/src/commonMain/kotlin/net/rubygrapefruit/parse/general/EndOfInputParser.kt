@@ -1,4 +1,8 @@
-package net.rubygrapefruit.parse
+package net.rubygrapefruit.parse.general
+
+import net.rubygrapefruit.parse.Expectation
+import net.rubygrapefruit.parse.Input
+import net.rubygrapefruit.parse.PullParser
 
 internal class EndOfInputParser<IN : Input<*>, OUT>(
     private val result: OUT

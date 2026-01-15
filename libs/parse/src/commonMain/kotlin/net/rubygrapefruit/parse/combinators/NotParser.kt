@@ -1,5 +1,14 @@
-package net.rubygrapefruit.parse
+package net.rubygrapefruit.parse.combinators
 
+import net.rubygrapefruit.parse.CombinatorBuilder
+import net.rubygrapefruit.parse.CompiledParser
+import net.rubygrapefruit.parse.Expectation
+import net.rubygrapefruit.parse.Input
+import net.rubygrapefruit.parse.ParseContinuation
+import net.rubygrapefruit.parse.Parser
+import net.rubygrapefruit.parse.PullParser
+import net.rubygrapefruit.parse.general.SucceedParser
+import net.rubygrapefruit.parse.parseZeroOrOne
 import kotlin.math.min
 
 internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, Unit>, CombinatorBuilder<Unit> {
@@ -17,7 +26,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
             get() = Expectation.Nothing
 
         override fun <NEXT> start(next: ParseContinuation<IN, Unit, NEXT>): PullParser<IN, NEXT> {
-            return NotPullParser(parser.start(), SucceedParser.start(next))
+            return NotPullParser(parser.start(), SucceedParser.Companion.start(next))
         }
     }
 

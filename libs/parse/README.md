@@ -28,6 +28,10 @@ Parsers that operate on text input
   - literal(chars, result)
 - oneOf(chars)
 
+Text combinators
+
+- match(parser)
+
 ## Binary parsers
 
 Parsers that operate on binary input

@@ -65,6 +65,11 @@ private class DefaultCompiler<IN : Input<*>> : CombinatorBuilder.Compiler<IN> {
                 (parser as CombinatorBuilder<OUT>).compile(this)
             }
 
+            is TypedInputCombinatorBuilder<*, *> -> {
+                @Suppress("UNCHECKED_CAST")
+                (parser as TypedInputCombinatorBuilder<IN, OUT>).compile(this)
+            }
+
             else -> throw IllegalArgumentException("Cannot compile parser $parser with unexpected type")
         }
     }

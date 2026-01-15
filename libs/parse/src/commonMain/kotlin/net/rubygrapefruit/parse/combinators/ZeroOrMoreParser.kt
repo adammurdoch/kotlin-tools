@@ -3,8 +3,8 @@ package net.rubygrapefruit.parse.combinators
 import net.rubygrapefruit.parse.*
 
 internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : Parser<IN, List<OUT>>, CombinatorBuilder<List<OUT>> {
-    override fun <IN : Input<*>> compile(converter: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, List<OUT>> {
-        val option = converter.compile(parser)
+    override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, List<OUT>> {
+        val option = compiler.compile(parser)
         return ZeroOrMoreCompiledParser(option)
     }
 

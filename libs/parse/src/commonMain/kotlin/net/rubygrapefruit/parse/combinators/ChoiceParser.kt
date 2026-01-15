@@ -4,8 +4,8 @@ import net.rubygrapefruit.parse.*
 import kotlin.math.min
 
 internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
-    override fun <IN : Input<*>> compile(converter: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, OUT> {
-        return ChoiceCompiledParser(choices.map { converter.compile(it) })
+    override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, OUT> {
+        return ChoiceCompiledParser(choices.map { compiler.compile(it) })
     }
 
     companion object {

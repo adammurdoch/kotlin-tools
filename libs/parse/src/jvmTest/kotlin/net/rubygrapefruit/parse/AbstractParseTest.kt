@@ -22,7 +22,7 @@ abstract class AbstractParseTest {
         val fixture = DefaultParseFixture()
         fixture.config()
 
-        fixture.trace(this).matches(fixture, input, expected)
+        fixture.tracing(this) { matches(fixture, input, expected) }
     }
 
     private fun <T> Parser<CharInput, T>.matches(fixture: DefaultParseFixture, input: String, expected: T) {
@@ -53,7 +53,7 @@ abstract class AbstractParseTest {
         val fixture = DefaultCharParseFailureFixture()
         fixture.config()
 
-        fixture.trace(this).doesNotMatch(input, fixture)
+        fixture.tracing(this) { doesNotMatch(input, fixture) }
     }
 
     private fun Parser<CharInput, *>.doesNotMatch(input: String, fixture: DefaultCharParseFailureFixture) {
@@ -109,38 +109,51 @@ abstract class AbstractParseTest {
     fun <T> Parser<ByteInput, T>.expecting(config: CompiledParserFixture.() -> Unit) {
         val fixture = DefaultCompiledParserFixture()
         fixture.config()
+
         val compiledParser = compile<ByteStream, T>()
         compiledParser.expecting(fixture)
     }
 
-    fun Parser<ByteInput, Unit>.matches(vararg input: Byte) {
-        doMatches(input = input, expected = Unit)
+    fun Parser<ByteInput, Unit>.matches(vararg input: Byte, config: ParseFixture.() -> Unit = {}) {
+        doMatches(input = input, expected = Unit, config = config)
     }
 
-    fun Parser<ByteInput, List<Byte>>.matches(vararg input: Byte, expected: List<Byte>) {
+    fun Parser<ByteInput, List<Byte>>.matches(vararg input: Byte, expected: List<Byte>, config: ParseFixture.() -> Unit = {}) {
         // Compiler passes in list of Int
-        doMatches(input = input, expected = expected.map { it.toByte() })
+        doMatches(input = input, expected = expected.map { it.toByte() }, config = config)
     }
 
-    fun <T> Parser<ByteInput, T>.matches(vararg input: Byte, expected: T) {
-        doMatches(input = input, expected = expected)
+    fun <T> Parser<ByteInput, T>.matches(vararg input: Byte, expected: T, config: ParseFixture.() -> Unit = {}) {
+        doMatches(input = input, expected = expected, config = config)
     }
 
-    private fun <T> Parser<ByteInput, T>.doMatches(vararg input: Byte, expected: T) {
+    private fun <T> Parser<ByteInput, T>.doMatches(vararg input: Byte, expected: T, config: ParseFixture.() -> Unit) {
+        val fixture = DefaultParseFixture()
+        fixture.config()
+
+        fixture.tracing(this) { doMatches(input = input, expected = expected, fixture = fixture) }
+    }
+
+    private fun <T> Parser<ByteInput, T>.doMatches(vararg input: Byte, expected: T, fixture: DefaultParseFixture) {
+        fixture.debug("PARSE ${input.joinToString(", ")}")
+
         val result = parse(input)
         result.assertIsSuccess(expected)
 
         input.oneChunk {
+            fixture.debug("ONE CHUNK")
             val result = pushParse(it)
             result.assertIsSuccess(expected)
         }
 
         input.chunkPerByte {
+            fixture.debug("ONE CHUNK PER BYTE")
             val result = pushParse(it)
             result.assertIsSuccess(expected)
         }
 
         input.maybeTwoChunks {
+            fixture.debug("TWO CHUNKS")
             val result = pushParse(it)
             result.assertIsSuccess(expected)
         }
@@ -150,7 +163,7 @@ abstract class AbstractParseTest {
         val fixture = DefaultByteParseFailureFixture()
         fixture.config()
 
-        fixture.trace(this).doesNotMatch(fixture = fixture, input = input)
+        fixture.tracing(this) { doesNotMatch(fixture = fixture, input = input) }
     }
 
     private fun Parser<ByteInput, *>.doesNotMatch(fixture: DefaultByteParseFailureFixture, vararg input: Byte) {
@@ -321,11 +334,12 @@ abstract class AbstractParseTest {
             }
         }
 
-        fun <IN, OUT> trace(parser: Parser<IN, OUT>): Parser<IN, OUT> {
-            return if (log) {
-                TracingParser(parser)
+        fun <IN, OUT> tracing(parser: Parser<IN, OUT>, action: Parser<IN, OUT>.() -> Unit) {
+            if (log) {
+                DiagnosticParser(parser, log).action()
             } else {
-                parser
+                parser.action()
+                DiagnosticParser(parser, false).action()
             }
         }
     }

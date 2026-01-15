@@ -1,6 +1,6 @@
 package net.rubygrapefruit.parse
 
-import net.rubygrapefruit.parse.byte.oneOf
+import net.rubygrapefruit.parse.binary.oneOf
 import net.rubygrapefruit.parse.combinators.sequence
 import kotlin.test.Test
 

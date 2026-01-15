@@ -1,25 +1,25 @@
-package net.rubygrapefruit.parse.char
+package net.rubygrapefruit.parse.binary
 
-internal class BufferingCharStream : AdvancingCharStream {
+internal class BufferingByteStream : AdvancingByteStream {
     private var tail = Buffer(null, 0)
     private var pos = 0
+
     override var finished: Boolean = false
         private set
 
     override val available: Int
         get() = tail.endIndex - pos
 
-    override fun get(index: Int): Char {
-        return tail.get(index + pos)
+    override fun get(index: Int): Byte {
+        return tail.get(pos + index)
     }
 
-    override fun posAt(index: Int): CharPosition {
-        val offset = index + pos
-        return CharPosition(offset, 1, offset + 1)
+    override fun posAt(index: Int): BytePosition {
+        return BytePosition(index + pos)
     }
 
-    fun append(chars: CharArray) {
-        tail = tail.append(chars)
+    fun append(bytes: ByteArray) {
+        tail = tail.append(bytes)
     }
 
     override fun advance(count: Int) {
@@ -32,12 +32,12 @@ internal class BufferingCharStream : AdvancingCharStream {
 
     private class Buffer(private val previous: Buffer?, private val startIndex: Int) {
         private var writeIndex = 0
-        private val content = CharArray(64 * 1024)
+        private val content = ByteArray(64 * 1024)
 
         val endIndex: Int
             get() = startIndex + writeIndex
 
-        fun get(index: Int): Char {
+        fun get(index: Int): Byte {
             return if (index < startIndex && previous != null) {
                 previous.get(index)
             } else {
@@ -45,11 +45,11 @@ internal class BufferingCharStream : AdvancingCharStream {
             }
         }
 
-        fun append(chars: CharArray): Buffer {
+        fun append(bytes: ByteArray): Buffer {
             val available = content.size - writeIndex
-            return if (chars.size <= available) {
-                chars.copyInto(content, writeIndex, 0, chars.size)
-                writeIndex += chars.size
+            return if (bytes.size <= available) {
+                bytes.copyInto(content, writeIndex, 0, bytes.size)
+                writeIndex += bytes.size
                 this
             } else {
                 TODO()

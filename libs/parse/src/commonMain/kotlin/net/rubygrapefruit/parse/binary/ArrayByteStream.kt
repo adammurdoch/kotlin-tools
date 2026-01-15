@@ -1,4 +1,4 @@
-package net.rubygrapefruit.parse.byte
+package net.rubygrapefruit.parse.binary
 
 internal class ArrayByteStream(val bytes: ByteArray) : AdvancingByteStream {
     private var pos = 0

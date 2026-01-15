@@ -1,7 +1,7 @@
 package net.rubygrapefruit.parse
 
-import net.rubygrapefruit.parse.byte.*
-import net.rubygrapefruit.parse.char.*
+import net.rubygrapefruit.parse.binary.*
+import net.rubygrapefruit.parse.text.*
 import kotlin.test.assertEquals
 import kotlin.test.fail
 

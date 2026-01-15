@@ -1,4 +1,4 @@
-package net.rubygrapefruit.parse.byte
+package net.rubygrapefruit.parse.binary
 
 import net.rubygrapefruit.parse.DefaultPushParser
 import net.rubygrapefruit.parse.ParseResult

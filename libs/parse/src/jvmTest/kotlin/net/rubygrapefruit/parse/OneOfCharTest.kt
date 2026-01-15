@@ -1,6 +1,6 @@
 package net.rubygrapefruit.parse
 
-import net.rubygrapefruit.parse.char.oneOf
+import net.rubygrapefruit.parse.text.oneOf
 import kotlin.test.Test
 
 class OneOfCharTest : AbstractParseTest() {

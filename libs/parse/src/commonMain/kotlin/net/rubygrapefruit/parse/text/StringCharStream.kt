@@ -1,4 +1,4 @@
-package net.rubygrapefruit.parse.char
+package net.rubygrapefruit.parse.text
 
 internal class StringCharStream(val text: String) : AdvancingCharStream {
     private var pos = 0

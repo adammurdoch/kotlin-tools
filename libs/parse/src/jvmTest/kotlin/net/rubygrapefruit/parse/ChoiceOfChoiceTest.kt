@@ -1,6 +1,6 @@
 package net.rubygrapefruit.parse
 
-import net.rubygrapefruit.parse.char.literal
+import net.rubygrapefruit.parse.text.literal
 import net.rubygrapefruit.parse.combinators.oneOf
 import kotlin.test.Test
 

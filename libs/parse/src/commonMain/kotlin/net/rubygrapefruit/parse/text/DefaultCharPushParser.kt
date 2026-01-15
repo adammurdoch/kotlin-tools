@@ -1,4 +1,4 @@
-package net.rubygrapefruit.parse.char
+package net.rubygrapefruit.parse.text
 
 import net.rubygrapefruit.parse.DefaultPushParser
 import net.rubygrapefruit.parse.ParseResult

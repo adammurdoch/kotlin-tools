@@ -1,7 +1,7 @@
 package net.rubygrapefruit.parse
 
-import net.rubygrapefruit.parse.byte.literal
-import net.rubygrapefruit.parse.char.literal
+import net.rubygrapefruit.parse.binary.literal
+import net.rubygrapefruit.parse.text.literal
 import net.rubygrapefruit.parse.combinators.sequence
 import kotlin.test.Test
 

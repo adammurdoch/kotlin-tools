@@ -1,25 +1,25 @@
-package net.rubygrapefruit.parse.byte
+package net.rubygrapefruit.parse.text
 
-internal class BufferingByteStream : AdvancingByteStream {
+internal class BufferingCharStream : AdvancingCharStream {
     private var tail = Buffer(null, 0)
     private var pos = 0
-
     override var finished: Boolean = false
         private set
 
     override val available: Int
         get() = tail.endIndex - pos
 
-    override fun get(index: Int): Byte {
-        return tail.get(pos + index)
+    override fun get(index: Int): Char {
+        return tail.get(index + pos)
     }
 
-    override fun posAt(index: Int): BytePosition {
-        return BytePosition(index + pos)
+    override fun posAt(index: Int): CharPosition {
+        val offset = index + pos
+        return CharPosition(offset, 1, offset + 1)
     }
 
-    fun append(bytes: ByteArray) {
-        tail = tail.append(bytes)
+    fun append(chars: CharArray) {
+        tail = tail.append(chars)
     }
 
     override fun advance(count: Int) {
@@ -32,12 +32,12 @@ internal class BufferingByteStream : AdvancingByteStream {
 
     private class Buffer(private val previous: Buffer?, private val startIndex: Int) {
         private var writeIndex = 0
-        private val content = ByteArray(64 * 1024)
+        private val content = CharArray(64 * 1024)
 
         val endIndex: Int
             get() = startIndex + writeIndex
 
-        fun get(index: Int): Byte {
+        fun get(index: Int): Char {
             return if (index < startIndex && previous != null) {
                 previous.get(index)
             } else {
@@ -45,11 +45,11 @@ internal class BufferingByteStream : AdvancingByteStream {
             }
         }
 
-        fun append(bytes: ByteArray): Buffer {
+        fun append(chars: CharArray): Buffer {
             val available = content.size - writeIndex
-            return if (bytes.size <= available) {
-                bytes.copyInto(content, writeIndex, 0, bytes.size)
-                writeIndex += bytes.size
+            return if (chars.size <= available) {
+                chars.copyInto(content, writeIndex, 0, chars.size)
+                writeIndex += chars.size
                 this
             } else {
                 TODO()

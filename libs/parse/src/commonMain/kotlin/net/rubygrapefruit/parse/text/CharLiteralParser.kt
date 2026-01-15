@@ -41,7 +41,7 @@ internal class CharLiteralParser<OUT>(private val text: String, private val resu
                 }
                 index++
             }
-            return next.matched(index, result)
+            return next.matched(-matched, index, result)
         }
     }
 }

@@ -38,7 +38,7 @@ internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : 
             return option.start { matched ->
                 result.add(matched.value)
                 val parser = ChoiceParser.of(listOf(this, empty), next)
-                PullParser.RequireMore(matched.count, parser)
+                PullParser.RequireMore(matched.end, parser)
             }
         }
     }

@@ -27,7 +27,7 @@ internal class SucceedParser<IN, OUT>(private val result: OUT) : Parser<IN, OUT>
         }
 
         fun <IN, OUT, NEXT> start(result: OUT, next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
-            val result = next.matched(0, result)
+            val result = next.matched(0, 0, result)
             return if (result is PullParser.RequireMore) {
                 result.parser
             } else {

@@ -24,7 +24,7 @@ internal class OneOfCharParser(private val chars: CharArray) : Parser<CharInput,
             } else {
                 val ch = input.get(0)
                 if (chars.contains(ch)) {
-                    next.matched(1, ch)
+                    next.matched(0, 1, ch)
                 } else {
                     PullParser.Failed(0, expectation)
                 }

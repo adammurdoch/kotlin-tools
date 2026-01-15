@@ -24,7 +24,7 @@ internal class OneOfByteParser(private val bytes: ByteArray) : Parser<ByteInput,
             } else {
                 val byte = input.get(0)
                 if (bytes.contains(byte)) {
-                    next.matched(1, byte)
+                    next.matched(0, 1, byte)
                 } else {
                     PullParser.Failed(0, expectation)
                 }

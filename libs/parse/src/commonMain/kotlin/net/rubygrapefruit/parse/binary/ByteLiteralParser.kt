@@ -44,7 +44,7 @@ internal class ByteLiteralParser<OUT>(private val bytes: ByteArray, private val 
                 }
                 index++
             }
-            return next.matched(index, result)
+            return next.matched(-matched, index, result)
         }
     }
 }

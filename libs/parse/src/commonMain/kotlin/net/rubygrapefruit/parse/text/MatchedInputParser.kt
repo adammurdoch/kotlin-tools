@@ -16,7 +16,7 @@ internal class MatchedInputParser(private val parser: Parser<CharInput, *>) : Pa
 
         override fun <NEXT> start(next: ParseContinuation<CharStream, String, NEXT>): PullParser<CharStream, NEXT> {
             return parser.start { matched ->
-                next.matched(matched.count, "??")
+                next.matched(matched.start, matched.end, "??")
             }
         }
     }

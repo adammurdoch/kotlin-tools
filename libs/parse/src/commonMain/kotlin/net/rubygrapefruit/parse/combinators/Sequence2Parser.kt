@@ -26,9 +26,10 @@ internal class Sequence2Parser<IN, A, B, OUT>(
             return a.start { resultA ->
                 val parserB = b.start { resultB ->
                     val result = map(resultA.value, resultB.value)
-                    next.matched(resultB.count, result)
+                    val lengthA = resultA.end - resultA.start
+                    next.matched(resultB.start - lengthA, resultB.end, result)
                 }
-                PullParser.RequireMore(resultA.count, parserB)
+                PullParser.RequireMore(resultA.end, parserB)
             }
         }
     }

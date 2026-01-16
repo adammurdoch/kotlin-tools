@@ -1,7 +1,8 @@
 package net.rubygrapefruit.parse.text
 
-internal class BufferingCharStream : AdvancingCharStream {
-    private var tail = Buffer(null, 0)
+
+internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharStream {
+    private var tail = Buffer(null, 0, bufferLen)
     private var pos = 0
     override var finished: Boolean = false
         private set
@@ -23,7 +24,7 @@ internal class BufferingCharStream : AdvancingCharStream {
     }
 
     fun append(chars: CharArray) {
-        tail = tail.append(chars)
+        tail = tail.append(chars, 0, chars.size)
     }
 
     override fun advance(count: Int) {
@@ -34,9 +35,9 @@ internal class BufferingCharStream : AdvancingCharStream {
         finished = true
     }
 
-    private class Buffer(private val previous: Buffer?, private val startIndex: Int) {
+    private class Buffer(private val previous: Buffer?, private val startIndex: Int, bufferLen: Int) {
         private var writeIndex = 0
-        private val content = CharArray(64 * 1024)
+        private val content = CharArray(bufferLen)
 
         val endIndex: Int
             get() = startIndex + writeIndex
@@ -62,14 +63,25 @@ internal class BufferingCharStream : AdvancingCharStream {
             }
         }
 
-        fun append(chars: CharArray): Buffer {
+        fun append(chars: CharArray, start: Int, end: Int): Buffer {
+            if (end == start) {
+                return this
+            }
+
             val available = content.size - writeIndex
-            return if (chars.size <= available) {
-                chars.copyInto(content, writeIndex, 0, chars.size)
-                writeIndex += chars.size
+            val count = end - start
+            return if (count <= available) {
+                chars.copyInto(content, writeIndex, start, end)
+                writeIndex += count
                 this
+            } else if (available == 0) {
+                val next = Buffer(this, startIndex + writeIndex, content.size)
+                next.append(chars, start, end)
             } else {
-                TODO()
+                chars.copyInto(content, writeIndex, start, start + available)
+                writeIndex += available
+                val next = Buffer(this, startIndex + writeIndex, content.size)
+                next.append(chars, start + available, end)
             }
         }
     }

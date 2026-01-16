@@ -4,7 +4,6 @@ import net.rubygrapefruit.parse.general.EndOfInputParser
 
 internal fun <POS, IN : AdvancingInput<POS>, OUT> parse(parser: PullParser<IN, OUT>, input: IN): ParseResult<POS, OUT> {
     val parser = DefaultPushParser(parser)
-    parser.inputAvailable(input)
     return parser.endOfInput(input)
 }
 

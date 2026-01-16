@@ -1,12 +1,6 @@
 package net.rubygrapefruit.parse.general
 
-import net.rubygrapefruit.parse.CombinatorBuilder
-import net.rubygrapefruit.parse.CompiledParser
-import net.rubygrapefruit.parse.Expectation
-import net.rubygrapefruit.parse.Input
-import net.rubygrapefruit.parse.ParseContinuation
-import net.rubygrapefruit.parse.Parser
-import net.rubygrapefruit.parse.PullParser
+import net.rubygrapefruit.parse.*
 
 internal class SucceedParser<IN, OUT>(private val result: OUT) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, OUT> {
@@ -16,10 +10,6 @@ internal class SucceedParser<IN, OUT>(private val result: OUT) : Parser<IN, OUT>
     companion object {
         fun <IN> of(): Parser<IN, Unit> {
             return SucceedParser(Unit)
-        }
-
-        fun <IN, OUT> compiled(result: OUT): CompiledParser<IN, OUT> {
-            return SucceedCompiledParser(result)
         }
 
         fun <IN, NEXT> start(next: ParseContinuation<IN, Unit, NEXT>): PullParser<IN, NEXT> {

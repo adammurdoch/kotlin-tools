@@ -51,15 +51,26 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
         }
 
         fun get(start: Int, end: Int): String {
-            return if (start < startIndex && previous != null) {
+            return if (start >= startIndex || previous == null) {
+                val regionEnd = end - startIndex
+                val regionStart = start - startIndex
+                content.concatToString(regionStart, regionEnd)
+            } else if (end <= startIndex) {
                 previous.get(start, end)
             } else {
-                val endIndex = (end - start) + startIndex
-                if (endIndex <= writeIndex) {
-                    content.concatToString(start - startIndex, endIndex)
-                } else {
-                    TODO()
-                }
+                val target = CharArray(end - start)
+                previous.get(start, startIndex, target)
+                content.copyInto(target, startIndex - start, 0, end - startIndex)
+                target.concatToString()
+            }
+        }
+
+        fun get(start: Int, end: Int, target: CharArray) {
+            if (start >= startIndex || previous == null) {
+                content.copyInto(target, 0, start, end)
+            } else {
+                previous.get(start, startIndex, target)
+                content.copyInto(target, startIndex - start, 0, end - startIndex)
             }
         }
 

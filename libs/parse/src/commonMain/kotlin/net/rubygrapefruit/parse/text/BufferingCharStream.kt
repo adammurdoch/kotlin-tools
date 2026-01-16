@@ -13,6 +13,10 @@ internal class BufferingCharStream : AdvancingCharStream {
         return tail.get(index + pos)
     }
 
+    override fun get(start: Int, end: Int): String {
+        return tail.get(start + pos, end + pos)
+    }
+
     override fun posAt(index: Int): CharPosition {
         val offset = index + pos
         return CharPosition(offset, 1, offset + 1)
@@ -42,6 +46,19 @@ internal class BufferingCharStream : AdvancingCharStream {
                 previous.get(index)
             } else {
                 content[index - startIndex]
+            }
+        }
+
+        fun get(start: Int, end: Int): String {
+            return if (start < startIndex && previous != null) {
+                previous.get(start, end)
+            } else {
+                val endIndex = (end - start) + startIndex
+                if (endIndex <= writeIndex) {
+                    content.concatToString(start - startIndex, endIndex)
+                } else {
+                    TODO()
+                }
             }
         }
 

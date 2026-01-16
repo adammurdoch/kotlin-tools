@@ -16,8 +16,20 @@ internal class MatchedInputParser(private val parser: Parser<CharInput, *>) : Pa
 
         override fun <NEXT> start(next: ParseContinuation<CharStream, String, NEXT>): PullParser<CharStream, NEXT> {
             return parser.start { matched ->
-                next.matched(matched.start, matched.end, "??")
+                PullParser.RequireMore(matched.end, CollectMatchedInputPullParser(matched.end - matched.start, next))
             }
+        }
+    }
+
+    private class CollectMatchedInputPullParser<NEXT>(
+        private val length: Int,
+        private val next: ParseContinuation<CharStream, String, NEXT>
+    ) : PullParser<CharStream, NEXT> {
+        override val expectation: Expectation
+            get() = Expectation.Nothing
+
+        override fun parse(input: CharStream, max: Int): PullParser.Result<CharStream, NEXT> {
+            return next.matched(-length, 0, input.get(-length, 0))
         }
     }
 }

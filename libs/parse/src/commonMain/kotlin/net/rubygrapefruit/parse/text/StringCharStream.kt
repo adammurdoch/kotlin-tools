@@ -13,6 +13,10 @@ internal class StringCharStream(val text: String) : AdvancingCharStream {
         return text[index + pos]
     }
 
+    override fun get(start: Int, end: Int): String {
+        return text.substring(start + pos, end + pos)
+    }
+
     override fun advance(count: Int) {
         pos += count
     }

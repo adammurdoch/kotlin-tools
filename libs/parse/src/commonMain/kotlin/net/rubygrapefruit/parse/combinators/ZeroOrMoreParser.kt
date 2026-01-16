@@ -19,14 +19,19 @@ internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : 
             get() = option.expectation
 
         override fun <NEXT> start(next: ParseContinuation<IN, List<OUT>, NEXT>): PullParser<IN, NEXT> {
-            val result = mutableListOf<OUT>()
-            val empty = SucceedParser.compiled<IN, List<OUT>>(result)
+            val result = Collector<OUT>()
+            val empty = EmptyCompiledParser<IN, OUT>(result)
             val nested = OptionCompiledParser(option, empty, result)
             return ChoiceParser.of(listOf(nested, empty), next)
         }
     }
 
-    private class OptionCompiledParser<IN, OUT>(val option: CompiledParser<IN, OUT>, val empty: CompiledParser<IN, List<OUT>>, val result: MutableList<OUT>) :
+    private class Collector<T> {
+        var length: Int = 0
+        val items = mutableListOf<T>()
+    }
+
+    private class OptionCompiledParser<IN, OUT>(val option: CompiledParser<IN, OUT>, val empty: CompiledParser<IN, List<OUT>>, val result: Collector<OUT>) :
         CompiledParser<IN, List<OUT>> {
         override val mayNotAdvanceOnMatch: Boolean
             get() = option.mayNotAdvanceOnMatch
@@ -36,10 +41,23 @@ internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : 
 
         override fun <NEXT> start(next: ParseContinuation<IN, List<OUT>, NEXT>): PullParser<IN, NEXT> {
             return option.start { matched ->
-                result.add(matched.value)
+                result.items.add(matched.value)
+                result.length += (matched.end - matched.start)
                 val parser = ChoiceParser.of(listOf(this, empty), next)
                 PullParser.RequireMore(matched.end, parser)
             }
+        }
+    }
+
+    private class EmptyCompiledParser<IN, OUT>(val result: Collector<OUT>) : CompiledParser<IN, List<OUT>> {
+        override val mayNotAdvanceOnMatch: Boolean
+            get() = true
+
+        override val expectation: Expectation
+            get() = Expectation.Nothing
+
+        override fun <NEXT> start(next: ParseContinuation<IN, List<OUT>, NEXT>): PullParser<IN, NEXT> {
+            return SucceedParser.start(result.items, next, length = result.length)
         }
     }
 }

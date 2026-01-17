@@ -95,6 +95,7 @@ samples {
     jvmCliApp("parse-jvm-cli-app") {
         cliArgs("1+2")
         expectedOutput("(1) + (2)")
+        deriveNative("parse-native-cli-app")
     }
 
     jvmCliApp("cli-args-parameters") { cliArgs("--help") }

@@ -3,6 +3,7 @@ package net.rubygrapefruit.parse
 import net.rubygrapefruit.parse.binary.*
 import net.rubygrapefruit.parse.text.*
 import kotlin.test.assertEquals
+import kotlin.test.assertSame
 import kotlin.test.fail
 
 abstract class AbstractParseTest {
@@ -254,6 +255,7 @@ abstract class AbstractParseTest {
             is ParseResult.Fail -> fail("Expected parse to succeed but failed at $position with $message")
             is ParseResult.Success -> {
                 assertEquals(expected, normalize(value), "unexpected value")
+                assertSame(value, get())
             }
         }
     }
@@ -266,6 +268,12 @@ abstract class AbstractParseTest {
                 assertEquals(line, position.line, "unexpected line")
                 assertEquals(col, position.col, "unexpected column")
                 assertEquals(message, this.message)
+
+                try {
+                    get()
+                } catch (e: IllegalStateException) {
+                    assertEquals("Line: $line, col: $col: $message", e.message)
+                }
             }
         }
     }
@@ -276,6 +284,12 @@ abstract class AbstractParseTest {
             is ParseResult.Fail -> {
                 assertEquals(offset, position.offset, "unexpected offset")
                 assertEquals(message, this.message)
+
+                try {
+                    get()
+                } catch (e: IllegalStateException) {
+                    assertEquals("Offset: $offset: $message", e.message)
+                }
             }
         }
     }

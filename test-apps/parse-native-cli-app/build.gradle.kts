@@ -5,6 +5,7 @@ plugins {
 application {
     entryPoint = "sample.main"
     common {
+        implementation("net.rubygrapefruit:cli-app:1.0")
         implementation(project(":parse-kmp-lib"))
     }
 }

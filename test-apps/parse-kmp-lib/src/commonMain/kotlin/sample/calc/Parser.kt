@@ -8,7 +8,7 @@ import net.rubygrapefruit.parse.text.literal
 import net.rubygrapefruit.parse.text.parse
 
 class Parser {
-    fun parse(args: Array<String>): ParseResult<CharPosition, Expression> {
+    fun parse(args: List<String>): ParseResult<CharPosition, Expression> {
         val combined = args.joinToString(" ")
 
         val digit = oneOf(

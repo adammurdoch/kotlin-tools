@@ -19,8 +19,7 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
     }
 
     override fun posAt(index: Int): CharPosition {
-        val offset = index + pos
-        return CharPosition(offset, 1, offset + 1)
+        return tail.posAt(index + pos)
     }
 
     fun append(chars: CharArray) {
@@ -38,6 +37,7 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
     private class Buffer(private val previous: Buffer?, private val startIndex: Int, bufferLen: Int) {
         private var writeIndex = 0
         private val content = CharArray(bufferLen)
+        private var startPos: CharPosition? = null
 
         val endIndex: Int
             get() = startIndex + writeIndex
@@ -65,13 +65,56 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
             }
         }
 
-        fun getInto(start: Int, end: Int, target: CharArray) {
+        private fun getInto(start: Int, end: Int, target: CharArray) {
             if (start >= startIndex || previous == null) {
                 content.copyInto(target, 0, start, end)
             } else {
                 previous.getInto(start, startIndex, target)
                 content.copyInto(target, startIndex - start, 0, end - startIndex)
             }
+        }
+
+        fun posAt(index: Int): CharPosition {
+            return if (index >= startIndex || previous == null) {
+                scan(startPos(), index)
+            } else {
+                previous.posAt(index)
+            }
+        }
+
+        private fun startPos(): CharPosition {
+            val startPos = startPos
+            return if (startPos != null) {
+                startPos
+            } else {
+                val startPos = if (previous == null) {
+                    CharPosition(0, 1, 1)
+                } else {
+                    previous.endPos()
+                }
+                this.startPos = startPos
+                startPos
+            }
+        }
+
+        private fun endPos(): CharPosition {
+            return scan(startPos(), writeIndex)
+        }
+
+        private fun scan(startPos: CharPosition, index: Int): CharPosition {
+            var line = startPos.line
+            var col = startPos.col
+
+            for (i in 0 until index - startIndex) {
+                if (content[i] == '\n') {
+                    line++
+                    col = 1
+                } else {
+                    col++
+                }
+            }
+
+            return CharPosition(index, line, col)
         }
 
         fun append(chars: CharArray, start: Int, end: Int): Buffer {

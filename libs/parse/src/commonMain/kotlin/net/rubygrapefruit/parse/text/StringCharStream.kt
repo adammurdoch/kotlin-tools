@@ -23,6 +23,6 @@ internal class StringCharStream(val text: String) : AdvancingCharStream {
 
     override fun posAt(index: Int): CharPosition {
         val offset = index + pos
-        return CharPosition(offset, 1, offset + 1)
+        return text.posAt(CharPosition(0, 1, 1), offset)
     }
 }

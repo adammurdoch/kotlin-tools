@@ -183,4 +183,73 @@ class BufferingCharStreamTest {
         assertEquals("12345", stream.get(0, 5))
         assertEquals("345678", stream.get(2, 8))
     }
+
+    @Test
+    fun `can query position from start of stream`() {
+        val stream = BufferingCharStream()
+
+        stream.append("123".toCharArray())
+
+        val pos = stream.posAt(0)
+        assertEquals(0, pos.offset)
+        assertEquals(1, pos.line)
+        assertEquals(1, pos.col)
+    }
+
+    @Test
+    fun `can query position from last buffer`() {
+        val stream = BufferingCharStream(bufferLen = 4)
+
+        stream.append("1\n2\n\n456".toCharArray())
+
+        stream.posAt(5).apply {
+            assertEquals(5, offset)
+            assertEquals(4, line)
+            assertEquals(1, col)
+        }
+
+        stream.posAt(7).apply {
+            assertEquals(7, offset)
+            assertEquals(4, line)
+            assertEquals(3, col)
+        }
+    }
+
+    @Test
+    fun `can query position from previous buffer`() {
+        val stream = BufferingCharStream(bufferLen = 4)
+
+        stream.append("1\n23456".toCharArray())
+
+        stream.posAt(2).apply {
+            assertEquals(2, offset)
+            assertEquals(2, line)
+            assertEquals(1, col)
+        }
+
+        stream.posAt(3).apply {
+            assertEquals(3, offset)
+            assertEquals(2, line)
+            assertEquals(2, col)
+        }
+    }
+
+    @Test
+    fun `can query position at end of line`() {
+        val stream = BufferingCharStream()
+
+        stream.append("1\n2\n\n".toCharArray())
+
+        stream.posAt(1).apply {
+            assertEquals(1, offset)
+            assertEquals(1, line)
+            assertEquals(2, col)
+        }
+
+        stream.posAt(4).apply {
+            assertEquals(4, offset)
+            assertEquals(3, line)
+            assertEquals(1, col)
+        }
+    }
 }

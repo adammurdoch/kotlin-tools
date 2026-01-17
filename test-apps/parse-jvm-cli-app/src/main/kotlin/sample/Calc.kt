@@ -1,26 +1,19 @@
 package sample
 
 import net.rubygrapefruit.cli.app.CliApp
-import net.rubygrapefruit.parse.ParseResult
 import sample.calc.*
 import sample.calc.Number
 
-class App : CliApp("parse-jvm-cli-app") {
+class Calc : CliApp("parse-jvm-cli-app") {
     val args by remainder("args")
 
     override fun run() {
         val parser = Parser()
-        val result = parser.parse(args)
-
-        when (result) {
-            is ParseResult.Fail -> throw IllegalArgumentException("${result.position}: ${result.message}")
-            is ParseResult.Success -> {
-                print("expression: ")
-                result.value.render()
-                println()
-                println("value: ${result.value.evaluate()}")
-            }
-        }
+        val result = parser.parse(args).get()
+        print("expression: ")
+        result.render()
+        println()
+        println("value: ${result.evaluate()}")
     }
 
     private fun Expression.render() {
@@ -44,5 +37,5 @@ class App : CliApp("parse-jvm-cli-app") {
     }
 }
 
-fun main(args: Array<String>) = App().run(args)
+fun main(args: Array<String>) = Calc().run(args)
 

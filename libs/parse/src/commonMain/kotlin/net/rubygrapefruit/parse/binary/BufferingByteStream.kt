@@ -14,6 +14,10 @@ internal class BufferingByteStream : AdvancingByteStream {
         return tail.get(pos + index)
     }
 
+    override fun get(start: Int, end: Int): ByteArray {
+        TODO()
+    }
+
     override fun posAt(index: Int): BytePosition {
         return BytePosition(index + pos)
     }

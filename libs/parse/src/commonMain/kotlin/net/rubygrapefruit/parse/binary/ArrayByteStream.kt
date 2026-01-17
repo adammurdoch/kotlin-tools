@@ -13,6 +13,10 @@ internal class ArrayByteStream(val bytes: ByteArray) : AdvancingByteStream {
         return bytes[pos + index]
     }
 
+    override fun get(start: Int, end: Int): ByteArray {
+        return bytes.copyOfRange(start + pos, end + pos)
+    }
+
     override fun advance(count: Int) {
         pos += count
     }

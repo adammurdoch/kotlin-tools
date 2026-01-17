@@ -1,6 +1,7 @@
 package net.rubygrapefruit.parse.text
 
 import net.rubygrapefruit.parse.Parser
+import net.rubygrapefruit.parse.general.MatchedInputParser
 
 /**
  * Returns a parser that matches the given text. Does not produce a result.

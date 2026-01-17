@@ -40,6 +40,10 @@ Parsers that operate on binary input
   - literal(bytes, result)
 - oneOf(bytes)
 
+Binary combinators
+
+- match(parser)
+
 ## General parsers
 
 Parsers that operate on any kind of input

@@ -115,47 +115,61 @@ abstract class AbstractParseTest {
     }
 
     fun Parser<ByteInput, Unit>.matches(vararg input: Byte, config: ParseFixture.() -> Unit = {}) {
-        doMatches(input = input, expected = Unit, config = config)
+        matches(input = input, expected = Unit, config = config)
     }
 
     fun Parser<ByteInput, List<Byte>>.matches(vararg input: Byte, expected: List<Byte>, config: ParseFixture.() -> Unit = {}) {
         // Compiler passes in list of Int
-        doMatches(input = input, expected = expected.map { it.toByte() }, config = config)
+        matches(input = input, expected = expected.map { it.toByte() }, config = config, normalize = { it })
+    }
+
+    fun Parser<ByteInput, ByteArray>.matches(vararg input: Byte, expected: ByteArray, config: ParseFixture.() -> Unit = {}) {
+        matches(input = input, expected = expected.toList(), config = config, normalize = { it.toList() })
     }
 
     fun <T> Parser<ByteInput, T>.matches(vararg input: Byte, expected: T, config: ParseFixture.() -> Unit = {}) {
-        doMatches(input = input, expected = expected, config = config)
+        matches(input = input, expected = expected, config = config, normalize = { it })
     }
 
-    private fun <T> Parser<ByteInput, T>.doMatches(vararg input: Byte, expected: T, config: ParseFixture.() -> Unit) {
+    private fun <T, E> Parser<ByteInput, T>.matches(
+        vararg input: Byte,
+        expected: E,
+        config: ParseFixture.() -> Unit,
+        normalize: (T) -> E
+    ) {
         val fixture = DefaultParseFixture()
         fixture.config()
 
-        fixture.tracing(this) { doMatches(input = input, expected = expected, fixture = fixture) }
+        fixture.tracing(this) { matches(input = input, expected = expected, fixture = fixture, normalize = normalize) }
     }
 
-    private fun <T> Parser<ByteInput, T>.doMatches(vararg input: Byte, expected: T, fixture: DefaultParseFixture) {
+    private fun <T, E> Parser<ByteInput, T>.matches(
+        vararg input: Byte,
+        expected: E,
+        fixture: DefaultParseFixture,
+        normalize: (T) -> E
+    ) {
         fixture.debug("PARSE ${input.joinToString(", ")}")
 
         val result = parse(input)
-        result.assertIsSuccess(expected)
+        result.assertIsSuccess(expected, normalize)
 
         input.oneChunk {
             fixture.debug("ONE CHUNK")
             val result = pushParse(it)
-            result.assertIsSuccess(expected)
+            result.assertIsSuccess(expected, normalize)
         }
 
         input.chunkPerByte {
             fixture.debug("ONE CHUNK PER BYTE")
             val result = pushParse(it)
-            result.assertIsSuccess(expected)
+            result.assertIsSuccess(expected, normalize)
         }
 
         input.maybeTwoChunks {
             fixture.debug("TWO CHUNKS")
             val result = pushParse(it)
-            result.assertIsSuccess(expected)
+            result.assertIsSuccess(expected, normalize)
         }
     }
 
@@ -232,10 +246,14 @@ abstract class AbstractParseTest {
     }
 
     private fun <T> ParseResult<*, T>.assertIsSuccess(expected: T) {
+        assertIsSuccess(expected) { it }
+    }
+
+    private fun <T, E> ParseResult<*, T>.assertIsSuccess(expected: E, normalize: (T) -> E) {
         when (this) {
             is ParseResult.Fail -> fail("Expected parse to succeed but failed at $position with $message")
             is ParseResult.Success -> {
-                assertEquals(expected, value, "unexpected value")
+                assertEquals(expected, normalize(value), "unexpected value")
             }
         }
     }

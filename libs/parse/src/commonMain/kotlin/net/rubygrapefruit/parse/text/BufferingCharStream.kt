@@ -23,7 +23,7 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
     }
 
     override fun contextAt(index: Int): CharFailureContext {
-        TODO("Not yet implemented")
+        return tail.contextAt(index + pos)
     }
 
     fun append(chars: CharArray) {
@@ -80,9 +80,41 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
 
         fun posAt(index: Int): CharPosition {
             return if (index >= startIndex || previous == null) {
-                scan(startPos(), index)
+                posAt(startPos(), index)
             } else {
                 previous.posAt(index)
+            }
+        }
+
+        fun contextAt(index: Int): CharFailureContext {
+            return if (index >= startIndex || previous == null) {
+                val startPos = startPos()
+                var line = startPos.line
+                var col = startPos.col
+                var startLine = 0
+
+                for (i in 0 until index - startIndex) {
+                    if (content[i] == '\n') {
+                        line++
+                        col = 1
+                        startLine = i + 1
+                    } else {
+                        col++
+                    }
+                }
+
+                var endLine = writeIndex
+                for (i in index until writeIndex) {
+                    if (content[i] == '\n') {
+                        endLine = i
+                        break
+                    }
+                }
+
+                val pos = CharPosition(index, line, col)
+                AdvancingCharStream.CharStreamContext(pos, content.concatToString(startLine, endLine))
+            } else {
+                TODO()
             }
         }
 
@@ -102,10 +134,10 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
         }
 
         private fun endPos(): CharPosition {
-            return scan(startPos(), writeIndex)
+            return posAt(startPos(), writeIndex)
         }
 
-        private fun scan(startPos: CharPosition, index: Int): CharPosition {
+        private fun posAt(startPos: CharPosition, index: Int): CharPosition {
             var line = startPos.line
             var col = startPos.col
 

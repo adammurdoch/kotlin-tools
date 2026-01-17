@@ -267,7 +267,7 @@ abstract class AbstractParseTest {
                 assertEquals(offset, context.position.offset, "unexpected offset")
                 assertEquals(line, context.position.line, "unexpected line")
                 assertEquals(col, context.position.col, "unexpected column")
-                assertEquals(failureLine, context.lineText)
+                assertEquals(failureLine, context.lineText, "unexpected line text")
                 assertEquals(message, this.message)
 
                 try {

@@ -1,6 +1,7 @@
 pluginManagement {
     includeBuild("../stage2")
     includeBuild("../local-plugins")
+    includeBuild("../libs")
 }
 plugins {
     id("net.rubygrapefruit.kotlin-base")
@@ -36,6 +37,8 @@ samples {
     kmpLib("native-lib-generated-source") {
         noSourceDirs()
     }
+
+    kmpLib("parse-kmp-lib")
 
     jvmCliApp("jvm-cli-app-min") {
         cliArgs("hello", "world")
@@ -87,6 +90,11 @@ samples {
     }
     jvmCliApp("jvm-cli-app-generated-source") {
         expectedOutput("Generated app class")
+    }
+
+    jvmCliApp("parse-jvm-cli-app") {
+        cliArgs("1+2")
+        expectedOutput("(1) + (2)")
     }
 
     jvmCliApp("cli-args-parameters") { cliArgs("--help") }

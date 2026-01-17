@@ -22,6 +22,10 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
         return tail.posAt(index + pos)
     }
 
+    override fun contextAt(index: Int): CharFailureContext {
+        TODO("Not yet implemented")
+    }
+
     fun append(chars: CharArray) {
         tail = tail.append(chars, 0, chars.size)
     }

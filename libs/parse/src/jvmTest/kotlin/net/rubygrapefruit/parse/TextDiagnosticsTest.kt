@@ -8,6 +8,18 @@ import kotlin.test.Test
 
 class TextDiagnosticsTest : AbstractParseTest() {
     @Test
+    fun `reports location of failure for empty input`() {
+        val parser = oneOf('a', 'b')
+
+        parser.doesNotMatch("") {
+            failAt(0, 1, 1)
+            expectContext("", "")
+            expectLiteral("a")
+            expectLiteral("b")
+        }
+    }
+
+    @Test
     fun `reports location of failure on first line`() {
         val item = oneOf('a', 'b')
         val delim = sequence(item, literal(",")) { _, _ -> }
@@ -15,6 +27,7 @@ class TextDiagnosticsTest : AbstractParseTest() {
 
         parser.doesNotMatch("X,a,b") {
             failAt(0, 1, 1)
+            expectContext("", "X,a,b")
             expectLiteral("a")
             expectLiteral("b")
             expectEndOfInput()
@@ -34,8 +47,9 @@ class TextDiagnosticsTest : AbstractParseTest() {
         val line = sequence(delim, literal("\n")) { _, _ -> }
         val parser = zeroOrMore(line)
 
-        parser.doesNotMatch("a,\na,\naX") {
+        parser.doesNotMatch("a,\na,\naXX") {
             failAt(7, 3, 2)
+            expectContext("a", "XX")
             expectLiteral(",")
         }
     }
@@ -46,8 +60,22 @@ class TextDiagnosticsTest : AbstractParseTest() {
         val line = sequence(delim, literal("\n")) { _, _ -> }
         val parser = zeroOrMore(line)
 
-        parser.doesNotMatch("a,\na,\na") {
-            failAt(7, 3, 2)
+        parser.doesNotMatch("a,\na\na,") {
+            failAt(4, 2, 2)
+            expectContext("a", "")
+            expectLiteral(",")
+        }
+    }
+
+    @Test
+    fun `reports location of failure at end of input`() {
+        val delim = sequence(literal("a"), literal(",")) { _, _ -> }
+        val line = sequence(delim, literal("\n")) { _, _ -> }
+        val parser = sequence(line, line) { _, _ -> }
+
+        parser.doesNotMatch("a,\na") {
+            failAt(4, 2, 2)
+            expectContext("a", "")
             expectLiteral(",")
         }
     }

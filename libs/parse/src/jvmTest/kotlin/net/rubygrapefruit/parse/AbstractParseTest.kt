@@ -60,24 +60,24 @@ abstract class AbstractParseTest {
     private fun Parser<CharInput, *>.doesNotMatch(input: String, fixture: DefaultCharParseFailureFixture) {
         fixture.debug("PARSE \"$input\"")
         val result = parse(input)
-        result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.message())
+        result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.lineText(input), fixture.message())
 
         input.oneChunk {
             fixture.debug("PARSE ONE CHUNK")
             val result = pushParse(it)
-            result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.message())
+            result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.lineText(input), fixture.message())
         }
 
         input.chunkPerChar {
             fixture.debug("PARSE CHUNK PER CHAR")
             val result = pushParse(it)
-            result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.message())
+            result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.lineText(input), fixture.message())
         }
 
         input.maybeTwoChunks {
             fixture.debug("PARSE TWO CHUNKS")
             val result = pushParse(it)
-            result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.message())
+            result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.lineText(input), fixture.message())
         }
     }
 
@@ -260,13 +260,14 @@ abstract class AbstractParseTest {
         }
     }
 
-    private fun ParseResult<CharFailureContext, *>.assertIsFail(offset: Int, line: Int, col: Int, message: String) {
+    private fun ParseResult<CharFailureContext, *>.assertIsFail(offset: Int, line: Int, col: Int, failureLine: String, message: String) {
         when (this) {
             is ParseResult.Success -> fail("Expected parse failure at offset $offset with message: $message")
             is ParseResult.Fail -> {
                 assertEquals(offset, context.position.offset, "unexpected offset")
                 assertEquals(line, context.position.line, "unexpected line")
                 assertEquals(col, context.position.col, "unexpected column")
+                assertEquals(failureLine, context.lineText)
                 assertEquals(message, this.message)
 
                 try {
@@ -399,6 +400,8 @@ abstract class AbstractParseTest {
     interface CharParseFailureFixture : ParseFailureFixture {
         fun failAt(offset: Int, line: Int = 1, col: Int = offset + 1)
 
+        fun expectContext(textBeforeFailure: String, textAfterFailure: String)
+
         fun expectLiteral(text: String)
     }
 
@@ -406,6 +409,8 @@ abstract class AbstractParseTest {
         var offset = 0
         var line = 1
         var col = 1
+        var textBefore: String? = null
+        var textAfter: String? = null
 
         override fun expectLiteral(text: String) {
             expect.expectLiteral(text)
@@ -415,6 +420,19 @@ abstract class AbstractParseTest {
             this.offset = offset
             this.line = line
             this.col = col
+        }
+
+        override fun expectContext(textBeforeFailure: String, textAfterFailure: String) {
+            textBefore = textBeforeFailure
+            textAfter = textAfterFailure
+        }
+
+        fun lineText(input: String): String {
+            return if (textBefore != null && textAfter != null) {
+                "$textBefore$textAfter"
+            } else {
+                input
+            }
         }
     }
 

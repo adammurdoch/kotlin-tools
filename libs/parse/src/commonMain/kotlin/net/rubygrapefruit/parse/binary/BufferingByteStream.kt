@@ -15,7 +15,7 @@ internal class BufferingByteStream : AdvancingByteStream {
     }
 
     override fun get(start: Int, end: Int): ByteArray {
-        TODO()
+        return tail.get(start + pos, end + pos)
     }
 
     override fun posAt(index: Int): BytePosition {
@@ -46,6 +46,30 @@ internal class BufferingByteStream : AdvancingByteStream {
                 previous.get(index)
             } else {
                 content[index - startIndex]
+            }
+        }
+
+        fun get(start: Int, end: Int): ByteArray {
+            return if (start >= startIndex || previous == null) {
+                val regionEnd = end - startIndex
+                val regionStart = start - startIndex
+                content.copyOfRange(regionStart, regionEnd)
+            } else if (end <= startIndex) {
+                previous.get(start, end)
+            } else {
+                val target = ByteArray(end - start)
+                previous.getInto(start, startIndex, target)
+                content.copyInto(target, startIndex - start, 0, end - startIndex)
+                target
+            }
+        }
+
+        fun getInto(start: Int, end: Int, target: ByteArray) {
+            if (start >= startIndex || previous == null) {
+                content.copyInto(target, 0, start, end)
+            } else {
+                previous.getInto(start, startIndex, target)
+                content.copyInto(target, startIndex - start, 0, end - startIndex)
             }
         }
 

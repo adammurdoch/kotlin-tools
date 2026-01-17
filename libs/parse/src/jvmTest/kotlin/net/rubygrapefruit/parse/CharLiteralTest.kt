@@ -30,6 +30,10 @@ class CharLiteralTest : AbstractParseTest() {
             failAt(1)
             expectEndOfInput()
         }
+        parser.doesNotMatch("aXXX") {
+            failAt(1)
+            expectEndOfInput()
+        }
 
         // incorrect case
         parser.doesNotMatch("A") {
@@ -85,6 +89,10 @@ class CharLiteralTest : AbstractParseTest() {
 
         // extra char
         parser.doesNotMatch("abX") {
+            failAt(2)
+            expectEndOfInput()
+        }
+        parser.doesNotMatch("abXX") {
             failAt(2)
             expectEndOfInput()
         }

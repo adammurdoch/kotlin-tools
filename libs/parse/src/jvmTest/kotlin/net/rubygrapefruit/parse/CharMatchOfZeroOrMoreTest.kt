@@ -21,6 +21,7 @@ class CharMatchOfZeroOrMoreTest : AbstractParseTest() {
         parser.matches("2", expected = "2")
         parser.matches("2211", expected = "2211")
 
+        // unexpected
         parser.doesNotMatch("X") {
             expectLiteral("1")
             expectLiteral("2")

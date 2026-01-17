@@ -4,7 +4,7 @@ import net.rubygrapefruit.parse.DefaultPushParser
 import net.rubygrapefruit.parse.ParseResult
 import net.rubygrapefruit.parse.PullParser
 
-internal class DefaultCharPushParser<OUT>(parser: PullParser<CharStream, OUT>) : DefaultPushParser<CharPosition, AdvancingCharStream, OUT>(parser), CharPushParser<OUT> {
+internal class DefaultCharPushParser<OUT>(parser: PullParser<CharStream, OUT>) : DefaultPushParser<CharFailureContext, AdvancingCharStream, OUT>(parser), CharPushParser<OUT> {
     private val input = BufferingCharStream()
 
     override fun input(chars: CharArray) {
@@ -16,8 +16,8 @@ internal class DefaultCharPushParser<OUT>(parser: PullParser<CharStream, OUT>) :
         inputAvailable(input)
     }
 
-    override fun endOfInput(): ParseResult<CharPosition, OUT> {
+    override fun endOfInput(): ParseResult<CharFailureContext, OUT> {
         input.end()
-        return endOfInput(input)
+        return endOfInput(input, ::failureFactory)
     }
 }

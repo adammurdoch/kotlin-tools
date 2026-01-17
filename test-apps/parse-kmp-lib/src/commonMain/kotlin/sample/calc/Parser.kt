@@ -3,12 +3,11 @@ package sample.calc
 import net.rubygrapefruit.parse.ParseResult
 import net.rubygrapefruit.parse.combinators.oneOf
 import net.rubygrapefruit.parse.combinators.sequence
-import net.rubygrapefruit.parse.text.CharPosition
 import net.rubygrapefruit.parse.text.literal
 import net.rubygrapefruit.parse.text.parse
 
 class Parser {
-    fun parse(args: List<String>): ParseResult<CharPosition, Expression> {
+    fun parse(args: List<String>): ParseResult<*, Expression> {
         val combined = args.joinToString(" ")
 
         val digit = oneOf(

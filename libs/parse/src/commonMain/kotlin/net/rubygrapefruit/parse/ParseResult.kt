@@ -1,9 +1,10 @@
 package net.rubygrapefruit.parse
 
-sealed interface ParseResult<out POS, out OUT> {
+sealed interface ParseResult<out CONTEXT, out OUT> {
     /**
      * Returns the parse result or throws an exception if parse failed.
      */
+    @Throws(ParseException::class)
     fun get(): OUT
 
     /**
@@ -18,12 +19,9 @@ sealed interface ParseResult<out POS, out OUT> {
     /**
      * Parsing failed with the given failure.
      */
-    class Fail<POS> internal constructor(private val context: FailureContext<POS>, val message: String) : ParseResult<POS, Nothing> {
-        val position: POS
-            get() = context.pos
-
+    class Fail<CONTEXT> internal constructor(val context: CONTEXT, val message: String, val formatter: (CONTEXT, String) -> String) : ParseResult<CONTEXT, Nothing> {
         override fun get(): Nothing {
-            throw IllegalStateException(context.formattedMessage(message))
+            throw ParseException(formatter(context, message))
         }
     }
 }

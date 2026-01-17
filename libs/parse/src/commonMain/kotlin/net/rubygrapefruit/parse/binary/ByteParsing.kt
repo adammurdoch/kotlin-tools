@@ -2,15 +2,15 @@ package net.rubygrapefruit.parse.binary
 
 import net.rubygrapefruit.parse.ParseResult
 import net.rubygrapefruit.parse.Parser
-import net.rubygrapefruit.parse.start
 import net.rubygrapefruit.parse.parse
+import net.rubygrapefruit.parse.start
 
 /**
  * Attempts to parse the given input. Fails when the parser cannot match the entire input.
  */
-fun <OUT> Parser<ByteInput, OUT>.parse(input: ByteArray): ParseResult<BytePosition, OUT> {
+fun <OUT> Parser<ByteInput, OUT>.parse(input: ByteArray): ParseResult<ByteFailureContext, OUT> {
     val parser = start<ByteStream, OUT>()
-    return parse(parser, ArrayByteStream(input))
+    return parse(parser, ArrayByteStream(input), ::failureFactory)
 }
 
 /**
@@ -20,4 +20,8 @@ fun <OUT> Parser<ByteInput, OUT>.parse(input: ByteArray): ParseResult<BytePositi
 fun <OUT> Parser<ByteInput, OUT>.pushParser(): BytePushParser<OUT> {
     val parser = start<ByteStream, OUT>()
     return DefaultBytePushParser(parser)
+}
+
+internal fun failureFactory(input: AdvancingByteStream, index: Int, message: String): ParseResult.Fail<ByteFailureContext> {
+    return ParseResult.Fail(input.contextAt(index), message) { context, message -> "Offset: ${context.position.offset}: $message" }
 }

@@ -82,7 +82,7 @@ abstract class AbstractParseTest {
     }
 
     @JvmName("pushParseChars")
-    private fun <T> Parser<CharInput, T>.pushParse(chunks: List<CharArray>): ParseResult<CharPosition, T> {
+    private fun <T> Parser<CharInput, T>.pushParse(chunks: List<CharArray>): ParseResult<CharFailureContext, T> {
         val pushParser = pushParser()
         for (chunk in chunks) {
             pushParser.input(chunk)
@@ -226,7 +226,7 @@ abstract class AbstractParseTest {
     }
 
     @JvmName("pushParseBytes")
-    private fun <T> Parser<ByteInput, T>.pushParse(chunks: List<ByteArray>): ParseResult<BytePosition, T> {
+    private fun <T> Parser<ByteInput, T>.pushParse(chunks: List<ByteArray>): ParseResult<ByteFailureContext, T> {
         val pushParser = pushParser()
         for (chunk in chunks) {
             pushParser.input(chunk)
@@ -252,7 +252,7 @@ abstract class AbstractParseTest {
 
     private fun <T, E> ParseResult<*, T>.assertIsSuccess(expected: E, normalize: (T) -> E) {
         when (this) {
-            is ParseResult.Fail -> fail("Expected parse to succeed but failed at $position with $message")
+            is ParseResult.Fail -> fail("Expected parse to succeed but failed at $context with $message")
             is ParseResult.Success -> {
                 assertEquals(expected, normalize(value), "unexpected value")
                 assertSame(value, get())
@@ -260,34 +260,34 @@ abstract class AbstractParseTest {
         }
     }
 
-    private fun ParseResult<CharPosition, *>.assertIsFail(offset: Int, line: Int, col: Int, message: String) {
+    private fun ParseResult<CharFailureContext, *>.assertIsFail(offset: Int, line: Int, col: Int, message: String) {
         when (this) {
             is ParseResult.Success -> fail("Expected parse failure at offset $offset with message: $message")
             is ParseResult.Fail -> {
-                assertEquals(offset, position.offset, "unexpected offset")
-                assertEquals(line, position.line, "unexpected line")
-                assertEquals(col, position.col, "unexpected column")
+                assertEquals(offset, context.position.offset, "unexpected offset")
+                assertEquals(line, context.position.line, "unexpected line")
+                assertEquals(col, context.position.col, "unexpected column")
                 assertEquals(message, this.message)
 
                 try {
                     get()
-                } catch (e: IllegalStateException) {
+                } catch (e: ParseException) {
                     assertEquals("Line: $line, col: $col: $message", e.message)
                 }
             }
         }
     }
 
-    private fun ParseResult<BytePosition, *>.assertIsFail(offset: Int, message: String) {
+    private fun ParseResult<ByteFailureContext, *>.assertIsFail(offset: Int, message: String) {
         when (this) {
             is ParseResult.Success -> fail("Expected parse failure at offset $offset with message: $message")
             is ParseResult.Fail -> {
-                assertEquals(offset, position.offset, "unexpected offset")
+                assertEquals(offset, context.position.offset, "unexpected offset")
                 assertEquals(message, this.message)
 
                 try {
                     get()
-                } catch (e: IllegalStateException) {
+                } catch (e: ParseException) {
                     assertEquals("Offset: $offset: $message", e.message)
                 }
             }

@@ -2,7 +2,7 @@ package net.rubygrapefruit.parse.text
 
 import net.rubygrapefruit.parse.PushParser
 
-interface CharPushParser<OUT> : PushParser<CharPosition, OUT> {
+interface CharPushParser<OUT> : PushParser<CharFailureContext, OUT> {
     /**
      * Signals that more input is available.
      */

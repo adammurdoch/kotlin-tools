@@ -4,7 +4,7 @@ import net.rubygrapefruit.parse.DefaultPushParser
 import net.rubygrapefruit.parse.ParseResult
 import net.rubygrapefruit.parse.PullParser
 
-internal class DefaultBytePushParser<OUT>(parser: PullParser<ByteStream, OUT>) : DefaultPushParser<BytePosition, AdvancingByteStream, OUT>(parser), BytePushParser<OUT> {
+internal class DefaultBytePushParser<OUT>(parser: PullParser<ByteStream, OUT>) : DefaultPushParser<ByteFailureContext, AdvancingByteStream, OUT>(parser), BytePushParser<OUT> {
     private val input = BufferingByteStream()
 
     override fun input(bytes: ByteArray) {
@@ -15,8 +15,8 @@ internal class DefaultBytePushParser<OUT>(parser: PullParser<ByteStream, OUT>) :
         inputAvailable(input)
     }
 
-    override fun endOfInput(): ParseResult<BytePosition, OUT> {
+    override fun endOfInput(): ParseResult<ByteFailureContext, OUT> {
         input.end()
-        return endOfInput(input)
+        return endOfInput(input, ::failureFactory)
     }
 }

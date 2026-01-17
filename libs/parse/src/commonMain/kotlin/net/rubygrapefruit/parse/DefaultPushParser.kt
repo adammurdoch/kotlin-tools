@@ -1,6 +1,6 @@
 package net.rubygrapefruit.parse
 
-internal open class DefaultPushParser<POS, IN : AdvancingInput<POS>, OUT>(
+internal open class DefaultPushParser<CONTEXT, IN : AdvancingInput<*>, OUT>(
     parser: PullParser<IN, OUT>
 ) {
     private var state: ParseState<IN, OUT> = parser
@@ -27,13 +27,13 @@ internal open class DefaultPushParser<POS, IN : AdvancingInput<POS>, OUT>(
         }
     }
 
-    fun endOfInput(input: IN): ParseResult<POS, OUT> {
+    fun endOfInput(input: IN, failureFactory: (IN, Int, String) -> ParseResult.Fail<CONTEXT>): ParseResult<CONTEXT, OUT> {
         inputAvailable(input)
 
         val result = state
         return when (result) {
             is PullParser.Matched -> ParseResult.Success(result.value)
-            is PullParser.Failed -> ParseResult.Fail(input.contextAt(result.index), result.expected.format())
+            is PullParser.Failed -> failureFactory(input, result.index, result.expected.format())
             is PullParser -> throw IllegalStateException("Expected parsing to be finished, but is $result")
         }
     }

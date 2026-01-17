@@ -38,4 +38,3 @@ class Calc : CliApp("parse-jvm-cli-app") {
 }
 
 fun main(args: Array<String>) = Calc().run(args)
-

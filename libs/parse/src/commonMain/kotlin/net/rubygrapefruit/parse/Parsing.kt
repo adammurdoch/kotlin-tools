@@ -2,9 +2,9 @@ package net.rubygrapefruit.parse
 
 import net.rubygrapefruit.parse.general.EndOfInputParser
 
-internal fun <POS, IN : AdvancingInput<POS>, OUT> parse(parser: PullParser<IN, OUT>, input: IN): ParseResult<POS, OUT> {
-    val parser = DefaultPushParser(parser)
-    return parser.endOfInput(input)
+internal fun <CONTEXT, IN : AdvancingInput<*>, OUT> parse(parser: PullParser<IN, OUT>, input: IN, failureFactory: (IN, Int, String) -> ParseResult.Fail<CONTEXT>): ParseResult<CONTEXT, OUT> {
+    val parser = DefaultPushParser<CONTEXT, IN, OUT>(parser)
+    return parser.endOfInput(input, failureFactory)
 }
 
 internal fun Expectation.format(): String {

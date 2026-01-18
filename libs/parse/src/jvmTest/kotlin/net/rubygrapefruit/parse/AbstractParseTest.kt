@@ -273,7 +273,10 @@ abstract class AbstractParseTest {
                 try {
                     get()
                 } catch (e: ParseException) {
-                    assertEquals("Line: $line, col: $col: $message", e.message)
+                    val lines = e.message?.lines() ?: emptyList()
+                    assertEquals(3, lines.size)
+                    assertEquals("$line | $failureLine", lines[0])
+                    assertEquals(message, lines[2])
                 }
             }
         }

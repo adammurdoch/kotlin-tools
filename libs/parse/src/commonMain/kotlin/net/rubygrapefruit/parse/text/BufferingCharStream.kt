@@ -39,6 +39,7 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
     }
 
     private class Buffer(private val previous: Buffer?, private val startIndex: Int, bufferLen: Int) {
+        private var next: Buffer? = null
         private var writeIndex = 0
         private val content = CharArray(bufferLen)
         private var startPos: CharPosition? = null
@@ -93,7 +94,8 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
                 var col = startPos.col
                 var startLine = 0
 
-                for (i in 0 until index - startIndex) {
+                val contentIndex = index - startIndex
+                for (i in 0 until contentIndex) {
                     if (content[i] == '\n') {
                         line++
                         col = 1
@@ -102,19 +104,29 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
                         col++
                     }
                 }
+                if (startLine == 0 && previous != null) {
+                    TODO()
+                }
 
-                var endLine = writeIndex
-                for (i in index until writeIndex) {
+                var endLine = -1
+                for (i in contentIndex until writeIndex) {
                     if (content[i] == '\n') {
                         endLine = i
                         break
+                    }
+                }
+                if (endLine < 0) {
+                    if (next == null) {
+                        endLine = writeIndex
+                    } else {
+                        TODO()
                     }
                 }
 
                 val pos = CharPosition(index, line, col)
                 AdvancingCharStream.CharStreamContext(pos, content.concatToString(startLine, endLine))
             } else {
-                TODO()
+                previous.contextAt(index)
             }
         }
 
@@ -165,14 +177,20 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
                 writeIndex += count
                 this
             } else if (available == 0) {
-                val next = Buffer(this, startIndex + writeIndex, content.size)
+                val next = appendBuffer()
                 next.append(chars, start, end)
             } else {
                 chars.copyInto(content, writeIndex, start, start + available)
                 writeIndex += available
-                val next = Buffer(this, startIndex + writeIndex, content.size)
+                val next = appendBuffer()
                 next.append(chars, start + available, end)
             }
+        }
+
+        private fun appendBuffer(): Buffer {
+            val next = Buffer(this, startIndex + writeIndex, content.size)
+            this.next = next
+            return next
         }
     }
 }

@@ -23,5 +23,19 @@ fun <OUT> Parser<CharInput, OUT>.pushParser(): CharPushParser<OUT> {
 }
 
 internal fun failureFactory(input: AdvancingCharStream, index: Int, message: String): ParseResult.Fail<CharFailureContext> {
-    return ParseResult.Fail(input.contextAt(index), message) { context, message -> "Line: ${context.position.line}, col: ${context.position.col}: $message" }
+    return ParseResult.Fail(input.contextAt(index), message) { context, message ->
+        val builder = StringBuilder()
+        val formattedLine = context.position.line.toString()
+        builder.append(formattedLine)
+        builder.append(" | ")
+        builder.append(context.lineText)
+        builder.append('\n')
+        repeat(formattedLine.length + 2 + context.position.col) {
+            builder.append(' ')
+        }
+        builder.append('^')
+        builder.append('\n')
+        builder.append(message)
+        builder.toString()
+    }
 }

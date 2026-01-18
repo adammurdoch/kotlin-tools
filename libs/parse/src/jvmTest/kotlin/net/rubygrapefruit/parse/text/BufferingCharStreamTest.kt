@@ -318,7 +318,7 @@ class BufferingCharStreamTest {
     }
 
     @Test
-    fun `can query context from line that spans multiple buffer`() {
+    fun `can query context from last line that spans multiple buffers`() {
         val stream = BufferingCharStream(bufferLen = 4)
 
         stream.append("\n1\n23456789".toCharArray())
@@ -340,6 +340,38 @@ class BufferingCharStreamTest {
             assertEquals(3, position.line)
             assertEquals(8, position.col)
             assertEquals("23456789", lineText)
+        }
+    }
+
+    @Test
+    fun `can query context from first line that spans multiple buffer`() {
+        val stream = BufferingCharStream(bufferLen = 4)
+
+        stream.append("123456789\na".toCharArray())
+
+        stream.contextAt(0).apply {
+            assertEquals(0, position.offset)
+            assertEquals(1, position.line)
+            assertEquals(1, position.col)
+            assertEquals("123456789", lineText)
+        }
+        stream.contextAt(2).apply {
+            assertEquals(2, position.offset)
+            assertEquals(1, position.line)
+            assertEquals(3, position.col)
+            assertEquals("123456789", lineText)
+        }
+        stream.contextAt(5).apply {
+            assertEquals(5, position.offset)
+            assertEquals(1, position.line)
+            assertEquals(6, position.col)
+            assertEquals("123456789", lineText)
+        }
+        stream.contextAt(8).apply {
+            assertEquals(8, position.offset)
+            assertEquals(1, position.line)
+            assertEquals(9, position.col)
+            assertEquals("123456789", lineText)
         }
     }
 

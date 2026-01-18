@@ -15,6 +15,12 @@ class ZeroOrMoreOfChoiceTest : AbstractParseTest() {
             )
         )
 
+        parser.expecting {
+            emptyMatch()
+            expectLiteral("a")
+            expectLiteral("ab")
+        }
+
         parser.matches("", expected = emptyList())
         parser.matches("a", expected = listOf(2))
         parser.matches("ab", expected = listOf(1))

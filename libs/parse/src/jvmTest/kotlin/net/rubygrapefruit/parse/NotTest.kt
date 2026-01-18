@@ -6,7 +6,7 @@ import kotlin.test.Test
 
 class NotTest : AbstractParseTest() {
     @Test
-    fun `matches empty input only`() {
+    fun `matches nothing`() {
         val parser = not(literal(byteArrayOf(0x1)))
 
         parser.expecting {

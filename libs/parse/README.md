@@ -58,4 +58,5 @@ Parsers that combine other parsers
 - oneOf(parsers)
 - sequence(parser, parser, map)
 - zeroOrMore(parser)
+  - Stops if the parser matches zero input values
 - not(parser)

@@ -119,9 +119,16 @@ abstract class AbstractParseTest {
         matches(input = input, expected = Unit, config = config)
     }
 
+    @JvmName("matchesBytes")
     fun Parser<ByteInput, List<Byte>>.matches(vararg input: Byte, expected: List<Byte>, config: ParseFixture.() -> Unit = {}) {
         // Compiler passes in list of Int
         matches(input = input, expected = expected.map { it.toByte() }, config = config, normalize = { it })
+    }
+
+    @JvmName("matchesListOfBytes")
+    fun Parser<ByteInput, List<List<Byte>>>.matches(vararg input: Byte, expected: List<List<Byte>>, config: ParseFixture.() -> Unit = {}) {
+        // Compiler passes in list of Int
+        matches(input = input, expected = expected.map { it.map { it.toByte() } }, config = config, normalize = { it })
     }
 
     fun Parser<ByteInput, ByteArray>.matches(vararg input: Byte, expected: ByteArray, config: ParseFixture.() -> Unit = {}) {

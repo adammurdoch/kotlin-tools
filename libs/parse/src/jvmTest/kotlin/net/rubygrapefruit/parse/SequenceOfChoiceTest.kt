@@ -55,7 +55,7 @@ class SequenceOfChoiceTest : AbstractParseTest() {
     }
 
     @Test
-    fun `matches sequence of choice then literal when choices have common prefix`() {
+    fun `matches sequence of choice then literal when options have common prefix`() {
         val parser = sequence(
             oneOf(
                 literal("abc", 1),
@@ -84,6 +84,45 @@ class SequenceOfChoiceTest : AbstractParseTest() {
         parser.doesNotMatch("ad1") {
             failAt(2)
             expectLiteral("12")
+        }
+    }
+
+    @Test
+    fun `matches sequence of choice then literal when one option is a prefix of another`() {
+        val parser = sequence(
+            oneOf(
+                literal("abc", 1),
+                literal("ab", 2)
+            ),
+            literal("12", 3)
+        ) { a, b -> listOf(a, b) }
+
+        parser.expecting {
+            expectLiteral("ab")
+            expectLiteral("abc")
+        }
+
+        parser.matches("abc12", expected = listOf(1, 3))
+        parser.matches("ab12", expected = listOf(2, 3))
+
+        // missing
+        parser.doesNotMatch("") {
+            expectLiteral("ab")
+            expectLiteral("abc")
+        }
+        parser.doesNotMatch("a") {
+            expectLiteral("ab")
+            expectLiteral("abc")
+        }
+        parser.doesNotMatch("ab1") {
+            failAt(2)
+            expectLiteral("12")
+        }
+
+        // unexpected
+        parser.doesNotMatch("aX") {
+            expectLiteral("ab")
+            expectLiteral("abc")
         }
     }
 

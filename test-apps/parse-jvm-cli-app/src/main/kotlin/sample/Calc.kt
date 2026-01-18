@@ -1,6 +1,9 @@
 package sample
 
+import kotlinx.io.buffered
+import kotlinx.io.readString
 import net.rubygrapefruit.cli.app.CliApp
+import net.rubygrapefruit.io.stream.stdin
 import sample.calc.*
 import sample.calc.Number
 
@@ -9,11 +12,19 @@ class Calc : CliApp("parse-jvm-cli-app") {
 
     override fun run() {
         val parser = Parser()
-        val result = parser.parse(args).get()
-        print("expression: ")
-        result.render()
-        println()
-        println("value: ${result.evaluate()}")
+        val text = if (args.isNotEmpty()) {
+            args.joinToString(" ")
+        } else {
+            println("Type something...")
+            stdin.buffered().readString()
+        }
+        val result = parser.parse(text).get()
+        for (expression in result) {
+            print("expression: ")
+            expression.render()
+            println()
+            println("value: ${expression.evaluate()}")
+        }
     }
 
     private fun Expression.render() {

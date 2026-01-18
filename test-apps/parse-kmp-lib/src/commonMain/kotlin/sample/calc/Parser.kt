@@ -3,13 +3,12 @@ package sample.calc
 import net.rubygrapefruit.parse.ParseResult
 import net.rubygrapefruit.parse.combinators.oneOf
 import net.rubygrapefruit.parse.combinators.sequence
+import net.rubygrapefruit.parse.combinators.zeroOrMore
 import net.rubygrapefruit.parse.text.literal
 import net.rubygrapefruit.parse.text.parse
 
 class Parser {
-    fun parse(args: List<String>): ParseResult<*, Expression> {
-        val combined = args.joinToString(" ")
-
+    fun parse(text: String): ParseResult<*, List<Expression>> {
         val digit = oneOf(
             literal("0", 0),
             literal("1", 1),
@@ -22,13 +21,16 @@ class Parser {
             literal("8", 8),
             literal("9", 9)
         )
-        val addition = sequence(digit, sequence(literal("+"), digit) { _, d -> d }) { a, b ->
-            Addition(Number(a), Number(b))
+        val number = sequence(digit, zeroOrMore(digit)) { a, b -> Number(("$a" + b.joinToString("")).toInt()) }
+        val addition = sequence(number, sequence(literal("+"), number) { _, d -> d }) { a, b ->
+            Addition(a, b)
         }
-        val subtraction = sequence(digit, sequence(literal("-"), digit) { _, d -> d }) { a, b ->
-            Subtraction(Number(a), Number(b))
+        val subtraction = sequence(number, sequence(literal("-"), number) { _, d -> d }) { a, b ->
+            Subtraction(a, b)
         }
-        val parser = oneOf(addition, subtraction)
-        return parser.parse(combined)
+        val expression = oneOf(addition, subtraction, number)
+        val line = sequence(expression, literal("\n")) { a, _ -> a }
+        val parser = sequence(zeroOrMore(line), zeroOrMore(expression)) { a, b -> a + b }
+        return parser.parse(text)
     }
 }

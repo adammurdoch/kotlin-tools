@@ -24,39 +24,39 @@ A parser combinator library for Kotlin multi-platform
 
 Parsers that operate on text input
 
-- literal(chars)
-  - literal(chars, result)
-- oneOf(chars)
+- literal(chars) - produces nothing
+  - literal(chars, result) - produces result
+- oneOf(chars) - produces matched char
 
 Text combinators
 
-- match(parser)
+- match(parser) - produces matched input
 
 ## Binary parsers
 
 Parsers that operate on binary input
 
-- literal(bytes)
-  - literal(bytes, result)
-- oneOf(bytes)
+- literal(bytes) - produces nothing
+  - literal(bytes, result) - produces result
+- oneOf(bytes) - produces matched char
 
 Binary combinators
 
-- match(parser)
+- match(parser) - produces matched input
 
 ## General parsers
 
 Parsers that operate on any kind of input
 
-- succeed()
-  - succeed(result)
+- succeed() - matches zero input values, produces nothing
+  - succeed(result) - produces result
 
 ## Combinators
 
 Parsers that combine other parsers
 
-- oneOf(parsers)
-- sequence(parser, parser, map)
-- zeroOrMore(parser)
+- oneOf(parsers) - produces result of first matching parser
+- sequence(parser, parser, map) - produces result of map function
+- zeroOrMore(parser) - produces list
   - Stops if the parser matches zero input values
-- not(parser)
+- not(parser) - matches zero input values, produces nothing

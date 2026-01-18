@@ -4,13 +4,13 @@ import net.rubygrapefruit.parse.*
 import net.rubygrapefruit.parse.general.SucceedParser
 import kotlin.math.min
 
-internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, Unit>, CombinatorBuilder<Unit> {
+internal class NotParser<IN>(private val parser: Parser<IN, *>) : Parser<IN, Unit>, CombinatorBuilder<Unit> {
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, Unit> {
         return NotCompiledParser(compiler.compile(parser))
     }
 
     private class NotCompiledParser<IN>(
-        private val parser: CompiledParser<IN, Unit>
+        private val parser: CompiledParser<IN, *>
     ) : CompiledParser<IN, Unit> {
         override val mayNotAdvanceOnMatch: Boolean
             get() = true
@@ -24,7 +24,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
     }
 
     private class NotPullParser<IN, NEXT>(
-        private var predicate: PullParser<IN, Unit>,
+        private var predicate: PullParser<IN, *>,
         private var next: PullParser<IN, NEXT>
     ) : PullParser<IN, NEXT> {
         private var matched = 0

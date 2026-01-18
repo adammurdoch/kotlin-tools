@@ -7,7 +7,7 @@ import kotlin.test.Test
 
 class CharMatchOfZeroOrMoreTest : AbstractParseTest() {
     @Test
-    fun `matches zero or more chars`() {
+    fun `matches zero or more one of char`() {
         val parser = match(zeroOrMore(oneOf('1', '2')))
 
         parser.expecting {

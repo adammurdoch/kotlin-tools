@@ -1,5 +1,6 @@
 package net.rubygrapefruit.parse
 
+import net.rubygrapefruit.parse.combinators.prefixed
 import net.rubygrapefruit.parse.combinators.sequence
 import net.rubygrapefruit.parse.combinators.zeroOrMore
 import net.rubygrapefruit.parse.text.literal
@@ -22,7 +23,7 @@ class TextDiagnosticsTest : AbstractParseTest() {
     @Test
     fun `reports location of failure on first line`() {
         val item = oneOf('a', 'b')
-        val delim = sequence(item, literal(",")) { _, _ -> }
+        val delim = prefixed(item, literal(","))
         val parser = zeroOrMore(delim)
 
         parser.doesNotMatch("X,a,b") {
@@ -43,8 +44,8 @@ class TextDiagnosticsTest : AbstractParseTest() {
 
     @Test
     fun `reports location of failure on subsequent line`() {
-        val delim = sequence(literal("a"), literal(",")) { _, _ -> }
-        val line = sequence(delim, literal("\n")) { _, _ -> }
+        val delim = sequence(literal("a"), literal(","))
+        val line = sequence(delim, literal("\n"))
         val parser = zeroOrMore(line)
 
         parser.doesNotMatch("a,\na,\naXX") {
@@ -56,8 +57,8 @@ class TextDiagnosticsTest : AbstractParseTest() {
 
     @Test
     fun `reports location of failure at end of line`() {
-        val delim = sequence(literal("a"), literal(",")) { _, _ -> }
-        val line = sequence(delim, literal("\n")) { _, _ -> }
+        val delim = sequence(literal("a"), literal(","))
+        val line = sequence(delim, literal("\n"))
         val parser = zeroOrMore(line)
 
         parser.doesNotMatch("a,\na\na,") {
@@ -69,9 +70,9 @@ class TextDiagnosticsTest : AbstractParseTest() {
 
     @Test
     fun `reports location of failure at end of input`() {
-        val delim = sequence(literal("a"), literal(",")) { _, _ -> }
-        val line = sequence(delim, literal("\n")) { _, _ -> }
-        val parser = sequence(line, line) { _, _ -> }
+        val delim = sequence(literal("a"), literal(","))
+        val line = sequence(delim, literal("\n"))
+        val parser = sequence(line, line)
 
         parser.doesNotMatch("a,\na") {
             failAt(4, 2, 2)

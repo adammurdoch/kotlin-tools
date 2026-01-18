@@ -13,7 +13,7 @@ class SequenceOfNotParserTest : AbstractParseTest() {
         val parser = sequence(
             not(literal(byteArrayOf(0x1))),
             zeroOrMore(oneOf(0x1, 0x2))
-        ) { _, b -> b }
+        )
 
         parser.expecting {
             emptyMatch()
@@ -48,7 +48,7 @@ class SequenceOfNotParserTest : AbstractParseTest() {
         val parser = sequence(
             not(literal(byteArrayOf(0x1, 0x2))),
             zeroOrMore(oneOf(0x1, 0x2))
-        ) { _, b -> b }
+        )
 
         parser.expecting {
             emptyMatch()
@@ -86,7 +86,7 @@ class SequenceOfNotParserTest : AbstractParseTest() {
         val parser = sequence(
             not(oneOf(0x1, 0x2)),
             zeroOrMore(oneOf(0x1, 0x2, 0x3, 0x4))
-        ) { _, b -> b }
+        )
 
         parser.expecting {
             emptyMatch()

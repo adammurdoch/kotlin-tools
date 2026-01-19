@@ -10,14 +10,14 @@ internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : 
     }
 
     companion object {
-        fun <IN, ITEM, OUT> of(option: CompiledParser<IN, ITEM>, initial: Collector<ITEM, OUT>): CompiledParser<IN, OUT> {
+        fun <IN, ITEM, OUT> of(option: CompiledParser<IN, ITEM>, initial: Accumulator<ITEM, OUT>): CompiledParser<IN, OUT> {
             return ZeroOrMoreCompiledParser(option, initial)
         }
     }
 
     private class ZeroOrMoreCompiledParser<IN, ITEM, OUT>(
         val option: CompiledParser<IN, ITEM>,
-        initial: Collector<ITEM, OUT>
+        initial: Accumulator<ITEM, OUT>
     ) : CompiledParser<IN, OUT> {
         private val empty = EmptyCompiledParser<IN, ITEM, OUT>(initial)
         private val nested = OptionCompiledParser(option, initial)
@@ -33,54 +33,9 @@ internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : 
         }
     }
 
-    interface Collector<ITEM, OUT> {
-        val length: Int
-
-        val value: OUT
-
-        fun add(item: ITEM, length: Int): Collector<ITEM, OUT>
-    }
-
-    private sealed interface ListCollector<T> : Collector<T, List<T>> {
-        fun collectInto(list: MutableList<T>)
-    }
-
-    private class Empty<T> : ListCollector<T> {
-        override val length: Int
-            get() = 0
-
-        override val value: List<T>
-            get() = emptyList()
-
-        override fun collectInto(list: MutableList<T>) {
-        }
-
-        override fun add(item: T, length: Int): Matched<T> {
-            return Matched(length, item, this)
-        }
-    }
-
-    private class Matched<T>(override val length: Int, val item: T, val prev: ListCollector<T>) : ListCollector<T> {
-        override val value: List<T>
-            get() {
-                val list = mutableListOf<T>()
-                collectInto(list)
-                return list
-            }
-
-        override fun collectInto(list: MutableList<T>) {
-            prev.collectInto(list)
-            list.add(item)
-        }
-
-        override fun add(item: T, length: Int): Matched<T> {
-            return Matched(length + this.length, item, this)
-        }
-    }
-
     private class OptionCompiledParser<IN, ITEM, OUT>(
         val option: CompiledParser<IN, ITEM>,
-        val previous: Collector<ITEM, OUT>
+        val previous: Accumulator<ITEM, OUT>
     ) :
         CompiledParser<IN, OUT> {
 
@@ -106,7 +61,7 @@ internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : 
         }
     }
 
-    private class EmptyCompiledParser<IN, ITEM, OUT>(val result: Collector<ITEM, OUT>) : CompiledParser<IN, OUT> {
+    private class EmptyCompiledParser<IN, ITEM, OUT>(val result: Accumulator<ITEM, OUT>) : CompiledParser<IN, OUT> {
         override val mayNotAdvanceOnMatch: Boolean
             get() = true
 

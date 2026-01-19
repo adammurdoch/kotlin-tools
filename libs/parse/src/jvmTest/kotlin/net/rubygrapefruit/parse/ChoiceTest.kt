@@ -1,8 +1,8 @@
 package net.rubygrapefruit.parse
 
 import net.rubygrapefruit.parse.binary.literal
-import net.rubygrapefruit.parse.text.literal
 import net.rubygrapefruit.parse.combinators.oneOf
+import net.rubygrapefruit.parse.text.literal
 import kotlin.test.Test
 
 class ChoiceTest : AbstractParseTest() {
@@ -13,6 +13,7 @@ class ChoiceTest : AbstractParseTest() {
         parser.expecting {
             expectLiteral("12")
             expectLiteral("abc")
+            expectIsChoice(2)
         }
 
         parser.matches("abc", expected = 1)
@@ -52,6 +53,7 @@ class ChoiceTest : AbstractParseTest() {
         parser.expecting {
             expectLiteral(0x1)
             expectLiteral(0x10)
+            expectIsChoice(2)
         }
 
         parser.matches(0x1, 0x2, 0x3, expected = 1)
@@ -81,6 +83,7 @@ class ChoiceTest : AbstractParseTest() {
         parser.expecting {
             expectLiteral("abc")
             expectLiteral("abd")
+            expectIsChoice(2)
         }
 
         parser.matches("abc", expected = 1)
@@ -99,6 +102,7 @@ class ChoiceTest : AbstractParseTest() {
         parser.expecting {
             expectLiteral("ab")
             expectLiteral("abc")
+            expectIsChoice(2)
         }
 
         parser.matches("abc", expected = 1)
@@ -122,6 +126,38 @@ class ChoiceTest : AbstractParseTest() {
         parser.doesNotMatch("abX") {
             failAt(2)
             expectEndOfInput()
+        }
+    }
+
+    @Test
+    fun `matches literals with common prefix and where one literal is a prefix of another`() {
+        val parser = oneOf(
+            literal("abc", 1),
+            literal("ad", 2),
+            literal("ab", 3)
+        )
+
+        parser.expecting {
+            expectLiteral("ab")
+            expectLiteral("abc")
+            expectLiteral("ad")
+            expectIsChoice(3)
+        }
+
+        parser.matches("abc", expected = 1)
+        parser.matches("ad", expected = 2)
+        parser.matches("ab", expected = 3)
+
+        // missing
+        parser.doesNotMatch("") {
+            expectLiteral("ab")
+            expectLiteral("abc")
+            expectLiteral("ad")
+        }
+        parser.doesNotMatch("a") {
+            expectLiteral("ab")
+            expectLiteral("abc")
+            expectLiteral("ad")
         }
     }
 

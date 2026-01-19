@@ -3,9 +3,19 @@ package net.rubygrapefruit.parse.combinators
 import net.rubygrapefruit.parse.*
 import kotlin.math.min
 
-internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
+internal class ChoiceParser<IN, OUT>(private val options: List<Parser<IN, OUT>>) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, OUT> {
-        return ChoiceCompiledParser(choices.map { compiler.compile(it) })
+        val compiledOptions = mutableListOf<CompiledParser<IN, OUT>>()
+        for (option in options) {
+            if (option is ChoiceParser) {
+                for (option in option.options) {
+                    compiledOptions.add(compiler.compile(option))
+                }
+            } else {
+                compiledOptions.add(compiler.compile(option))
+            }
+        }
+        return ChoiceCompiledParser(compiledOptions)
     }
 
     companion object {
@@ -14,7 +24,7 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
         }
     }
 
-    private class ChoiceCompiledParser<IN, OUT>(private val parsers: List<CompiledParser<IN, OUT>>) : CompiledParser<IN, OUT> {
+    internal class ChoiceCompiledParser<IN, OUT>(val parsers: List<CompiledParser<IN, OUT>>) : CompiledParser<IN, OUT> {
         override val mayNotAdvanceOnMatch: Boolean = parsers.any { it.mayNotAdvanceOnMatch }
 
         override val expectation: Expectation = Expectation.OneOf(parsers.map { it.expectation })
@@ -70,7 +80,7 @@ internal class ChoiceParser<IN, OUT>(private val choices: List<Parser<IN, OUT>>)
                         is PullParser.Finished -> {
                             states[index] = nextChoice
                             if (index == first) {
-                                first++
+                                first = states.indexOfFirst { it is PullParser }
                             }
                         }
 

@@ -23,6 +23,7 @@ class ChoiceOfChoiceTest : AbstractParseTest() {
             expectLiteral("ab")
             expectLiteral("abc")
             expectLiteral("ad")
+            expectIsChoice(4)
         }
 
         parser.matches("abc", expected = 1)

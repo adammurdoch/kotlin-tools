@@ -1,8 +1,10 @@
 package net.rubygrapefruit.parse
 
 import net.rubygrapefruit.parse.binary.*
+import net.rubygrapefruit.parse.combinators.ChoiceParser
 import net.rubygrapefruit.parse.text.*
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlin.test.assertSame
 import kotlin.test.fail
 
@@ -245,6 +247,8 @@ abstract class AbstractParseTest {
         assertEquals(fixture.emptyMatch, mayNotAdvanceOnMatch)
         assertEquals(fixture.message(), expectation.format())
 
+        fixture.inspector.inspect(this)
+
         val pullParser = start()
         pullParser.expecting(fixture)
     }
@@ -259,7 +263,7 @@ abstract class AbstractParseTest {
 
     private fun <T, E> ParseResult<*, T>.assertIsSuccess(expected: E, normalize: (T) -> E) {
         when (this) {
-            is ParseResult.Fail -> fail("Expected parse to succeed but failed at $context with $message")
+            is ParseResult.Fail -> fail("Expected parse to succeed but failed with $context and $message")
             is ParseResult.Success -> {
                 assertEquals(expected, normalize(value), "unexpected value")
                 assertSame(value, get())
@@ -313,6 +317,8 @@ abstract class AbstractParseTest {
         fun expectLiteral(text: String)
 
         fun expectLiteral(byte: Byte)
+
+        fun expectIsChoice(count: Int)
     }
 
     private class HasExpectation {
@@ -335,9 +341,26 @@ abstract class AbstractParseTest {
         }
     }
 
+    private sealed interface Inspector {
+        fun inspect(parser: CompiledParser<*, *>)
+
+        data object AcceptAnything : Inspector {
+            override fun inspect(parser: CompiledParser<*, *>) {
+            }
+        }
+
+        class IsChoice(val count: Int) : Inspector {
+            override fun inspect(parser: CompiledParser<*, *>) {
+                assertIs<ChoiceParser.ChoiceCompiledParser<*, *>>(parser)
+                assertEquals(count, parser.parsers.size)
+            }
+        }
+    }
+
     private class DefaultCompiledParserFixture : CompiledParserFixture {
         private val expected = HasExpectation()
         var emptyMatch = false
+        var inspector: Inspector = Inspector.AcceptAnything
 
         override fun emptyMatch() {
             emptyMatch = true
@@ -353,6 +376,10 @@ abstract class AbstractParseTest {
 
         override fun expectLiteral(byte: Byte) {
             expected.expectLiteral(byte)
+        }
+
+        override fun expectIsChoice(count: Int) {
+            inspector = Inspector.IsChoice(count)
         }
 
         fun message(): String {

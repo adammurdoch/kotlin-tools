@@ -1,13 +1,13 @@
 package net.rubygrapefruit.parse
 
-import net.rubygrapefruit.parse.combinators.prefixed
+import net.rubygrapefruit.parse.combinators.sequence
 import net.rubygrapefruit.parse.text.literal
 import kotlin.test.Test
 
-class PrefixedTest : AbstractParseTest() {
+class DiscardFirstSequenceTest : AbstractParseTest() {
     @Test
-    fun `matches literal that produces value then literal`() {
-        val parser = prefixed(literal("a", 1), literal("b", 2))
+    fun `matches literal then literal`() {
+        val parser = sequence(literal("a"), literal("b", 2))
 
         parser.expecting {
             expectLiteral("a")

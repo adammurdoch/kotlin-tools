@@ -57,8 +57,9 @@ Parsers that combine other parsers
 
 - oneOf(parsers) - produces result of first matching parser
 - sequence(parser, parser, map) - produces result of map function
-- sequence(unitParser, parser) - produces result of second parser
 - prefixed(parser, parser) - produces result of second parser
+  - sequence(unitParser, parser) - an alias
 - zeroOrMore(parser) - produces list
   - Stops if the parser matches zero input values
+  - zeroOrMore(unitParser) - produces nothing
 - not(parser) - matches zero input values, produces nothing

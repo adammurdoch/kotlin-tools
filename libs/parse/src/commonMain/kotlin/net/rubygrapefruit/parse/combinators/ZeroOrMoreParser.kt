@@ -6,15 +6,21 @@ import net.rubygrapefruit.parse.general.SucceedParser
 internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : Parser<IN, List<OUT>>, CombinatorBuilder<List<OUT>> {
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, List<OUT>> {
         val option = compiler.compile(parser)
-        return ZeroOrMoreCompiledParser(option)
+        return ZeroOrMoreCompiledParser(option, Empty())
     }
 
-    private class ZeroOrMoreCompiledParser<IN, OUT>(
-        val option: CompiledParser<IN, OUT>,
-    ) : CompiledParser<IN, List<OUT>> {
-        private val previous = Empty<OUT>()
-        private val empty = EmptyCompiledParser<IN, OUT>(previous)
-        private val nested = OptionCompiledParser(option, previous)
+    companion object {
+        fun <IN, ITEM, OUT> of(option: CompiledParser<IN, ITEM>, initial: Collector<ITEM, OUT>): CompiledParser<IN, OUT> {
+            return ZeroOrMoreCompiledParser(option, initial)
+        }
+    }
+
+    private class ZeroOrMoreCompiledParser<IN, ITEM, OUT>(
+        val option: CompiledParser<IN, ITEM>,
+        initial: Collector<ITEM, OUT>
+    ) : CompiledParser<IN, OUT> {
+        private val empty = EmptyCompiledParser<IN, ITEM, OUT>(initial)
+        private val nested = OptionCompiledParser(option, initial)
 
         override val mayNotAdvanceOnMatch: Boolean
             get() = true
@@ -22,26 +28,28 @@ internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : 
         override val expectation: Expectation
             get() = option.expectation
 
-        override fun <NEXT> start(next: ParseContinuation<IN, List<OUT>, NEXT>): PullParser<IN, NEXT> {
+        override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return ChoiceParser.of(listOf(nested, empty), next)
         }
     }
 
-    private sealed interface Collector<T> {
+    interface Collector<ITEM, OUT> {
         val length: Int
 
-        val items: List<T>
+        val value: OUT
 
-        fun collectInto(list: MutableList<T>)
-
-        fun add(item: T, length: Int): Matched<T>
+        fun add(item: ITEM, length: Int): Collector<ITEM, OUT>
     }
 
-    private class Empty<T> : Collector<T> {
+    private sealed interface ListCollector<T> : Collector<T, List<T>> {
+        fun collectInto(list: MutableList<T>)
+    }
+
+    private class Empty<T> : ListCollector<T> {
         override val length: Int
             get() = 0
 
-        override val items: List<T>
+        override val value: List<T>
             get() = emptyList()
 
         override fun collectInto(list: MutableList<T>) {
@@ -52,8 +60,8 @@ internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : 
         }
     }
 
-    private class Matched<T>(override val length: Int, val item: T, val prev: Collector<T>) : Collector<T> {
-        override val items: List<T>
+    private class Matched<T>(override val length: Int, val item: T, val prev: ListCollector<T>) : ListCollector<T> {
+        override val value: List<T>
             get() {
                 val list = mutableListOf<T>()
                 collectInto(list)
@@ -70,22 +78,26 @@ internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : 
         }
     }
 
-    private class OptionCompiledParser<IN, OUT>(val option: CompiledParser<IN, OUT>, val previous: Collector<OUT>) :
-        CompiledParser<IN, List<OUT>> {
+    private class OptionCompiledParser<IN, ITEM, OUT>(
+        val option: CompiledParser<IN, ITEM>,
+        val previous: Collector<ITEM, OUT>
+    ) :
+        CompiledParser<IN, OUT> {
+
         override val mayNotAdvanceOnMatch: Boolean
             get() = option.mayNotAdvanceOnMatch
 
         override val expectation: Expectation
             get() = option.expectation
 
-        override fun <NEXT> start(next: ParseContinuation<IN, List<OUT>, NEXT>): PullParser<IN, NEXT> {
+        override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return option.start { matched ->
                 val length = matched.end - matched.start
                 val result = previous.add(matched.value, length)
                 val parser = if (length == 0) {
-                    SucceedParser.start(result.items, next)
+                    SucceedParser.start(result.value, next)
                 } else {
-                    val empty = EmptyCompiledParser<IN, OUT>(result)
+                    val empty = EmptyCompiledParser<IN, ITEM, OUT>(result)
                     val nested = OptionCompiledParser(option, result)
                     ChoiceParser.of(listOf(nested, empty), next)
                 }
@@ -94,15 +106,15 @@ internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : 
         }
     }
 
-    private class EmptyCompiledParser<IN, OUT>(val result: Collector<OUT>) : CompiledParser<IN, List<OUT>> {
+    private class EmptyCompiledParser<IN, ITEM, OUT>(val result: Collector<ITEM, OUT>) : CompiledParser<IN, OUT> {
         override val mayNotAdvanceOnMatch: Boolean
             get() = true
 
         override val expectation: Expectation
             get() = Expectation.Nothing
 
-        override fun <NEXT> start(next: ParseContinuation<IN, List<OUT>, NEXT>): PullParser<IN, NEXT> {
-            return SucceedParser.start(result.items, next, length = result.length)
+        override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
+            return SucceedParser.start(result.value, next, length = result.length)
         }
     }
 }

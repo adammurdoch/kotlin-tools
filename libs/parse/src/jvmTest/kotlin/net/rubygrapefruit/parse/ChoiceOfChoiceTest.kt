@@ -1,7 +1,7 @@
 package net.rubygrapefruit.parse
 
-import net.rubygrapefruit.parse.text.literal
 import net.rubygrapefruit.parse.combinators.oneOf
+import net.rubygrapefruit.parse.text.literal
 import kotlin.test.Test
 
 class ChoiceOfChoiceTest : AbstractParseTest() {
@@ -63,6 +63,47 @@ class ChoiceOfChoiceTest : AbstractParseTest() {
         parser.doesNotMatch("adX") {
             failAt(2)
             expectEndOfInput()
+        }
+    }
+
+    @Test
+    fun `matches choice of choice of choice of literals`() {
+        val parser = oneOf(
+            oneOf(
+                oneOf(
+                    literal("abc", 1),
+                    literal("ade", 2)
+                ),
+                oneOf(
+                    literal("ab", 3),
+                    literal("ad", 4)
+                )
+            ),
+            literal("a", 5)
+        )
+
+        parser.expecting {
+            expectLiteral("a")
+            expectLiteral("ab")
+            expectLiteral("abc")
+            expectLiteral("ad")
+            expectLiteral("ade")
+            expectIsChoice(5)
+        }
+
+        parser.matches("abc", expected = 1)
+        parser.matches("ade", expected = 2)
+        parser.matches("ab", expected = 3)
+        parser.matches("ad", expected = 4)
+        parser.matches("a", expected = 5)
+
+        // missing
+        parser.doesNotMatch("") {
+            expectLiteral("a")
+            expectLiteral("ab")
+            expectLiteral("abc")
+            expectLiteral("ad")
+            expectLiteral("ade")
         }
     }
 }

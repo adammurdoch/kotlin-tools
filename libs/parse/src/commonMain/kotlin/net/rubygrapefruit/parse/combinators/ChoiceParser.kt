@@ -6,11 +6,11 @@ import kotlin.math.min
 internal class ChoiceParser<IN, OUT>(private val options: List<Parser<IN, OUT>>) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, OUT> {
         val compiledOptions = mutableListOf<CompiledParser<IN, OUT>>()
-        for (option in options) {
+        val queue = options.toMutableList()
+        while (queue.isNotEmpty()) {
+            val option = queue.removeFirst()
             if (option is ChoiceParser) {
-                for (option in option.options) {
-                    compiledOptions.add(compiler.compile(option))
-                }
+                queue.addAll(0, option.options)
             } else {
                 compiledOptions.add(compiler.compile(option))
             }

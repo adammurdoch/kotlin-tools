@@ -38,7 +38,6 @@ internal class ChoiceParser<IN, OUT>(private val options: List<Parser<IN, OUT>>)
         parsers: List<CompiledParser<IN, OUT>>,
         private val next: ParseContinuation<IN, OUT, NEXT>
     ) : PullParser<IN, NEXT> {
-        private var first = 0
         private val matched = BooleanArray(parsers.size)
         private var currentExpected: Expectation? = null
         private val states = Array<ParseState<IN, NEXT>>(parsers.size) { index ->
@@ -72,16 +71,17 @@ internal class ChoiceParser<IN, OUT>(private val options: List<Parser<IN, OUT>>)
                 val choice = states[index]
                 if (choice is PullParser) {
                     val nextChoice = choice.parseZeroOrOne(input, maxAdvance)
-                    if (matched[index] && index == first && nextChoice !is PullParser.Failed) {
+                    if (matched[index] && !requireMore) {
                         // Could fail at the same location as other choices
+                        if (nextChoice is PullParser.Failed) {
+                            states[index] = nextChoice
+                            return mergedFailures()
+                        }
                         return nextChoice
                     }
                     when (nextChoice) {
                         is PullParser.Finished -> {
                             states[index] = nextChoice
-                            if (index == first) {
-                                first = states.indexOfFirst { it is PullParser }
-                            }
                         }
 
                         is PullParser.RequireMore -> {
@@ -103,11 +103,15 @@ internal class ChoiceParser<IN, OUT>(private val options: List<Parser<IN, OUT>>)
                 }
                 PullParser.RequireMore(maxAdvance, this)
             } else {
-                val failures = states.filterIsInstance<PullParser.Failed<IN, NEXT>>()
-                val largestIndex = failures.maxOf { it.index }
-                val relevantFailures = failures.filter { it.index == largestIndex }
-                PullParser.Failed(largestIndex, Expectation.OneOf(relevantFailures.map { it.expected }))
+                mergedFailures()
             }
+        }
+
+        private fun mergedFailures(): PullParser.Failed<IN, NEXT> {
+            val failures = states.filterIsInstance<PullParser.Failed<IN, NEXT>>()
+            val largestIndex = failures.maxOf { it.index }
+            val relevantFailures = failures.filter { it.index == largestIndex }
+            return PullParser.Failed(largestIndex, Expectation.OneOf(relevantFailures.map { it.expected }))
         }
     }
 }

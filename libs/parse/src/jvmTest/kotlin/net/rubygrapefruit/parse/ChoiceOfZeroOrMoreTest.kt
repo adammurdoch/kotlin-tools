@@ -22,32 +22,32 @@ class ChoiceOfZeroOrMoreTest : AbstractParseTest() {
         }
 
         parser.matches(expected = emptyList())
-
         parser.matches(0x1, expected = listOf(0x1))
-        parser.matches(0x11, expected = listOf(0x11))
-
         parser.matches(0x1, 0x2, 0x1, expected = listOf(0x1, 0x2, 0x1))
-        parser.matches(0x11, 0x10, 0x11, expected = listOf(0x11, 0x10, 0x11))
+
+        // second zero or more can never succeed as first zero or more always succeeds
+        parser.doesNotMatch(0x11) {
+            expectEndOfInput()
+            expectLiteral(0x1)
+            expectLiteral(0x2)
+        }
+        parser.doesNotMatch(0x11, 0x10, 0x11) {
+            expectEndOfInput()
+            expectLiteral(0x1)
+            expectLiteral(0x2)
+        }
 
         // unexpected
         parser.doesNotMatch(0x3) {
             expectEndOfInput()
             expectLiteral(0x1)
             expectLiteral(0x2)
-            expectLiteral(0x10)
-            expectLiteral(0x11)
         }
         parser.doesNotMatch(0x1, 0x11) {
             failAt(1)
             expectEndOfInput()
             expectLiteral(0x1)
             expectLiteral(0x2)
-        }
-        parser.doesNotMatch(0x10, 0x2) {
-            failAt(1)
-            expectEndOfInput()
-            expectLiteral(0x10)
-            expectLiteral(0x11)
         }
     }
 }

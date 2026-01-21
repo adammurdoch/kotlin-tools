@@ -14,6 +14,10 @@ internal class OneOfByteParser(private val bytes: ByteArray) : Parser<ByteInput,
         override val expectation: Expectation,
         private val next: ParseContinuation<ByteStream, Byte, NEXT>
     ) : PullParser<ByteStream, NEXT> {
+        override fun toString(): String {
+            return "{one-of ${bytes.joinToString { format(it) }}}"
+        }
+
         override fun parse(input: ByteStream, max: Int): PullParser.Result<ByteStream, NEXT> {
             return if (max == 0) {
                 if (input.finished) {

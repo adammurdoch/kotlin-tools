@@ -159,8 +159,7 @@ abstract class AbstractParseTest {
         fixture: DefaultParseFixture,
         normalize: (T) -> E
     ) {
-        fixture.debug("PARSE ${input.joinToString(", ")}")
-
+        fixture.debug("PARSE [${input.joinToString { format(it) }}]")
         val result = parse(input)
         result.assertIsSuccess(expected, normalize)
 
@@ -191,7 +190,7 @@ abstract class AbstractParseTest {
     }
 
     private fun Parser<ByteInput, *>.doesNotMatch(fixture: DefaultByteParseFailureFixture, vararg input: Byte) {
-        fixture.debug("PARSE ${input.map { it.toString(16) }}")
+        fixture.debug("PARSE [${input.joinToString { format(it) }}]")
         val result = parse(input)
         result.assertIsFail(fixture.offset, fixture.message())
 

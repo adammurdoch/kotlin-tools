@@ -6,30 +6,14 @@ import net.rubygrapefruit.parse.general.SucceedParser
 internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : Parser<IN, List<OUT>>, CombinatorBuilder<List<OUT>> {
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, List<OUT>> {
         val option = compiler.compile(parser)
-        return ZeroOrMoreCompiledParser(option, Empty())
+        return of(option, Empty())
     }
 
     companion object {
         fun <IN, ITEM, OUT> of(option: CompiledParser<IN, ITEM>, initial: Accumulator<ITEM, OUT>): CompiledParser<IN, OUT> {
-            return ZeroOrMoreCompiledParser(option, initial)
-        }
-    }
-
-    private class ZeroOrMoreCompiledParser<IN, ITEM, OUT>(
-        val option: CompiledParser<IN, ITEM>,
-        initial: Accumulator<ITEM, OUT>
-    ) : CompiledParser<IN, OUT> {
-        private val empty = EmptyCompiledParser<IN, ITEM, OUT>(initial)
-        private val nested = OptionCompiledParser(option, initial)
-
-        override val mayNotAdvanceOnMatch: Boolean
-            get() = true
-
-        override val expectation: Expectation
-            get() = option.expectation
-
-        override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
-            return ChoiceParser.of(listOf(nested, empty), next)
+            val empty = EmptyCompiledParser<IN, ITEM, OUT>(initial)
+            val nested = OptionCompiledParser(option, initial)
+            return ChoiceParser.of(listOf(nested, empty))
         }
     }
 

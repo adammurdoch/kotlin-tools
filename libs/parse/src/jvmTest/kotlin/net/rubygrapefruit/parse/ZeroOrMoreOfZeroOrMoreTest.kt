@@ -20,8 +20,8 @@ class ZeroOrMoreOfZeroOrMoreTest : AbstractParseTest() {
         }
 
         parser.matches(expected = listOf(emptyList()))
-        parser.matches(0x2, expected = listOf(listOf(0x2), emptyList()))
-        parser.matches(0x2, 0x1, 0x2, expected = listOf(listOf(0x2, 0x1, 0x2), emptyList()))
+        parser.matches(0x2, expected = listOf(bytes(0x2), emptyList()))
+        parser.matches(0x2, 0x1, 0x2, expected = listOf(bytes(0x2, 0x1, 0x2), emptyList()))
 
         // unexpected
         parser.doesNotMatch(0x3) {

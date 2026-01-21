@@ -5,20 +5,22 @@ import kotlin.math.min
 
 internal class ChoiceParser<IN, OUT>(private val options: List<Parser<IN, OUT>>) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, OUT> {
-        val compiledOptions = mutableListOf<CompiledParser<IN, OUT>>()
-        val queue = options.toMutableList()
-        while (queue.isNotEmpty()) {
-            val option = queue.removeFirst()
-            if (option is ChoiceParser) {
-                queue.addAll(0, option.options)
-            } else {
-                compiledOptions.add(compiler.compile(option))
-            }
-        }
-        return ChoiceCompiledParser(compiledOptions)
+        return of(options.map { compiler.compile(it) })
     }
 
     companion object {
+        fun <IN, OUT> of(options: List<CompiledParser<IN, OUT>>): CompiledParser<IN, OUT> {
+            val effective = mutableListOf<CompiledParser<IN, OUT>>()
+            for (option in options) {
+                if (option is ChoiceCompiledParser) {
+                    effective.addAll(option.parsers)
+                } else {
+                    effective.add(option)
+                }
+            }
+            return ChoiceCompiledParser(effective)
+        }
+
         fun <IN, OUT, NEXT> of(parsers: List<CompiledParser<IN, OUT>>, next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return ChoicePullParser(parsers, next)
         }

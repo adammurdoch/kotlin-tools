@@ -22,8 +22,8 @@ class SequenceOfNotParserTest : AbstractParseTest() {
         }
 
         parser.matches(expected = emptyList())
-        parser.matches(0x2, expected = listOf(0x2))
-        parser.matches(0x2, 0x1, expected = listOf(0x2, 0x1))
+        parser.matches(0x2, expected = bytes(0x2))
+        parser.matches(0x2, 0x1, expected = bytes(0x2, 0x1))
 
         parser.doesNotMatch(0x1) {
             expectEndOfInput()
@@ -57,11 +57,11 @@ class SequenceOfNotParserTest : AbstractParseTest() {
         }
 
         parser.matches(expected = emptyList())
-        parser.matches(0x2, expected = listOf(0x2))
-        parser.matches(0x2, 0x1, expected = listOf(0x2, 0x1))
-        parser.matches(0x1, expected = listOf(0x1))
-        parser.matches(0x1, 0x1, expected = listOf(0x1, 0x1))
-        parser.matches(0x1, 0x1, 0x2, expected = listOf(0x1, 0x1, 0x2))
+        parser.matches(0x2, expected = bytes(0x2))
+        parser.matches(0x2, 0x1, expected = bytes(0x2, 0x1))
+        parser.matches(0x1, expected = bytes(0x1))
+        parser.matches(0x1, 0x1, expected = bytes(0x1, 0x1))
+        parser.matches(0x1, 0x1, 0x2, expected = bytes(0x1, 0x1, 0x2))
 
         parser.doesNotMatch(0x1, 0x2) {
             expectEndOfInput()
@@ -97,8 +97,8 @@ class SequenceOfNotParserTest : AbstractParseTest() {
         }
 
         parser.matches(expected = emptyList())
-        parser.matches(0x3, expected = listOf(0x3))
-        parser.matches(0x3, 0x1, expected = listOf(0x3, 0x1))
+        parser.matches(0x3, expected = bytes(0x3))
+        parser.matches(0x3, 0x1, expected = bytes(0x3, 0x1))
 
         parser.doesNotMatch(0x1) {
             expectEndOfInput()

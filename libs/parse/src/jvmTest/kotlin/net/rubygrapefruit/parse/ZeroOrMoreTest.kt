@@ -12,6 +12,7 @@ class ZeroOrMoreTest : AbstractParseTest() {
         parser.expecting {
             emptyMatch()
             expectLiteral("abc")
+            expectIsChoice(2)
         }
 
         parser.matches("", expected = emptyList())

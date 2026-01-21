@@ -11,6 +11,7 @@ class ZeroOrMoreOfSucceedTest : AbstractParseTest() {
 
         parser.expecting {
             emptyMatch()
+            expectIsChoice(2) // could be replaced with succeed()
         }
 
         parser.matches("", expected = listOf(2))

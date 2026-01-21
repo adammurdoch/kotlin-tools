@@ -20,8 +20,7 @@ internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : 
     private class OptionCompiledParser<IN, ITEM, OUT>(
         val option: CompiledParser<IN, ITEM>,
         val previous: Accumulator<ITEM, OUT>
-    ) :
-        CompiledParser<IN, OUT> {
+    ) : CompiledParser<IN, OUT> {
 
         override val mayNotAdvanceOnMatch: Boolean
             get() = option.mayNotAdvanceOnMatch

@@ -2,6 +2,7 @@ package net.rubygrapefruit.parse
 
 import net.rubygrapefruit.parse.binary.oneOf
 import net.rubygrapefruit.parse.combinators.zeroOrMore
+import net.rubygrapefruit.parse.text.literal
 import kotlin.test.Test
 
 class ZeroOrMoreOfZeroOrMoreTest : AbstractParseTest() {
@@ -34,6 +35,39 @@ class ZeroOrMoreOfZeroOrMoreTest : AbstractParseTest() {
             expectEndOfInput()
             expectLiteral(0x1)
             expectLiteral(0x2)
+        }
+    }
+
+    @Test
+    fun `matches zero or more of zero or more char literal`() {
+        val parser = zeroOrMore(
+            zeroOrMore(
+                literal("12", 1)
+            )
+        )
+
+        parser.expecting {
+            emptyMatch()
+            expectLiteral("12")
+        }
+
+        parser.matches("", expected = listOf(emptyList()))
+        parser.matches("12", expected = listOf(listOf(1), emptyList()))
+        parser.matches("121212", expected = listOf(listOf(1, 1, 1), emptyList()))
+
+        // unexpected
+        parser.doesNotMatch("3") {
+            expectLiteral("12")
+            expectEndOfInput()
+        }
+        parser.doesNotMatch("13") {
+            expectLiteral("12")
+            expectEndOfInput()
+        }
+        parser.doesNotMatch("123") {
+            failAt(2)
+            expectLiteral("12")
+            expectEndOfInput()
         }
     }
 }

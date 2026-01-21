@@ -3,10 +3,15 @@ package net.rubygrapefruit.parse.combinators
 import net.rubygrapefruit.parse.*
 import net.rubygrapefruit.parse.general.SucceedParser
 
-internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : Parser<IN, List<OUT>>, CombinatorBuilder<List<OUT>> {
-    override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, List<OUT>> {
-        val option = compiler.compile(parser)
-        return of(option, Empty())
+internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : Parser<IN, List<OUT>>, TypedInputCombinatorBuilder<BoxingInput<*, OUT>, List<OUT>> {
+    override fun compile(compiler: CombinatorBuilder.Compiler<BoxingInput<*, OUT>>): CompiledParser<BoxingInput<*, OUT>, List<OUT>> {
+        val singleValueOption = compiler.compileToSingleValueParser(parser)
+        return if (singleValueOption != null) {
+            ZeroOrMoreSingleInputParser(singleValueOption)
+        } else {
+            val option = compiler.compile(parser)
+            of(option, Empty())
+        }
     }
 
     companion object {

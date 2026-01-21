@@ -2,11 +2,15 @@ package net.rubygrapefruit.parse.text
 
 import net.rubygrapefruit.parse.*
 
-internal class OneOfCharParser(private val chars: CharArray) : Parser<CharInput, Char>, ParserBuilder<CharStream, Char> {
+internal class OneOfCharParser(private val chars: CharArray) : Parser<CharInput, Char>, ParserBuilder<CharStream, Char>, SingleInputParser<CharStream, Char> {
     override val expectation = Expectation.OneOf(chars.map { Expectation.One(format(it)) })
 
+    override fun match(input: CharStream, index: Int): Boolean {
+        return chars.contains(input.get(index))
+    }
+
     override fun <NEXT> start(next: ParseContinuation<CharStream, Char, NEXT>): PullParser<CharStream, NEXT> {
-        return OneOfCharPullParser(chars, this@OneOfCharParser.expectation, next)
+        return OneOfCharPullParser(chars, expectation, next)
     }
 
     private class OneOfCharPullParser<NEXT>(

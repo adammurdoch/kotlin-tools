@@ -1,11 +1,41 @@
 package net.rubygrapefruit.parse
 
 import net.rubygrapefruit.parse.combinators.zeroOrMore
+import net.rubygrapefruit.parse.text.literal
 import net.rubygrapefruit.parse.text.match
 import net.rubygrapefruit.parse.text.oneOf
 import kotlin.test.Test
 
 class CharMatchOfZeroOrMoreTest : AbstractParseTest() {
+    @Test
+    fun `matches zero or more one char literal`() {
+        val parser = match(zeroOrMore(literal("12", 1)))
+
+        parser.expecting {
+            emptyMatch()
+            expectLiteral("12")
+        }
+
+        parser.matches("", expected = "")
+        parser.matches("12", expected = "12")
+        parser.matches("1212", expected = "1212")
+
+        // unexpected
+        parser.doesNotMatch("X") {
+            expectLiteral("12")
+            expectEndOfInput()
+        }
+        parser.doesNotMatch("1X") {
+            expectLiteral("12")
+            expectEndOfInput()
+        }
+        parser.doesNotMatch("12X") {
+            failAt(2)
+            expectLiteral("12")
+            expectEndOfInput()
+        }
+    }
+
     @Test
     fun `matches zero or more one of char`() {
         val parser = match(zeroOrMore(oneOf('1', '2')))
@@ -23,6 +53,12 @@ class CharMatchOfZeroOrMoreTest : AbstractParseTest() {
 
         // unexpected
         parser.doesNotMatch("X") {
+            expectLiteral("1")
+            expectLiteral("2")
+            expectEndOfInput()
+        }
+        parser.doesNotMatch("1X") {
+            failAt(1)
             expectLiteral("1")
             expectLiteral("2")
             expectEndOfInput()

@@ -7,5 +7,9 @@ internal interface AdvancingByteStream : ByteStream, AdvancingInput<BytePosition
         return ByteStreamContext(posAt(index))
     }
 
-    private class ByteStreamContext(override val position: BytePosition) : ByteFailureContext
+    private class ByteStreamContext(override val position: BytePosition) : ByteFailureContext {
+        override fun toString(): String {
+            return "{context offset=${position.offset}}"
+        }
+    }
 }

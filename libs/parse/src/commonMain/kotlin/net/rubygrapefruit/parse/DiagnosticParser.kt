@@ -17,6 +17,10 @@ internal class DiagnosticParser<IN, OUT> private constructor(private val parser:
         override fun <OUT> compile(parser: Parser<*, OUT>): CompiledParser<IN, OUT> {
             return compiler.compile(DiagnosticParser(parser, logger))
         }
+
+        override fun <OUT> compileToSingleValueParser(parser: Parser<*, OUT>): SingleInputParser<IN, OUT>? {
+            return compiler.compileToSingleValueParser(parser)
+        }
     }
 
     private class DiagnosticCompiledParser<IN, OUT>(private val parser: CompiledParser<IN, OUT>, private val logger: Logger) : CompiledParser<IN, OUT> {
@@ -48,6 +52,7 @@ internal class DiagnosticParser<IN, OUT> private constructor(private val parser:
                     require(result.end <= max)
                     result
                 }
+
                 is PullParser.Failed -> {
                     require(result.index <= max)
                     result

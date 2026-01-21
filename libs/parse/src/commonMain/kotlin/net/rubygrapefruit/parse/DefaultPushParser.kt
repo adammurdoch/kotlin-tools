@@ -15,6 +15,9 @@ internal open class DefaultPushParser<CONTEXT, IN : AdvancingInput<*>, OUT>(
                     when (result) {
                         is PullParser.Finished -> state = result
                         is PullParser.RequireMore -> {
+                            if (result.advance == 0 && result.parser == state && input.finished) {
+                                throw IllegalStateException("Parsing cannot continue, parser = ${result.parser}")
+                            }
                             input.advance(result.advance)
                             state = result.parser
                             if (!input.finished) {

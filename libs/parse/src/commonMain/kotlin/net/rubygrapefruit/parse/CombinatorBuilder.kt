@@ -5,5 +5,7 @@ internal interface CombinatorBuilder<out OUT> {
 
     interface Compiler<IN> {
         fun <OUT> compile(parser: Parser<*, OUT>): CompiledParser<IN, OUT>
+
+        fun <OUT> compileToSingleValueParser(parser: Parser<*, OUT>): SingleInputParser<IN, OUT>?
     }
 }

@@ -2,11 +2,15 @@ package net.rubygrapefruit.parse.binary
 
 import net.rubygrapefruit.parse.*
 
-internal class OneOfByteParser(private val bytes: ByteArray) : Parser<ByteInput, Byte>, ParserBuilder<ByteStream, Byte> {
+internal class OneOfByteParser(private val bytes: ByteArray) : Parser<ByteInput, Byte>, ParserBuilder<ByteStream, Byte>, SingleInputParser<ByteStream, Byte> {
     override val expectation = Expectation.OneOf(bytes.map { Expectation.One(format(it)) })
 
+    override fun match(input: ByteStream, index: Int): Boolean {
+        return bytes.contains(input.get(index))
+    }
+
     override fun <NEXT> start(next: ParseContinuation<ByteStream, Byte, NEXT>): PullParser<ByteStream, NEXT> {
-        return OneOfBytePullParser(bytes, this@OneOfByteParser.expectation, next)
+        return OneOfBytePullParser(bytes, expectation, next)
     }
 
     private class OneOfBytePullParser<NEXT>(
@@ -14,6 +18,7 @@ internal class OneOfByteParser(private val bytes: ByteArray) : Parser<ByteInput,
         override val expectation: Expectation,
         private val next: ParseContinuation<ByteStream, Byte, NEXT>
     ) : PullParser<ByteStream, NEXT> {
+
         override fun toString(): String {
             return "{one-of ${bytes.joinToString { format(it) }}}"
         }

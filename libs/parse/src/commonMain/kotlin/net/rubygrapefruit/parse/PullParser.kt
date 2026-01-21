@@ -26,19 +26,19 @@ internal interface PullParser<in IN, out OUT> : ParseState<IN, OUT> {
      * @param start Relative to the start of input to [parse]. Must be <= 0.
      * @param end Relative to the start of input to [parse]. Can be 0. Must be smaller that max passed to [parse].
      */
-    data class Matched<IN, OUT>(val start: Int, val end: Int, val value: OUT) : Finished<IN, OUT>
+    data class Matched<out OUT>(val start: Int, val end: Int, val value: OUT) : Finished<Any?, OUT>
 
     /**
      * Parser stopped matching
      *
      * @param index Relative to the start of input to [parse]. Can be negative.
      */
-    data class Failed<IN, OUT>(val index: Int, val expected: Expectation) : Finished<IN, OUT>
+    data class Failed(val index: Int, val expected: Expectation) : Finished<Any?, Nothing>
 
     /**
      * Move the input forward the given number of values and try again.
      *
      * @param advance Can be 0.
      */
-    data class RequireMore<IN, OUT>(val advance: Int, val parser: PullParser<IN, OUT>) : Result<IN, OUT>
+    data class RequireMore<in IN, out OUT>(val advance: Int, val parser: PullParser<IN, OUT>) : Result<IN, OUT>
 }

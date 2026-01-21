@@ -3,7 +3,7 @@ package net.rubygrapefruit.parse
 /**
  * Implementations are cached and reused and so must be stateless.
  */
-internal interface CompiledParser<IN, OUT> {
+internal interface CompiledParser<IN, out OUT> {
     /**
      * Does this parser advance zero input items on match?
      */
@@ -19,7 +19,7 @@ internal interface CompiledParser<IN, OUT> {
      */
     fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT>
 
-    fun <NEXT> start(next: (PullParser.Matched<IN, OUT>) -> PullParser.Result<IN, NEXT>): PullParser<IN, NEXT> {
+    fun <NEXT> start(next: (PullParser.Matched<OUT>) -> PullParser.Result<IN, NEXT>): PullParser<IN, NEXT> {
         return start(ParseContinuation.of(next))
     }
 

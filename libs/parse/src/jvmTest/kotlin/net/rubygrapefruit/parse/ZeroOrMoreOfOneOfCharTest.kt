@@ -12,7 +12,6 @@ class ZeroOrMoreOfOneOfCharTest : AbstractParseTest() {
         )
 
         parser.expecting {
-            parser
             emptyMatch()
             expectLiteral("a")
             expectLiteral("b")

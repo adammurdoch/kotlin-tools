@@ -1,6 +1,7 @@
 package net.rubygrapefruit.parse
 
 import net.rubygrapefruit.parse.general.EndOfInputParser
+import net.rubygrapefruit.parse.general.SingleInputCompiledParser
 
 internal fun <CONTEXT, IN : AdvancingInput<*>, OUT> parse(
     parser: PullParser<IN, OUT>,
@@ -60,6 +61,11 @@ private class DefaultCompiler<IN : Input<*>> : CombinatorBuilder.Compiler<IN> {
             is ParserBuilder<*, *> -> {
                 @Suppress("UNCHECKED_CAST")
                 ParserBuilderAdaptor(parser as ParserBuilder<IN, OUT>)
+            }
+
+            is SingleInputParser<*, *> -> {
+                @Suppress("UNCHECKED_CAST")
+                SingleInputCompiledParser(parser as SingleInputParser<IN, OUT>) as CompiledParser<IN, OUT>
             }
 
             is CombinatorBuilder<*> -> {

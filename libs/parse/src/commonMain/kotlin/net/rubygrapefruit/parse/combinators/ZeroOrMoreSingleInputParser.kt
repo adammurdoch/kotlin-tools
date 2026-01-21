@@ -36,10 +36,10 @@ internal class ZeroOrMoreSingleInputParser<IN : BoxingInput<*, OUT>, OUT>(privat
                 result.add(input.getBoxed(index))
                 index++
             }
-            return if (index == input.available && !input.finished) {
-                PullParser.RequireMore(index, this)
-            } else {
+            return if (index < max || index == input.available && input.finished) {
                 next.matched(-matched, index, result)
+            } else {
+                PullParser.RequireMore(index, this)
             }
         }
     }

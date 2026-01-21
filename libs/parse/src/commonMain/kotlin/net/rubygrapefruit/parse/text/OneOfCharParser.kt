@@ -1,38 +1,17 @@
 package net.rubygrapefruit.parse.text
 
-import net.rubygrapefruit.parse.*
+import net.rubygrapefruit.parse.Expectation
+import net.rubygrapefruit.parse.Parser
+import net.rubygrapefruit.parse.SingleInputParser
 
-internal class OneOfCharParser(private val chars: CharArray) : Parser<CharInput, Char>, ParserBuilder<CharStream, Char>, SingleInputParser<CharStream, Char> {
+internal class OneOfCharParser(private val chars: CharArray) : Parser<CharInput, Char>, SingleInputParser<CharStream, Char> {
     override val expectation = Expectation.OneOf(chars.map { Expectation.One(format(it)) })
+
+    override fun toString(): String {
+        return "{one-of ${chars.joinToString { format(it) }}}"
+    }
 
     override fun match(input: CharStream, index: Int): Boolean {
         return chars.contains(input.get(index))
-    }
-
-    override fun <NEXT> start(next: ParseContinuation<CharStream, Char, NEXT>): PullParser<CharStream, NEXT> {
-        return OneOfCharPullParser(chars, expectation, next)
-    }
-
-    private class OneOfCharPullParser<NEXT>(
-        private val chars: CharArray,
-        override val expectation: Expectation,
-        private val next: ParseContinuation<CharStream, Char, NEXT>
-    ) : PullParser<CharStream, NEXT> {
-        override fun parse(input: CharStream, max: Int): PullParser.Result<CharStream, NEXT> {
-            return if (max == 0) {
-                if (input.finished) {
-                    PullParser.Failed(0, expectation)
-                } else {
-                    PullParser.RequireMore(0, this)
-                }
-            } else {
-                val ch = input.get(0)
-                if (chars.contains(ch)) {
-                    next.matched(0, 1, ch)
-                } else {
-                    PullParser.Failed(0, expectation)
-                }
-            }
-        }
     }
 }

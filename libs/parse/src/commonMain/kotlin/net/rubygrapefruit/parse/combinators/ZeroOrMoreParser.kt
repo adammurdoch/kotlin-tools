@@ -34,17 +34,15 @@ internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : 
             get() = option.expectation
 
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
-            return option.start { matched ->
-                val length = matched.end - matched.start
-                val result = previous.add(matched.value, length)
-                val parser = if (length == 0) {
+            return option.start { length, value ->
+                val result = previous.add(value, length)
+                if (length == 0) {
                     SucceedParser.start(result.value, next)
                 } else {
                     val empty = EmptyCompiledParser<IN, ITEM, OUT>(result)
                     val nested = OptionCompiledParser(option, result)
                     ChoiceParser.of(listOf(nested, empty), next)
                 }
-                PullParser.RequireMore(matched.end, parser)
             }
         }
     }

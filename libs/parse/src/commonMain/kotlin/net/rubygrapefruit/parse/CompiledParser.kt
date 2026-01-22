@@ -19,11 +19,14 @@ internal interface CompiledParser<IN, out OUT> {
      */
     fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT>
 
-    fun <NEXT> start(next: (PullParser.Matched<OUT>) -> PullParser.Result<IN, NEXT>): PullParser<IN, NEXT> {
+    fun <NEXT> start(next: (length: Int, value: OUT) -> PullParser<IN, NEXT>): PullParser<IN, NEXT> {
         return start(ParseContinuation.of(next))
     }
 
+    /**
+     * Starts this parser as the last parser.
+     */
     fun start(): PullParser<IN, OUT> {
-        return start(ParseContinuation.of())
+        return start(ParseContinuation.end())
     }
 }

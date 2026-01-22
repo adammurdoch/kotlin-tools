@@ -1,13 +1,6 @@
 package net.rubygrapefruit.parse.general
 
-import net.rubygrapefruit.parse.CombinatorBuilder
-import net.rubygrapefruit.parse.CompiledParser
-import net.rubygrapefruit.parse.Expectation
-import net.rubygrapefruit.parse.ParseContinuation
-import net.rubygrapefruit.parse.Parser
-import net.rubygrapefruit.parse.PullParser
-import net.rubygrapefruit.parse.SlicingInput
-import net.rubygrapefruit.parse.TypedInputCombinatorBuilder
+import net.rubygrapefruit.parse.*
 
 internal class MatchedInputParser<IN, OUT>(private val parser: Parser<IN, *>) : Parser<IN, OUT>, TypedInputCombinatorBuilder<SlicingInput<OUT>, OUT> {
     override fun compile(compiler: CombinatorBuilder.Compiler<SlicingInput<OUT>>): CompiledParser<SlicingInput<OUT>, OUT> {
@@ -22,8 +15,8 @@ internal class MatchedInputParser<IN, OUT>(private val parser: Parser<IN, *>) : 
             get() = parser.expectation
 
         override fun <NEXT> start(next: ParseContinuation<SlicingInput<OUT>, OUT, NEXT>): PullParser<SlicingInput<OUT>, NEXT> {
-            return parser.start { matched ->
-                PullParser.RequireMore(matched.end, CollectMatchedInputPullParser(matched.end - matched.start, next))
+            return parser.start { length, _ ->
+                CollectMatchedInputPullParser(length, next)
             }
         }
     }

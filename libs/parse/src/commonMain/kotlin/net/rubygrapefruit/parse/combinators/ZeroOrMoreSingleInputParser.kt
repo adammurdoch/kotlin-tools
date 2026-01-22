@@ -37,12 +37,8 @@ internal class ZeroOrMoreSingleInputParser<IN : BoxingInput<*, OUT>, OUT>(privat
                 index++
             }
             return if (index < max || index == input.available && input.finished) {
-                val nextResult = next.matched(-matched, index, result)
-                when (nextResult) {
-                    is PullParser.Failed -> TODO()
-                    is PullParser.Matched -> TODO()
-                    is PullParser.RequireMore -> PullParser.RequireMore(index, EndPullParser(nextResult.parser, expectation))
-                }
+                val nextParser = next.next(index - matched, result)
+                PullParser.RequireMore(index, EndPullParser(nextParser, expectation))
             } else {
                 PullParser.RequireMore(index, this)
             }
@@ -63,6 +59,7 @@ internal class ZeroOrMoreSingleInputParser<IN : BoxingInput<*, OUT>, OUT>(privat
                         TODO()
                     }
                 }
+
                 is PullParser.Matched -> result
                 is PullParser.RequireMore -> {
                     if (result.advance == 0) {

@@ -31,7 +31,7 @@ internal fun <IN, OUT> PullParser<IN, OUT>.parseZeroOrOne(input: IN, maxAdvance:
 }
 
 internal fun <IN : Input<*>, OUT> Parser<*, OUT>.start(): PullParser<IN, OUT> {
-    return DefaultCompiler<IN>().compile(this).start { match -> PullParser.RequireMore(match.end, EndOfInputParser(match.value)) }
+    return DefaultCompiler<IN>().compile(this).start { _, value -> EndOfInputParser(value) }
 }
 
 internal fun <IN : Input<*>, OUT> Parser<*, OUT>.compile(): CompiledParser<IN, OUT> {

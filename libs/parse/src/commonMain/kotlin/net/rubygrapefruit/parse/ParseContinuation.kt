@@ -10,18 +10,7 @@ internal interface ParseContinuation<in IN, in OUT, out NEXT> {
 
     companion object {
         fun <IN, OUT> end(): ParseContinuation<IN, OUT, OUT> {
-            return object : ParseContinuation<IN, OUT, OUT> {
-                override fun next(length: Int, value: OUT): PullParser<IN, OUT> {
-                    return object : PullParser<IN, OUT> {
-                        override val expectation: Expectation
-                            get() = Expectation.Nothing
-
-                        override fun parse(input: IN, max: Int): PullParser.Result<IN, OUT> {
-                            return PullParser.Matched(-length, 0, value)
-                        }
-                    }
-                }
-            }
+            return EndParseContinuation()
         }
 
         fun <IN, OUT, NEXT> of(next: (length: Int, value: OUT) -> PullParser<IN, NEXT>): ParseContinuation<IN, OUT, NEXT> {
@@ -30,6 +19,25 @@ internal interface ParseContinuation<in IN, in OUT, out NEXT> {
                     return next(length, value)
                 }
             }
+        }
+    }
+
+    private class EndParseContinuation<IN, OUT> : ParseContinuation<IN, OUT, OUT> {
+        override fun next(length: Int, value: OUT): PullParser<IN, OUT> {
+            return EndMatchPullParser(value)
+        }
+    }
+
+    private class EndMatchPullParser<IN, OUT>(val value: OUT) : PullParser<IN, OUT> {
+        override val expectation: Expectation
+            get() = Expectation.Nothing
+
+        override fun toString(): String {
+            return "{end}"
+        }
+
+        override fun parse(input: IN, max: Int): PullParser.Result<IN, OUT> {
+            return PullParser.Matched(value)
         }
     }
 }

@@ -27,7 +27,6 @@ internal class ZeroOrMoreSingleInputParser<IN : BoxingInput<*, OUT>, OUT>(privat
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
-            val matched = result.size
             var index = 0
             while (index < max) {
                 if (!parser.match(input, index)) {
@@ -37,7 +36,7 @@ internal class ZeroOrMoreSingleInputParser<IN : BoxingInput<*, OUT>, OUT>(privat
                 index++
             }
             return if (index < max || index == input.available && input.finished) {
-                val nextParser = next.next(index - matched, result)
+                val nextParser = next.next(result.size, result)
                 PullParser.RequireMore(index, EndPullParser(nextParser, expectation))
             } else {
                 PullParser.RequireMore(index, this)
@@ -48,6 +47,10 @@ internal class ZeroOrMoreSingleInputParser<IN : BoxingInput<*, OUT>, OUT>(privat
     private class EndPullParser<IN, OUT>(val parser: PullParser<IN, OUT>, val optionExpectation: Expectation) : PullParser<IN, OUT> {
         override val expectation: Expectation
             get() = Expectation.OneOf.of(optionExpectation, parser.expectation)
+
+        override fun toString(): String {
+            return "{end-zero-or-more $parser}"
+        }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN, OUT> {
             val result = parser.parse(input, max)

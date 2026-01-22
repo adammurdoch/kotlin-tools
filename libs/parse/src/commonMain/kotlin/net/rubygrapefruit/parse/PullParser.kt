@@ -22,11 +22,8 @@ internal interface PullParser<in IN, out OUT> : ParseState<IN, OUT> {
 
     /**
      * Parser has successfully matched
-     *
-     * @param start Relative to the start of input to [parse]. Must be <= 0.
-     * @param end Relative to the start of input to [parse]. Can be 0. Must be < max passed to [parse].
      */
-    data class Matched<out OUT>(val start: Int, val end: Int, val value: OUT) : Finished<Any?, OUT>
+    data class Matched<out OUT>(val value: OUT) : Finished<Any?, OUT>
 
     /**
      * Parser stopped matching

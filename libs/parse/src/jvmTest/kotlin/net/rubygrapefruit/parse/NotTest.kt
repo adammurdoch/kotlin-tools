@@ -17,11 +17,9 @@ class NotTest : AbstractParseTest() {
 
         parser.doesNotMatch(0x1) {
             expectEndOfInput()
-            expect("not x01")
         }
         parser.doesNotMatch(0x1, 0x2) {
             expectEndOfInput()
-            expect("not x01")
         }
         parser.doesNotMatch(0x2) {
             expectEndOfInput()

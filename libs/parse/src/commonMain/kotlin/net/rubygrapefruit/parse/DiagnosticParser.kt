@@ -47,11 +47,7 @@ internal class DiagnosticParser<IN, OUT> private constructor(private val parser:
             val result = parser.parse(input, max)
             logger.log("-> $parser (max=$max) => $result")
             return when (result) {
-                is PullParser.Matched -> {
-                    require(result.start <= 0)
-                    require(result.end <= max)
-                    result
-                }
+                is PullParser.Matched -> result
 
                 is PullParser.Failed -> {
                     require(result.index <= max)

@@ -1,7 +1,6 @@
 package net.rubygrapefruit.parse.combinators
 
 import net.rubygrapefruit.parse.*
-import net.rubygrapefruit.parse.general.SucceedParser
 
 internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : Parser<IN, List<OUT>>, TypedInputCombinatorBuilder<BoxingInput<*, OUT>, List<OUT>> {
     override fun compile(compiler: CombinatorBuilder.Compiler<BoxingInput<*, OUT>>): CompiledParser<BoxingInput<*, OUT>, List<OUT>> {
@@ -37,7 +36,7 @@ internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : 
             return option.start { length, value ->
                 val result = previous.add(value, length)
                 if (length == 0) {
-                    SucceedParser.start(result.value, next)
+                    next.next(0, result.value)
                 } else {
                     val empty = EmptyCompiledParser<IN, ITEM, OUT>(result)
                     val nested = OptionCompiledParser(option, result)
@@ -55,7 +54,7 @@ internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : 
             get() = Expectation.Nothing
 
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
-            return SucceedParser.start(result.value, next, length = result.length)
+            return next.next(result.length, result.value)
         }
     }
 }

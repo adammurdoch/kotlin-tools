@@ -11,14 +11,6 @@ internal class SucceedParser<IN, OUT>(private val result: OUT) : Parser<IN, OUT>
         fun <IN> of(): Parser<IN, Unit> {
             return SucceedParser(Unit)
         }
-
-        fun <IN, NEXT> start(next: ParseContinuation<IN, Unit, NEXT>): PullParser<IN, NEXT> {
-            return start(Unit, next)
-        }
-
-        fun <IN, OUT, NEXT> start(result: OUT, next: ParseContinuation<IN, OUT, NEXT>, length: Int = 0): PullParser<IN, NEXT> {
-            return next.next(length, result)
-        }
     }
 
     private class SucceedCompiledParser<IN, OUT>(
@@ -31,7 +23,7 @@ internal class SucceedParser<IN, OUT>(private val result: OUT) : Parser<IN, OUT>
             get() = Expectation.Nothing
 
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
-            return start(result, next)
+            return next.next(0, result)
         }
     }
 }

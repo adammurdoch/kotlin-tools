@@ -1,7 +1,6 @@
 package net.rubygrapefruit.parse.combinators
 
 import net.rubygrapefruit.parse.*
-import net.rubygrapefruit.parse.general.SucceedParser
 import kotlin.math.min
 
 internal class NotParser<IN>(private val parser: Parser<IN, *>) : Parser<IN, Unit>, CombinatorBuilder<Unit> {
@@ -19,7 +18,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, *>) : Parser<IN, Uni
             get() = Expectation.Nothing
 
         override fun <NEXT> start(next: ParseContinuation<IN, Unit, NEXT>): PullParser<IN, NEXT> {
-            return NotPullParser(parser.start(), SucceedParser.start(next))
+            return NotPullParser(parser.start(), next.next(0, Unit))
         }
     }
 
@@ -32,6 +31,10 @@ internal class NotParser<IN>(private val parser: Parser<IN, *>) : Parser<IN, Uni
 
         override val expectation: Expectation
             get() = next.expectation
+
+        override fun toString(): String {
+            return "{not predicate=$predicate $next}"
+        }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
             val maxAdvance = min(max, 1)

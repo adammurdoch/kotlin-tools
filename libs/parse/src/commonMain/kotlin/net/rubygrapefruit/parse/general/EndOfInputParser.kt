@@ -17,7 +17,7 @@ internal class EndOfInputParser<IN : Input<*>, OUT>(
         return if (input.available > 0) {
             PullParser.Failed(0, Expectation.One("end of input"))
         } else if (input.finished) {
-            PullParser.Matched(0, 0, result)
+            PullParser.Matched(result)
         } else {
             PullParser.RequireMore(0, this)
         }

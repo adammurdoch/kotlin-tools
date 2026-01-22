@@ -44,8 +44,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, *>) : Parser<IN, Uni
 
             val result = next.parseZeroOrOne(input, maxAdvance)
             when (result) {
-                is PullParser.Matched -> return result
-                is PullParser.Failed -> return result
+                is PullParser.Finished -> return result
                 is PullParser.RequireMore -> next = result.parser
             }
             matched += maxAdvance

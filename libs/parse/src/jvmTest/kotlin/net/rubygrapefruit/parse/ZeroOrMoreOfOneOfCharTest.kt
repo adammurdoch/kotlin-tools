@@ -22,7 +22,14 @@ class ZeroOrMoreOfOneOfCharTest : AbstractParseTest() {
         parser.matches("b", expected = listOf('b'))
         parser.matches("baa", expected = listOf('b', 'a', 'a'))
 
+        // unexpected
         parser.doesNotMatch("1") {
+            expectLiteral("a")
+            expectLiteral("b")
+            expectEndOfInput()
+        }
+        parser.doesNotMatch("ba1") {
+            failAt(2)
             expectLiteral("a")
             expectLiteral("b")
             expectEndOfInput()

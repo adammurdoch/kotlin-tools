@@ -32,5 +32,11 @@ internal sealed interface Expectation {
                 expectation.accept(visitor)
             }
         }
+
+        companion object {
+            fun of(first: Expectation, second: Expectation): Expectation {
+                return OneOf(listOf(first, second))
+            }
+        }
     }
 }

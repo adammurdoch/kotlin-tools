@@ -24,21 +24,21 @@ internal interface PullParser<in IN, out OUT> : ParseState<IN, OUT> {
      * Parser has successfully matched
      *
      * @param start Relative to the start of input to [parse]. Must be <= 0.
-     * @param end Relative to the start of input to [parse]. Can be 0. Must be smaller that max passed to [parse].
+     * @param end Relative to the start of input to [parse]. Can be 0. Must be < max passed to [parse].
      */
     data class Matched<out OUT>(val start: Int, val end: Int, val value: OUT) : Finished<Any?, OUT>
 
     /**
      * Parser stopped matching
      *
-     * @param index Relative to the start of input to [parse]. Can be negative.
+     * @param index Relative to the start of input to [parse]. Can be positive or negative. Must be < max passed to [parse].
      */
     data class Failed(val index: Int, val expected: Expectation) : Finished<Any?, Nothing>
 
     /**
      * Move the input forward the given number of values and try again.
      *
-     * @param advance Can be 0.
+     * @param advance Can be 0. Must be <= max passed to [parse].
      */
     data class RequireMore<in IN, out OUT>(val advance: Int, val parser: PullParser<IN, OUT>) : Result<IN, OUT>
 }

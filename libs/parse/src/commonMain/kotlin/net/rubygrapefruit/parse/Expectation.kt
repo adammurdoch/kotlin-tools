@@ -39,4 +39,12 @@ internal sealed interface Expectation {
             }
         }
     }
+
+    class Not(val expectation: Expectation) : Expectation {
+        override fun accept(visitor: (String) -> Unit) {
+            expectation.accept { text ->
+                visitor("not $text")
+            }
+        }
+    }
 }

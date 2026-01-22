@@ -28,7 +28,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, *>) : Parser<IN, Uni
         private var next: PullParser<IN, NEXT>
     ) : PullParser<IN, NEXT> {
         private var matched = 0
-        private val expectedAtStart = next.expectation
+        private val expectedAtStart = Expectation.OneOf.of(Expectation.Not(predicate.expectation), next.expectation)
 
         override val expectation: Expectation
             get() = next.expectation

@@ -44,8 +44,9 @@ internal class DiagnosticParser<IN, OUT> private constructor(private val parser:
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN, OUT> {
+            val parserState = parser.toString()
             val result = parser.parse(input, max)
-            logger.log("-> $parser (max=$max) => $result")
+            logger.log("-> $parserState parse(max=$max) => $result")
             return when (result) {
                 is PullParser.Matched -> result
 

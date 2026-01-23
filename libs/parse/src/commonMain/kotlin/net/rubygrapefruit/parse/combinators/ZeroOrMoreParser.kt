@@ -33,7 +33,7 @@ internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : 
             get() = option.expectation
 
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
-            return option.start { length, value ->
+            return option.start(next.expectation) { length, value ->
                 val result = previous.add(value, length)
                 if (length == 0) {
                     next.next(0, result.value)

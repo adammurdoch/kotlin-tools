@@ -15,7 +15,7 @@ internal class MatchedInputParser<IN, OUT>(private val parser: Parser<IN, *>) : 
             get() = parser.expectation
 
         override fun <NEXT> start(next: ParseContinuation<SlicingInput<OUT>, OUT, NEXT>): PullParser<SlicingInput<OUT>, NEXT> {
-            return parser.start { length, _ ->
+            return parser.start(next.expectation) { length, _ ->
                 CollectMatchedInputPullParser(length, next)
             }
         }

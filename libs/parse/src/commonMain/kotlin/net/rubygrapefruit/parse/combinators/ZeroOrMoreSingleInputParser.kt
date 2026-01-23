@@ -20,7 +20,7 @@ internal class ZeroOrMoreSingleInputParser<IN : BoxingInput<*, OUT>, OUT>(privat
         private val result = mutableListOf<OUT>()
 
         override val expectation: Expectation
-            get() = parser.expectation
+            get() = Expectation.OneOf.of(parser.expectation, next.expectation)
 
         override fun toString(): String {
             return "{zero-or-more $parser}"

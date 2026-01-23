@@ -2,6 +2,7 @@ package net.rubygrapefruit.parse
 
 import net.rubygrapefruit.parse.binary.*
 import net.rubygrapefruit.parse.combinators.ChoiceParser
+import net.rubygrapefruit.parse.combinators.ZeroOrMoreSingleInputParser
 import net.rubygrapefruit.parse.text.*
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -310,6 +311,8 @@ abstract class AbstractParseTest {
         fun expectLiteral(byte: Byte)
 
         fun expectIsChoice(count: Int)
+
+        fun expectIsZeroOrMoreSingleInput()
     }
 
     private class HasExpectation {
@@ -346,6 +349,12 @@ abstract class AbstractParseTest {
                 assertEquals(count, parser.parsers.size)
             }
         }
+
+        data object IsZeroOrMoreSingleInput : Inspector {
+            override fun inspect(parser: CompiledParser<*, *>) {
+                assertIs<ZeroOrMoreSingleInputParser<*, *>>(parser)
+            }
+        }
     }
 
     private class DefaultCompiledParserFixture : CompiledParserFixture {
@@ -371,6 +380,10 @@ abstract class AbstractParseTest {
 
         override fun expectIsChoice(count: Int) {
             inspector = Inspector.IsChoice(count)
+        }
+
+        override fun expectIsZeroOrMoreSingleInput() {
+            inspector = Inspector.IsZeroOrMoreSingleInput
         }
 
         fun message(): String {

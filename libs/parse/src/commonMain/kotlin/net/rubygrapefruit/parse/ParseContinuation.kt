@@ -8,7 +8,7 @@ internal interface ParseContinuation<in IN, in OUT, out NEXT> {
     }
 
     /**
-     * Returns the next parser given a match.
+     * Returns the next parser, given a match.
      */
     fun next(length: Int, value: OUT): PullParser<IN, NEXT>
 

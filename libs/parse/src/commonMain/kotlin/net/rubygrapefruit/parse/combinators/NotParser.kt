@@ -41,7 +41,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, *>) : Parser<IN, Uni
             val checkResult = predicate.parseZeroOrOne(input, maxAdvance)
             when (checkResult) {
                 is PullParser.Matched -> return PullParser.Failed(-matched, expectedAtStart)
-                is PullParser.Failed -> return PullParser.RequireMore(0, next)
+                is PullParser.Failed -> return PullParser.RequireMore(0, MergeExpectationsPullParser(next, Expectation.Not(predicate.expectation)))
                 is PullParser.RequireMore -> predicate = checkResult.parser
             }
 

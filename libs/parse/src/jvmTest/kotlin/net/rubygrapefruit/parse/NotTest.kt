@@ -23,6 +23,7 @@ class NotTest : AbstractParseTest() {
         }
         parser.doesNotMatch(0x2) {
             expectEndOfInput()
+            expect("not x01")
         }
     }
 }

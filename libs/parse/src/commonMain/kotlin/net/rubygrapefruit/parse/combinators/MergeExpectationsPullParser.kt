@@ -1,0 +1,35 @@
+package net.rubygrapefruit.parse.combinators
+
+import net.rubygrapefruit.parse.Expectation
+import net.rubygrapefruit.parse.PullParser
+
+internal class MergeExpectationsPullParser<IN, OUT>(val parser: PullParser<IN, OUT>, val optionExpectation: Expectation) : PullParser<IN, OUT> {
+    override val expectation: Expectation
+        get() = Expectation.OneOf.of(optionExpectation, parser.expectation)
+
+    override fun toString(): String {
+        return "{merge-expectations $parser}"
+    }
+
+    override fun parse(input: IN, max: Int): PullParser.Result<IN, OUT> {
+        val result = parser.parse(input, max)
+        return when (result) {
+            is PullParser.Failed -> {
+                if (result.index == 0) {
+                    PullParser.Failed(0, expectation)
+                } else {
+                    TODO()
+                }
+            }
+
+            is PullParser.Matched -> result
+            is PullParser.RequireMore -> {
+                if (result.advance == 0) {
+                    PullParser.RequireMore(0, MergeExpectationsPullParser(result.parser, optionExpectation))
+                } else {
+                    result
+                }
+            }
+        }
+    }
+}

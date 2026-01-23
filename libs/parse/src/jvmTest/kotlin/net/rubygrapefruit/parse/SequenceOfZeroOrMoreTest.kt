@@ -3,6 +3,7 @@ package net.rubygrapefruit.parse
 import net.rubygrapefruit.parse.text.literal
 import net.rubygrapefruit.parse.combinators.sequence
 import net.rubygrapefruit.parse.combinators.zeroOrMore
+import net.rubygrapefruit.parse.text.oneOf
 import kotlin.test.Test
 
 class SequenceOfZeroOrMoreTest : AbstractParseTest() {
@@ -129,6 +130,50 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
         parser.doesNotMatch("abcadX") {
             failAt(5)
             expectEndOfInput()
+        }
+    }
+
+    @Test
+    fun `matches zero or more one of char then literal`() {
+        val parser = sequence(
+            zeroOrMore(oneOf('a', 'b')),
+            literal(".end", listOf('.'))
+        ) { a, b -> a + b }
+
+        parser.expecting {
+            expectLiteral(".end")
+            expectLiteral("a")
+            expectLiteral("b")
+        }
+
+        parser.matches(".end", expected = listOf('.'))
+        parser.matches("a.end", expected = listOf('a', '.'))
+        parser.matches("baa.end", expected = listOf('b', 'a', 'a', '.'))
+
+        // missing
+        parser.doesNotMatch("") {
+            expectLiteral(".end")
+            expectLiteral("a")
+            expectLiteral("b")
+        }
+        parser.doesNotMatch("a") {
+            failAt(1)
+            expectLiteral(".end")
+            expectLiteral("a")
+            expectLiteral("b")
+        }
+        parser.doesNotMatch("b.") {
+            failAt(1)
+            expectLiteral(".end")
+            expectLiteral("a")
+            expectLiteral("b")
+        }
+        parser.doesNotMatch("b.en?") {
+            log()
+            failAt(1)
+            expectLiteral(".end")
+            expectLiteral("a")
+            expectLiteral("b")
         }
     }
 }

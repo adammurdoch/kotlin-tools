@@ -42,7 +42,7 @@ class SequenceOfNotParserTest : AbstractParseTest() {
         // unexpected
         parser.doesNotMatch(0x3) {
             expectEndOfInput()
-//            expect("not x01")
+            expect("not x01")
             expectLiteral(0x1)
             expectLiteral(0x2)
         }
@@ -91,14 +91,14 @@ class SequenceOfNotParserTest : AbstractParseTest() {
         // unexpected
         parser.doesNotMatch(0x3) {
             expectEndOfInput()
-//            expect("not x01")
+            expect("not x01")
             expectLiteral(0x1)
             expectLiteral(0x2)
         }
         parser.doesNotMatch(0x1, 0x3) {
             failAt(1)
             expectEndOfInput()
-//            expect("not x02")
+            expect("not x02")
             expectLiteral(0x1)
             expectLiteral(0x2)
         }
@@ -152,8 +152,8 @@ class SequenceOfNotParserTest : AbstractParseTest() {
         // unexpected
         parser.doesNotMatch(0x5) {
             expectEndOfInput()
-//            expect("not x01")
-//            expect("not x02")
+            expect("not x01")
+            expect("not x02")
             expectLiteral(0x1)
             expectLiteral(0x2)
             expectLiteral(0x3)

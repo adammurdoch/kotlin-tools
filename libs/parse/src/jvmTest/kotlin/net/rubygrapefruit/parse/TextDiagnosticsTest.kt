@@ -44,7 +44,7 @@ class TextDiagnosticsTest : AbstractParseTest() {
 
     @Test
     fun `reports location of failure on subsequent line`() {
-        val delim = sequence(literal("a"), literal(","))
+        val delim = sequence(literal("a", 1), literal(","))
         val line = sequence(delim, literal("\n"))
         val parser = zeroOrMore(line)
 
@@ -57,7 +57,7 @@ class TextDiagnosticsTest : AbstractParseTest() {
 
     @Test
     fun `reports location of failure at end of line`() {
-        val delim = sequence(literal("a"), literal(","))
+        val delim = sequence(literal("a", 1), literal(","))
         val line = sequence(delim, literal("\n"))
         val parser = zeroOrMore(line)
 
@@ -70,9 +70,9 @@ class TextDiagnosticsTest : AbstractParseTest() {
 
     @Test
     fun `reports location of failure at end of input`() {
-        val delim = sequence(literal("a"), literal(","))
+        val delim = sequence(literal("a", 1), literal(","))
         val line = sequence(delim, literal("\n"))
-        val parser = sequence(line, line)
+        val parser = sequence(line, line) { _, _ -> 1 }
 
         parser.doesNotMatch("a,\na") {
             failAt(4, 2, 2)

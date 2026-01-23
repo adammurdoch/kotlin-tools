@@ -1,5 +1,6 @@
 package net.rubygrapefruit.parse
 
+import net.rubygrapefruit.parse.combinators.suffixed
 import net.rubygrapefruit.parse.general.EndOfInputParser
 import net.rubygrapefruit.parse.general.SingleInputCompiledParser
 
@@ -31,7 +32,8 @@ internal fun <IN, OUT> PullParser<IN, OUT>.parseZeroOrOne(input: IN, maxAdvance:
 }
 
 internal fun <IN : Input<*>, OUT> Parser<*, OUT>.start(): PullParser<IN, OUT> {
-    return DefaultCompiler<IN>().compile(this).start(Expectation.One("end of input")) { _, value -> EndOfInputParser(value) }
+    val all = suffixed(this, EndOfInputParser())
+    return DefaultCompiler<IN>().compile(all).start()
 }
 
 internal fun <IN : Input<*>, OUT> Parser<*, OUT>.compile(): CompiledParser<IN, OUT> {

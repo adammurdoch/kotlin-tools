@@ -50,6 +50,7 @@ Parsers that operate on any kind of input
 
 - succeed() - matches zero input values, produces nothing
   - succeed(result) - produces result
+- endOfInput() - matches end of input, produces nothing
 
 ## Combinators
 

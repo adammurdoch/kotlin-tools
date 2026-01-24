@@ -11,7 +11,6 @@ class SequenceOfSucceedTest : AbstractParseTest() {
         val parser = sequence(succeed(1), succeed(2)) { a, b -> listOf(a, b) }
 
         parser.expecting {
-            emptyMatch()
             expectSequence {
                 expectSucceed(result = 1)
                 expectSucceed(result = 2)

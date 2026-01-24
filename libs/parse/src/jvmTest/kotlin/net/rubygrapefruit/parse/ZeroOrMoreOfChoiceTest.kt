@@ -16,7 +16,6 @@ class ZeroOrMoreOfChoiceTest : AbstractParseTest() {
         )
 
         parser.expecting {
-            emptyMatch()
             expectChoice {
                 expectOneOrMore {
                     expectChoice {

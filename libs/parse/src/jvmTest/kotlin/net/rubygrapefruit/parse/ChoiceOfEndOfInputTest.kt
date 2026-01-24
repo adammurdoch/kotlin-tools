@@ -14,7 +14,6 @@ class ChoiceOfEndOfInputTest : AbstractParseTest() {
         )
 
         parser.expecting {
-            emptyMatch()
             expectChoice {
                 expectEndOfInput()
                 expectLiteral("abc")

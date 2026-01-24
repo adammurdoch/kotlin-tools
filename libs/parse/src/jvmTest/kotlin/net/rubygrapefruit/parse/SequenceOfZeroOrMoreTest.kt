@@ -15,7 +15,6 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
         ) { a, b -> a + b }
 
         parser.expecting {
-            emptyMatch()
             expectSequence {
                 expectChoice {
                     expectOneOrMore {

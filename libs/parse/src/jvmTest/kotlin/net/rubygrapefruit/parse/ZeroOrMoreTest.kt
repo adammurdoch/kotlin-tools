@@ -10,7 +10,6 @@ class ZeroOrMoreTest : AbstractParseTest() {
         val parser = zeroOrMore(literal("abc", 1))
 
         parser.expecting {
-            emptyMatch()
             expectChoice {
                 expectOneOrMore {
                     expectLiteral("abc", result = 1)

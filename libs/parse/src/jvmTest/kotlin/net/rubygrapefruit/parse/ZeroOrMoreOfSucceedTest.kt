@@ -10,7 +10,6 @@ class ZeroOrMoreOfSucceedTest : AbstractParseTest() {
         val parser = zeroOrMore(succeed(2))
 
         parser.expecting {
-            emptyMatch()
             // could be replaced with succeed()
             expectChoice {
                 expectOneOrMore {

@@ -302,10 +302,6 @@ abstract class AbstractParseTest {
     }
 
     interface CompiledParserFixture {
-        fun emptyMatch()
-
-        fun expect(text: String)
-
         fun expectSucceed(result: Any = Unit)
 
         fun expectEndOfInput()
@@ -547,36 +543,30 @@ abstract class AbstractParseTest {
     }
 
     private class DefaultCompiledParserFixture : CompiledParserFixture {
-        var emptyMatch = false
         private val inspectors = mutableListOf<Inspector>()
+
+        val emptyMatch: Boolean
+            get() = inspector().mayBeEmpty
 
         fun choices(): List<Inspector> {
             assertTrue(inspectors.isNotEmpty(), "no expected parsers defined")
             return inspectors
         }
 
+        fun inspector(): Inspector {
+            assertEquals(1, inspectors.size, "expected one parser defined")
+            return inspectors.first()
+        }
+
         fun inspect(parser: CompiledParser<*, *>) {
-            assertTrue(inspectors.isNotEmpty(), "no expected parsers defined")
-            for (inspector in inspectors) {
-                inspector.inspect(parser)
-            }
-        }
-
-        override fun emptyMatch() {
-            emptyMatch = true
-        }
-
-        override fun expect(text: String) {
-            TODO()
+            inspector().inspect(parser)
         }
 
         override fun expectSucceed(result: Any) {
-            emptyMatch = true
             inspectors.add(Inspector.IsSucceed(result))
         }
 
         override fun expectEndOfInput() {
-            emptyMatch = true
             inspectors.add(Inspector.IsEndOfInput)
         }
 
@@ -599,13 +589,12 @@ abstract class AbstractParseTest {
         override fun expectMatch(config: CompiledParserFixture.() -> Unit) {
             val fixture = DefaultCompiledParserFixture()
             fixture.config()
-            inspectors.add(Inspector.IsMatchInput(fixture.choices().first()))
+            inspectors.add(Inspector.IsMatchInput(fixture.inspector()))
         }
 
         override fun expectNot(config: CompiledParserFixture.() -> Unit) {
             val fixture = DefaultCompiledParserFixture()
             fixture.config()
-            emptyMatch = true
             inspectors.add(Inspector.IsNot(fixture.choices().first()))
         }
 
@@ -624,11 +613,10 @@ abstract class AbstractParseTest {
         override fun expectOneOrMore(config: CompiledParserFixture.() -> Unit) {
             val fixture = DefaultCompiledParserFixture()
             fixture.config()
-            inspectors.add(Inspector.IsOneOrMore(fixture.choices().first()))
+            inspectors.add(Inspector.IsOneOrMore(fixture.inspector()))
         }
 
         override fun expectZero() {
-            emptyMatch = true
             inspectors.add(Inspector.IsZero)
         }
 

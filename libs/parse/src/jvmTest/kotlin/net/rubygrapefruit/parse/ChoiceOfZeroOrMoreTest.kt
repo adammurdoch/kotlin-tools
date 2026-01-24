@@ -15,7 +15,6 @@ class ChoiceOfZeroOrMoreTest : AbstractParseTest() {
         )
 
         parser.expecting {
-            emptyMatch()
             expectChoice {
                 expectOneOrMore {
                     expectLiteral(0x1, result = 1)
@@ -62,7 +61,6 @@ class ChoiceOfZeroOrMoreTest : AbstractParseTest() {
         )
 
         parser.expecting {
-            emptyMatch()
             expectChoice {
                 expectZeroOrMoreSingleInput(0x1, 0x2)
                 expectZeroOrMoreSingleInput(0x10, 0x11)
@@ -110,7 +108,6 @@ class ChoiceOfZeroOrMoreTest : AbstractParseTest() {
         )
 
         parser.expecting {
-            emptyMatch()
             expectChoice {
                 expectLiteral(0x10, 0x11, result = bytes(0x10, 0x11))
                 expectLiteral(0x12, result = bytes(0x12))

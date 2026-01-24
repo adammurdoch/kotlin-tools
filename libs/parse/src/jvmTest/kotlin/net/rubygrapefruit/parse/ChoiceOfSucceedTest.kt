@@ -14,7 +14,6 @@ class ChoiceOfSucceedTest : AbstractParseTest() {
         )
 
         parser.expecting {
-            emptyMatch()
             expectChoice {
                 expectLiteral("ab", result = 1)
                 expectSucceed(result = 2)
@@ -55,7 +54,6 @@ class ChoiceOfSucceedTest : AbstractParseTest() {
         )
 
         parser.expecting {
-            emptyMatch()
             expectChoice {
                 expectSucceed(result = 2)
                 expectLiteral("ab", result = 1)

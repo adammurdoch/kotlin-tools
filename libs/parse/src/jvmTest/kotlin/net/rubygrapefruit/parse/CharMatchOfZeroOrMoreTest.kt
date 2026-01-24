@@ -12,7 +12,6 @@ class CharMatchOfZeroOrMoreTest : AbstractParseTest() {
         val parser = match(zeroOrMore(literal("12", 1)))
 
         parser.expecting {
-            emptyMatch()
             expectMatch {
                 expectChoice {
                     expectOneOrMore {
@@ -48,7 +47,6 @@ class CharMatchOfZeroOrMoreTest : AbstractParseTest() {
         val parser = match(zeroOrMore(oneOf('1', '2')))
 
         parser.expecting {
-            emptyMatch()
             expectMatch {
                 expectZeroOrMoreSingleInput("1", "2")
             }

@@ -9,7 +9,6 @@ class SucceedTest : AbstractParseTest() {
         val parser = succeed()
 
         parser.expecting {
-            emptyMatch()
             expectSucceed()
         }
 
@@ -29,7 +28,6 @@ class SucceedTest : AbstractParseTest() {
         val parser = succeed(1)
 
         parser.expecting {
-            emptyMatch()
             expectSucceed(result = 1)
         }
 

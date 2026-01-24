@@ -16,7 +16,6 @@ class SequenceOfNotParserTest : AbstractParseTest() {
         )
 
         parser.expecting {
-            emptyMatch()
             expectSequence {
                 expectNot {
                     expectLiteral(0x1)
@@ -66,7 +65,6 @@ class SequenceOfNotParserTest : AbstractParseTest() {
         )
 
         parser.expecting {
-            emptyMatch()
             expectSequence {
                 expectNot {
                     expectLiteral(0x1, 0x2)
@@ -126,7 +124,6 @@ class SequenceOfNotParserTest : AbstractParseTest() {
         )
 
         parser.expecting {
-            emptyMatch()
             expectSequence {
                 expectNot {
                     expectOneOf(0x1, 0x2)

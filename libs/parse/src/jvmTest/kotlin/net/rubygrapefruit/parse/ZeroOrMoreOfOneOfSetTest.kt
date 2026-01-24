@@ -5,7 +5,7 @@ import net.rubygrapefruit.parse.combinators.zeroOrMore
 import net.rubygrapefruit.parse.text.oneOf
 import kotlin.test.Test
 
-class ZeroOrMoreOfSingleInputTest : AbstractParseTest() {
+class ZeroOrMoreOfOneOfSetTest : AbstractParseTest() {
     @Test
     fun `matches zero or more of one of char`() {
         val parser = zeroOrMore(

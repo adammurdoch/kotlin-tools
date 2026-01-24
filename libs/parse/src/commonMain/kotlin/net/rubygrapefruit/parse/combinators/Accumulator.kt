@@ -26,20 +26,20 @@ internal class UnitAccumulator(override val length: Int) : Accumulator<Unit, Uni
 
 internal interface ListAccumulator<T> : Accumulator<T, List<T>> {
     fun collectInto(list: MutableList<T>)
-}
 
-internal class Empty<T> : ListAccumulator<T> {
-    override val length: Int
-        get() = 0
+    class Empty<T> : ListAccumulator<T> {
+        override val length: Int
+            get() = 0
 
-    override val value: List<T>
-        get() = emptyList()
+        override val value: List<T>
+            get() = emptyList()
 
-    override fun collectInto(list: MutableList<T>) {
-    }
+        override fun collectInto(list: MutableList<T>) {
+        }
 
-    override fun add(item: T, length: Int): ListAccumulator<T> {
-        return ListItem(length, item, this)
+        override fun add(item: T, length: Int): ListAccumulator<T> {
+            return ListItem(length, item, this)
+        }
     }
 }
 

@@ -2,22 +2,26 @@ package net.rubygrapefruit.parse.combinators
 
 import net.rubygrapefruit.parse.*
 
-internal class ZeroOrMoreSingleInputParser<IN : BoxingInput<*, OUT>, OUT>(private val parser: SingleInputParser<IN>) : CompiledParser<IN, List<OUT>> {
+internal class ZeroOrMoreSingleInputCompiledParser<IN : Input<*>, OUT>(
+    private val parser: SingleInputParser<IN>,
+    private val accumulator: RangeAccumulator<IN, OUT>
+) : CompiledParser<IN, OUT> {
     override val mayNotAdvanceOnMatch: Boolean
         get() = true
 
     override val expectation: Expectation
         get() = parser.expectation
 
-    override fun <NEXT> start(next: ParseContinuation<IN, List<OUT>, NEXT>): PullParser<IN, NEXT> {
-        return ZeroOrMorePullParser(parser, next)
+    override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
+        return ZeroOrMorePullParser(parser, accumulator, next)
     }
 
-    private class ZeroOrMorePullParser<IN : BoxingInput<*, OUT>, OUT, NEXT>(
+    private class ZeroOrMorePullParser<IN : Input<*>, OUT, NEXT>(
         val parser: SingleInputParser<IN>,
-        val next: ParseContinuation<IN, List<OUT>, NEXT>
+        private var accumulator: RangeAccumulator<IN, OUT>,
+        val next: ParseContinuation<IN, OUT, NEXT>
     ) : PullParser<IN, NEXT> {
-        private val result = mutableListOf<OUT>()
+        private var matched = 0
 
         override val expectation: Expectation
             get() = Expectation.OneOf.of(parser.expectation, next.expectation)
@@ -32,11 +36,14 @@ internal class ZeroOrMoreSingleInputParser<IN : BoxingInput<*, OUT>, OUT>(privat
                 if (!parser.match(input, index)) {
                     break
                 }
-                result.add(input.getBoxed(index))
                 index++
             }
+            if (index > 0) {
+                matched += index
+                accumulator = accumulator.extract(input, 0, index)
+            }
             return if (index < max || index == input.available && input.finished) {
-                val nextParser = MergeExpectationsPullParser(next.next(result.size, result), expectation)
+                val nextParser = MergeExpectationsPullParser(next.next(matched, accumulator.value), expectation)
                 PullParser.RequireMore(index, nextParser)
             } else {
                 PullParser.RequireMore(index, this)

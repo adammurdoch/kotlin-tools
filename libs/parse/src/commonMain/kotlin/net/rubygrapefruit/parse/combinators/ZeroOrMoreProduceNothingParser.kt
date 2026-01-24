@@ -4,6 +4,7 @@ import net.rubygrapefruit.parse.CombinatorBuilder
 import net.rubygrapefruit.parse.CompiledParser
 import net.rubygrapefruit.parse.Input
 import net.rubygrapefruit.parse.Parser
+import net.rubygrapefruit.parse.combinators.ZeroOrMoreParser.Companion.of
 
 internal class ZeroOrMoreProduceNothingParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, Unit>, CombinatorBuilder<Unit> {
     override fun withNoResult(): CombinatorBuilder<Unit> {
@@ -11,7 +12,12 @@ internal class ZeroOrMoreProduceNothingParser<IN>(private val parser: Parser<IN,
     }
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, Unit> {
-        val option = compiler.compile(parser)
-        return ZeroOrMoreParser.of(option, UnitAccumulator.Empty)
+        val singleValueOption = compiler.compileToSingleValueParser(parser)
+        return if (singleValueOption != null) {
+            ZeroOrMoreSingleInputCompiledParser(singleValueOption, UnitRangeAccumulator)
+        } else {
+            val option = compiler.compile(parser)
+            of(option, UnitAccumulator.Empty)
+        }
     }
 }

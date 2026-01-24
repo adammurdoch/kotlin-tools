@@ -478,7 +478,7 @@ abstract class AbstractParseTest {
                 get() = true
 
             override fun inspect(parser: CompiledParser<*, *>) {
-                assertIs<ZeroOrMoreSingleInputParser<*, *>>(parser)
+                assertIs<ZeroOrMoreSingleInputCompiledParser<*, *>>(parser)
             }
         }
 

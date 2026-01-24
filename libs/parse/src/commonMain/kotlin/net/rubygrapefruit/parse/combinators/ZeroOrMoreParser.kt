@@ -10,10 +10,10 @@ internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : 
     override fun compile(compiler: CombinatorBuilder.Compiler<BoxingInput<*, OUT>>): CompiledParser<BoxingInput<*, OUT>, List<OUT>> {
         val singleValueOption = compiler.compileToSingleValueParser(parser)
         return if (singleValueOption != null) {
-            ZeroOrMoreSingleInputParser(singleValueOption)
+            ZeroOrMoreSingleInputCompiledParser(singleValueOption, ListRangeAccumulator.Empty())
         } else {
             val option = compiler.compile(parser)
-            of(option, Empty())
+            of(option, ListAccumulator.Empty())
         }
     }
 

@@ -3,14 +3,14 @@ package net.rubygrapefruit.parse.combinators
 import net.rubygrapefruit.parse.BoxingInput
 
 /**
- * Extracts a value from an input.
+ * Extracts a value from the next input value.
  */
 internal interface Extractor<in IN, out OUT> {
     fun extract(input: IN): OUT
 }
 
-internal object UnitExtractor : Extractor<Any?, Unit> {
-    override fun extract(input: Any?) {
+internal object UnitExtractor : Extractor<Any, Unit> {
+    override fun extract(input: Any) {
     }
 }
 

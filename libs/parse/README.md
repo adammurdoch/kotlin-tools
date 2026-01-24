@@ -66,4 +66,4 @@ Parsers that combine other parsers
   - Stops if the parser matches zero input values
   - zeroOrMore(unitParser) - produces nothing
 - not(parser) - matches zero input values, produces nothing
-- discard(parser) - produces nothing
+- discard(parser) - creates a unitParser, produces nothing

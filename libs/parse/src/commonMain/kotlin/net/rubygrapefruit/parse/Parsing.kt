@@ -73,6 +73,11 @@ private class DefaultCompiler<IN : Input<*>> : CombinatorBuilder.Compiler<IN> {
                 SingleInputCompiledParser(parser as SingleInputParser<IN>, UnitExtractor)
             }
 
+            is TypedInputCombinatorBuilder<*, *> -> {
+                @Suppress("UNCHECKED_CAST")
+                (parser as TypedInputCombinatorBuilder<IN, *>).withNoResult().compile(this)
+            }
+
             is CombinatorBuilder<*> -> {
                 @Suppress("UNCHECKED_CAST")
                 (parser as CombinatorBuilder<*>).withNoResult().compile(this)

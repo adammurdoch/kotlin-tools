@@ -11,7 +11,6 @@ internal interface Extractor<in IN, out OUT> {
 
 internal object UnitExtractor : Extractor<Any?, Unit> {
     override fun extract(input: Any?) {
-        return Unit
     }
 }
 

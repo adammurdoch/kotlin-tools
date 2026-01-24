@@ -3,6 +3,10 @@ package net.rubygrapefruit.parse.combinators
 import net.rubygrapefruit.parse.*
 
 internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : Parser<IN, List<OUT>>, TypedInputCombinatorBuilder<BoxingInput<*, OUT>, List<OUT>> {
+    override fun withNoResult(): CombinatorBuilder<Unit> {
+        return ZeroOrMoreProduceNothingParser(DiscardParser(parser))
+    }
+
     override fun compile(compiler: CombinatorBuilder.Compiler<BoxingInput<*, OUT>>): CompiledParser<BoxingInput<*, OUT>, List<OUT>> {
         val singleValueOption = compiler.compileToSingleValueParser(parser)
         return if (singleValueOption != null) {

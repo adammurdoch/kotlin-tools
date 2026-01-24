@@ -1,5 +1,12 @@
 package net.rubygrapefruit.parse
 
-internal interface CombinatorSingleInputBuilder<in IN> {
-    fun maybeAsSingleInputParser(): SingleInputParser<IN>?
+/**
+ * A parser that may be converted to a [SingleInputParser].
+ */
+internal interface CombinatorSingleInputBuilder {
+    fun <IN> maybeAsSingleInputParser(compiler: Compiler<IN>): SingleInputParser<IN>?
+
+    interface Compiler<IN> {
+        fun maybeAsSingleInputParser(parser: Parser<*, *>): SingleInputParser<IN>?
+    }
 }

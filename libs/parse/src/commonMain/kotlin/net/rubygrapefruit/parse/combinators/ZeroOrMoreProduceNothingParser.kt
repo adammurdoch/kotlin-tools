@@ -12,7 +12,7 @@ internal class ZeroOrMoreProduceNothingParser<IN>(private val parser: Parser<IN,
     }
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, Unit> {
-        val singleValueOption = compiler.compileToSingleValueParser(parser)
+        val singleValueOption = compiler.maybeAsSingleInputParser(parser)
         return if (singleValueOption != null) {
             ZeroOrMoreSingleInputCompiledParser(singleValueOption, UnitRangeAccumulator)
         } else {

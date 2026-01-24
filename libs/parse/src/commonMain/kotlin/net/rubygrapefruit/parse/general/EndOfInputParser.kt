@@ -3,6 +3,10 @@ package net.rubygrapefruit.parse.general
 import net.rubygrapefruit.parse.*
 
 internal class EndOfInputParser<IN> : Parser<IN, Unit>, CombinatorBuilder<Unit> {
+    override fun withNoResult(): CombinatorBuilder<Unit> {
+        TODO("Not yet implemented")
+    }
+
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, Unit> {
         return EndOfInputCompiledParser()
     }
@@ -37,6 +41,9 @@ internal class EndOfInputParser<IN> : Parser<IN, Unit>, CombinatorBuilder<Unit> 
     }
 }
 
+/**
+ * Returns a parser that matches the end of input. Does not consume any input or produce a result
+ */
 fun <IN> endOfInput(): Parser<IN, Unit> {
     return EndOfInputParser()
 }

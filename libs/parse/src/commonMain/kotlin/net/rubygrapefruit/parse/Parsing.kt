@@ -42,6 +42,7 @@ internal fun <IN : Input<*>, OUT> Parser<*, OUT>.compile(): CompiledParser<IN, O
 
 private class DefaultCompiler<IN : Input<*>> : CombinatorBuilder.Compiler<IN> {
     private val compiledParsers = mutableMapOf<Parser<*, *>, CompiledParser<IN, *>>()
+    private val compiledNoResultParsers = mutableMapOf<Parser<*, *>, CompiledParser<IN, *>>()
 
     override fun <OUT> compileToSingleValueParser(parser: Parser<*, OUT>): SingleInputParser<IN, OUT>? {
         return if (parser is SingleInputParser<*, *>) {
@@ -49,6 +50,28 @@ private class DefaultCompiler<IN : Input<*>> : CombinatorBuilder.Compiler<IN> {
             parser as SingleInputParser<IN, OUT>
         } else {
             null
+        }
+    }
+
+    override fun compileWithNoResult(parser: Parser<*, *>): CompiledParser<IN, Unit> {
+        val compiled = compiledNoResultParsers.getOrPut(parser) { doCompileNoResult(parser) }
+        @Suppress("UNCHECKED_CAST")
+        return compiled as CompiledParser<IN, Unit>
+    }
+
+    private fun doCompileNoResult(parser: Parser<*, *>): CompiledParser<IN, Unit> {
+        return when (parser) {
+            is ParserBuilder<*, *> -> {
+                @Suppress("UNCHECKED_CAST")
+                ParserBuilderAdaptor((parser as ParserBuilder<IN, *>).withNoResult())
+            }
+
+            is CombinatorBuilder<*> -> {
+                @Suppress("UNCHECKED_CAST")
+                (parser as CombinatorBuilder<*>).withNoResult().compile(this)
+            }
+
+            else -> throw IllegalArgumentException("Cannot compile parser $parser with unexpected type")
         }
     }
 
@@ -81,18 +104,6 @@ private class DefaultCompiler<IN : Input<*>> : CombinatorBuilder.Compiler<IN> {
             }
 
             else -> throw IllegalArgumentException("Cannot compile parser $parser with unexpected type")
-        }
-    }
-
-    private class ParserBuilderAdaptor<IN, OUT>(val parser: ParserBuilder<IN, OUT>) : CompiledParser<IN, OUT> {
-        override val mayNotAdvanceOnMatch: Boolean
-            get() = false
-
-        override val expectation: Expectation
-            get() = parser.expectation
-
-        override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
-            return parser.start(next)
         }
     }
 }

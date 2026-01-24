@@ -2,11 +2,15 @@ package net.rubygrapefruit.parse.text
 
 import net.rubygrapefruit.parse.*
 
-internal class CharLiteralParser<OUT>(private val text: String, private val result: OUT) : Parser<CharInput, OUT>, ParserBuilder<CharStream, OUT> {
+internal class CharLiteralParser<OUT>(private val text: String, val result: OUT) : Parser<CharInput, OUT>, ParserBuilder<CharStream, OUT> {
     override val expectation = Expectation.One(format(text))
 
+    override fun withNoResult(): ParserBuilder<CharStream, Unit> {
+        return CharLiteralParser(text, Unit)
+    }
+
     override fun <NEXT> start(next: ParseContinuation<CharStream, OUT, NEXT>): PullParser<CharStream, NEXT> {
-        return CharLiteralPullParser(text, result, this@CharLiteralParser.expectation, next)
+        return CharLiteralPullParser(text, result, expectation, next)
     }
 
     private class CharLiteralPullParser<OUT, NEXT>(

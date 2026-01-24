@@ -308,7 +308,11 @@ abstract class AbstractParseTest {
 
         fun expectLiteral(text: String)
 
+        fun expectLiteralNoResult(text: String)
+
         fun expectLiteral(byte: Byte)
+
+        fun expectLiteralNoResult(byte: Byte)
 
         fun expectIsChoice(count: Int)
 
@@ -355,6 +359,22 @@ abstract class AbstractParseTest {
                 assertIs<ZeroOrMoreSingleInputParser<*, *>>(parser)
             }
         }
+
+        data object IsCharLiteralNoResult: Inspector {
+            override fun inspect(parser: CompiledParser<*, *>) {
+                assertIs<ParserBuilderAdaptor<*, *>>(parser)
+                assertIs<CharLiteralParser<*>>(parser.parser)
+                assertEquals(Unit, parser.parser.result)
+            }
+        }
+
+        data object IsByteLiteralNoResult: Inspector {
+            override fun inspect(parser: CompiledParser<*, *>) {
+                assertIs<ParserBuilderAdaptor<*, *>>(parser)
+                assertIs<ByteLiteralParser<*>>(parser.parser)
+                assertEquals(Unit, parser.parser.result)
+            }
+        }
     }
 
     private class DefaultCompiledParserFixture : CompiledParserFixture {
@@ -374,8 +394,18 @@ abstract class AbstractParseTest {
             expected.expectLiteral(text)
         }
 
+        override fun expectLiteralNoResult(text: String) {
+            expectLiteral(text)
+            inspector = Inspector.IsCharLiteralNoResult
+        }
+
         override fun expectLiteral(byte: Byte) {
             expected.expectLiteral(byte)
+        }
+
+        override fun expectLiteralNoResult(byte: Byte) {
+            expectLiteral(byte)
+            inspector = Inspector.IsByteLiteralNoResult
         }
 
         override fun expectIsChoice(count: Int) {

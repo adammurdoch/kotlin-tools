@@ -1,7 +1,13 @@
 package net.rubygrapefruit.parse
 
+import net.rubygrapefruit.parse.combinators.DiscardParser
+
 internal class DiagnosticParser<IN, OUT> private constructor(private val parser: Parser<IN, OUT>, private val logger: Logger) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
     constructor(parser: Parser<IN, OUT>, log: Boolean) : this(parser, if (log) Logger.Active(0) else Logger.Disabled)
+
+    override fun withNoResult(): CombinatorBuilder<Unit> {
+        return DiscardParser(parser)
+    }
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, OUT> {
         val parser = if (parser is CombinatorBuilder<*>) {
@@ -16,6 +22,10 @@ internal class DiagnosticParser<IN, OUT> private constructor(private val parser:
     private class DiagnosticCompiler<IN>(private val compiler: CombinatorBuilder.Compiler<IN>, private val logger: Logger) : CombinatorBuilder.Compiler<IN> {
         override fun <OUT> compile(parser: Parser<*, OUT>): CompiledParser<IN, OUT> {
             return compiler.compile(DiagnosticParser(parser, logger))
+        }
+
+        override fun compileWithNoResult(parser: Parser<*, *>): CompiledParser<IN, Unit> {
+            return compiler.compileWithNoResult(DiagnosticParser(parser, logger))
         }
 
         override fun <OUT> compileToSingleValueParser(parser: Parser<*, OUT>): SingleInputParser<IN, OUT>? {

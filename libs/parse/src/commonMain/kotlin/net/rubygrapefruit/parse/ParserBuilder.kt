@@ -1,7 +1,8 @@
 package net.rubygrapefruit.parse
 
 /**
- * A simplified variant of [CombinatorBuilder]. Parsers must always match at least one value.
+ * A simplified variant of [CombinatorBuilder] that has no compilation step.
+ * Parsers must always match at least one value.
  */
 internal interface ParserBuilder<IN, OUT> {
     /**
@@ -9,5 +10,13 @@ internal interface ParserBuilder<IN, OUT> {
      */
     val expectation: Expectation
 
+    /**
+     * Creates a copy of this parser that produces no result.
+     */
+    fun withNoResult(): ParserBuilder<IN, Unit>
+
+    /**
+     * Starts parsing.
+     */
     fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT>
 }

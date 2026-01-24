@@ -11,8 +11,12 @@ class ZeroOrMoreProduceNothingTest : AbstractParseTest() {
 
         parser.expecting {
             emptyMatch()
-            expectLiteral("ab")
-            expectIsChoice(2)
+            expectChoice {
+                expectOneOrMore {
+                    expectLiteral("ab")
+                }
+                expectZero()
+            }
         }
 
         parser.matches("")

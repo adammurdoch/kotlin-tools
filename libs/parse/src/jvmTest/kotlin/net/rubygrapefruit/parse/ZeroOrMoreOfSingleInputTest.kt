@@ -14,9 +14,7 @@ class ZeroOrMoreOfSingleInputTest : AbstractParseTest() {
 
         parser.expecting {
             emptyMatch()
-            expectLiteral("a")
-            expectLiteral("b")
-            expectIsZeroOrMoreSingleInput()
+            expectZeroOrMoreSingleInput("a", "b")
         }
 
         parser.matches("", expected = emptyList())
@@ -46,9 +44,7 @@ class ZeroOrMoreOfSingleInputTest : AbstractParseTest() {
 
         parser.expecting {
             emptyMatch()
-            expectLiteral(0x1)
-            expectLiteral(0x2)
-            expectIsZeroOrMoreSingleInput()
+            expectZeroOrMoreSingleInput(0x1, 0x2)
         }
 
         parser.matches(expected = emptyList())

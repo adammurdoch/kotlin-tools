@@ -17,7 +17,7 @@ internal class SucceedParser<IN, OUT>(private val result: OUT) : Parser<IN, OUT>
         }
     }
 
-    private class SucceedCompiledParser<IN, OUT>(
+    internal class SucceedCompiledParser<IN, OUT>(
         val result: OUT
     ) : CompiledParser<IN, OUT> {
         override val mayNotAdvanceOnMatch: Boolean

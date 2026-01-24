@@ -17,11 +17,26 @@ class CharMatchOfSequenceTest : AbstractParseTest() {
         )
 
         parser.expecting {
-            expectLiteral("12")
+            expectMatch {
+                expectSequence {
+                    expectLiteral("12")
+                    expectOneOf('3', '!')
+                }
+            }
         }
 
         parser.matches("123", expected = "123")
         parser.matches("12!", expected = "12!")
+
+        // missing
+        parser.doesNotMatch("") {
+            expectLiteral("12")
+        }
+        parser.doesNotMatch("12") {
+            failAt(2)
+            expectLiteral("!")
+            expectLiteral("3")
+        }
 
         // extra
         parser.doesNotMatch("123!") {

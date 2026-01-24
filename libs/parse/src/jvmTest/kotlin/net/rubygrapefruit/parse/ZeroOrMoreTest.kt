@@ -1,7 +1,7 @@
 package net.rubygrapefruit.parse
 
-import net.rubygrapefruit.parse.text.literal
 import net.rubygrapefruit.parse.combinators.zeroOrMore
+import net.rubygrapefruit.parse.text.literal
 import kotlin.test.Test
 
 class ZeroOrMoreTest : AbstractParseTest() {
@@ -11,8 +11,12 @@ class ZeroOrMoreTest : AbstractParseTest() {
 
         parser.expecting {
             emptyMatch()
-            expectLiteral("abc")
-            expectIsChoice(2)
+            expectChoice {
+                expectOneOrMore {
+                    expectLiteral("abc", result = 1)
+                }
+                expectZero()
+            }
         }
 
         parser.matches("", expected = emptyList())

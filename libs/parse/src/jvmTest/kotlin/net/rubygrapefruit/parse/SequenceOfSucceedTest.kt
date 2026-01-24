@@ -1,17 +1,21 @@
 package net.rubygrapefruit.parse
 
-import net.rubygrapefruit.parse.text.literal
 import net.rubygrapefruit.parse.combinators.sequence
 import net.rubygrapefruit.parse.general.succeed
+import net.rubygrapefruit.parse.text.literal
 import kotlin.test.Test
 
 class SequenceOfSucceedTest : AbstractParseTest() {
     @Test
     fun `matches succeed then succeed`() {
-        val parser = sequence(succeed(1), succeed(2)) { a, b -> listOf(a,b) }
+        val parser = sequence(succeed(1), succeed(2)) { a, b -> listOf(a, b) }
 
         parser.expecting {
             emptyMatch()
+            expectSequence {
+                expectSucceed(result = 1)
+                expectSucceed(result = 2)
+            }
         }
 
         parser.matches("", expected = listOf(1, 2))
@@ -24,10 +28,13 @@ class SequenceOfSucceedTest : AbstractParseTest() {
 
     @Test
     fun `matches succeed then literal`() {
-        val parser = sequence(succeed(1), literal("ab", 2)) { a, b -> listOf(a,b) }
+        val parser = sequence(succeed(1), literal("ab", 2)) { a, b -> listOf(a, b) }
 
         parser.expecting {
-            expectLiteral("ab")
+            expectSequence {
+                expectSucceed(result = 1)
+                expectLiteral("ab", result = 2)
+            }
         }
 
         parser.matches("ab", expected = listOf(1, 2))
@@ -51,10 +58,13 @@ class SequenceOfSucceedTest : AbstractParseTest() {
 
     @Test
     fun `matches literal then succeed`() {
-        val parser = sequence(literal("ab", 1), succeed(2)) { a, b -> listOf(a,b) }
+        val parser = sequence(literal("ab", 1), succeed(2)) { a, b -> listOf(a, b) }
 
         parser.expecting {
-            expectLiteral("ab")
+            expectSequence {
+                expectLiteral("ab", result = 1)
+                expectSucceed(result = 2)
+            }
         }
 
         parser.matches("ab", expected = listOf(1, 2))

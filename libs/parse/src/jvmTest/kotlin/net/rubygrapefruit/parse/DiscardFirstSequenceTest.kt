@@ -10,7 +10,10 @@ class DiscardFirstSequenceTest : AbstractParseTest() {
         val parser = sequence(literal("a"), literal("b", 2))
 
         parser.expecting {
-            expectLiteral("a")
+            expectSequence {
+                expectLiteral("a")
+                expectLiteral("b", result = 2)
+            }
         }
 
         parser.matches("ab", expected = 2)

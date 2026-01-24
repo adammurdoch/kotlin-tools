@@ -1,13 +1,13 @@
 package net.rubygrapefruit.parse
 
 import net.rubygrapefruit.parse.binary.*
-import net.rubygrapefruit.parse.combinators.ChoiceParser
-import net.rubygrapefruit.parse.combinators.ZeroOrMoreSingleInputParser
+import net.rubygrapefruit.parse.combinators.*
+import net.rubygrapefruit.parse.general.EndOfInputParser
+import net.rubygrapefruit.parse.general.MatchedInputParser
+import net.rubygrapefruit.parse.general.SingleInputCompiledParser
+import net.rubygrapefruit.parse.general.SucceedParser
 import net.rubygrapefruit.parse.text.*
-import kotlin.test.assertEquals
-import kotlin.test.assertIs
-import kotlin.test.assertSame
-import kotlin.test.fail
+import kotlin.test.*
 
 abstract class AbstractParseTest {
     fun Parser<CharInput, Unit>.matches(input: String) {
@@ -239,7 +239,7 @@ abstract class AbstractParseTest {
         assertEquals(fixture.emptyMatch, mayNotAdvanceOnMatch)
         assertEquals(fixture.message(), expectation.format())
 
-        fixture.inspector.inspect(this)
+        fixture.inspect(this)
 
         val pullParser = start()
         pullParser.expecting(fixture)
@@ -306,17 +306,33 @@ abstract class AbstractParseTest {
 
         fun expect(text: String)
 
-        fun expectLiteral(text: String)
+        fun expectSucceed(result: Any = Unit)
 
-        fun expectLiteralNoResult(text: String)
+        fun expectEndOfInput()
 
-        fun expectLiteral(byte: Byte)
+        fun expectLiteral(text: String, result: Any = Unit)
 
-        fun expectLiteralNoResult(byte: Byte)
+        fun expectLiteral(vararg bytes: Byte, result: Any = Unit)
 
-        fun expectIsChoice(count: Int)
+        fun expectOneOf(vararg chars: Char)
 
-        fun expectIsZeroOrMoreSingleInput()
+        fun expectOneOf(vararg bytes: Byte)
+
+        fun expectMatch(config: CompiledParserFixture.() -> Unit)
+
+        fun expectNot(config: CompiledParserFixture.() -> Unit)
+
+        fun expectChoice(config: CompiledParserFixture.() -> Unit)
+
+        fun expectSequence(config: CompiledParserFixture.() -> Unit)
+
+        fun expectOneOrMore(config: CompiledParserFixture.() -> Unit)
+
+        fun expectZero()
+
+        fun expectZeroOrMoreSingleInput(vararg literals: String)
+
+        fun expectZeroOrMoreSingleInput(vararg literals: Byte)
     }
 
     private class HasExpectation {
@@ -335,88 +351,306 @@ abstract class AbstractParseTest {
         }
 
         fun message(): String {
-            return "Expected ${expect.joinToString(", ")}"
+            return "Expected ${expect.sorted().joinToString(", ")}"
         }
     }
 
     private sealed interface Inspector {
+        val expected: List<String>
+
+        val mayBeEmpty: Boolean
+            get() = false
+
         fun inspect(parser: CompiledParser<*, *>)
 
-        data object AcceptAnything : Inspector {
+        data class IsSucceed(val result: Any) : Inspector {
+            override val expected: List<String>
+                get() = emptyList()
+
+            override val mayBeEmpty: Boolean
+                get() = true
+
             override fun inspect(parser: CompiledParser<*, *>) {
+                assertIs<SucceedParser.SucceedCompiledParser<*, *>>(parser)
+                assertEquals(result, parser.result)
             }
         }
 
-        class IsChoice(val count: Int) : Inspector {
+        data object IsEndOfInput : Inspector {
+            override val expected: List<String>
+                get() = listOf("end of input")
+
+            override val mayBeEmpty: Boolean
+                get() = true
+
+            override fun inspect(parser: CompiledParser<*, *>) {
+                assertIs<EndOfInputParser.EndOfInputCompiledParser<*>>(parser)
+            }
+        }
+
+        class IsMatchInput(val inspector: Inspector) : Inspector {
+            override val expected: List<String>
+                get() = inspector.expected
+
+            override val mayBeEmpty: Boolean
+                get() = inspector.mayBeEmpty
+
+            override fun inspect(parser: CompiledParser<*, *>) {
+                assertIs<MatchedInputParser.MatchedInputCompiledParser<*>>(parser)
+                inspector.inspect(parser.parser)
+            }
+        }
+
+        class IsNot(val inspector: Inspector) : Inspector {
+            override val expected: List<String>
+                get() = emptyList()
+
+            override val mayBeEmpty: Boolean
+                get() = true
+
+            override fun inspect(parser: CompiledParser<*, *>) {
+                assertIs<NotParser.NotCompiledParser<*>>(parser)
+                inspector.inspect(parser.parser)
+            }
+        }
+
+        class IsChoice(val choices: List<Inspector>) : Inspector {
+            override val expected: List<String>
+                get() = choices.flatMap { it.expected }
+
+            override val mayBeEmpty: Boolean
+                get() = choices.any { it.mayBeEmpty }
+
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<ChoiceParser.ChoiceCompiledParser<*, *>>(parser)
-                assertEquals(count, parser.parsers.size)
+                assertEquals(choices.size, parser.parsers.size)
+                for (index in choices.indices) {
+                    choices[index].inspect(parser.parsers[index])
+                }
             }
         }
 
-        data object IsZeroOrMoreSingleInput : Inspector {
+        class IsSequence(val a: Inspector, val b: Inspector) : Inspector {
+            override val expected: List<String>
+                get() = if (a.mayBeEmpty) a.expected + b.expected else a.expected
+
+            override val mayBeEmpty: Boolean
+                get() = a.mayBeEmpty && b.mayBeEmpty
+
+            override fun inspect(parser: CompiledParser<*, *>) {
+                assertIs<Sequence2Parser.Sequence2CompiledParser<*, *, *, *>>(parser)
+                a.inspect(parser.a)
+                b.inspect(parser.b)
+            }
+        }
+
+        class IsOneOrMore(val inspector: Inspector) : Inspector {
+            override val expected: List<String>
+                get() = inspector.expected
+
+            override val mayBeEmpty: Boolean
+                get() = inspector.mayBeEmpty
+
+            override fun inspect(parser: CompiledParser<*, *>) {
+                assertIs<ZeroOrMoreParser.OptionCompiledParser<*, *, *>>(parser)
+                inspector.inspect(parser.option)
+            }
+        }
+
+        data object IsZero : Inspector {
+            override val expected: List<String>
+                get() = emptyList()
+
+            override val mayBeEmpty: Boolean
+                get() = true
+
+            override fun inspect(parser: CompiledParser<*, *>) {
+                assertIs<ZeroOrMoreParser.EmptyCompiledParser<*, *, *>>(parser)
+            }
+        }
+
+        data class IsZeroOrMoreSingleInput(val expectation: HasExpectation) : Inspector {
+            override val expected: List<String>
+                get() = expectation.expect
+
+            override val mayBeEmpty: Boolean
+                get() = true
+
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<ZeroOrMoreSingleInputParser<*, *>>(parser)
             }
         }
 
-        data object IsCharLiteralNoResult: Inspector {
+        data class IsCharLiteral(val text: String, val result: Any) : Inspector {
+            override val expected: List<String>
+                get() {
+                    val expected = HasExpectation()
+                    expected.expectLiteral(text)
+                    return expected.expect
+                }
+
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<ParserBuilderAdaptor<*, *>>(parser)
                 assertIs<CharLiteralParser<*>>(parser.parser)
-                assertEquals(Unit, parser.parser.result)
+                assertEquals(result, parser.parser.result)
             }
         }
 
-        data object IsByteLiteralNoResult: Inspector {
+        class IsByteLiteral(val bytes: ByteArray, val result: Any) : Inspector {
+            override val expected: List<String>
+                get() {
+                    val expected = HasExpectation()
+                    expected.expectLiteral(bytes.first())
+                    return expected.expect
+                }
+
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<ParserBuilderAdaptor<*, *>>(parser)
                 assertIs<ByteLiteralParser<*>>(parser.parser)
-                assertEquals(Unit, parser.parser.result)
+                assertEquals(result, parser.parser.result)
+            }
+        }
+
+        data class IsOneOfChar(val chars: List<Char>) : Inspector {
+            override val expected: List<String>
+                get() {
+                    val expected = HasExpectation()
+                    for (ch in chars) {
+                        expected.expectLiteral(ch.toString())
+                    }
+                    return expected.expect
+                }
+
+            override fun inspect(parser: CompiledParser<*, *>) {
+                assertIs<SingleInputCompiledParser<*, *>>(parser)
+                assertIs<OneOfCharParser>(parser.parser)
+                assertEquals(chars, parser.parser.chars.toList())
+            }
+        }
+
+        data class IsOneOfByte(val bytes: List<Byte>) : Inspector {
+            override val expected: List<String>
+                get() {
+                    val expected = HasExpectation()
+                    for (b in bytes) {
+                        expected.expectLiteral(b)
+                    }
+                    return expected.expect
+                }
+
+            override fun inspect(parser: CompiledParser<*, *>) {
+                assertIs<SingleInputCompiledParser<*, *>>(parser)
+                assertIs<OneOfByteParser>(parser.parser)
+                assertEquals(bytes, parser.parser.bytes.toList())
             }
         }
     }
 
     private class DefaultCompiledParserFixture : CompiledParserFixture {
-        private val expected = HasExpectation()
         var emptyMatch = false
-        var inspector: Inspector = Inspector.AcceptAnything
+        private val inspectors = mutableListOf<Inspector>()
+
+        fun choices(): List<Inspector> {
+            assertTrue(inspectors.isNotEmpty(), "no expected parsers defined")
+            return inspectors
+        }
+
+        fun inspect(parser: CompiledParser<*, *>) {
+            assertTrue(inspectors.isNotEmpty(), "no expected parsers defined")
+            for (inspector in inspectors) {
+                inspector.inspect(parser)
+            }
+        }
 
         override fun emptyMatch() {
             emptyMatch = true
         }
 
         override fun expect(text: String) {
-            expected.expect(text)
+            TODO()
         }
 
-        override fun expectLiteral(text: String) {
-            expected.expectLiteral(text)
+        override fun expectSucceed(result: Any) {
+            emptyMatch = true
+            inspectors.add(Inspector.IsSucceed(result))
         }
 
-        override fun expectLiteralNoResult(text: String) {
-            expectLiteral(text)
-            inspector = Inspector.IsCharLiteralNoResult
+        override fun expectEndOfInput() {
+            emptyMatch = true
+            inspectors.add(Inspector.IsEndOfInput)
         }
 
-        override fun expectLiteral(byte: Byte) {
-            expected.expectLiteral(byte)
+        override fun expectLiteral(text: String, result: Any) {
+            inspectors.add(Inspector.IsCharLiteral(text, result))
         }
 
-        override fun expectLiteralNoResult(byte: Byte) {
-            expectLiteral(byte)
-            inspector = Inspector.IsByteLiteralNoResult
+        override fun expectLiteral(vararg bytes: Byte, result: Any) {
+            inspectors.add(Inspector.IsByteLiteral(bytes, result))
         }
 
-        override fun expectIsChoice(count: Int) {
-            inspector = Inspector.IsChoice(count)
+        override fun expectOneOf(vararg chars: Char) {
+            inspectors.add(Inspector.IsOneOfChar(chars.toList()))
         }
 
-        override fun expectIsZeroOrMoreSingleInput() {
-            inspector = Inspector.IsZeroOrMoreSingleInput
+        override fun expectOneOf(vararg bytes: Byte) {
+            inspectors.add(Inspector.IsOneOfByte(bytes.toList()))
+        }
+
+        override fun expectMatch(config: CompiledParserFixture.() -> Unit) {
+            val fixture = DefaultCompiledParserFixture()
+            fixture.config()
+            inspectors.add(Inspector.IsMatchInput(fixture.choices().first()))
+        }
+
+        override fun expectNot(config: CompiledParserFixture.() -> Unit) {
+            val fixture = DefaultCompiledParserFixture()
+            fixture.config()
+            emptyMatch = true
+            inspectors.add(Inspector.IsNot(fixture.choices().first()))
+        }
+
+        override fun expectChoice(config: CompiledParserFixture.() -> Unit) {
+            val fixture = DefaultCompiledParserFixture()
+            fixture.config()
+            inspectors.add(Inspector.IsChoice(fixture.choices()))
+        }
+
+        override fun expectSequence(config: CompiledParserFixture.() -> Unit) {
+            val fixture = DefaultCompiledParserFixture()
+            fixture.config()
+            inspectors.add(Inspector.IsSequence(fixture.choices()[0], fixture.choices()[1]))
+        }
+
+        override fun expectOneOrMore(config: CompiledParserFixture.() -> Unit) {
+            val fixture = DefaultCompiledParserFixture()
+            fixture.config()
+            inspectors.add(Inspector.IsOneOrMore(fixture.choices().first()))
+        }
+
+        override fun expectZero() {
+            emptyMatch = true
+            inspectors.add(Inspector.IsZero)
+        }
+
+        override fun expectZeroOrMoreSingleInput(vararg literals: String) {
+            val expected = HasExpectation()
+            for (text in literals) {
+                expected.expectLiteral(text)
+            }
+            inspectors.add(Inspector.IsZeroOrMoreSingleInput(expected))
+        }
+
+        override fun expectZeroOrMoreSingleInput(vararg literals: Byte) {
+            val expected = HasExpectation()
+            for (b in literals) {
+                expected.expectLiteral(b)
+            }
+            inspectors.add(Inspector.IsZeroOrMoreSingleInput(expected))
         }
 
         fun message(): String {
+            val expected = HasExpectation()
+            expected.expect.addAll(inspectors.first().expected)
             return expected.message()
         }
     }

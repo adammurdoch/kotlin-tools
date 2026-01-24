@@ -17,8 +17,12 @@ class SequenceOfNotParserTest : AbstractParseTest() {
 
         parser.expecting {
             emptyMatch()
-            expectLiteral(0x1)
-            expectLiteral(0x2)
+            expectSequence {
+                expectNot {
+                    expectLiteral(0x1)
+                }
+                expectZeroOrMoreSingleInput(0x1, 0x2)
+            }
         }
 
         parser.matches(expected = emptyList())
@@ -63,8 +67,12 @@ class SequenceOfNotParserTest : AbstractParseTest() {
 
         parser.expecting {
             emptyMatch()
-            expectLiteral(0x1)
-            expectLiteral(0x2)
+            expectSequence {
+                expectNot {
+                    expectLiteral(0x1, 0x2)
+                }
+                expectZeroOrMoreSingleInput(0x1, 0x2)
+            }
         }
 
         parser.matches(expected = emptyList())
@@ -119,10 +127,12 @@ class SequenceOfNotParserTest : AbstractParseTest() {
 
         parser.expecting {
             emptyMatch()
-            expectLiteral(0x1)
-            expectLiteral(0x2)
-            expectLiteral(0x3)
-            expectLiteral(0x4)
+            expectSequence {
+                expectNot {
+                    expectOneOf(0x1, 0x2)
+                }
+                expectZeroOrMoreSingleInput(0x1, 0x2, 0x3, 0x4)
+            }
         }
 
         parser.matches(expected = emptyList())

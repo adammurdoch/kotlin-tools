@@ -10,11 +10,14 @@ class ByteMatchTest : AbstractParseTest() {
         val parser = match(literal(byteArrayOf(0x1, 0x2)))
 
         parser.expecting {
-            expectLiteral(0x1)
+            expectMatch {
+                expectLiteral(0x1)
+            }
         }
 
         parser.matches(0x1, 0x2, expected = byteArrayOf(0x1, 0x2))
 
+        // missing
         parser.doesNotMatch {
             expectLiteral(0x1)
         }

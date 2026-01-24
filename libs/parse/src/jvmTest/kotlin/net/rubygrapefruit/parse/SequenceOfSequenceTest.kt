@@ -13,7 +13,16 @@ class SequenceOfSequenceTest : AbstractParseTest() {
         ) { a, b -> a + b }
 
         parser.expecting {
-            expectLiteral("a")
+            expectSequence {
+                expectSequence {
+                    expectLiteral("a", result = 1)
+                    expectLiteral("b", result = 2)
+                }
+                expectSequence {
+                    expectLiteral("c", result = 3)
+                    expectLiteral("d", result = 4)
+                }
+            }
         }
 
         parser.matches("abcd", expected = listOf(1, 2, 3, 4))

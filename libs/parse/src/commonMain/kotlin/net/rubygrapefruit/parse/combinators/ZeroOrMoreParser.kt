@@ -21,9 +21,9 @@ internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : 
         }
     }
 
-    private class OptionCompiledParser<IN, ITEM, OUT>(
+    internal class OptionCompiledParser<IN, ITEM, OUT>(
         val option: CompiledParser<IN, ITEM>,
-        val previous: Accumulator<ITEM, OUT>
+        private val previous: Accumulator<ITEM, OUT>
     ) : CompiledParser<IN, OUT> {
 
         override val mayNotAdvanceOnMatch: Boolean
@@ -46,7 +46,7 @@ internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : 
         }
     }
 
-    private class EmptyCompiledParser<IN, ITEM, OUT>(val result: Accumulator<ITEM, OUT>) : CompiledParser<IN, OUT> {
+    internal class EmptyCompiledParser<IN, ITEM, OUT>(private val result: Accumulator<ITEM, OUT>) : CompiledParser<IN, OUT> {
         override val mayNotAdvanceOnMatch: Boolean
             get() = true
 

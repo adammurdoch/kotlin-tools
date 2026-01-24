@@ -9,8 +9,7 @@ class OneOfCharTest : AbstractParseTest() {
         val parser = oneOf('a', 'b')
 
         parser.expecting {
-            expectLiteral("a")
-            expectLiteral("b")
+            expectOneOf('a', 'b')
         }
 
         parser.matches("a", expected = 'a')

@@ -16,8 +16,20 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
 
         parser.expecting {
             emptyMatch()
-            expectLiteral("abc")
-            expectLiteral("ad")
+            expectSequence {
+                expectChoice {
+                    expectOneOrMore {
+                        expectLiteral("abc", result = 1)
+                    }
+                    expectZero()
+                }
+                expectChoice {
+                    expectOneOrMore {
+                        expectLiteral("ad", result = 2)
+                    }
+                    expectZero()
+                }
+            }
         }
 
         parser.matches("", expected = listOf())
@@ -80,8 +92,15 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
         ) { a, b -> a + b }
 
         parser.expecting {
-            expectLiteral("abc")
-            expectLiteral("ad")
+            expectSequence {
+                expectChoice {
+                    expectOneOrMore {
+                        expectLiteral("abc", result = 1)
+                    }
+                    expectZero()
+                }
+                expectLiteral("ad", result = 2)
+            }
         }
 
         parser.matches("ad", expected = listOf(2))
@@ -141,9 +160,10 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
         ) { a, b -> a + b }
 
         parser.expecting {
-            expectLiteral(".end")
-            expectLiteral("a")
-            expectLiteral("b")
+            expectSequence {
+                expectZeroOrMoreSingleInput("a", "b")
+                expectLiteral(".end", result = listOf('.'))
+            }
         }
 
         parser.matches(".end", expected = listOf('.'))

@@ -14,8 +14,16 @@ class ChoiceOfSequenceTest : AbstractParseTest() {
         )
 
         parser.expecting {
-            expectLiteral("a")
-            expectLiteral("ab")
+            expectChoice {
+                expectSequence {
+                    expectLiteral("ab", result = 1)
+                    expectLiteral("c", result = 2)
+                }
+                expectSequence {
+                    expectLiteral("a", result = 5)
+                    expectLiteral("b", result = 6)
+                }
+            }
         }
 
         parser.matches("abc", expected = listOf(1, 2))

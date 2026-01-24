@@ -11,9 +11,10 @@ class ChoiceTest : AbstractParseTest() {
         val parser = oneOf(literal("abc", 1), literal("12", 2))
 
         parser.expecting {
-            expectLiteral("12")
-            expectLiteral("abc")
-            expectIsChoice(2)
+            expectChoice {
+                expectLiteral("12", result = 1)
+                expectLiteral("abc", result = 2)
+            }
         }
 
         parser.matches("abc", expected = 1)
@@ -51,9 +52,10 @@ class ChoiceTest : AbstractParseTest() {
         val parser = oneOf(literal(byteArrayOf(0x1, 0x2, 0x3), 1), literal(byteArrayOf(0x10, 0x11), 2))
 
         parser.expecting {
-            expectLiteral(0x1)
-            expectLiteral(0x10)
-            expectIsChoice(2)
+            expectChoice {
+                expectLiteral(0x1, 0x2, 0x3, result = 1)
+                expectLiteral(0x10, 0x11, result = 2)
+            }
         }
 
         parser.matches(0x1, 0x2, 0x3, expected = 1)
@@ -81,9 +83,10 @@ class ChoiceTest : AbstractParseTest() {
         val parser = oneOf(literal("abc", 1), literal("abd", 2))
 
         parser.expecting {
-            expectLiteral("abc")
-            expectLiteral("abd")
-            expectIsChoice(2)
+            expectChoice {
+                expectLiteral("abc", result = 1)
+                expectLiteral("abd", result = 2)
+            }
         }
 
         parser.matches("abc", expected = 1)
@@ -100,9 +103,10 @@ class ChoiceTest : AbstractParseTest() {
         val parser = oneOf(literal("abc", 1), literal("ab", 2))
 
         parser.expecting {
-            expectLiteral("ab")
-            expectLiteral("abc")
-            expectIsChoice(2)
+            expectChoice {
+                expectLiteral("ab", result = 1)
+                expectLiteral("abc", result = 2)
+            }
         }
 
         parser.matches("abc", expected = 1)
@@ -138,10 +142,11 @@ class ChoiceTest : AbstractParseTest() {
         )
 
         parser.expecting {
-            expectLiteral("ab")
-            expectLiteral("abc")
-            expectLiteral("ad")
-            expectIsChoice(3)
+            expectChoice {
+                expectLiteral("ab", result = 1)
+                expectLiteral("abc", result = 2)
+                expectLiteral("ad", result = 3)
+            }
         }
 
         parser.matches("abc", expected = 1)

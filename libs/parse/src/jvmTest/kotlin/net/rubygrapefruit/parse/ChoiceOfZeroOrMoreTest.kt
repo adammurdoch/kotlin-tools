@@ -16,16 +16,24 @@ class ChoiceOfZeroOrMoreTest : AbstractParseTest() {
 
         parser.expecting {
             emptyMatch()
-            expectLiteral(0x1)
-            expectLiteral(0x11)
-            expectIsChoice(4) // should discard everything after the second choice
+            expectChoice {
+                expectOneOrMore {
+                    expectLiteral(0x1, result = 1)
+                }
+                expectZero()
+                // should discard everything after the second choice
+                expectOneOrMore {
+                    expectLiteral(0x11, result = 2)
+                }
+                expectZero()
+            }
         }
 
         parser.matches(expected = emptyList())
         parser.matches(0x1, 0x2, expected = listOf(1))
         parser.matches(0x1, 0x2, 0x1, 0x2, expected = listOf(1, 1))
 
-        // second zero or more can never succeed as first zero or more always succeeds
+        // second zero or more can never succeed as first always succeeds
         parser.doesNotMatch(0x11, 0x12) {
             expectEndOfInput()
             expectLiteral(0x1)
@@ -55,18 +63,17 @@ class ChoiceOfZeroOrMoreTest : AbstractParseTest() {
 
         parser.expecting {
             emptyMatch()
-            expectLiteral(0x1)
-            expectLiteral(0x2)
-            expectLiteral(0x10)
-            expectLiteral(0x11)
-            expectIsChoice(2)
+            expectChoice {
+                expectZeroOrMoreSingleInput(0x1, 0x2)
+                expectZeroOrMoreSingleInput(0x10, 0x11)
+            }
         }
 
         parser.matches(expected = emptyList())
         parser.matches(0x1, expected = bytes(0x1))
         parser.matches(0x1, 0x2, 0x1, expected = bytes(0x1, 0x2, 0x1))
 
-        // second zero or more can never succeed as first zero or more always succeeds
+        // second zero or more can never succeed as first always succeeds
         parser.doesNotMatch(0x11) {
             expectEndOfInput()
             expectLiteral(0x1)
@@ -104,11 +111,11 @@ class ChoiceOfZeroOrMoreTest : AbstractParseTest() {
 
         parser.expecting {
             emptyMatch()
-            expectLiteral(0x1)
-            expectLiteral(0x2)
-            expectLiteral(0x10)
-            expectLiteral(0x12)
-            expectIsChoice(3)
+            expectChoice {
+                expectLiteral(0x10, 0x11, result = bytes(0x10, 0x11))
+                expectLiteral(0x12, result = bytes(0x12))
+                expectZeroOrMoreSingleInput(0x1, 0x2)
+            }
         }
 
         parser.matches(expected = emptyList())

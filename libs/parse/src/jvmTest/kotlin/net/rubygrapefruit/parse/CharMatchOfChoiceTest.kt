@@ -16,8 +16,12 @@ class CharMatchOfChoiceTest : AbstractParseTest() {
         )
 
         parser.expecting {
-            expectLiteral("12")
-            expectLiteral("abc")
+            expectMatch {
+                expectChoice {
+                    expectLiteral("12", result = 1)
+                    expectLiteral("abc", result = 2)
+                }
+            }
         }
 
         parser.matches("abc", expected = "abc")

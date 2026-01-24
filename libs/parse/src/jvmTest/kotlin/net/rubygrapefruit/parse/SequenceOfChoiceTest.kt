@@ -20,8 +20,16 @@ class SequenceOfChoiceTest : AbstractParseTest() {
         ) { a, b -> listOf(a, b) }
 
         parser.expecting {
-            expectLiteral("ab")
-            expectLiteral("c")
+            expectSequence {
+                expectChoice {
+                    expectLiteral("ab", result = 1)
+                    expectLiteral("c", result = 2)
+                }
+                expectChoice {
+                    expectLiteral("11", result = 1)
+                    expectLiteral("2", result = 2)
+                }
+            }
         }
 
         parser.matches("ab11", expected = listOf(1, 1))
@@ -65,8 +73,13 @@ class SequenceOfChoiceTest : AbstractParseTest() {
         ) { a, b -> listOf(a, b) }
 
         parser.expecting {
-            expectLiteral("abc")
-            expectLiteral("ad")
+            expectSequence {
+                expectChoice {
+                    expectLiteral("abc", result = 1)
+                    expectLiteral("ad", result = 2)
+                }
+                expectLiteral("12", result = 3)
+            }
         }
 
         parser.matches("abc12", expected = listOf(1, 3))
@@ -98,8 +111,13 @@ class SequenceOfChoiceTest : AbstractParseTest() {
         ) { a, b -> listOf(a, b) }
 
         parser.expecting {
-            expectLiteral("ab")
-            expectLiteral("abc")
+            expectSequence {
+                expectChoice {
+                    expectLiteral("abc", result = 1)
+                    expectLiteral("ab", result = 2)
+                }
+                expectLiteral("12", result = 3)
+            }
         }
 
         parser.matches("abc12", expected = listOf(1, 3))
@@ -138,8 +156,16 @@ class SequenceOfChoiceTest : AbstractParseTest() {
         ) { a, b -> listOf(a, b) }
 
         parser.expecting {
-            expectLiteral("abc")
-            expectLiteral("ad")
+            expectSequence {
+                expectChoice {
+                    expectLiteral("abc", result = 1)
+                    expectLiteral("ad", result = 2)
+                }
+                expectChoice {
+                    expectLiteral("abc", result = 1)
+                    expectLiteral("ad", result = 2)
+                }
+            }
         }
 
         parser.matches("abcad", expected = listOf(1, 2))

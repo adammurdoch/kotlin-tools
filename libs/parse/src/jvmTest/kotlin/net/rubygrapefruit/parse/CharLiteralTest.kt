@@ -9,14 +9,14 @@ class CharLiteralTest : AbstractParseTest() {
         val parser = literal("a")
 
         parser.expecting {
-            // don't use expectLiteral() here, to check formatting
-            expect("\"a\"")
+            expectLiteral("a")
         }
 
         parser.matches("a")
 
         // missing
         parser.doesNotMatch("") {
+            // don't use expectLiteral() here, to check formatting
             expect("\"a\"")
         }
 
@@ -45,6 +45,10 @@ class CharLiteralTest : AbstractParseTest() {
     fun `matches single char literal and produces result`() {
         val parser = literal("a", 1)
 
+        parser.expecting {
+            expectLiteral("a", result = 1)
+        }
+
         parser.matches("a", expected = 1)
     }
 
@@ -53,14 +57,14 @@ class CharLiteralTest : AbstractParseTest() {
         val parser = literal("ab")
 
         parser.expecting {
-            // don't use expectLiteral() here, to check formatting
-            expect("\"ab\"")
+            expectLiteral("ab")
         }
 
         parser.matches("ab")
 
         // missing
         parser.doesNotMatch("") {
+            // don't use expectLiteral() here, to check formatting
             expect("\"ab\"")
         }
         parser.doesNotMatch("a") {

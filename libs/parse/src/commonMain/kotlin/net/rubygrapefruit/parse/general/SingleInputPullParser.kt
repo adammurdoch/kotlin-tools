@@ -3,7 +3,7 @@ package net.rubygrapefruit.parse.general
 import net.rubygrapefruit.parse.*
 
 internal class SingleInputCompiledParser<IN : BoxingInput<*, OUT>, OUT>(
-    private val parser: SingleInputParser<IN, OUT>,
+    val parser: SingleInputParser<IN, OUT>,
 ) : CompiledParser<IN, OUT> {
     override val mayNotAdvanceOnMatch: Boolean
         get() = false

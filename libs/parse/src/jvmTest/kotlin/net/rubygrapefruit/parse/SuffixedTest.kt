@@ -10,7 +10,10 @@ class SuffixedTest : AbstractParseTest() {
         val parser = suffixed(literal("a", 1), literal("b", 2))
 
         parser.expecting {
-            expectLiteral("a")
+            expectSequence {
+                expectLiteral("a", result = 1)
+                expectLiteral("a", result = 2)
+            }
         }
 
         parser.matches("ab", expected = 1)

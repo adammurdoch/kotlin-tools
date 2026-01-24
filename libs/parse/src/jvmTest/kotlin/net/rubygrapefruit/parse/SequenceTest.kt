@@ -1,8 +1,8 @@
 package net.rubygrapefruit.parse
 
 import net.rubygrapefruit.parse.binary.literal
-import net.rubygrapefruit.parse.text.literal
 import net.rubygrapefruit.parse.combinators.sequence
+import net.rubygrapefruit.parse.text.literal
 import kotlin.test.Test
 
 class SequenceTest : AbstractParseTest() {
@@ -11,7 +11,10 @@ class SequenceTest : AbstractParseTest() {
         val parser = sequence(literal("a", 1), literal("b", 2)) { a, b -> listOf(a, b) }
 
         parser.expecting {
-            expectLiteral("a")
+            expectSequence {
+                expectLiteral("a", result = 1)
+                expectLiteral("b", result = 2)
+            }
         }
 
         parser.matches("ab", expected = listOf(1, 2))
@@ -46,7 +49,10 @@ class SequenceTest : AbstractParseTest() {
         val parser = sequence(literal(byteArrayOf(0x1, 0x2), 1), literal(byteArrayOf(0x3, 0x4), 2)) { a, b -> listOf(a, b) }
 
         parser.expecting {
-            expectLiteral(0x1)
+            expectSequence {
+                expectLiteral(0x1, 0x2, result = 1)
+                expectLiteral(0x3, 0x4, result = 2)
+            }
         }
 
         parser.matches(0x1, 0x2, 0x3, 0x4, expected = listOf(1, 2))

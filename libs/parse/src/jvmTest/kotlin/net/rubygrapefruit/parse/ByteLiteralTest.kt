@@ -9,14 +9,14 @@ class ByteLiteralTest : AbstractParseTest() {
         val parser = literal(byteArrayOf(0x1))
 
         parser.expecting {
-            // don't use expectLiteral() here, to check formatting
-            expect("x01")
+            expectLiteral(0x1)
         }
 
         parser.matches(0x1)
 
         // missing
         parser.doesNotMatch {
+            // don't use expectLiteral() here, to check formatting
             expect("x01")
         }
 
@@ -44,14 +44,14 @@ class ByteLiteralTest : AbstractParseTest() {
         val parser = literal(byteArrayOf(0x1, 0x2))
 
         parser.expecting {
-            // don't use expectLiteral() here, to check formatting
-            expect("x01")
+            expectLiteral(0x1)
         }
 
         parser.matches(0x1, 0x2)
 
         // missing
         parser.doesNotMatch {
+            // don't use expectLiteral() here, to check formatting
             expect("x01")
         }
         parser.doesNotMatch(0x1) {

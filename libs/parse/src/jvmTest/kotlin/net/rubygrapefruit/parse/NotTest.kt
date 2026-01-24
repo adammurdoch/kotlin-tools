@@ -10,7 +10,9 @@ class NotTest : AbstractParseTest() {
         val parser = not(literal(byteArrayOf(0x1)))
 
         parser.expecting {
-            emptyMatch()
+            expectNot {
+                expectLiteral(0x1)
+            }
         }
 
         parser.matches()

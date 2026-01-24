@@ -11,7 +11,7 @@ internal class EndOfInputParser<IN> : Parser<IN, Unit>, CombinatorBuilder<Unit> 
         return EndOfInputCompiledParser()
     }
 
-    private class EndOfInputCompiledParser<IN : Input<*>> : CompiledParser<IN, Unit> {
+    internal class EndOfInputCompiledParser<IN : Input<*>> : CompiledParser<IN, Unit> {
         override val mayNotAdvanceOnMatch: Boolean
             get() = true
 

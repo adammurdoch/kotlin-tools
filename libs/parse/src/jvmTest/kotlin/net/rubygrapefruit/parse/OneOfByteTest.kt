@@ -9,8 +9,7 @@ class OneOfByteTest : AbstractParseTest() {
         val parser = oneOf(0x1, 0x2)
 
         parser.expecting {
-            expectLiteral(0x1)
-            expectLiteral(0x2)
+            expectOneOf(0x1, 0x2)
         }
 
         parser.matches(0x1, expected = 0x1)

@@ -13,7 +13,14 @@ class CharMatchOfZeroOrMoreTest : AbstractParseTest() {
 
         parser.expecting {
             emptyMatch()
-            expectLiteral("12")
+            expectMatch {
+                expectChoice {
+                    expectOneOrMore {
+                        expectLiteral("12", result = 1)
+                    }
+                    expectZero()
+                }
+            }
         }
 
         parser.matches("", expected = "")
@@ -42,8 +49,9 @@ class CharMatchOfZeroOrMoreTest : AbstractParseTest() {
 
         parser.expecting {
             emptyMatch()
-            expectLiteral("1")
-            expectLiteral("2")
+            expectMatch {
+                expectZeroOrMoreSingleInput("1", "2")
+            }
         }
 
         parser.matches("", expected = "")

@@ -12,8 +12,8 @@ internal class NotParser<IN>(private val parser: Parser<IN, *>) : Parser<IN, Uni
         return NotCompiledParser(compiler.compile(parser))
     }
 
-    private class NotCompiledParser<IN>(
-        private val parser: CompiledParser<IN, *>
+    internal class NotCompiledParser<IN>(
+        val parser: CompiledParser<IN, *>
     ) : CompiledParser<IN, Unit> {
         override val mayNotAdvanceOnMatch: Boolean
             get() = true

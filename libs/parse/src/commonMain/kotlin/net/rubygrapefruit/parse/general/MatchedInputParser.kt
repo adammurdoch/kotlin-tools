@@ -7,7 +7,7 @@ internal class MatchedInputParser<IN, OUT>(private val parser: Parser<IN, *>) : 
         return MatchedInputCompiledParser(compiler.compile(parser))
     }
 
-    private class MatchedInputCompiledParser<OUT>(private val parser: CompiledParser<SlicingInput<OUT>, *>) : CompiledParser<SlicingInput<OUT>, OUT> {
+    internal class MatchedInputCompiledParser<OUT>(val parser: CompiledParser<SlicingInput<OUT>, *>) : CompiledParser<SlicingInput<OUT>, OUT> {
         override val mayNotAdvanceOnMatch: Boolean
             get() = parser.mayNotAdvanceOnMatch
 

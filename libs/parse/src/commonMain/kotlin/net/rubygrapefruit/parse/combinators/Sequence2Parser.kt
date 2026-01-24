@@ -17,9 +17,9 @@ internal class Sequence2Parser<IN, A, B, OUT>(
         return Sequence2CompiledParser(compiledA, compiledB, map)
     }
 
-    private class Sequence2CompiledParser<IN, A, B, OUT>(
-        private val a: CompiledParser<IN, A>,
-        private val b: CompiledParser<IN, B>,
+    internal class Sequence2CompiledParser<IN, A, B, OUT>(
+        val a: CompiledParser<IN, A>,
+        val b: CompiledParser<IN, B>,
         private val map: (A, B) -> OUT
     ) : CompiledParser<IN, OUT> {
         override val mayNotAdvanceOnMatch: Boolean = a.mayNotAdvanceOnMatch && b.mayNotAdvanceOnMatch

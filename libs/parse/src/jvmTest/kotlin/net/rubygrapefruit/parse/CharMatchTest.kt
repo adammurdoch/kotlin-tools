@@ -10,7 +10,9 @@ class CharMatchTest : AbstractParseTest() {
         val parser = match(literal("abc"))
 
         parser.expecting {
-            expectLiteral("abc")
+            expectMatch {
+                expectLiteral("abc")
+            }
         }
 
         parser.matches("abc", expected = "abc")

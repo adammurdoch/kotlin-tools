@@ -10,7 +10,10 @@ class PrefixedTest : AbstractParseTest() {
         val parser = prefixed(literal("a", 1), literal("b", 2))
 
         parser.expecting {
-            expectLiteral("a")
+            expectSequence {
+                expectLiteral("a", 1)
+                expectLiteral("a", 2)
+            }
         }
 
         parser.matches("ab", expected = 2)

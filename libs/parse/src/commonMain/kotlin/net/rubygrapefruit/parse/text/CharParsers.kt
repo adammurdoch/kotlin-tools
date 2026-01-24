@@ -21,7 +21,7 @@ fun <OUT> literal(text: String, result: OUT): Parser<CharInput, OUT> {
  * Returns a parser that matches one of the given characters and produces it as a result.
  */
 fun oneOf(vararg chars: Char): Parser<CharInput, Char> {
-    return OneOfCharParser(chars)
+    return OneOfCharParser(chars.toList())
 }
 
 /**

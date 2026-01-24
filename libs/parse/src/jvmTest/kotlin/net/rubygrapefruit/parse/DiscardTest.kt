@@ -11,7 +11,7 @@ class DiscardTest : AbstractParseTest() {
         val parser = discard(literal("abc", 1))
 
         parser.expecting {
-            expectLiteral("abc")
+            expectLiteral("abc", result = Unit)
         }
 
         parser.matches("abc")
@@ -26,7 +26,7 @@ class DiscardTest : AbstractParseTest() {
         val parser = discard(literal(byteArrayOf(0x1, 0x2), 1))
 
         parser.expecting {
-            expectLiteral(0x1)
+            expectLiteral(0x1, 0x2, result = Unit)
         }
 
         parser.matches(0x1, 0x2)

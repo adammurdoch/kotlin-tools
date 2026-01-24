@@ -28,7 +28,7 @@ internal class DiagnosticParser<IN, OUT> private constructor(private val parser:
             return compiler.compileWithNoResult(DiagnosticParser(parser, logger))
         }
 
-        override fun <OUT> compileToSingleValueParser(parser: Parser<*, OUT>): SingleInputParser<IN, OUT>? {
+        override fun compileToSingleValueParser(parser: Parser<*, *>): SingleInputParser<IN>? {
             return compiler.compileToSingleValueParser(parser)
         }
     }

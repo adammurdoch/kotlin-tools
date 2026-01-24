@@ -1,5 +1,7 @@
 package net.rubygrapefruit.parse
 
+import net.rubygrapefruit.parse.combinators.NextValueExtractor
+import net.rubygrapefruit.parse.combinators.UnitExtractor
 import net.rubygrapefruit.parse.combinators.suffixed
 import net.rubygrapefruit.parse.general.EndOfInputParser
 import net.rubygrapefruit.parse.general.SingleInputCompiledParser
@@ -44,10 +46,10 @@ private class DefaultCompiler<IN : Input<*>> : CombinatorBuilder.Compiler<IN> {
     private val compiledParsers = mutableMapOf<Parser<*, *>, CompiledParser<IN, *>>()
     private val compiledNoResultParsers = mutableMapOf<Parser<*, *>, CompiledParser<IN, *>>()
 
-    override fun <OUT> compileToSingleValueParser(parser: Parser<*, OUT>): SingleInputParser<IN, OUT>? {
-        return if (parser is SingleInputParser<*, *>) {
+    override fun compileToSingleValueParser(parser: Parser<*, *>): SingleInputParser<IN>? {
+        return if (parser is SingleInputParser<*>) {
             @Suppress("UNCHECKED_CAST")
-            parser as SingleInputParser<IN, OUT>
+            parser as SingleInputParser<IN>
         } else {
             null
         }
@@ -64,6 +66,11 @@ private class DefaultCompiler<IN : Input<*>> : CombinatorBuilder.Compiler<IN> {
             is ParserBuilder<*, *> -> {
                 @Suppress("UNCHECKED_CAST")
                 ParserBuilderAdaptor((parser as ParserBuilder<IN, *>).withNoResult())
+            }
+
+            is SingleInputParser<*> -> {
+                @Suppress("UNCHECKED_CAST")
+                SingleInputCompiledParser(parser as SingleInputParser<IN>, UnitExtractor)
             }
 
             is CombinatorBuilder<*> -> {
@@ -88,9 +95,9 @@ private class DefaultCompiler<IN : Input<*>> : CombinatorBuilder.Compiler<IN> {
                 ParserBuilderAdaptor(parser as ParserBuilder<IN, OUT>)
             }
 
-            is SingleInputParser<*, *> -> {
+            is SingleInputParser<*> -> {
                 @Suppress("UNCHECKED_CAST")
-                SingleInputCompiledParser(parser as SingleInputParser<IN, OUT>) as CompiledParser<IN, OUT>
+                SingleInputCompiledParser(parser as SingleInputParser<IN>, NextValueExtractor.of<_, OUT>()) as CompiledParser<IN, OUT>
             }
 
             is CombinatorBuilder<*> -> {

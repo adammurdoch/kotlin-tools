@@ -310,9 +310,9 @@ abstract class AbstractParseTest {
 
         fun expectLiteral(vararg bytes: Byte, result: Any = Unit)
 
-        fun expectOneOf(vararg chars: Char)
+        fun expectOneOf(vararg chars: Char, hasResult: Boolean = true)
 
-        fun expectOneOf(vararg bytes: Byte)
+        fun expectOneOf(vararg bytes: Byte, hasResult: Boolean = true)
 
         fun expectMatch(config: CompiledParserFixture.() -> Unit)
 
@@ -322,7 +322,7 @@ abstract class AbstractParseTest {
 
         fun expectSequence(config: CompiledParserFixture.() -> Unit)
 
-        fun expectOneOrMore(config: CompiledParserFixture.() -> Unit)
+        fun expectOneOrMore(hasResult: Boolean = true, config: CompiledParserFixture.() -> Unit)
 
         fun expectZero()
 
@@ -440,7 +440,7 @@ abstract class AbstractParseTest {
             }
         }
 
-        class IsOneOrMore(val inspector: Inspector) : Inspector {
+        class IsOneOrMore(val inspector: Inspector, val hasResult: Boolean) : Inspector {
             override val expected: List<String>
                 get() = inspector.expected
 
@@ -450,6 +450,11 @@ abstract class AbstractParseTest {
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<ZeroOrMoreParser.OptionCompiledParser<*, *, *>>(parser)
                 inspector.inspect(parser.option)
+                if (hasResult) {
+                    assertIs<ListAccumulator<*>>(parser.previous)
+                } else {
+                    assertIs<UnitAccumulator>(parser.previous)
+                }
             }
         }
 
@@ -507,7 +512,7 @@ abstract class AbstractParseTest {
             }
         }
 
-        data class IsOneOfChar(val chars: List<Char>) : Inspector {
+        data class IsOneOfChar(val chars: List<Char>, val hasResult: Boolean) : Inspector {
             override val expected: List<String>
                 get() {
                     val expected = HasExpectation()
@@ -520,11 +525,16 @@ abstract class AbstractParseTest {
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<SingleInputCompiledParser<*, *>>(parser)
                 assertIs<OneOfCharParser>(parser.parser)
-                assertEquals(chars, parser.parser.chars.toList())
+                assertEquals(chars, parser.parser.chars)
+                if (hasResult) {
+                    assertIs<NextValueExtractor<*, *>>(parser.extractor)
+                } else {
+                    assertIs<UnitExtractor>(parser.extractor)
+                }
             }
         }
 
-        data class IsOneOfByte(val bytes: List<Byte>) : Inspector {
+        data class IsOneOfByte(val bytes: List<Byte>, val hasResult: Boolean) : Inspector {
             override val expected: List<String>
                 get() {
                     val expected = HasExpectation()
@@ -537,7 +547,12 @@ abstract class AbstractParseTest {
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<SingleInputCompiledParser<*, *>>(parser)
                 assertIs<OneOfByteParser>(parser.parser)
-                assertEquals(bytes, parser.parser.bytes.toList())
+                assertEquals(bytes, parser.parser.bytes)
+                if (hasResult) {
+                    assertIs<NextValueExtractor<*, *>>(parser.extractor)
+                } else {
+                    assertIs<UnitExtractor>(parser.extractor)
+                }
             }
         }
     }
@@ -578,12 +593,12 @@ abstract class AbstractParseTest {
             inspectors.add(Inspector.IsByteLiteral(bytes, result))
         }
 
-        override fun expectOneOf(vararg chars: Char) {
-            inspectors.add(Inspector.IsOneOfChar(chars.toList()))
+        override fun expectOneOf(vararg chars: Char, hasResult: Boolean) {
+            inspectors.add(Inspector.IsOneOfChar(chars.toList(), hasResult))
         }
 
-        override fun expectOneOf(vararg bytes: Byte) {
-            inspectors.add(Inspector.IsOneOfByte(bytes.toList()))
+        override fun expectOneOf(vararg bytes: Byte, hasResult: Boolean) {
+            inspectors.add(Inspector.IsOneOfByte(bytes.toList(), hasResult))
         }
 
         override fun expectMatch(config: CompiledParserFixture.() -> Unit) {
@@ -610,10 +625,10 @@ abstract class AbstractParseTest {
             inspectors.add(Inspector.IsSequence(fixture.choices()[0], fixture.choices()[1]))
         }
 
-        override fun expectOneOrMore(config: CompiledParserFixture.() -> Unit) {
+        override fun expectOneOrMore(hasResult: Boolean, config: CompiledParserFixture.() -> Unit) {
             val fixture = DefaultCompiledParserFixture()
             fixture.config()
-            inspectors.add(Inspector.IsOneOrMore(fixture.inspector()))
+            inspectors.add(Inspector.IsOneOrMore(fixture.inspector(), hasResult))
         }
 
         override fun expectZero() {

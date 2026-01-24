@@ -21,7 +21,7 @@ fun <OUT> literal(bytes: ByteArray, result: OUT): Parser<ByteInput, OUT> {
  * Returns a parser that matches one of the given bytes and produces it as a result.
  */
 fun oneOf(vararg bytes: Byte): Parser<ByteInput, Byte> {
-    return OneOfByteParser(bytes)
+    return OneOfByteParser(bytes.toList())
 }
 
 /**

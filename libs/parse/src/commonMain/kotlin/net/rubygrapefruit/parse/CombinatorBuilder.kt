@@ -13,6 +13,6 @@ internal interface CombinatorBuilder<out OUT> {
 
         fun compileWithNoResult(parser: Parser<*, *>): CompiledParser<IN, Unit>
 
-        fun <OUT> compileToSingleValueParser(parser: Parser<*, OUT>): SingleInputParser<IN, OUT>?
+        fun compileToSingleValueParser(parser: Parser<*, *>): SingleInputParser<IN>?
     }
 }

@@ -3,8 +3,8 @@ package net.rubygrapefruit.parse
 import net.rubygrapefruit.parse.combinators.NextValueExtractor
 import net.rubygrapefruit.parse.combinators.UnitExtractor
 import net.rubygrapefruit.parse.combinators.suffixed
-import net.rubygrapefruit.parse.general.EndOfInputParser
 import net.rubygrapefruit.parse.general.SingleInputCompiledParser
+import net.rubygrapefruit.parse.general.endOfInput
 
 internal fun <CONTEXT, IN : AdvancingInput<*>, OUT> parse(
     parser: PullParser<IN, OUT>,
@@ -34,7 +34,7 @@ internal fun <IN, OUT> PullParser<IN, OUT>.parseZeroOrOne(input: IN, maxAdvance:
 }
 
 internal fun <IN : Input<*>, OUT> Parser<*, OUT>.start(): PullParser<IN, OUT> {
-    val all = suffixed(this, EndOfInputParser())
+    val all = suffixed(this, endOfInput())
     return DefaultCompiler<IN>().compile(all).start()
 }
 

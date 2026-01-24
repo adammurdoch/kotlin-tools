@@ -304,7 +304,7 @@ abstract class AbstractParseTest {
     interface CompiledParserFixture {
         fun expectSucceed(result: Any = Unit)
 
-        fun expectEndOfInput()
+        fun expectEndOfInput(result: Any = Unit)
 
         fun expectLiteral(text: String, result: Any = Unit)
 
@@ -372,7 +372,7 @@ abstract class AbstractParseTest {
             }
         }
 
-        data object IsEndOfInput : Inspector {
+        data class IsEndOfInput(val result: Any) : Inspector {
             override val expected: List<String>
                 get() = listOf("end of input")
 
@@ -380,7 +380,8 @@ abstract class AbstractParseTest {
                 get() = true
 
             override fun inspect(parser: CompiledParser<*, *>) {
-                assertIs<EndOfInputParser.EndOfInputCompiledParser<*>>(parser)
+                assertIs<EndOfInputParser.EndOfInputCompiledParser<*, *>>(parser)
+                assertEquals(result, parser.result)
             }
         }
 
@@ -586,8 +587,8 @@ abstract class AbstractParseTest {
             inspectors.add(Inspector.IsSucceed(result))
         }
 
-        override fun expectEndOfInput() {
-            inspectors.add(Inspector.IsEndOfInput)
+        override fun expectEndOfInput(result: Any) {
+            inspectors.add(Inspector.IsEndOfInput(result))
         }
 
         override fun expectLiteral(text: String, result: Any) {

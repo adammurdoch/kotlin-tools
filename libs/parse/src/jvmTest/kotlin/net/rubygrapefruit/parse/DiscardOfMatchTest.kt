@@ -18,12 +18,7 @@ class DiscardOfMatchTest : AbstractParseTest() {
         )
 
         parser.expecting {
-            expectChoice {
-                expectOneOrMore(hasResult = false) {
-                    expectOneOf(0x1, 0x2, hasResult = false)
-                }
-                expectZero()
-            }
+            expectZeroOrMoreSingleInput(0x1, 0x2, hasResult = false)
         }
 
         parser.matches()

@@ -4,7 +4,7 @@ import net.rubygrapefruit.parse.*
 
 internal class ZeroOrMoreSingleInputCompiledParser<IN : Input<*>, OUT>(
     private val parser: SingleInputParser<IN>,
-    private val accumulator: RangeAccumulator<IN, OUT>
+    val accumulator: RangeAccumulator<IN, OUT>
 ) : CompiledParser<IN, OUT> {
     override val mayNotAdvanceOnMatch: Boolean
         get() = true

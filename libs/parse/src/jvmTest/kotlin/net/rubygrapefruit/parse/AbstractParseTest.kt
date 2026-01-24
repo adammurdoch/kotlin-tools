@@ -326,9 +326,9 @@ abstract class AbstractParseTest {
 
         fun expectZero()
 
-        fun expectZeroOrMoreSingleInput(vararg literals: String)
+        fun expectZeroOrMoreSingleInput(vararg literals: String, hasResult: Boolean = true)
 
-        fun expectZeroOrMoreSingleInput(vararg literals: Byte)
+        fun expectZeroOrMoreSingleInput(vararg literals: Byte, hasResult: Boolean = true)
     }
 
     private class HasExpectation {
@@ -470,7 +470,7 @@ abstract class AbstractParseTest {
             }
         }
 
-        data class IsZeroOrMoreSingleInput(val expectation: HasExpectation) : Inspector {
+        data class IsZeroOrMoreSingleInput(val expectation: HasExpectation, val hasResult: Boolean) : Inspector {
             override val expected: List<String>
                 get() = expectation.expect
 
@@ -479,6 +479,11 @@ abstract class AbstractParseTest {
 
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<ZeroOrMoreSingleInputCompiledParser<*, *>>(parser)
+                if (hasResult) {
+                    assertIs<ListRangeAccumulator<*, *>>(parser.accumulator)
+                } else {
+                    assertIs<UnitRangeAccumulator>(parser.accumulator)
+                }
             }
         }
 
@@ -635,20 +640,20 @@ abstract class AbstractParseTest {
             inspectors.add(Inspector.IsZero)
         }
 
-        override fun expectZeroOrMoreSingleInput(vararg literals: String) {
+        override fun expectZeroOrMoreSingleInput(vararg literals: String, hasResult: Boolean) {
             val expected = HasExpectation()
             for (text in literals) {
                 expected.expectLiteral(text)
             }
-            inspectors.add(Inspector.IsZeroOrMoreSingleInput(expected))
+            inspectors.add(Inspector.IsZeroOrMoreSingleInput(expected, hasResult))
         }
 
-        override fun expectZeroOrMoreSingleInput(vararg literals: Byte) {
+        override fun expectZeroOrMoreSingleInput(vararg literals: Byte, hasResult: Boolean) {
             val expected = HasExpectation()
             for (b in literals) {
                 expected.expectLiteral(b)
             }
-            inspectors.add(Inspector.IsZeroOrMoreSingleInput(expected))
+            inspectors.add(Inspector.IsZeroOrMoreSingleInput(expected, hasResult))
         }
 
         fun message(): String {

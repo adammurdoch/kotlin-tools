@@ -47,11 +47,20 @@ private class DefaultCompiler<IN : Input<*>> : CombinatorBuilder.Compiler<IN> {
     private val compiledNoResultParsers = mutableMapOf<Parser<*, *>, CompiledParser<IN, *>>()
 
     override fun compileToSingleValueParser(parser: Parser<*, *>): SingleInputParser<IN>? {
-        return if (parser is SingleInputParser<*>) {
-            @Suppress("UNCHECKED_CAST")
-            parser as SingleInputParser<IN>
-        } else {
-            null
+        return when (parser) {
+            is SingleInputParser<*> -> {
+                @Suppress("UNCHECKED_CAST")
+                parser as SingleInputParser<IN>
+            }
+
+            is CombinatorSingleInputBuilder<*> -> {
+                @Suppress("UNCHECKED_CAST")
+                (parser as CombinatorSingleInputBuilder<IN>).maybeAsSingleInputParser()
+            }
+
+            else -> {
+                null
+            }
         }
     }
 

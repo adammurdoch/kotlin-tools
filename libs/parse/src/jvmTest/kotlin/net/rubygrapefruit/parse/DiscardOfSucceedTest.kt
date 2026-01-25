@@ -21,7 +21,7 @@ class DiscardOfSucceedTest : AbstractParseTest() {
     }
 
     @Test
-    fun `discards result of succeed that does not produce a value`() {
+    fun `does nothing for succeed that does not produce a value`() {
         val parser = discard(succeed())
 
         parser.expecting {

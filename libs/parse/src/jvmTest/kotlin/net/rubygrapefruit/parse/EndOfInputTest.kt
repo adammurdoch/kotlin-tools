@@ -1,13 +1,12 @@
 package net.rubygrapefruit.parse
 
-import net.rubygrapefruit.parse.binary.ByteInput
 import net.rubygrapefruit.parse.general.endOfInput
 import kotlin.test.Test
 
 class EndOfInputTest : AbstractParseTest() {
     @Test
     fun `matches end of input`() {
-        val parser = endOfInput<ByteInput>()
+        val parser = endOfInput()
 
         parser.expecting {
             expectEndOfInput()
@@ -22,7 +21,7 @@ class EndOfInputTest : AbstractParseTest() {
 
     @Test
     fun `matches end of input and produces a result`() {
-        val parser = endOfInput<ByteInput, _>(2)
+        val parser = endOfInput(2)
 
         parser.expecting {
             expectEndOfInput(result = 2)

@@ -18,7 +18,7 @@ class SequenceOfNotParserTest : AbstractParseTest() {
         parser.expecting {
             expectSequence {
                 expectNot {
-                    expectLiteral(0x1)
+                    expectLiteral(0x1, result = Unit)
                 }
                 expectZeroOrMoreSingleInput(0x1, 0x2)
             }
@@ -126,7 +126,7 @@ class SequenceOfNotParserTest : AbstractParseTest() {
         parser.expecting {
             expectSequence {
                 expectNot {
-                    expectOneOf(0x1, 0x2)
+                    expectOneOf(0x1, 0x2, hasResult = false)
                 }
                 expectZeroOrMoreSingleInput(0x1, 0x2, 0x3, 0x4)
             }

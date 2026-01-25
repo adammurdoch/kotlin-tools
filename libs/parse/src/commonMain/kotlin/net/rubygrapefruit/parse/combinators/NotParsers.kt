@@ -7,5 +7,5 @@ import net.rubygrapefruit.parse.Parser
  * Does not produce a result or consume any input.
  */
 fun <IN> not(parser: Parser<IN, *>): Parser<IN, Unit> {
-    return NotParser(parser)
+    return NotParser(DiscardParser(parser))
 }

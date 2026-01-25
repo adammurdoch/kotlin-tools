@@ -3,9 +3,9 @@ package net.rubygrapefruit.parse.combinators
 import net.rubygrapefruit.parse.*
 import kotlin.math.min
 
-internal class NotParser<IN>(private val parser: Parser<IN, *>) : Parser<IN, Unit>, CombinatorBuilder<Unit> {
+internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, Unit>, CombinatorBuilder<Unit> {
     override fun withNoResult(): CombinatorBuilder<Unit> {
-        TODO()
+        return this
     }
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, Unit> {

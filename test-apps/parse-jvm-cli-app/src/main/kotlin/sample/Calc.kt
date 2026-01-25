@@ -4,8 +4,10 @@ import kotlinx.io.buffered
 import kotlinx.io.readString
 import net.rubygrapefruit.cli.app.CliApp
 import net.rubygrapefruit.io.stream.stdin
-import sample.calc.*
+import sample.calc.BinaryExpression
+import sample.calc.Expression
 import sample.calc.Number
+import sample.calc.Parser
 
 class Calc : CliApp("parse-jvm-cli-app") {
     val args by remainder("args")
@@ -29,20 +31,18 @@ class Calc : CliApp("parse-jvm-cli-app") {
 
     private fun Expression.render() {
         when (this) {
-            is Addition -> {
+            is BinaryExpression -> {
+                print("(")
                 left.render()
-                print(" + ")
+                print(") ")
+                print(operator)
+                print(" (")
                 right.render()
-            }
-
-            is Subtraction -> {
-                left.render()
-                print(" - ")
-                right.render()
+                print(")")
             }
 
             is Number -> {
-                print("($value)")
+                print(value)
             }
         }
     }

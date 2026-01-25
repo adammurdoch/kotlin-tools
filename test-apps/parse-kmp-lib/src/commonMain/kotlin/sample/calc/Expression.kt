@@ -10,13 +10,25 @@ class Number(val value: Int) : Expression() {
     }
 }
 
-class Addition(val left: Expression, val right: Expression) : Expression() {
+sealed class BinaryExpression : Expression() {
+    abstract val left: Expression
+    abstract val right: Expression
+    abstract val operator: String
+}
+
+class Addition(override val left: Expression, override val right: Expression) : BinaryExpression() {
+    override val operator: String
+        get() = "+"
+
     override fun evaluate(): Int {
         return left.evaluate() + right.evaluate()
     }
 }
 
-class Subtraction(val left: Expression, val right: Expression) : Expression() {
+class Subtraction(override val left: Expression, override val right: Expression) : BinaryExpression() {
+    override val operator: String
+        get() = "-"
+
     override fun evaluate(): Int {
         return left.evaluate() - right.evaluate()
     }

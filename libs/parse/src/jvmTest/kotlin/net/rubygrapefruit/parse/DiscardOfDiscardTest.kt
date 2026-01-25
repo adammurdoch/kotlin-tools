@@ -23,5 +23,4 @@ class DiscardOfDiscardTest : AbstractParseTest() {
             expectLiteral("abc")
         }
     }
-
 }

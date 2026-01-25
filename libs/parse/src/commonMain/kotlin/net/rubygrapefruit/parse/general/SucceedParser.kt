@@ -2,9 +2,9 @@ package net.rubygrapefruit.parse.general
 
 import net.rubygrapefruit.parse.*
 
-internal class SucceedParser<IN, OUT>(private val result: OUT) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
+internal class SucceedParser<OUT>(private val result: OUT) : Parser<Any, OUT>, CombinatorBuilder<OUT> {
     override fun withNoResult(): CombinatorBuilder<Unit> {
-        TODO()
+        return SucceedParser(Unit)
     }
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, OUT> {
@@ -12,7 +12,7 @@ internal class SucceedParser<IN, OUT>(private val result: OUT) : Parser<IN, OUT>
     }
 
     companion object {
-        fun <IN> of(): Parser<IN, Unit> {
+        fun of(): Parser<Any, Unit> {
             return SucceedParser(Unit)
         }
     }

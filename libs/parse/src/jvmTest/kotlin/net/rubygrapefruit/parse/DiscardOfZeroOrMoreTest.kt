@@ -22,5 +22,41 @@ class DiscardOfZeroOrMoreTest : AbstractParseTest() {
                 expectZero()
             }
         }
+
+        parser.matches("")
+        parser.matches("abcabc")
+
+        parser.doesNotMatch("abcaX") {
+            failAt(3)
+            expectLiteral("abc")
+            expectEndOfInput()
+        }
+    }
+
+    @Test
+    fun `discards result of zero or more of char literal with no result`() {
+        val parser = discard(
+            zeroOrMore(
+                literal("abc")
+            )
+        )
+
+        parser.expecting {
+            expectChoice {
+                expectOneOrMore(hasResult = false) {
+                    expectLiteral("abc", result = Unit)
+                }
+                expectZero()
+            }
+        }
+
+        parser.matches("")
+        parser.matches("abcabc")
+
+        parser.doesNotMatch("abcaX") {
+            failAt(3)
+            expectLiteral("abc")
+            expectEndOfInput()
+        }
     }
 }

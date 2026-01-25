@@ -8,7 +8,7 @@ internal class Sequence2Parser<IN, A, B, OUT>(
     private val map: (A, B) -> OUT
 ) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
     override fun withNoResult(): CombinatorBuilder<Unit> {
-        TODO()
+        return Sequence2Parser(DiscardParser(a), DiscardParser(b)) { _, _ -> }
     }
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, OUT> {

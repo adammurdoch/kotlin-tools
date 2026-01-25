@@ -8,7 +8,7 @@ import net.rubygrapefruit.parse.combinators.ZeroOrMoreParser.Companion.of
 
 internal class ZeroOrMoreProduceNothingParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, Unit>, CombinatorBuilder<Unit> {
     override fun withNoResult(): CombinatorBuilder<Unit> {
-        TODO()
+        return this
     }
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, Unit> {

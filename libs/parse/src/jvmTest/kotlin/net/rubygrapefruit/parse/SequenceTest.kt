@@ -3,7 +3,10 @@ package net.rubygrapefruit.parse
 import net.rubygrapefruit.parse.binary.literal
 import net.rubygrapefruit.parse.combinators.sequence
 import net.rubygrapefruit.parse.text.literal
+import net.rubygrapefruit.parse.text.parse
 import kotlin.test.Test
+import kotlin.test.assertSame
+import kotlin.test.fail
 
 class SequenceTest : AbstractParseTest() {
     @Test
@@ -84,5 +87,22 @@ class SequenceTest : AbstractParseTest() {
             failAt(4)
             expectEndOfInput()
         }
+    }
+
+    @Test
+    fun `rethrows mapping failure`() {
+        val failure = RuntimeException()
+        val parser = sequence(literal("a", 1), literal("b", 2)) { _, _ ->
+            failure.fillInStackTrace()
+            throw failure
+        }
+
+        try {
+            parser.parse("ab")
+        } catch (e: RuntimeException) {
+            assertSame(failure, e)
+            return
+        }
+        fail()
     }
 }

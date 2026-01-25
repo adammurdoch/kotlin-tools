@@ -102,6 +102,11 @@ private class DefaultCompiler<IN : Input<*>> : CombinatorBuilder.Compiler<IN>, C
         return compiled as CompiledParser<IN, OUT>
     }
 
+    override fun <OUT> compileRecursive(outer: Parser<*, OUT>, compiledOuter: CompiledParser<IN, OUT>, parser: Parser<*, OUT>): CompiledParser<IN, OUT> {
+        compiledParsers[outer] = compiledOuter
+        return compile(parser)
+    }
+
     private fun <OUT> doCompile(parser: Parser<*, OUT>): CompiledParser<IN, OUT> {
         return when (parser) {
             is ParserBuilder<*, *> -> {

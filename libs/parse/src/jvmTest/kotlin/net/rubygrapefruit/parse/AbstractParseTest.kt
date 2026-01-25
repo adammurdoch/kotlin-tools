@@ -329,6 +329,10 @@ abstract class AbstractParseTest {
         fun expectZeroOrMoreSingleInput(vararg literals: String, hasResult: Boolean = true)
 
         fun expectZeroOrMoreSingleInput(vararg literals: Byte, hasResult: Boolean = true)
+
+        fun expectRecursive(config: CompiledParserFixture.() -> Unit)
+
+        fun expectRecurses()
     }
 
     private class HasExpectation {
@@ -561,6 +565,31 @@ abstract class AbstractParseTest {
                 }
             }
         }
+
+        class IsRecursive(val inspector: Inspector) : Inspector {
+            override val expected: List<String>
+                get() = inspector.expected
+
+            override val mayBeEmpty: Boolean
+                get() = inspector.mayBeEmpty
+
+            override fun inspect(parser: CompiledParser<*, *>) {
+                assertIs<DefaultRecursiveParser.RecursiveCompiledParser<*, *>>(parser)
+                inspector.inspect(parser.parser!!)
+            }
+        }
+
+        data object Recurses : Inspector {
+            override val expected: List<String>
+                get() = emptyList()
+
+            override val mayBeEmpty: Boolean
+                get() = true
+
+            override fun inspect(parser: CompiledParser<*, *>) {
+                assertIs<DefaultRecursiveParser.RecursiveCompiledParser<*, *>>(parser)
+            }
+        }
     }
 
     private class DefaultCompiledParserFixture : CompiledParserFixture {
@@ -655,6 +684,16 @@ abstract class AbstractParseTest {
                 expected.expectLiteral(b)
             }
             inspectors.add(Inspector.IsZeroOrMoreSingleInput(expected, hasResult))
+        }
+
+        override fun expectRecursive(config: CompiledParserFixture.() -> Unit) {
+            val fixture = DefaultCompiledParserFixture()
+            fixture.config()
+            inspectors.add(Inspector.IsRecursive(fixture.inspector()))
+        }
+
+        override fun expectRecurses() {
+            inspectors.add(Inspector.Recurses)
         }
 
         fun message(): String {

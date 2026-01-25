@@ -24,6 +24,10 @@ internal class DiagnosticParser<IN, OUT> private constructor(private val parser:
             return compiler.compile(DiagnosticParser(parser, logger))
         }
 
+        override fun <OUT> compileRecursive(outer: Parser<*, OUT>, compiledOuter: CompiledParser<IN, OUT>, parser: Parser<*, OUT>): CompiledParser<IN, OUT> {
+            return compiler.compileRecursive(outer, compiledOuter, parser)
+        }
+
         override fun compileWithNoResult(parser: Parser<*, *>): CompiledParser<IN, Unit> {
             return compiler.compileWithNoResult(DiagnosticParser(parser, logger))
         }

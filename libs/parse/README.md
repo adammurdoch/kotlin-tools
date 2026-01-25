@@ -63,6 +63,7 @@ Parsers that combine other parsers
   - sequence(unitParser, parser) - an alias
 - suffixed(parser, parser) - produces result of the first parser
   - sequence(parser, unitParser) - an alias
+- sequence(parser, parser, parser, map) - produces result of map function
 - zeroOrMore(parser) - produces list
   - Stops if the parser matches zero input values
   - zeroOrMore(unitParser) - produces nothing

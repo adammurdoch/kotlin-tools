@@ -11,8 +11,8 @@ class PrefixedTest : AbstractParseTest() {
 
         parser.expecting {
             expectSequence {
-                expectLiteral("a", 1)
-                expectLiteral("a", 2)
+                expectLiteral("a")
+                expectLiteral("a", result = 2)
             }
         }
 

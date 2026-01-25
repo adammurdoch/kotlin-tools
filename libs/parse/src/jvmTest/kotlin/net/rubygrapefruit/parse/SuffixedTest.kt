@@ -12,7 +12,7 @@ class SuffixedTest : AbstractParseTest() {
         parser.expecting {
             expectSequence {
                 expectLiteral("a", result = 1)
-                expectLiteral("a", result = 2)
+                expectLiteral("b")
             }
         }
 

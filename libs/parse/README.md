@@ -67,6 +67,7 @@ Parsers that combine other parsers:
 - zeroOrMore(parser) - produces list
   - Stops if the parser matches zero input values
   - zeroOrMore(unitParser) - produces nothing
+- map(parser, map) - produces result of map function
 - recursive() - a parser that is applied recursively
 - not(parser) - matches zero input values, produces nothing
 - discard(parser) - creates a unitParser, produces nothing

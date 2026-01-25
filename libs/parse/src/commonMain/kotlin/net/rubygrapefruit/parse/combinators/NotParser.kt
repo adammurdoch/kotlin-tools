@@ -3,8 +3,8 @@ package net.rubygrapefruit.parse.combinators
 import net.rubygrapefruit.parse.*
 import kotlin.math.min
 
-internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, Unit>, CombinatorBuilder<Unit> {
-    override fun withNoResult(): CombinatorBuilder<Unit> {
+internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, Unit>, CombinatorBuilder<Unit>, DiscardableParser<IN> {
+    override fun withNoResult(): Parser<IN, Unit> {
         return this
     }
 

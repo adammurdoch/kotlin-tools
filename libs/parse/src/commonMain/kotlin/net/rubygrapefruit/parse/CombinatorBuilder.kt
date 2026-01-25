@@ -5,11 +5,6 @@ package net.rubygrapefruit.parse
  */
 internal interface CombinatorBuilder<out OUT> {
     /**
-     * Creates a copy of this parser that produces no result.
-     */
-    fun withNoResult(): CombinatorBuilder<Unit>
-
-    /**
      * Compiles this parser.
      */
     fun <IN : Input<*>> compile(compiler: Compiler<IN>): CompiledParser<IN, OUT>

@@ -72,24 +72,14 @@ private class DefaultCompiler<IN : Input<*>> : CombinatorBuilder.Compiler<IN>, C
 
     private fun doCompileNoResult(parser: Parser<*, *>): CompiledParser<IN, Unit> {
         return when (parser) {
-            is ParserBuilder<*, *> -> {
-                @Suppress("UNCHECKED_CAST")
-                ParserBuilderAdaptor((parser as ParserBuilder<IN, *>).withNoResult())
-            }
-
             is SingleInputParser<*> -> {
                 @Suppress("UNCHECKED_CAST")
                 SingleInputCompiledParser(parser as SingleInputParser<IN>, UnitExtractor)
             }
 
-            is TypedInputCombinatorBuilder<*, *> -> {
+            is DiscardableParser<*> -> {
                 @Suppress("UNCHECKED_CAST")
-                (parser as TypedInputCombinatorBuilder<IN, *>).withNoResult().compile(this)
-            }
-
-            is CombinatorBuilder<*> -> {
-                @Suppress("UNCHECKED_CAST")
-                (parser as CombinatorBuilder<*>).withNoResult().compile(this)
+                doCompile((parser as DiscardableParser<IN>).withNoResult())
             }
 
             else -> throw IllegalArgumentException("Cannot compile parser $parser with unexpected type")

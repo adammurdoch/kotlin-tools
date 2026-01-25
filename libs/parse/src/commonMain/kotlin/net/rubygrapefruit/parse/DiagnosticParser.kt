@@ -2,10 +2,13 @@ package net.rubygrapefruit.parse
 
 import net.rubygrapefruit.parse.combinators.DiscardParser
 
-internal class DiagnosticParser<IN, OUT> private constructor(private val parser: Parser<IN, OUT>, private val logger: Logger) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
+internal class DiagnosticParser<IN, OUT> private constructor(
+    private val parser: Parser<IN, OUT>,
+    private val logger: Logger
+) : Parser<IN, OUT>, CombinatorBuilder<OUT>, DiscardableParser<IN> {
     constructor(parser: Parser<IN, OUT>, log: Boolean) : this(parser, if (log) Logger.Active(0) else Logger.Disabled)
 
-    override fun withNoResult(): CombinatorBuilder<Unit> {
+    override fun withNoResult(): Parser<IN, Unit> {
         return DiscardParser(parser)
     }
 

@@ -6,8 +6,8 @@ internal class Sequence2Parser<IN, A, B, OUT>(
     private val a: Parser<IN, A>,
     private val b: Parser<IN, B>,
     private val map: (A, B) -> OUT
-) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
-    override fun withNoResult(): CombinatorBuilder<Unit> {
+) : Parser<IN, OUT>, CombinatorBuilder<OUT>, DiscardableParser<IN> {
+    override fun withNoResult(): Parser<IN, Unit> {
         return Sequence2Parser(DiscardParser(a), DiscardParser(b)) { _, _ -> }
     }
 

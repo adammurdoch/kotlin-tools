@@ -3,8 +3,10 @@ package net.rubygrapefruit.parse.combinators
 import net.rubygrapefruit.parse.*
 import kotlin.math.min
 
-internal class ChoiceParser<IN, OUT>(private val options: List<Parser<IN, OUT>>) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
-    override fun withNoResult(): CombinatorBuilder<Unit> {
+internal class ChoiceParser<IN, OUT>(
+    private val options: List<Parser<IN, OUT>>
+) : Parser<IN, OUT>, CombinatorBuilder<OUT>, DiscardableParser<IN> {
+    override fun withNoResult(): Parser<IN, Unit> {
         return ChoiceParser(options.map { DiscardParser(it) })
     }
 

@@ -2,8 +2,10 @@ package net.rubygrapefruit.parse.combinators
 
 import net.rubygrapefruit.parse.*
 
-internal class ZeroOrMoreParser<IN, OUT>(private val parser: Parser<IN, OUT>) : Parser<IN, List<OUT>>, TypedInputCombinatorBuilder<BoxingInput<*, OUT>, List<OUT>> {
-    override fun withNoResult(): CombinatorBuilder<Unit> {
+internal class ZeroOrMoreParser<IN, OUT>(
+    private val parser: Parser<IN, OUT>
+) : Parser<IN, List<OUT>>, TypedInputCombinatorBuilder<BoxingInput<*, OUT>, List<OUT>>, DiscardableParser<IN> {
+    override fun withNoResult(): Parser<IN, Unit> {
         return ZeroOrMoreProduceNothingParser(DiscardParser(parser))
     }
 

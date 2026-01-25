@@ -6,15 +6,15 @@ interface RecursiveParser<IN, OUT> : Parser<IN, OUT> {
     fun parser(parser: Parser<IN, OUT>)
 }
 
-internal class DefaultRecursiveParser<IN, OUT> : RecursiveParser<IN, OUT>, CombinatorBuilder<OUT> {
+internal class DefaultRecursiveParser<IN, OUT>(
     private var parser: Parser<IN, OUT>? = null
-
+) : RecursiveParser<IN, OUT>, CombinatorBuilder<OUT>, DiscardableParser<IN> {
     override fun parser(parser: Parser<IN, OUT>) {
         this.parser = parser
     }
 
-    override fun withNoResult(): CombinatorBuilder<Unit> {
-        TODO()
+    override fun withNoResult(): Parser<IN, Unit> {
+        return DefaultRecursiveParser(DiscardParser(parser!!))
     }
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, OUT> {

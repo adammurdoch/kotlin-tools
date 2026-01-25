@@ -2,8 +2,8 @@ package net.rubygrapefruit.parse.general
 
 import net.rubygrapefruit.parse.*
 
-internal class EndOfInputParser<OUT>(val result: OUT) : Parser<Any, OUT>, CombinatorBuilder<OUT> {
-    override fun withNoResult(): CombinatorBuilder<Unit> {
+internal class EndOfInputParser<OUT>(val result: OUT) : Parser<Any, OUT>, CombinatorBuilder<OUT>, DiscardableParser<Any> {
+    override fun withNoResult(): Parser<Any, Unit> {
         return EndOfInputParser(Unit)
     }
 

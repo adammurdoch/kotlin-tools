@@ -3,8 +3,10 @@ package net.rubygrapefruit.parse.general
 import net.rubygrapefruit.parse.*
 import net.rubygrapefruit.parse.combinators.DiscardParser
 
-internal class MatchedInputParser<IN, OUT>(private val parser: Parser<IN, *>) : Parser<IN, OUT>, TypedInputCombinatorBuilder<SlicingInput<OUT>, OUT> {
-    override fun withNoResult(): CombinatorBuilder<Unit> {
+internal class MatchedInputParser<IN, OUT>(
+    private val parser: Parser<IN, *>
+) : Parser<IN, OUT>, TypedInputCombinatorBuilder<SlicingInput<OUT>, OUT>, DiscardableParser<IN> {
+    override fun withNoResult(): Parser<IN, Unit> {
         return DiscardParser(parser)
     }
 

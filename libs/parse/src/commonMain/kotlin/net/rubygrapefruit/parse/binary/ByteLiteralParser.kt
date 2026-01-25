@@ -2,13 +2,16 @@ package net.rubygrapefruit.parse.binary
 
 import net.rubygrapefruit.parse.*
 
-internal class ByteLiteralParser<OUT>(private val bytes: ByteArray, val result: OUT) : Parser<ByteInput, OUT>, ParserBuilder<ByteStream, OUT> {
+internal class ByteLiteralParser<OUT>(
+    private val bytes: ByteArray,
+    val result: OUT
+) : Parser<ByteInput, OUT>, ParserBuilder<ByteStream, OUT>, DiscardableParser<ByteInput> {
     private val expectations = bytes.map { Expectation.One(format(it)) }
 
     override val expectation: Expectation
         get() = expectations.first()
 
-    override fun withNoResult(): ParserBuilder<ByteStream, Unit> {
+    override fun withNoResult(): Parser<ByteInput, Unit> {
         return ByteLiteralParser(bytes, Unit)
     }
 

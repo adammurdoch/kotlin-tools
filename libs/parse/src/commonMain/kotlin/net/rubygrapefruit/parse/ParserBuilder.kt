@@ -11,11 +11,6 @@ internal interface ParserBuilder<IN, OUT> {
     val expectation: Expectation
 
     /**
-     * Creates a copy of this parser that produces no result.
-     */
-    fun withNoResult(): ParserBuilder<IN, Unit>
-
-    /**
      * Starts parsing.
      */
     fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT>

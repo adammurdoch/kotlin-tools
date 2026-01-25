@@ -1,13 +1,12 @@
 package net.rubygrapefruit.parse.combinators
 
-import net.rubygrapefruit.parse.CombinatorBuilder
-import net.rubygrapefruit.parse.CompiledParser
-import net.rubygrapefruit.parse.Input
-import net.rubygrapefruit.parse.Parser
+import net.rubygrapefruit.parse.*
 import net.rubygrapefruit.parse.combinators.ZeroOrMoreParser.Companion.of
 
-internal class ZeroOrMoreProduceNothingParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, Unit>, CombinatorBuilder<Unit> {
-    override fun withNoResult(): CombinatorBuilder<Unit> {
+internal class ZeroOrMoreProduceNothingParser<IN>(
+    private val parser: Parser<IN, Unit>
+) : Parser<IN, Unit>, CombinatorBuilder<Unit>, DiscardableParser<IN> {
+    override fun withNoResult(): Parser<IN, Unit> {
         return this
     }
 

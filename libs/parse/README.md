@@ -57,7 +57,7 @@ Parsers that operate on any kind of input:
 
 Parsers that combine other parsers:
 
-- oneOf(parsers) - produces result of first matching parser
+- oneOf(parsers) - produces result of first parser that matches
 - sequence(parser, parser, map) - produces result of map function
 - prefixed(parser, parser) - produces result of the second parser
   - sequence(unitParser, parser) - an alias

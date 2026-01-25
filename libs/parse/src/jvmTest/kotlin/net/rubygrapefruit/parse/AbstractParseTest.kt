@@ -330,6 +330,8 @@ abstract class AbstractParseTest {
 
         fun expectZeroOrMoreSingleInput(vararg literals: Byte, hasResult: Boolean = true)
 
+        fun expectMap(config: CompiledParserFixture.() -> Unit)
+
         fun expectRecursive(config: CompiledParserFixture.() -> Unit)
 
         fun expectRecurses()
@@ -442,6 +444,19 @@ abstract class AbstractParseTest {
                 assertIs<Sequence2Parser.Sequence2CompiledParser<*, *, *, *>>(parser)
                 a.inspect(parser.a)
                 b.inspect(parser.b)
+            }
+        }
+
+        class IsMap(val inspector: Inspector) : Inspector {
+            override val expected: List<String>
+                get() = inspector.expected
+
+            override val mayBeEmpty: Boolean
+                get() = inspector.mayBeEmpty
+
+            override fun inspect(parser: CompiledParser<*, *>) {
+                assertIs<MapParser.MapCompiledParser<*, *, *>>(parser)
+                inspector.inspect(parser.parser)
             }
         }
 
@@ -684,6 +699,12 @@ abstract class AbstractParseTest {
                 expected.expectLiteral(b)
             }
             inspectors.add(Inspector.IsZeroOrMoreSingleInput(expected, hasResult))
+        }
+
+        override fun expectMap(config: CompiledParserFixture.() -> Unit) {
+            val fixture = DefaultCompiledParserFixture()
+            fixture.config()
+            inspectors.add(Inspector.IsMap(fixture.inspector()))
         }
 
         override fun expectRecursive(config: CompiledParserFixture.() -> Unit) {

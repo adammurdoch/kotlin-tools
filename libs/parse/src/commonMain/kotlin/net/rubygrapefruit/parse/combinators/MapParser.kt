@@ -5,7 +5,12 @@ import net.rubygrapefruit.parse.*
 internal class MapParser<IN, INTERMEDIATE, OUT>(
     private val parser: Parser<IN, INTERMEDIATE>,
     private val map: (INTERMEDIATE) -> OUT
-) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
+) : Parser<IN, OUT>, CombinatorBuilder<OUT>, DiscardableParser<IN> {
+
+    override fun withNoResult(): Parser<IN, Unit> {
+        return DiscardParser(parser)
+    }
+
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, OUT> {
         return MapCompiledParser(compiler.compile(parser), map)
     }

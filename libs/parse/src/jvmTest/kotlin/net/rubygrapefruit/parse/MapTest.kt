@@ -9,6 +9,12 @@ class MapTest : AbstractParseTest() {
     fun `maps the result of binary literal`() {
         val parser = map(literal(byteArrayOf(0x1, 0x2), 1)) { it + 1 }
 
+        parser.expecting {
+            expectMap {
+                expectLiteral(0x1, 0x2, result = 1)
+            }
+        }
+
         parser.matches(0x1, 0x2, expected = 2)
 
         // missing

@@ -1,9 +1,12 @@
 package net.rubygrapefruit.parse.text
 
 internal fun format(char: Char): String {
-    return "\"$char\""
+    return format(char.toString())
 }
 
 internal fun format(text: String): String {
-    return "\"$text\""
+    return when {
+        text == "\n" -> "new line"
+        else -> "\"$text\""
+    }
 }

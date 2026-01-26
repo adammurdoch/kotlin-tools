@@ -42,6 +42,35 @@ class CharLiteralTest : AbstractParseTest() {
     }
 
     @Test
+    fun `matches single new line character`() {
+        val parser = literal("\n")
+
+        parser.expecting {
+            expectLiteral("\n")
+        }
+
+        parser.matches("\n")
+
+        // missing
+        parser.doesNotMatch("") {
+            // don't use expectLiteral() here, to check formatting
+            expect("new line")
+        }
+
+        // unexpected char
+        parser.doesNotMatch("X") {
+            expect("new line")
+        }
+
+        // extra char
+        parser.doesNotMatch("\nX") {
+            failAt(1, 2, 1)
+            expectContext("", "X")
+            expectEndOfInput()
+        }
+    }
+
+    @Test
     fun `matches single char literal and produces result`() {
         val parser = literal("a", 1)
 

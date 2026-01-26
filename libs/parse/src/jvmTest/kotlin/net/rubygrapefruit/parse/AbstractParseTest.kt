@@ -345,7 +345,11 @@ abstract class AbstractParseTest {
         }
 
         fun expectLiteral(text: String) {
-            expect("\"$text\"")
+            if (text == "\n") {
+                expect("new line")
+            } else {
+                expect("\"$text\"")
+            }
         }
 
         fun expectLiteral(byte: Byte) {

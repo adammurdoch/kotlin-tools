@@ -14,7 +14,7 @@ internal sealed interface Expectation {
 
     class One(val description: String) : Expectation {
         override fun toString(): String {
-            return "{expect \"$description\"}"
+            return "{expect $description}"
         }
 
         override fun accept(visitor: (String) -> Unit) {

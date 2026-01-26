@@ -43,4 +43,29 @@ class OneOfCharTest : AbstractParseTest() {
             expectEndOfInput()
         }
     }
+
+    @Test
+    fun `matches new line character`() {
+        val parser = oneOf(';', '\n')
+
+        parser.expecting {
+            expectOneOf(';', '\n')
+        }
+
+        parser.matches(";", expected = ';')
+        parser.matches("\n", expected = '\n')
+
+        // missing
+        parser.doesNotMatch("") {
+            expectLiteral(";")
+            expect("new line")
+        }
+
+        // extra
+        parser.doesNotMatch("\nX") {
+            failAt(1, 2, 1)
+            expectContext("", "X")
+            expectEndOfInput()
+        }
+    }
 }

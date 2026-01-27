@@ -18,7 +18,7 @@ internal open class DefaultPushParser<CONTEXT, IN : AdvancingInput<*>, OUT>(
                             input.advance(result.advance)
                             state = result.parser
                             if (!input.finished) {
-                                break
+                                return
                             }
                         }
                     }

@@ -40,14 +40,14 @@ internal class CharLiteralParser<OUT>(
             while (index < remaining) {
                 if (index >= max) {
                     return if (index >= input.available && input.finished) {
-                        PullParser.Failed(-matched, startExpectation)
+                        stop()
                     } else {
                         matched += index
                         PullParser.RequireMore(index, this)
                     }
                 }
                 if (input.get(index) != text[matched + index]) {
-                    return PullParser.Failed(-matched, startExpectation)
+                    return stop()
                 }
                 index++
             }

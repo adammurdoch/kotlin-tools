@@ -29,7 +29,7 @@ internal class SingleInputCompiledParser<IN : Input<*>, OUT>(
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
             return if (max == 0) {
-                if (input.finished) {
+                if (input.available == 0 && input.finished) {
                     stop()
                 } else {
                     PullParser.RequireMore(0, this)

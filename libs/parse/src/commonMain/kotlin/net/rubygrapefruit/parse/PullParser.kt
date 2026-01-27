@@ -31,6 +31,10 @@ internal interface PullParser<in IN, out OUT> : ParseState<IN, OUT> {
      * @param index Relative to the start of input to [parse]. Can be positive or negative. Must be < max passed to [parse].
      */
     data class Failed(val index: Int, val expected: Expectation) : Finished<Any?, Nothing> {
+        fun map(map: (Expectation) -> Expectation): Failed {
+            return Failed(index, map(expected))
+        }
+
         companion object {
             fun merged(failures: List<Failed>): Failed {
                 val largestIndex = failures.maxOf { it.index }

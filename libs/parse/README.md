@@ -26,7 +26,10 @@ Parsers that operate on text input:
 
 - literal(chars) - produces nothing
   - literal(chars, result) - produces result
-- oneOf(chars) - produces matched char
+- oneOf(chars) - produces matched input char
+  - oneOf(char...)
+  - oneOf(charRange)
+  - oneOf(collection)
 
 Text combinators:
 
@@ -38,7 +41,10 @@ Parsers that operate on binary input:
 
 - literal(bytes) - produces nothing
   - literal(bytes, result) - produces result
-- oneOf(bytes) - produces matched char
+- oneOf(bytes) - produces matched input byte
+  - oneOf(byte...)
+  - oneOf(byteRange)
+  - oneOf(collection)
 
 Binary combinators:
 

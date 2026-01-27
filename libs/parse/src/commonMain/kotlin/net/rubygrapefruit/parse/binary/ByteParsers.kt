@@ -18,10 +18,27 @@ fun <OUT> literal(bytes: ByteArray, result: OUT): Parser<ByteInput, OUT> {
 }
 
 /**
- * Returns a parser that matches one of the given bytes and produces it as a result.
+ * Returns a parser that matches one of the given bytes and produces the matched byte as a result.
  */
-fun oneOf(vararg bytes: Byte): Parser<ByteInput, Byte> {
-    return OneOfByteParser(bytes.toList())
+fun oneOf(first: Byte, second: Byte, vararg additional: Byte): Parser<ByteInput, Byte> {
+    return OneOfByteParser.of(listOf(first, second) + additional.toList())
+}
+
+/**
+ * Returns a parser that matches one of the given bytes and produces the matched byte as a result.
+ */
+fun oneOf(bytes: Collection<Byte>): Parser<ByteInput, Byte> {
+    return OneOfByteParser.of(bytes)
+}
+
+/**
+ * Returns a parser that matches one of the given bytes and produces the matched byte as a result.
+ *
+ * @param from inclusive
+ * @param to inclusive
+ */
+fun oneOf(from: Byte, to: Byte): Parser<ByteInput, Byte> {
+    return OneOfByteParser.of((from..to).map { it.toByte() })
 }
 
 /**

@@ -2,25 +2,11 @@ package sample.calc
 
 import net.rubygrapefruit.parse.ParseResult
 import net.rubygrapefruit.parse.combinators.*
-import net.rubygrapefruit.parse.text.CharInput
-import net.rubygrapefruit.parse.text.literal
-import net.rubygrapefruit.parse.text.match
-import net.rubygrapefruit.parse.text.parse
+import net.rubygrapefruit.parse.text.*
 
 class Parser {
     fun parse(text: String): ParseResult<*, List<Expression>> {
-        val digit = oneOf(
-            literal("0", 0),
-            literal("1", 1),
-            literal("2", 2),
-            literal("3", 3),
-            literal("4", 4),
-            literal("5", 5),
-            literal("6", 6),
-            literal("7", 7),
-            literal("8", 8),
-            literal("9", 9)
-        )
+        val digit = oneOf('0'..'9')
 
         val whitespace = zeroOrMore(literal(" "))
 
@@ -50,10 +36,7 @@ class Parser {
         // operand = number | "(" expression ")"
         // expression = plus | minus | operand
 
-        val separator = oneOf(
-            literal(","),
-            literal("\n")
-        )
+        val separator = oneOf(',', '\n')
         val blankLine = sequence(whitespace, literal("\n")) { _, _ -> }
         val parser = sequence(statement, zeroOrMore(prefixed(separator, statement)), zeroOrMore(blankLine)) { a, b, _ -> listOf(a) + b }
 

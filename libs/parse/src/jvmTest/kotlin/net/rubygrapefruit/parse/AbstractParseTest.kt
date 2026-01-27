@@ -471,7 +471,7 @@ abstract class AbstractParseTest {
                 get() = inspector.expected
 
             override val mayBeEmpty: Boolean
-                get() = inspector.mayBeEmpty
+                get() = false
 
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<DecideParser.DecideCompiledParser<*, *, *>>(parser)

@@ -18,7 +18,7 @@ internal class MergeExpectationsPullParser<IN, OUT>(val parser: PullParser<IN, O
                 if (result.index == 0) {
                     PullParser.Failed(0, expectation)
                 } else {
-                    TODO()
+                    result
                 }
             }
 

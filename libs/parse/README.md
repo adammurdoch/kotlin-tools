@@ -63,18 +63,33 @@ Parsers that operate on any kind of input:
 
 Parsers that combine other parsers:
 
+Choice parsers:
+
 - oneOf(parsers) - produces result of first parser that matches
+
+Sequence parsers:
+
 - sequence(parser, parser, map) - produces result of map function
+- sequence(parser, parser, parser, map) - produces result of map function
 - prefixed(parser, parser) - produces result of the second parser
   - sequence(unitParser, parser) - an alias
 - suffixed(parser, parser) - produces result of the first parser
   - sequence(parser, unitParser) - an alias
-- sequence(parser, parser, parser, map) - produces result of map function
+- decide(parser, factory) - uses factory to create second parser from the result of the first parser
+
+Repeating parsers:
+
 - zeroOrMore(parser) - produces list
   - Stops if the parser matches zero input values
   - zeroOrMore(unitParser) - produces nothing
+
+Mapping parsers:
+
 - map(parser, map) - produces result of map function
-- recursive() - a parser that is applied recursively
-- not(parser) - matches zero input values, produces nothing
 - discard(parser) - discards result of parser, produces nothing
 - replace(parser, result) - replaces result of parser with fixed value
+
+Other parsers:
+
+- recursive() - a parser that is applied recursively
+- not(parser) - matches zero input values, produces nothing

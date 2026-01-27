@@ -332,6 +332,8 @@ abstract class AbstractParseTest {
 
         fun expectMap(config: CompiledParserFixture.() -> Unit)
 
+        fun expectDecide(config: CompiledParserFixture.() -> Unit)
+
         fun expectRecursive(config: CompiledParserFixture.() -> Unit)
 
         fun expectRecurses()
@@ -460,6 +462,19 @@ abstract class AbstractParseTest {
 
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<MapParser.MapCompiledParser<*, *, *>>(parser)
+                inspector.inspect(parser.parser)
+            }
+        }
+
+        class IsDecide(val inspector: Inspector) : Inspector {
+            override val expected: List<String>
+                get() = inspector.expected
+
+            override val mayBeEmpty: Boolean
+                get() = inspector.mayBeEmpty
+
+            override fun inspect(parser: CompiledParser<*, *>) {
+                assertIs<DecideParser.DecideCompiledParser<*, *, *>>(parser)
                 inspector.inspect(parser.parser)
             }
         }
@@ -709,6 +724,12 @@ abstract class AbstractParseTest {
             val fixture = DefaultCompiledParserFixture()
             fixture.config()
             inspectors.add(Inspector.IsMap(fixture.inspector()))
+        }
+
+        override fun expectDecide(config: CompiledParserFixture.() -> Unit) {
+            val fixture = DefaultCompiledParserFixture()
+            fixture.config()
+            inspectors.add(Inspector.IsDecide(fixture.inspector()))
         }
 
         override fun expectRecursive(config: CompiledParserFixture.() -> Unit) {

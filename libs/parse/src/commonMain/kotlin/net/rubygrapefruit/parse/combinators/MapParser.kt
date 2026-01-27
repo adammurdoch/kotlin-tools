@@ -23,7 +23,7 @@ internal class MapParser<IN, INTERMEDIATE, OUT>(
             get() = parser.expectation
 
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
-            return parser.start(next.expectation) { length, value ->
+            return parser.start { length, value ->
                 next.next(length, map(value))
             }
         }

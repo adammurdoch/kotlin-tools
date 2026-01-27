@@ -1,8 +1,6 @@
 package net.rubygrapefruit.parse
 
 internal interface ParseContinuation<in IN, in OUT, out NEXT> {
-    val expectation: Expectation
-
     fun matched(start: Int, end: Int, value: OUT): PullParser.RequireMore<IN, NEXT> {
         return PullParser.RequireMore(end, next(end - start, value))
     }
@@ -17,11 +15,8 @@ internal interface ParseContinuation<in IN, in OUT, out NEXT> {
             return EndParseContinuation()
         }
 
-        fun <IN, OUT, NEXT> of(expectation: Expectation, next: (length: Int, value: OUT) -> PullParser<IN, NEXT>): ParseContinuation<IN, OUT, NEXT> {
+        fun <IN, OUT, NEXT> of(next: (length: Int, value: OUT) -> PullParser<IN, NEXT>): ParseContinuation<IN, OUT, NEXT> {
             return object : ParseContinuation<IN, OUT, NEXT> {
-                override val expectation: Expectation
-                    get() = expectation
-
                 override fun next(length: Int, value: OUT): PullParser<IN, NEXT> {
                     return next(length, value)
                 }
@@ -30,9 +25,6 @@ internal interface ParseContinuation<in IN, in OUT, out NEXT> {
     }
 
     private class EndParseContinuation<IN, OUT> : ParseContinuation<IN, OUT, OUT> {
-        override val expectation: Expectation
-            get() = Expectation.Nothing
-
         override fun next(length: Int, value: OUT): PullParser<IN, OUT> {
             return EndMatchPullParser(value)
         }

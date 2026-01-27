@@ -29,8 +29,8 @@ internal class Sequence2Parser<IN, A, B, OUT>(
             get() = if (a.mayNotAdvanceOnMatch) Expectation.OneOf.of(a.expectation, b.expectation) else a.expectation
 
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
-            return a.start(b.expectation) { lengthA, valueA ->
-                b.start(next.expectation) { lengthB, valueB ->
+            return a.start { lengthA, valueA ->
+                b.start { lengthB, valueB ->
                     val value = map(valueA, valueB)
                     next.next(lengthA + lengthB, value)
                 }

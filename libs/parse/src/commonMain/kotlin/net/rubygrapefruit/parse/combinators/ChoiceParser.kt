@@ -52,7 +52,7 @@ internal class ChoiceParser<IN, OUT>(
         private var currentExpected: Expectation? = null
         private val states = Array<ParseState<IN, NEXT>>(parsers.size) { index ->
             val parser = parsers[index]
-            parser.start(next.expectation) { length, value ->
+            parser.start { length, value ->
                 matched[index] = true
                 next.next(length, value)
             }

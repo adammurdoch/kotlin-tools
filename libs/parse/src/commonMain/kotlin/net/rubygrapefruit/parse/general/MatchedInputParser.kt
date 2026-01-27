@@ -22,7 +22,7 @@ internal class MatchedInputParser<IN, OUT>(
             get() = parser.expectation
 
         override fun <NEXT> start(next: ParseContinuation<SlicingInput<OUT>, OUT, NEXT>): PullParser<SlicingInput<OUT>, NEXT> {
-            return parser.start(next.expectation) { length, _ ->
+            return parser.start { length, _ ->
                 CollectMatchedInputPullParser(length, next)
             }
         }

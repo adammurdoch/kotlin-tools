@@ -4,6 +4,7 @@ import net.rubygrapefruit.parse.ParseResult
 import net.rubygrapefruit.parse.combinators.*
 import net.rubygrapefruit.parse.text.CharInput
 import net.rubygrapefruit.parse.text.literal
+import net.rubygrapefruit.parse.text.match
 import net.rubygrapefruit.parse.text.parse
 
 class Parser {
@@ -23,15 +24,17 @@ class Parser {
 
         val whitespace = zeroOrMore(literal(" "))
 
-        val plus = sequence(whitespace, literal("+"), whitespace) { _, _, _ -> }
-        val minus = sequence(whitespace, literal("-"), whitespace) { _, _, _ -> }
-
-        val number = sequence(digit, zeroOrMore(digit)) { a, b -> Number(("$a" + b.joinToString("")).toInt()) }
+        val digits = sequence(digit, zeroOrMore(digit)) { _, _ -> }
+        val number = map(match(digits)) { Number(it.toInt()) }
 
         val expression = recursive<CharInput, Expression>()
 
         val parenExpression = sequence(literal("("), expression, literal(")")) { _, b, _ -> b }
         val operand = oneOf(number, parenExpression)
+
+        val plus = sequence(whitespace, literal("+"), whitespace) { _, _, _ -> }
+        val minus = sequence(whitespace, literal("-"), whitespace) { _, _, _ -> }
+
         val addition = sequence(operand, plus, operand) { a, _, b -> Addition(a, b) }
         val subtraction = sequence(operand, minus, operand) { a, _, b -> Subtraction(a, b) }
 

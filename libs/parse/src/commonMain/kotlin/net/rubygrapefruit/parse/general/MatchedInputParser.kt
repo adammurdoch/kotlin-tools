@@ -33,6 +33,10 @@ internal class MatchedInputParser<IN, OUT>(
             return "{collect-matched-input length=$length}"
         }
 
+        override fun stop(): PullParser.Failed {
+            return PullParser.Failed(0 ,expectation)
+        }
+
         override fun parse(input: SlicingInput<OUT>, max: Int): PullParser.Result<SlicingInput<OUT>, NEXT> {
             return next.matched(-length, 0, input.get(-length, 0))
         }

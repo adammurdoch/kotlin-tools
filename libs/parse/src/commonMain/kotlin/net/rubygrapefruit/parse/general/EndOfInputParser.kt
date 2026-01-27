@@ -24,6 +24,10 @@ internal class EndOfInputParser<OUT>(val result: OUT) : Parser<Any, OUT>, Combin
             return "{end-of-input}"
         }
 
+        override fun stop(): PullParser.Failed {
+            return PullParser.Failed(0, expectation)
+        }
+
         override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
             return if (input.available > 0) {
                 PullParser.Failed(0, expectation)

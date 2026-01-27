@@ -11,6 +11,10 @@ internal class MergeExpectationsPullParser<IN, OUT>(val parser: PullParser<IN, O
         return "{merge-expectations $parser}"
     }
 
+    override fun stop(): PullParser.Failed {
+        return PullParser.Failed(0, expectation)
+    }
+
     override fun parse(input: IN, max: Int): PullParser.Result<IN, OUT> {
         val result = parser.parse(input, max)
         return when (result) {

@@ -34,6 +34,10 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
             return "{not predicate=$predicate $next}"
         }
 
+        override fun stop(): PullParser.Failed {
+            return PullParser.Failed(0, expectation)
+        }
+
         override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
             val maxAdvance = min(max, 1)
             val checkResult = predicate.parseZeroOrOne(input, maxAdvance)

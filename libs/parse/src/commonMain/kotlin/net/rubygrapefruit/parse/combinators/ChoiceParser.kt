@@ -76,6 +76,10 @@ internal class ChoiceParser<IN, OUT>(
             return "{choice}"
         }
 
+        override fun stop(): PullParser.Failed {
+            return PullParser.Failed(0, expectation)
+        }
+
         override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
             var requireMore = false
             val maxAdvance = min(max, 1)

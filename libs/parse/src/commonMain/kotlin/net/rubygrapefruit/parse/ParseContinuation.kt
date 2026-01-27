@@ -34,6 +34,10 @@ internal interface ParseContinuation<in IN, in OUT, out NEXT> {
         override val expectation: Expectation
             get() = Expectation.Nothing
 
+        override fun stop(): PullParser.Failed {
+            return PullParser.Failed(0, expectation)
+        }
+
         override fun toString(): String {
             return "{end}"
         }

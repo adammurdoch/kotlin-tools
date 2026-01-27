@@ -30,6 +30,10 @@ internal class CharLiteralParser<OUT>(
             return "{literal ${format(text)} matched=$matched}"
         }
 
+        override fun stop(): PullParser.Failed {
+            return PullParser.Failed(-matched, startExpectation)
+        }
+
         override fun parse(input: CharStream, max: Int): PullParser.Result<CharStream, NEXT> {
             var index = 0
             val remaining = text.length - matched

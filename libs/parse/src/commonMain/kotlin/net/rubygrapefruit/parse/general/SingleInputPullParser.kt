@@ -23,10 +23,14 @@ internal class SingleInputCompiledParser<IN : Input<*>, OUT>(
             return "{one $parser}"
         }
 
+        override fun stop(): PullParser.Failed {
+            return PullParser.Failed(0, expectation)
+        }
+
         override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
             return if (max == 0) {
                 if (input.finished) {
-                    PullParser.Failed(0, expectation)
+                    stop()
                 } else {
                     PullParser.RequireMore(0, this)
                 }
@@ -35,7 +39,7 @@ internal class SingleInputCompiledParser<IN : Input<*>, OUT>(
                     val result = extractor.extract(input)
                     next.matched(0, 1, result)
                 } else {
-                    PullParser.Failed(0, expectation)
+                    stop()
                 }
             }
         }

@@ -54,6 +54,10 @@ internal class DiagnosticParser<IN, OUT> private constructor(
             return parser.toString()
         }
 
+        override fun stop(): PullParser.Failed {
+            return parser.stop()
+        }
+
         override fun parse(input: IN, max: Int): PullParser.Result<IN, OUT> {
             val parserState = parser.toString()
             val result = parser.parse(input, max)

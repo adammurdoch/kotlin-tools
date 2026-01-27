@@ -34,6 +34,10 @@ internal class ByteLiteralParser<OUT>(
             return "{literal ${bytes.map { format(it) }}}"
         }
 
+        override fun stop(): PullParser.Failed {
+            return PullParser.Failed(0, expectation)
+        }
+
         override fun parse(input: ByteStream, max: Int): PullParser.Result<ByteStream, NEXT> {
             var index = 0
             val remaining = bytes.size - matched

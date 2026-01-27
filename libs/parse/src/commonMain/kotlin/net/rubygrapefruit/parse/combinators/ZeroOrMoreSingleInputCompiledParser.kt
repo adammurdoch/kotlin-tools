@@ -24,6 +24,10 @@ internal class ZeroOrMoreSingleInputCompiledParser<IN : Input<*>, OUT>(
             return "{zero-or-more $parser}"
         }
 
+        override fun stop(): PullParser.Failed {
+            return PullParser.Failed(0, expectation)
+        }
+
         override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
             var index = 0
             while (index < max) {

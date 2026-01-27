@@ -10,6 +10,11 @@ internal interface PullParser<in IN, out OUT> : ParseState<IN, OUT> {
     val expectation: Expectation
 
     /**
+     * Forces this parser to stop at the current position.
+     */
+    fun stop(): Failed
+
+    /**
      * Attempts to parse the given inputs, up to the given max number of values.
      *
      * @param max May be 0

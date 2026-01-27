@@ -267,7 +267,7 @@ abstract class AbstractParseTest {
         when (this) {
             is ParseResult.Success -> fail("Expected parse failure at offset $offset with message: $message")
             is ParseResult.Fail -> {
-                assertEquals(offset, context.position.offset, "unexpected offset")
+                assertEquals(offset, context.position.offset, "unexpected offset for failure '$message'")
                 assertEquals(line, context.position.line, "unexpected line")
                 assertEquals(col, context.position.col, "unexpected column")
                 assertEquals(failureLine, context.lineText, "unexpected line text")
@@ -412,7 +412,7 @@ abstract class AbstractParseTest {
 
         class IsNot(val inspector: Inspector) : Inspector {
             override val expected: List<String>
-                get() = emptyList()
+                get() = inspector.expected.map { "not $it" }
 
             override val mayBeEmpty: Boolean
                 get() = true

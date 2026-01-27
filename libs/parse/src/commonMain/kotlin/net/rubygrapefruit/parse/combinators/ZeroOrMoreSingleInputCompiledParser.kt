@@ -43,7 +43,7 @@ internal class ZeroOrMoreSingleInputCompiledParser<IN : Input<*>, OUT>(
                 accumulator = accumulator.extract(input, 0, index)
             }
             return if (index < max || index == input.available && input.finished) {
-                val nextParser = MergeExpectationsPullParser(next.next(matched, accumulator.value), expectation)
+                val nextParser = MergeExpectationsPullParser(next.next(matched, accumulator.value), parser.expectation)
                 PullParser.RequireMore(index, nextParser)
             } else {
                 PullParser.RequireMore(index, this)

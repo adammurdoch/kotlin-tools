@@ -13,28 +13,28 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
     }
 
     internal class NotCompiledParser<IN>(
-        val parser: CompiledParser<IN, *>
+        val parser: CompiledParser<IN, Unit>
     ) : CompiledParser<IN, Unit> {
         override val mayNotAdvanceOnMatch: Boolean
             get() = true
 
         override val expectation: Expectation
-            get() = Expectation.Nothing
+            get() = Expectation.Not(parser.expectation)
 
         override fun <NEXT> start(next: ParseContinuation<IN, Unit, NEXT>): PullParser<IN, NEXT> {
-            return NotPullParser(parser.start(), next.next(0, Unit))
+            return NotPullParser(parser, next.next(0, Unit))
         }
     }
 
     private class NotPullParser<IN, NEXT>(
-        private var predicate: PullParser<IN, *>,
+        private val parser: CompiledParser<IN, Unit>,
         private var next: PullParser<IN, NEXT>
     ) : PullParser<IN, NEXT> {
+        private var predicate = parser.start()
         private var matched = 0
-        private val expectedAtStart = Expectation.OneOf.of(Expectation.Not(predicate.expectation), next.expectation)
 
         override val expectation: Expectation
-            get() = next.expectation
+            get() = Expectation.OneOf.of(Expectation.Not(predicate.expectation), next.expectation)
 
         override fun toString(): String {
             return "{not predicate=$predicate $next}"
@@ -44,7 +44,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
             val maxAdvance = min(max, 1)
             val checkResult = predicate.parseZeroOrOne(input, maxAdvance)
             when (checkResult) {
-                is PullParser.Matched -> return PullParser.Failed(-matched, expectedAtStart)
+                is PullParser.Matched -> return PullParser.Failed(-matched, Expectation.OneOf.of(Expectation.Not(parser.start().expectation), next.expectation))
                 is PullParser.Failed -> return PullParser.RequireMore(0, MergeExpectationsPullParser(next, Expectation.Not(predicate.expectation)))
                 is PullParser.RequireMore -> predicate = checkResult.parser
             }

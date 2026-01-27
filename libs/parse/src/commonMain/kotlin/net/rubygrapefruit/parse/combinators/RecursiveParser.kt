@@ -27,12 +27,6 @@ internal class DefaultRecursiveParser<IN, OUT>(
     internal class RecursiveCompiledParser<IN, OUT> : CompiledParser<IN, OUT> {
         var parser: CompiledParser<IN, OUT>? = null
 
-        override val mayNotAdvanceOnMatch: Boolean
-            get() = parser!!.mayNotAdvanceOnMatch
-
-        override val expectation: Expectation
-            get() = parser!!.expectation
-
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return parser!!.start(next)
         }

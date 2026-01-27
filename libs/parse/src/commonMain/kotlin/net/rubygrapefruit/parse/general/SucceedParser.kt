@@ -22,12 +22,6 @@ internal class SucceedParser<OUT>(
     internal class SucceedCompiledParser<IN, OUT>(
         val result: OUT
     ) : CompiledParser<IN, OUT> {
-        override val mayNotAdvanceOnMatch: Boolean
-            get() = true
-
-        override val expectation: Expectation
-            get() = Expectation.Nothing
-
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return next.next(0, result)
         }

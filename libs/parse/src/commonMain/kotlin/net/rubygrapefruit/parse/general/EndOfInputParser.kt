@@ -12,11 +12,6 @@ internal class EndOfInputParser<OUT>(val result: OUT) : Parser<Any, OUT>, Combin
     }
 
     internal class EndOfInputCompiledParser<IN : Input<*>, OUT>(val result: OUT) : CompiledParser<IN, OUT> {
-        override val mayNotAdvanceOnMatch: Boolean
-            get() = true
-
-        override val expectation: Expectation = Expectation.One("end of input")
-
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return EndOfInputPullParser(result, next)
         }

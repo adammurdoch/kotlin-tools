@@ -236,9 +236,6 @@ abstract class AbstractParseTest {
     }
 
     private fun CompiledParser<*, *>.expecting(fixture: DefaultCompiledParserFixture) {
-        assertEquals(fixture.emptyMatch, mayNotAdvanceOnMatch)
-//        assertEquals(fixture.message(), expectation.format())
-
         fixture.inspect(this)
 
         val pullParser = start()
@@ -628,9 +625,6 @@ abstract class AbstractParseTest {
 
     private class DefaultCompiledParserFixture : CompiledParserFixture {
         private val inspectors = mutableListOf<Inspector>()
-
-        val emptyMatch: Boolean
-            get() = inspector().mayBeEmpty
 
         fun choices(): List<Inspector> {
             assertTrue(inspectors.isNotEmpty(), "no expected parsers defined")

@@ -33,12 +33,6 @@ internal class ChoiceParser<IN, OUT>(
     }
 
     internal class ChoiceCompiledParser<IN, OUT>(val parsers: List<CompiledParser<IN, OUT>>) : CompiledParser<IN, OUT> {
-        override val mayNotAdvanceOnMatch: Boolean
-            get() = parsers.any { it.mayNotAdvanceOnMatch }
-
-        override val expectation: Expectation
-            get() = Expectation.OneOf(parsers.map { it.expectation })
-
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return ChoicePullParser(parsers, next)
         }

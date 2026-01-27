@@ -22,12 +22,6 @@ internal class Sequence2Parser<IN, A, B, OUT>(
         val b: CompiledParser<IN, B>,
         private val map: (A, B) -> OUT
     ) : CompiledParser<IN, OUT> {
-        override val mayNotAdvanceOnMatch: Boolean
-            get() = a.mayNotAdvanceOnMatch && b.mayNotAdvanceOnMatch
-
-        override val expectation: Expectation
-            get() = if (a.mayNotAdvanceOnMatch) Expectation.OneOf.of(a.expectation, b.expectation) else a.expectation
-
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return a.start { lengthA, valueA ->
                 b.start { lengthB, valueB ->

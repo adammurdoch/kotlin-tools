@@ -31,13 +31,6 @@ internal class ZeroOrMoreParser<IN, OUT>(
         val option: CompiledParser<IN, ITEM>,
         val previous: Accumulator<ITEM, OUT>
     ) : CompiledParser<IN, OUT> {
-
-        override val mayNotAdvanceOnMatch: Boolean
-            get() = option.mayNotAdvanceOnMatch
-
-        override val expectation: Expectation
-            get() = option.expectation
-
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return option.start { length, value ->
                 val result = previous.add(value, length)
@@ -53,12 +46,6 @@ internal class ZeroOrMoreParser<IN, OUT>(
     }
 
     internal class EmptyCompiledParser<IN, ITEM, OUT>(private val result: Accumulator<ITEM, OUT>) : CompiledParser<IN, OUT> {
-        override val mayNotAdvanceOnMatch: Boolean
-            get() = true
-
-        override val expectation: Expectation
-            get() = Expectation.Nothing
-
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return next.next(result.length, result.value)
         }

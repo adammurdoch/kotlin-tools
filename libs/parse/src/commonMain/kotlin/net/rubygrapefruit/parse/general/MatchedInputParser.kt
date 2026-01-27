@@ -15,12 +15,6 @@ internal class MatchedInputParser<IN, OUT>(
     }
 
     internal class MatchedInputCompiledParser<OUT>(val parser: CompiledParser<SlicingInput<OUT>, *>) : CompiledParser<SlicingInput<OUT>, OUT> {
-        override val mayNotAdvanceOnMatch: Boolean
-            get() = parser.mayNotAdvanceOnMatch
-
-        override val expectation: Expectation
-            get() = parser.expectation
-
         override fun <NEXT> start(next: ParseContinuation<SlicingInput<OUT>, OUT, NEXT>): PullParser<SlicingInput<OUT>, NEXT> {
             return parser.start { length, _ ->
                 CollectMatchedInputPullParser(length, next)

@@ -6,12 +6,6 @@ internal class ZeroOrMoreSingleInputCompiledParser<IN : Input<*>, OUT>(
     private val parser: SingleInputParser<IN>,
     val accumulator: RangeAccumulator<IN, OUT>
 ) : CompiledParser<IN, OUT> {
-    override val mayNotAdvanceOnMatch: Boolean
-        get() = true
-
-    override val expectation: Expectation
-        get() = parser.expectation
-
     override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
         return ZeroOrMorePullParser(parser, accumulator, next)
     }

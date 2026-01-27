@@ -41,12 +41,6 @@ internal class DiagnosticParser<IN, OUT> private constructor(
     }
 
     private class DiagnosticCompiledParser<IN, OUT>(private val parser: CompiledParser<IN, OUT>, private val logger: Logger) : CompiledParser<IN, OUT> {
-        override val mayNotAdvanceOnMatch: Boolean
-            get() = parser.mayNotAdvanceOnMatch
-
-        override val expectation: Expectation
-            get() = parser.expectation
-
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return DiagnosticPullParser(parser.start(next), logger)
         }

@@ -52,13 +52,13 @@ internal class ChoiceParser<IN, OUT>(
             }
         }
 
-        override val expectation: Expectation
+        private val expectation: Expectation
             get() {
                 val currentExpected = currentExpected
                 return if (currentExpected == null) {
                     val expected = Expectation.OneOf.of(states.mapNotNull {
                         if (it is PullParser) {
-                            it.expectation
+                            it.stop().expected
                         } else if (it is PullParser.Failed && it.index == 0) {
                             it.expected
                         } else {

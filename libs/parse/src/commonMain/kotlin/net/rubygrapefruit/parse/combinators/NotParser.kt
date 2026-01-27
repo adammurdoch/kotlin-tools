@@ -27,15 +27,12 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
         private var predicate = parser.start()
         private var matched = 0
 
-        override val expectation: Expectation
-            get() = Expectation.OneOf.of(Expectation.Not(predicate.expectation), next.expectation)
-
         override fun toString(): String {
             return "{not predicate=$predicate $next}"
         }
 
         override fun stop(): PullParser.Failed {
-            return PullParser.Failed(0, expectation)
+            return PullParser.Failed(0, Expectation.OneOf.of(Expectation.Not(predicate.stop().expected), next.stop().expected))
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {

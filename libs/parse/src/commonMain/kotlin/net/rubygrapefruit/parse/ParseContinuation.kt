@@ -31,11 +31,8 @@ internal interface ParseContinuation<in IN, in OUT, out NEXT> {
     }
 
     private class EndMatchPullParser<IN, OUT>(val value: OUT) : PullParser<IN, OUT> {
-        override val expectation: Expectation
-            get() = Expectation.Nothing
-
         override fun stop(): PullParser.Failed {
-            return PullParser.Failed(0, expectation)
+            return PullParser.Failed(0, Expectation.Nothing)
         }
 
         override fun toString(): String {

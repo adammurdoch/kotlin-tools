@@ -23,9 +23,6 @@ internal class CharLiteralParser<OUT>(
     ) : PullParser<CharStream, NEXT> {
         private var matched = 0
 
-        override val expectation: Expectation
-            get() = if (matched == 0) startExpectation else Expectation.Nothing
-
         override fun toString(): String {
             return "{literal ${format(text)} matched=$matched}"
         }

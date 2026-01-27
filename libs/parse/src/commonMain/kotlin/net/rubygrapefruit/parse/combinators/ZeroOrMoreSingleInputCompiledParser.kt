@@ -17,15 +17,13 @@ internal class ZeroOrMoreSingleInputCompiledParser<IN : Input<*>, OUT>(
     ) : PullParser<IN, NEXT> {
         private var matched = 0
 
-        override val expectation: Expectation
-            get() = Expectation.OneOf.of(parser.expectation, next.next(matched, accumulator.value).expectation)
-
         override fun toString(): String {
             return "{zero-or-more $parser}"
         }
 
         override fun stop(): PullParser.Failed {
-            return PullParser.Failed(0, expectation)
+            val nextParser = MergeExpectationsPullParser(next.next(matched, accumulator.value), parser.expectation)
+            return nextParser.stop()
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {

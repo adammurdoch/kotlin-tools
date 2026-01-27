@@ -47,9 +47,6 @@ internal class DiagnosticParser<IN, OUT> private constructor(
     }
 
     private class DiagnosticPullParser<IN, OUT>(private val parser: PullParser<IN, OUT>, private val logger: Logger) : PullParser<IN, OUT> {
-        override val expectation: Expectation
-            get() = parser.expectation
-
         override fun toString(): String {
             return parser.toString()
         }

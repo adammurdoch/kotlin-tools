@@ -16,15 +16,12 @@ internal class SingleInputCompiledParser<IN : Input<*>, OUT>(
         private val extractor: Extractor<IN, OUT>,
         private val next: ParseContinuation<IN, OUT, NEXT>
     ) : PullParser<IN, NEXT> {
-        override val expectation: Expectation
-            get() = parser.expectation
-
         override fun toString(): String {
             return "{one $parser}"
         }
 
         override fun stop(): PullParser.Failed {
-            return PullParser.Failed(0, expectation)
+            return PullParser.Failed(0, parser.expectation)
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {

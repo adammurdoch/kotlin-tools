@@ -5,11 +5,6 @@ package net.rubygrapefruit.parse
  */
 internal interface PullParser<in IN, out OUT> : ParseState<IN, OUT> {
     /**
-     * What does this parser currently expect?
-     */
-    val expectation: Expectation
-
-    /**
      * Forces this parser to stop at the current position.
      */
     fun stop(): Failed

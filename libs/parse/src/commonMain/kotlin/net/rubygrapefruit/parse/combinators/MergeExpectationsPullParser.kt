@@ -4,9 +4,6 @@ import net.rubygrapefruit.parse.Expectation
 import net.rubygrapefruit.parse.PullParser
 
 internal class MergeExpectationsPullParser<IN, OUT>(val parser: PullParser<IN, OUT>, val optionExpectation: Expectation) : PullParser<IN, OUT> {
-    override val expectation: Expectation
-        get() = Expectation.OneOf.of(optionExpectation, parser.expectation)
-
     override fun toString(): String {
         return "{merge-expectations $parser}"
     }
@@ -25,7 +22,7 @@ internal class MergeExpectationsPullParser<IN, OUT>(val parser: PullParser<IN, O
         return when (result) {
             is PullParser.Failed -> {
                 if (result.index == 0) {
-                    PullParser.Failed(0, expectation)
+                    PullParser.Failed(0, Expectation.OneOf.of(optionExpectation, result.expected))
                 } else {
                     result
                 }

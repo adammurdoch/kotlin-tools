@@ -26,15 +26,12 @@ internal class MatchedInputParser<IN, OUT>(
         private val length: Int,
         private val next: ParseContinuation<SlicingInput<OUT>, OUT, NEXT>
     ) : PullParser<SlicingInput<OUT>, NEXT> {
-        override val expectation: Expectation
-            get() = Expectation.Nothing
-
         override fun toString(): String {
             return "{collect-matched-input length=$length}"
         }
 
         override fun stop(): PullParser.Failed {
-            return PullParser.Failed(0 ,expectation)
+            return PullParser.Failed(0, Expectation.Nothing)
         }
 
         override fun parse(input: SlicingInput<OUT>, max: Int): PullParser.Result<SlicingInput<OUT>, NEXT> {

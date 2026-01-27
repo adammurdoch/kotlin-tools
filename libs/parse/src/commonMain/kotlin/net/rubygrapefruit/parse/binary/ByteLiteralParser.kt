@@ -27,15 +27,12 @@ internal class ByteLiteralParser<OUT>(
     ) : PullParser<ByteStream, NEXT> {
         private var matched = 0
 
-        override val expectation: Expectation
-            get() = expectations[matched]
-
         override fun toString(): String {
             return "{literal ${bytes.map { format(it) }}}"
         }
 
         override fun stop(): PullParser.Failed {
-            return PullParser.Failed(0, expectation)
+            return PullParser.Failed(0, expectations[matched])
         }
 
         override fun parse(input: ByteStream, max: Int): PullParser.Result<ByteStream, NEXT> {

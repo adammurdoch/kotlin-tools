@@ -18,7 +18,7 @@ internal class EndOfInputParser<OUT>(val result: OUT) : Parser<Any, OUT>, Combin
     }
 
     private class EndOfInputPullParser<IN : Input<*>, OUT, NEXT>(val result: OUT, val next: ParseContinuation<IN, OUT, NEXT>) : PullParser<IN, NEXT> {
-        override val expectation: Expectation = Expectation.One("end of input")
+        private val expectation: Expectation = Expectation.One("end of input")
 
         override fun toString(): String {
             return "{end-of-input}"

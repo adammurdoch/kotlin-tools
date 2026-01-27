@@ -1,9 +1,9 @@
 package net.rubygrapefruit.parse.combinators
 
-import net.rubygrapefruit.parse.Expectation
+import net.rubygrapefruit.parse.ExpectationProvider
 import net.rubygrapefruit.parse.PullParser
 
-internal class MergeExpectationsPullParser<IN, OUT>(val parser: PullParser<IN, OUT>, val optionExpectation: Expectation) : PullParser<IN, OUT> {
+internal class MergeExpectationsPullParser<IN, OUT>(val parser: PullParser<IN, OUT>, val optionExpectation: ExpectationProvider) : PullParser<IN, OUT> {
     override fun toString(): String {
         return "{merge-expectations $parser}"
     }

@@ -33,7 +33,7 @@ internal open class DefaultPushParser<CONTEXT, IN : AdvancingInput<*>, OUT>(
         val result = state
         return when (result) {
             is PullParser.Matched -> ParseResult.Success(result.value)
-            is PullParser.Failed -> failureFactory(input, result.index, result.expected.format())
+            is PullParser.Failed -> failureFactory(input, result.index, result.expected.expectation().format())
             is PullParser -> throw IllegalStateException("Expected parsing to be finished, but is $result")
         }
     }

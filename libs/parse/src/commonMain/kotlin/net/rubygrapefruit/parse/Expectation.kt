@@ -1,7 +1,11 @@
 package net.rubygrapefruit.parse
 
-internal sealed interface Expectation {
+internal sealed interface Expectation : ExpectationProvider {
     fun accept(visitor: (String) -> Unit)
+
+    override fun expectation(): Expectation {
+        return this
+    }
 
     companion object {
         fun oneOf(expectations: List<Expectation>): Expectation {

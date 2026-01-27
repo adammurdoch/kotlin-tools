@@ -24,7 +24,7 @@ internal class ZeroOrMoreSingleInputCompiledParser<IN : Input<*>, OUT>(
         private var matched = 0
 
         override val expectation: Expectation
-            get() = Expectation.OneOf.of(parser.expectation, next.expectation)
+            get() = Expectation.OneOf.of(parser.expectation, next.next(matched, accumulator.value).expectation)
 
         override fun toString(): String {
             return "{zero-or-more $parser}"

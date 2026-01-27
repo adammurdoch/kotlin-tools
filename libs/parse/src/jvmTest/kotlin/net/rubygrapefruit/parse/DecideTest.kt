@@ -12,6 +12,7 @@ class DecideTest : AbstractParseTest() {
         parser.expecting {
             expectDecide {
                 expectLiteral("ab", result = 2)
+                expectLiteral("2")
             }
         }
 

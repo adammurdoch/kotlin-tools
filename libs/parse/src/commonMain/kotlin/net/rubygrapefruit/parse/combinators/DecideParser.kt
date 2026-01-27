@@ -5,7 +5,12 @@ import net.rubygrapefruit.parse.*
 internal class DecideParser<IN, INTERMEDIATE, OUT>(
     private val parser: Parser<IN, INTERMEDIATE>,
     private val factory: (INTERMEDIATE) -> Parser<IN, OUT>
-) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
+) : Parser<IN, OUT>, CombinatorBuilder<OUT>, DiscardableParser<IN> {
+
+    override fun withNoResult(): Parser<IN, Unit> {
+        return DecideParser(parser) { value -> DiscardParser(factory(value)) }
+    }
+
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, OUT> {
         val compiled = compiler.compile(parser)
         return DecideCompiledParser(compiled, factory, compiler)

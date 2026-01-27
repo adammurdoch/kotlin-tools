@@ -56,7 +56,15 @@ internal class ChoiceParser<IN, OUT>(
             get() {
                 val currentExpected = currentExpected
                 return if (currentExpected == null) {
-                    val expected = Expectation.OneOf(states.mapNotNull { if (it is PullParser) it.expectation else null })
+                    val expected = Expectation.OneOf.of(states.mapNotNull {
+                        if (it is PullParser) {
+                            it.expectation
+                        } else if (it is PullParser.Failed && it.index == 0) {
+                            it.expected
+                        } else {
+                            null
+                        }
+                    })
                     this.currentExpected = expected
                     expected
                 } else {
@@ -115,7 +123,7 @@ internal class ChoiceParser<IN, OUT>(
             val failures = states.filterIsInstance<PullParser.Failed>()
             val largestIndex = failures.maxOf { it.index }
             val relevantFailures = failures.filter { it.index == largestIndex }
-            return PullParser.Failed(largestIndex, Expectation.OneOf(relevantFailures.map { it.expected }))
+            return PullParser.Failed(largestIndex, Expectation.OneOf.of(relevantFailures.map { it.expected }))
         }
     }
 }

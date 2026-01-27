@@ -1,5 +1,6 @@
 package net.rubygrapefruit.parse
 
+import net.rubygrapefruit.parse.combinators.oneOf
 import net.rubygrapefruit.parse.combinators.sequence
 import net.rubygrapefruit.parse.combinators.zeroOrMore
 import net.rubygrapefruit.parse.text.literal
@@ -187,14 +188,68 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
             expectLiteral("a")
             expectLiteral("b")
         }
-        /*
         parser.doesNotMatch("b.en?") {
-            log()
             failAt(1)
             expectLiteral(".end")
             expectLiteral("a")
             expectLiteral("b")
         }
-         */
+    }
+
+    @Test
+    fun `matches zero or more one of char then choice of literal`() {
+        val parser = sequence(
+            zeroOrMore(oneOf('a', 'b')),
+            oneOf(
+                literal("?", '?'),
+                literal("!", '!')
+            )
+        ) { a, b -> a + b }
+
+        parser.expecting {
+            expectSequence {
+                expectZeroOrMoreSingleInput("a", "b")
+                expectChoice {
+                    expectLiteral("?", result = '?')
+                    expectLiteral("!", result = '!')
+                }
+            }
+        }
+
+        parser.matches("?", expected = listOf('?'))
+        parser.matches("ba!", expected = listOf('b', 'a', '!'))
+
+        // missing
+        parser.doesNotMatch("") {
+            expectLiteral("a")
+            expectLiteral("b")
+            expectLiteral("?")
+            expectLiteral("!")
+        }
+        parser.doesNotMatch("bb") {
+            failAt(2)
+            expectLiteral("a")
+            expectLiteral("b")
+            expectLiteral("?")
+            expectLiteral("!")
+        }
+
+        // unexpected
+        parser.doesNotMatch("X") {
+            expectLiteral("a")
+            expectLiteral("b")
+            expectLiteral("?")
+            expectLiteral("!")
+        }
+
+        // extra
+        parser.doesNotMatch("?X") {
+            failAt(1)
+            expectEndOfInput()
+        }
+        parser.doesNotMatch("ab!X") {
+            failAt(3)
+            expectEndOfInput()
+        }
     }
 }

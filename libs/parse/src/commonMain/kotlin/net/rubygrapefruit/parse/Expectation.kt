@@ -22,7 +22,7 @@ internal sealed interface Expectation {
         }
     }
 
-    class OneOf(val expectations: List<Expectation>) : Expectation {
+    class OneOf private constructor(val expectations: List<Expectation>) : Expectation {
         override fun toString(): String {
             return "{expect $expectations}"
         }
@@ -34,8 +34,17 @@ internal sealed interface Expectation {
         }
 
         companion object {
+            fun of(expectations: List<Expectation>): Expectation {
+                val effective = expectations.filter { it !is Nothing }
+                return when (effective.size) {
+                    0 -> Nothing
+                    1 -> effective.first()
+                    else -> OneOf(effective)
+                }
+            }
+
             fun of(first: Expectation, second: Expectation): Expectation {
-                return OneOf(listOf(first, second))
+                return of(listOf(first, second))
             }
         }
     }

@@ -70,4 +70,5 @@ Parsers that combine other parsers:
 - map(parser, map) - produces result of map function
 - recursive() - a parser that is applied recursively
 - not(parser) - matches zero input values, produces nothing
-- discard(parser) - creates a unitParser, produces nothing
+- discard(parser) - discards result of parser, produces nothing
+- replace(parser, result) - replaces result of parser with fixed value

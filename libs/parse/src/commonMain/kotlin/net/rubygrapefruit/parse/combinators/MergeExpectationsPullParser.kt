@@ -11,7 +11,7 @@ internal class MergeExpectationsPullParser<IN, OUT>(val parser: PullParser<IN, O
     override fun stop(): PullParser.Failed {
         val failure = parser.stop()
         return if (failure.index == 0) {
-            PullParser.Failed(0, Expectation.OneOf.of(optionExpectation, failure.expected))
+            PullParser.Failed(0, Expectation.oneOf(optionExpectation, failure.expected))
         } else {
             failure
         }
@@ -22,7 +22,7 @@ internal class MergeExpectationsPullParser<IN, OUT>(val parser: PullParser<IN, O
         return when (result) {
             is PullParser.Failed -> {
                 if (result.index == 0) {
-                    PullParser.Failed(0, Expectation.OneOf.of(optionExpectation, result.expected))
+                    PullParser.Failed(0, Expectation.oneOf(optionExpectation, result.expected))
                 } else {
                     result
                 }

@@ -32,14 +32,14 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
         }
 
         override fun stop(): PullParser.Failed {
-            return PullParser.Failed(0, Expectation.OneOf.of(Expectation.Not(predicate.stop().expected), next.stop().expected))
+            return PullParser.Failed(0, Expectation.oneOf(Expectation.Not(predicate.stop().expected), next.stop().expected))
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
             val maxAdvance = min(max, 1)
             val checkResult = predicate.parseZeroOrOne(input, maxAdvance)
             when (checkResult) {
-                is PullParser.Matched -> return PullParser.Failed(-matched, Expectation.OneOf.of(Expectation.Not(parser.start().stop().expected), next.stop().expected))
+                is PullParser.Matched -> return PullParser.Failed(-matched, Expectation.oneOf(Expectation.Not(parser.start().stop().expected), next.stop().expected))
                 is PullParser.Failed -> return PullParser.RequireMore(0, MergeExpectationsPullParser(next, Expectation.Not(predicate.stop().expected)))
                 is PullParser.RequireMore -> predicate = checkResult.parser
             }

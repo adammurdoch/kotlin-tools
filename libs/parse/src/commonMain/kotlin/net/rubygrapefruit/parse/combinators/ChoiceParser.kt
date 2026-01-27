@@ -43,7 +43,6 @@ internal class ChoiceParser<IN, OUT>(
         private val next: ParseContinuation<IN, OUT, NEXT>
     ) : PullParser<IN, NEXT> {
         private val matched = BooleanArray(parsers.size)
-        private var currentExpected: Expectation? = null
         private val states = Array<ParseState<IN, NEXT>>(parsers.size) { index ->
             val parser = parsers[index]
             parser.start { length, value ->
@@ -52,32 +51,20 @@ internal class ChoiceParser<IN, OUT>(
             }
         }
 
-        private val expectation: Expectation
-            get() {
-                val currentExpected = currentExpected
-                return if (currentExpected == null) {
-                    val expected = Expectation.OneOf.of(states.mapNotNull {
-                        if (it is PullParser) {
-                            it.stop().expected
-                        } else if (it is PullParser.Failed && it.index == 0) {
-                            it.expected
-                        } else {
-                            null
-                        }
-                    })
-                    this.currentExpected = expected
-                    expected
-                } else {
-                    currentExpected
-                }
-            }
-
         override fun toString(): String {
             return "{choice}"
         }
 
         override fun stop(): PullParser.Failed {
-            return PullParser.Failed(0, expectation)
+            return PullParser.Failed.merged(states.mapNotNull {
+                if (it is PullParser) {
+                    it.stop()
+                } else if (it is PullParser.Failed && it.index == 0) {
+                    it
+                } else {
+                    null
+                }
+            })
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
@@ -115,7 +102,6 @@ internal class ChoiceParser<IN, OUT>(
                             states[index] = PullParser.Failed(choice.index - maxAdvance, choice.expected)
                         }
                     }
-                    currentExpected = null
                 }
                 PullParser.RequireMore(maxAdvance, this)
             } else {
@@ -125,9 +111,7 @@ internal class ChoiceParser<IN, OUT>(
 
         private fun mergedFailures(): PullParser.Failed {
             val failures = states.filterIsInstance<PullParser.Failed>()
-            val largestIndex = failures.maxOf { it.index }
-            val relevantFailures = failures.filter { it.index == largestIndex }
-            return PullParser.Failed(largestIndex, Expectation.OneOf.of(relevantFailures.map { it.expected }))
+            return PullParser.Failed.merged(failures)
         }
     }
 }

@@ -3,6 +3,21 @@ package net.rubygrapefruit.parse
 internal sealed interface Expectation {
     fun accept(visitor: (String) -> Unit)
 
+    companion object {
+        fun oneOf(expectations: List<Expectation>): Expectation {
+            val effective = expectations.filter { it !is Nothing }
+            return when (effective.size) {
+                0 -> Nothing
+                1 -> effective.first()
+                else -> OneOf(effective)
+            }
+        }
+
+        fun oneOf(first: Expectation, second: Expectation): Expectation {
+            return oneOf(listOf(first, second))
+        }
+    }
+
     data object Nothing : Expectation {
         override fun toString(): String {
             return "{nothing}"
@@ -22,7 +37,7 @@ internal sealed interface Expectation {
         }
     }
 
-    class OneOf private constructor(val expectations: List<Expectation>) : Expectation {
+    private class OneOf(val expectations: List<Expectation>) : Expectation {
         override fun toString(): String {
             return "{expect $expectations}"
         }
@@ -30,21 +45,6 @@ internal sealed interface Expectation {
         override fun accept(visitor: (String) -> Unit) {
             for (expectation in expectations) {
                 expectation.accept(visitor)
-            }
-        }
-
-        companion object {
-            fun of(expectations: List<Expectation>): Expectation {
-                val effective = expectations.filter { it !is Nothing }
-                return when (effective.size) {
-                    0 -> Nothing
-                    1 -> effective.first()
-                    else -> OneOf(effective)
-                }
-            }
-
-            fun of(first: Expectation, second: Expectation): Expectation {
-                return of(listOf(first, second))
             }
         }
     }

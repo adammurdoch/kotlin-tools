@@ -50,6 +50,10 @@ internal sealed interface Expectation : ExpectationProvider {
     }
 
     class Not(val expectation: Expectation) : Expectation {
+        override fun toString(): String {
+            return "{not $expectation}"
+        }
+
         override fun accept(visitor: (String) -> Unit) {
             expectation.accept { text ->
                 visitor("not $text")

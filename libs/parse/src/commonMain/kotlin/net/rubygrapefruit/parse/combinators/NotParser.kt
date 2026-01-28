@@ -16,15 +16,16 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
         val parser: CompiledParser<IN, Unit>
     ) : CompiledParser<IN, Unit> {
         override fun <NEXT> start(next: ParseContinuation<IN, Unit, NEXT>): PullParser<IN, NEXT> {
-            return NotPullParser(parser, next.next(0, Unit))
+            return NotPullParser(parser, next)
         }
     }
 
     private class NotPullParser<IN, NEXT>(
         private val parser: CompiledParser<IN, Unit>,
-        private var next: PullParser<IN, NEXT>
+        private val continuation: ParseContinuation<IN, Unit, NEXT>
     ) : PullParser<IN, NEXT> {
         private var predicate = parser.start()
+        private var next = continuation.next(0, Unit)
         private var matched = 0
 
         override fun toString(): String {
@@ -40,7 +41,9 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
             val checkResult = predicate.parseZeroOrOne(input, maxAdvance)
             when (checkResult) {
                 is PullParser.Matched -> {
-                    val failure = PullParser.Failed.merged(listOf(parser.start().stop().map { Expectation.Not(it) }, next.stop()))
+                    val predicateExpectation = parser.start().stop().map { Expectation.Not(it) }
+                    val nextExpectation = continuation.next(0, Unit).stop()
+                    val failure = PullParser.Failed.merged(listOf(predicateExpectation, nextExpectation))
                     return PullParser.Failed(failure.index - matched, failure.expected)
                 }
 

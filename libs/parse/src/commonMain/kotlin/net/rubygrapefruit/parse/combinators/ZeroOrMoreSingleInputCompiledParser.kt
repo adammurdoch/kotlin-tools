@@ -18,7 +18,7 @@ internal class ZeroOrMoreSingleInputCompiledParser<IN : Input<*>, OUT>(
         private var matched = 0
 
         override fun toString(): String {
-            return "{zero-or-more $parser}"
+            return "{zero-or-more-of-one $parser}"
         }
 
         override fun stop(): PullParser.Failed {

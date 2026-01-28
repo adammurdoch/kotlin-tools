@@ -6,7 +6,7 @@ internal class DiagnosticParser<IN, OUT> private constructor(
     private val parser: Parser<IN, OUT>,
     private val logger: Logger
 ) : Parser<IN, OUT>, CombinatorBuilder<OUT>, DiscardableParser<IN> {
-    constructor(parser: Parser<IN, OUT>, log: Boolean) : this(parser, if (log) Logger.Active(0) else Logger.Disabled)
+    constructor(parser: Parser<IN, OUT>, log: Boolean) : this(parser, if (log) Logger.Active() else Logger.Disabled)
 
     override fun withNoResult(): Parser<IN, Unit> {
         return DiscardParser(parser)
@@ -15,11 +15,15 @@ internal class DiagnosticParser<IN, OUT> private constructor(
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, OUT> {
         val parser = if (parser is CombinatorBuilder<*>) {
             @Suppress("UNCHECKED_CAST")
-            (parser as CombinatorBuilder<OUT>).compile(DiagnosticCompiler(compiler, logger.nested()))
+            (parser as CombinatorBuilder<OUT>).compile(DiagnosticCompiler(compiler, logger))
         } else {
             compiler.compile(parser)
         }
         return DiagnosticCompiledParser(parser, logger)
+    }
+
+    companion object {
+        private var nextId = 0
     }
 
     private class DiagnosticCompiler<IN>(private val compiler: CombinatorBuilder.Compiler<IN>, private val logger: Logger) : CombinatorBuilder.Compiler<IN> {
@@ -47,6 +51,8 @@ internal class DiagnosticParser<IN, OUT> private constructor(
     }
 
     private class DiagnosticPullParser<IN, OUT>(private val parser: PullParser<IN, OUT>, private val logger: Logger) : PullParser<IN, OUT> {
+        private val id = nextId++
+
         override fun toString(): String {
             return parser.toString()
         }
@@ -56,9 +62,17 @@ internal class DiagnosticParser<IN, OUT> private constructor(
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN, OUT> {
+            if (parser is DiagnosticPullParser) {
+                return parser.parse(input, max)
+            }
+
             val parserState = parser.toString()
-            val result = parser.parse(input, max)
-            logger.log("-> $parserState parse(max=$max) => $result")
+            logger.logTopLevel("[$id] start (max=$max)")
+            val result = logger.nested {
+                parser.parse(input, max)
+            }
+            logger.log("[$id] $parserState => $result")
+
             return when (result) {
                 is PullParser.Matched -> result
 
@@ -78,11 +92,26 @@ internal class DiagnosticParser<IN, OUT> private constructor(
     private sealed class Logger {
         abstract fun log(message: String)
 
-        abstract fun nested(): Logger
+        abstract fun logTopLevel(message: String)
 
-        class Active(val depth: Int) : Logger() {
-            override fun nested(): Logger {
-                return Active(depth + 1)
+        abstract fun <T> nested(action: () -> T): T
+
+        class Active : Logger() {
+            private var depth: Int = 0
+
+            override fun <T> nested(action: () -> T): T {
+                depth++
+                try {
+                    return action()
+                } finally {
+                    depth--
+                }
+            }
+
+            override fun logTopLevel(message: String) {
+                if (depth == 0) {
+                    log(message)
+                }
             }
 
             override fun log(message: String) {
@@ -94,8 +123,11 @@ internal class DiagnosticParser<IN, OUT> private constructor(
         }
 
         data object Disabled : Logger() {
-            override fun nested(): Logger {
-                return this
+            override fun <T> nested(action: () -> T): T {
+                return action()
+            }
+
+            override fun logTopLevel(message: String) {
             }
 
             override fun log(message: String) {

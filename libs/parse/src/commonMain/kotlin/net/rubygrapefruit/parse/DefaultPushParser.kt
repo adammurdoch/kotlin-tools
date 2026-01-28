@@ -4,6 +4,8 @@ internal open class DefaultPushParser<CONTEXT, IN : AdvancingInput<*>, OUT>(
     parser: PullParser<IN, OUT>
 ) {
     private var state: ParseState<IN, OUT> = parser
+    private var failedChoice: ExpectationProvider? = null
+    private var failedChoiceIndex = 0
 
     fun inputAvailable(input: IN) {
         while (true) {
@@ -13,9 +15,23 @@ internal open class DefaultPushParser<CONTEXT, IN : AdvancingInput<*>, OUT>(
                 is PullParser -> {
                     val result = currentState.parse(input, input.available)
                     when (result) {
-                        is PullParser.Finished -> state = result
+                        is PullParser.Failed -> {
+                            state = if (failedChoice != null) {
+                                PullParser.Failed.merged(listOf(PullParser.Failed(failedChoiceIndex, failedChoice!!), result))
+                            } else {
+                                result
+                            }
+                        }
+
+                        is PullParser.Matched -> state = result
                         is PullParser.RequireMore -> {
                             input.advance(result.advance)
+                            if (result.failedChoice != null) {
+                                failedChoice = result.failedChoice
+                                failedChoiceIndex = 0
+                            } else {
+                                failedChoiceIndex -= result.advance
+                            }
                             state = result.parser
                             if (!input.finished) {
                                 return

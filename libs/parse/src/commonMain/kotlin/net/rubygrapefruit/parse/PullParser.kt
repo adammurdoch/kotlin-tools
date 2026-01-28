@@ -53,5 +53,9 @@ internal interface PullParser<in IN, out OUT> : ParseState<IN, OUT> {
      *
      * @param advance Can be 0. Must be <= max passed to [parse].
      */
-    data class RequireMore<in IN, out OUT>(val advance: Int, val parser: PullParser<IN, OUT>) : Result<IN, OUT>
+    data class RequireMore<in IN, out OUT>(
+        val advance: Int,
+        val parser: PullParser<IN, OUT>,
+        val failedChoice: ExpectationProvider? = null
+    ) : Result<IN, OUT>
 }

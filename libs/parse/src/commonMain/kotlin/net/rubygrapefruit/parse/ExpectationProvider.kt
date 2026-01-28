@@ -11,4 +11,14 @@ internal interface ExpectationProvider {
             }
         }
     }
+
+    companion object {
+        fun oneOf(first: ExpectationProvider, second: ExpectationProvider): ExpectationProvider {
+            return object : ExpectationProvider {
+                override fun expectation(): Expectation {
+                    return Expectation.oneOf(listOf(first.expectation(), second.expectation()))
+                }
+            }
+        }
+    }
 }

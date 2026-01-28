@@ -44,7 +44,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
                     return PullParser.Failed(failure.index - matched, failure.expected)
                 }
 
-                is PullParser.Failed -> return PullParser.RequireMore(0, MergeExpectationsPullParser(next, predicate.stop().expected.map { Expectation.Not(it)}))
+                is PullParser.Failed -> return PullParser.RequireMore(0, next, predicate.stop().expected.map { Expectation.Not(it) })
                 is PullParser.RequireMore -> predicate = checkResult.parser
             }
 

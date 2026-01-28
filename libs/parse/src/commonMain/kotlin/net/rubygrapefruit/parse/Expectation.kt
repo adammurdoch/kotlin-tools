@@ -16,10 +16,6 @@ internal sealed interface Expectation : ExpectationProvider {
                 else -> OneOf(effective)
             }
         }
-
-        fun oneOf(first: Expectation, second: Expectation): Expectation {
-            return oneOf(listOf(first, second))
-        }
     }
 
     data object Nothing : Expectation {

@@ -28,3 +28,10 @@ fun <IN> discard(parser: Parser<IN, *>): Parser<IN, Unit> {
 fun <IN, OUT> replace(parser: Parser<IN, *>, result: OUT): Parser<IN, OUT> {
     return map(discard(parser)) { result }
 }
+
+/**
+ * Returns a parser that applies the given parser and calls the given function with its result.
+ */
+fun <IN, OUT> consume(parser: Parser<IN, OUT>, consumer: (OUT) -> Unit): Parser<IN, Unit> {
+    return map(parser) { (consumer(it)) }
+}

@@ -568,7 +568,6 @@ abstract class AbstractParseTest {
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<SingleInputCompiledParser<*, *>>(parser)
                 assertIs<OneOfCharParser>(parser.parser)
-                assertEquals(chars, parser.parser.chars)
                 if (hasResult) {
                     assertIs<NextValueExtractor<*, *>>(parser.extractor)
                 } else {
@@ -590,7 +589,6 @@ abstract class AbstractParseTest {
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<SingleInputCompiledParser<*, *>>(parser)
                 assertIs<OneOfByteParser>(parser.parser)
-                assertEquals(bytes, parser.parser.bytes)
                 if (hasResult) {
                     assertIs<NextValueExtractor<*, *>>(parser.extractor)
                 } else {

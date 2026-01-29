@@ -46,9 +46,23 @@ fun <IN, OUT> sequence(parser: Parser<IN, OUT>, suffixed: Parser<IN, Unit>): Par
 }
 
 /**
+ * Returns a parser that applies the given parsers in order. Produces no result.
+ */
+fun <IN> sequence(a: Parser<IN, Unit>, b: Parser<IN, Unit>): Parser<IN, Unit> {
+    return sequence(a, b) { _, _ -> }
+}
+
+/**
  * Returns a parser that applies the given parsers in order.
  * Uses the given mapping function to produce the result.
  */
 fun <IN, A, B, C, OUT> sequence(a: Parser<IN, A>, b: Parser<IN, B>, c: Parser<IN, C>, map: (A, B, C) -> OUT): Parser<IN, OUT> {
     return Sequence2Parser(a, Sequence2Parser(b, c) { b, c -> Pair(b, c) }) { a, tail -> map(a, tail.first, tail.second) }
+}
+
+/**
+ * Returns a parser that applies the given parsers in order. Produces no result.
+ */
+fun <IN> sequence(a: Parser<IN, Unit>, b: Parser<IN, Unit>, c: Parser<IN, Unit>): Parser<IN, Unit> {
+    return sequence(a, b, c) { _, _, _ -> }
 }

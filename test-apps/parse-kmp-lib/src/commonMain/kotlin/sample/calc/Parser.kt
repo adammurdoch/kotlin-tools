@@ -6,10 +6,9 @@ import net.rubygrapefruit.parse.text.*
 
 class Parser {
     fun parse(text: String): ParseResult<*, List<Expression>> {
-        val digit = oneOf('0'..'9')
-
         val whitespace = zeroOrMore(literal(" "))
 
+        val digit = discard(oneOf('0'..'9'))
         val digits = sequence(digit, zeroOrMore(digit)) { _, _ -> }
         val number = map(match(digits)) { Number(it.toInt()) }
 
@@ -18,8 +17,8 @@ class Parser {
         val parenExpression = sequence(literal("("), expression, literal(")")) { _, b, _ -> b }
         val operand = oneOf(number, parenExpression)
 
-        val plus = sequence(whitespace, literal("+"), whitespace) { _, _, _ -> }
-        val minus = sequence(whitespace, literal("-"), whitespace) { _, _, _ -> }
+        val plus = sequence(whitespace, literal("+"), whitespace)
+        val minus = sequence(whitespace, literal("-"), whitespace)
 
         val addition = sequence(operand, plus, operand) { a, _, b -> Addition(a, b) }
         val subtraction = sequence(operand, minus, operand) { a, _, b -> Subtraction(a, b) }
@@ -37,7 +36,7 @@ class Parser {
         // expression = plus | minus | operand
 
         val separator = oneOf(',', '\n')
-        val blankLine = sequence(whitespace, literal("\n")) { _, _ -> }
+        val blankLine = sequence(whitespace, literal("\n"))
         val parser = sequence(statement, zeroOrMore(prefixed(separator, statement)), zeroOrMore(blankLine)) { a, b, _ -> listOf(a) + b }
 
         return parser.parse(text)

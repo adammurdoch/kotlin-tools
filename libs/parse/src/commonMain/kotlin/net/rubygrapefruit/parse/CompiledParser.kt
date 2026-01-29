@@ -9,6 +9,9 @@ internal interface CompiledParser<IN, out OUT> {
      */
     fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT>
 
+    /**
+     * A convenience for [start].
+     */
     fun <NEXT> start(next: (length: Int, value: OUT) -> PullParser<IN, NEXT>): PullParser<IN, NEXT> {
         return start(ParseContinuation.of(next))
     }

@@ -17,7 +17,7 @@ class ConsumeTest : AbstractParseTest() {
         }
 
         parser.expecting {
-            expectMap {
+            expectConsume {
                 expectLiteral("abc", result = 1)
             }
         }

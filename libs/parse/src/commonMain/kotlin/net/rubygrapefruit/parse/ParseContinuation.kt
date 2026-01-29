@@ -2,6 +2,10 @@ package net.rubygrapefruit.parse
 
 internal interface ParseContinuation<in IN, in OUT, out NEXT> {
     fun matched(start: Int, end: Int, value: OUT): PullParser.RequireMore<IN, NEXT> {
+        return matched(start, end, ValueProvider.of(value))
+    }
+
+    fun matched(start: Int, end: Int, value: ValueProvider<OUT>): PullParser.RequireMore<IN, NEXT> {
         return PullParser.RequireMore(end, next(end - start, value))
     }
 

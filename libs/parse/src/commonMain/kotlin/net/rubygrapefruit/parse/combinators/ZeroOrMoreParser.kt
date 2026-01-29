@@ -33,9 +33,9 @@ internal class ZeroOrMoreParser<IN, OUT>(
     ) : CompiledParser<IN, OUT> {
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return option.start { length, value ->
-                val result = previous.add(value.get(), length)
+                val result = previous.add(value, length)
                 if (length == 0) {
-                    next.next(0, result.value)
+                    next.next(0, result)
                 } else {
                     val empty = EmptyCompiledParser<IN, ITEM, OUT>(result)
                     val nested = OptionCompiledParser(option, result)
@@ -47,7 +47,7 @@ internal class ZeroOrMoreParser<IN, OUT>(
 
     internal class EmptyCompiledParser<IN, ITEM, OUT>(private val result: Accumulator<ITEM, OUT>) : CompiledParser<IN, OUT> {
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
-            return next.next(result.length, result.value)
+            return next.next(result.length, result)
         }
     }
 }

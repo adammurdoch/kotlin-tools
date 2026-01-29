@@ -7,6 +7,7 @@ internal class ByteLiteralParser<OUT>(
     val result: OUT
 ) : Parser<ByteInput, OUT>, ParserBuilder<ByteStream, OUT>, DiscardableParser<ByteInput> {
     private val expectations = bytes.map { Expectation.One(format(it)) }
+    private val provider = ValueProvider.of(result)
 
     override val expectation: Expectation
         get() = expectations.first()
@@ -16,12 +17,12 @@ internal class ByteLiteralParser<OUT>(
     }
 
     override fun <NEXT> start(next: ParseContinuation<ByteStream, OUT, NEXT>): PullParser<ByteStream, NEXT> {
-        return ByteLiteralPullParser(bytes, result, expectations, next)
+        return ByteLiteralPullParser(bytes, provider, expectations, next)
     }
 
     private class ByteLiteralPullParser<OUT, NEXT>(
         private val bytes: ByteArray,
-        private val result: OUT,
+        private val result: ValueProvider<OUT>,
         private val expectations: List<Expectation>,
         private val next: ParseContinuation<ByteStream, OUT, NEXT>
     ) : PullParser<ByteStream, NEXT> {

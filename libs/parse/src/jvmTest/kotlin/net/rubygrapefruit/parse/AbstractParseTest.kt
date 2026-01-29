@@ -381,7 +381,7 @@ abstract class AbstractParseTest {
 
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<SucceedParser.SucceedCompiledParser<*, *>>(parser)
-                assertEquals(result, parser.result)
+                assertEquals(result, parser.result.get())
             }
         }
 

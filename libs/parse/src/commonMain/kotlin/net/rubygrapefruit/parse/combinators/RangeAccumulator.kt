@@ -1,13 +1,12 @@
 package net.rubygrapefruit.parse.combinators
 
 import net.rubygrapefruit.parse.BoxingInput
+import net.rubygrapefruit.parse.ValueProvider
 
 /**
  * Implementation may be mutable.
  */
-internal interface RangeAccumulator<in IN, out OUT> {
-    val value: OUT
-
+internal interface RangeAccumulator<in IN, out OUT> : ValueProvider<OUT> {
     fun extract(input: IN, start: Int, end: Int): RangeAccumulator<IN, OUT>
 }
 
@@ -23,20 +22,20 @@ internal abstract class ListRangeAccumulator<IN : BoxingInput<*, T>, T> : RangeA
     protected abstract fun collectInto(list: MutableList<T>)
 
     class Empty<IN : BoxingInput<*, T>, T> : ListRangeAccumulator<IN, T>() {
-        override val value: List<T>
-            get() = emptyList()
+        override fun get(): List<T> {
+            return emptyList()
+        }
 
         override fun collectInto(list: MutableList<T>) {
         }
     }
 
     private class Matched<IN : BoxingInput<*, T>, T>(private val items: List<T>, private val prev: ListRangeAccumulator<IN, T>) : ListRangeAccumulator<IN, T>() {
-        override val value: List<T>
-            get() {
-                val value = mutableListOf<T>()
-                collectInto(value)
-                return value
-            }
+        override fun get(): List<T> {
+            val value = mutableListOf<T>()
+            collectInto(value)
+            return value
+        }
 
         override fun collectInto(list: MutableList<T>) {
             prev.collectInto(list)
@@ -46,8 +45,8 @@ internal abstract class ListRangeAccumulator<IN : BoxingInput<*, T>, T> : RangeA
 }
 
 internal object UnitRangeAccumulator : RangeAccumulator<Any, Unit> {
-    override val value: Unit
-        get() = Unit
+    override fun get() {
+    }
 
     override fun extract(input: Any, start: Int, end: Int): RangeAccumulator<Any, Unit> {
         return this

@@ -12,13 +12,6 @@ internal interface ParseContinuation<in IN, in OUT, out NEXT> {
     /**
      * Returns the next parser, given a match.
      */
-    fun next(length: Int, value: OUT): PullParser<IN, NEXT> {
-        return next(length, ValueProvider.of(value))
-    }
-
-    /**
-     * Returns the next parser, given a match.
-     */
     fun next(length: Int, value: ValueProvider<OUT>): PullParser<IN, NEXT>
 
     companion object {

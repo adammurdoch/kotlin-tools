@@ -6,7 +6,7 @@ import net.rubygrapefruit.parse.Parser
  * Returns a parser that always succeeds. Does not consume any input or produce a result.
  */
 fun succeed(): Parser<Any, Unit> {
-    return SucceedParser.of()
+    return SucceedParser.NoResult
 }
 
 /**

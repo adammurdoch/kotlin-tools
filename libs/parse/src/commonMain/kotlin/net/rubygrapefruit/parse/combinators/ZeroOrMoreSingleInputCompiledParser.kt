@@ -22,7 +22,7 @@ internal class ZeroOrMoreSingleInputCompiledParser<IN : Input<*>, OUT>(
         }
 
         override fun stop(): PullParser.Failed {
-            return PullParser.Failed.merged(listOf(PullParser.Failed(0, parser.expectation), next.next(matched, accumulator.value).stop()))
+            return PullParser.Failed.merged(listOf(PullParser.Failed(0, parser.expectation), next.next(matched, accumulator).stop()))
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
@@ -38,7 +38,7 @@ internal class ZeroOrMoreSingleInputCompiledParser<IN : Input<*>, OUT>(
                 accumulator = accumulator.extract(input, 0, index)
             }
             return if (index < max || index == input.available && input.finished) {
-                val nextParser = next.next(matched, accumulator.value)
+                val nextParser = next.next(matched, accumulator)
                 PullParser.RequireMore(index, nextParser, parser.expectation)
             } else {
                 PullParser.RequireMore(index, this)

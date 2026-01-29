@@ -10,17 +10,15 @@ internal class SucceedParser<OUT>(
     }
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, OUT> {
-        return SucceedCompiledParser(result)
+        return SucceedCompiledParser(ValueProvider.of(result))
     }
 
     companion object {
-        fun of(): Parser<Any, Unit> {
-            return SucceedParser(Unit)
-        }
+        val NoResult = SucceedParser(Unit)
     }
 
     internal class SucceedCompiledParser<IN, OUT>(
-        val result: OUT
+        val result: ValueProvider<OUT>
     ) : CompiledParser<IN, OUT> {
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return next.next(0, result)

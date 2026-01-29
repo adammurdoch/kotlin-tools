@@ -25,7 +25,7 @@ internal class Sequence2Parser<IN, A, B, OUT>(
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return a.start { lengthA, valueA ->
                 b.start { lengthB, valueB ->
-                    val value = map(valueA, valueB)
+                    val value = map(valueA.get(), valueB.get())
                     next.next(lengthA + lengthB, value)
                 }
             }

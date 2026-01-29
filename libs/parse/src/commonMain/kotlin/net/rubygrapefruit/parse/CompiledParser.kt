@@ -12,7 +12,7 @@ internal interface CompiledParser<IN, out OUT> {
     /**
      * A convenience for [start].
      */
-    fun <NEXT> start(next: (length: Int, value: OUT) -> PullParser<IN, NEXT>): PullParser<IN, NEXT> {
+    fun <NEXT> start(next: (length: Int, value: ValueProvider<OUT>) -> PullParser<IN, NEXT>): PullParser<IN, NEXT> {
         return start(ParseContinuation.of(next))
     }
 

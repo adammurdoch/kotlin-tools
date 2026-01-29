@@ -22,10 +22,10 @@ internal interface ParseContinuation<in IN, in OUT, out NEXT> {
             return EndParseContinuation()
         }
 
-        fun <IN, OUT, NEXT> of(next: (length: Int, value: OUT) -> PullParser<IN, NEXT>): ParseContinuation<IN, OUT, NEXT> {
+        fun <IN, OUT, NEXT> of(next: (length: Int, value: ValueProvider<OUT>) -> PullParser<IN, NEXT>): ParseContinuation<IN, OUT, NEXT> {
             return object : ParseContinuation<IN, OUT, NEXT> {
                 override fun next(length: Int, value: ValueProvider<OUT>): PullParser<IN, NEXT> {
-                    return next(length, value.get())
+                    return next(length, value)
                 }
             }
         }

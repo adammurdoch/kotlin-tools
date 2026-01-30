@@ -22,27 +22,38 @@ class Calc : CliApp("parse-jvm-cli-app") {
         }
         val result = parser.parse(text).get()
         for (expression in result) {
-            print("expression: ")
             expression.render()
-            println()
-            println("value: ${expression.evaluate()}")
+            print(" = ")
+            println(expression.evaluate())
         }
     }
 
     private fun Expression.render() {
         when (this) {
             is BinaryExpression -> {
-                print("(")
-                left.render()
-                print(") ")
+                left.renderNested()
+                print(' ')
                 print(operator)
-                print(" (")
-                right.render()
-                print(")")
+                print(' ')
+                right.renderNested()
             }
 
             is Number -> {
                 print(value)
+            }
+        }
+    }
+
+    private fun Expression.renderNested() {
+        when (this) {
+            is BinaryExpression -> {
+                print('(')
+                render()
+                print(')')
+            }
+
+            is Number -> {
+                render()
             }
         }
     }

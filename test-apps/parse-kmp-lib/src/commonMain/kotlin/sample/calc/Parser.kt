@@ -14,7 +14,9 @@ class Parser {
 
         val expression = recursive<CharInput, Expression>()
 
-        val parenExpression = sequence(literal("("), expression, literal(")")) { _, b, _ -> b }
+        val openParen = sequence(literal("("), whitespace)
+        val closeParen = sequence(whitespace, literal(")"))
+        val parenExpression = sequence(openParen, expression, closeParen)
         val operand = oneOf(number, parenExpression)
 
         val plus = sequence(whitespace, literal("+"), whitespace)
@@ -25,7 +27,7 @@ class Parser {
 
         expression.parser(oneOf(addition, subtraction, operand))
 
-        val statement = sequence(whitespace, expression, whitespace) { _, b, _ -> b }
+        val statement = sequence(whitespace, expression, whitespace)
 
         // expression = operand ("+" operand | "-" operand)*
         // operand = number | "(" expression ")"

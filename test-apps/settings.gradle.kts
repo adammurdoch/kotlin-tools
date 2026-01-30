@@ -94,7 +94,7 @@ samples {
 
     jvmCliApp("parse-jvm-cli-app") {
         cliArgs("100 + 200")
-        expectedOutput("(100) + (200)")
+        expectedOutput("100 + 200 = 300")
         deriveNative("parse-native-cli-app")
     }
 

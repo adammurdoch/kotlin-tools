@@ -97,6 +97,11 @@ samples {
         expectedOutput("100 + 200 = 300")
         deriveNative("parse-native-cli-app")
     }
+    jvmCliApp("parse-toml-jvm-cli-app") {
+        cliArgs("--file", "../parse-toml-jvm-cli-app/test.toml")
+        expectedOutput("""key-1 = "value"""")
+        deriveNative("parse-toml-native-cli-app")
+    }
 
     jvmCliApp("cli-args-parameters") { cliArgs("--help") }
     jvmCliApp("cli-args-options") { cliArgs("--help") }

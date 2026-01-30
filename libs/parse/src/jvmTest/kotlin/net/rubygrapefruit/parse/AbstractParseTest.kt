@@ -309,6 +309,10 @@ abstract class AbstractParseTest {
 
         fun expectLiteral(vararg bytes: Byte, result: Any = Unit)
 
+        fun expectOneChar(hasResult: Boolean = true)
+
+        fun expectOneByte(hasResult: Boolean = true)
+
         fun expectOneOf(vararg chars: Char, hasResult: Boolean = true)
 
         fun expectOneOf(vararg bytes: Byte, hasResult: Boolean = true)
@@ -570,6 +574,36 @@ abstract class AbstractParseTest {
             }
         }
 
+        data class IsOneChar(val hasResult: Boolean) : Inspector {
+            override val expected: List<String>
+                get() = listOf("one character")
+
+            override fun inspect(parser: CompiledParser<*, *>) {
+                assertIs<SingleInputCompiledParser<*, *>>(parser)
+                assertIs<OneCharParser>(parser.parser)
+                if (hasResult) {
+                    assertIs<NextValueExtractor<*, *>>(parser.extractor)
+                } else {
+                    assertIs<UnitExtractor>(parser.extractor)
+                }
+            }
+        }
+
+        data class IsOneByte(val hasResult: Boolean) : Inspector {
+            override val expected: List<String>
+                get() = listOf("one byte")
+
+            override fun inspect(parser: CompiledParser<*, *>) {
+                assertIs<SingleInputCompiledParser<*, *>>(parser)
+                assertIs<OneByteParser>(parser.parser)
+                if (hasResult) {
+                    assertIs<NextValueExtractor<*, *>>(parser.extractor)
+                } else {
+                    assertIs<UnitExtractor>(parser.extractor)
+                }
+            }
+        }
+
         data class IsOneOfChar(val chars: List<Char>, val hasResult: Boolean) : Inspector {
             override val expected: List<String>
                 get() {
@@ -669,6 +703,14 @@ abstract class AbstractParseTest {
 
         override fun expectLiteral(vararg bytes: Byte, result: Any) {
             inspectors.add(Inspector.IsByteLiteral(bytes, result))
+        }
+
+        override fun expectOneChar(hasResult: Boolean) {
+            inspectors.add(Inspector.IsOneChar(hasResult))
+        }
+
+        override fun expectOneByte(hasResult: Boolean) {
+            inspectors.add(Inspector.IsOneByte(hasResult))
         }
 
         override fun expectOneOf(vararg chars: Char, hasResult: Boolean) {

@@ -1,0 +1,18 @@
+- "literal" -> "text" and "bytes"?
+- Improve description for `\r`, `\t` and ranges
+- `description()`
+- `separated()`
+- Optimized implementation for `not(single-input)`
+- `literal(one-value)` is a single input parser
+- `oneOf(single-input...)` is a single input parser
+- `oneOrMore()`
+- Separator for `zeroOrMore()` and `oneOrMore()`
+- Binary ints
+- Parse file
+- `accept()` does not call function on a failed branch
+- Match location/region
+- Semantic errors
+- Discard buffered input once it is not required
+- Common prefix for choice
+- Sync on parse failure
+- Left recursion

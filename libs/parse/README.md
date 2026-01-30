@@ -26,6 +26,7 @@ Parsers that operate on text input:
 
 - literal(chars) - produces nothing
   - literal(chars, result) - produces result
+- one() - produces matched input char
 - oneOf(chars) - produces matched input char
   - oneOf(char...)
   - oneOf(charRange)
@@ -41,6 +42,7 @@ Parsers that operate on binary input:
 
 - literal(bytes) - produces nothing
   - literal(bytes, result) - produces result
+- one() - produces matched input byte
 - oneOf(bytes) - produces matched input byte
   - oneOf(byte...)
   - oneOf(byteRange)

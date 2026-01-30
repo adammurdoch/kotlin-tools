@@ -5,6 +5,13 @@ import net.rubygrapefruit.parse.combinators.discard
 import net.rubygrapefruit.parse.general.MatchedInputParser
 
 /**
+ * Returns a parser that matches a single byte and produces the matched byte as a result.
+ */
+fun one(): Parser<ByteInput, Byte> {
+    return OneByteParser
+}
+
+/**
  * Returns a parser that matches the given sequence of bytes. Does not produce a result.
  */
 fun literal(bytes: ByteArray): Parser<ByteInput, Unit> {

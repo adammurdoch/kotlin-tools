@@ -8,6 +8,8 @@ import sample.calc.BinaryExpression
 import sample.calc.Expression
 import sample.calc.Number
 import sample.calc.Parser
+import sample.render.Terminal
+import sample.render.terminal
 
 class Calc : CliApp("parse-jvm-cli-app") {
     val args by remainder("args")
@@ -21,39 +23,41 @@ class Calc : CliApp("parse-jvm-cli-app") {
             stdin.buffered().readString()
         }
         val result = parser.parse(text).get()
+        val terminal = terminal()
         for (expression in result) {
-            expression.render()
+            expression.renderTo(terminal)
             print(" = ")
-            println(expression.evaluate())
+            expression.evaluate().renderTo(terminal)
+            println()
         }
     }
 
-    private fun Expression.render() {
+    private fun Expression.renderTo(terminal: Terminal) {
         when (this) {
             is BinaryExpression -> {
-                left.renderNested()
-                print(' ')
-                print(operator)
-                print(' ')
-                right.renderNested()
+                left.renderNestedTo(terminal)
+                terminal.whitespace(" ")
+                terminal.operator(operator)
+                terminal.whitespace(" ")
+                right.renderNestedTo(terminal)
             }
 
             is Number -> {
-                print(value)
+                terminal.literal(value)
             }
         }
     }
 
-    private fun Expression.renderNested() {
+    private fun Expression.renderNestedTo(terminal: Terminal) {
         when (this) {
             is BinaryExpression -> {
-                print('(')
-                render()
-                print(')')
+                terminal.operator('(')
+                renderTo(terminal)
+                terminal.operator(')')
             }
 
             is Number -> {
-                render()
+                renderTo(terminal)
             }
         }
     }

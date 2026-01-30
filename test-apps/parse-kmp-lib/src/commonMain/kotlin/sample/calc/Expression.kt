@@ -1,12 +1,12 @@
 package sample.calc
 
 sealed class Expression {
-    abstract fun evaluate(): Int
+    abstract fun evaluate(): Number
 }
 
 class Number(val value: Int) : Expression() {
-    override fun evaluate(): Int {
-        return value
+    override fun evaluate(): Number {
+        return this
     }
 }
 
@@ -20,8 +20,8 @@ class Addition(override val left: Expression, override val right: Expression) : 
     override val operator: String
         get() = "+"
 
-    override fun evaluate(): Int {
-        return left.evaluate() + right.evaluate()
+    override fun evaluate(): Number {
+        return Number(left.evaluate().value + right.evaluate().value)
     }
 }
 
@@ -29,7 +29,7 @@ class Subtraction(override val left: Expression, override val right: Expression)
     override val operator: String
         get() = "-"
 
-    override fun evaluate(): Int {
-        return left.evaluate() - right.evaluate()
+    override fun evaluate(): Number {
+        return Number(left.evaluate().value - right.evaluate().value)
     }
 }

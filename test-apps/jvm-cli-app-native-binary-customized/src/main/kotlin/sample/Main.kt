@@ -1,9 +1,9 @@
 package sample
 
-import sample.calc.Failure
-import sample.calc.Parser
-import sample.calc.Success
-import sample.render.render
+import sample.calc.*
+import sample.calc.Number
+import sample.render.Terminal
+import sample.render.terminal
 import sample.system.reportSystemInfo
 
 fun main(args: Array<String>) {
@@ -20,5 +20,23 @@ fun main(args: Array<String>) {
         }
 
         is Failure -> println(result.message)
+    }
+}
+
+fun render(expression: Expression) {
+    val renderer = terminal()
+    expression.renderTo(renderer)
+}
+
+private fun Expression.renderTo(terminal: Terminal) {
+    when (this) {
+        is Number -> terminal.literal(value)
+        is Addition -> {
+            left.renderTo(terminal)
+            terminal.whitespace(" ")
+            terminal.operator("+")
+            terminal.whitespace(" ")
+            right.renderTo(terminal)
+        }
     }
 }

@@ -6,9 +6,4 @@ library {
     jvm {
         module.name = "sample.render"
     }
-    desktop {
-        dependencies {
-            implementation(project(":kmp-lib"))
-        }
-    }
 }

@@ -49,7 +49,7 @@ samples {
 
     jvmCliApp("jvm-cli-app") {
         cliArgs("1", "+", "2")
-        expectedOutput("Expression: (1) + (2)")
+        expectedOutput("1 + 2 = 3")
         derive("jvm-cli-app-customized") {
             launcher("app")
         }

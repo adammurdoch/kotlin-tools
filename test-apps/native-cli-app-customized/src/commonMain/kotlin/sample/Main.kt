@@ -13,9 +13,10 @@ fun main(args: Array<String>) {
     println("Input: ${args.joinToString(" ")}")
     when (result) {
         is Success -> {
-            print("Expression: ")
             render(result.expression)
-            println("Result: ${result.expression.evaluate()}")
+            print(" = ")
+            render(result.expression.evaluate())
+            println()
         }
 
         is Failure -> println(result.message)

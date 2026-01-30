@@ -7,7 +7,7 @@ import kotlin.test.Test
 class CharMatchTest : AbstractParseTest() {
     @Test
     fun `matches char literal and produces matching input`() {
-        val parser = match(literal("abc"))
+        val parser = match(literal("abc", 1))
 
         parser.expecting {
             expectMatch {

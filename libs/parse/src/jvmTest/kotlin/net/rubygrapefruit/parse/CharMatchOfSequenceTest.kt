@@ -20,7 +20,7 @@ class CharMatchOfSequenceTest : AbstractParseTest() {
             expectMatch {
                 expectSequence {
                     expectLiteral("12")
-                    expectOneOf('3', '!')
+                    expectOneOf('3', '!', hasResult = false)
                 }
             }
         }

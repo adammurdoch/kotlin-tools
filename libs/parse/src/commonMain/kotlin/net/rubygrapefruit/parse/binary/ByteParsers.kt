@@ -1,6 +1,7 @@
 package net.rubygrapefruit.parse.binary
 
 import net.rubygrapefruit.parse.Parser
+import net.rubygrapefruit.parse.combinators.discard
 import net.rubygrapefruit.parse.general.MatchedInputParser
 
 /**
@@ -45,5 +46,5 @@ fun oneOf(from: Byte, to: Byte): Parser<ByteInput, Byte> {
  * Returns a parser that applies the given parser and produces the input bytes that it matched.
  */
 fun match(parser: Parser<ByteInput, *>): Parser<ByteInput, ByteArray> {
-    return MatchedInputParser(parser)
+    return MatchedInputParser(discard(parser))
 }

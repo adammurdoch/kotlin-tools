@@ -7,7 +7,7 @@ import kotlin.test.Test
 class ByteMatchTest : AbstractParseTest() {
     @Test
     fun `matches byte literal and produces matching input`() {
-        val parser = match(literal(byteArrayOf(0x1, 0x2)))
+        val parser = match(literal(byteArrayOf(0x1, 0x2), 1))
 
         parser.expecting {
             expectMatch {

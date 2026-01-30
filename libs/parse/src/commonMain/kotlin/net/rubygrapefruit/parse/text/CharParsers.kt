@@ -1,6 +1,7 @@
 package net.rubygrapefruit.parse.text
 
 import net.rubygrapefruit.parse.Parser
+import net.rubygrapefruit.parse.combinators.discard
 import net.rubygrapefruit.parse.general.MatchedInputParser
 
 /**
@@ -42,5 +43,5 @@ fun oneOf(chars: CharRange): Parser<CharInput, Char> {
  * Returns a parser that applies the given parser and produces the input text that it matched.
  */
 fun match(parser: Parser<CharInput, *>): Parser<CharInput, String> {
-    return MatchedInputParser(parser)
+    return MatchedInputParser(discard((parser)))
 }

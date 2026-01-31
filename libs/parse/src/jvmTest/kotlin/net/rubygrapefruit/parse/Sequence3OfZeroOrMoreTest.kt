@@ -16,10 +16,16 @@ class Sequence3OfZeroOrMoreTest : AbstractParseTest() {
 
         parser.expecting {
             expectSequence {
-                expectZeroOrMoreSingleInput("a", "b")
+                expectZeroOrMoreSingleInput {
+                    expectOneOf("a", "b")
+                }
                 expectSequence {
-                    expectZeroOrMoreSingleInput("1", "2")
-                    expectZeroOrMoreSingleInput("!", "?")
+                    expectZeroOrMoreSingleInput {
+                        expectOneOf("1", "2")
+                    }
+                    expectZeroOrMoreSingleInput {
+                        expectOneOf("!", "?")
+                    }
                 }
             }
         }

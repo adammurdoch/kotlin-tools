@@ -18,7 +18,9 @@ class DiscardOfMatchTest : AbstractParseTest() {
         )
 
         parser.expecting {
-            expectZeroOrMoreSingleInput(0x1, 0x2, hasResult = false)
+            expectZeroOrMoreSingleInput(hasResult = false) {
+                expectOneOf(0x1, 0x2)
+            }
         }
 
         parser.matches()

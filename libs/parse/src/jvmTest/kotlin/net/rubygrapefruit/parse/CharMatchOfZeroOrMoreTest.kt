@@ -48,7 +48,9 @@ class CharMatchOfZeroOrMoreTest : AbstractParseTest() {
 
         parser.expecting {
             expectMatch {
-                expectZeroOrMoreSingleInput("1", "2", hasResult = false)
+                expectZeroOrMoreSingleInput(hasResult = false) {
+                    expectOneOf("1", "2")
+                }
             }
         }
 

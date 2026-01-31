@@ -15,7 +15,9 @@ class ZeroOrMoreOfDiscardOneOfSetTest : AbstractParseTest() {
         )
 
         parser.expecting {
-            expectZeroOrMoreSingleInput("a", "b", hasResult = false)
+            expectZeroOrMoreSingleInput(hasResult = false) {
+                expectOneOf("a", "b")
+            }
         }
 
         parser.matches("")

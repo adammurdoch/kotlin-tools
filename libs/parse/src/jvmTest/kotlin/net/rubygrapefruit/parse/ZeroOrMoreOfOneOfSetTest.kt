@@ -13,7 +13,9 @@ class ZeroOrMoreOfOneOfSetTest : AbstractParseTest() {
         )
 
         parser.expecting {
-            expectZeroOrMoreSingleInput("a", "b")
+            expectZeroOrMoreSingleInput {
+                expectOneOf("a", "b")
+            }
         }
 
         parser.matches("", expected = emptyList())
@@ -42,7 +44,9 @@ class ZeroOrMoreOfOneOfSetTest : AbstractParseTest() {
         )
 
         parser.expecting {
-            expectZeroOrMoreSingleInput(0x1, 0x2)
+            expectZeroOrMoreSingleInput {
+                expectOneOf(0x1, 0x2)
+            }
         }
 
         parser.matches(expected = emptyList())

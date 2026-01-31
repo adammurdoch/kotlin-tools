@@ -4,8 +4,9 @@ Parsers
 - `description()`
 - `separated()`
 - `oneOrMore()`
-- Separator for `zeroOrMore()` and `oneOrMore()`
+- `zeroOrMore()` and `oneOrMore()` with a separator
 - Binary ints
+- Repeat, `take(parser<int>)`, `drop(parser<int>)`
 - `accept()` does not call function on a failed branch
 
 Performance

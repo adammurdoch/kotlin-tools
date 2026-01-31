@@ -13,7 +13,9 @@ class DecideOfZeroOrMoreTest : AbstractParseTest() {
 
         parser.expecting {
             expectDecide {
-                expectZeroOrMoreSingleInput(0x1, 0x2)
+                expectZeroOrMoreSingleInput {
+                    expectOneOf(0x1, 0x2)
+                }
                 expectLiteral(0x3)
             }
         }

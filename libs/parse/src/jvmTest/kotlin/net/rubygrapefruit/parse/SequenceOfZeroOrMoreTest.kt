@@ -161,7 +161,9 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
 
         parser.expecting {
             expectSequence {
-                expectZeroOrMoreSingleInput("a", "b")
+                expectZeroOrMoreSingleInput {
+                    expectOneOf("a", "b")
+                }
                 expectLiteral(".end", result = listOf('.'))
             }
         }
@@ -208,7 +210,9 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
 
         parser.expecting {
             expectSequence {
-                expectZeroOrMoreSingleInput("a", "b")
+                expectZeroOrMoreSingleInput {
+                    expectOneOf("a", "b")
+                }
                 expectChoice {
                     expectLiteral("?", result = '?')
                     expectLiteral("!", result = '!')

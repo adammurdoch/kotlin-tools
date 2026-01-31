@@ -3,7 +3,7 @@ package net.rubygrapefruit.parse.combinators
 import net.rubygrapefruit.parse.*
 
 internal class ZeroOrMoreSingleInputCompiledParser<IN : Input<*>, OUT>(
-    private val parser: SingleInputParser<IN>,
+    val parser: SingleInputParser<IN>,
     val accumulator: RangeAccumulator<IN, OUT>
 ) : CompiledParser<IN, OUT> {
     override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {

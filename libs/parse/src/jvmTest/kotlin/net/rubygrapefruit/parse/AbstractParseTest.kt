@@ -313,7 +313,15 @@ abstract class AbstractParseTest {
 
         fun expectOneByte(hasResult: Boolean = true)
 
-        fun expectOneOf(vararg chars: Char, hasResult: Boolean = true)
+        fun expectOneOf(vararg chars: Char, hasResult: Boolean = true) {
+            expectOneOf(chars.toList(), hasResult = hasResult)
+        }
+
+        fun expectOneOf(chars: List<Char>, hasResult: Boolean = true)
+
+        fun expectOneOf(vararg chars: String, hasResult: Boolean = true) {
+            expectOneOf(chars.map { it.first() }, hasResult = hasResult)
+        }
 
         fun expectOneOf(vararg bytes: Byte, hasResult: Boolean = true)
 
@@ -329,9 +337,7 @@ abstract class AbstractParseTest {
 
         fun expectZero()
 
-        fun expectZeroOrMoreSingleInput(vararg literals: String, hasResult: Boolean = true)
-
-        fun expectZeroOrMoreSingleInput(vararg literals: Byte, hasResult: Boolean = true)
+        fun expectZeroOrMoreSingleInput(hasResult: Boolean = true, config: CompiledParserFixture.() -> Unit)
 
         fun expectMap(config: CompiledParserFixture.() -> Unit)
 
@@ -375,6 +381,10 @@ abstract class AbstractParseTest {
             get() = false
 
         fun inspect(parser: CompiledParser<*, *>)
+
+        fun inspect(parser: SingleInputParser<*>) {
+            fail()
+        }
 
         data class IsSucceed(val result: Any) : Inspector {
             override val expected: List<String>
@@ -527,15 +537,16 @@ abstract class AbstractParseTest {
             }
         }
 
-        data class IsZeroOrMoreSingleInput(val expectation: HasExpectation, val hasResult: Boolean) : Inspector {
+        data class IsZeroOrMoreSingleInput(val inspector: Inspector, val hasResult: Boolean) : Inspector {
             override val expected: List<String>
-                get() = expectation.expect
+                get() = inspector.expected
 
             override val mayBeEmpty: Boolean
                 get() = true
 
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<ZeroOrMoreSingleInputCompiledParser<*, *>>(parser)
+                inspector.inspect(parser.parser)
                 if (hasResult) {
                     assertIs<ListRangeAccumulator<*, *>>(parser.accumulator)
                 } else {
@@ -578,9 +589,13 @@ abstract class AbstractParseTest {
             override val expected: List<String>
                 get() = listOf("one character")
 
+            override fun inspect(parser: SingleInputParser<*>) {
+                assertIs<OneCharParser>(parser)
+            }
+
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<SingleInputCompiledParser<*, *>>(parser)
-                assertIs<OneCharParser>(parser.parser)
+                inspect(parser.parser)
                 if (hasResult) {
                     assertIs<NextValueExtractor<*, *>>(parser.extractor)
                 } else {
@@ -593,9 +608,13 @@ abstract class AbstractParseTest {
             override val expected: List<String>
                 get() = listOf("one byte")
 
+            override fun inspect(parser: SingleInputParser<*>) {
+                assertIs<OneByteParser>(parser)
+            }
+
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<SingleInputCompiledParser<*, *>>(parser)
-                assertIs<OneByteParser>(parser.parser)
+                inspect(parser.parser)
                 if (hasResult) {
                     assertIs<NextValueExtractor<*, *>>(parser.extractor)
                 } else {
@@ -614,9 +633,13 @@ abstract class AbstractParseTest {
                     return expected.expect
                 }
 
+            override fun inspect(parser: SingleInputParser<*>) {
+                assertIs<OneOfCharParser>(parser)
+            }
+
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<SingleInputCompiledParser<*, *>>(parser)
-                assertIs<OneOfCharParser>(parser.parser)
+                inspect(parser.parser)
                 if (hasResult) {
                     assertIs<NextValueExtractor<*, *>>(parser.extractor)
                 } else {
@@ -635,9 +658,13 @@ abstract class AbstractParseTest {
                     return expected.expect
                 }
 
+            override fun inspect(parser: SingleInputParser<*>) {
+                assertIs<OneOfByteParser>(parser)
+            }
+
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<SingleInputCompiledParser<*, *>>(parser)
-                assertIs<OneOfByteParser>(parser.parser)
+                inspect(parser.parser)
                 if (hasResult) {
                     assertIs<NextValueExtractor<*, *>>(parser.extractor)
                 } else {
@@ -713,8 +740,8 @@ abstract class AbstractParseTest {
             inspectors.add(Inspector.IsOneByte(hasResult))
         }
 
-        override fun expectOneOf(vararg chars: Char, hasResult: Boolean) {
-            inspectors.add(Inspector.IsOneOfChar(chars.toList(), hasResult))
+        override fun expectOneOf(chars: List<Char>, hasResult: Boolean) {
+            inspectors.add(Inspector.IsOneOfChar(chars, hasResult))
         }
 
         override fun expectOneOf(vararg bytes: Byte, hasResult: Boolean) {
@@ -755,20 +782,10 @@ abstract class AbstractParseTest {
             inspectors.add(Inspector.IsZero)
         }
 
-        override fun expectZeroOrMoreSingleInput(vararg literals: String, hasResult: Boolean) {
-            val expected = HasExpectation()
-            for (text in literals) {
-                expected.expectLiteral(text)
-            }
-            inspectors.add(Inspector.IsZeroOrMoreSingleInput(expected, hasResult))
-        }
-
-        override fun expectZeroOrMoreSingleInput(vararg literals: Byte, hasResult: Boolean) {
-            val expected = HasExpectation()
-            for (b in literals) {
-                expected.expectLiteral(b)
-            }
-            inspectors.add(Inspector.IsZeroOrMoreSingleInput(expected, hasResult))
+        override fun expectZeroOrMoreSingleInput(hasResult: Boolean, config: CompiledParserFixture.() -> Unit) {
+            val fixture = DefaultCompiledParserFixture()
+            fixture.config()
+            inspectors.add(Inspector.IsZeroOrMoreSingleInput(fixture.inspector(), hasResult))
         }
 
         override fun expectConsume(config: CompiledParserFixture.() -> Unit) {

@@ -16,6 +16,9 @@ internal class DiagnosticParser<IN, OUT> private constructor(
         val parser = if (parser is CombinatorBuilder<*>) {
             @Suppress("UNCHECKED_CAST")
             (parser as CombinatorBuilder<OUT>).compile(DiagnosticCompiler(compiler, logger))
+        } else if (parser is TypedInputCombinatorBuilder<*, *>) {
+            @Suppress("UNCHECKED_CAST")
+            (parser as TypedInputCombinatorBuilder<IN, OUT>).compile(DiagnosticCompiler(compiler, logger))
         } else {
             compiler.compile(parser)
         }
@@ -67,7 +70,7 @@ internal class DiagnosticParser<IN, OUT> private constructor(
             }
 
             val parserState = parser.toString()
-            logger.logTopLevel("[$id] start (max=$max)")
+            logger.logTopLevel("[$id] start (max=$max) $parserState")
             val result = logger.nested {
                 parser.parse(input, max)
             }

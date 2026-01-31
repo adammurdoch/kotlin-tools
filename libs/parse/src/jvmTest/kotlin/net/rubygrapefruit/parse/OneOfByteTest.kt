@@ -117,7 +117,7 @@ class OneOfByteTest : AbstractParseTest() {
     }
 
     @Test
-    fun `cannot provide single byte`() {
+    fun `cannot provide list with single byte`() {
         try {
             oneOf(listOf(0x1))
         } catch (e: IllegalArgumentException) {
@@ -127,9 +127,9 @@ class OneOfByteTest : AbstractParseTest() {
     }
 
     @Test
-    fun `cannot provide no byte`() {
+    fun `cannot provide empty list`() {
         try {
-            oneOf(emptyList<Byte>())
+            oneOf(emptyList<Byte>()) // type parameter to force correct overload
         } catch (e: IllegalArgumentException) {
             return
         }

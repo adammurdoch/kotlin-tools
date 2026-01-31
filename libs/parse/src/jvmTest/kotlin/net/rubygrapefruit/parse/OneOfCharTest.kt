@@ -71,6 +71,27 @@ class OneOfCharTest : AbstractParseTest() {
     }
 
     @Test
+    fun `formats special chars`() {
+        // test a subset, the full set is tested via literals
+        val candidates = listOf(
+            '\t' to "tab",
+            '\n' to "new line",
+            ' ' to "space",
+        )
+        for (candidate in candidates) {
+            val parser = oneOf(candidate.first, '!')
+
+            parser.matches(candidate.first.toString(), expected = candidate.first)
+
+            // missing
+            parser.doesNotMatch("") {
+                expectLiteral("!")
+                expect(candidate.second)
+            }
+        }
+    }
+
+    @Test
     fun `matches one of a range of chars`() {
         val parser = oneOf('a'..'c')
 
@@ -173,7 +194,7 @@ class OneOfCharTest : AbstractParseTest() {
     }
 
     @Test
-    fun `cannot provide single char`() {
+    fun `cannot provide list with single char`() {
         try {
             oneOf(listOf('a'))
         } catch (e: IllegalArgumentException) {
@@ -183,9 +204,9 @@ class OneOfCharTest : AbstractParseTest() {
     }
 
     @Test
-    fun `cannot provide no chars`() {
+    fun `cannot provide empty list`() {
         try {
-            oneOf(emptyList<Char>())
+            oneOf(emptyList<Char>()) // type parameter to force correct overload
         } catch (e: IllegalArgumentException) {
             return
         }

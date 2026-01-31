@@ -71,6 +71,28 @@ class CharLiteralTest : AbstractParseTest() {
     }
 
     @Test
+    fun `formats special chars`() {
+        val candidates = listOf(
+            "\t" to "tab",
+            "\n" to "new line",
+            "\r" to "carriage return",
+            "\r\n" to "carriage return new line",
+            " " to "space",
+            "\"" to "'\"'"
+        )
+        for (candidate in candidates) {
+            val parser = literal(candidate.first)
+
+            parser.matches(candidate.first)
+
+            // missing
+            parser.doesNotMatch("") {
+                expect(candidate.second)
+            }
+        }
+    }
+
+    @Test
     fun `matches single char literal and produces result`() {
         val parser = literal("a", 1)
 

@@ -5,8 +5,13 @@ internal fun format(char: Char): String {
 }
 
 internal fun format(text: String): String {
-    return when {
-        text == "\n" -> "new line"
+    return when (text) {
+        "\n" -> "new line"
+        "\r" -> "carriage return"
+        "\r\n" -> "carriage return new line"
+        "\t" -> "tab"
+        " " -> "space"
+        "\"" -> "'\"'"
         else -> "\"$text\""
     }
 }

@@ -38,13 +38,19 @@ internal interface PullParser<in IN, out OUT> : ParseState<IN, OUT> {
         companion object {
             fun merged(failures: List<Failed>): Failed {
                 val largestIndex = failures.maxOf { it.index }
-                return Failed(largestIndex, object : ExpectationProvider {
-                    override fun expectation(): Expectation {
-                        val relevantFailures = failures.filter { it.index == largestIndex }
-                        return Expectation.oneOf(relevantFailures.map { it.expected.expectation() })
-                    }
-                })
+                return Failed(largestIndex, MergedFailures(largestIndex, failures))
             }
+        }
+    }
+
+    private class MergedFailures(val largestIndex: Int, val failures: List<Failed>) : ExpectationProvider {
+        override fun toString(): String {
+            return "{merged $failures}"
+        }
+
+        override fun expectation(): Expectation {
+            val relevantFailures = failures.filter { it.index == largestIndex }
+            return Expectation.oneOf(relevantFailures.map { it.expected.expectation() })
         }
     }
 

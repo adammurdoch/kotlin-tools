@@ -6,7 +6,6 @@ internal class DiagnosticParser<IN, OUT> private constructor(
     private val parser: Parser<IN, OUT>,
     private val logger: Logger
 ) : Parser<IN, OUT>, CombinatorBuilder<OUT>, DiscardableParser<IN> {
-    constructor(parser: Parser<IN, OUT>, log: Boolean) : this(parser, if (log) Logger.Active() else Logger.Disabled)
 
     override fun withNoResult(): Parser<IN, Unit> {
         return DiscardParser(parser)
@@ -27,6 +26,15 @@ internal class DiagnosticParser<IN, OUT> private constructor(
 
     companion object {
         private var nextId = 0
+
+        fun <IN, OUT> of(parser: Parser<IN, OUT>, log: Boolean): Parser<IN, OUT> {
+            val logger = if (log) Logger.Active() else Logger.Disabled
+            return if (parser is SingleInputParser<*>) {
+                parser
+            } else {
+                DiagnosticParser(parser, logger)
+            }
+        }
     }
 
     private class DiagnosticCompiler<IN>(private val compiler: CombinatorBuilder.Compiler<IN>, private val logger: Logger) : CombinatorBuilder.Compiler<IN> {

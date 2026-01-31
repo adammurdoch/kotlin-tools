@@ -1,9 +1,11 @@
 package net.rubygrapefruit.parse
 
+import net.rubygrapefruit.parse.combinators.not
 import net.rubygrapefruit.parse.combinators.oneOf
 import net.rubygrapefruit.parse.combinators.sequence
 import net.rubygrapefruit.parse.combinators.zeroOrMore
 import net.rubygrapefruit.parse.text.literal
+import net.rubygrapefruit.parse.text.one
 import net.rubygrapefruit.parse.text.oneOf
 import kotlin.test.Test
 
@@ -255,5 +257,50 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
             failAt(3)
             expectEndOfInput()
         }
+    }
+
+    @Test
+    fun `matches zero or more of any except literal then literal`() {
+        val parser = sequence(
+            zeroOrMore(sequence(not(literal("!")), one())),
+            literal("!")
+        )
+
+        parser.matches("!", expected = emptyList())
+        parser.matches("abc!", expected = listOf('a', 'b', 'c'))
+
+        // missing
+        parser.doesNotMatch("") {
+            expectLiteral("!")
+        }
+        parser.doesNotMatch("a") {
+            failAt(1)
+            expectLiteral("!")
+            expectLiteral("!")
+        }
+
+        // unexpected
+        parser.doesNotMatch("X") {
+            expectLiteral("!")
+            expect("not \"!\"")
+            expect("one character")
+        }
+
+        // extra
+        parser.doesNotMatch("a!X") {
+            failAt(2)
+            expectEndOfInput()
+        }
+    }
+
+    @Test
+    fun `matches zero or more of any except multi-char literal then multi-char literal`() {
+        val parser = sequence(
+            zeroOrMore(sequence(not(literal("!!")), one())),
+            literal("!!")
+        )
+
+        parser.matches("!!", expected = emptyList())
+        parser.matches("abc!!", expected = listOf('a', 'b', 'c'))
     }
 }

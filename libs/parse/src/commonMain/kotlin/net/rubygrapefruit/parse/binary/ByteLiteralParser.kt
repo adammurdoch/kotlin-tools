@@ -29,7 +29,7 @@ internal class ByteLiteralParser<OUT>(
         private var matched = 0
 
         override fun toString(): String {
-            return "{literal ${bytes.map { format(it) }}}"
+            return "{literal ${bytes.map { format(it) }} matched=$matched}"
         }
 
         override fun stop(): PullParser.Failed {

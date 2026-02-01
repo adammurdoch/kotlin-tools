@@ -8,7 +8,10 @@ import kotlin.test.Test
 class ChoiceTest : AbstractParseTest() {
     @Test
     fun `matches char literals with no common prefix`() {
-        val parser = oneOf(literal("abc", 1), literal("12", 2))
+        val parser = oneOf(
+            literal("abc", 1),
+            literal("12", 2)
+        )
 
         parser.expecting {
             expectChoice {
@@ -49,7 +52,10 @@ class ChoiceTest : AbstractParseTest() {
 
     @Test
     fun `matches byte literals with no common prefix`() {
-        val parser = oneOf(literal(byteArrayOf(0x1, 0x2, 0x3), 1), literal(byteArrayOf(0x10, 0x11), 2))
+        val parser = oneOf(
+            literal(byteArrayOf(0x1, 0x2, 0x3), 1),
+            literal(byteArrayOf(0x10, 0x11), 2)
+        )
 
         parser.expecting {
             expectChoice {
@@ -80,7 +86,10 @@ class ChoiceTest : AbstractParseTest() {
 
     @Test
     fun `matches literals with common prefix`() {
-        val parser = oneOf(literal("abc", 1), literal("abd", 2))
+        val parser = oneOf(
+            literal("abc", 1),
+            literal("abd", 2)
+        )
 
         parser.expecting {
             expectChoice {
@@ -100,7 +109,10 @@ class ChoiceTest : AbstractParseTest() {
 
     @Test
     fun `matches literals where one literal is a prefix of another`() {
-        val parser = oneOf(literal("abc", 1), literal("ab", 2))
+        val parser = oneOf(
+            literal("abc", 1),
+            literal("ab", 2)
+        )
 
         parser.expecting {
             expectChoice {
@@ -168,7 +180,10 @@ class ChoiceTest : AbstractParseTest() {
 
     @Test
     fun `uses result from first parser that matches`() {
-        val parser = oneOf(literal("ab", 1), literal("abc", 2))
+        val parser = oneOf(
+            literal("ab", 1),
+            literal("abc", 2)
+        )
 
         parser.matches("ab", expected = 1)
 

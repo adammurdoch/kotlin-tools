@@ -42,12 +42,10 @@ internal class ChoiceParser<IN, OUT>(
         parsers: List<CompiledParser<IN, OUT>>,
         private val next: ParseContinuation<IN, OUT, NEXT>
     ) : PullParser<IN, NEXT> {
-        private val matched = BooleanArray(parsers.size)
         private val states = Array<ParseState<IN, NEXT>>(parsers.size) { index ->
             val parser = parsers[index]
             parser.start { length, value ->
-                matched[index] = true
-                next.next(length, value)
+                ContinuingMatchedOption(next.next(length, value))
             }
         }
 
@@ -74,22 +72,44 @@ internal class ChoiceParser<IN, OUT>(
                 val option = states[index]
                 if (option is PullParser) {
                     val optionResult = option.parseZeroOrOne(input, maxAdvance)
-                    if (matched[index] && !requireMore) {
-                        // Could fail at the same location as other choices
-                        if (optionResult is PullParser.Failed) {
-                            states[index] = optionResult
-                            return mergedFailures()
-                        }
-                        return optionResult
-                    }
                     when (optionResult) {
-                        is PullParser.Finished -> {
+                        is PullParser.Matched -> TODO()
+
+                        is PullParser.Failed -> {
                             states[index] = optionResult
                         }
 
                         is PullParser.RequireMore -> {
-                            requireMore = true
-                            states[index] = optionResult.parser
+                            if (optionResult.parser is MatchedOption) {
+                                val state = optionResult.parser.state
+                                when (state) {
+                                    is PullParser.Matched -> TODO()
+                                    is PullParser.Failed -> {
+                                        if (!requireMore) {
+                                            val translated = if (optionResult.advance == 0) {
+                                                state
+                                            } else {
+                                                PullParser.Failed(state.index + optionResult.advance, state.expected)
+                                            }
+                                            states[index] = translated
+                                            return mergedFailures()
+                                        }
+                                        states[index] = optionResult.parser
+                                    }
+                                    is PullParser -> {
+                                        if (!requireMore) {
+                                            if (optionResult.failedChoice != null) {
+                                                TODO()
+                                            }
+                                            return PullParser.RequireMore(optionResult.advance, state)
+                                        }
+                                        states[index] = optionResult.parser
+                                    }
+                                }
+                            } else {
+                                requireMore = true
+                                states[index] = optionResult.parser
+                            }
                         }
                     }
                 }
@@ -112,6 +132,67 @@ internal class ChoiceParser<IN, OUT>(
         private fun mergedFailures(): PullParser.Failed {
             val failures = states.filterIsInstance<PullParser.Failed>()
             return PullParser.Failed.merged(failures)
+        }
+    }
+
+    internal interface MatchedOption<IN, NEXT> : PullParser<IN, NEXT> {
+        val state: ParseState<IN, NEXT>
+    }
+
+    private class ContinuingMatchedOption<IN, NEXT>(var parser: PullParser<IN, NEXT>) : MatchedOption<IN, NEXT> {
+        override val state: ParseState<IN, NEXT>
+            get() = parser
+
+        override fun toString(): String {
+            return "{matched-option $parser}"
+        }
+
+        override fun stop(): PullParser.Failed {
+            return parser.stop()
+        }
+
+        override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
+            val result = parser.parse(input, max)
+            when (result) {
+                is PullParser.Matched -> return PullParser.RequireMore(0, FinishedMatchedOption(result))
+                is PullParser.Failed -> return PullParser.RequireMore(0, FailedMatchedOption(result))
+                is PullParser.RequireMore -> {
+                    parser = result.parser
+                    if (result.failedChoice != null) {
+                        TODO()
+                    }
+                    return PullParser.RequireMore(result.advance, this)
+                }
+            }
+        }
+    }
+
+    private class FailedMatchedOption<IN, NEXT>(override var state: PullParser.Failed) : MatchedOption<IN, NEXT> {
+        override fun toString(): String {
+            return "{failed-matched-option $state}"
+        }
+
+        override fun stop(): PullParser.Failed {
+            TODO()
+        }
+
+        override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
+            return if (max == 0) {
+                TODO()
+            } else {
+                state = PullParser.Failed(state.index - max, state.expected)
+                PullParser.RequireMore(max, this)
+            }
+        }
+    }
+
+    private class FinishedMatchedOption<IN, NEXT>(override val state: PullParser.Matched<NEXT>) : MatchedOption<IN, NEXT> {
+        override fun stop(): PullParser.Failed {
+            TODO()
+        }
+
+        override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
+            TODO()
         }
     }
 }

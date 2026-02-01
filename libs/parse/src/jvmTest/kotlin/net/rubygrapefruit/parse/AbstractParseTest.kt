@@ -812,7 +812,7 @@ abstract class AbstractParseTest {
 
         fun <IN, OUT> tracing(parser: Parser<IN, OUT>, action: Parser<IN, OUT>.() -> Unit) {
             if (log) {
-                DiagnosticParser.of(parser, log).action()
+                DiagnosticParser.of(parser, true).action()
             } else {
                 parser.action()
                 DiagnosticParser.of(parser, false).action()

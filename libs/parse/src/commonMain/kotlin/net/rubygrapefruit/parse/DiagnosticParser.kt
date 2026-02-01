@@ -1,5 +1,6 @@
 package net.rubygrapefruit.parse
 
+import net.rubygrapefruit.parse.combinators.ChoiceParser
 import net.rubygrapefruit.parse.combinators.DiscardParser
 
 internal class DiagnosticParser<IN, OUT> private constructor(
@@ -65,7 +66,7 @@ internal class DiagnosticParser<IN, OUT> private constructor(
         private val id = nextId++
 
         override fun toString(): String {
-            return parser.toString()
+            return "{d $parser}"
         }
 
         override fun stop(): PullParser.Failed {
@@ -94,10 +95,10 @@ internal class DiagnosticParser<IN, OUT> private constructor(
 
                 is PullParser.RequireMore -> {
                     require(result.advance <= max)
-                    val effective = if (result.parser == parser) {
-                        this
-                    } else {
-                        DiagnosticPullParser(result.parser, logger)
+                    val effective = when (result.parser) {
+                        parser -> this
+                        is ChoiceParser.MatchedOption -> result.parser
+                        else -> DiagnosticPullParser(result.parser, logger)
                     }
                     PullParser.RequireMore(result.advance, effective, result.failedChoice)
                 }

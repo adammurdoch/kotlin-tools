@@ -4,6 +4,7 @@ import net.rubygrapefruit.file.RegularFile
 import net.rubygrapefruit.parse.combinators.*
 import net.rubygrapefruit.parse.text.literal
 import net.rubygrapefruit.parse.text.match
+import net.rubygrapefruit.parse.text.one
 import net.rubygrapefruit.parse.text.oneOf
 import net.rubygrapefruit.parse.text.parse
 
@@ -21,7 +22,7 @@ class Parser {
         val key = match(sequence(discard(keyChar), zeroOrMore(discard(keyChar))))
 
         val quote = literal("\"")
-        val stringChar = oneOf('a'..'z') // not right
+        val stringChar = one() // not right
         val stringBody = match(zeroOrMore(sequence(not(oneOf(quote, endLine)), stringChar)))
         val string = sequence(quote, stringBody, quote)
 

@@ -1,6 +1,8 @@
 package net.rubygrapefruit.parse
 
 /**
+ * Encapsulates what is expected next in the input stream, and how to produce a result from this.
+ *
  * Implementations may have mutable state and must not be reused.
  */
 internal interface PullParser<in IN, out OUT> : ParseState<IN, OUT> {

@@ -94,7 +94,12 @@ internal class DiagnosticParser<IN, OUT> private constructor(
 
                 is PullParser.RequireMore -> {
                     require(result.advance <= max)
-                    PullParser.RequireMore(result.advance, DiagnosticPullParser(result.parser, logger), result.failedChoice)
+                    val effective = if (result.parser == parser) {
+                        this
+                    } else {
+                        DiagnosticPullParser(result.parser, logger)
+                    }
+                    PullParser.RequireMore(result.advance, effective, result.failedChoice)
                 }
             }
         }

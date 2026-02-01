@@ -71,25 +71,25 @@ internal class ChoiceParser<IN, OUT>(
             var requireMore = false
             val maxAdvance = min(max, 1)
             for (index in states.indices) {
-                val choice = states[index]
-                if (choice is PullParser) {
-                    val nextChoice = choice.parseZeroOrOne(input, maxAdvance)
+                val option = states[index]
+                if (option is PullParser) {
+                    val optionResult = option.parseZeroOrOne(input, maxAdvance)
                     if (matched[index] && !requireMore) {
                         // Could fail at the same location as other choices
-                        if (nextChoice is PullParser.Failed) {
-                            states[index] = nextChoice
+                        if (optionResult is PullParser.Failed) {
+                            states[index] = optionResult
                             return mergedFailures()
                         }
-                        return nextChoice
+                        return optionResult
                     }
-                    when (nextChoice) {
+                    when (optionResult) {
                         is PullParser.Finished -> {
-                            states[index] = nextChoice
+                            states[index] = optionResult
                         }
 
                         is PullParser.RequireMore -> {
                             requireMore = true
-                            states[index] = nextChoice.parser
+                            states[index] = optionResult.parser
                         }
                     }
                 }

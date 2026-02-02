@@ -6,7 +6,7 @@ internal interface ParseContinuation<in IN, in OUT, out NEXT> {
     }
 
     fun matched(start: Int, end: Int, value: ValueProvider<OUT>): PullParser.RequireMore<IN, NEXT> {
-        return PullParser.RequireMore(end, next(end - start, value))
+        return PullParser.RequireMore(end, true, next(end - start, value))
     }
 
     /**

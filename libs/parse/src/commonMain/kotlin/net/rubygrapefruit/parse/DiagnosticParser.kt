@@ -43,6 +43,7 @@ internal class DiagnosticParser<IN, OUT> private constructor(
 
         override fun compileWithNoResult(parser: Parser<*, *>): CompiledParser<IN, Unit> {
             if (parser is DiscardableParser<*>) {
+                @Suppress("UNCHECKED_CAST")
                 val noResult = (parser as DiscardableParser<IN>).withNoResult()
                 return compiler.compile(DiagnosticParser(noResult, logger))
             } else {
@@ -100,10 +101,9 @@ internal class DiagnosticParser<IN, OUT> private constructor(
                     require(result.advance <= max)
                     val effective = when (result.parser) {
                         parser -> this
-                        is ChoiceParser.MatchedOption -> result.parser
                         else -> DiagnosticPullParser(result.parser, logger)
                     }
-                    PullParser.RequireMore(result.advance, effective, result.failedChoice)
+                    PullParser.RequireMore(result.advance, result.matched, effective, result.failedChoice)
                 }
             }
         }

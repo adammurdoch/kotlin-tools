@@ -45,7 +45,7 @@ internal class ByteLiteralParser<OUT>(
                         PullParser.Failed(index, expectations[matched + index])
                     } else {
                         matched += index
-                        PullParser.RequireMore(index, this)
+                        PullParser.RequireMore(index, false, this)
                     }
                 }
                 if (input.get(index) != bytes[matched + index]) {

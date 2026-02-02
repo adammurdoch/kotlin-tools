@@ -56,7 +56,7 @@ class ChoiceOfSequenceTest : AbstractParseTest() {
     }
 
     @Test
-    fun `matches choice of sequences of char match and literal`() {
+    fun `matches choice of sequences of char match with common prefix then literal`() {
         val parser = oneOf(
             sequence(match(literal("a")), literal("b", "b")) { a, b -> a + b },
             sequence(match(literal("a")), literal("c", "c")) { a, b -> a + b },
@@ -83,7 +83,7 @@ class ChoiceOfSequenceTest : AbstractParseTest() {
     }
 
     @Test
-    fun `matches choice of sequences of zero or more of char and literal`() {
+    fun `matches choice of sequences of zero or more of char with common prefix then literal`() {
         val parser = oneOf(
             sequence(zeroOrMore(oneOf('1', '2')), literal("b", 'b')) { a, b -> a + b },
             sequence(zeroOrMore(oneOf('1', '2')), literal("c", 'c')) { a, b -> a + b },
@@ -96,6 +96,14 @@ class ChoiceOfSequenceTest : AbstractParseTest() {
         parser.matches("1c", expected = listOf('1', 'c'))
 
         parser.matches("221b", expected = listOf('2', '2', '1', 'b'))
+
+        // missing
+        parser.doesNotMatch("") {
+            expectLiteral("1")
+            expectLiteral("2")
+            expectLiteral("b")
+            expectLiteral("c")
+        }
     }
 
     @Test

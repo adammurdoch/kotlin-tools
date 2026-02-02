@@ -35,7 +35,7 @@ internal class ZeroOrMoreParser<IN, OUT>(
             return option.start { length, value ->
                 val result = previous.add(value, length)
                 if (length == 0) {
-                    next.next(0, result)
+                    EmptyPullParser(result, next)
                 } else {
                     val empty = EmptyCompiledParser<IN, ITEM, OUT>(result)
                     val nested = OptionCompiledParser(option, result)

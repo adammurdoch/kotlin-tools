@@ -154,8 +154,8 @@ internal class ChoiceParser<IN, OUT>(
     }
 
     private class OptionContinuation<IN, OUT, NEXT>(val next: ParseContinuation<IN, OUT, NEXT>) : ParseContinuation<IN, OUT, NEXT> {
-        override fun matched(start: Int, end: Int, value: ValueProvider<OUT>): PullParser.RequireMore<IN, NEXT> {
-            return PullParser.RequireMore(end, true, next(end - start, value))
+        override fun matched(start: Int, end: Int, value: ValueProvider<OUT>, failedChoice: ExpectationProvider?): PullParser.RequireMore<IN, NEXT> {
+            return PullParser.RequireMore(end, true, next(end - start, value), failedChoice)
         }
 
         override fun next(length: Int, value: ValueProvider<OUT>): PullParser<IN, NEXT> {

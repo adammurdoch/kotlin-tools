@@ -2,11 +2,15 @@ package net.rubygrapefruit.parse
 
 internal interface ParseContinuation<in IN, in OUT, out NEXT> {
     fun matched(start: Int, end: Int, value: OUT): PullParser.RequireMore<IN, NEXT> {
-        return matched(start, end, ValueProvider.of(value))
+        return matched(start, end, ValueProvider.of(value), null)
     }
 
     fun matched(start: Int, end: Int, value: ValueProvider<OUT>): PullParser.RequireMore<IN, NEXT> {
-        return PullParser.RequireMore(end, true, next(end - start, value))
+        return matched(start, end, value, null)
+    }
+
+    fun matched(start: Int, end: Int, value: ValueProvider<OUT>, failedChoice: ExpectationProvider?): PullParser.RequireMore<IN, NEXT> {
+        return PullParser.RequireMore(end, true, next(end - start, value), failedChoice)
     }
 
     /**
@@ -21,6 +25,18 @@ internal interface ParseContinuation<in IN, in OUT, out NEXT> {
 
         fun <IN, OUT, NEXT> of(next: (length: Int, value: ValueProvider<OUT>) -> PullParser<IN, NEXT>): ParseContinuation<IN, OUT, NEXT> {
             return object : ParseContinuation<IN, OUT, NEXT> {
+                override fun next(length: Int, value: ValueProvider<OUT>): PullParser<IN, NEXT> {
+                    return next(length, value)
+                }
+            }
+        }
+
+        fun <IN, OUT, NEXT> then(next: (length: Int, value: ValueProvider<OUT>) -> PullParser<IN, NEXT>): ParseContinuation<IN, OUT, NEXT> {
+            return object : ParseContinuation<IN, OUT, NEXT> {
+                override fun matched(start: Int, end: Int, value: ValueProvider<OUT>, failedChoice: ExpectationProvider?): PullParser.RequireMore<IN, NEXT> {
+                    return PullParser.RequireMore(end, false, next(end - start, value), failedChoice)
+                }
+
                 override fun next(length: Int, value: ValueProvider<OUT>): PullParser<IN, NEXT> {
                     return next(length, value)
                 }

@@ -23,23 +23,11 @@ internal class Sequence2Parser<IN, A, B, OUT>(
         private val map: (A, B) -> OUT
     ) : CompiledParser<IN, OUT> {
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
-            return a.start(FirstContinuation(b, map, next))
-        }
-    }
-
-    private class FirstContinuation<IN, A, B, OUT, NEXT>(
-        val b: CompiledParser<IN, B>,
-        val map: (A, B) -> OUT,
-        val next: ParseContinuation<IN, OUT, NEXT>
-    ) : ParseContinuation<IN, A, NEXT> {
-        override fun matched(start: Int, end: Int, value: ValueProvider<A>): PullParser.RequireMore<IN, NEXT> {
-            return PullParser.RequireMore(end, false, next(end - start, value))
-        }
-
-        override fun next(length: Int, value: ValueProvider<A>): PullParser<IN, NEXT> {
-            return b.start { lengthB, valueB ->
-                val value = value.zip(valueB, map)
-                next.next(length + lengthB, value)
+            return a.then { lengthA, valueA ->
+                b.start { lengthB, valueB ->
+                    val value = valueA.zip(valueB, map)
+                    next.next(lengthA + lengthB, value)
+                }
             }
         }
     }

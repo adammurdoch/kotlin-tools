@@ -2,8 +2,10 @@ package net.rubygrapefruit.parse
 
 import net.rubygrapefruit.parse.combinators.oneOf
 import net.rubygrapefruit.parse.combinators.sequence
+import net.rubygrapefruit.parse.combinators.zeroOrMore
 import net.rubygrapefruit.parse.text.literal
 import net.rubygrapefruit.parse.text.match
+import net.rubygrapefruit.parse.text.oneOf
 import kotlin.test.Test
 import kotlin.test.fail
 
@@ -78,6 +80,22 @@ class ChoiceOfSequenceTest : AbstractParseTest() {
             failAt(2)
             expectEndOfInput()
         }
+    }
+
+    @Test
+    fun `matches choice of sequences of zero or more of char and literal`() {
+        val parser = oneOf(
+            sequence(zeroOrMore(oneOf('1', '2')), literal("b", 'b')) { a, b -> a + b },
+            sequence(zeroOrMore(oneOf('1', '2')), literal("c", 'c')) { a, b -> a + b },
+        )
+
+        parser.matches("b", expected = listOf('b'))
+        parser.matches("c", expected = listOf('c'))
+
+        parser.matches("2b", expected = listOf('2', 'b'))
+        parser.matches("1c", expected = listOf('1', 'c'))
+
+        parser.matches("221b", expected = listOf('2', '2', '1', 'b'))
     }
 
     @Test

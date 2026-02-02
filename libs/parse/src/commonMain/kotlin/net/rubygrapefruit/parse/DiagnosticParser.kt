@@ -1,17 +1,11 @@
 package net.rubygrapefruit.parse
 
 import net.rubygrapefruit.parse.combinators.ChoiceParser
-import net.rubygrapefruit.parse.combinators.DiscardParser
 
 internal class DiagnosticParser<IN, OUT> private constructor(
     private val parser: Parser<IN, OUT>,
     private val logger: Logger
-) : Parser<IN, OUT>, CombinatorBuilder<OUT>, DiscardableParser<IN> {
-
-    override fun withNoResult(): Parser<IN, Unit> {
-        return DiscardParser(parser)
-    }
-
+) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, OUT> {
         val parser = if (parser is CombinatorBuilder<*>) {
             @Suppress("UNCHECKED_CAST")
@@ -48,7 +42,12 @@ internal class DiagnosticParser<IN, OUT> private constructor(
         }
 
         override fun compileWithNoResult(parser: Parser<*, *>): CompiledParser<IN, Unit> {
-            return compiler.compileWithNoResult(DiagnosticParser(parser, logger))
+            if (parser is DiscardableParser<*>) {
+                val noResult = (parser as DiscardableParser<IN>).withNoResult()
+                return compiler.compile(DiagnosticParser(noResult, logger))
+            } else {
+                return DiagnosticCompiledParser(compiler.compileWithNoResult(parser), logger)
+            }
         }
 
         override fun maybeAsSingleInputParser(parser: Parser<*, *>): SingleInputParser<IN>? {
@@ -57,6 +56,10 @@ internal class DiagnosticParser<IN, OUT> private constructor(
     }
 
     private class DiagnosticCompiledParser<IN, OUT>(private val parser: CompiledParser<IN, OUT>, private val logger: Logger) : CompiledParser<IN, OUT> {
+        override fun toString(): String {
+            return "{d $parser}"
+        }
+
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return DiagnosticPullParser(parser.start(next), logger)
         }

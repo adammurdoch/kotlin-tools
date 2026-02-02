@@ -3,6 +3,7 @@ package net.rubygrapefruit.parse
 import net.rubygrapefruit.parse.combinators.oneOf
 import net.rubygrapefruit.parse.combinators.sequence
 import net.rubygrapefruit.parse.text.literal
+import net.rubygrapefruit.parse.text.match
 import kotlin.test.Test
 import kotlin.test.fail
 
@@ -48,6 +49,33 @@ class ChoiceOfSequenceTest : AbstractParseTest() {
         parser.doesNotMatch("abX") {
             failAt(2)
             expectLiteral("c")
+            expectEndOfInput()
+        }
+    }
+
+    @Test
+    fun `matches choice of sequences of char match and literal`() {
+        val parser = oneOf(
+            sequence(match(literal("a")), literal("b", "b")) { a, b -> a + b },
+            sequence(match(literal("a")), literal("c", "c")) { a, b -> a + b },
+        )
+
+        parser.matches("ab", expected = "ab")
+        parser.matches("ac", expected = "ac")
+
+        // missing
+        parser.doesNotMatch("") {
+            expectLiteral("a")
+        }
+        parser.doesNotMatch("a") {
+            failAt(1)
+            expectLiteral("b")
+            expectLiteral("c")
+        }
+
+        // extra
+        parser.doesNotMatch("acX") {
+            failAt(2)
             expectEndOfInput()
         }
     }

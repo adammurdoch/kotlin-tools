@@ -13,11 +13,19 @@ internal class MatchedInputParser<IN, OUT>(
         return MatchedInputCompiledParser(compiler.compile(parser))
     }
 
-    internal class MatchedInputCompiledParser<OUT>(val parser: CompiledParser<SlicingInput<OUT>, *>) : CompiledParser<SlicingInput<OUT>, OUT> {
+    internal class MatchedInputCompiledParser<OUT>(val parser: CompiledParser<SlicingInput<OUT>, Unit>) : CompiledParser<SlicingInput<OUT>, OUT> {
         override fun <NEXT> start(next: ParseContinuation<SlicingInput<OUT>, OUT, NEXT>): PullParser<SlicingInput<OUT>, NEXT> {
-            return parser.start { length, _ ->
-                CollectMatchedInputPullParser(length, next)
-            }
+            return parser.start(CollectingContinuation(next))
+        }
+    }
+
+    private class CollectingContinuation<OUT, NEXT>(val next: ParseContinuation<SlicingInput<OUT>, OUT, NEXT>) : ParseContinuation<SlicingInput<OUT>, Unit, NEXT> {
+        override fun matched(start: Int, end: Int, value: ValueProvider<Unit>): PullParser.RequireMore<SlicingInput<OUT>, NEXT> {
+            return PullParser.RequireMore(end, false, next(end - start, value))
+        }
+
+        override fun next(length: Int, value: ValueProvider<Unit>): PullParser<SlicingInput<OUT>, NEXT> {
+            return CollectMatchedInputPullParser(length, next)
         }
     }
 

@@ -47,7 +47,21 @@ internal class ZeroOrMoreParser<IN, OUT>(
 
     internal class EmptyCompiledParser<IN, ITEM, OUT>(private val result: Accumulator<ITEM, OUT>) : CompiledParser<IN, OUT> {
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
-            return next.next(result.length, result)
+            return EmptyPullParser(result, next)
+        }
+    }
+
+    private class EmptyPullParser<IN, ITEM, OUT, NEXT>(val result: Accumulator<ITEM, OUT>, val next: ParseContinuation<IN, OUT, NEXT>) : PullParser<IN, NEXT> {
+        override fun toString(): String {
+            return "{end-zero-or-more}"
+        }
+
+        override fun stop(): PullParser.Failed {
+            return next.next(result.length, result).stop()
+        }
+
+        override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
+            return next.matched(-result.length, 0, result)
         }
     }
 }

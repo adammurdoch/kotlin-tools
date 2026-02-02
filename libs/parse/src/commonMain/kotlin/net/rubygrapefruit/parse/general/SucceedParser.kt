@@ -21,7 +21,24 @@ internal class SucceedParser<OUT>(
         val result: ValueProvider<OUT>
     ) : CompiledParser<IN, OUT> {
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
-            return next.next(0, result)
+            return SucceedPullParser(result, next)
+        }
+    }
+
+    private class SucceedPullParser<IN, OUT, NEXT>(
+        val result: ValueProvider<OUT>,
+        val next: ParseContinuation<IN, OUT, NEXT>
+    ) : PullParser<IN, NEXT> {
+        override fun toString(): String {
+            return "{succeed}"
+        }
+
+        override fun stop(): PullParser.Failed {
+            return next.next(0, result).stop()
+        }
+
+        override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
+            return next.matched(0, 0, result)
         }
     }
 }

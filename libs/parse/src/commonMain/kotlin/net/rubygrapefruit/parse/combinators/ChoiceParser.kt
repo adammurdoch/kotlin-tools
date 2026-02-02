@@ -38,6 +38,16 @@ internal class ChoiceParser<IN, OUT>(
         }
     }
 
+    private class OptionContinuation<IN, OUT, NEXT>(val next: ParseContinuation<IN, OUT, NEXT>) : ParseContinuation<IN, OUT, NEXT> {
+        override fun matched(start: Int, end: Int, value: ValueProvider<OUT>): PullParser.RequireMore<IN, NEXT> {
+            return PullParser.RequireMore(end, true, next(end - start, value))
+        }
+
+        override fun next(length: Int, value: ValueProvider<OUT>): PullParser<IN, NEXT> {
+            return next.next(length, value)
+        }
+    }
+
     private class ChoicePullParser<IN, OUT, NEXT>(
         parsers: List<CompiledParser<IN, OUT>>,
         private val next: ParseContinuation<IN, OUT, NEXT>
@@ -45,7 +55,7 @@ internal class ChoiceParser<IN, OUT>(
         private val matched = BooleanArray(parsers.size)
         private val states = Array<ParseState<IN, NEXT>>(parsers.size) { index ->
             val parser = parsers[index]
-            parser.start(next)
+            parser.start(OptionContinuation(next))
         }
 
         override fun toString(): String {

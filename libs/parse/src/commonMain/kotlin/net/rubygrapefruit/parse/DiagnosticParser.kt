@@ -1,7 +1,5 @@
 package net.rubygrapefruit.parse
 
-import net.rubygrapefruit.parse.combinators.ChoiceParser
-
 internal class DiagnosticParser<IN, OUT> private constructor(
     private val parser: Parser<IN, OUT>,
     private val logger: Logger

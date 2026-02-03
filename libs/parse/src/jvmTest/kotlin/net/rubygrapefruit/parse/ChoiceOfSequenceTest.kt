@@ -154,8 +154,20 @@ class ChoiceOfSequenceTest : AbstractParseTest() {
         )
 
         parser.matches("b!", expected = "B!")
-        parser.matches("a?", expected = "a?") {
-            log()
+        parser.matches("a?", expected = "a?")
+
+        // missing
+        parser.doesNotMatch("") {
+            expectLiteral("a")
+        }
+        parser.doesNotMatch("a") {
+            failAt(1)
+            expectLiteral("b")
+        }
+        parser.doesNotMatch("ab") {
+            failAt(2)
+            expectLiteral("!")
+            expectLiteral("?")
         }
     }
 
@@ -197,7 +209,11 @@ class ChoiceOfSequenceTest : AbstractParseTest() {
     @Test
     fun `matches choice of sequence or literal with common prefix`() {
         val parser = oneOf(
-            sequence(literal("a", 1), zeroOrMore(literal("1", 1)), literal("!", 1)) { a, b, c -> listOf(a) + b + listOf(c) },
+            sequence(
+                literal("a", 1),
+                zeroOrMore(literal("1", 1)),
+                literal("!", 1)
+            ) { a, b, c -> listOf(a) + b + listOf(c) },
             literal("a", listOf(2))
         )
 

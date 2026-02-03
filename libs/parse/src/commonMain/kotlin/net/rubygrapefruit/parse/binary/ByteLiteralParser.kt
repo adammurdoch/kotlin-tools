@@ -41,11 +41,13 @@ internal class ByteLiteralParser<OUT>(
             val remaining = bytes.size - matched
             while (index < remaining) {
                 if (index >= max) {
-                    return if (index >= input.available && input.finished) {
-                        PullParser.Failed(index, expectations[matched + index])
-                    } else {
+                    return if (index > 0) {
                         matched += index
                         PullParser.RequireMore(index, false, this)
+                    } else if (input.available == 0 && input.finished) {
+                        PullParser.Failed(0, expectations[matched])
+                    } else {
+                        PullParser.RequireMore(0, false, this)
                     }
                 }
                 if (input.get(index) != bytes[matched + index]) {

@@ -24,10 +24,10 @@ internal class Sequence2Parser<IN, A, B, OUT>(
     ) : CompiledParser<IN, OUT> {
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return a.then { lengthA, valueA ->
-                b.start { lengthB, valueB ->
+                b.start(next.map { lengthB, valueB ->
                     val value = valueA.zip(valueB, map)
-                    next.next(lengthA + lengthB, value)
-                }
+                    Pair(lengthA + lengthB, value)
+                })
             }
         }
     }

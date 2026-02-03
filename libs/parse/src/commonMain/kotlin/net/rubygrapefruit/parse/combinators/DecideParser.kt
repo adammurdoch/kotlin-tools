@@ -12,8 +12,7 @@ internal class DecideParser<IN, INTERMEDIATE, OUT>(
     }
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, OUT> {
-        val compiled = compiler.compile(parser)
-        return DecideCompiledParser(compiled, factory, compiler)
+        return DecideCompiledParser(compiler.compile(parser), factory, compiler)
     }
 
     internal class DecideCompiledParser<IN, INTERMEDIATE, OUT>(

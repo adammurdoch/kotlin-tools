@@ -10,8 +10,8 @@ import net.rubygrapefruit.parse.text.*
 import kotlin.test.*
 
 abstract class AbstractParseTest {
-    fun Parser<CharInput, Unit>.matches(input: String) {
-        matches(input = input, expected = Unit)
+    fun Parser<CharInput, Unit>.matches(input: String, config: ParseFixture.() -> Unit = {}) {
+        matches(input = input, expected = Unit, config = config)
     }
 
     fun bytes(vararg items: Byte): List<Byte> {

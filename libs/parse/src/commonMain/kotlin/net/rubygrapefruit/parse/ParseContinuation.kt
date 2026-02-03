@@ -1,6 +1,8 @@
 package net.rubygrapefruit.parse
 
 internal interface ParseContinuation<in IN, in OUT, out NEXT> {
+    val matches: Boolean
+
     fun matched(start: Int, end: Int, value: OUT): PullParser.RequireMore<IN, NEXT> {
         return matched(start, end, ValueProvider.of(value), null)
     }
@@ -10,7 +12,24 @@ internal interface ParseContinuation<in IN, in OUT, out NEXT> {
     }
 
     fun matched(start: Int, end: Int, value: ValueProvider<OUT>, failedChoice: ExpectationProvider?): PullParser.RequireMore<IN, NEXT> {
-        return PullParser.RequireMore(end, true, next(end - start, value), failedChoice)
+        return PullParser.RequireMore(end, matches, next(end - start, value), failedChoice)
+    }
+
+    fun <T> map(map: (Int, ValueProvider<T>) -> Pair<Int, ValueProvider<OUT>>): ParseContinuation<IN, T, NEXT> {
+        val self = this
+        return object : ParseContinuation<IN, T, NEXT> {
+            override val matches: Boolean
+                get() = self.matches
+
+            override fun toString(): String {
+                return "{map $self}"
+            }
+
+            override fun next(length: Int, value: ValueProvider<T>): PullParser<IN, NEXT> {
+                val mapped = map(length, value)
+                return self.next(mapped.first, mapped.second)
+            }
+        }
     }
 
     /**
@@ -25,6 +44,9 @@ internal interface ParseContinuation<in IN, in OUT, out NEXT> {
 
         fun <IN, OUT, NEXT> of(next: (length: Int, value: ValueProvider<OUT>) -> PullParser<IN, NEXT>): ParseContinuation<IN, OUT, NEXT> {
             return object : ParseContinuation<IN, OUT, NEXT> {
+                override val matches: Boolean
+                    get() = true
+
                 override fun next(length: Int, value: ValueProvider<OUT>): PullParser<IN, NEXT> {
                     return next(length, value)
                 }
@@ -33,9 +55,8 @@ internal interface ParseContinuation<in IN, in OUT, out NEXT> {
 
         fun <IN, OUT, NEXT> then(next: (length: Int, value: ValueProvider<OUT>) -> PullParser<IN, NEXT>): ParseContinuation<IN, OUT, NEXT> {
             return object : ParseContinuation<IN, OUT, NEXT> {
-                override fun matched(start: Int, end: Int, value: ValueProvider<OUT>, failedChoice: ExpectationProvider?): PullParser.RequireMore<IN, NEXT> {
-                    return PullParser.RequireMore(end, false, next(end - start, value), failedChoice)
-                }
+                override val matches: Boolean
+                    get() = false
 
                 override fun next(length: Int, value: ValueProvider<OUT>): PullParser<IN, NEXT> {
                     return next(length, value)
@@ -45,6 +66,9 @@ internal interface ParseContinuation<in IN, in OUT, out NEXT> {
     }
 
     private class EndParseContinuation<IN, OUT> : ParseContinuation<IN, OUT, OUT> {
+        override val matches: Boolean
+            get() = true
+
         override fun next(length: Int, value: ValueProvider<OUT>): PullParser<IN, OUT> {
             return EndMatchPullParser(value)
         }

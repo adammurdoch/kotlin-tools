@@ -14,6 +14,7 @@ Performance
 - Optimized implementation for `not(single-input)`
 - `literal(one-value)` is a single input parser
 - `oneOf(single-input...)` is a single input parser
+- Allow `CompiledParser.start()` to fail or complete parsing
 - Choice exits when there is one remaining candidate
 - Discard buffered input once it is not required
 - Match common prefix for choice

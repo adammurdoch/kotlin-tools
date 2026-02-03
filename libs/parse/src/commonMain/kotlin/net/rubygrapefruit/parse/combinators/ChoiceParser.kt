@@ -40,7 +40,7 @@ internal class ChoiceParser<IN, OUT>(
 
     private class ChoicePullParser<IN, OUT, NEXT>(
         parsers: List<CompiledParser<IN, OUT>>,
-        next: ParseContinuation<IN, OUT, NEXT>
+        val next: ParseContinuation<IN, OUT, NEXT>
     ) : PullParser<IN, NEXT> {
         private val states: Array<OptionState<IN, NEXT>>
         private var advancedZero = true
@@ -105,9 +105,9 @@ internal class ChoiceParser<IN, OUT>(
                                             }
                                         } + if (optionResult.failedChoice != null) listOf(optionResult.failedChoice) else emptyList()
                                         val expected = ExpectationProvider.oneOfOrNull(failures)
-                                        PullParser.RequireMore(0, true, optionResult.parser, expected)
+                                        PullParser.RequireMore(0, next.matches, optionResult.parser, expected)
                                     } else {
-                                        optionResult
+                                        PullParser.RequireMore(optionResult.advance, next.matches, optionResult.parser, optionResult.failedChoice)
                                     }
                                 }
                             } else {

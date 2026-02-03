@@ -1,5 +1,6 @@
 package net.rubygrapefruit.parse
 
+import net.rubygrapefruit.parse.combinators.map
 import net.rubygrapefruit.parse.combinators.oneOf
 import net.rubygrapefruit.parse.combinators.sequence
 import net.rubygrapefruit.parse.combinators.zeroOrMore
@@ -56,6 +57,33 @@ class ChoiceOfSequenceTest : AbstractParseTest() {
     }
 
     @Test
+    fun `matches choice of sequences of map with common prefix then literal`() {
+        val parser = oneOf(
+            sequence(map(literal("a", 1)) { it.toString() }, literal("b", "b")) { a, b -> a + b },
+            sequence(map(literal("a", 2)) { it.toString() }, literal("c", "c")) { a, b -> a + b },
+        )
+
+        parser.matches("ab", expected = "1b")
+        parser.matches("ac", expected = "2c")
+
+        // missing
+        parser.doesNotMatch("") {
+            expectLiteral("a")
+        }
+        parser.doesNotMatch("a") {
+            failAt(1)
+            expectLiteral("b")
+            expectLiteral("c")
+        }
+
+        // extra
+        parser.doesNotMatch("acX") {
+            failAt(2)
+            expectEndOfInput()
+        }
+    }
+
+    @Test
     fun `matches choice of sequences of char match with common prefix then literal`() {
         val parser = oneOf(
             sequence(match(literal("a")), literal("b", "b")) { a, b -> a + b },
@@ -107,7 +135,32 @@ class ChoiceOfSequenceTest : AbstractParseTest() {
     }
 
     @Test
-    fun `matches choice of sequence of sequence`() {
+    fun `matches choice of sequences of choice with common prefix then literal`() {
+        val parser = oneOf(
+            sequence(
+                oneOf(
+                    literal("a", "A"),
+                    literal("b", "B")
+                ),
+                literal("!", "!")
+            ) { a, b -> a + b },
+            sequence(
+                oneOf(
+                    literal("a", "a"),
+                    literal("b", "b")
+                ),
+                literal("?", "?")
+            ) { a, b -> a + b },
+        )
+
+        parser.matches("b!", expected = "B!")
+        parser.matches("a?", expected = "a?") {
+            log()
+        }
+    }
+
+    @Test
+    fun `matches choice of sequence of sequence with common prefix then literal`() {
         val parser = oneOf(
             sequence(sequence(literal("a"), literal("b")), literal("?")),
             sequence(sequence(literal("a"), literal("b")), literal("!"))

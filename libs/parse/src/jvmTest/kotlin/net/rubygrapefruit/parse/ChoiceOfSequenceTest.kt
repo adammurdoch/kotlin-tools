@@ -195,6 +195,45 @@ class ChoiceOfSequenceTest : AbstractParseTest() {
     }
 
     @Test
+    fun `matches choice of sequence or literal with common prefix`() {
+        val parser = oneOf(
+            sequence(literal("a", 1), zeroOrMore(literal("1", 1)), literal("!", 1)) { a, b, c -> listOf(a) + b + listOf(c) },
+            literal("a", listOf(2))
+        )
+
+        parser.matches("a!", expected = listOf(1, 1))
+        parser.matches("a11!", expected = listOf(1, 1, 1, 1))
+        parser.matches("a", expected = listOf(2))
+
+        // missing
+        parser.doesNotMatch("") {
+            expectLiteral("a")
+        }
+
+        // unexpected
+        parser.doesNotMatch("X") {
+            expectLiteral("a")
+        }
+        parser.doesNotMatch("a1X") {
+            failAt(2)
+            expectLiteral("!")
+            expectLiteral("1")
+        }
+
+        // extra
+        parser.doesNotMatch("aX") {
+            failAt(1)
+            expectLiteral("!")
+            expectLiteral("1")
+            expectEndOfInput()
+        }
+        parser.doesNotMatch("a!X") {
+            failAt(2)
+            expectEndOfInput()
+        }
+    }
+
+    @Test
     fun `does not call map function of discarded option`() {
         val parser = oneOf(
             sequence(literal("ab", 1), literal("c", 2)) { a, b -> listOf(a, b) },

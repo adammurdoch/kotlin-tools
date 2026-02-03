@@ -84,7 +84,7 @@ internal class ChoiceParser<IN, OUT>(
                     }
                     val optionResult = optionState.parse(input, maxAdvance)
                     when (optionResult) {
-                        is PullParser.Matched -> TODO()
+                        is PullParser.Matched -> return optionResult
 
                         is PullParser.Failed -> {
                             option.state = optionResult

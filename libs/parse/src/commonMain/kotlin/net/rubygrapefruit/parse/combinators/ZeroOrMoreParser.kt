@@ -27,21 +27,32 @@ internal class ZeroOrMoreParser<IN, OUT>(
         }
     }
 
+    private class OptionContinuation<IN, ITEM, OUT, NEXT>(
+        private val option: CompiledParser<IN, ITEM>,
+        private val previous: Accumulator<ITEM, OUT>,
+        private val next: ParseContinuation<IN, OUT, NEXT>
+    ) : ParseContinuation<IN, ITEM, NEXT> {
+        override val matches: Boolean
+            get() = false
+
+        override fun next(length: Int, value: ValueProvider<ITEM>): PullParser<IN, NEXT> {
+            val result = previous.add(value, length)
+            return if (length == 0) {
+                EmptyPullParser(result, next)
+            } else {
+                val empty = EmptyCompiledParser<IN, ITEM, OUT>(result)
+                val nested = OptionCompiledParser(option, result)
+                ChoiceParser.of(listOf(nested, empty), next)
+            }
+        }
+    }
+
     internal class OptionCompiledParser<IN, ITEM, OUT>(
         val option: CompiledParser<IN, ITEM>,
         val previous: Accumulator<ITEM, OUT>
     ) : CompiledParser<IN, OUT> {
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
-            return option.start { length, value ->
-                val result = previous.add(value, length)
-                if (length == 0) {
-                    EmptyPullParser(result, next)
-                } else {
-                    val empty = EmptyCompiledParser<IN, ITEM, OUT>(result)
-                    val nested = OptionCompiledParser(option, result)
-                    ChoiceParser.of(listOf(nested, empty), next)
-                }
-            }
+            return option.start(OptionContinuation(option, previous, next))
         }
     }
 

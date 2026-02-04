@@ -42,17 +42,6 @@ internal interface ParseContinuation<in IN, in OUT, out NEXT> {
             return EndParseContinuation()
         }
 
-        fun <IN, OUT, NEXT> of(next: (length: Int, value: ValueProvider<OUT>) -> PullParser<IN, NEXT>): ParseContinuation<IN, OUT, NEXT> {
-            return object : ParseContinuation<IN, OUT, NEXT> {
-                override val matches: Boolean
-                    get() = true
-
-                override fun next(length: Int, value: ValueProvider<OUT>): PullParser<IN, NEXT> {
-                    return next(length, value)
-                }
-            }
-        }
-
         fun <IN, OUT, NEXT> then(next: (length: Int, value: ValueProvider<OUT>) -> PullParser<IN, NEXT>): ParseContinuation<IN, OUT, NEXT> {
             return object : ParseContinuation<IN, OUT, NEXT> {
                 override val matches: Boolean

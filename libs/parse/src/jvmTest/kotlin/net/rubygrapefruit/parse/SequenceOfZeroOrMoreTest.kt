@@ -282,14 +282,11 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
             expect("one character")
         }
 
-        // unexpected
-        parser.doesNotMatch("X") {
-            expectLiteral("!")
-            expect("not \"!\"")
-            expect("one character")
-        }
-
         // extra
+        parser.doesNotMatch("!!") {
+            failAt(1)
+            expectEndOfInput()
+        }
         parser.doesNotMatch("a!X") {
             failAt(2)
             expectEndOfInput()

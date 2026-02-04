@@ -132,6 +132,79 @@ class ChoiceOfSequenceTest : AbstractParseTest() {
             expectLiteral("b")
             expectLiteral("c")
         }
+        parser.doesNotMatch("1122") {
+            failAt(4)
+            expectLiteral("1")
+            expectLiteral("2")
+            expectLiteral("b")
+            expectLiteral("c")
+        }
+
+        // unexpected
+        parser.doesNotMatch("X") {
+            expectLiteral("1")
+            expectLiteral("2")
+            expectLiteral("b")
+            expectLiteral("c")
+        }
+        parser.doesNotMatch("2211X") {
+            failAt(4)
+            expectLiteral("1")
+            expectLiteral("2")
+            expectLiteral("b")
+            expectLiteral("c")
+        }
+
+        // extra
+        parser.doesNotMatch("cX") {
+            failAt(1)
+            expectEndOfInput()
+        }
+    }
+
+    @Test
+    fun `matches choice of sequences of zero or more of literal with common prefix then literal`() {
+        val parser = oneOf(
+            sequence(zeroOrMore(literal("12", '1')), literal("b", 'b')) { a, b -> a + b },
+            sequence(zeroOrMore(literal("12", '2')), literal("c", 'c')) { a, b -> a + b },
+        )
+
+        parser.matches("b", expected = listOf('b'))
+        parser.matches("c", expected = listOf('c'))
+        parser.matches("12b", expected = listOf('1', 'b'))
+        parser.matches("12c", expected = listOf('2', 'c'))
+
+        // missing
+        parser.doesNotMatch("") {
+            expectLiteral("12")
+            expectLiteral("b")
+            expectLiteral("c")
+        }
+        parser.doesNotMatch("1212") {
+            failAt(4)
+            expectLiteral("12")
+            expectLiteral("b")
+            expectLiteral("c")
+        }
+
+        // unexpected
+        parser.doesNotMatch("X") {
+            expectLiteral("12")
+            expectLiteral("b")
+            expectLiteral("c")
+        }
+        parser.doesNotMatch("12X") {
+            failAt(2)
+            expectLiteral("12")
+            expectLiteral("b")
+            expectLiteral("c")
+        }
+
+        // extra
+        parser.doesNotMatch("12cX") {
+            failAt(3)
+            expectEndOfInput()
+        }
     }
 
     @Test

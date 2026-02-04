@@ -23,9 +23,9 @@ internal class DecideParser<IN, INTERMEDIATE, OUT>(
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return parser.then { lengthA, valueA ->
                 val nextParser: CompiledParser<IN, OUT> = compiler.compile(factory(valueA.get()))
-                nextParser.start { lengthB, valueB ->
-                    next.next(lengthA + lengthB, valueB)
-                }
+                nextParser.start(next.map { lengthB, valueB ->
+                    Pair(lengthA + lengthB, valueB)
+                })
             }
         }
     }

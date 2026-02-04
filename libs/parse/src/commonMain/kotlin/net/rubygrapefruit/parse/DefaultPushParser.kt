@@ -37,7 +37,7 @@ internal open class DefaultPushParser<CONTEXT, IN : AdvancingInput<*>, OUT>(
                                 failedChoiceIndex -= result.advance
                             }
                             state = result.parser
-                            if (!input.finished) {
+                            if (input.available == 0 && !input.finished) {
                                 return
                             }
                         }

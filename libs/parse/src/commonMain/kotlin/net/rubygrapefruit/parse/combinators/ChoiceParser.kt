@@ -94,6 +94,7 @@ internal class ChoiceParser<IN, OUT>(
                                 optionResult
                             }
                             option.state = effective
+                            actualAdvance = 0
                         }
 
                         is PullParser.RequireMore -> {

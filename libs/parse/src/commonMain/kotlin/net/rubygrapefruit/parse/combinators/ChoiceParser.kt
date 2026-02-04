@@ -87,7 +87,13 @@ internal class ChoiceParser<IN, OUT>(
                         is PullParser.Matched -> return optionResult
 
                         is PullParser.Failed -> {
-                            option.state = optionResult
+                            val failedChoice = option.failedChoice
+                            val effective = if (optionResult.index == 0 && failedChoice != null) {
+                                PullParser.Failed(0, ExpectationProvider.oneOf(failedChoice, optionResult.expected))
+                            } else {
+                                optionResult
+                            }
+                            option.state = effective
                         }
 
                         is PullParser.RequireMore -> {
@@ -114,6 +120,7 @@ internal class ChoiceParser<IN, OUT>(
                                 requireMore = true
                             }
                             option.state = optionResult.parser
+                            option.failedChoice = optionResult.failedChoice
                             option.advance = optionResult.advance
                             if (optionResult.advance == 0) {
                                 actualAdvance = 0
@@ -147,9 +154,10 @@ internal class ChoiceParser<IN, OUT>(
     private class OptionState<IN, NEXT>(var state: ParseState<IN, NEXT>) {
         var advance = 0
         var matched = false
+        var failedChoice: ExpectationProvider? = null
 
         override fun toString(): String {
-            return "{$state advance=$advance matched=$matched}"
+            return "{$state advance=$advance matched=$matched failedChoice=$failedChoice}"
         }
     }
 
@@ -161,5 +169,4 @@ internal class ChoiceParser<IN, OUT>(
             return next.next(length, value)
         }
     }
-
 }

@@ -21,11 +21,23 @@ internal interface ExpectationProvider {
         }
 
         fun oneOf(first: ExpectationProvider, second: ExpectationProvider): ExpectationProvider {
-            return object : ExpectationProvider {
-                override fun expectation(): Expectation {
-                    return Expectation.oneOf(listOf(first.expectation(), second.expectation()))
-                }
+            return if (first is Expectation.Nothing) {
+                second
+            } else if (second is Expectation.Nothing) {
+                first
+            } else {
+                OneOfExpectationProvider(first, second)
             }
+        }
+    }
+
+    private class OneOfExpectationProvider(val first: ExpectationProvider, val second: ExpectationProvider) : ExpectationProvider {
+        override fun toString(): String {
+            return "{one-of $first $second}"
+        }
+
+        override fun expectation(): Expectation {
+            return Expectation.oneOf(listOf(first.expectation(), second.expectation()))
         }
     }
 

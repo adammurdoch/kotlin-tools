@@ -159,15 +159,29 @@ class ChoiceOfSequenceTest : AbstractParseTest() {
         // missing
         parser.doesNotMatch("") {
             expectLiteral("a")
+            expectLiteral("b")
         }
         parser.doesNotMatch("a") {
             failAt(1)
-            expectLiteral("b")
-        }
-        parser.doesNotMatch("ab") {
-            failAt(2)
             expectLiteral("!")
             expectLiteral("?")
+        }
+
+        // unexpected
+        parser.doesNotMatch("X") {
+            expectLiteral("a")
+            expectLiteral("b")
+        }
+        parser.doesNotMatch("bX") {
+            failAt(1)
+            expectLiteral("!")
+            expectLiteral("?")
+        }
+
+        // extra
+        parser.doesNotMatch("b?X") {
+            failAt(2)
+            expectEndOfInput()
         }
     }
 

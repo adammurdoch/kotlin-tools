@@ -71,9 +71,9 @@ internal class ChoiceParser<IN, OUT>(
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
-            var requireMore = false
             val maxAdvance = min(max, 1)
-            var actualAdvance = 1
+            var requireMore = false
+            var hasZeroAdvance = false
             for (index in states.indices) {
                 val option = states[index]
                 val optionState = option.state
@@ -126,21 +126,24 @@ internal class ChoiceParser<IN, OUT>(
                             option.failedChoice = optionResult.failedChoice
                             option.advance = optionResult.advance
                             if (optionResult.advance == 0) {
-                                actualAdvance = 0
+                                hasZeroAdvance = true
                             }
                         }
                     }
                 }
             }
-            advancedZero = actualAdvance == 0
+            advancedZero = hasZeroAdvance
             return if (requireMore) {
-                if (actualAdvance > 0) {
+                if (hasZeroAdvance) {
+                    PullParser.RequireMore(0, false, this)
+                } else {
                     for (index in states.indices) {
                         val choice = states[index].state
                         if (choice is PullParser.Failed) {
-                            states[index].state = PullParser.Failed(choice.index - actualAdvance, choice.expected)
+                            states[index].state = PullParser.Failed(choice.index - 1, choice.expected)
                         }
                     }
+                    PullParser.RequireMore(1, false, this)
                 }
                 PullParser.RequireMore(actualAdvance, false, this)
             } else {

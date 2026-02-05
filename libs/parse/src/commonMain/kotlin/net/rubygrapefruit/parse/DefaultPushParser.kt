@@ -27,7 +27,7 @@ internal open class DefaultPushParser<CONTEXT, IN : AdvancingInput<*>, OUT>(
                         is PullParser.RequireMore -> {
                             input.advance(result.advance)
                             if (result.failedChoice != null) {
-                                if (result.advance == 0 && failedChoice != null) {
+                                if (result.advance == 0 && failedChoiceIndex == 0 && failedChoice != null) {
                                     failedChoice = ExpectationProvider.oneOf(failedChoice!!, result.failedChoice)
                                 } else {
                                     failedChoice = result.failedChoice

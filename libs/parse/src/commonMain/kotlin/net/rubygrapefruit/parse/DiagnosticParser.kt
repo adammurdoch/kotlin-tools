@@ -96,7 +96,7 @@ internal class DiagnosticParser<IN, OUT> private constructor(
                 }
 
                 is PullParser.RequireMore -> {
-                    require(result.advance <= max)
+                    require(result.advance <= max) { "$parserState returned $result when max=$max" }
                     val effective = when (result.parser) {
                         parser -> this
                         else -> DiagnosticPullParser(result.parser, logger)

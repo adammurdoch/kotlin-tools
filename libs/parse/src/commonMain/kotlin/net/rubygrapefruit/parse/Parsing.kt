@@ -21,30 +21,6 @@ internal fun Expectation.format(): String {
     return "Expected ${expected.sorted().joinToString(", ")}"
 }
 
-internal fun <IN, OUT> PullParser<IN, OUT>.parseZeroOrOne(input: IN, maxAdvance: Int): PullParser.Result<IN, OUT> {
-    var current = this
-    var failedChoice: ExpectationProvider? = null
-    var matched = false
-    while (true) {
-        val result = current.parse(input, maxAdvance)
-        if (maxAdvance == 1 && result is PullParser.RequireMore && result.advance == 0) {
-            current = result.parser
-            if (result.failedChoice != null) {
-                failedChoice = result.failedChoice
-            }
-            matched = result.matched
-            continue
-        } else if (result is PullParser.Failed && result.index == 0 && failedChoice != null) {
-            return PullParser.Failed(0, ExpectationProvider.oneOf(failedChoice, result.expected))
-        }
-        return if (matched && result is PullParser.RequireMore && !result.matched) {
-            PullParser.RequireMore(result.advance, true, result.parser, result.failedChoice)
-        } else {
-            result
-        }
-    }
-}
-
 internal fun <IN : Input<*>, OUT> Parser<*, OUT>.start(): PullParser<IN, OUT> {
     val all = suffixed(this, endOfInput())
     return DefaultCompiler<IN>().compile(all).start()

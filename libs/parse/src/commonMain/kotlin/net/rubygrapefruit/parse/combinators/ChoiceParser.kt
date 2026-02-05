@@ -107,6 +107,8 @@ internal class ChoiceParser<IN, OUT>(
                                             val state = it.state
                                             if (state is PullParser.Failed && state.index == 0) {
                                                 state.expected
+                                            } else if (state is PullParser && it.advance == 0) {
+                                                it.failedChoice
                                             } else {
                                                 null
                                             }

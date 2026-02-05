@@ -302,5 +302,36 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
 
         parser.matches("!!", expected = emptyList())
         parser.matches("abc!!", expected = listOf('a', 'b', 'c'))
+
+        // missing
+        parser.doesNotMatch("") {
+            expectLiteral("!!")
+            expect("not \"!!\"")
+            expect("one character")
+        }
+        parser.doesNotMatch("!") {
+            failAt(1)
+            expectLiteral("!!")
+        }
+        parser.doesNotMatch("abc") {
+            failAt(3)
+            expectLiteral("!!")
+            expect("not \"!!\"")
+            expect("one character")
+        }
+        parser.doesNotMatch("abc!") {
+            failAt(3)
+            expectLiteral("!!")
+        }
+
+        // extra
+        parser.doesNotMatch("!!X") {
+            failAt(2)
+            expectEndOfInput()
+        }
+        parser.doesNotMatch("a!!X") {
+            failAt(3)
+            expectEndOfInput()
+        }
     }
 }

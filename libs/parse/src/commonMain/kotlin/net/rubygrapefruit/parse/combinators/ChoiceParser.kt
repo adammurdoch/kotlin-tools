@@ -94,7 +94,6 @@ internal class ChoiceParser<IN, OUT>(
                                 optionResult
                             }
                             option.state = effective
-                            actualAdvance = 0
                         }
 
                         is PullParser.RequireMore -> {
@@ -145,7 +144,6 @@ internal class ChoiceParser<IN, OUT>(
                     }
                     PullParser.RequireMore(1, false, this)
                 }
-                PullParser.RequireMore(actualAdvance, false, this)
             } else {
                 mergedFailures()
             }

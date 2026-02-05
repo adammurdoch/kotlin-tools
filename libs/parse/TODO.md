@@ -14,12 +14,14 @@ Performance
 - Optimized implementation for `not(single-input)`
 - `literal(one-value)` is a single input parser
 - `oneOf(single-input...)` is a single input parser
+- `sequence(not(single-input), single-input)` is a single input parser
 - Allow `CompiledParser.start()` to fail or complete parsing
-- Choice exits when there is one remaining candidate
+- Choice exits when there is one remaining candidate that has not failed
 - Discard buffered input once it is not required
 - Match common prefix for choice
 
 Features
+- Push parse indicates that parsing has already failed, prior to end of input being received
 - Parse file
 - Match location/region
 - Semantic errors

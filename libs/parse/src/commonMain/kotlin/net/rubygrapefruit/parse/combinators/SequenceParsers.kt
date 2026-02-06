@@ -78,6 +78,22 @@ fun <IN, OUT> sequence(prefix: Parser<IN, Unit>, parser: Parser<IN, OUT>, suffix
 }
 
 /**
+ * Returns a parser that applies the given parsers in order.
+ * Produces the result of applying the given mapping function to the result of the first and last parsers.
+ */
+fun <IN, A, B, OUT> separated(a: Parser<IN, A>, separator: Parser<IN, *>, b: Parser<IN, B>, map: (A, B) -> OUT): Parser<IN, OUT> {
+    return sequence(a, discard(separator), b, map)
+}
+
+/**
+ * Returns a parser that applies the given parsers in order.
+ * Produces the result of applying the given mapping function to the result of the first and last parsers.
+ */
+fun <IN, A, B, OUT> sequence(a: Parser<IN, A>, separator: Parser<IN, Unit>, b: Parser<IN, B>, map: (A, B) -> OUT): Parser<IN, OUT> {
+    return sequence(a, separator, b) { a, _, b -> map(a, b) }
+}
+
+/**
  * Returns a parser that applies the given parsers in order. Produces no result.
  */
 fun <IN> sequence(a: Parser<IN, Unit>, b: Parser<IN, Unit>, c: Parser<IN, Unit>): Parser<IN, Unit> {

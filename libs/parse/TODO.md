@@ -5,10 +5,11 @@ Parsers
 - `separated()`
 - `oneOrMore()`
 - `zeroOrMore()` and `oneOrMore()` with a separator
+- `concat(parser<char>)`
 - Binary ints
 - Repeat, `take(parser<int>)`, `drop(parser<int>)`
 - `accept()` does not call function on a failed branch
-- Improve expected message for not e.g: expecting one character but not "  
+- Improve expected message for `not()` e.g: expecting one character but not "  
 
 Performance
 - Optimized implementation for `not(single-input)`

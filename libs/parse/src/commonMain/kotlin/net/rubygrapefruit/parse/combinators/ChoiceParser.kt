@@ -60,12 +60,10 @@ internal class ChoiceParser<IN, OUT>(
         override fun stop(): PullParser.Failed {
             return PullParser.Failed.merged(states.mapNotNull {
                 val state = it.state
-                if (state is PullParser) {
-                    state.stop()
-                } else if (state is PullParser.Failed && state.index == 0) {
-                    state
-                } else {
-                    null
+                when (state) {
+                    is PullParser -> state.stop()
+                    is PullParser.Failed if state.index == 0 -> state
+                    else -> null
                 }
             })
         }
@@ -104,12 +102,10 @@ internal class ChoiceParser<IN, OUT>(
                                     return if (optionResult.advance == 0) {
                                         val failures = states.mapNotNull {
                                             val state = it.state
-                                            if (state is PullParser.Failed && state.index == 0) {
-                                                state.expected
-                                            } else if (state is PullParser && it.advance == 0) {
-                                                it.failedChoice
-                                            } else {
-                                                null
+                                            when (state) {
+                                                is PullParser.Failed if state.index == 0 -> state.expected
+                                                is PullParser if it.advance == 0 -> it.failedChoice
+                                                else -> null
                                             }
                                         } + if (optionResult.failedChoice != null) listOf(optionResult.failedChoice) else emptyList()
                                         val expected = ExpectationProvider.oneOfOrNull(failures)

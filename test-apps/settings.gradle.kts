@@ -99,7 +99,7 @@ samples {
     }
     jvmCliApp("parse-toml-jvm-cli-app") {
         cliArgs("--file", "../parse-toml-jvm-cli-app/test.toml")
-        expectedOutput("""key-1 = "value 1"""")
+        expectedOutput("key-1 = value 1")
         deriveNative("parse-toml-native-cli-app")
     }
 

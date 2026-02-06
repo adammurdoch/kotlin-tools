@@ -22,8 +22,8 @@ class Parser {
         val plus = sequence(whitespace, literal("+"), whitespace)
         val minus = sequence(whitespace, literal("-"), whitespace)
 
-        val addition = sequence(operand, plus, operand) { a, _, b -> Addition(a, b) }
-        val subtraction = sequence(operand, minus, operand) { a, _, b -> Subtraction(a, b) }
+        val addition = sequence(operand, plus, operand) { a, b -> Addition(a, b) }
+        val subtraction = sequence(operand, minus, operand) { a, b -> Subtraction(a, b) }
 
         expression.parser(oneOf(addition, subtraction, operand))
 

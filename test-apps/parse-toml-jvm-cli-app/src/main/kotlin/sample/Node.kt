@@ -23,7 +23,7 @@ class Leaf(val name: String, val value: String) : Node() {
         terminal.whitespace(" ")
         terminal.operator("=")
         terminal.whitespace(" ")
-        terminal.literal("\"" + value + "\"")
+        terminal.literal(value)
         println()
     }
 }

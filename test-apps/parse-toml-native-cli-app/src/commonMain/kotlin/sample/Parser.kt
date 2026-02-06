@@ -2,15 +2,13 @@ package sample
 
 import net.rubygrapefruit.file.RegularFile
 import net.rubygrapefruit.parse.combinators.*
-import net.rubygrapefruit.parse.text.literal
-import net.rubygrapefruit.parse.text.match
-import net.rubygrapefruit.parse.text.one
-import net.rubygrapefruit.parse.text.oneOf
-import net.rubygrapefruit.parse.text.parse
+import net.rubygrapefruit.parse.text.*
 
 class Parser {
     fun parse(file: RegularFile): Root {
-        val whitespace = oneOf(' ', '\t')
+        val whitespace = discard(oneOf(' ', '\t'))
+        val optionalWhitespace = zeroOrMore(whitespace)
+
         val endLine = oneOf(literal("\n"), literal("\r\n"))
 
         val keyChar = oneOf(
@@ -22,13 +20,18 @@ class Parser {
         val key = match(sequence(discard(keyChar), zeroOrMore(discard(keyChar))))
 
         val quote = literal("\"")
-        val stringChar = one() // not right
-        val stringBody = match(zeroOrMore(sequence(not(oneOf(quote, endLine)), stringChar)))
+        // not right
+        val stringContent = oneOf(
+            literal("\\\"", '"'),
+            literal("\\\\", '\\'),
+            sequence(not(oneOf(quote, endLine)), one())
+        )
+        val stringBody = map(zeroOrMore(stringContent)) { it.joinToString("") }
         val string = sequence(quote, stringBody, quote)
 
-        val equals = literal("=")
-        val pair = sequence(key, equals, string) { key, _, value -> Leaf(key, value) }
-        val line = sequence(pair, endLine) { pair, _ -> pair }
+        val equals = sequence(optionalWhitespace, literal("="), optionalWhitespace)
+        val pair = sequence(key, equals, string) { key, value -> Leaf(key, value) }
+        val line = sequence(pair, endLine)
         val lines = zeroOrMore(line)
 
         val leaves = lines.parse(file.readText())

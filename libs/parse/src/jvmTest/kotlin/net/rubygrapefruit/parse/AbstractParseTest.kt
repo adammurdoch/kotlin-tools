@@ -436,7 +436,7 @@ abstract class AbstractParseTest {
 
         class IsChoice(val choices: List<Inspector>) : Inspector {
             override val expected: List<String>
-                get() = choices.flatMap { it.expected }
+                get() = choices.flatMap { it.expected }.distinct()
 
             override val mayBeEmpty: Boolean
                 get() = choices.any { it.mayBeEmpty }

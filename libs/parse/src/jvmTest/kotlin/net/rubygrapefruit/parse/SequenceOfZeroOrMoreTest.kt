@@ -266,6 +266,23 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
             literal("!")
         )
 
+        parser.expecting {
+            expectSequence {
+                expectChoice {
+                    expectOneOrMore {
+                        expectSequence {
+                            expectNot {
+                                expectLiteral("!")
+                            }
+                            expectOneChar()
+                        }
+                    }
+                    expectZero()
+                }
+                expectLiteral("!")
+            }
+        }
+
         parser.matches("!", expected = emptyList())
         parser.matches("abc!", expected = listOf('a', 'b', 'c'))
 
@@ -299,6 +316,23 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
             zeroOrMore(sequence(not(literal("!!")), one())),
             literal("!!")
         )
+
+        parser.expecting {
+            expectSequence {
+                expectChoice {
+                    expectOneOrMore {
+                        expectSequence {
+                            expectNot {
+                                expectLiteral("!!")
+                            }
+                            expectOneChar()
+                        }
+                    }
+                    expectZero()
+                }
+                expectLiteral("!!")
+            }
+        }
 
         parser.matches("!!", expected = emptyList())
         parser.matches("abc!!", expected = listOf('a', 'b', 'c'))

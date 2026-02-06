@@ -4,7 +4,7 @@ import net.rubygrapefruit.parse.combinators.sequence
 import net.rubygrapefruit.parse.text.literal
 import kotlin.test.Test
 
-class DiscardSecondSequenceTest : AbstractParseTest() {
+class DiscardLastSequenceTest : AbstractParseTest() {
     @Test
     fun `matches literal then literal`() {
         val parser = sequence(literal("a", 1), literal("b"))

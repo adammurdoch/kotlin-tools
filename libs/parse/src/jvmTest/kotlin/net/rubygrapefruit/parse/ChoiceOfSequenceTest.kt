@@ -63,6 +63,23 @@ class ChoiceOfSequenceTest : AbstractParseTest() {
             sequence(map(literal("a", 2)) { it.toString() }, literal("c", "c")) { a, b -> a + b },
         )
 
+        parser.expecting {
+            expectChoice {
+                expectSequence {
+                    expectMap {
+                        expectLiteral("a", result = 1)
+                    }
+                    expectLiteral("b", result = "b")
+                }
+                expectSequence {
+                    expectMap {
+                        expectLiteral("a", result = 2)
+                    }
+                    expectLiteral("c", result = "c")
+                }
+            }
+        }
+
         parser.matches("ab", expected = "1b")
         parser.matches("ac", expected = "2c")
 
@@ -90,6 +107,19 @@ class ChoiceOfSequenceTest : AbstractParseTest() {
             sequence(match(literal("a")), literal("c", "c")) { a, b -> a + b },
         )
 
+        parser.expecting {
+            expectChoice {
+                expectSequence {
+                    expectMatch { expectLiteral("a") }
+                    expectLiteral("b", result = "b")
+                }
+                expectSequence {
+                    expectMatch { expectLiteral("a") }
+                    expectLiteral("c", result = "c")
+                }
+            }
+        }
+
         parser.matches("ab", expected = "ab")
         parser.matches("ac", expected = "ac")
 
@@ -116,6 +146,23 @@ class ChoiceOfSequenceTest : AbstractParseTest() {
             sequence(zeroOrMore(oneOf('1', '2')), literal("b", 'b')) { a, b -> a + b },
             sequence(zeroOrMore(oneOf('1', '2')), literal("c", 'c')) { a, b -> a + b },
         )
+
+        parser.expecting {
+            expectChoice {
+                expectSequence {
+                    expectZeroOrMoreSingleInput {
+                        expectOneOf("1", "2")
+                    }
+                    expectLiteral("b", result = 'b')
+                }
+                expectSequence {
+                    expectZeroOrMoreSingleInput {
+                        expectOneOf("1", "2")
+                    }
+                    expectLiteral("c", result = 'c')
+                }
+            }
+        }
 
         parser.matches("b", expected = listOf('b'))
         parser.matches("c", expected = listOf('c'))
@@ -168,6 +215,29 @@ class ChoiceOfSequenceTest : AbstractParseTest() {
             sequence(zeroOrMore(literal("12", '1')), literal("b", 'b')) { a, b -> a + b },
             sequence(zeroOrMore(literal("12", '2')), literal("c", 'c')) { a, b -> a + b },
         )
+
+        parser.expecting {
+            expectChoice {
+                expectSequence {
+                    expectChoice {
+                        expectOneOrMore {
+                            expectLiteral("12", result = '1')
+                        }
+                        expectZero()
+                    }
+                    expectLiteral("b", result = 'b')
+                }
+                expectSequence {
+                    expectChoice {
+                        expectOneOrMore {
+                            expectLiteral("12", result = '2')
+                        }
+                        expectZero()
+                    }
+                    expectLiteral("c", result = 'c')
+                }
+            }
+        }
 
         parser.matches("b", expected = listOf('b'))
         parser.matches("c", expected = listOf('c'))
@@ -226,6 +296,25 @@ class ChoiceOfSequenceTest : AbstractParseTest() {
             ) { a, b -> a + b },
         )
 
+        parser.expecting {
+            expectChoice {
+                expectSequence {
+                    expectChoice {
+                        expectLiteral("a", result = "A")
+                        expectLiteral("b", result = "B")
+                    }
+                    expectLiteral("!", result = "!")
+                }
+                expectSequence {
+                    expectChoice {
+                        expectLiteral("a", result = "a")
+                        expectLiteral("b", result = "b")
+                    }
+                    expectLiteral("?", result = "?")
+                }
+            }
+        }
+
         parser.matches("b!", expected = "B!")
         parser.matches("a?", expected = "a?")
 
@@ -265,6 +354,25 @@ class ChoiceOfSequenceTest : AbstractParseTest() {
             sequence(sequence(literal("a"), literal("b")), literal("!"))
         )
 
+        parser.expecting {
+            expectChoice {
+                expectSequence {
+                    expectSequence {
+                        expectLiteral("a")
+                        expectLiteral("b")
+                    }
+                    expectLiteral("?")
+                }
+                expectSequence {
+                    expectSequence {
+                        expectLiteral("a")
+                        expectLiteral("b")
+                    }
+                    expectLiteral("!")
+                }
+            }
+        }
+
         parser.matches("ab?")
         parser.matches("ab!")
 
@@ -303,6 +411,24 @@ class ChoiceOfSequenceTest : AbstractParseTest() {
             ) { a, b, c -> listOf(a) + b + listOf(c) },
             literal("a", listOf(2))
         )
+
+        parser.expecting {
+            expectChoice {
+                expectSequence {
+                    expectLiteral("a", result = 1)
+                    expectSequence {
+                        expectChoice {
+                            expectOneOrMore {
+                                expectLiteral("1", result = 1)
+                            }
+                            expectZero()
+                        }
+                        expectLiteral("!", result =  1)
+                    }
+                }
+                expectLiteral("a", result =  listOf(2))
+            }
+        }
 
         parser.matches("a!", expected = listOf(1, 1))
         parser.matches("a11!", expected = listOf(1, 1, 1, 1))

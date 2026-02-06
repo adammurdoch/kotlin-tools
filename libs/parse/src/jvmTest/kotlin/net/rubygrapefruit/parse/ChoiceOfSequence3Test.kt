@@ -14,6 +14,25 @@ class ChoiceOfSequence3Test : AbstractParseTest() {
             sequence(literal("a"), literal("b"), literal("!"))
         )
 
+        parser.expecting {
+            expectChoice {
+                expectSequence {
+                    expectLiteral("a")
+                    expectSequence {
+                        expectLiteral("b")
+                        expectLiteral("?")
+                    }
+                }
+                expectSequence {
+                    expectLiteral("a")
+                    expectSequence {
+                        expectLiteral("b")
+                        expectLiteral("!")
+                    }
+                }
+            }
+        }
+
         parser.matches("ab?")
         parser.matches("ab!")
 

@@ -13,6 +13,19 @@ class ChoiceOfDecideTest : AbstractParseTest() {
             decide(literal("a", 2)) { literal(it.toString()) }
         )
 
+        parser.expecting {
+            expectChoice {
+                expectDecide {
+                    expectLiteral("a", result = 1)
+                    expectLiteral("1")
+                }
+                expectDecide {
+                    expectLiteral("a", result = 2)
+                    expectLiteral("2")
+                }
+            }
+        }
+
         parser.matches("a1")
         parser.matches("a2")
 

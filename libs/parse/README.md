@@ -99,6 +99,7 @@ Mapping parsers:
 
 Other parsers:
 
+- describedAs(parser, description) - uses the description in error messages
 - recursive() - a parser that is applied recursively
 - not(parser) - matches zero input values, produces nothing
 - consume(parser, action) - calls function with result, then discards result

@@ -5,10 +5,16 @@ import net.rubygrapefruit.parse.combinators.describedAs
 import net.rubygrapefruit.parse.text.literal
 import kotlin.test.Test
 
-class DescriptionTest : AbstractParseTest() {
+class DescribedAsTest : AbstractParseTest() {
     @Test
     fun `replaces expectation of char literal`() {
         val parser = describedAs(literal("abc", 1), "<literal>")
+
+        parser.expecting {
+            expectDescribed("<literal>") {
+                expectLiteral("abc", result = 1)
+            }
+        }
 
         parser.matches("abc", expected = 1)
 
@@ -35,6 +41,12 @@ class DescriptionTest : AbstractParseTest() {
     @Test
     fun `replaces expectation at start of boolean literal`() {
         val parser = describedAs(literal(byteArrayOf(0x1, 0x2), 1), "<literal>")
+
+        parser.expecting {
+            expectDescribed("<literal>") {
+                expectLiteral(0x1, 0x2, result = 1)
+            }
+        }
 
         parser.matches(0x1, 0x2, expected = 1)
 

@@ -5,7 +5,11 @@ import net.rubygrapefruit.parse.*
 internal class DescribingParser<IN, OUT>(
     private val parser: Parser<IN, OUT>,
     private val description: String
-) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
+) : Parser<IN, OUT>, CombinatorBuilder<OUT>, DiscardableParser<IN> {
+    override fun withNoResult(): Parser<IN, Unit> {
+        return DescribingParser(DiscardParser(parser), description)
+    }
+
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, OUT> {
         return DescribingCompiledParser(compiler.compile(parser), Expectation.One(description))
     }
@@ -27,20 +31,15 @@ internal class DescribingParser<IN, OUT>(
         private var advanced = 0
 
         override fun stop(): PullParser.Failed {
-            TODO()
+            val failure = parser.stop()
+            return mapFailure(failure)
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
             val result = parser.parse(input, max)
             return when (result) {
                 is PullParser.Matched -> result
-                is PullParser.Failed -> {
-                    if (result.index == -advanced) {
-                        PullParser.Failed(result.index, expectation)
-                    } else {
-                        result
-                    }
-                }
+                is PullParser.Failed -> mapFailure(result)
 
                 is PullParser.RequireMore -> {
                     advanced += result.advance
@@ -48,6 +47,12 @@ internal class DescribingParser<IN, OUT>(
                     PullParser.RequireMore(result.advance, result.matched, this, result.failedChoice)
                 }
             }
+        }
+
+        private fun mapFailure(result: PullParser.Failed): PullParser.Failed = if (result.index == -advanced) {
+            PullParser.Failed(result.index, expectation)
+        } else {
+            result
         }
     }
 }

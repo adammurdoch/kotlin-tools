@@ -341,6 +341,8 @@ abstract class AbstractParseTest {
 
         fun expectMap(config: CompiledParserFixture.() -> Unit)
 
+        fun expectDescribed(description: String, config: CompiledParserFixture.() -> Unit)
+
         fun expectConsume(config: CompiledParserFixture.() -> Unit)
 
         fun expectDecide(config: CompiledParserFixture.() -> Unit)
@@ -473,6 +475,19 @@ abstract class AbstractParseTest {
 
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<MapParser.MapCompiledParser<*, *, *>>(parser)
+                inspector.inspect(parser.parser)
+            }
+        }
+
+        class IsDescribed(val description: String, val inspector: Inspector) : Inspector {
+            override val expected: List<String>
+                get() = listOf(description)
+
+            override val mayBeEmpty: Boolean
+                get() = inspector.mayBeEmpty
+
+            override fun inspect(parser: CompiledParser<*, *>) {
+                assertIs<DescribingParser.DescribingCompiledParser<*, *>>(parser)
                 inspector.inspect(parser.parser)
             }
         }
@@ -762,6 +777,12 @@ abstract class AbstractParseTest {
             val fixture = DefaultCompiledParserFixture()
             fixture.config()
             inspectors.add(Inspector.IsConsume(fixture.inspector()))
+        }
+
+        override fun expectDescribed(description: String, config: CompiledParserFixture.() -> Unit) {
+            val fixture = DefaultCompiledParserFixture()
+            fixture.config()
+            inspectors.add(Inspector.IsDescribed(description, fixture.inspector()))
         }
 
         override fun expectMap(config: CompiledParserFixture.() -> Unit) {

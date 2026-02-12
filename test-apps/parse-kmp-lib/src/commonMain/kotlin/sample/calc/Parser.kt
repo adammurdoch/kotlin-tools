@@ -8,7 +8,7 @@ class Parser {
     fun parse(text: String): ParseResult<*, List<Expression>> {
         val whitespace = zeroOrMore(literal(" "))
 
-        val digit = discard(oneOf('0'..'9'))
+        val digit = describedAs(oneOf('0'..'9'), "a digit")
         val digits = sequence(digit, zeroOrMore(digit)) { _, _ -> }
         val number = map(match(digits)) { Number(it.toInt()) }
 

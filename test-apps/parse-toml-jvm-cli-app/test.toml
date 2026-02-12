@@ -1,3 +1,7 @@
-key-1 = "value 1"
+# comment
+
+key-1 = "value 1" # trailing comment
 key_2 = "value 2"
 escapes = "\"value\\\""
+contains-comment = "# comment"
+# no trailing new line

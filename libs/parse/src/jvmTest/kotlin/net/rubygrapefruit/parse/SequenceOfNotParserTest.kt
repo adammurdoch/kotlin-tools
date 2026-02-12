@@ -5,13 +5,14 @@ import net.rubygrapefruit.parse.binary.oneOf
 import net.rubygrapefruit.parse.combinators.not
 import net.rubygrapefruit.parse.combinators.sequence
 import net.rubygrapefruit.parse.combinators.zeroOrMore
+import net.rubygrapefruit.parse.general.endOfInput
 import kotlin.test.Test
 
 class SequenceOfNotParserTest : AbstractParseTest() {
     @Test
     fun `matches not single byte literal followed by bytes`() {
         val parser = sequence(
-            not(literal(byteArrayOf(0x1))),
+            not(literal(byteArrayOf(0x1), 1)),
             zeroOrMore(oneOf(0x1, 0x2))
         )
 
@@ -62,7 +63,7 @@ class SequenceOfNotParserTest : AbstractParseTest() {
     @Test
     fun `matches not multi-byte literal followed by bytes`() {
         val parser = sequence(
-            not(literal(byteArrayOf(0x1, 0x2))),
+            not(literal(byteArrayOf(0x1, 0x2), 1)),
             zeroOrMore(oneOf(0x1, 0x2))
         )
 
@@ -185,6 +186,50 @@ class SequenceOfNotParserTest : AbstractParseTest() {
             expectLiteral(0x2)
             expectLiteral(0x3)
             expectLiteral(0x4)
+        }
+    }
+
+    @Test
+    fun `matches not end of input followed by bytes`() {
+        val parser = sequence(
+            not(endOfInput(1)),
+            zeroOrMore(oneOf(0x1, 0x2))
+        )
+
+        parser.expecting {
+            expectSequence {
+                expectNot {
+                    expectEndOfInput()
+                }
+                expectZeroOrMoreSingleInput {
+                    expectOneOf(0x1, 0x2)
+                }
+            }
+        }
+
+        parser.matches(0x2, expected = bytes(0x2))
+        parser.matches(0x2, 0x1, expected = bytes(0x2, 0x1))
+
+        // matches not predicate
+        parser.doesNotMatch {
+            expect("end of input")
+            expect("not end of input")
+            expectLiteral(0x1)
+            expectLiteral(0x2)
+        }
+
+        // unexpected
+        parser.doesNotMatch(0x5) {
+            expect("end of input")
+            expect("not end of input")
+            expectLiteral(0x1)
+            expectLiteral(0x2)
+        }
+        parser.doesNotMatch(0x2, 0x5) {
+            failAt(1)
+            expect("end of input")
+            expectLiteral(0x1)
+            expectLiteral(0x2)
         }
     }
 }

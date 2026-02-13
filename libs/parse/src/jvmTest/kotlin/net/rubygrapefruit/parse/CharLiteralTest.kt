@@ -12,7 +12,11 @@ class CharLiteralTest : AbstractParseTest() {
             expectLiteral("a")
         }
 
-        parser.matches("a")
+        parser.matches("a") {
+            steps {
+                commit(1)
+            }
+        }
 
         // missing
         parser.doesNotMatch("") {
@@ -111,7 +115,11 @@ class CharLiteralTest : AbstractParseTest() {
             expectLiteral("ab")
         }
 
-        parser.matches("ab")
+        parser.matches("ab") {
+            steps {
+                commit(2)
+            }
+        }
 
         // missing
         parser.doesNotMatch("") {

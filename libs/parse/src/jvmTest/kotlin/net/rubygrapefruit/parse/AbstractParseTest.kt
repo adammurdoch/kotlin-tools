@@ -30,14 +30,21 @@ abstract class AbstractParseTest {
         val fixture = DefaultParseFixture()
         fixture.config()
 
-        fixture.tracing(this) { matches(fixture, input, expected) }
+        fixture.tracing(this, fixture.steps) {
+            matchesString(fixture, input, expected)
+        }
+        fixture.tracing(this, null) {
+            matchesChunks(fixture, input, expected)
+        }
     }
 
-    private fun <T> Parser<CharInput, T>.matches(fixture: DefaultParseFixture, input: String, expected: T) {
+    private fun <T> Parser<CharInput, T>.matchesString(fixture: DefaultParseFixture, input: String, expected: T) {
         fixture.debug("PARSE \"$input\"")
         val result = parse(input)
         result.assertIsSuccess(expected)
+    }
 
+    private fun <T> Parser<CharInput, T>.matchesChunks(fixture: DefaultParseFixture, input: String, expected: T) {
         input.oneChunk {
             fixture.debug("PARSE ONE CHUNK")
             val result = pushParse(it)
@@ -61,7 +68,9 @@ abstract class AbstractParseTest {
         val fixture = DefaultCharParseFailureFixture()
         fixture.config()
 
-        fixture.tracing(this) { doesNotMatch(input, fixture) }
+        fixture.tracing(this, fixture.steps) {
+            doesNotMatch(input, fixture)
+        }
     }
 
     private fun Parser<CharInput, *>.doesNotMatch(input: String, fixture: DefaultCharParseFailureFixture) {
@@ -143,10 +152,15 @@ abstract class AbstractParseTest {
         val fixture = DefaultParseFixture()
         fixture.config()
 
-        fixture.tracing(this) { matches(input = input, expected = expected, fixture = fixture, normalize = normalize) }
+        fixture.tracing(this, fixture.steps) {
+            matchesArray(input = input, expected = expected, fixture = fixture, normalize = normalize)
+        }
+        fixture.tracing(this, null) {
+            matchesChunks(input = input, expected = expected, fixture = fixture, normalize = normalize)
+        }
     }
 
-    private fun <T, E> Parser<ByteInput, T>.matches(
+    private fun <T, E> Parser<ByteInput, T>.matchesArray(
         vararg input: Byte,
         expected: E,
         fixture: DefaultParseFixture,
@@ -155,7 +169,14 @@ abstract class AbstractParseTest {
         fixture.debug("PARSE [${input.joinToString { format(it) }}]")
         val result = parse(input)
         result.assertIsSuccess(expected, normalize)
+    }
 
+    private fun <T, E> Parser<ByteInput, T>.matchesChunks(
+        vararg input: Byte,
+        expected: E,
+        fixture: DefaultParseFixture,
+        normalize: (T) -> E
+    ) {
         input.oneChunk {
             fixture.debug("ONE CHUNK")
             val result = pushParse(it)
@@ -179,7 +200,9 @@ abstract class AbstractParseTest {
         val fixture = DefaultByteParseFailureFixture()
         fixture.config()
 
-        fixture.tracing(this) { doesNotMatch(fixture = fixture, input = input) }
+        fixture.tracing(this, fixture.steps) {
+            doesNotMatch(fixture = fixture, input = input)
+        }
     }
 
     private fun Parser<ByteInput, *>.doesNotMatch(fixture: DefaultByteParseFailureFixture, vararg input: Byte) {
@@ -816,13 +839,22 @@ abstract class AbstractParseTest {
 
     interface ParseFixture {
         fun log()
+
+        fun steps(config: ParseStepsFixture.() -> Unit)
     }
 
     private open class DefaultParseFixture : ParseFixture {
         var log = false
+        var steps: DefaultParseStepsFixture? = null
 
         override fun log() {
             log = true
+        }
+
+        override fun steps(config: ParseStepsFixture.() -> Unit) {
+            val steps = DefaultParseStepsFixture()
+            steps.config()
+            this.steps = steps
         }
 
         fun debug(message: String) {
@@ -831,15 +863,38 @@ abstract class AbstractParseTest {
             }
         }
 
-        fun <IN, OUT> tracing(parser: Parser<IN, OUT>, action: Parser<IN, OUT>.() -> Unit) {
+        fun <IN, OUT> tracing(parser: Parser<IN, OUT>, expectedSteps: DefaultParseStepsFixture?, action: Parser<IN, OUT>.() -> Unit) {
+            val steps = mutableListOf<Step>()
+            val tracingListener = object : DiagnosticParser.Listener {
+                override fun requireMore(advance: Int, commit: Int) {
+                    steps.add(Step(commit))
+                }
+            }
             if (log) {
-                DiagnosticParser.of(parser, true).action()
+                DiagnosticParser.of(parser, true, tracingListener).action()
             } else {
                 parser.action()
-                DiagnosticParser.of(parser, false).action()
+                DiagnosticParser.of(parser, false, tracingListener).action()
+            }
+            if (expectedSteps != null) {
+                assertEquals(expectedSteps.steps + listOf(Step(0)), steps)
             }
         }
     }
+
+    interface ParseStepsFixture {
+        fun commit(count: Int)
+    }
+
+    private class DefaultParseStepsFixture : ParseStepsFixture {
+        val steps = mutableListOf<Step>()
+
+        override fun commit(count: Int) {
+            steps.add(Step(count))
+        }
+    }
+
+    private data class Step(val commit: Int)
 
     interface ParseFailureFixture : ParseFixture {
         fun expect(text: String)

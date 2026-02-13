@@ -12,7 +12,11 @@ class ByteLiteralTest : AbstractParseTest() {
             expectLiteral(0x1)
         }
 
-        parser.matches(0x1)
+        parser.matches(0x1) {
+            steps {
+                commit(1)
+            }
+        }
 
         // missing
         parser.doesNotMatch {
@@ -47,7 +51,11 @@ class ByteLiteralTest : AbstractParseTest() {
             expectLiteral(0x1)
         }
 
-        parser.matches(0x1, 0x2)
+        parser.matches(0x1, 0x2) {
+            steps {
+                commit(2)
+            }
+        }
 
         // missing
         parser.doesNotMatch {

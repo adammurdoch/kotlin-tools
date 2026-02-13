@@ -34,7 +34,7 @@ internal class EndOfInputParser<OUT>(val result: OUT) : Parser<Any, OUT>, Combin
             } else if (input.finished) {
                 next.matched(0, 0, result)
             } else {
-                PullParser.RequireMore(0, false, this)
+                PullParser.RequireMore(0, 0, false, this)
             }
         }
     }

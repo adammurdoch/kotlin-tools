@@ -49,11 +49,11 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
                         return PullParser.Failed(failure.index - totalAdvanced, failure.expected)
                     }
 
-                    is PullParser.Failed -> return PullParser.RequireMore(0, continuation.matches, next, predicate.stop().expected.map { Expectation.Not(it) })
+                    is PullParser.Failed -> return PullParser.RequireMore(0, 0, continuation.matches, next, predicate.stop().expected.map { Expectation.Not(it) })
                     is PullParser.RequireMore -> {
                         predicate = checkResult.parser
                         if (checkResult.advance == 0) {
-                            return PullParser.RequireMore(0, false, this, null)
+                            return PullParser.RequireMore(0, 0, false, this, null)
                         }
                     }
                 }
@@ -68,7 +68,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
                 }
             }
             totalAdvanced += nextAdvance
-            return PullParser.RequireMore(nextAdvance, false, this)
+            return PullParser.RequireMore(nextAdvance, 0, false, this)
         }
     }
 }

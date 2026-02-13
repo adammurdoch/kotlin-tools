@@ -40,7 +40,7 @@ internal class ZeroOrMoreSingleInputCompiledParser<IN : Input<*>, OUT>(
             return if (index < max || index == input.available && input.finished) {
                 next.matched(index - matched, index, accumulator, parser.expectation)
             } else {
-                PullParser.RequireMore(index, false, this)
+                PullParser.RequireMore(index, index, false, this)
             }
         }
     }

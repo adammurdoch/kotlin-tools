@@ -101,7 +101,7 @@ internal class DiagnosticParser<IN, OUT> private constructor(
                         parser -> this
                         else -> DiagnosticPullParser(result.parser, logger)
                     }
-                    PullParser.RequireMore(result.advance, result.matched, effective, result.failedChoice)
+                    PullParser.RequireMore(result.advance, result.commit, result.matched, effective, result.failedChoice)
                 }
             }
         }

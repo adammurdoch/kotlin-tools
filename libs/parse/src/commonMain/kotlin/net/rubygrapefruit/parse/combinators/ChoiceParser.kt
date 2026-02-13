@@ -109,9 +109,9 @@ internal class ChoiceParser<IN, OUT>(
                                             }
                                         } + if (optionResult.failedChoice != null) listOf(optionResult.failedChoice) else emptyList()
                                         val expected = ExpectationProvider.oneOfOrNull(failures)
-                                        PullParser.RequireMore(0, next.matches, optionResult.parser, expected)
+                                        PullParser.RequireMore(0, 0, next.matches, optionResult.parser, expected)
                                     } else {
-                                        PullParser.RequireMore(optionResult.advance, next.matches, optionResult.parser, optionResult.failedChoice)
+                                        PullParser.RequireMore(optionResult.advance, 0, next.matches, optionResult.parser, optionResult.failedChoice)
                                     }
                                 }
                             } else {
@@ -130,7 +130,7 @@ internal class ChoiceParser<IN, OUT>(
             advancedZero = hasZeroAdvance
             return if (requireMore) {
                 if (hasZeroAdvance) {
-                    PullParser.RequireMore(0, false, this)
+                    PullParser.RequireMore(0, 0, false, this)
                 } else {
                     for (index in states.indices) {
                         val choice = states[index].state
@@ -138,7 +138,7 @@ internal class ChoiceParser<IN, OUT>(
                             states[index].state = PullParser.Failed(choice.index - 1, choice.expected)
                         }
                     }
-                    PullParser.RequireMore(1, false, this)
+                    PullParser.RequireMore(1, 0, false, this)
                 }
             } else {
                 mergedFailures()

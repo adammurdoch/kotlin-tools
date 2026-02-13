@@ -41,7 +41,7 @@ internal class CharLiteralParser<OUT>(
                         stop()
                     } else {
                         matched += index
-                        PullParser.RequireMore(index, false, this)
+                        PullParser.RequireMore(index, 0, false, this)
                     }
                 }
                 if (input.get(index) != text[matched + index]) {

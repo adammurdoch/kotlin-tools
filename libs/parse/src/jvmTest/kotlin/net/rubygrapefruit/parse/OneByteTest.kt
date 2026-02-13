@@ -12,7 +12,11 @@ class OneByteTest : AbstractParseTest() {
             expectOneByte()
         }
 
-        parser.matches(0x1, expected = 0x1)
+        parser.matches(0x1, expected = 0x1) {
+            steps {
+                commit(1)
+            }
+        }
         parser.matches(0xFF.toByte(), expected = 0xFF.toByte())
 
         // missing

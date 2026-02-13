@@ -12,7 +12,11 @@ class EndOfInputTest : AbstractParseTest() {
             expectEndOfInput()
         }
 
-        parser.matches()
+        parser.matches {
+            steps {
+                commit(0)
+            }
+        }
 
         parser.doesNotMatch(0x1) {
             expectEndOfInput()

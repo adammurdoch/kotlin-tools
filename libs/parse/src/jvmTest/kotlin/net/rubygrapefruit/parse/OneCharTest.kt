@@ -12,7 +12,11 @@ class OneCharTest : AbstractParseTest() {
             expectOneChar()
         }
 
-        parser.matches("a", expected = 'a')
+        parser.matches("a", expected = 'a') {
+            steps {
+                commit(1)
+            }
+        }
         parser.matches("b", expected = 'b')
 
         // missing

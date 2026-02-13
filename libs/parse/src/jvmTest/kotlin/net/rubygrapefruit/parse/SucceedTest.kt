@@ -12,8 +12,16 @@ class SucceedTest : AbstractParseTest() {
             expectSucceed()
         }
 
-        parser.matches("")
-        parser.matches()
+        parser.matches("") {
+            steps {
+                commit(0)
+            }
+        }
+        parser.matches {
+            steps {
+                commit(0)
+            }
+        }
 
         parser.doesNotMatch("X") {
             expectEndOfInput()

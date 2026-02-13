@@ -20,7 +20,12 @@ class SequenceTest : AbstractParseTest() {
             }
         }
 
-        parser.matches("ab", expected = listOf(1, 2))
+        parser.matches("ab", expected = listOf(1, 2)) {
+            steps {
+                commit(1)
+                commit(1)
+            }
+        }
 
         // missing
         parser.doesNotMatch("") {
@@ -58,7 +63,12 @@ class SequenceTest : AbstractParseTest() {
             }
         }
 
-        parser.matches(0x1, 0x2, 0x3, 0x4, expected = listOf(1, 2))
+        parser.matches(0x1, 0x2, 0x3, 0x4, expected = listOf(1, 2)) {
+            steps {
+                commit(2)
+                commit(2)
+            }
+        }
 
         // missing
         parser.doesNotMatch {

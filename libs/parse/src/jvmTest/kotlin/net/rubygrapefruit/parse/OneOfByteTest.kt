@@ -13,7 +13,11 @@ class OneOfByteTest : AbstractParseTest() {
             expectOneOf(0x1, 0x2)
         }
 
-        parser.matches(0x1, expected = 0x1)
+        parser.matches(0x1, expected = 0x1) {
+            steps {
+                commit(1)
+            }
+        }
         parser.matches(0x2, expected = 0x2)
 
         // missing

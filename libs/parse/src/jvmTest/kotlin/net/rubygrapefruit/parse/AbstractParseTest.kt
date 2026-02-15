@@ -210,11 +210,20 @@ abstract class AbstractParseTest {
         fixture.config()
 
         fixture.tracing(this, fixture.steps) {
-            doesNotMatch(fixture = fixture, input = input)
+            doesNotMatchArray(fixture = fixture, input = input)
+        }
+        fixture.tracing(this, null) {
+            doesNotMatchChunks(fixture = fixture, input = input)
         }
     }
 
-    private fun Parser<ByteInput, *>.doesNotMatch(fixture: DefaultByteParseFailureFixture, vararg input: Byte) {
+    private fun Parser<ByteInput, *>.doesNotMatchArray(fixture: DefaultByteParseFailureFixture, vararg input: Byte) {
+        fixture.debug("PARSE [${input.joinToString { format(it) }}]")
+        val result = parse(input)
+        result.assertIsFail(fixture.offset, fixture.message())
+    }
+
+    private fun Parser<ByteInput, *>.doesNotMatchChunks(fixture: DefaultByteParseFailureFixture, vararg input: Byte) {
         fixture.debug("PARSE [${input.joinToString { format(it) }}]")
         val result = parse(input)
         result.assertIsFail(fixture.offset, fixture.message())

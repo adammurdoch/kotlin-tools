@@ -108,16 +108,25 @@ class ChoiceTest : AbstractParseTest() {
         parser.doesNotMatch {
             expectLiteral(0x1)
             expectLiteral(0x10)
+            steps { }
         }
 
         // partial match one
         parser.doesNotMatch(0x1, 0x2) {
             failAt(2)
             expectLiteral(0x3)
+            steps {
+                commit(1)
+                // byte literal does not look ahead for end of input
+                commit(1)
+            }
         }
         parser.doesNotMatch(0x10) {
             failAt(1)
             expectLiteral(0x11)
+            steps {
+                commit(1)
+            }
         }
     }
 
@@ -153,6 +162,10 @@ class ChoiceTest : AbstractParseTest() {
         parser.doesNotMatch("ab") {
             expectLiteral("abc")
             expectLiteral("abd")
+            steps {
+                advance(1)
+                // char literal looks ahead for end of input
+            }
         }
     }
 
@@ -188,20 +201,33 @@ class ChoiceTest : AbstractParseTest() {
         parser.doesNotMatch("") {
             expectLiteral("ab")
             expectLiteral("abc")
+            steps { }
         }
         parser.doesNotMatch("a") {
             expectLiteral("ab")
             expectLiteral("abc")
+            steps {
+                // char literal looks ahead for end of input
+            }
         }
 
         // extra
         parser.doesNotMatch("abcX") {
             failAt(3)
             expectEndOfInput()
+            steps {
+                advance(1)
+                advance(1)
+                advance(1, commit = 3)
+            }
         }
         parser.doesNotMatch("abX") {
             failAt(2)
             expectEndOfInput()
+            steps {
+                advance(1)
+                advance(1, commit = 2)
+            }
         }
     }
 
@@ -221,20 +247,38 @@ class ChoiceTest : AbstractParseTest() {
             }
         }
 
-        parser.matches("abc", expected = 1)
-        parser.matches("ad", expected = 2)
-        parser.matches("ab", expected = 3)
+        parser.matches("abc", expected = 1) {
+            steps {
+                advance(1)
+                advance(1)
+                advance(1, commit = 3)
+            }
+        }
+        parser.matches("ad", expected = 2) {
+            steps {
+                advance(1)
+                advance(1, commit = 2)
+            }
+        }
+        parser.matches("ab", expected = 3) {
+            steps {
+                advance(1)
+                advance(1, commit = 2)
+            }
+        }
 
         // missing
         parser.doesNotMatch("") {
             expectLiteral("ab")
             expectLiteral("abc")
             expectLiteral("ad")
+            steps {  }
         }
         parser.doesNotMatch("a") {
             expectLiteral("ab")
             expectLiteral("abc")
             expectLiteral("ad")
+            steps {  }
         }
     }
 

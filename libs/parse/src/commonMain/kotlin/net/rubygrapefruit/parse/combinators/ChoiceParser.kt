@@ -96,6 +96,7 @@ internal class ChoiceParser<IN, OUT>(
                         }
 
                         is PullParser.RequireMore -> {
+                            option.commit += optionResult.commit
                             if (optionResult.matched) {
                                 if (waitingFor > 0) {
                                     option.successful = true
@@ -103,9 +104,9 @@ internal class ChoiceParser<IN, OUT>(
                                     return if (optionResult.advance == 0) {
                                         val failures = failedChoices(matched) + if (optionResult.failedChoice != null) listOf(optionResult.failedChoice) else emptyList()
                                         val expected = ExpectationProvider.oneOfOrNull(failures)
-                                        PullParser.RequireMore(0, 0, next.matches, optionResult.parser, expected)
+                                        PullParser.RequireMore(0, option.commit, next.matches, optionResult.parser, expected)
                                     } else {
-                                        PullParser.RequireMore(optionResult.advance, optionResult.commit, next.matches, optionResult.parser, optionResult.failedChoice)
+                                        PullParser.RequireMore(optionResult.advance, option.commit, next.matches, optionResult.parser, optionResult.failedChoice)
                                     }
                                 }
                             }
@@ -113,7 +114,6 @@ internal class ChoiceParser<IN, OUT>(
                             option.state = optionResult.parser
                             option.failedChoice = optionResult.failedChoice
                             option.matched += optionResult.advance
-                            option.commit += optionResult.commit
                             if (optionResult.advance == 0) {
                                 hasZeroAdvance = true
                             }

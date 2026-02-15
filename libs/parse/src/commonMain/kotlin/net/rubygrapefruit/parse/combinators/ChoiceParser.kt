@@ -101,18 +101,11 @@ internal class ChoiceParser<IN, OUT>(
                                     option.successful = true
                                 } else {
                                     return if (optionResult.advance == 0) {
-                                        val failures = states.mapNotNull {
-                                            val state = it.state
-                                            when (state) {
-                                                is PullParser.Failed if it.matched == matched -> state.expected
-                                                is PullParser if it.matched == matched -> it.failedChoice
-                                                else -> null
-                                            }
-                                        } + if (optionResult.failedChoice != null) listOf(optionResult.failedChoice) else emptyList()
+                                        val failures = failedChoices(matched) + if (optionResult.failedChoice != null) listOf(optionResult.failedChoice) else emptyList()
                                         val expected = ExpectationProvider.oneOfOrNull(failures)
                                         PullParser.RequireMore(0, 0, next.matches, optionResult.parser, expected)
                                     } else {
-                                        PullParser.RequireMore(optionResult.advance, 0, next.matches, optionResult.parser, optionResult.failedChoice)
+                                        PullParser.RequireMore(optionResult.advance, optionResult.commit, next.matches, optionResult.parser, optionResult.failedChoice)
                                     }
                                 }
                             }
@@ -130,9 +123,14 @@ internal class ChoiceParser<IN, OUT>(
             }
             if (waitingFor == 1) {
                 val option = states.first { it.state is PullParser }
-                return PullParser.RequireMore(option.matched - matched, option.commit, false, option.state as PullParser, null)
+                val failures = states.filter { it.state is PullParser.Failed }
+                val maxFailureIndex = failures.maxOf { it.matched }
+                if (option.commit > maxFailureIndex) {
+                    val failedChoices = ExpectationProvider.oneOfOrNull(failedChoices(option.matched))
+                    return PullParser.RequireMore(option.matched - matched, option.commit, false, option.state as PullParser, failedChoices)
+                }
             }
-            return if (waitingFor > 1) {
+            return if (waitingFor > 0) {
                 if (hasZeroAdvance) {
                     PullParser.RequireMore(0, 0, false, this)
                 } else {
@@ -144,9 +142,28 @@ internal class ChoiceParser<IN, OUT>(
             }
         }
 
+        private fun failedChoices(matched: Int): List<ExpectationProvider> {
+            return states.mapNotNull {
+                val state = it.state
+                when (state) {
+                    is PullParser.Failed if it.matched == matched -> state.expected
+                    is PullParser if it.matched == matched -> it.failedChoice
+                    else -> null
+                }
+            }
+        }
+
         private fun mergedFailures(): PullParser.Failed {
-            val failures = states.mapNotNull { it.state as? PullParser.Failed }
-            return PullParser.Failed.merged(failures)
+            val failures = states.filter { option -> option.state is PullParser.Failed }
+            val maxIndex = failures.maxOf { option -> option.matched }
+            val filtered = failures.mapNotNull { option ->
+                if (option.matched == maxIndex) {
+                    (option.state as PullParser.Failed).expected
+                } else {
+                    null
+                }
+            }
+            return PullParser.Failed(maxIndex - matched, ExpectationProvider.oneOf(filtered))
         }
     }
 

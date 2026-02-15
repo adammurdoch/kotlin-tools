@@ -20,6 +20,18 @@ internal interface ExpectationProvider {
             }
         }
 
+        fun oneOf(providers: List<ExpectationProvider>): ExpectationProvider {
+            return when (providers.size) {
+                0 -> Expectation.Nothing
+                1 -> providers.first()
+                else -> object : ExpectationProvider {
+                    override fun expectation(): Expectation {
+                        return Expectation.oneOf(providers.map { it.expectation() })
+                    }
+                }
+            }
+        }
+
         fun oneOf(first: ExpectationProvider, second: ExpectationProvider): ExpectationProvider {
             return if (first is Expectation.Nothing) {
                 second

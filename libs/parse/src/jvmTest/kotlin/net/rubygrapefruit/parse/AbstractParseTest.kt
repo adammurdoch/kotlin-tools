@@ -69,11 +69,20 @@ abstract class AbstractParseTest {
         fixture.config()
 
         fixture.tracing(this, fixture.steps) {
-            doesNotMatch(input, fixture)
+            doesNotMatchString(input, fixture)
+        }
+        fixture.tracing(this, null) {
+            doesNotMatchChunks(input, fixture)
         }
     }
 
-    private fun Parser<CharInput, *>.doesNotMatch(input: String, fixture: DefaultCharParseFailureFixture) {
+    private fun Parser<CharInput, *>.doesNotMatchString(input: String, fixture: DefaultCharParseFailureFixture) {
+        fixture.debug("PARSE \"$input\"")
+        val result = parse(input)
+        result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.lineText(input), fixture.message())
+    }
+
+    private fun Parser<CharInput, *>.doesNotMatchChunks(input: String, fixture: DefaultCharParseFailureFixture) {
         fixture.debug("PARSE \"$input\"")
         val result = parse(input)
         result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.lineText(input), fixture.message())
@@ -849,13 +858,17 @@ abstract class AbstractParseTest {
     private open class DefaultParseFixture : ParseFixture {
         var log = false
         var steps: DefaultParseStepsFixture? = null
+            private set
+
+        protected open val fails: Boolean
+            get() = false
 
         override fun log() {
             log = true
         }
 
         override fun steps(config: ParseStepsFixture.() -> Unit) {
-            val steps = DefaultParseStepsFixture()
+            val steps = DefaultParseStepsFixture(fails)
             steps.config()
             this.steps = steps
         }
@@ -880,7 +893,7 @@ abstract class AbstractParseTest {
                 DiagnosticParser.of(parser, false, tracingListener).action()
             }
             if (expectedSteps != null) {
-                assertEquals(expectedSteps.steps + listOf(Step(0, 0)), steps)
+                assertEquals(expectedSteps.steps(), steps)
             }
         }
     }
@@ -897,8 +910,16 @@ abstract class AbstractParseTest {
         fun advance(count: Int, commit: Int = 0)
     }
 
-    private class DefaultParseStepsFixture : ParseStepsFixture {
-        val steps = mutableListOf<Step>()
+    private class DefaultParseStepsFixture(val fails: Boolean) : ParseStepsFixture {
+        private val steps = mutableListOf<Step>()
+
+        fun steps(): List<Step> {
+            return if (fails) {
+                steps
+            } else {
+                steps + listOf(Step(0, 0))
+            }
+        }
 
         override fun commit(count: Int) {
             steps.add(Step(count, count))
@@ -921,6 +942,9 @@ abstract class AbstractParseTest {
 
     private open class DefaultParseFailureFixture : DefaultParseFixture(), ParseFailureFixture {
         val expect = HasExpectation()
+
+        override val fails: Boolean
+            get() = true
 
         override fun expect(text: String) {
             expect.expect(text)

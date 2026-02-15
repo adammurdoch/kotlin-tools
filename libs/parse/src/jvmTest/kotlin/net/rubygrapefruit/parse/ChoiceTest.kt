@@ -22,8 +22,10 @@ class ChoiceTest : AbstractParseTest() {
 
         parser.matches("abc", expected = 1) {
             steps {
+                // char literal does not commit until it matches the entire literal
                 advance(1)
-                advance(2, commit = 3)
+                advance(1)
+                advance(1, commit = 3)
             }
         }
         parser.matches("12", expected = 2) {
@@ -37,26 +39,41 @@ class ChoiceTest : AbstractParseTest() {
         parser.doesNotMatch("") {
             expectLiteral("12")
             expectLiteral("abc")
+            steps { }
         }
 
         // partial match one
         parser.doesNotMatch("ab") {
             expectLiteral("12")
             expectLiteral("abc")
+            steps {
+                advance(1)
+            }
         }
         parser.doesNotMatch("1") {
             expectLiteral("12")
             expectLiteral("abc")
+            steps {
+            }
         }
 
         // extra
         parser.doesNotMatch("abcX") {
             failAt(3)
             expectEndOfInput()
+            steps {
+                advance(1)
+                advance(1)
+                advance(1, commit = 3)
+            }
         }
         parser.doesNotMatch("12X") {
             failAt(2)
             expectEndOfInput()
+            steps {
+                advance(1)
+                advance(1, commit = 2)
+            }
         }
     }
 
@@ -118,8 +135,20 @@ class ChoiceTest : AbstractParseTest() {
             }
         }
 
-        parser.matches("abc", expected = 1)
-        parser.matches("abd", expected = 2)
+        parser.matches("abc", expected = 1) {
+            steps {
+                advance(1)
+                advance(1)
+                advance(1, 3)
+            }
+        }
+        parser.matches("abd", expected = 2) {
+            steps {
+                advance(1)
+                advance(1)
+                advance(1, 3)
+            }
+        }
 
         parser.doesNotMatch("ab") {
             expectLiteral("abc")
@@ -141,8 +170,19 @@ class ChoiceTest : AbstractParseTest() {
             }
         }
 
-        parser.matches("abc", expected = 1)
-        parser.matches("ab", expected = 2)
+        parser.matches("abc", expected = 1) {
+            steps {
+                advance(1)
+                advance(1)
+                advance(1, 3)
+            }
+        }
+        parser.matches("ab", expected = 2) {
+            steps {
+                advance(1)
+                advance(1, 2)
+            }
+        }
 
         // missing
         parser.doesNotMatch("") {

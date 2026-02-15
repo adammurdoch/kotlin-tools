@@ -20,8 +20,18 @@ class ChoiceTest : AbstractParseTest() {
             }
         }
 
-        parser.matches("abc", expected = 1)
-        parser.matches("12", expected = 2)
+        parser.matches("abc", expected = 1) {
+            steps {
+                advance(1)
+                advance(2, commit = 3)
+            }
+        }
+        parser.matches("12", expected = 2) {
+            steps {
+                advance(1)
+                advance(1, commit = 2)
+            }
+        }
 
         // missing
         parser.doesNotMatch("") {
@@ -64,8 +74,18 @@ class ChoiceTest : AbstractParseTest() {
             }
         }
 
-        parser.matches(0x1, 0x2, 0x3, expected = 1)
-        parser.matches(0x10, 0x11, expected = 2)
+        parser.matches(0x1, 0x2, 0x3, expected = 1) {
+            steps {
+                commit(1)
+                commit(2)
+            }
+        }
+        parser.matches(0x10, 0x11, expected = 2) {
+            steps {
+                commit(1)
+                commit(1)
+            }
+        }
 
         // missing
         parser.doesNotMatch {

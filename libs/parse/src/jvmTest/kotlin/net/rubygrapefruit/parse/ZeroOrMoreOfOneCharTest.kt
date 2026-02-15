@@ -17,9 +17,21 @@ class ZeroOrMoreOfOneCharTest : AbstractParseTest() {
             }
         }
 
-        parser.matches("", expected = emptyList())
-        parser.matches("a", expected = listOf('a'))
+        parser.matches("", expected = emptyList()) {
+            steps {
+                commit(0)
+            }
+        }
+        parser.matches("a", expected = listOf('a')) {
+            steps {
+                commit(1)
+            }
+        }
         parser.matches("b", expected = listOf('b'))
-        parser.matches("baa", expected = listOf('b', 'a', 'a'))
+        parser.matches("baa", expected = listOf('b', 'a', 'a')) {
+            steps {
+                commit(3)
+            }
+        }
     }
 }

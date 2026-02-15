@@ -886,7 +886,15 @@ abstract class AbstractParseTest {
     }
 
     interface ParseStepsFixture {
+        /**
+         * Advances and commits the given number of input values.
+         */
         fun commit(count: Int)
+
+        /**
+         * Advances the given number of input values.
+         */
+        fun advance(count: Int, commit: Int = 0)
     }
 
     private class DefaultParseStepsFixture : ParseStepsFixture {
@@ -894,6 +902,10 @@ abstract class AbstractParseTest {
 
         override fun commit(count: Int) {
             steps.add(Step(count, count))
+        }
+
+        override fun advance(count: Int, commit: Int) {
+            steps.add(Step(count, commit))
         }
     }
 

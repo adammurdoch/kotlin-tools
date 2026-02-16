@@ -13,6 +13,7 @@ internal interface ValueProvider<out T> {
 
     companion object {
         val Nothing = of(Unit)
+        val Null = of(null)
 
         fun <T> of(value: T): ValueProvider<T> {
             return FixedValueProvider(value)

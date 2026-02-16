@@ -1,7 +1,22 @@
 package net.rubygrapefruit.parse.combinators
 
 import net.rubygrapefruit.parse.Parser
+import net.rubygrapefruit.parse.ValueProvider
 import kotlin.jvm.JvmName
+
+/**
+ * Returns a parser that applies the given parser zero or one times. Produces `null` when there is no match.
+ */
+fun <IN, OUT : Any> optional(parser: Parser<IN, OUT>): Parser<IN, OUT?> {
+    return OptionalParser(parser, ValueProvider.Null)
+}
+
+/**
+ * Returns a parser that applies the given parser zero or one times. Produces the given default value when there is no match.
+ */
+fun <IN, OUT> optional(parser: Parser<IN, OUT>, defaultValue: OUT): Parser<IN, OUT> {
+    return OptionalParser(parser, ValueProvider.of(defaultValue))
+}
 
 /**
  * Returns a parser that applies the given parser zero or more times. Produces a list containing the results.

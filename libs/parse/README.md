@@ -87,7 +87,9 @@ Sequence parsers:
 
 Repeating parsers:
 
-- zeroOrMore(parser) - produces list
+- optional(parser) - matches zero or one, produces null when missing
+  - optional(parser, result) - produces given default value when missing 
+- zeroOrMore(parser) - matches zero or more, produces list
   - Stops if the parser matches zero input values
   - zeroOrMore(unitParser) - produces nothing
 

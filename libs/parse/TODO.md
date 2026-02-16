@@ -18,6 +18,7 @@ Performance
 - Allow `CompiledParser.start()` to fail or complete parsing
 - Choice exits when there is one remaining candidate that has not failed
   - Need to know that candidate will not fail before/at other failed options
+- Choice continuation is deeply nested 
 - `describedAs()` wraps parsing of entire remaining input 
 - Discard buffered input once it is not required
 - Match common prefix for choice

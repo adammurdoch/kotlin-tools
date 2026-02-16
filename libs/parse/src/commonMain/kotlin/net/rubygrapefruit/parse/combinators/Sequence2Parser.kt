@@ -22,6 +22,10 @@ internal class Sequence2Parser<IN, A, B, OUT>(
         val b: CompiledParser<IN, B>,
         private val map: (A, B) -> OUT
     ) : CompiledParser<IN, OUT> {
+        override fun toString(): String {
+            return "{sequence $a $b}"
+        }
+
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return a.then { lengthA, valueA ->
                 b.start(next.map { lengthB, valueB ->

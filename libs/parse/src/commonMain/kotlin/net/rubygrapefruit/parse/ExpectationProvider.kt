@@ -12,11 +12,7 @@ internal interface ExpectationProvider {
             return when (providers.size) {
                 0 -> null
                 1 -> providers.first()
-                else -> object : ExpectationProvider {
-                    override fun expectation(): Expectation {
-                        return Expectation.oneOf(providers.map { it.expectation() })
-                    }
-                }
+                else -> OneOfListExpectationProvider(providers)
             }
         }
 
@@ -24,11 +20,7 @@ internal interface ExpectationProvider {
             return when (providers.size) {
                 0 -> Expectation.Nothing
                 1 -> providers.first()
-                else -> object : ExpectationProvider {
-                    override fun expectation(): Expectation {
-                        return Expectation.oneOf(providers.map { it.expectation() })
-                    }
-                }
+                else -> OneOfListExpectationProvider(providers)
             }
         }
 
@@ -50,6 +42,16 @@ internal interface ExpectationProvider {
 
         override fun expectation(): Expectation {
             return Expectation.oneOf(listOf(first.expectation(), second.expectation()))
+        }
+    }
+
+    private class OneOfListExpectationProvider(val providers: List<ExpectationProvider>) : ExpectationProvider {
+        override fun toString(): String {
+            return "{one-of $providers}"
+        }
+
+        override fun expectation(): Expectation {
+            return Expectation.oneOf(providers.map { it.expectation() })
         }
     }
 

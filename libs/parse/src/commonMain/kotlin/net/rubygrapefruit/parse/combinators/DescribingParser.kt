@@ -30,6 +30,10 @@ internal class DescribingParser<IN, OUT>(
     ) : PullParser<IN, NEXT> {
         private var advanced = 0
 
+        override fun toString(): String {
+            return "{described-as $parser}"
+        }
+
         override fun stop(): PullParser.Failed {
             val failure = parser.stop()
             return mapFailure(failure)

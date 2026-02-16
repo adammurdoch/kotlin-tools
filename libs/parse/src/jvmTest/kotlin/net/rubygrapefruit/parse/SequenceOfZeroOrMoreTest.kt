@@ -356,7 +356,7 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
             expect("one character")
         }
         parser.doesNotMatch("abc!") {
-            failAt(3)
+            failAt(4)
             expectLiteral("!!")
             expect("not \"!!\"")
             expect("one character")

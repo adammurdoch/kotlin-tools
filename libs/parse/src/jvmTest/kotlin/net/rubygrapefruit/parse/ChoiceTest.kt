@@ -9,23 +9,24 @@ class ChoiceTest : AbstractParseTest() {
     @Test
     fun `matches char literals with no common prefix`() {
         val parser = oneOf(
-            literal("abc", 1),
+            literal("abcd", 1),
             literal("12", 2)
         )
 
         parser.expecting {
             expectChoice {
                 expectLiteral("12", result = 1)
-                expectLiteral("abc", result = 2)
+                expectLiteral("abcd", result = 2)
             }
         }
 
-        parser.matches("abc", expected = 1) {
+        parser.matches("abcd", expected = 1) {
             steps {
                 // char literal does not commit until it matches the entire literal
                 advance(1)
                 advance(1)
-                advance(1, commit = 3)
+                advance(1)
+                advance(1, commit = 4)
             }
         }
         parser.matches("12", expected = 2) {
@@ -38,33 +39,34 @@ class ChoiceTest : AbstractParseTest() {
         // missing
         parser.doesNotMatch("") {
             expectLiteral("12")
-            expectLiteral("abc")
+            expectLiteral("abcd")
             steps { }
         }
 
         // partial match one
         parser.doesNotMatch("ab") {
             expectLiteral("12")
-            expectLiteral("abc")
+            expectLiteral("abcd")
             steps {
                 advance(1)
             }
         }
         parser.doesNotMatch("1") {
             expectLiteral("12")
-            expectLiteral("abc")
+            expectLiteral("abcd")
             steps {
             }
         }
 
         // extra
-        parser.doesNotMatch("abcX") {
-            failAt(3)
+        parser.doesNotMatch("abcdX") {
+            failAt(4)
             expectEndOfInput()
             steps {
                 advance(1)
                 advance(1)
-                advance(1, commit = 3)
+                advance(1)
+                advance(1, commit = 4)
             }
         }
         parser.doesNotMatch("12X") {
@@ -80,21 +82,21 @@ class ChoiceTest : AbstractParseTest() {
     @Test
     fun `matches byte literals with no common prefix`() {
         val parser = oneOf(
-            literal(byteArrayOf(0x1, 0x2, 0x3), 1),
+            literal(byteArrayOf(0x1, 0x2, 0x3, 0x4), 1),
             literal(byteArrayOf(0x10, 0x11), 2)
         )
 
         parser.expecting {
             expectChoice {
-                expectLiteral(0x1, 0x2, 0x3, result = 1)
+                expectLiteral(0x1, 0x2, 0x3, 0x4, result = 1)
                 expectLiteral(0x10, 0x11, result = 2)
             }
         }
 
-        parser.matches(0x1, 0x2, 0x3, expected = 1) {
+        parser.matches(0x1, 0x2, 0x3, 0x4, expected = 1) {
             steps {
                 commit(1)
-                commit(2)
+                commit(3)
             }
         }
         parser.matches(0x10, 0x11, expected = 2) {
@@ -226,7 +228,7 @@ class ChoiceTest : AbstractParseTest() {
             expectEndOfInput()
             steps {
                 advance(1)
-                advance(1, commit = 2)
+                advance(1) // does not commit as reaches failure on matched branch and earlier branch on same input value
             }
         }
     }

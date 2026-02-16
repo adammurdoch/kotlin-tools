@@ -47,6 +47,10 @@ internal interface ParseContinuation<in IN, in OUT, out NEXT> {
                 override val matches: Boolean
                     get() = false
 
+                override fun toString(): String {
+                    return "{then $next}"
+                }
+
                 override fun next(length: Int, value: ValueProvider<OUT>): PullParser<IN, NEXT> {
                     return next(length, value)
                 }

@@ -31,7 +31,13 @@ class ChoiceOfSequenceTest : AbstractParseTest() {
             }
         }
 
-        parser.matches("abc", expected = listOf(1, 2))
+        parser.matches("abc", expected = listOf(1, 2)) {
+            steps {
+                advance(1)
+                advance(1)
+                advance(1, commit = 3)
+            }
+        }
         parser.matches("ab", expected = listOf(5, 6))
 
         // missing

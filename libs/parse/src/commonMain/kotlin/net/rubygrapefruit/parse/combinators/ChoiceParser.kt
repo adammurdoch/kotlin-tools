@@ -43,10 +43,10 @@ internal class ChoiceParser<IN, OUT>(
         val next: ParseContinuation<IN, OUT, NEXT>
     ) : PullParser<IN, NEXT> {
         private val states: Array<OptionState<IN, NEXT>>
+        private val continuation = OptionContinuation(next)
         private var matched = 0
 
         init {
-            val continuation = OptionContinuation(next)
             states = Array(parsers.size) { index ->
                 val parser = parsers[index]
                 OptionState(parser.start(continuation))
@@ -127,6 +127,7 @@ internal class ChoiceParser<IN, OUT>(
                 val maxFailureIndex = failures.maxOf { it.matched }
                 if (option.commit > maxFailureIndex) {
                     val failedChoices = ExpectationProvider.oneOfOrNull(failedChoices(option.matched))
+                    continuation.matches = next.matches
                     return PullParser.RequireMore(option.matched - matched, option.commit, false, option.state as PullParser, failedChoices)
                 }
             }
@@ -179,8 +180,11 @@ internal class ChoiceParser<IN, OUT>(
     }
 
     private class OptionContinuation<IN, OUT, NEXT>(val next: ParseContinuation<IN, OUT, NEXT>) : ParseContinuation<IN, OUT, NEXT> {
-        override val matches: Boolean
-            get() = true
+        override fun toString(): String {
+            return "{choice-option-continuation $next}"
+        }
+
+        override var matches: Boolean = true
 
         override fun next(length: Int, value: ValueProvider<OUT>): PullParser<IN, NEXT> {
             return next.next(length, value)

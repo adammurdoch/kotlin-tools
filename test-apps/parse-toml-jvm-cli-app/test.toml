@@ -1,7 +1,17 @@
 # comment
 
-key-1 = "value 1" # trailing comment
-key_2 = "value 2"
-escapes = "\"value\\\""
+key-1="value 1" # trailing comment
+# space around key and value
+  key_2  =  "value 2"
+# tab around key and value
+  key_3 = "value 3"
+
+# strings
+contains-escapes = "\"value\\\""
 contains-comment = "# comment"
+
+# ints
+int-1 = 0
+int-2 = 12
+
 # no trailing new line

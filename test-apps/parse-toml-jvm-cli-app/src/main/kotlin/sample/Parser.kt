@@ -10,7 +10,11 @@ class Parser {
         val whitespace = discard(oneOf(' ', '\t'))
         val optionalWhitespace = zeroOrMore(whitespace)
 
-        val endLine = oneOf(literal("\n"), literal("\r\n"), endOfInput())
+        val endLine = oneOf(
+            literal("\n"),
+            literal("\r\n"),
+            endOfInput()
+        )
 
         val lineComment = sequence(
             literal("#"),
@@ -43,9 +47,14 @@ class Parser {
         val stringBody = map(zeroOrMore(stringContent)) { it.joinToString("") }
         val string = sequence(quote, stringBody, quote)
 
+        val digit = describedAs(oneOf('0'..'9'), "a digit")
+        val number = map(match(sequence(discard(digit), zeroOrMore(digit)))) { it.toInt() }
+
+        val value = oneOf(string, number)
+
         val equals = sequence(optionalWhitespace, literal("="), optionalWhitespace)
-        val pair = sequence(key, equals, string) { key, value -> Leaf(key, value) }
-        val line = sequence(pair, blankLine)
+        val pair = sequence(key, equals, value) { key, value -> Leaf(key, value) }
+        val line = sequence(optionalWhitespace, pair, blankLine)
         val lines = sequence(blankLines, zeroOrMore(sequence(line, blankLines)))
 
         val leaves = lines.parse(file.readText())

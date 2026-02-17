@@ -16,7 +16,7 @@ class Root(val nodes: List<Node>) : Node() {
     }
 }
 
-class Leaf(val name: String, val value: String) : Node() {
+class Leaf(val name: String, val value: Any) : Node() {
     override fun renderTo(terminal: Terminal) {
         terminal.whitespace("  ")
         terminal.literal(name)

@@ -15,10 +15,23 @@ int-1 = 0
 int-2 = 12
 
 # dotted paths
-table.key-1 = "value"
-table.nested.key-1 = "value"
+table.key = "value"
+table.nested.key = "value"
 
 table-2.key = "value"
+
+# out of order
 table.key-2 = "value"
+
+# implicit intermediate table
+table-3.nested.nested.nested.key = "value"
+
+# tables
+[header]
+key = "value"
+
+# table is already defined
+[table.nested-2]
+key = "value"
 
 # no trailing new line

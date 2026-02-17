@@ -6,7 +6,7 @@ import net.rubygrapefruit.parse.general.endOfInput
 import net.rubygrapefruit.parse.text.*
 
 class Parser {
-    fun parse(file: RegularFile): Root {
+    fun parse(file: RegularFile): Table {
         val whitespace = discard(oneOf(' ', '\t'))
         val optionalWhitespace = zeroOrMore(whitespace)
 
@@ -57,11 +57,17 @@ class Parser {
 
         val equals = sequence(optionalWhitespace, literal("="), optionalWhitespace)
         val pair = sequence(key, equals, value) { key, value -> Pair(key, value) }
-        val line = sequence(optionalWhitespace, pair, blankLine)
-        val lines = sequence(blankLines, zeroOrMore(sequence(line, blankLines)))
+        val pairLine = sequence(optionalWhitespace, pair, blankLine)
+        val pairs = sequence(blankLines, zeroOrMore(sequence(pairLine, blankLines)))
 
-        val leaves = lines.parse(file.readText())
+        val tablePath = sequence(literal("["), key, literal("]"))
+        val tableHeader = sequence(tablePath, blankLine)
+        val table = sequence(blankLines, tableHeader, pairs) { _, header, pairs -> TableTree(header, pairs) }
 
-        return Root.of(leaves.get())
+        val tomlFile = sequence(pairs, zeroOrMore(table)) { a, b -> FileTree(a, b) }
+
+        val leaves = tomlFile.parse(file.readText())
+
+        return Table.of(leaves.get())
     }
 }

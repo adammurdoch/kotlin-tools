@@ -27,6 +27,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
         private var predicate = parser.start()
         private var next = continuation.next(0)
         private var nextAdvance = 1
+        private var nextCommit = 0
         private var totalAdvanced = 0
 
         override fun toString(): String {
@@ -49,7 +50,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
                         return PullParser.Failed(failure.index - totalAdvanced, failure.expected)
                     }
 
-                    is PullParser.Failed -> return PullParser.RequireMore(0, 0, continuation.matches, next, predicate.stop().expected.map { Expectation.Not(it) })
+                    is PullParser.Failed -> return PullParser.RequireMore(0, nextCommit, continuation.matches, next, predicate.stop().expected.map { Expectation.Not(it) })
                     is PullParser.RequireMore -> {
                         predicate = checkResult.parser
                         if (checkResult.advance == 0) {
@@ -65,6 +66,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
                 is PullParser.RequireMore -> {
                     next = result.parser
                     nextAdvance = result.advance
+                    nextCommit += result.commit
                 }
             }
             totalAdvanced += nextAdvance

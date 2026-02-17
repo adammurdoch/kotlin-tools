@@ -25,13 +25,29 @@ class NotOfSequenceTest : AbstractParseTest() {
             }
         }
 
-        parser.matches("")
+        parser.matches("") {
+            steps {
+                commit(0)
+            }
+        }
 
+        // matches predicate
         parser.doesNotMatch("a1") {
+            expect("not \"a\"")
             expectEndOfInput()
+            steps { }
+        }
+
+        // does not match predicate
+        parser.doesNotMatch("X") {
+            expect("not \"a\"")
+            expectEndOfInput()
+            steps { }
         }
         parser.doesNotMatch("aX") {
+            expect("not \"a\"")
             expectEndOfInput()
+            steps { }
         }
     }
 }

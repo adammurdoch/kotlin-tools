@@ -30,25 +30,37 @@ class SequenceTest : AbstractParseTest() {
         // missing
         parser.doesNotMatch("") {
             expectLiteral("a")
+            steps {  }
         }
         parser.doesNotMatch("a") {
             failAt(1)
             expectLiteral("b")
+            steps {
+                commit(1)
+            }
         }
 
         // unexpected
         parser.doesNotMatch("X") {
             expectLiteral("a")
+            steps {  }
         }
         parser.doesNotMatch("aX") {
             failAt(1)
             expectLiteral("b")
+            steps {
+                commit(1)
+            }
         }
 
         // extra
         parser.doesNotMatch("abX") {
             failAt(2)
             expectEndOfInput()
+            steps {
+                commit(1)
+                commit(1)
+            }
         }
     }
 
@@ -73,29 +85,45 @@ class SequenceTest : AbstractParseTest() {
         // missing
         parser.doesNotMatch {
             expectLiteral(0x1)
+            steps {  }
         }
         parser.doesNotMatch(0x1) {
             failAt(1)
             expectLiteral(0x2)
+            steps {
+                commit(1)
+            }
         }
         parser.doesNotMatch(0x1, 0x2, 0x3) {
             failAt(3)
             expectLiteral(0x4)
+            steps {
+                commit(2)
+                commit(1)
+            }
         }
 
         // unexpected
         parser.doesNotMatch(0x3) {
             expectLiteral(0x1)
+            steps {  }
         }
         parser.doesNotMatch(0x1, 0x2, 0x3, 0x1) {
             failAt(3)
             expectLiteral(0x4)
+            steps {
+                commit(2)
+            }
         }
 
         // extra
         parser.doesNotMatch(0x1, 0x2, 0x3, 0x4, 0x5) {
             failAt(4)
             expectEndOfInput()
+            steps {
+                commit(2)
+                commit(2)
+            }
         }
     }
 

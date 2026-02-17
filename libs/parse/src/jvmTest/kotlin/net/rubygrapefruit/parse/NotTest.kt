@@ -15,17 +15,29 @@ class NotTest : AbstractParseTest() {
             }
         }
 
-        parser.matches()
+        parser.matches {
+            steps {
+                commit(0)
+            }
+        }
 
+        // matches predicate
         parser.doesNotMatch(0x1) {
             expectEndOfInput()
+            steps { }
         }
         parser.doesNotMatch(0x1, 0x2) {
             expectEndOfInput()
+            steps { }
         }
+
+        // extra
         parser.doesNotMatch(0x2) {
             expectEndOfInput()
             expect("not x01")
+            steps {
+                commit(0)
+            }
         }
     }
 }

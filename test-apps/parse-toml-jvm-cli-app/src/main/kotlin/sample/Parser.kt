@@ -56,7 +56,7 @@ class Parser {
         val value = oneOf(string, number)
 
         val equals = sequence(optionalWhitespace, literal("="), optionalWhitespace)
-        val pair = sequence(key, equals, value) { key, value -> Pair(key, value) }
+        val pair = sequence(key, equals, value) { key, value -> ValueTree(key, value) }
         val pairLine = sequence(optionalWhitespace, pair, blankLine)
         val pairs = sequence(blankLines, zeroOrMore(sequence(pairLine, blankLines)))
 

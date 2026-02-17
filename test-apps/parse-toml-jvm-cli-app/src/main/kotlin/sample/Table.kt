@@ -2,12 +2,6 @@ package sample
 
 import sample.render.Terminal
 
-data class Pair(val path: Path, val value: Any)
-
-class TableTree(val path: Path, val pairs: List<Pair>)
-
-class FileTree(val pairs: List<Pair>, val tables: List<TableTree>)
-
 class Table private constructor(private val values: List<Value>) {
     fun renderTo(terminal: Terminal, indent: String = "") {
         terminal.operator("{")

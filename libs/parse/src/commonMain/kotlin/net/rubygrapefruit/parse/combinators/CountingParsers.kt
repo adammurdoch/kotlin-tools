@@ -12,6 +12,14 @@ fun <IN, OUT : Any> optional(parser: Parser<IN, OUT>): Parser<IN, OUT?> {
 }
 
 /**
+ * Returns a parser that applies the given parser zero or one times. Produces no result
+ */
+@JvmName("optionalProduceNothing")
+fun <IN> optional(parser: Parser<IN, Unit>): Parser<IN, Unit> {
+    return OptionalParser(parser, ValueProvider.Nothing)
+}
+
+/**
  * Returns a parser that applies the given parser zero or one times. Produces the given default value when there is no match.
  */
 fun <IN, OUT> optional(parser: Parser<IN, OUT>, defaultValue: OUT): Parser<IN, OUT> {

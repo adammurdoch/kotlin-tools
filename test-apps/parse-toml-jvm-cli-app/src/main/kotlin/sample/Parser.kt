@@ -15,22 +15,22 @@ class Parser {
         val lineComment = sequence(
             literal("#"),
             discard(zeroOrMore(sequence(not(endLine), one()))),
-            endLine
         )
-        val blankLine = sequence(optionalWhitespace,
-            oneOf(
-                lineComment,
-                endLine
-            )
+        val blankLine = sequence(
+            optionalWhitespace,
+            optional(lineComment),
+            endLine
         )
         val blankLines = zeroOrMore(blankLine)
 
-        val keyChar = describedAs(oneOf(
-            oneOf('a'..'z'),
-            oneOf('A'..'Z'),
-            oneOf('0'..'9'),
-            oneOf('_', '-')
-        ), "a key character")
+        val keyChar = describedAs(
+            oneOf(
+                oneOf('a'..'z'),
+                oneOf('A'..'Z'),
+                oneOf('0'..'9'),
+                oneOf('_', '-')
+            ), "a key character"
+        )
         val key = match(sequence(discard(keyChar), zeroOrMore(discard(keyChar))))
 
         val quote = literal("\"")
@@ -46,7 +46,7 @@ class Parser {
         val equals = sequence(optionalWhitespace, literal("="), optionalWhitespace)
         val pair = sequence(key, equals, string) { key, value -> Leaf(key, value) }
         val line = sequence(pair, blankLine)
-        val lines = sequence(blankLines, zeroOrMore(sequence( line, blankLines)))
+        val lines = sequence(blankLines, zeroOrMore(sequence(line, blankLines)))
 
         val leaves = lines.parse(file.readText())
 

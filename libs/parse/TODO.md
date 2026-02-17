@@ -11,6 +11,7 @@ Parsers
 
 Performance
 - Optimized implementation for `not(single-input)`
+- Optimized implementation for `optional(single-input)`
 - `literal(one-value)` is a single input parser
 - `oneOf(single-input...)` is a single input parser
 - `sequence(not(single-input), single-input)` is a single input parser

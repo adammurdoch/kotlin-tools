@@ -342,7 +342,7 @@ abstract class AbstractParseTest {
     }
 
     interface CompiledParserFixture {
-        fun expectSucceed(result: Any = Unit)
+        fun expectSucceed(result: Any? = Unit)
 
         fun expectEndOfInput(result: Any = Unit)
 
@@ -425,7 +425,7 @@ abstract class AbstractParseTest {
 
         fun inspect(parser: CompiledParser<*, *>)
 
-        data class IsSucceed(val result: Any) : Inspector {
+        data class IsSucceed(val result: Any?) : Inspector {
             override val expected: List<String>
                 get() = emptyList()
 
@@ -742,7 +742,7 @@ abstract class AbstractParseTest {
             inspector().inspect(parser)
         }
 
-        override fun expectSucceed(result: Any) {
+        override fun expectSucceed(result: Any?) {
             inspectors.add(Inspector.IsSucceed(result))
         }
 

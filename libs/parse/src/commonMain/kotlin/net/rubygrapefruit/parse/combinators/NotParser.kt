@@ -62,7 +62,16 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
 
             val result = next.parse(input, maxAdvance)
             when (result) {
-                is PullParser.Finished -> return result
+                is PullParser.Matched -> return result
+                is PullParser.Failed -> {
+                    return if (result.index == -totalAdvanced) {
+                        val predicateExpectation = parser.start().stop().expected.map { Expectation.Not(it) }
+                        PullParser.Failed(result.index, ExpectationProvider.oneOf(predicateExpectation, result.expected))
+                    } else {
+                        result
+                    }
+                }
+
                 is PullParser.RequireMore -> {
                     next = result.parser
                     nextAdvance = result.advance

@@ -42,7 +42,9 @@ class NotOfSequenceTest : AbstractParseTest() {
         parser.doesNotMatch("X") {
             expect("not \"a\"")
             expectEndOfInput()
-            steps { }
+            steps {
+                commit(0)
+            }
         }
         parser.doesNotMatch("aX") {
             expect("not \"a\"")

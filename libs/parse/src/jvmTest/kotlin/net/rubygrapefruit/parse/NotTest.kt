@@ -24,10 +24,12 @@ class NotTest : AbstractParseTest() {
         // matches predicate
         parser.doesNotMatch(0x1) {
             expectEndOfInput()
+            expect("not x01")
             steps { }
         }
         parser.doesNotMatch(0x1, 0x2) {
             expectEndOfInput()
+            expect("not x01")
             steps { }
         }
 

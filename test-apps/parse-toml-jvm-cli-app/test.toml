@@ -1,4 +1,4 @@
-# comment
+# comment with #
 
 key-1="value 1" # trailing comment
 # space around key and value
@@ -13,5 +13,12 @@ contains-comment = "# comment"
 # ints
 int-1 = 0
 int-2 = 12
+
+# dotted paths
+table.key-1 = "value"
+table.nested.key-1 = "value"
+
+table-2.key = "value"
+table.key-2 = "value"
 
 # no trailing new line

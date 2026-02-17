@@ -35,7 +35,10 @@ class Parser {
                 oneOf('_', '-')
             ), "a key character"
         )
-        val key = match(sequence(discard(keyChar), zeroOrMore(discard(keyChar))))
+        val bareKey = match(sequence(discard(keyChar), zeroOrMore(discard(keyChar))))
+        val key = sequence(bareKey, zeroOrMore(sequence(literal("."), bareKey))) { a, b ->
+            Path(listOf(a) + b)
+        }
 
         val quote = literal("\"")
         // not complete
@@ -53,12 +56,12 @@ class Parser {
         val value = oneOf(string, number)
 
         val equals = sequence(optionalWhitespace, literal("="), optionalWhitespace)
-        val pair = sequence(key, equals, value) { key, value -> Leaf(key, value) }
+        val pair = sequence(key, equals, value) { key, value -> Pair(key, value) }
         val line = sequence(optionalWhitespace, pair, blankLine)
         val lines = sequence(blankLines, zeroOrMore(sequence(line, blankLines)))
 
         val leaves = lines.parse(file.readText())
 
-        return Root(leaves.get())
+        return Root.of(leaves.get())
     }
 }

@@ -7,3 +7,4 @@ build/
 .settings/
 .DS_Store
 .sync/
+yarn.lock

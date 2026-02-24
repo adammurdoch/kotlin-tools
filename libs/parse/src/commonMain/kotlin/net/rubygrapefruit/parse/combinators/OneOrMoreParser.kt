@@ -14,16 +14,19 @@ internal class OneOrMoreParser<IN, OUT>(
     }
 
     companion object {
-        fun <IN, ITEM, OUT> of(parser: CompiledParser<IN, ITEM>, empty: Accumulator<ITEM, OUT>): CompiledParser<IN, OUT> {
-            return OneOrMoreCompiledParser(parser, empty)
+        fun <IN, ITEM, OUT> of(parser: CompiledParser<IN, ITEM>, initial: Accumulator<ITEM, OUT>): CompiledParser<IN, OUT> {
+            return OneOrMoreCompiledParser(parser, initial)
         }
     }
 
-    class OneOrMoreCompiledParser<IN, ITEM, OUT>(val parser: CompiledParser<IN, ITEM>, val empty: Accumulator<ITEM, OUT>) : CompiledParser<IN, OUT> {
+    class OneOrMoreCompiledParser<IN, ITEM, OUT>(
+        val parser: CompiledParser<IN, ITEM>,
+        val initial: Accumulator<ITEM, OUT>
+    ) : CompiledParser<IN, OUT> {
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return parser.start(ParseContinuation.then { length, value ->
-                val result = empty.add(value, length)
-                ZeroOrMoreParser.of(parser, result).start(next)
+                val result = initial.add(value, length)
+                ZeroOrMoreParser.of(parser, result, next)
             })
         }
     }

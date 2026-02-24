@@ -1,7 +1,7 @@
 Parsers
 - "literal" -> "text" and "bytes"?
 - Improve description for ranges
-- `oneOrMore()`
+- `oneOrMore(parser<unit>)`
 - `zeroOrMore()` and `oneOrMore()` with a separator
 - `concat(parser<char>)`
 - Binary ints
@@ -12,6 +12,7 @@ Parsers
 Performance
 - Optimized implementation for `not(single-input)`
 - Optimized implementation for `optional(single-input)`
+- Optimized implementation for `oneOrMore(single-input)`
 - `literal(one-value)` is a single input parser
 - `oneOf(single-input...)` is a single input parser
 - `sequence(not(single-input), single-input)` is a single input parser
@@ -22,7 +23,7 @@ Performance
 - Choice continuation is deeply nested 
 - `describedAs()` wraps parsing of entire remaining input 
 - Discard buffered input once it is not required
-- Match common prefix for choice
+- Choice matches common prefix of options
 
 Features
 - Push parse indicates that parsing has already failed, prior to end of input being received

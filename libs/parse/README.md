@@ -90,9 +90,10 @@ Repeating parsers:
 - optional(parser) - matches zero or one, produces null when missing
   - optional(parser, result) - produces given default value when missing
   - optional(unitParser) - produces nothing
-- zeroOrMore(parser) - matches zero or more, produces list
+- zeroOrMore(parser) - matches zero or more, produces a list
   - Stops if the parser matches zero input values
   - zeroOrMore(unitParser) - produces nothing
+- oneOrMore(parser) - matches one or more, produces a list
 
 Mapping parsers:
 

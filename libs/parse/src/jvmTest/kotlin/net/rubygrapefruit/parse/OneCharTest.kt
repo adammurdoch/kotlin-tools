@@ -21,6 +21,7 @@ class OneCharTest : AbstractParseTest() {
 
         // missing
         parser.doesNotMatch("") {
+            // don't use expectOneChar() here, to check formatting
             expect("any character")
         }
 

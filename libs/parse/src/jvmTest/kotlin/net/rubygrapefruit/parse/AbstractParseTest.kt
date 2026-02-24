@@ -358,6 +358,8 @@ abstract class AbstractParseTest {
             expectOneOf(chars.toList(), hasResult = hasResult)
         }
 
+        fun expectOneOfRange(from: Char, to: Char, hasResult: Boolean = true)
+
         fun expectOneOf(chars: List<Char>, hasResult: Boolean = true)
 
         fun expectOneOf(vararg chars: String, hasResult: Boolean = true) {
@@ -690,6 +692,17 @@ abstract class AbstractParseTest {
             }
         }
 
+        class IsOneOfCharRange(val from: Char, val to: Char, hasResult: Boolean) : IsSingleInput(hasResult) {
+            override val expected: List<String>
+                get() {
+                    return listOf("\"$from\"..\"$to\"")
+                }
+
+            override fun inspect(parser: SingleInputParser<*>) {
+                assertIs<OneOfCharRangeParser>(parser)
+            }
+        }
+
         class IsOneOfByte(val bytes: List<Byte>, hasResult: Boolean) : IsSingleInput(hasResult) {
             override val expected: List<String>
                 get() {
@@ -774,6 +787,10 @@ abstract class AbstractParseTest {
 
         override fun expectOneOf(chars: List<Char>, hasResult: Boolean) {
             inspectors.add(Inspector.IsOneOfChar(chars, hasResult))
+        }
+
+        override fun expectOneOfRange(from: Char, to: Char, hasResult: Boolean) {
+            inspectors.add(Inspector.IsOneOfCharRange(from, to, hasResult))
         }
 
         override fun expectOneOf(vararg bytes: Byte, hasResult: Boolean) {
@@ -976,6 +993,10 @@ abstract class AbstractParseTest {
         fun failAt(offset: Int, line: Int = 1, col: Int = offset + 1)
 
         fun expectContext(textBeforeFailure: String, textAfterFailure: String)
+
+        fun expectOneChar() {
+            expect("any character")
+        }
 
         fun expectLiteral(text: String)
     }

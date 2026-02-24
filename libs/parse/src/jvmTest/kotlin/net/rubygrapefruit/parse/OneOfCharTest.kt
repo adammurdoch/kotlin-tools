@@ -100,7 +100,7 @@ class OneOfCharTest : AbstractParseTest() {
         val parser = oneOf('a'..'c')
 
         parser.expecting {
-            expectOneOf('a', 'b', 'c')
+            expectOneOfRange('a', 'c')
         }
 
         parser.matches("a", expected = 'a')
@@ -109,23 +109,17 @@ class OneOfCharTest : AbstractParseTest() {
 
         // missing
         parser.doesNotMatch("") {
-            expectLiteral("a")
-            expectLiteral("b")
-            expectLiteral("c")
+            expect("\"a\"..\"c\"")
         }
 
         // unexpected
         parser.doesNotMatch("X") {
-            expectLiteral("a")
-            expectLiteral("b")
-            expectLiteral("c")
+            expect("\"a\"..\"c\"")
         }
 
         // mismatched case
         parser.doesNotMatch("A") {
-            expectLiteral("a")
-            expectLiteral("b")
-            expectLiteral("c")
+            expect("\"a\"..\"c\"")
         }
 
         // extra

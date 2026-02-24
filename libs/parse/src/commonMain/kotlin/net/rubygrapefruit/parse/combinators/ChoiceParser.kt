@@ -7,11 +7,11 @@ internal class ChoiceParser<IN, OUT>(
     private val options: List<Parser<IN, OUT>>
 ) : Parser<IN, OUT>, CombinatorBuilder<OUT>, DiscardableParser<IN> {
     override fun withNoResult(): Parser<IN, Unit> {
-        return ChoiceParser(this@ChoiceParser.options.map { DiscardParser(it) })
+        return ChoiceParser(options.map { DiscardParser(it) })
     }
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, OUT> {
-        return of(this@ChoiceParser.options.map { compiler.compile(it) })
+        return of(options.map { compiler.compile(it) })
     }
 
     companion object {
@@ -106,9 +106,9 @@ internal class ChoiceParser<IN, OUT>(
                                     return if (optionResult.advance == 0) {
                                         val failures = failedChoices(matched) + if (optionResult.failedChoice != null) listOf(optionResult.failedChoice) else emptyList()
                                         val expected = ExpectationProvider.oneOfOrNull(failures)
-                                        PullParser.RequireMore(0, option.commit, option.continuation.matches, optionResult.parser, expected)
+                                        PullParser.RequireMore(0, option.commit, option.continuation.next.matches, optionResult.parser, expected)
                                     } else {
-                                        PullParser.RequireMore(optionResult.advance, option.commit, option.continuation.matches, optionResult.parser, optionResult.failedChoice)
+                                        PullParser.RequireMore(optionResult.advance, option.commit, option.continuation.next.matches, optionResult.parser, optionResult.failedChoice)
                                     }
                                 }
                             }

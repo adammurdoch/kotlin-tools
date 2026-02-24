@@ -486,9 +486,9 @@ abstract class AbstractParseTest {
 
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<ChoiceParser.ChoiceCompiledParser<*, *>>(parser)
-                assertEquals(choices.size, parser.parsers.size)
+                assertEquals(choices.size, parser.options.size)
                 for (index in choices.indices) {
-                    choices[index].inspect(parser.parsers[index])
+                    choices[index].inspect(parser.options[index])
                 }
             }
         }

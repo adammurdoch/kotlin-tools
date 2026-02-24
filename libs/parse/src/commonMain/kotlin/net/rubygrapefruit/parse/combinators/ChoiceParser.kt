@@ -7,11 +7,11 @@ internal class ChoiceParser<IN, OUT>(
     private val options: List<Parser<IN, OUT>>
 ) : Parser<IN, OUT>, CombinatorBuilder<OUT>, DiscardableParser<IN> {
     override fun withNoResult(): Parser<IN, Unit> {
-        return ChoiceParser(options.map { DiscardParser(it) })
+        return ChoiceParser(this@ChoiceParser.options.map { DiscardParser(it) })
     }
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, OUT> {
-        return of(options.map { compiler.compile(it) })
+        return of(this@ChoiceParser.options.map { compiler.compile(it) })
     }
 
     companion object {
@@ -19,7 +19,7 @@ internal class ChoiceParser<IN, OUT>(
             val effective = mutableListOf<CompiledParser<IN, OUT>>()
             for (option in options) {
                 if (option is ChoiceCompiledParser) {
-                    effective.addAll(option.parsers)
+                    effective.addAll(option.options)
                 } else {
                     effective.add(option)
                 }
@@ -27,30 +27,32 @@ internal class ChoiceParser<IN, OUT>(
             return ChoiceCompiledParser(effective)
         }
 
-        fun <IN, OUT, NEXT> of(parsers: List<CompiledParser<IN, OUT>>, next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
-            return ChoicePullParser(parsers, next)
+        fun <IN, NEXT> of(options: List<Option<IN, *, NEXT>>): PullParser<IN, NEXT> {
+            return ChoicePullParser(options)
         }
     }
 
-    internal class ChoiceCompiledParser<IN, OUT>(val parsers: List<CompiledParser<IN, OUT>>) : CompiledParser<IN, OUT> {
+    class Option<IN, OUT, NEXT>(val parser: CompiledParser<IN, OUT>, val continuation: ParseContinuation<IN, OUT, NEXT>) {
+        internal fun start(): OptionState<IN, NEXT> {
+            val continuation = OptionContinuation(continuation)
+            return OptionState(parser.start(continuation), continuation)
+        }
+    }
+
+    class ChoiceCompiledParser<IN, OUT>(val options: List<CompiledParser<IN, OUT>>) : CompiledParser<IN, OUT> {
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
-            return ChoicePullParser(parsers, next)
+            return ChoicePullParser(options.map { Option(it, next) })
         }
     }
 
-    private class ChoicePullParser<IN, OUT, NEXT>(
-        parsers: List<CompiledParser<IN, OUT>>,
-        val next: ParseContinuation<IN, OUT, NEXT>
+    private class ChoicePullParser<IN, NEXT>(
+        options: List<Option<IN, *, NEXT>>
     ) : PullParser<IN, NEXT> {
         private val states: Array<OptionState<IN, NEXT>>
-        private val continuation = OptionContinuation(next)
         private var matched = 0
 
         init {
-            states = Array(parsers.size) { index ->
-                val parser = parsers[index]
-                OptionState(parser.start(continuation))
-            }
+            states = Array(options.size) { index -> options[index].start() }
         }
 
         override fun toString(): String {
@@ -104,9 +106,9 @@ internal class ChoiceParser<IN, OUT>(
                                     return if (optionResult.advance == 0) {
                                         val failures = failedChoices(matched) + if (optionResult.failedChoice != null) listOf(optionResult.failedChoice) else emptyList()
                                         val expected = ExpectationProvider.oneOfOrNull(failures)
-                                        PullParser.RequireMore(0, option.commit, next.matches, optionResult.parser, expected)
+                                        PullParser.RequireMore(0, option.commit, option.continuation.matches, optionResult.parser, expected)
                                     } else {
-                                        PullParser.RequireMore(optionResult.advance, option.commit, next.matches, optionResult.parser, optionResult.failedChoice)
+                                        PullParser.RequireMore(optionResult.advance, option.commit, option.continuation.matches, optionResult.parser, optionResult.failedChoice)
                                     }
                                 }
                             }
@@ -127,7 +129,7 @@ internal class ChoiceParser<IN, OUT>(
                 val maxFailureIndex = failures.maxOf { it.matched }
                 if (option.commit > maxFailureIndex) {
                     val failedChoices = ExpectationProvider.oneOfOrNull(failedChoices(option.matched))
-                    continuation.matches = next.matches
+                    option.continuation.matches = option.continuation.next.matches
                     return PullParser.RequireMore(option.matched - matched, option.commit, false, option.state as PullParser, failedChoices)
                 }
             }
@@ -168,7 +170,7 @@ internal class ChoiceParser<IN, OUT>(
         }
     }
 
-    private class OptionState<IN, NEXT>(var state: ParseState<IN, NEXT>) {
+    internal class OptionState<IN, NEXT> internal constructor(var state: ParseState<IN, NEXT>, internal val continuation: OptionContinuation<*, *, *>) {
         var matched = 0
         var commit = 0
         var successful = false
@@ -179,7 +181,7 @@ internal class ChoiceParser<IN, OUT>(
         }
     }
 
-    private class OptionContinuation<IN, OUT, NEXT>(val next: ParseContinuation<IN, OUT, NEXT>) : ParseContinuation<IN, OUT, NEXT> {
+    internal class OptionContinuation<IN, OUT, NEXT>(val next: ParseContinuation<IN, OUT, NEXT>) : ParseContinuation<IN, OUT, NEXT> {
         override fun toString(): String {
             return "{choice-option-continuation $next}"
         }

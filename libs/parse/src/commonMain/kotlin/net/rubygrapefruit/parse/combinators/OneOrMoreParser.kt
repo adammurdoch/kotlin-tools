@@ -6,18 +6,24 @@ internal class OneOrMoreParser<IN, OUT>(
     private val parser: Parser<IN, OUT>
 ) : Parser<IN, List<OUT>>, CombinatorBuilder<List<OUT>>, DiscardableParser<IN> {
     override fun withNoResult(): Parser<IN, Unit> {
-        TODO()
+        return OneOrMoreProduceNothingParser(DiscardParser(parser))
     }
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, List<OUT>> {
-        return OneOrMoreCompiledParser(compiler.compile(parser))
+        return of(compiler.compile(parser), ListAccumulator.Empty())
     }
 
-    class OneOrMoreCompiledParser<IN, OUT>(val parser: CompiledParser<IN, OUT>) : CompiledParser<IN, List<OUT>> {
-        override fun <NEXT> start(next: ParseContinuation<IN, List<OUT>, NEXT>): PullParser<IN, NEXT> {
+    companion object {
+        fun <IN, ITEM, OUT> of(parser: CompiledParser<IN, ITEM>, empty: Accumulator<ITEM, OUT>): CompiledParser<IN, OUT> {
+            return OneOrMoreCompiledParser(parser, empty)
+        }
+    }
+
+    class OneOrMoreCompiledParser<IN, ITEM, OUT>(val parser: CompiledParser<IN, ITEM>, private val empty: Accumulator<ITEM, OUT>) : CompiledParser<IN, OUT> {
+        override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return parser.start(ParseContinuation.then { length, value ->
-                val initial = ListAccumulator.Empty<OUT>().add(value, length)
-                ZeroOrMoreParser.of(parser, initial).start(next)
+                val result = empty.add(value, length)
+                ZeroOrMoreParser.of(parser, result).start(next)
             })
         }
     }

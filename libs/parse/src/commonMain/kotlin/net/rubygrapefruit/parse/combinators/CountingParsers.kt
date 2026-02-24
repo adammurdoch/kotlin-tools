@@ -47,3 +47,11 @@ fun <IN> zeroOrMore(parser: Parser<IN, Unit>): Parser<IN, Unit> {
 fun <IN, OUT> oneOrMore(parser: Parser<IN, OUT>): Parser<IN, List<OUT>> {
     return OneOrMoreParser(parser)
 }
+
+/**
+ * Returns a parser that applies the given parser one or more times. Produces no result
+ */
+@JvmName("oneOrMoreProduceNothing")
+fun <IN> oneOrMore(parser: Parser<IN, Unit>): Parser<IN, Unit> {
+    return OneOrMoreProduceNothingParser(parser)
+}

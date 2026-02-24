@@ -94,6 +94,7 @@ Repeating parsers:
   - Stops if the parser matches zero input values
   - zeroOrMore(unitParser) - produces nothing
 - oneOrMore(parser) - matches one or more, produces a list
+  - oneOrMore(unitParser) - produces nothing
 
 Mapping parsers:
 

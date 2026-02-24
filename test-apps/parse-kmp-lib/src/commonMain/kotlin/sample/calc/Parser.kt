@@ -9,8 +9,8 @@ class Parser {
         val whitespace = zeroOrMore(literal(" "))
 
         val digit = describedAs(oneOf('0'..'9'), "a digit")
-        val digits = sequence(digit, zeroOrMore(digit)) { _, _ -> }
-        val number = map(match(digits)) { Number(it.toInt()) }
+        val digits = match(oneOrMore(digit))
+        val number = map(digits) { Number(it.toInt()) }
 
         val expression = recursive<CharInput, Expression>()
 

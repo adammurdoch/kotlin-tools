@@ -35,7 +35,7 @@ class Parser {
                 oneOf('_', '-')
             ), "a key character"
         )
-        val bareKey = match(sequence(discard(keyChar), zeroOrMore(discard(keyChar))))
+        val bareKey = match(oneOrMore(keyChar))
         val key = sequence(bareKey, zeroOrMore(sequence(literal("."), bareKey))) { a, b ->
             Path(listOf(a) + b)
         }

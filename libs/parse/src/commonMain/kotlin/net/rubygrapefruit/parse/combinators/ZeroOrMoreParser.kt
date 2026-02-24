@@ -21,9 +21,18 @@ internal class ZeroOrMoreParser<IN, OUT>(
 
     companion object {
         fun <IN, ITEM, OUT> of(option: CompiledParser<IN, ITEM>, initial: Accumulator<ITEM, OUT>): CompiledParser<IN, OUT> {
+            return ZeroOrMoreCompiledParser(option, initial)
+        }
+    }
+
+    class ZeroOrMoreCompiledParser<IN, ITEM, OUT>(
+        val option: CompiledParser<IN, ITEM>,
+        val initial: Accumulator<ITEM, OUT>
+    ) : CompiledParser<IN, OUT> {
+        override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             val empty = EmptyCompiledParser<IN, ITEM, OUT>(initial)
-            val nested = OptionCompiledParser(option, initial)
-            return ChoiceParser.of(listOf(nested, empty))
+            val nested = OptionCompiledParser<IN, ITEM, OUT>(option, this.initial)
+            return ChoiceParser.of(listOf(nested, empty), next)
         }
     }
 
@@ -47,7 +56,7 @@ internal class ZeroOrMoreParser<IN, OUT>(
         }
     }
 
-    internal class OptionCompiledParser<IN, ITEM, OUT>(
+    private class OptionCompiledParser<IN, ITEM, OUT>(
         val option: CompiledParser<IN, ITEM>,
         val previous: Accumulator<ITEM, OUT>
     ) : CompiledParser<IN, OUT> {

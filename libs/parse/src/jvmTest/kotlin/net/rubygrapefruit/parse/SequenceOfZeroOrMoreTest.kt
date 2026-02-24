@@ -19,17 +19,11 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
 
         parser.expecting {
             expectSequence {
-                expectChoice {
-                    expectZeroOrMore {
-                        expectLiteral("abc", result = 1)
-                    }
-                    expectZero()
+                expectZeroOrMore {
+                    expectLiteral("abc", result = 1)
                 }
-                expectChoice {
-                    expectZeroOrMore {
-                        expectLiteral("ad", result = 2)
-                    }
-                    expectZero()
+                expectZeroOrMore {
+                    expectLiteral("ad", result = 2)
                 }
             }
         }
@@ -95,11 +89,8 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
 
         parser.expecting {
             expectSequence {
-                expectChoice {
-                    expectZeroOrMore {
-                        expectLiteral("abc", result = 1)
-                    }
-                    expectZero()
+                expectZeroOrMore {
+                    expectLiteral("abc", result = 1)
                 }
                 expectLiteral("ad", result = 2)
             }
@@ -268,16 +259,13 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
 
         parser.expecting {
             expectSequence {
-                expectChoice {
-                    expectZeroOrMore {
-                        expectSequence {
-                            expectNot {
-                                expectLiteral("!")
-                            }
-                            expectOneChar()
+                expectZeroOrMore {
+                    expectSequence {
+                        expectNot {
+                            expectLiteral("!")
                         }
+                        expectOneChar()
                     }
-                    expectZero()
                 }
                 expectLiteral("!")
             }
@@ -319,16 +307,13 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
 
         parser.expecting {
             expectSequence {
-                expectChoice {
-                    expectZeroOrMore {
-                        expectSequence {
-                            expectNot {
-                                expectLiteral("!!")
-                            }
-                            expectOneChar()
+                expectZeroOrMore {
+                    expectSequence {
+                        expectNot {
+                            expectLiteral("!!")
                         }
+                        expectOneChar()
                     }
-                    expectZero()
                 }
                 expectLiteral("!!")
             }

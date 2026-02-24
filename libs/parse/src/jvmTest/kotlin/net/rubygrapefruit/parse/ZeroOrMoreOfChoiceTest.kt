@@ -16,14 +16,11 @@ class ZeroOrMoreOfChoiceTest : AbstractParseTest() {
         )
 
         parser.expecting {
-            expectChoice {
-                expectZeroOrMore {
-                    expectChoice {
-                        expectLiteral("ab", result = 1)
-                        expectLiteral("a", result = 2)
-                    }
+            expectZeroOrMore {
+                expectChoice {
+                    expectLiteral("ab", result = 1)
+                    expectLiteral("a", result = 2)
                 }
-                expectZero()
             }
         }
 

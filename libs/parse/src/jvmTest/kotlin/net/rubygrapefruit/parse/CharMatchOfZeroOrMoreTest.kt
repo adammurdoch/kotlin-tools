@@ -13,11 +13,8 @@ class CharMatchOfZeroOrMoreTest : AbstractParseTest() {
 
         parser.expecting {
             expectMatch {
-                expectChoice {
-                    expectZeroOrMore(hasResult = false) {
-                        expectLiteral("12")
-                    }
-                    expectZero()
+                expectZeroOrMore(hasResult = false) {
+                    expectLiteral("12")
                 }
             }
         }

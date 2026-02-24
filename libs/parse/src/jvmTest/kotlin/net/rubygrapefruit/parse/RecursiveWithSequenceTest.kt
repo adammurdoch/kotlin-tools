@@ -18,11 +18,8 @@ class RecursiveWithSequenceTest : AbstractParseTest() {
             expectRecursive {
                 expectSequence {
                     expectLiteral(".")
-                    expectChoice {
-                        expectZeroOrMore {
-                            expectRecurses()
-                        }
-                        expectZero()
+                    expectZeroOrMore {
+                        expectRecurses()
                     }
                 }
             }

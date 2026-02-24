@@ -376,8 +376,6 @@ abstract class AbstractParseTest {
 
         fun expectZeroOrMore(hasResult: Boolean = true, config: CompiledParserFixture.() -> Unit)
 
-        fun expectZero()
-
         fun expectOneOrMore(hasResult: Boolean = true, config: CompiledParserFixture.() -> Unit)
 
         fun expectZeroOrMoreSingleInput(hasResult: Boolean = true, config: CompiledParserFixture.() -> Unit)
@@ -566,28 +564,16 @@ abstract class AbstractParseTest {
                 get() = inspector.expected
 
             override val mayBeEmpty: Boolean
-                get() = inspector.mayBeEmpty
-
-            override fun inspect(parser: CompiledParser<*, *>) {
-                assertIs<ZeroOrMoreParser.OptionCompiledParser<*, *, *>>(parser)
-                inspector.inspect(parser.option)
-                if (hasResult) {
-                    assertIs<ListAccumulator<*>>(parser.previous)
-                } else {
-                    assertIs<UnitAccumulator>(parser.previous)
-                }
-            }
-        }
-
-        data object IsZero : Inspector {
-            override val expected: List<String>
-                get() = emptyList()
-
-            override val mayBeEmpty: Boolean
                 get() = true
 
             override fun inspect(parser: CompiledParser<*, *>) {
-                assertIs<ZeroOrMoreParser.EmptyCompiledParser<*, *, *>>(parser)
+                assertIs<ZeroOrMoreParser.ZeroOrMoreCompiledParser<*, *, *>>(parser)
+                inspector.inspect(parser.option)
+                if (hasResult) {
+                    assertIs<ListAccumulator<*>>(parser.initial)
+                } else {
+                    assertIs<UnitAccumulator>(parser.initial)
+                }
             }
         }
 
@@ -822,10 +808,6 @@ abstract class AbstractParseTest {
             val fixture = DefaultCompiledParserFixture()
             fixture.config()
             inspectors.add(Inspector.IsZeroOrMore(fixture.inspector(), hasResult))
-        }
-
-        override fun expectZero() {
-            inspectors.add(Inspector.IsZero)
         }
 
         override fun expectZeroOrMoreSingleInput(hasResult: Boolean, config: CompiledParserFixture.() -> Unit) {

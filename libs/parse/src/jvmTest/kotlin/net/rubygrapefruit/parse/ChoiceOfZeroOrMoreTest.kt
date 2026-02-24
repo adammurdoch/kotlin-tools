@@ -19,12 +19,10 @@ class ChoiceOfZeroOrMoreTest : AbstractParseTest() {
                 expectZeroOrMore {
                     expectLiteral(0x1, result = 1)
                 }
-                expectZero()
-                // should discard everything after the second choice
+                // should discard everything after the first choice
                 expectZeroOrMore {
                     expectLiteral(0x11, result = 2)
                 }
-                expectZero()
             }
         }
 

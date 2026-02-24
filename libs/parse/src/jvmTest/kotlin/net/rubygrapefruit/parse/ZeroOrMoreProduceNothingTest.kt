@@ -10,11 +10,8 @@ class ZeroOrMoreProduceNothingTest : AbstractParseTest() {
         val parser = zeroOrMore(literal("ab"))
 
         parser.expecting {
-            expectChoice {
-                expectZeroOrMore(hasResult = false) {
-                    expectLiteral("ab")
-                }
-                expectZero()
+            expectZeroOrMore(hasResult = false) {
+                expectLiteral("ab")
             }
         }
 

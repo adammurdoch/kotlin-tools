@@ -5,10 +5,10 @@ import net.rubygrapefruit.parse.Parser
 import net.rubygrapefruit.parse.SingleInputParser
 
 internal object OneByteParser : Parser<ByteInput, Byte>, SingleInputParser<ByteStream> {
-    override val expectation: Expectation = Expectation.One("one byte")
+    override val expectation: Expectation = Expectation.One("any byte")
 
     override fun toString(): String {
-        return "{one-byte}"
+        return "{any-byte}"
     }
 
     override fun match(input: ByteStream, index: Int): Boolean {

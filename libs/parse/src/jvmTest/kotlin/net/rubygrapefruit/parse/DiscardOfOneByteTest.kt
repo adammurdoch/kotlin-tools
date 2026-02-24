@@ -17,7 +17,7 @@ class DiscardOfOneByteTest : AbstractParseTest() {
         parser.matches(0x45)
 
         parser.doesNotMatch {
-            expect("one byte")
+            expect("any byte")
         }
     }
 }

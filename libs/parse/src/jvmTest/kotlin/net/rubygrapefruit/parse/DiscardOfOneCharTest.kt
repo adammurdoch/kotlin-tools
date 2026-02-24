@@ -17,7 +17,7 @@ class DiscardOfOneCharTest : AbstractParseTest() {
         parser.matches("b")
 
         parser.doesNotMatch("") {
-            expect("one character")
+            expect("any character")
         }
     }
 }

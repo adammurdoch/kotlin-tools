@@ -278,13 +278,13 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
         parser.doesNotMatch("") {
             expectLiteral("!")
             expect("not \"!\"")
-            expect("one character")
+            expect("any character")
         }
         parser.doesNotMatch("a") {
             failAt(1)
             expectLiteral("!")
             expect("not \"!\"")
-            expect("one character")
+            expect("any character")
         }
 
         // extra
@@ -326,25 +326,25 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
         parser.doesNotMatch("") {
             expectLiteral("!!")
             expect("not \"!!\"")
-            expect("one character")
+            expect("any character")
         }
         parser.doesNotMatch("!") {
             failAt(1)
             expectLiteral("!!")
             expect("not \"!!\"")
-            expect("one character")
+            expect("any character")
         }
         parser.doesNotMatch("abc") {
             failAt(3)
             expectLiteral("!!")
             expect("not \"!!\"")
-            expect("one character")
+            expect("any character")
         }
         parser.doesNotMatch("abc!") {
             failAt(4)
             expectLiteral("!!")
             expect("not \"!!\"")
-            expect("one character")
+            expect("any character")
         }
 
         // extra

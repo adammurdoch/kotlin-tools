@@ -659,7 +659,7 @@ abstract class AbstractParseTest {
 
         class IsOneChar(hasResult: Boolean) : IsSingleInput(hasResult) {
             override val expected: List<String>
-                get() = listOf("one character")
+                get() = listOf("any character")
 
             override fun inspect(parser: SingleInputParser<*>) {
                 assertIs<OneCharParser>(parser)
@@ -668,7 +668,7 @@ abstract class AbstractParseTest {
 
         class IsOneByte(hasResult: Boolean) : IsSingleInput(hasResult) {
             override val expected: List<String>
-                get() = listOf("one byte")
+                get() = listOf("any byte")
 
             override fun inspect(parser: SingleInputParser<*>) {
                 assertIs<OneByteParser>(parser)

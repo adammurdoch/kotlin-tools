@@ -1,13 +1,14 @@
 Parsers
 - "literal" -> "text" and "bytes"?
 - Improve description for ranges
-- `oneOrMore(parser<unit>)`
 - `zeroOrMore()` and `oneOrMore()` with a separator
-- `concat(parser<char>)`
+- `concat(parser<string>)`
 - Binary ints
 - Repeat, `take(parser<int>)`, `drop(parser<int>)`
+- `except()`
+- `upTo()`
 - `accept()` does not call function on a failed branch
-- Improve expected message for `not()` e.g: expecting one character but not "  
+- Improve expected message for `not()` e.g: expecting any character but not "x"  
 
 Performance
 - Optimized implementation for `not(single-input)`
@@ -21,7 +22,6 @@ Performance
 - Choice exits when there is one remaining candidate that has not failed
   - Need to know that candidate will not fail before/at other failed options
 - Choice continuation is deeply nested 
-- `describedAs()` wraps parsing of entire remaining input 
 - Discard buffered input once it is not required
 - Choice matches common prefix of options
 

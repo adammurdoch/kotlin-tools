@@ -5,10 +5,10 @@ import net.rubygrapefruit.parse.Parser
 import net.rubygrapefruit.parse.SingleInputParser
 
 internal object OneCharParser : Parser<CharInput, Char>, SingleInputParser<CharStream> {
-    override val expectation: Expectation = Expectation.One("one character")
+    override val expectation: Expectation = Expectation.One("any character")
 
     override fun toString(): String {
-        return "{one-char}"
+        return "{any-char}"
     }
 
     override fun match(input: CharStream, index: Int): Boolean {

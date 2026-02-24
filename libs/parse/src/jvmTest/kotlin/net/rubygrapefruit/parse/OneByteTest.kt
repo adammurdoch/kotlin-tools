@@ -21,7 +21,7 @@ class OneByteTest : AbstractParseTest() {
 
         // missing
         parser.doesNotMatch {
-            expect("one byte")
+            expect("any byte")
         }
 
         // extra

@@ -226,7 +226,7 @@ class ChoiceOfSequenceTest : AbstractParseTest() {
             expectChoice {
                 expectSequence {
                     expectChoice {
-                        expectOneOrMore {
+                        expectZeroOrMore {
                             expectLiteral("12", result = '1')
                         }
                         expectZero()
@@ -235,7 +235,7 @@ class ChoiceOfSequenceTest : AbstractParseTest() {
                 }
                 expectSequence {
                     expectChoice {
-                        expectOneOrMore {
+                        expectZeroOrMore {
                             expectLiteral("12", result = '2')
                         }
                         expectZero()
@@ -424,7 +424,7 @@ class ChoiceOfSequenceTest : AbstractParseTest() {
                     expectLiteral("a", result = 1)
                     expectSequence {
                         expectChoice {
-                            expectOneOrMore {
+                            expectZeroOrMore {
                                 expectLiteral("1", result = 1)
                             }
                             expectZero()

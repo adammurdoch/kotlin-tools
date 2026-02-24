@@ -16,7 +16,7 @@ class ZeroOrMoreOfZeroOrMoreTest : AbstractParseTest() {
 
         parser.expecting {
             expectChoice {
-                expectOneOrMore {
+                expectZeroOrMore {
                     expectZeroOrMoreSingleInput {
                         expectOneOf(0x1, 0x2)
                     }
@@ -53,9 +53,9 @@ class ZeroOrMoreOfZeroOrMoreTest : AbstractParseTest() {
 
         parser.expecting {
             expectChoice {
-                expectOneOrMore {
+                expectZeroOrMore {
                     expectChoice {
-                        expectOneOrMore {
+                        expectZeroOrMore {
                             expectLiteral("12", result = 1)
                         }
                         expectZero()

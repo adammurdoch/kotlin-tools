@@ -16,7 +16,7 @@ class DiscardOfZeroOrMoreTest : AbstractParseTest() {
 
         parser.expecting {
             expectChoice {
-                expectOneOrMore(hasResult = false) {
+                expectZeroOrMore(hasResult = false) {
                     expectLiteral("abc", result = Unit)
                 }
                 expectZero()
@@ -43,7 +43,7 @@ class DiscardOfZeroOrMoreTest : AbstractParseTest() {
 
         parser.expecting {
             expectChoice {
-                expectOneOrMore(hasResult = false) {
+                expectZeroOrMore(hasResult = false) {
                     expectLiteral("abc", result = Unit)
                 }
                 expectZero()

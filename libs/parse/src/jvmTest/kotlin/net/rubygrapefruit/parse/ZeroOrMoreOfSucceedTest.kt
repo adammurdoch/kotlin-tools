@@ -12,7 +12,7 @@ class ZeroOrMoreOfSucceedTest : AbstractParseTest() {
         parser.expecting {
             // could be replaced with succeed()
             expectChoice {
-                expectOneOrMore {
+                expectZeroOrMore {
                     expectSucceed(result = 2)
                 }
                 expectZero()

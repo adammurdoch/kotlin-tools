@@ -20,13 +20,13 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
         parser.expecting {
             expectSequence {
                 expectChoice {
-                    expectOneOrMore {
+                    expectZeroOrMore {
                         expectLiteral("abc", result = 1)
                     }
                     expectZero()
                 }
                 expectChoice {
-                    expectOneOrMore {
+                    expectZeroOrMore {
                         expectLiteral("ad", result = 2)
                     }
                     expectZero()
@@ -96,7 +96,7 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
         parser.expecting {
             expectSequence {
                 expectChoice {
-                    expectOneOrMore {
+                    expectZeroOrMore {
                         expectLiteral("abc", result = 1)
                     }
                     expectZero()
@@ -269,7 +269,7 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
         parser.expecting {
             expectSequence {
                 expectChoice {
-                    expectOneOrMore {
+                    expectZeroOrMore {
                         expectSequence {
                             expectNot {
                                 expectLiteral("!")
@@ -320,7 +320,7 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
         parser.expecting {
             expectSequence {
                 expectChoice {
-                    expectOneOrMore {
+                    expectZeroOrMore {
                         expectSequence {
                             expectNot {
                                 expectLiteral("!!")

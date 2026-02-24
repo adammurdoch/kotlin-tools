@@ -374,9 +374,11 @@ abstract class AbstractParseTest {
 
         fun expectSequence(config: CompiledParserFixture.() -> Unit)
 
-        fun expectOneOrMore(hasResult: Boolean = true, config: CompiledParserFixture.() -> Unit)
+        fun expectZeroOrMore(hasResult: Boolean = true, config: CompiledParserFixture.() -> Unit)
 
         fun expectZero()
+
+        fun expectOneOrMore(hasResult: Boolean = true, config: CompiledParserFixture.() -> Unit)
 
         fun expectZeroOrMoreSingleInput(hasResult: Boolean = true, config: CompiledParserFixture.() -> Unit)
 
@@ -559,7 +561,7 @@ abstract class AbstractParseTest {
             }
         }
 
-        class IsOneOrMore(val inspector: Inspector, val hasResult: Boolean) : Inspector {
+        class IsZeroOrMore(val inspector: Inspector, val hasResult: Boolean) : Inspector {
             override val expected: List<String>
                 get() = inspector.expected
 
@@ -603,6 +605,24 @@ abstract class AbstractParseTest {
                     assertIs<ListRangeAccumulator<*, *>>(parser.accumulator)
                 } else {
                     assertIs<UnitRangeAccumulator>(parser.accumulator)
+                }
+            }
+        }
+
+        class IsOneOrMore(val inspector: Inspector, val hasResult: Boolean) : Inspector {
+            override val expected: List<String>
+                get() = inspector.expected
+
+            override val mayBeEmpty: Boolean
+                get() = inspector.mayBeEmpty
+
+            override fun inspect(parser: CompiledParser<*, *>) {
+                assertIs<OneOrMoreParser.OneOrMoreCompiledParser<*, *, *>>(parser)
+                inspector.inspect(parser.parser)
+                if (hasResult) {
+                    assertIs<ListAccumulator<*>>(parser.empty)
+                } else {
+                    assertIs<UnitAccumulator>(parser.empty)
                 }
             }
         }
@@ -798,10 +818,10 @@ abstract class AbstractParseTest {
             inspectors.add(Inspector.IsSequence(fixture.choices()[0], fixture.choices()[1]))
         }
 
-        override fun expectOneOrMore(hasResult: Boolean, config: CompiledParserFixture.() -> Unit) {
+        override fun expectZeroOrMore(hasResult: Boolean, config: CompiledParserFixture.() -> Unit) {
             val fixture = DefaultCompiledParserFixture()
             fixture.config()
-            inspectors.add(Inspector.IsOneOrMore(fixture.inspector(), hasResult))
+            inspectors.add(Inspector.IsZeroOrMore(fixture.inspector(), hasResult))
         }
 
         override fun expectZero() {
@@ -812,6 +832,12 @@ abstract class AbstractParseTest {
             val fixture = DefaultCompiledParserFixture()
             fixture.config()
             inspectors.add(Inspector.IsZeroOrMoreSingleInput(fixture.inspector() as Inspector.IsSingleInput, hasResult))
+        }
+
+        override fun expectOneOrMore(hasResult: Boolean, config: CompiledParserFixture.() -> Unit) {
+            val fixture = DefaultCompiledParserFixture()
+            fixture.config()
+            inspectors.add(Inspector.IsOneOrMore(fixture.inspector(), hasResult))
         }
 
         override fun expectConsume(config: CompiledParserFixture.() -> Unit) {

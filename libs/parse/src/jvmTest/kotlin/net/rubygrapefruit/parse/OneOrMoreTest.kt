@@ -9,6 +9,12 @@ class OneOrMoreTest : AbstractParseTest() {
     fun `matches one or more char literals`() {
         val parser = oneOrMore(literal("a.", 1))
 
+        parser.expecting {
+            expectOneOrMore {
+                expectLiteral("a.", result = 1)
+            }
+        }
+
         parser.matches("a.", expected = listOf(1))
         parser.matches("a.a.a.", expected = listOf(1, 1, 1))
 

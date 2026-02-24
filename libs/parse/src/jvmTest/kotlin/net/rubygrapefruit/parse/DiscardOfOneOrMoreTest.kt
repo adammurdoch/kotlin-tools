@@ -14,6 +14,12 @@ class DiscardOfOneOrMoreTest : AbstractParseTest() {
             )
         )
 
+        parser.expecting {
+            expectOneOrMore(hasResult = false) {
+                expectLiteral("a.", result = Unit)
+            }
+        }
+
         parser.matches("a.")
         parser.matches("a.a.a.")
 
@@ -31,6 +37,12 @@ class DiscardOfOneOrMoreTest : AbstractParseTest() {
                 literal("a.")
             )
         )
+
+        parser.expecting {
+            expectOneOrMore(hasResult = false) {
+                expectLiteral("a.", result = Unit)
+            }
+        }
 
         parser.matches("a.")
         parser.matches("a.a.a.")

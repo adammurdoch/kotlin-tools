@@ -4,7 +4,7 @@ sealed class Expression {
     abstract fun evaluate(): Number
 }
 
-class Number(val value: Int) : Expression() {
+data class Number(val value: Int) : Expression() {
     override fun evaluate(): Number {
         return this
     }
@@ -16,7 +16,7 @@ sealed class BinaryExpression : Expression() {
     abstract val operator: String
 }
 
-class Addition(override val left: Expression, override val right: Expression) : BinaryExpression() {
+data class Addition(override val left: Expression, override val right: Expression) : BinaryExpression() {
     override val operator: String
         get() = "+"
 
@@ -25,7 +25,7 @@ class Addition(override val left: Expression, override val right: Expression) : 
     }
 }
 
-class Subtraction(override val left: Expression, override val right: Expression) : BinaryExpression() {
+data class Subtraction(override val left: Expression, override val right: Expression) : BinaryExpression() {
     override val operator: String
         get() = "-"
 

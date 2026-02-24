@@ -96,44 +96,6 @@ class OneOfCharTest : AbstractParseTest() {
     }
 
     @Test
-    fun `matches one of a range of chars`() {
-        val parser = oneOf('a'..'c')
-
-        parser.expecting {
-            expectOneOfRange('a', 'c')
-        }
-
-        parser.matches("a", expected = 'a')
-        parser.matches("b", expected = 'b')
-        parser.matches("c", expected = 'c')
-
-        // missing
-        parser.doesNotMatch("") {
-            expect("\"a\"..\"c\"")
-        }
-
-        // unexpected
-        parser.doesNotMatch("X") {
-            expect("\"a\"..\"c\"")
-        }
-
-        // mismatched case
-        parser.doesNotMatch("A") {
-            expect("\"a\"..\"c\"")
-        }
-
-        // extra
-        parser.doesNotMatch("cX") {
-            failAt(1)
-            expectEndOfInput()
-        }
-        parser.doesNotMatch("cb") {
-            failAt(1)
-            expectEndOfInput()
-        }
-    }
-
-    @Test
     fun `matches one of a collection of chars`() {
         val parser = oneOf(setOf('a', 'b'))
 

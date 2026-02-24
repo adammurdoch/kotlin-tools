@@ -358,7 +358,7 @@ abstract class AbstractParseTest {
             expectOneOf(chars.toList(), hasResult = hasResult)
         }
 
-        fun expectOneOfRange(from: Char, to: Char, hasResult: Boolean = true)
+        fun expectOneInRange(from: Char, to: Char, hasResult: Boolean = true)
 
         fun expectOneOf(chars: List<Char>, hasResult: Boolean = true)
 
@@ -367,6 +367,8 @@ abstract class AbstractParseTest {
         }
 
         fun expectOneOf(vararg bytes: Byte, hasResult: Boolean = true)
+
+        fun expectOneInRange(from: Byte, to: Byte, hasResult: Boolean = true)
 
         fun expectMatch(config: CompiledParserFixture.() -> Unit)
 
@@ -692,7 +694,7 @@ abstract class AbstractParseTest {
             }
         }
 
-        class IsOneOfCharRange(val from: Char, val to: Char, hasResult: Boolean) : IsSingleInput(hasResult) {
+        class IsOneInCharRange(val from: Char, val to: Char, hasResult: Boolean) : IsSingleInput(hasResult) {
             override val expected: List<String>
                 get() {
                     return listOf("\"$from\"..\"$to\"")
@@ -715,6 +717,21 @@ abstract class AbstractParseTest {
 
             override fun inspect(parser: SingleInputParser<*>) {
                 assertIs<OneOfByteParser>(parser)
+            }
+        }
+
+        class IsOneInByteRange(val from: Byte, val to: Byte, hasResult: Boolean) : IsSingleInput(hasResult) {
+            override val expected: List<String>
+                get() {
+                    val first = HasExpectation()
+                    first.expectLiteral(from)
+                    val second = HasExpectation()
+                    second.expectLiteral(to)
+                    return listOf("${first.expect.first()}..${second.expect.first()}")
+                }
+
+            override fun inspect(parser: SingleInputParser<*>) {
+                assertIs<OneOfByteRangeParser>(parser)
             }
         }
 
@@ -789,12 +806,16 @@ abstract class AbstractParseTest {
             inspectors.add(Inspector.IsOneOfChar(chars, hasResult))
         }
 
-        override fun expectOneOfRange(from: Char, to: Char, hasResult: Boolean) {
-            inspectors.add(Inspector.IsOneOfCharRange(from, to, hasResult))
+        override fun expectOneInRange(from: Char, to: Char, hasResult: Boolean) {
+            inspectors.add(Inspector.IsOneInCharRange(from, to, hasResult))
         }
 
         override fun expectOneOf(vararg bytes: Byte, hasResult: Boolean) {
             inspectors.add(Inspector.IsOneOfByte(bytes.toList(), hasResult))
+        }
+
+        override fun expectOneInRange(from: Byte, to: Byte, hasResult: Boolean) {
+            inspectors.add(Inspector.IsOneInByteRange(from, to, hasResult))
         }
 
         override fun expectMatch(config: CompiledParserFixture.() -> Unit) {

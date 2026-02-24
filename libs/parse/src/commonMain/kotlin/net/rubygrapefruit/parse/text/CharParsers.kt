@@ -42,7 +42,7 @@ fun oneOf(chars: Collection<Char>): Parser<CharInput, Char> {
 /**
  * Returns a parser that matches one of the given characters and produces the matched character as a result.
  */
-fun oneOf(chars: CharRange): Parser<CharInput, Char> {
+fun oneInRange(chars: CharRange): Parser<CharInput, Char> {
     return OneOfCharRangeParser(chars)
 }
 

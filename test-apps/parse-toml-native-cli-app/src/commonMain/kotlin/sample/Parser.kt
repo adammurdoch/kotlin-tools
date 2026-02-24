@@ -29,9 +29,9 @@ class Parser {
 
         val keyChar = describedAs(
             oneOf(
-                oneOf('a'..'z'),
-                oneOf('A'..'Z'),
-                oneOf('0'..'9'),
+                oneInRange('a'..'z'),
+                oneInRange('A'..'Z'),
+                oneInRange('0'..'9'),
                 oneOf('_', '-')
             ), "a key character"
         )
@@ -50,7 +50,7 @@ class Parser {
         val stringBody = map(zeroOrMore(stringContent)) { it.joinToString("") }
         val string = sequence(quote, stringBody, quote)
 
-        val digit = describedAs(oneOf('0'..'9'), "a digit")
+        val digit = describedAs(oneInRange('0'..'9'), "a digit")
         val number = map(match(sequence(discard(digit), zeroOrMore(digit)))) { it.toInt() }
 
         val value = oneOf(string, number)

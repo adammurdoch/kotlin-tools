@@ -45,8 +45,8 @@ fun oneOf(bytes: Collection<Byte>): Parser<ByteInput, Byte> {
  * @param from inclusive
  * @param to inclusive
  */
-fun oneOf(from: Byte, to: Byte): Parser<ByteInput, Byte> {
-    return OneOfByteParser.of((from..to).map { it.toByte() })
+fun oneInRange(from: Byte, to: Byte): Parser<ByteInput, Byte> {
+    return OneOfByteRangeParser(from, to)
 }
 
 /**

@@ -17,20 +17,20 @@ A parser combinator library for Kotlin multi-platform.
 - `parser.parse(string)` to parse a string
 - `parser.parse(byte-array)` to parse a byte array
 - `parser.pushParser()` to create a push parser
-  - Call `pushParser.input(array)` to add more input
-  - Call `pushParser.endOfInput()` to finish parsing
+    - Call `pushParser.input(array)` to add more input
+    - Call `pushParser.endOfInput()` to finish parsing
 
 ## Text parsers
 
 Parsers that operate on text input:
 
-- literal(chars) - produces nothing
-  - literal(chars, result) - produces result
+- literal(string) - produces nothing
+    - literal(string, result) - produces result
 - one() - produces matched input char
 - oneOf(chars) - produces matched input char
-  - oneOf(char...)
-  - oneOf(charRange)
-  - oneOf(collection)
+    - oneOf(char...)
+    - oneOf(collection)
+- oneInRange(charRange) - produces matched input char
 
 Text combinators:
 
@@ -41,12 +41,12 @@ Text combinators:
 Parsers that operate on binary input:
 
 - literal(bytes) - produces nothing
-  - literal(bytes, result) - produces result
+    - literal(bytes, result) - produces result
 - one() - produces matched input byte
 - oneOf(bytes) - produces matched input byte
-  - oneOf(byte...)
-  - oneOf(byteRange)
-  - oneOf(collection)
+    - oneOf(byte...)
+    - oneOf(collection)
+- oneInRange(byteRange) - produces matched input byte
 
 Binary combinators:
 
@@ -57,9 +57,9 @@ Binary combinators:
 Parsers that operate on any kind of input:
 
 - succeed() - matches zero input values, produces nothing
-  - succeed(result) - produces result
+    - succeed(result) - produces result
 - endOfInput() - matches end of input, produces nothing
-  - endOfInput(result) - produces result
+    - endOfInput(result) - produces result
 
 ## Combinators
 
@@ -74,13 +74,13 @@ Sequence parsers:
 - sequence(parser, parser, map) - produces result of map function
 - sequence(parser, parser, parser, map) - produces result of map function
 - prefixed(parser, parser) - produces result of the second parser
-  - sequence(unitParser, parser) - an alias
+    - sequence(unitParser, parser) - an alias
 - suffixed(parser, parser) - produces result of the first parser
-  - sequence(parser, unitParser) - an alias
+    - sequence(parser, unitParser) - an alias
 - quoted(parser, parser, parser) - produces result of the middle parser
-  - sequence(unitParser, parser, unitParser) - an alias
+    - sequence(unitParser, parser, unitParser) - an alias
 - separated(parser, parser, parser, map) - produces result of map function applied to result of first and last parser
-  - sequence(parser, unitParser, parser, map) - an alias
+    - sequence(parser, unitParser, parser, map) - an alias
 - sequence(unitParser, unitParser) - produces no result
 - sequence(unitParser, unitParser, unitParser) - produces no result
 - decide(parser, factory) - uses factory to create second parser from the result of the first parser
@@ -88,13 +88,14 @@ Sequence parsers:
 Repeating parsers:
 
 - optional(parser) - matches zero or one, produces null when missing
-  - optional(parser, result) - produces given default value when missing
-  - optional(unitParser) - produces nothing
+    - optional(parser, result) - produces given default value when missing
+    - optional(unitParser) - produces nothing
 - zeroOrMore(parser) - matches zero or more, produces a list
-  - Stops if the parser matches zero input values
-  - zeroOrMore(unitParser) - produces nothing
+    - Stops if the parser matches zero input values
+    - zeroOrMore(unitParser) - produces nothing
 - oneOrMore(parser) - matches one or more, produces a list
-  - oneOrMore(unitParser) - produces nothing
+    - Stops if the parser matches zero input values
+    - oneOrMore(unitParser) - produces nothing
 
 Mapping parsers:
 

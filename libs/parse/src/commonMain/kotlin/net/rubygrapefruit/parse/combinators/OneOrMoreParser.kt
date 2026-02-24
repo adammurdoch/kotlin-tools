@@ -26,7 +26,11 @@ internal class OneOrMoreParser<IN, OUT>(
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return parser.start(ParseContinuation.then { length, value ->
                 val result = initial.add(value, length)
-                ZeroOrMoreParser.of(parser, result, next)
+                if (length == 0) {
+                    next.next(result.length, result)
+                } else {
+                    ZeroOrMoreParser.of(parser, result, next)
+                }
             })
         }
     }

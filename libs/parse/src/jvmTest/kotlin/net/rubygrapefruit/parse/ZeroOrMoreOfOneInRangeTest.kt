@@ -21,12 +21,12 @@ class ZeroOrMoreOfOneInRangeTest : AbstractParseTest() {
 
         // unexpected
         parser.doesNotMatch("X") {
-            expect("\"a\"..\"z\"")
+            expectOneInRange('a', 'z')
             expectEndOfInput()
         }
         parser.doesNotMatch("abcX") {
             failAt(3)
-            expect("\"a\"..\"z\"")
+            expectOneInRange('a', 'z')
             expectEndOfInput()
         }
     }
@@ -47,12 +47,12 @@ class ZeroOrMoreOfOneInRangeTest : AbstractParseTest() {
         // unexpected
         parser.doesNotMatch(0x4) {
             expectEndOfInput()
-            expect("x01..x03")
+            expectOneInRange(0x1, 0x3)
         }
         parser.doesNotMatch(0x1, 0x2, 0x3, 0x4) {
             failAt(3)
             expectEndOfInput()
-            expect("x01..x03")
+            expectOneInRange(0x1, 0x3)
         }
     }
 }

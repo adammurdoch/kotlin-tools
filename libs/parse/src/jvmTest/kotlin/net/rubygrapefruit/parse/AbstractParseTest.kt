@@ -405,20 +405,34 @@ abstract class AbstractParseTest {
         }
 
         fun expectLiteral(text: String) {
-            if (text == "\n") {
-                expect("new line")
-            } else {
-                expect("\"$text\"")
-            }
+            expect(format(text))
         }
 
         fun expectLiteral(byte: Byte) {
-            expect('x' + byte.toString(16).padStart(2, '0'))
+            expect(format(byte))
+        }
+
+        fun expectRange(from: Char, to: Char) {
+            expect("${format(from)}..${format(to)}")
+        }
+
+        fun expectRange(from: Byte, to: Byte) {
+            expect("${format(from)}..${format(to)}")
         }
 
         fun message(): String {
             return "Expected ${expect.sorted().joinToString(", ")}"
         }
+
+        private fun format(text: String): String {
+            return if (text == "\n") {
+                "new line"
+            } else {
+                "\"$text\""
+            }
+        }
+
+        private fun format(byte: Byte): String = 'x' + byte.toString(16).padStart(2, '0')
     }
 
     private sealed interface Inspector {
@@ -697,7 +711,9 @@ abstract class AbstractParseTest {
         class IsOneInCharRange(val from: Char, val to: Char, hasResult: Boolean) : IsSingleInput(hasResult) {
             override val expected: List<String>
                 get() {
-                    return listOf("\"$from\"..\"$to\"")
+                    val expected = HasExpectation()
+                    expected.expectRange(from, to)
+                    return expected.expect
                 }
 
             override fun inspect(parser: SingleInputParser<*>) {
@@ -723,11 +739,9 @@ abstract class AbstractParseTest {
         class IsOneInByteRange(val from: Byte, val to: Byte, hasResult: Boolean) : IsSingleInput(hasResult) {
             override val expected: List<String>
                 get() {
-                    val first = HasExpectation()
-                    first.expectLiteral(from)
-                    val second = HasExpectation()
-                    second.expectLiteral(to)
-                    return listOf("${first.expect.first()}..${second.expect.first()}")
+                    val expected = HasExpectation()
+                    expected.expectRange(from, to)
+                    return expected.expect
                 }
 
             override fun inspect(parser: SingleInputParser<*>) {
@@ -1019,6 +1033,8 @@ abstract class AbstractParseTest {
             expect("any character")
         }
 
+        fun expectOneInRange(from: Char, to: Char)
+
         fun expectLiteral(text: String)
     }
 
@@ -1031,6 +1047,10 @@ abstract class AbstractParseTest {
 
         override fun expectLiteral(text: String) {
             expect.expectLiteral(text)
+        }
+
+        override fun expectOneInRange(from: Char, to: Char) {
+            expect.expectRange(from, to)
         }
 
         override fun failAt(offset: Int, line: Int, col: Int) {
@@ -1057,6 +1077,8 @@ abstract class AbstractParseTest {
         fun failAt(offset: Int)
 
         fun expectLiteral(byte: Byte)
+
+        fun expectOneInRange(from: Byte, to: Byte)
     }
 
     private class DefaultByteParseFailureFixture : DefaultParseFailureFixture(), ByteParseFailureFixture {
@@ -1064,6 +1086,10 @@ abstract class AbstractParseTest {
 
         override fun expectLiteral(byte: Byte) {
             expect.expectLiteral(byte)
+        }
+
+        override fun expectOneInRange(from: Byte, to: Byte) {
+            expect.expectRange(from, to)
         }
 
         override fun failAt(offset: Int) {

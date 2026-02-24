@@ -43,7 +43,7 @@ class DescribedAsTest : AbstractParseTest() {
     }
 
     @Test
-    fun `replaces expectation at start of boolean literal`() {
+    fun `replaces expectation at start of binary literal`() {
         val parser = describedAs(literal(byteArrayOf(0x1, 0x2), 1), "<literal>")
 
         parser.expecting {

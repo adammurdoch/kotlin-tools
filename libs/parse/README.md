@@ -99,6 +99,7 @@ Repeating parsers:
     - Stops if the parser matches zero input values
     - oneOrMore(unitParser) - produces nothing
 - oneOrMore(parser, parser) - matches one or more of first parser, separated by second parser, produces a list
+    - oneOrMore(unitParser, parser) - produces nothing
 
 Mapping parsers:
 

@@ -53,4 +53,30 @@ class DiscardOfOneOrMoreTest : AbstractParseTest() {
             expectEndOfInput()
         }
     }
+
+    @Test
+    fun `discards result of one or more of char literal with separator`() {
+        val parser = discard(
+            oneOrMore(
+                literal("a", 1),
+                literal(".", 2)
+            )
+        )
+
+        parser.expecting {
+            expectOneOrMore(hasResult = false) {
+                expectLiteral("a", result = Unit)
+                expectLiteral(".", result = Unit)
+            }
+        }
+
+        parser.matches("a")
+        parser.matches("a.a.a")
+
+        parser.doesNotMatch("a.aX") {
+            failAt(3)
+            expectLiteral(".")
+            expectEndOfInput()
+        }
+    }
 }

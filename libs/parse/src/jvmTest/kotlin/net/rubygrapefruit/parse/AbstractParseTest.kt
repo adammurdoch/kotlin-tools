@@ -618,7 +618,7 @@ abstract class AbstractParseTest {
             }
         }
 
-        class IsOneOrMore(val inspector: Inspector, val hasResult: Boolean) : Inspector {
+        class IsOneOrMore(val inspector: Inspector, val separator: Inspector?, val hasResult: Boolean) : Inspector {
             override val expected: List<String>
                 get() = inspector.expected
 
@@ -628,6 +628,11 @@ abstract class AbstractParseTest {
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<OneOrMoreParser.OneOrMoreCompiledParser<*, *, *>>(parser)
                 inspector.inspect(parser.parser)
+                if (separator != null) {
+                    IsSequence(separator, inspector).inspect(parser.tail)
+                } else {
+                    inspector.inspect(parser.tail)
+                }
                 if (hasResult) {
                     assertIs<ListAccumulator<*>>(parser.initial)
                 } else {
@@ -883,7 +888,8 @@ abstract class AbstractParseTest {
         override fun expectOneOrMore(hasResult: Boolean, config: CompiledParserFixture.() -> Unit) {
             val fixture = DefaultCompiledParserFixture()
             fixture.config()
-            inspectors.add(Inspector.IsOneOrMore(fixture.inspector(), hasResult))
+            val choices = fixture.choices()
+            inspectors.add(Inspector.IsOneOrMore(choices.first(), choices.getOrNull(1), hasResult))
         }
 
         override fun expectConsume(config: CompiledParserFixture.() -> Unit) {

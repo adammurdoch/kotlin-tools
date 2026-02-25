@@ -7,7 +7,7 @@ internal class OneOrMoreParser<IN, OUT>(
     private val separator: Parser<IN, Unit>?
 ) : Parser<IN, List<OUT>>, CombinatorBuilder<List<OUT>>, DiscardableParser<IN> {
     override fun withNoResult(): Parser<IN, Unit> {
-        return OneOrMoreProduceNothingParser(DiscardParser(parser))
+        return OneOrMoreProduceNothingParser(DiscardParser(parser), separator)
     }
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, List<OUT>> {
@@ -22,8 +22,8 @@ internal class OneOrMoreParser<IN, OUT>(
     }
 
     companion object {
-        fun <IN, ITEM, OUT> of(parser: CompiledParser<IN, ITEM>, initial: Accumulator<ITEM, OUT>): CompiledParser<IN, OUT> {
-            return OneOrMoreCompiledParser(parser, parser, initial)
+        fun <IN, ITEM, OUT> of(parser: CompiledParser<IN, ITEM>, tail: CompiledParser<IN, ITEM>, initial: Accumulator<ITEM, OUT>): CompiledParser<IN, OUT> {
+            return OneOrMoreCompiledParser(parser, tail, initial)
         }
     }
 

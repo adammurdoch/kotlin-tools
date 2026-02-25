@@ -36,24 +36,30 @@ class Parser {
             ), "a key character"
         )
         val bareKey = match(oneOrMore(keyChar))
-        val key = sequence(bareKey, zeroOrMore(sequence(literal("."), bareKey))) { a, b ->
-            Path(listOf(a) + b)
-        }
+        val bareKeys = oneOrMore(bareKey, separator = literal("."))
+        val key = map(bareKeys) { Path(it) }
 
         val quote = literal("\"")
         // not complete
-        val stringContent = oneOf(
+        val basicStringSpan = oneOf(
             literal("\\\"", '"'),
             literal("\\\\", '\\'),
             sequence(not(oneOf(quote, endLine)), one())
         )
-        val stringBody = map(zeroOrMore(stringContent)) { it.joinToString("") }
-        val string = sequence(quote, stringBody, quote)
+        val basicStringBody = map(zeroOrMore(basicStringSpan)) { it.joinToString("") }
+        val basicString = sequence(quote, basicStringBody, quote)
+
+        val singleQuote = literal("'")
+        val literalStringBody = match(zeroOrMore(sequence(not(oneOf(singleQuote, endLine)), one())))
+        val literalString = sequence(singleQuote, literalStringBody, singleQuote)
 
         val digit = describedAs(oneInRange('0'..'9'), "a digit")
-        val number = map(match(sequence(discard(digit), zeroOrMore(digit)))) { it.toInt() }
+        val digits = match(oneOrMore(digit))
+        val number = map(digits) { it.toInt() }
 
-        val value = oneOf(string, number)
+        val boolean = oneOf(literal("true", true), literal("false", false))
+
+        val value = oneOf(basicString, literalString, number, boolean)
 
         val equals = sequence(optionalWhitespace, literal("="), optionalWhitespace)
         val pair = sequence(key, equals, value) { key, value -> ValueTree(key, value) }

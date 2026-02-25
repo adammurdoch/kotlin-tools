@@ -6,13 +6,24 @@ key-1="value 1" # trailing comment
 # tab around key and value
   key_3 = "value 3"
 
-# strings
-contains-escapes = "\"value\\\""
-contains-comment = "# comment"
+# basic strings
+basic-empty = ""
+basic-contains-escapes = "\"value\\\""
+basic-contains-comment = "# comment" # comment
+
+# literal strings
+literal = 'value'
+literal-empty = ''
+literal-contains-escapes = '"value"\'
+literal-contains-comment = '# comment' # comment
 
 # ints
 int-1 = 0
 int-2 = 12
+
+# booleans
+boolean-1 = true
+boolean-2 = false
 
 # dotted paths
 table.key = "value"

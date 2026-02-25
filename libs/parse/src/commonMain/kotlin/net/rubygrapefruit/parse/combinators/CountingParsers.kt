@@ -30,7 +30,15 @@ fun <IN> optional(parser: Parser<IN, Unit>): Parser<IN, Unit> {
  * Returns a parser that applies the given parser zero or more times. Produces a list containing the results.
  */
 fun <IN, OUT> zeroOrMore(parser: Parser<IN, OUT>): Parser<IN, List<OUT>> {
-    return ZeroOrMoreParser(parser)
+    return ZeroOrMoreParser(parser, null)
+}
+
+/**
+ * Returns a parser that applies the given parser zero or more times, with the given separator.
+ * Produces a list containing the results.
+ */
+fun <IN, OUT> zeroOrMore(parser: Parser<IN, OUT>, separator: Parser<IN, *>): Parser<IN, List<OUT>> {
+    return ZeroOrMoreParser(parser, separator)
 }
 
 /**

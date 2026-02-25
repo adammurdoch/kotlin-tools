@@ -29,7 +29,7 @@ internal class OneOrMoreParser<IN, OUT>(
                 if (length == 0) {
                     next.next(result.length, result)
                 } else {
-                    ZeroOrMoreParser.of(parser, result, next)
+                    ZeroOrMoreParser.of(parser, parser, result, next)
                 }
             })
         }

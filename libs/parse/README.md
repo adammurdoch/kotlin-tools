@@ -93,6 +93,7 @@ Repeating parsers:
 - zeroOrMore(parser) - matches zero or more, produces a list
     - Stops if the parser matches zero input values
     - zeroOrMore(unitParser) - produces nothing
+- zeroOrMore(parser, parser) - matches zero or more of first parser, separated by second parser, produces a list
 - oneOrMore(parser) - matches one or more, produces a list
     - Stops if the parser matches zero input values
     - oneOrMore(unitParser) - produces nothing

@@ -63,7 +63,15 @@ fun <IN> zeroOrMore(parser: Parser<IN, Unit>, separator: Parser<IN, *>): Parser<
  * Returns a parser that applies the given parser one or more times. Produces a list containing the results.
  */
 fun <IN, OUT> oneOrMore(parser: Parser<IN, OUT>): Parser<IN, List<OUT>> {
-    return OneOrMoreParser(parser)
+    return OneOrMoreParser(parser, null)
+}
+
+/**
+ * Returns a parser that applies the given parser one or more times, with the given separator.
+ * Produces a list containing the results.
+ */
+fun <IN, OUT> oneOrMore(parser: Parser<IN, OUT>, separator: Parser<IN, *>): Parser<IN, List<OUT>> {
+    return OneOrMoreParser(parser, discard(separator))
 }
 
 /**

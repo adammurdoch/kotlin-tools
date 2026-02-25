@@ -3,24 +3,33 @@ package net.rubygrapefruit.parse.combinators
 import net.rubygrapefruit.parse.*
 
 internal class OneOrMoreParser<IN, OUT>(
-    private val parser: Parser<IN, OUT>
+    private val parser: Parser<IN, OUT>,
+    private val separator: Parser<IN, Unit>?
 ) : Parser<IN, List<OUT>>, CombinatorBuilder<List<OUT>>, DiscardableParser<IN> {
     override fun withNoResult(): Parser<IN, Unit> {
         return OneOrMoreProduceNothingParser(DiscardParser(parser))
     }
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, List<OUT>> {
-        return of(compiler.compile(parser), ListAccumulator.Empty())
+        val option = compiler.compile(parser)
+        val tail = if (separator == null) {
+            option
+        } else {
+            val tail = Sequence2Parser(separator, parser) { _, b -> b }
+            compiler.compile(tail)
+        }
+        return OneOrMoreCompiledParser(option, tail, ListAccumulator.Empty())
     }
 
     companion object {
         fun <IN, ITEM, OUT> of(parser: CompiledParser<IN, ITEM>, initial: Accumulator<ITEM, OUT>): CompiledParser<IN, OUT> {
-            return OneOrMoreCompiledParser(parser, initial)
+            return OneOrMoreCompiledParser(parser, parser, initial)
         }
     }
 
     class OneOrMoreCompiledParser<IN, ITEM, OUT>(
         val parser: CompiledParser<IN, ITEM>,
+        val tail: CompiledParser<IN, ITEM>,
         val initial: Accumulator<ITEM, OUT>
     ) : CompiledParser<IN, OUT> {
         override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
@@ -29,7 +38,7 @@ internal class OneOrMoreParser<IN, OUT>(
                 if (length == 0) {
                     next.next(result.length, result)
                 } else {
-                    ZeroOrMoreParser.of(parser, parser, result, next)
+                    ZeroOrMoreParser.of(tail, tail, result, next)
                 }
             })
         }

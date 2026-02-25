@@ -1,7 +1,7 @@
 Parsers
 - "literal" -> "text" and "bytes"?
 - Improve description for ranges
-- `zeroOrMore()` and `oneOrMore()` with a separator
+- `oneOrMore()` with a separator
 - `concat(parser<string>)`
 - Binary ints
 - Repeat, `take(parser<int>)`, `drop(parser<int>)`

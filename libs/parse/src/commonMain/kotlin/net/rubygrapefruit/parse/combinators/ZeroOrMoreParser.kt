@@ -11,27 +11,24 @@ internal class ZeroOrMoreParser<IN, OUT>(
     }
 
     override fun compile(compiler: CombinatorBuilder.Compiler<BoxingInput<*, OUT>>): CompiledParser<BoxingInput<*, OUT>, List<OUT>> {
-        return if (separator == null) {
+        if (separator == null) {
             val singleValueOption = compiler.maybeAsSingleInputParser(parser)
             if (singleValueOption != null) {
-                ZeroOrMoreSingleInputCompiledParser(singleValueOption, ListRangeAccumulator.Empty())
-            } else {
-                val firstOption = compiler.compile(parser)
-                of(firstOption, ListAccumulator.Empty())
+                return ZeroOrMoreSingleInputCompiledParser(singleValueOption, ListRangeAccumulator.Empty())
             }
-        } else {
-            val option = compiler.compile(parser)
-            val tail = Sequence2Parser(separator, parser) { _, v -> v }
-            val compiledTail = compiler.compile(tail)
-            of(option, compiledTail, ListAccumulator.Empty())
         }
+
+        val option = compiler.compile(parser)
+        val tail = if (separator == null) {
+            option
+        } else {
+            val tail = Sequence2Parser(separator, parser) { _, v -> v }
+            compiler.compile(tail)
+        }
+        return of(option, tail, ListAccumulator.Empty())
     }
 
     companion object {
-        fun <IN, ITEM, OUT> of(option: CompiledParser<IN, ITEM>, initial: Accumulator<ITEM, OUT>): CompiledParser<IN, OUT> {
-            return ZeroOrMoreCompiledParser(option, option, initial)
-        }
-
         fun <IN, ITEM, OUT> of(option: CompiledParser<IN, ITEM>, tail: CompiledParser<IN, ITEM>, initial: Accumulator<ITEM, OUT>): CompiledParser<IN, OUT> {
             return ZeroOrMoreCompiledParser(option, tail, initial)
         }

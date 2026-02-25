@@ -61,6 +61,13 @@ class ZeroOrMoreTest : AbstractParseTest() {
     fun `matches zero or more char literals with separator`() {
         val parser = zeroOrMore(literal("abc", 1), separator = literal(",", 2))
 
+        parser.expecting {
+            expectZeroOrMore {
+                expectLiteral("abc", result = 1)
+                expectLiteral(",")
+            }
+        }
+
         parser.matches("", expected = emptyList())
         parser.matches("abc", expected = listOf(1))
         parser.matches("abc,abc,abc", expected = listOf(1, 1, 1))

@@ -38,15 +38,25 @@ fun <IN, OUT> zeroOrMore(parser: Parser<IN, OUT>): Parser<IN, List<OUT>> {
  * Produces a list containing the results.
  */
 fun <IN, OUT> zeroOrMore(parser: Parser<IN, OUT>, separator: Parser<IN, *>): Parser<IN, List<OUT>> {
-    return ZeroOrMoreParser(parser, separator)
+    return ZeroOrMoreParser(parser, discard(separator))
 }
 
 /**
- * Returns a parser that applies the given parser zero or more times. Does not produce a result.
+ * Returns a parser that applies the given parser zero or more times.
+ * Does not produce a result.
  */
 @JvmName("zeroOrMoreProduceNothing")
 fun <IN> zeroOrMore(parser: Parser<IN, Unit>): Parser<IN, Unit> {
-    return ZeroOrMoreProduceNothingParser(parser)
+    return ZeroOrMoreProduceNothingParser(parser, null)
+}
+
+/**
+ * Returns a parser that applies the given parser zero or more times, with the given separator.
+ * Produces a list containing the results.
+ */
+@JvmName("zeroOrMoreProduceNothing")
+fun <IN> zeroOrMore(parser: Parser<IN, Unit>, separator: Parser<IN, *>): Parser<IN, Unit> {
+    return ZeroOrMoreProduceNothingParser(parser, discard(separator))
 }
 
 /**

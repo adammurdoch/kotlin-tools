@@ -4,13 +4,10 @@ import net.rubygrapefruit.parse.*
 
 internal class ZeroOrMoreParser<IN, OUT>(
     private val parser: Parser<IN, OUT>,
-    private val separator: Parser<IN, *>?
+    private val separator: Parser<IN, Unit>?
 ) : Parser<IN, List<OUT>>, TypedInputCombinatorBuilder<BoxingInput<*, OUT>, List<OUT>>, DiscardableParser<IN> {
     override fun withNoResult(): Parser<IN, Unit> {
-        if (separator != null) {
-            TODO()
-        }
-        return ZeroOrMoreProduceNothingParser(DiscardParser(parser))
+        return ZeroOrMoreProduceNothingParser(DiscardParser(parser), separator)
     }
 
     override fun compile(compiler: CombinatorBuilder.Compiler<BoxingInput<*, OUT>>): CompiledParser<BoxingInput<*, OUT>, List<OUT>> {

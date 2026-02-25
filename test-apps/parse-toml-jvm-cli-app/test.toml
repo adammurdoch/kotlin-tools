@@ -29,6 +29,18 @@ boolean-false = false
 array = ["basic", 'literal', 0, true, [1, 2]]
 array-empty = []
 array-whitespace = [  "one"   ,   "two"  ]
+array-trailing-comma = [1, 2, ]
+array-indented = [
+    'one',
+    'two',
+]
+array-multi-line = [
+    # comment
+    'one' # comment
+    , # comment
+'two',
+    # comment
+]
 
 # values as keys
 0 = 0

@@ -61,10 +61,14 @@ class Parser {
 
         val value = recursive<CharInput, Any>()
 
-        val arrayPrefix = sequence(literal("["), optionalWhitespace)
-        val arraySeparator = sequence(optionalWhitespace, literal(","), optionalWhitespace)
-        val arraySuffix = sequence(optionalWhitespace, literal("]"))
-        val array = sequence(arrayPrefix, zeroOrMore(value, separator = arraySeparator), arraySuffix)
+        val arrayWhitespace = sequence(blankLines, optionalWhitespace)
+        val arrayPrefix = sequence(literal("["), arrayWhitespace)
+        val arraySeparator = sequence(arrayWhitespace, literal(","), arrayWhitespace)
+        val arrayItem = sequence(value, arraySeparator)
+        val arrayLastItem = sequence(value, arrayWhitespace)
+        val arrayItems = sequence(zeroOrMore(arrayItem), optional(arrayLastItem)) { a, b -> if (b == null) a else a + b }
+        val arraySuffix = literal("]")
+        val array = sequence(arrayPrefix, arrayItems, arraySuffix)
 
         value.parser(oneOf(basicString, literalString, number, boolean, array))
 

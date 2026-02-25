@@ -59,7 +59,14 @@ class Parser {
 
         val boolean = oneOf(literal("true", true), literal("false", false))
 
-        val value = oneOf(basicString, literalString, number, boolean)
+        val value = recursive<CharInput, Any>()
+
+        val arrayPrefix = sequence(literal("["), optionalWhitespace)
+        val arraySeparator = sequence(optionalWhitespace, literal(","), optionalWhitespace)
+        val arraySuffix = sequence(optionalWhitespace, literal("]"))
+        val array = sequence(arrayPrefix, zeroOrMore(value, separator = arraySeparator), arraySuffix)
+
+        value.parser(oneOf(basicString, literalString, number, boolean, array))
 
         val equals = sequence(optionalWhitespace, literal("="), optionalWhitespace)
         val pair = sequence(key, equals, value) { key, value -> ValueTree(key, value) }

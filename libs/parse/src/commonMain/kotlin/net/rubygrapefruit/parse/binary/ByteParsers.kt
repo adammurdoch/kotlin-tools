@@ -2,6 +2,8 @@ package net.rubygrapefruit.parse.binary
 
 import net.rubygrapefruit.parse.Parser
 import net.rubygrapefruit.parse.combinators.discard
+import net.rubygrapefruit.parse.combinators.not
+import net.rubygrapefruit.parse.combinators.sequence
 import net.rubygrapefruit.parse.general.MatchedInputParser
 
 /**
@@ -47,6 +49,14 @@ fun oneOf(bytes: Collection<Byte>): Parser<ByteInput, Byte> {
  */
 fun oneInRange(from: Byte, to: Byte): Parser<ByteInput, Byte> {
     return OneOfByteRangeParser(from, to)
+}
+
+/**
+ * Returns a parser that matches any single byte except when the given parser succeeds.
+ * Produces the matched byte as a result.
+ */
+fun oneExcept(parser: Parser<ByteInput, *>): Parser<ByteInput, Byte> {
+    return sequence(not(parser), one())
 }
 
 /**

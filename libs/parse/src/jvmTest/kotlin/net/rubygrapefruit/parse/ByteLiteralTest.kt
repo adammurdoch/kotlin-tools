@@ -37,6 +37,27 @@ class ByteLiteralTest : AbstractParseTest() {
     }
 
     @Test
+    fun `formats expected bytes`() {
+        val candidates = listOf(
+            0 to "x0",
+            0x1 to "x01",
+            0xf to "x0F",
+            0xFF to "xFF"
+        )
+        for (candidate in candidates) {
+            val literal = candidate.first.toByte()
+            val parser = literal(byteArrayOf(literal))
+
+            parser.matches(literal)
+
+            // missing
+            parser.doesNotMatch {
+                expect(candidate.second)
+            }
+        }
+    }
+
+    @Test
     fun `matches single byte literal and produces result`() {
         val parser = literal(byteArrayOf(0x1), result = "one")
 

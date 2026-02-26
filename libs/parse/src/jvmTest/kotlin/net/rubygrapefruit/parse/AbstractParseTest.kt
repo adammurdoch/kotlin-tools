@@ -432,7 +432,13 @@ abstract class AbstractParseTest {
             }
         }
 
-        private fun format(byte: Byte): String = 'x' + byte.toString(16).padStart(2, '0')
+        private fun format(byte: Byte): String {
+            return if (byte == 0.toByte()) {
+                "x0"
+            } else {
+                'x' + byte.toString(16).padStart(2, '0')
+            }
+        }
     }
 
     private sealed interface Inspector {

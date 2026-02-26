@@ -1,15 +1,34 @@
 package net.rubygrapefruit.file.fixtures
 
-import net.rubygrapefruit.file.Directory
-import net.rubygrapefruit.file.RegularFile
-import net.rubygrapefruit.file.SymLink
-import net.rubygrapefruit.file.fileSystem
+import net.rubygrapefruit.file.*
 
 class FilesFixture {
     val testDir by lazy {
         val baseDir = fileSystem.currentDirectory.dir("build/test files")
         baseDir.createDirectories()
         baseDir.createTemporaryDirectory()
+    }
+
+    fun cleanup() {
+        // Try to reset the test file permissions
+        if (testDir.supports(FileSystemCapability.PosixPermissions)) {
+            testDir.visitTopDown {
+                when (type) {
+                    ElementType.Directory -> toDir().setPermissions(PosixPermissions.readWriteDirectory)
+                    ElementType.SymLink -> {
+                        val element = toSymLink()
+                        if (element.supports(FileSystemCapability.SetSymLinkPosixPermissions)) {
+                            element.setPermissions(PosixPermissions.readWriteFile)
+                        }
+                    }
+
+                    ElementType.RegularFile -> toFile().setPermissions(PosixPermissions.readWriteFile)
+                    ElementType.Other -> {}
+                }
+            }
+        }
+
+        testDir.deleteRecursively()
     }
 
     operator fun invoke(builder: DirFixture.() -> Unit) {

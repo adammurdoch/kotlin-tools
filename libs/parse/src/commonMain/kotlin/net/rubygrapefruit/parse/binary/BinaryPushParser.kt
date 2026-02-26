@@ -2,7 +2,7 @@ package net.rubygrapefruit.parse.binary
 
 import net.rubygrapefruit.parse.PushParser
 
-interface BytePushParser<OUT> : PushParser<ByteFailureContext, OUT> {
+interface BinaryPushParser<OUT> : PushParser<BinaryFailureContext, OUT> {
     /**
      * Signals that more input is available.
      */

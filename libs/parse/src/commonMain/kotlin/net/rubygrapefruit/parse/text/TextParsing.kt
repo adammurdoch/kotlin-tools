@@ -8,21 +8,21 @@ import net.rubygrapefruit.parse.start
 /**
  * Attempts to parse the given string. Fails when the parser cannot match the entire input.
  */
-fun <OUT> Parser<TextInput, OUT>.parse(input: String): ParseResult<CharFailureContext, OUT> {
+fun <OUT> Parser<TextInput, OUT>.parse(input: String): ParseResult<TextFailureContext, OUT> {
     val parser = start<CharStream, OUT>()
     return parse(parser, StringCharStream(input), ::failureFactory)
 }
 
 /**
- * Creates a [CharPushParser] that will attempt to match input as it becomes available.
+ * Creates a [TextPushParser] that will attempt to match input as it becomes available.
  * Fails when the parser cannot match the entire input.
  */
-fun <OUT> Parser<TextInput, OUT>.pushParser(): CharPushParser<OUT> {
+fun <OUT> Parser<TextInput, OUT>.pushParser(): TextPushParser<OUT> {
     val parser = start<CharStream, OUT>()
-    return DefaultCharPushParser(parser)
+    return DefaultTextPushParser(parser)
 }
 
-internal fun failureFactory(input: AdvancingCharStream, index: Int, message: String): ParseResult.Fail<CharFailureContext> {
+internal fun failureFactory(input: AdvancingCharStream, index: Int, message: String): ParseResult.Fail<TextFailureContext> {
     return ParseResult.Fail(input.contextAt(index), message) { context, message ->
         val builder = StringBuilder()
         val formattedLine = context.position.line.toString()

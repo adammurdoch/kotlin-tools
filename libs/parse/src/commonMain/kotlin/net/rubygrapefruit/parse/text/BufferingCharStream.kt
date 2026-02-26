@@ -22,7 +22,7 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
         return tail.posAt(index + pos)
     }
 
-    override fun contextAt(index: Int): CharFailureContext {
+    override fun contextAt(index: Int): TextFailureContext {
         return tail.contextAt(index + pos)
     }
 
@@ -98,7 +98,7 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
             }
         }
 
-        fun contextAt(index: Int): CharFailureContext {
+        fun contextAt(index: Int): TextFailureContext {
             return if (index >= startIndex || previous == null) {
                 var line = startLine
                 var col = startCol
@@ -140,7 +140,7 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
                 }
 
                 val pos = CharPosition(index, line, col)
-                AdvancingCharStream.CharStreamContext(pos, builder.endBuffer.get(builder.startLine, builder.endLine))
+                AdvancingCharStream.TextStreamContext(pos, builder.endBuffer.get(builder.startLine, builder.endLine))
             } else {
                 previous.contextAt(index)
             }

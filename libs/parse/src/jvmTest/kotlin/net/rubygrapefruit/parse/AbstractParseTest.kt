@@ -107,7 +107,7 @@ abstract class AbstractParseTest {
     }
 
     @JvmName("pushParseChars")
-    private fun <T> Parser<TextInput, T>.pushParse(chunks: List<CharArray>): ParseResult<CharFailureContext, T> {
+    private fun <T> Parser<TextInput, T>.pushParse(chunks: List<CharArray>): ParseResult<TextFailureContext, T> {
         val pushParser = pushParser()
         for (chunk in chunks) {
             pushParser.input(chunk)
@@ -268,7 +268,7 @@ abstract class AbstractParseTest {
     }
 
     @JvmName("pushParseBytes")
-    private fun <T> Parser<BinaryInput, T>.pushParse(chunks: List<ByteArray>): ParseResult<ByteFailureContext, T> {
+    private fun <T> Parser<BinaryInput, T>.pushParse(chunks: List<ByteArray>): ParseResult<BinaryFailureContext, T> {
         val pushParser = pushParser()
         for (chunk in chunks) {
             pushParser.input(chunk)
@@ -307,7 +307,7 @@ abstract class AbstractParseTest {
         }
     }
 
-    private fun ParseResult<CharFailureContext, *>.assertIsFail(offset: Int, line: Int, col: Int, failureLine: String, message: String) {
+    private fun ParseResult<TextFailureContext, *>.assertIsFail(offset: Int, line: Int, col: Int, failureLine: String, message: String) {
         when (this) {
             is ParseResult.Success -> fail("Expected parse failure at offset $offset with message: $message")
             is ParseResult.Fail -> {
@@ -329,7 +329,7 @@ abstract class AbstractParseTest {
         }
     }
 
-    private fun ParseResult<ByteFailureContext, *>.assertIsFail(offset: Int, message: String) {
+    private fun ParseResult<BinaryFailureContext, *>.assertIsFail(offset: Int, message: String) {
         when (this) {
             is ParseResult.Success -> fail("Expected parse failure at offset $offset with message: $message")
             is ParseResult.Fail -> {

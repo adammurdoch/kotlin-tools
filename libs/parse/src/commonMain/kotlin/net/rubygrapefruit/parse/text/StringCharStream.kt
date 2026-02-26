@@ -26,11 +26,11 @@ internal class StringCharStream(val text: String) : AdvancingCharStream {
         return text.posAt(offset)
     }
 
-    override fun contextAt(index: Int): CharFailureContext {
+    override fun contextAt(index: Int): TextFailureContext {
         val offset = index + pos
         val pos = text.posAt(offset)
         val lineText = text.line(offset)
-        return AdvancingCharStream.CharStreamContext(pos, lineText)
+        return AdvancingCharStream.TextStreamContext(pos, lineText)
     }
 
     private fun CharSequence.posAt(index: Int): CharPosition {

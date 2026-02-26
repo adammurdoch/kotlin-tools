@@ -1,5 +1,5 @@
 package net.rubygrapefruit.parse.binary
 
-interface ByteFailureContext {
+interface BinaryFailureContext {
     val position: BytePosition
 }

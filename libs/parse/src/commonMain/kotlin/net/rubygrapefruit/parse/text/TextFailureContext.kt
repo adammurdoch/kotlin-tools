@@ -1,6 +1,6 @@
 package net.rubygrapefruit.parse.text
 
-interface CharFailureContext {
+interface TextFailureContext {
     val position: CharPosition
 
     val lineText: String

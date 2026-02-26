@@ -40,7 +40,7 @@ fun oneOf(bytes: Collection<Byte>): Parser<ByteInput, Byte> {
 }
 
 /**
- * Returns a parser that matches one of the given bytes and produces the matched byte as a result.
+ * Returns a parser that matches a byte in the given range and produces the matched byte as a result.
  *
  * @param from inclusive
  * @param to inclusive

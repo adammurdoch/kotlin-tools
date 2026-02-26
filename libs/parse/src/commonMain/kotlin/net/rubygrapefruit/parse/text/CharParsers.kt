@@ -2,6 +2,8 @@ package net.rubygrapefruit.parse.text
 
 import net.rubygrapefruit.parse.Parser
 import net.rubygrapefruit.parse.combinators.discard
+import net.rubygrapefruit.parse.combinators.not
+import net.rubygrapefruit.parse.combinators.sequence
 import net.rubygrapefruit.parse.general.MatchedInputParser
 
 /**
@@ -40,10 +42,18 @@ fun oneOf(chars: Collection<Char>): Parser<CharInput, Char> {
 }
 
 /**
- * Returns a parser that matches one of the given characters and produces the matched character as a result.
+ * Returns a parser that matches a character in the given range and produces the matched character as a result.
  */
 fun oneInRange(chars: CharRange): Parser<CharInput, Char> {
     return OneOfCharRangeParser(chars)
+}
+
+/**
+ * Returns a parser that matches any single character except when the given parser succeeds.
+ * Produces the matched character as a result.
+ */
+fun oneExcept(parser: Parser<CharInput, *>): Parser<CharInput, Char> {
+    return sequence(not(parser), one())
 }
 
 /**

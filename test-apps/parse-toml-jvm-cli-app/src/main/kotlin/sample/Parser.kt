@@ -40,17 +40,23 @@ class Parser {
         val key = map(bareKeys) { Path(it) }
 
         val quote = literal("\"")
+        val escape = literal("\\")
         // not complete
+        val escapes = sequence(
+            escape, oneOf(
+                literal("\"", "\""),
+                literal("\\", "\\")
+            )
+        )
         val basicStringSpan = oneOf(
-            literal("\\\"", '"'),
-            literal("\\\\", '\\'),
-            sequence(not(oneOf(quote, endLine)), one())
+            escapes,
+            match(oneOrMore(oneExcept(oneOf(escape, quote, endLine))))
         )
         val basicStringBody = map(zeroOrMore(basicStringSpan)) { it.joinToString("") }
         val basicString = sequence(quote, basicStringBody, quote)
 
         val singleQuote = literal("'")
-        val literalStringBody = match(zeroOrMore(sequence(not(oneOf(singleQuote, endLine)), one())))
+        val literalStringBody = match(zeroOrMore(oneExcept(oneOf(singleQuote, endLine))))
         val literalString = sequence(singleQuote, literalStringBody, singleQuote)
 
         val digit = describedAs(oneInRange('0'..'9'), "a digit")

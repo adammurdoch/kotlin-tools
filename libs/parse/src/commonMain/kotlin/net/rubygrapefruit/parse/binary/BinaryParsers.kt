@@ -17,14 +17,14 @@ fun one(): Parser<BinaryInput, Byte> {
  * Returns a parser that matches the given sequence of bytes. Does not produce a result.
  */
 fun literal(bytes: ByteArray): Parser<BinaryInput, Unit> {
-    return ByteLiteralParser(bytes, Unit)
+    return BinaryLiteralParser(bytes, Unit)
 }
 
 /**
  * Returns a parser that matches the given sequence of bytes and produces the given result.
  */
 fun <OUT> literal(bytes: ByteArray, result: OUT): Parser<BinaryInput, OUT> {
-    return ByteLiteralParser(bytes, result)
+    return BinaryLiteralParser(bytes, result)
 }
 
 /**
@@ -48,7 +48,7 @@ fun oneOf(bytes: Collection<Byte>): Parser<BinaryInput, Byte> {
  * @param to inclusive
  */
 fun oneInRange(from: Byte, to: Byte): Parser<BinaryInput, Byte> {
-    return OneOfByteRangeParser(from, to)
+    return OneInByteRangeParser(from, to)
 }
 
 /**

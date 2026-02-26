@@ -661,7 +661,7 @@ abstract class AbstractParseTest {
 
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<ParserBuilderAdaptor<*, *>>(parser)
-                assertIs<CharLiteralParser<*>>(parser.parser)
+                assertIs<TextLiteralParser<*>>(parser.parser)
                 assertEquals(result, parser.parser.result)
             }
         }
@@ -676,7 +676,7 @@ abstract class AbstractParseTest {
 
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<ParserBuilderAdaptor<*, *>>(parser)
-                assertIs<ByteLiteralParser<*>>(parser.parser)
+                assertIs<BinaryLiteralParser<*>>(parser.parser)
                 assertEquals(result, parser.parser.result)
             }
         }
@@ -737,7 +737,7 @@ abstract class AbstractParseTest {
                 }
 
             override fun inspect(parser: SingleInputParser<*>) {
-                assertIs<OneOfCharRangeParser>(parser)
+                assertIs<OneInCharRangeParser>(parser)
             }
         }
 
@@ -765,7 +765,7 @@ abstract class AbstractParseTest {
                 }
 
             override fun inspect(parser: SingleInputParser<*>) {
-                assertIs<OneOfByteRangeParser>(parser)
+                assertIs<OneInByteRangeParser>(parser)
             }
         }
 

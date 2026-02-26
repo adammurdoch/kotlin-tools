@@ -2,7 +2,7 @@ package net.rubygrapefruit.parse.binary
 
 import net.rubygrapefruit.parse.*
 
-internal class ByteLiteralParser<OUT>(
+internal class BinaryLiteralParser<OUT>(
     private val bytes: ByteArray,
     val result: OUT
 ) : Parser<BinaryInput, OUT>, ParserBuilder<ByteStream, OUT>, DiscardableParser<BinaryInput> {
@@ -13,7 +13,7 @@ internal class ByteLiteralParser<OUT>(
         get() = expectations.first()
 
     override fun withNoResult(): Parser<BinaryInput, Unit> {
-        return ByteLiteralParser(bytes, Unit)
+        return BinaryLiteralParser(bytes, Unit)
     }
 
     override fun <NEXT> start(next: ParseContinuation<ByteStream, OUT, NEXT>): PullParser<ByteStream, NEXT> {

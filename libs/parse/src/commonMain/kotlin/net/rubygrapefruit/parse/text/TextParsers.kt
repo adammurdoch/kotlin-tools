@@ -17,14 +17,14 @@ fun one(): Parser<TextInput, Char> {
  * Returns a parser that matches the given text. Does not produce a result.
  */
 fun literal(text: String): Parser<TextInput, Unit> {
-    return CharLiteralParser(text, Unit)
+    return TextLiteralParser(text, Unit)
 }
 
 /**
  * Returns a parser that matches the given text and produces the given result.
  */
 fun <OUT> literal(text: String, result: OUT): Parser<TextInput, OUT> {
-    return CharLiteralParser(text, result)
+    return TextLiteralParser(text, result)
 }
 
 /**
@@ -45,7 +45,7 @@ fun oneOf(chars: Collection<Char>): Parser<TextInput, Char> {
  * Returns a parser that matches a character in the given range and produces the matched character as a result.
  */
 fun oneInRange(chars: CharRange): Parser<TextInput, Char> {
-    return OneOfCharRangeParser(chars)
+    return OneInCharRangeParser(chars)
 }
 
 /**

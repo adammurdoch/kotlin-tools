@@ -11,7 +11,13 @@ library {
     }
     nativeDesktop()
     browser()
+
     test {
         implementation(versions.test.coordinates)
+    }
+    jvm {
+        test {
+            implementation(versions.libs.coordinates("file-fixtures"))
+        }
     }
 }

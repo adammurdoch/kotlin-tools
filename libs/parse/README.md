@@ -22,6 +22,7 @@ The implementation is a bottom-up parser, meaning that grammars can be deeply ne
 
 - `parser.parse(string)` to parse a string
 - `parser.parse(byte-array)` to parse a byte array
+- `parser.parse(file, charset)` to parse a text file
 - `parser.pushParser()` to create a push parser
     - Call `pushParser.input(array)` to add more input
     - Call `pushParser.endOfInput()` to finish parsing

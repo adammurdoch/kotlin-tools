@@ -7,12 +7,12 @@ import net.rubygrapefruit.parse.PullParser
 internal class DefaultCharPushParser<OUT>(parser: PullParser<CharStream, OUT>) : DefaultPushParser<CharFailureContext, AdvancingCharStream, OUT>(parser), CharPushParser<OUT> {
     private val input = BufferingCharStream()
 
-    override fun input(chars: CharArray) {
-        if (chars.isEmpty()) {
+    override fun input(chars: CharArray, offset: Int, count: Int) {
+        if (count == 0) {
             return
         }
 
-        input.append(chars)
+        input.append(chars, offset, count)
         inputAvailable(input)
     }
 

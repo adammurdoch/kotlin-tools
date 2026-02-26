@@ -6,7 +6,7 @@ import net.rubygrapefruit.parse.parse
 import net.rubygrapefruit.parse.start
 
 /**
- * Attempts to parse the given input. Fails when the parser cannot match the entire input.
+ * Attempts to parse the given string. Fails when the parser cannot match the entire input.
  */
 fun <OUT> Parser<CharInput, OUT>.parse(input: String): ParseResult<CharFailureContext, OUT> {
     val parser = start<CharStream, OUT>()

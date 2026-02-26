@@ -9,7 +9,8 @@ import javax.inject.Inject
 
 abstract class DefaultJvmComponent<D : Dependencies> @Inject constructor(
     private val project: Project,
-    private val mainSourceSetName: String
+    private val mainSourceSetName: String,
+    private val testSourceSetName: String
 ) : JvmComponent<D> {
     private val mainSourceSet
         get() = project.extensions.getByType(KotlinProjectExtension::class.java).sourceSets.getByName(mainSourceSetName)
@@ -19,7 +20,7 @@ abstract class DefaultJvmComponent<D : Dependencies> @Inject constructor(
     }
 
     override fun test(config: D.() -> Unit) {
-        project.extensions.getByType(KotlinProjectExtension::class.java).sourceSets.getByName("test").dependencies { config(wrap(this)) }
+        project.extensions.getByType(KotlinProjectExtension::class.java).sourceSets.getByName(testSourceSetName).dependencies { config(wrap(this)) }
     }
 
     fun attach() {

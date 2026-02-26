@@ -8,8 +8,9 @@ import javax.inject.Inject
 
 abstract class DefaultJvmLibrary @Inject constructor(
     project: Project,
-    mainSourceSetName: String
-) : DefaultJvmComponent<LibraryDependencies>(project, mainSourceSetName), JvmLibrary {
+    mainSourceSetName: String,
+    testSourceSetName: String
+) : DefaultJvmComponent<LibraryDependencies>(project, mainSourceSetName, testSourceSetName), JvmLibrary {
     override fun wrap(dependencyHandler: KotlinDependencyHandler): LibraryDependencies {
         return KotlinHandlerBackedLibraryDependencies(dependencyHandler)
     }

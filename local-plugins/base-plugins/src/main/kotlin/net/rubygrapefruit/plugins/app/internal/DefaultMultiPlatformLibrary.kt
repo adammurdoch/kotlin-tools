@@ -56,7 +56,7 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
 
     private fun createJvm(): JvmLibrary {
         if (jvm == null) {
-            val lib = factory.newInstance(DefaultJvmLibrary::class.java, "jvmMain")
+            val lib = factory.newInstance(DefaultJvmLibrary::class.java, "jvmMain", "jvmTest")
             lib.module.name.convention(toModuleName(project.name))
             lib.targetJvmVersion.convention(Versions.libs.jvm.version)
             jvm = lib

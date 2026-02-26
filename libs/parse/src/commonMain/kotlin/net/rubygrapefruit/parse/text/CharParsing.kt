@@ -8,7 +8,7 @@ import net.rubygrapefruit.parse.start
 /**
  * Attempts to parse the given string. Fails when the parser cannot match the entire input.
  */
-fun <OUT> Parser<CharInput, OUT>.parse(input: String): ParseResult<CharFailureContext, OUT> {
+fun <OUT> Parser<TextInput, OUT>.parse(input: String): ParseResult<CharFailureContext, OUT> {
     val parser = start<CharStream, OUT>()
     return parse(parser, StringCharStream(input), ::failureFactory)
 }
@@ -17,7 +17,7 @@ fun <OUT> Parser<CharInput, OUT>.parse(input: String): ParseResult<CharFailureCo
  * Creates a [CharPushParser] that will attempt to match input as it becomes available.
  * Fails when the parser cannot match the entire input.
  */
-fun <OUT> Parser<CharInput, OUT>.pushParser(): CharPushParser<OUT> {
+fun <OUT> Parser<TextInput, OUT>.pushParser(): CharPushParser<OUT> {
     val parser = start<CharStream, OUT>()
     return DefaultCharPushParser(parser)
 }

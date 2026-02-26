@@ -12,7 +12,7 @@ class Parser {
         val digits = match(oneOrMore(digit))
         val number = map(digits) { Number(it.toInt()) }
 
-        val expression = recursive<CharInput, Expression>()
+        val expression = recursive<TextInput, Expression>()
 
         val openParen = sequence(literal("("), whitespace)
         val closeParen = sequence(whitespace, literal(")"))

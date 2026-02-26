@@ -4,7 +4,7 @@ import net.rubygrapefruit.parse.Expectation
 import net.rubygrapefruit.parse.Parser
 import net.rubygrapefruit.parse.SingleInputParser
 
-internal class OneOfByteRangeParser(private val from: Byte, private val to: Byte) : Parser<ByteInput, Byte>, SingleInputParser<ByteStream> {
+internal class OneOfByteRangeParser(private val from: Byte, private val to: Byte) : Parser<BinaryInput, Byte>, SingleInputParser<ByteStream> {
     override val expectation = Expectation.One("${format(from)}..${format(to)}")
 
     override fun match(input: ByteStream, index: Int): Boolean {

@@ -9,35 +9,35 @@ import net.rubygrapefruit.parse.general.MatchedInputParser
 /**
  * Returns a parser that matches a single byte and produces the matched byte as a result.
  */
-fun one(): Parser<ByteInput, Byte> {
+fun one(): Parser<BinaryInput, Byte> {
     return OneByteParser
 }
 
 /**
  * Returns a parser that matches the given sequence of bytes. Does not produce a result.
  */
-fun literal(bytes: ByteArray): Parser<ByteInput, Unit> {
+fun literal(bytes: ByteArray): Parser<BinaryInput, Unit> {
     return ByteLiteralParser(bytes, Unit)
 }
 
 /**
  * Returns a parser that matches the given sequence of bytes and produces the given result.
  */
-fun <OUT> literal(bytes: ByteArray, result: OUT): Parser<ByteInput, OUT> {
+fun <OUT> literal(bytes: ByteArray, result: OUT): Parser<BinaryInput, OUT> {
     return ByteLiteralParser(bytes, result)
 }
 
 /**
  * Returns a parser that matches one of the given bytes and produces the matched byte as a result.
  */
-fun oneOf(first: Byte, second: Byte, vararg additional: Byte): Parser<ByteInput, Byte> {
+fun oneOf(first: Byte, second: Byte, vararg additional: Byte): Parser<BinaryInput, Byte> {
     return OneOfByteParser.of(listOf(first, second) + additional.toList())
 }
 
 /**
  * Returns a parser that matches one of the given bytes and produces the matched byte as a result.
  */
-fun oneOf(bytes: Collection<Byte>): Parser<ByteInput, Byte> {
+fun oneOf(bytes: Collection<Byte>): Parser<BinaryInput, Byte> {
     return OneOfByteParser.of(bytes)
 }
 
@@ -47,7 +47,7 @@ fun oneOf(bytes: Collection<Byte>): Parser<ByteInput, Byte> {
  * @param from inclusive
  * @param to inclusive
  */
-fun oneInRange(from: Byte, to: Byte): Parser<ByteInput, Byte> {
+fun oneInRange(from: Byte, to: Byte): Parser<BinaryInput, Byte> {
     return OneOfByteRangeParser(from, to)
 }
 
@@ -55,13 +55,13 @@ fun oneInRange(from: Byte, to: Byte): Parser<ByteInput, Byte> {
  * Returns a parser that matches any single byte except when the given parser succeeds.
  * Produces the matched byte as a result.
  */
-fun oneExcept(parser: Parser<ByteInput, *>): Parser<ByteInput, Byte> {
+fun oneExcept(parser: Parser<BinaryInput, *>): Parser<BinaryInput, Byte> {
     return sequence(not(parser), one())
 }
 
 /**
  * Returns a parser that applies the given parser and produces the input bytes that it matched.
  */
-fun match(parser: Parser<ByteInput, *>): Parser<ByteInput, ByteArray> {
+fun match(parser: Parser<BinaryInput, *>): Parser<BinaryInput, ByteArray> {
     return MatchedInputParser(discard(parser))
 }

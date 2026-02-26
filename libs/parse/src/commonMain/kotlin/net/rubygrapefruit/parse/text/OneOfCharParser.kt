@@ -4,7 +4,7 @@ import net.rubygrapefruit.parse.Expectation
 import net.rubygrapefruit.parse.Parser
 import net.rubygrapefruit.parse.SingleInputParser
 
-internal class OneOfCharParser private constructor(private val chars: CharArray) : Parser<CharInput, Char>, SingleInputParser<CharStream> {
+internal class OneOfCharParser private constructor(private val chars: CharArray) : Parser<TextInput, Char>, SingleInputParser<CharStream> {
     override val expectation = Expectation.oneOf(chars.map { Expectation.One(format(it)) })
 
     override fun toString(): String {

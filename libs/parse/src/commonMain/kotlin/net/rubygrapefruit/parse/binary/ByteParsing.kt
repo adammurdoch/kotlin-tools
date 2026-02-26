@@ -8,7 +8,7 @@ import net.rubygrapefruit.parse.start
 /**
  * Attempts to parse the given input. Fails when the parser cannot match the entire input.
  */
-fun <OUT> Parser<ByteInput, OUT>.parse(input: ByteArray): ParseResult<ByteFailureContext, OUT> {
+fun <OUT> Parser<BinaryInput, OUT>.parse(input: ByteArray): ParseResult<ByteFailureContext, OUT> {
     val parser = start<ByteStream, OUT>()
     return parse(parser, ArrayByteStream(input), ::failureFactory)
 }
@@ -17,7 +17,7 @@ fun <OUT> Parser<ByteInput, OUT>.parse(input: ByteArray): ParseResult<ByteFailur
  * Creates a [BytePushParser] that will attempt to match input as it becomes available.
  * Fails when the parser cannot match the entire input.
  */
-fun <OUT> Parser<ByteInput, OUT>.pushParser(): BytePushParser<OUT> {
+fun <OUT> Parser<BinaryInput, OUT>.pushParser(): BytePushParser<OUT> {
     val parser = start<ByteStream, OUT>()
     return DefaultBytePushParser(parser)
 }

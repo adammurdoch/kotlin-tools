@@ -4,11 +4,11 @@ import net.rubygrapefruit.parse.*
 
 internal class CharLiteralParser<OUT>(
     private val text: String, val result: OUT
-) : Parser<CharInput, OUT>, ParserBuilder<CharStream, OUT>, DiscardableParser<CharInput> {
+) : Parser<TextInput, OUT>, ParserBuilder<CharStream, OUT>, DiscardableParser<TextInput> {
     override val expectation = Expectation.One(format(text))
     private val provider = ValueProvider.of(result)
 
-    override fun withNoResult(): Parser<CharInput, Unit> {
+    override fun withNoResult(): Parser<TextInput, Unit> {
         return CharLiteralParser(text, Unit)
     }
 

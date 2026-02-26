@@ -65,7 +65,7 @@ class Parser {
 
         val boolean = oneOf(literal("true", true), literal("false", false))
 
-        val value = recursive<CharInput, Any>()
+        val value = recursive<TextInput, Any>()
 
         val arrayWhitespace = sequence(blankLines, optionalWhitespace)
         val arrayPrefix = sequence(literal("["), arrayWhitespace)

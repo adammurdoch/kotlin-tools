@@ -5,14 +5,14 @@ import net.rubygrapefruit.parse.*
 internal class ByteLiteralParser<OUT>(
     private val bytes: ByteArray,
     val result: OUT
-) : Parser<ByteInput, OUT>, ParserBuilder<ByteStream, OUT>, DiscardableParser<ByteInput> {
+) : Parser<BinaryInput, OUT>, ParserBuilder<ByteStream, OUT>, DiscardableParser<BinaryInput> {
     private val expectations = bytes.map { Expectation.One(format(it)) }
     private val provider = ValueProvider.of(result)
 
     override val expectation: Expectation
         get() = expectations.first()
 
-    override fun withNoResult(): Parser<ByteInput, Unit> {
+    override fun withNoResult(): Parser<BinaryInput, Unit> {
         return ByteLiteralParser(bytes, Unit)
     }
 

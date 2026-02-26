@@ -10,7 +10,7 @@ import net.rubygrapefruit.parse.text.*
 import kotlin.test.*
 
 abstract class AbstractParseTest {
-    fun Parser<CharInput, Unit>.matches(input: String, config: ParseFixture.() -> Unit = {}) {
+    fun Parser<TextInput, Unit>.matches(input: String, config: ParseFixture.() -> Unit = {}) {
         matches(input = input, expected = Unit, config = config)
     }
 
@@ -26,7 +26,7 @@ abstract class AbstractParseTest {
         compiledParser.expecting(fixture)
     }
 
-    fun <T> Parser<CharInput, T>.matches(input: String, expected: T, config: ParseFixture.() -> Unit = {}) {
+    fun <T> Parser<TextInput, T>.matches(input: String, expected: T, config: ParseFixture.() -> Unit = {}) {
         val fixture = DefaultParseFixture()
         fixture.config()
 
@@ -38,13 +38,13 @@ abstract class AbstractParseTest {
         }
     }
 
-    private fun <T> Parser<CharInput, T>.matchesString(fixture: DefaultParseFixture, input: String, expected: T) {
+    private fun <T> Parser<TextInput, T>.matchesString(fixture: DefaultParseFixture, input: String, expected: T) {
         fixture.debug("PARSE \"$input\"")
         val result = parse(input)
         result.assertIsSuccess(expected)
     }
 
-    private fun <T> Parser<CharInput, T>.matchesChunks(fixture: DefaultParseFixture, input: String, expected: T) {
+    private fun <T> Parser<TextInput, T>.matchesChunks(fixture: DefaultParseFixture, input: String, expected: T) {
         input.oneChunk {
             fixture.debug("PARSE ONE CHUNK")
             val result = pushParse(it)
@@ -64,7 +64,7 @@ abstract class AbstractParseTest {
         }
     }
 
-    fun Parser<CharInput, *>.doesNotMatch(input: String, config: CharParseFailureFixture.() -> Unit = {}) {
+    fun Parser<TextInput, *>.doesNotMatch(input: String, config: CharParseFailureFixture.() -> Unit = {}) {
         val fixture = DefaultCharParseFailureFixture()
         fixture.config()
 
@@ -76,13 +76,13 @@ abstract class AbstractParseTest {
         }
     }
 
-    private fun Parser<CharInput, *>.doesNotMatchString(input: String, fixture: DefaultCharParseFailureFixture) {
+    private fun Parser<TextInput, *>.doesNotMatchString(input: String, fixture: DefaultCharParseFailureFixture) {
         fixture.debug("PARSE \"$input\"")
         val result = parse(input)
         result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.lineText(input), fixture.message())
     }
 
-    private fun Parser<CharInput, *>.doesNotMatchChunks(input: String, fixture: DefaultCharParseFailureFixture) {
+    private fun Parser<TextInput, *>.doesNotMatchChunks(input: String, fixture: DefaultCharParseFailureFixture) {
         fixture.debug("PARSE \"$input\"")
         val result = parse(input)
         result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.lineText(input), fixture.message())
@@ -107,7 +107,7 @@ abstract class AbstractParseTest {
     }
 
     @JvmName("pushParseChars")
-    private fun <T> Parser<CharInput, T>.pushParse(chunks: List<CharArray>): ParseResult<CharFailureContext, T> {
+    private fun <T> Parser<TextInput, T>.pushParse(chunks: List<CharArray>): ParseResult<CharFailureContext, T> {
         val pushParser = pushParser()
         for (chunk in chunks) {
             pushParser.input(chunk)
@@ -132,7 +132,7 @@ abstract class AbstractParseTest {
     }
 
     @JvmName("expectingBytes")
-    fun <T> Parser<ByteInput, T>.expecting(config: CompiledParserFixture.() -> Unit) {
+    fun <T> Parser<BinaryInput, T>.expecting(config: CompiledParserFixture.() -> Unit) {
         val fixture = DefaultCompiledParserFixture()
         fixture.config()
 
@@ -140,19 +140,19 @@ abstract class AbstractParseTest {
         compiledParser.expecting(fixture)
     }
 
-    fun Parser<ByteInput, Unit>.matches(vararg input: Byte, config: ParseFixture.() -> Unit = {}) {
+    fun Parser<BinaryInput, Unit>.matches(vararg input: Byte, config: ParseFixture.() -> Unit = {}) {
         matches(input = input, expected = Unit, config = config)
     }
 
-    fun Parser<ByteInput, ByteArray>.matches(vararg input: Byte, expected: ByteArray, config: ParseFixture.() -> Unit = {}) {
+    fun Parser<BinaryInput, ByteArray>.matches(vararg input: Byte, expected: ByteArray, config: ParseFixture.() -> Unit = {}) {
         matches(input = input, expected = expected.toList(), config = config, normalize = { it.toList() })
     }
 
-    fun <T> Parser<ByteInput, T>.matches(vararg input: Byte, expected: T, config: ParseFixture.() -> Unit = {}) {
+    fun <T> Parser<BinaryInput, T>.matches(vararg input: Byte, expected: T, config: ParseFixture.() -> Unit = {}) {
         matches(input = input, expected = expected, config = config, normalize = { it })
     }
 
-    private fun <T, E> Parser<ByteInput, T>.matches(
+    private fun <T, E> Parser<BinaryInput, T>.matches(
         vararg input: Byte,
         expected: E,
         config: ParseFixture.() -> Unit,
@@ -169,7 +169,7 @@ abstract class AbstractParseTest {
         }
     }
 
-    private fun <T, E> Parser<ByteInput, T>.matchesArray(
+    private fun <T, E> Parser<BinaryInput, T>.matchesArray(
         vararg input: Byte,
         expected: E,
         fixture: DefaultParseFixture,
@@ -180,7 +180,7 @@ abstract class AbstractParseTest {
         result.assertIsSuccess(expected, normalize)
     }
 
-    private fun <T, E> Parser<ByteInput, T>.matchesChunks(
+    private fun <T, E> Parser<BinaryInput, T>.matchesChunks(
         vararg input: Byte,
         expected: E,
         fixture: DefaultParseFixture,
@@ -205,7 +205,7 @@ abstract class AbstractParseTest {
         }
     }
 
-    fun Parser<ByteInput, *>.doesNotMatch(vararg input: Byte, config: ByteParseFailureFixture.() -> Unit = {}) {
+    fun Parser<BinaryInput, *>.doesNotMatch(vararg input: Byte, config: ByteParseFailureFixture.() -> Unit = {}) {
         val fixture = DefaultByteParseFailureFixture()
         fixture.config()
 
@@ -217,13 +217,13 @@ abstract class AbstractParseTest {
         }
     }
 
-    private fun Parser<ByteInput, *>.doesNotMatchArray(fixture: DefaultByteParseFailureFixture, vararg input: Byte) {
+    private fun Parser<BinaryInput, *>.doesNotMatchArray(fixture: DefaultByteParseFailureFixture, vararg input: Byte) {
         fixture.debug("PARSE [${input.joinToString { format(it) }}]")
         val result = parse(input)
         result.assertIsFail(fixture.offset, fixture.message())
     }
 
-    private fun Parser<ByteInput, *>.doesNotMatchChunks(fixture: DefaultByteParseFailureFixture, vararg input: Byte) {
+    private fun Parser<BinaryInput, *>.doesNotMatchChunks(fixture: DefaultByteParseFailureFixture, vararg input: Byte) {
         fixture.debug("PARSE [${input.joinToString { format(it) }}]")
         val result = parse(input)
         result.assertIsFail(fixture.offset, fixture.message())
@@ -268,7 +268,7 @@ abstract class AbstractParseTest {
     }
 
     @JvmName("pushParseBytes")
-    private fun <T> Parser<ByteInput, T>.pushParse(chunks: List<ByteArray>): ParseResult<ByteFailureContext, T> {
+    private fun <T> Parser<BinaryInput, T>.pushParse(chunks: List<ByteArray>): ParseResult<ByteFailureContext, T> {
         val pushParser = pushParser()
         for (chunk in chunks) {
             pushParser.input(chunk)

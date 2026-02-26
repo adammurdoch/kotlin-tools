@@ -6,7 +6,6 @@ import net.rubygrapefruit.parse.text.parse
 import net.rubygrapefruit.parse.text.pushParser
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertIs
 
 class ConsumeTest : AbstractParseTest() {
     @Test

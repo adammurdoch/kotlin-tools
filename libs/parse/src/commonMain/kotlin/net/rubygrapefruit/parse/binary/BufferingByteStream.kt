@@ -23,7 +23,11 @@ internal class BufferingByteStream : AdvancingByteStream {
     }
 
     fun append(bytes: ByteArray) {
-        tail = tail.append(bytes)
+        tail = tail.append(bytes, 0, bytes.size)
+    }
+
+    fun append(bytes: ByteArray, offset: Int, count: Int) {
+        tail = tail.append(bytes, offset, count)
     }
 
     override fun advance(count: Int) {
@@ -73,11 +77,11 @@ internal class BufferingByteStream : AdvancingByteStream {
             }
         }
 
-        fun append(bytes: ByteArray): Buffer {
+        fun append(bytes: ByteArray, offset: Int, count: Int): Buffer {
             val available = content.size - writeIndex
-            return if (bytes.size <= available) {
-                bytes.copyInto(content, writeIndex, 0, bytes.size)
-                writeIndex += bytes.size
+            return if (count <= available) {
+                bytes.copyInto(content, writeIndex, offset, offset + count)
+                writeIndex += count
                 this
             } else {
                 TODO()

@@ -6,5 +6,12 @@ interface BytePushParser<OUT> : PushParser<ByteFailureContext, OUT> {
     /**
      * Signals that more input is available.
      */
-    fun input(bytes: ByteArray)
+    fun input(bytes: ByteArray) {
+        input(bytes, 0, bytes.size)
+    }
+
+    /**
+     * Signals that more input is available.
+     */
+    fun input(bytes: ByteArray, offset: Int, count: Int)
 }

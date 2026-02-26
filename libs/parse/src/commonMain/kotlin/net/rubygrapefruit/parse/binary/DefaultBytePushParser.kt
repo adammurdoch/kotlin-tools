@@ -7,11 +7,11 @@ import net.rubygrapefruit.parse.PullParser
 internal class DefaultBytePushParser<OUT>(parser: PullParser<ByteStream, OUT>) : DefaultPushParser<ByteFailureContext, AdvancingByteStream, OUT>(parser), BytePushParser<OUT> {
     private val input = BufferingByteStream()
 
-    override fun input(bytes: ByteArray) {
-        if (bytes.isEmpty()) {
+    override fun input(bytes: ByteArray, offset: Int, count: Int) {
+        if (count == 0) {
             return
         }
-        input.append(bytes)
+        input.append(bytes, offset, count)
         inputAvailable(input)
     }
 

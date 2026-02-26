@@ -289,7 +289,11 @@ abstract class AbstractParseTest {
         assertEquals(fixture.message(), failure.expected.expectation().format())
     }
 
-    private fun <T> ParseResult<*, T>.assertIsSuccess(expected: T) {
+    protected fun ParseResult<*, Unit>.assertIsSuccess() {
+        assertIsSuccess(Unit) { it }
+    }
+
+    protected fun <T> ParseResult<*, T>.assertIsSuccess(expected: T) {
         assertIsSuccess(expected) { it }
     }
 

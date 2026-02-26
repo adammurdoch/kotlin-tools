@@ -31,7 +31,7 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
     }
 
     fun append(chars: CharArray, offset: Int, count: Int) {
-        tail = tail.append(chars, offset, count)
+        tail = tail.append(chars, offset, offset + count)
     }
 
     override fun advance(count: Int) {

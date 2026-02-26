@@ -27,7 +27,9 @@ Performance
 
 Features
 - Push parse indicates that parsing has already failed, prior to end of input being received
-- Parse file or input stream
+- Parse input stream
+- Parse kotlinx-io Source
+- Parser file-io files
 - Match location/region
 - Semantic errors
 - Android and iOS

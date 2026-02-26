@@ -23,12 +23,12 @@ class ConsumeTest : AbstractParseTest() {
         }
 
         val result = parser.parse("abc")
-        assertIs<ParseResult.Success<*>>(result)
+        result.assertIsSuccess()
         assertEquals(1, counter)
     }
 
     @Test
-    fun `calls function when matching input becomes available`() {
+    fun `calls function eagerly when matching input becomes available`() {
         var counter = 0
         val parser = consume(literal("abc", 1)) {
             counter++
@@ -42,7 +42,7 @@ class ConsumeTest : AbstractParseTest() {
         assertEquals(1, counter)
 
         val result = pushParser.endOfInput()
-        assertIs<ParseResult.Success<*>>(result)
+        result.assertIsSuccess()
         assertEquals(1, counter)
     }
 }

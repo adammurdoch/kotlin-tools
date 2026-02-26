@@ -30,5 +30,6 @@ Features
 - Parse file or input stream
 - Match location/region
 - Semantic errors
+- Android and iOS
 - Sync on parse failure
 - Left recursion

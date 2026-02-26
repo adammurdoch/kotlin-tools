@@ -1,15 +1,17 @@
 # Parser
 
-A parser combinator library for Kotlin multi-platform.
+A Kotlin multi-platform library for parsing text and binary files and streams.
 
 ## Features
 
-- Parses text or binary input
+- Parse text or binary inputs
 - Push parsing, allows the content of a stream to be parsed as it becomes available
-- Provides a library of parsers that can be composed to produce higher level parser
+- Provides a library of parsers that can be composed to produce higher level parsers
 - Good quality diagnostics
-- Good performance is a goal
-- Targets JVM (Java 17+), macOS, Linux, Windows and the browser
+- Good performance
+- Targets JVM (Java 17+), macOS, Linux, Windows and JavaScript on the browser
+
+The implementation is a bottom-up parser, meaning that grammars can be deeply nested without exhausting the stack.
 
 ## Usage
 
@@ -39,7 +41,7 @@ Parsers that operate on text input:
 Text combinators:
 
 - oneExcept(parser) - produces matched input char
-- match(parser) - produces matched input
+- match(parser) - produces matched input as a string
 
 ## Binary parsers
 
@@ -55,7 +57,8 @@ Parsers that operate on binary input:
 
 Binary combinators:
 
-- match(parser) - produces matched input
+- oneExcept(parser) - produces matched input char
+- match(parser) - produces matched input as a byte array
 
 ## General parsers
 

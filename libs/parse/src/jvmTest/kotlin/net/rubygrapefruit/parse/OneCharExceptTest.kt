@@ -18,7 +18,7 @@ class OneCharExceptTest : AbstractParseTest() {
             }
         }
 
-        parser.matches("a", 'a')
+        parser.matches("a", expected = 'a')
 
         // missing
         parser.doesNotMatch("") {

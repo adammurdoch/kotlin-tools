@@ -9,6 +9,8 @@ import net.rubygrapefruit.parse.PushParser
 interface TextPushParser<OUT> : PushParser<TextFailureContext, OUT> {
     /**
      * Signals that more input is available.
+     *
+     * If the parsing has failed, returns the failure.
      */
     fun input(chars: CharArray): ParseResult.Fail<TextFailureContext>? {
         return input(chars, 0, chars.size)
@@ -16,6 +18,8 @@ interface TextPushParser<OUT> : PushParser<TextFailureContext, OUT> {
 
     /**
      * Signals that more input is available.
+     *
+     * If the parsing has failed, returns the failure.
      */
     fun input(chars: CharArray, offset: Int, count: Int): ParseResult.Fail<TextFailureContext>?
 }

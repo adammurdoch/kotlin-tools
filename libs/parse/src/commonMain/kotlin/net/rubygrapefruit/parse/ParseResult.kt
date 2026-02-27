@@ -19,7 +19,7 @@ sealed interface ParseResult<out CONTEXT, out OUT> {
     /**
      * Parsing failed with the given failure.
      */
-    class Fail<CONTEXT> internal constructor(val context: CONTEXT, val message: String, val formatter: (CONTEXT, String) -> String) : ParseResult<CONTEXT, Nothing> {
+    class Fail<CONTEXT> internal constructor(val context: CONTEXT, val message: String, private val formatter: (CONTEXT, String) -> String) : ParseResult<CONTEXT, Nothing> {
         override fun get(): Nothing {
             throw ParseException(formatter(context, message))
         }

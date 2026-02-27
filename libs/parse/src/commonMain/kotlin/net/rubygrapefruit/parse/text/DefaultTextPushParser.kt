@@ -4,20 +4,23 @@ import net.rubygrapefruit.parse.DefaultPushParser
 import net.rubygrapefruit.parse.ParseResult
 import net.rubygrapefruit.parse.PullParser
 
-internal class DefaultTextPushParser<OUT>(parser: PullParser<CharStream, OUT>) : DefaultPushParser<TextFailureContext, AdvancingCharStream, OUT>(parser), TextPushParser<OUT> {
+internal class DefaultTextPushParser<OUT>(
+    parser: PullParser<CharStream, OUT>,
+    failureFormatter: (TextFailureContext, String) -> String
+) : DefaultPushParser<TextFailureContext, AdvancingCharStream, OUT>(parser, failureFormatter), TextPushParser<OUT> {
     private val input = BufferingCharStream()
 
     override fun input(chars: CharArray, offset: Int, count: Int): ParseResult.Fail<TextFailureContext>? {
         if (count == 0) {
-            return null
+            return maybeFailed()
         }
 
         input.append(chars, offset, count)
-        return inputAvailable(input, ::failureFactory)
+        return inputAvailable(input)
     }
 
     override fun endOfInput(): ParseResult<TextFailureContext, OUT> {
         input.end()
-        return endOfInput(input, ::failureFactory)
+        return endOfInput(input)
     }
 }

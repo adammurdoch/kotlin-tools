@@ -19,23 +19,21 @@ fun <OUT> Parser<TextInput, OUT>.parse(input: String): ParseResult<TextFailureCo
  */
 fun <OUT> Parser<TextInput, OUT>.pushParser(): TextPushParser<OUT> {
     val parser = start<CharStream, OUT>()
-    return DefaultTextPushParser(parser)
+    return DefaultTextPushParser(parser, ::failureFactory)
 }
 
-internal fun failureFactory(input: AdvancingCharStream, index: Int, message: String): ParseResult.Fail<TextFailureContext> {
-    return ParseResult.Fail(input.contextAt(index), message) { context, message ->
-        val builder = StringBuilder()
-        val formattedLine = context.position.line.toString()
-        builder.append(formattedLine)
-        builder.append(" | ")
-        builder.append(context.lineText)
-        builder.append('\n')
-        repeat(formattedLine.length + 2 + context.position.col) {
-            builder.append(' ')
-        }
-        builder.append('^')
-        builder.append('\n')
-        builder.append(message)
-        builder.toString()
+private fun failureFactory(context: TextFailureContext, message: String): String {
+    val builder = StringBuilder()
+    val formattedLine = context.position.line.toString()
+    builder.append(formattedLine)
+    builder.append(" | ")
+    builder.append(context.lineText)
+    builder.append('\n')
+    repeat(formattedLine.length + 2 + context.position.col) {
+        builder.append(' ')
     }
+    builder.append('^')
+    builder.append('\n')
+    builder.append(message)
+    return builder.toString()
 }

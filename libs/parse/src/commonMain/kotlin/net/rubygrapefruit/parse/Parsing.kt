@@ -6,13 +6,13 @@ import net.rubygrapefruit.parse.combinators.suffixed
 import net.rubygrapefruit.parse.general.SingleInputCompiledParser
 import net.rubygrapefruit.parse.general.endOfInput
 
-internal fun <CONTEXT, IN : AdvancingInput<*>, OUT> parse(
+internal fun <CONTEXT, IN : ContextualInput<CONTEXT, *>, OUT> parse(
     parser: PullParser<IN, OUT>,
     input: IN,
-    failureFactory: (IN, Int, String) -> ParseResult.Fail<CONTEXT>
+    failureFormatter: (CONTEXT, String) -> String
 ): ParseResult<CONTEXT, OUT> {
-    val parser = DefaultPushParser<CONTEXT, IN, OUT>(parser)
-    return parser.endOfInput(input, failureFactory)
+    val parser = DefaultPushParser(parser, failureFormatter)
+    return parser.endOfInput(input)
 }
 
 internal fun Expectation.format(): String {

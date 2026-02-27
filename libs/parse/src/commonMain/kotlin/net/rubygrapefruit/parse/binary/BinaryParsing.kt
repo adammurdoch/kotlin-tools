@@ -10,7 +10,7 @@ import net.rubygrapefruit.parse.start
  */
 fun <OUT> Parser<BinaryInput, OUT>.parse(input: ByteArray): ParseResult<BinaryFailureContext, OUT> {
     val parser = start<ByteStream, OUT>()
-    return parse(parser, ArrayByteStream(input), ::failureFactory)
+    return parse(parser, ArrayByteStream(input), ::failureFormatter)
 }
 
 /**
@@ -19,9 +19,9 @@ fun <OUT> Parser<BinaryInput, OUT>.parse(input: ByteArray): ParseResult<BinaryFa
  */
 fun <OUT> Parser<BinaryInput, OUT>.pushParser(): BinaryPushParser<OUT> {
     val parser = start<ByteStream, OUT>()
-    return DefaultBinaryPushParser(parser)
+    return DefaultBinaryPushParser(parser, ::failureFormatter)
 }
 
-internal fun failureFactory(input: AdvancingByteStream, index: Int, message: String): ParseResult.Fail<BinaryFailureContext> {
-    return ParseResult.Fail(input.contextAt(index), message) { context, message -> "Offset: ${context.position.offset}: $message" }
+private fun failureFormatter(context: BinaryFailureContext, message: String): String {
+    return "Offset: ${context.position.offset}: $message"
 }

@@ -1,10 +1,8 @@
 package net.rubygrapefruit.parse.text
 
-import net.rubygrapefruit.parse.AdvancingInput
+import net.rubygrapefruit.parse.ContextualInput
 
-internal interface AdvancingCharStream : CharStream, AdvancingInput<CharPosition> {
-    fun contextAt(index: Int): TextFailureContext
-
+internal interface AdvancingCharStream : CharStream, ContextualInput<TextFailureContext, CharPosition> {
     class TextStreamContext(override val position: CharPosition, override val lineText: String) : TextFailureContext {
         override fun toString(): String {
             return "{context offset=${position.offset}}"

@@ -11,7 +11,7 @@ import kotlin.test.assertNull
 
 class TextPushParserTest : AbstractParseTest() {
     @Test
-    fun `can parse empty stream`() {
+    fun `can signal end of input without supplying any input`() {
         val parser = succeed(1)
 
         val pushParser = parser.pushParser()
@@ -21,7 +21,7 @@ class TextPushParserTest : AbstractParseTest() {
     }
 
     @Test
-    fun `returns failure on end of input when empty stream provided`() {
+    fun `returns failure on end of input when no input supplied`() {
         val parser = literal("abc", 1)
 
         val pushParser = parser.pushParser()
@@ -46,11 +46,30 @@ class TextPushParserTest : AbstractParseTest() {
 
         val pushParser = parser.pushParser()
 
-        val result = pushParser.input("a,".toCharArray())
-        assertNull(result)
+        val result1 = pushParser.input("a,".toCharArray())
+        assertNull(result1)
 
         val result2 = pushParser.endOfInput()
         assertIs<ParseResult.Fail<*>>(result2)
+    }
+
+    @Test
+    fun `can continue to supply input after parse failure`() {
+        val parser = zeroOrMore(literal("a", 1), separator = literal(","))
+
+        val pushParser = parser.pushParser()
+
+        val result1 = pushParser.input("a,X".toCharArray())
+        assertIs<ParseResult.Fail<*>>(result1)
+
+        val result2 = pushParser.input("XX".toCharArray())
+        assertIs<ParseResult.Fail<*>>(result2)
+
+        val result3 = pushParser.input(CharArray(0))
+        assertIs<ParseResult.Fail<*>>(result3)
+
+        val result4 = pushParser.endOfInput()
+        assertIs<ParseResult.Fail<*>>(result4)
     }
 
     @Test
@@ -64,16 +83,16 @@ class TextPushParserTest : AbstractParseTest() {
         buffer[6] = ','
         buffer[7] = 'b'
 
-        val r1 = pushParser.input(buffer, 5, 3)
-        assertNull(r1)
+        val result1 = pushParser.input(buffer, 5, 3)
+        assertNull(result1)
 
         buffer[0] = ','
         buffer[1] = 'c'
 
-        val r2 = pushParser.input(buffer, 0, 2)
-        assertNull(r2)
+        val result2 = pushParser.input(buffer, 0, 2)
+        assertNull(result2)
 
-        val result = pushParser.endOfInput()
-        result.assertIsSuccess(listOf('a', 'b', 'c'))
+        val result3 = pushParser.endOfInput()
+        result3.assertIsSuccess(listOf('a', 'b', 'c'))
     }
 }

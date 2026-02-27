@@ -1,27 +1,32 @@
 package net.rubygrapefruit.parse
 
-internal open class DefaultPushParser<CONTEXT, IN : AdvancingInput<*>, OUT>(
-    parser: PullParser<IN, OUT>
+internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>, OUT>(
+    parser: PullParser<IN, OUT>,
+    private val failureFormatter: (CONTEXT, String) -> String
 ) {
     private var state: ParseState<IN, OUT> = parser
     private var failedChoice: ExpectationProvider? = null
     private var failedChoiceIndex = 0
+    private var failure: ParseResult.Fail<CONTEXT>? = null
 
-    fun inputAvailable(input: IN, failureFactory: (IN, Int, String) -> ParseResult.Fail<CONTEXT>): ParseResult.Fail<CONTEXT>? {
+    fun inputAvailable(input: IN): ParseResult.Fail<CONTEXT>? {
         while (true) {
             val currentState = state
             when (currentState) {
                 is PullParser.Matched -> return null
-                is PullParser.Failed -> return toFail(input, currentState, failureFactory)
+                is PullParser.Failed -> return failure!!
+
                 is PullParser -> {
                     val result = currentState.parse(input, input.available)
                     when (result) {
                         is PullParser.Failed -> {
-                            state = if (failedChoice != null) {
+                            val effectiveFailure = if (failedChoice != null) {
                                 PullParser.Failed.merged(listOf(PullParser.Failed(failedChoiceIndex, failedChoice!!), result))
                             } else {
                                 result
                             }
+                            failure = mapFailed(input, effectiveFailure)
+                            state = effectiveFailure
                         }
 
                         is PullParser.Matched -> state = result
@@ -48,18 +53,23 @@ internal open class DefaultPushParser<CONTEXT, IN : AdvancingInput<*>, OUT>(
         }
     }
 
-    fun endOfInput(input: IN, failureFactory: (IN, Int, String) -> ParseResult.Fail<CONTEXT>): ParseResult<CONTEXT, OUT> {
-        inputAvailable(input, failureFactory)
+    fun endOfInput(input: IN): ParseResult<CONTEXT, OUT> {
+        inputAvailable(input)
 
         val result = state
         return when (result) {
             is PullParser.Matched -> ParseResult.Success(result.value)
-            is PullParser.Failed -> toFail(input, result, failureFactory)
+            is PullParser.Failed -> failure!!
             is PullParser -> throw IllegalStateException("Expected parsing to be finished, but is $result")
         }
     }
 
-    private fun toFail(input: IN, result: PullParser.Failed, failureFactory: (IN, Int, String) -> ParseResult.Fail<CONTEXT>): ParseResult.Fail<CONTEXT> {
-        return failureFactory(input, result.index, result.expected.expectation().format())
+    fun maybeFailed(): ParseResult.Fail<CONTEXT>? {
+        return failure
+    }
+
+    private fun mapFailed(input: IN, result: PullParser.Failed): ParseResult.Fail<CONTEXT> {
+        val context = input.contextAt(result.index)
+        return ParseResult.Fail(context, result.expected.expectation().format(), failureFormatter)
     }
 }

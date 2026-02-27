@@ -1,9 +1,9 @@
 package net.rubygrapefruit.parse.binary
 
-import net.rubygrapefruit.parse.AdvancingInput
+import net.rubygrapefruit.parse.ContextualInput
 
-internal interface AdvancingByteStream : ByteStream, AdvancingInput<BytePosition> {
-    fun contextAt(index: Int): BinaryFailureContext {
+internal interface AdvancingByteStream : ByteStream, ContextualInput<BinaryFailureContext, BytePosition> {
+    override fun contextAt(index: Int): BinaryFailureContext {
         return BinaryStreamContext(posAt(index))
     }
 

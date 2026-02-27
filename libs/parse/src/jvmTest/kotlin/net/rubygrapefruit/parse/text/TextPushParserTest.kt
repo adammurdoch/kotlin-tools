@@ -1,13 +1,13 @@
 package net.rubygrapefruit.parse.text
 
 import net.rubygrapefruit.parse.AbstractParseTest
-import net.rubygrapefruit.parse.ParseResult
 import net.rubygrapefruit.parse.combinators.oneOrMore
 import net.rubygrapefruit.parse.combinators.zeroOrMore
 import net.rubygrapefruit.parse.general.succeed
 import kotlin.test.Test
-import kotlin.test.assertIs
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertSame
 
 class TextPushParserTest : AbstractParseTest() {
     @Test
@@ -27,7 +27,9 @@ class TextPushParserTest : AbstractParseTest() {
         val pushParser = parser.pushParser()
 
         val result = pushParser.endOfInput()
-        assertIs<ParseResult.Fail<*>>(result)
+        result.assertIsFail {
+            expectLiteral("abc")
+        }
     }
 
     @Test
@@ -37,7 +39,11 @@ class TextPushParserTest : AbstractParseTest() {
         val pushParser = parser.pushParser()
 
         val result = pushParser.input("a,X\n".toCharArray())
-        assertIs<ParseResult.Fail<*>>(result)
+        result.assertIsFail {
+            failAt(2)
+            expectLiteral("a")
+            expectContext("a,X", "")
+        }
     }
 
     @Test
@@ -50,7 +56,11 @@ class TextPushParserTest : AbstractParseTest() {
         assertNull(result1)
 
         val result2 = pushParser.input("X\n".toCharArray())
-        assertIs<ParseResult.Fail<*>>(result2)
+        result2.assertIsFail {
+            failAt(2)
+            expectLiteral("a")
+            expectContext("a,X", "X")
+        }
     }
 
     @Test
@@ -63,7 +73,11 @@ class TextPushParserTest : AbstractParseTest() {
         assertNull(result1)
 
         val result2 = pushParser.endOfInput()
-        assertIs<ParseResult.Fail<*>>(result2)
+        result2.assertIsFail {
+            failAt(2)
+            expectLiteral("a")
+            expectContext("a,", "")
+        }
     }
 
     @Test
@@ -73,17 +87,22 @@ class TextPushParserTest : AbstractParseTest() {
         val pushParser = parser.pushParser()
 
         val result1 = pushParser.input("a,X\n".toCharArray())
-        assertIs<ParseResult.Fail<*>>(result1)
+        assertNotNull(result1)
+        result1.assertIsFail {
+            failAt(2)
+            expectLiteral("a")
+            expectContext("a,X", "")
+        }
 
         val result2 = pushParser.input("XX".toCharArray())
-        assertIs<ParseResult.Fail<*>>(result2)
+        assertSame(result1, result2)
 
         // empty
         val result3 = pushParser.input(CharArray(0))
-        assertIs<ParseResult.Fail<*>>(result3)
+        assertSame(result1, result3)
 
         val result4 = pushParser.endOfInput()
-        assertIs<ParseResult.Fail<*>>(result4)
+        assertSame(result1, result4)
     }
 
     @Test

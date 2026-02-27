@@ -310,6 +310,15 @@ abstract class AbstractParseTest {
         }
     }
 
+    protected fun ParseResult<TextFailureContext, *>?.assertIsFail(config: CharParseFailureFixture.() -> Unit) {
+        assertNotNull(this)
+
+        val fixture = DefaultCharParseFailureFixture()
+        fixture.config()
+
+        assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.lineText(""), fixture.message())
+    }
+
     private fun ParseResult<TextFailureContext, *>.assertIsFail(offset: Int, line: Int, col: Int, failureLine: String, message: String) {
         when (this) {
             is ParseResult.Success -> fail("Expected parse failure at offset $offset with message: $message")

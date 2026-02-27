@@ -223,30 +223,30 @@ abstract class AbstractParseTest {
     private fun Parser<BinaryInput, *>.doesNotMatchArray(fixture: DefaultBinaryParseFailureFixture, vararg input: Byte) {
         fixture.debug("PARSE [${input.joinToString { format(it) }}]")
         val result = parse(input)
-        result.assertIsFail(fixture.offset, fixture.message())
+        result.assertIsFail(fixture.offset, fixture.failureContext(input), fixture.message())
     }
 
     private fun Parser<BinaryInput, *>.doesNotMatchChunks(fixture: DefaultBinaryParseFailureFixture, vararg input: Byte) {
         fixture.debug("PARSE [${input.joinToString { format(it) }}]")
         val result = parse(input)
-        result.assertIsFail(fixture.offset, fixture.message())
+        result.assertIsFail(fixture.offset, fixture.failureContext(input), fixture.message())
 
         input.oneChunk {
             fixture.debug("PARSE ONE CHUNK")
             val result = pushParse(it)
-            result.assertIsFail(fixture.offset, fixture.message())
+            result.assertIsFail(fixture.offset, fixture.failureContext(input), fixture.message())
         }
 
         input.chunkPerByte {
             fixture.debug("PARSE CHUNK PER BYTE")
             val result = pushParse(it)
-            result.assertIsFail(fixture.offset, fixture.message())
+            result.assertIsFail(fixture.offset, fixture.failureContext(input), fixture.message())
         }
 
         input.maybeTwoChunks {
             fixture.debug("PARSE TWO CHUNKS")
             val result = pushParse(it)
-            result.assertIsFail(fixture.offset, fixture.message())
+            result.assertIsFail(fixture.offset, fixture.failureContext(input), fixture.message())
         }
     }
 
@@ -349,20 +349,21 @@ abstract class AbstractParseTest {
         val fixture = DefaultBinaryParseFailureFixture()
         fixture.config()
 
-        assertIsFail(fixture.offset, fixture.message())
+        assertIsFail(fixture.offset, fixture.failureContext(byteArrayOf()), fixture.message())
     }
 
-    private fun ParseResult<BinaryFailureContext, *>.assertIsFail(offset: Int, message: String) {
+    private fun ParseResult<BinaryFailureContext, *>.assertIsFail(offset: Int, failureContext: String, message: String) {
         when (this) {
             is ParseResult.Success -> fail("Expected parse failure at offset $offset with message: $message")
             is ParseResult.Fail -> {
                 assertEquals(message, this.message)
                 assertEquals(offset, context.position.offset, "unexpected offset for failure $message")
+                assertEquals(failureContext, context.found)
 
                 try {
                     get()
                 } catch (e: ParseException) {
-                    assertEquals("Offset: $offset: $message", e.message)
+                    assertEquals("Offset: $offset: $message, found: $failureContext", e.message)
                 }
             }
         }
@@ -1131,10 +1132,13 @@ abstract class AbstractParseTest {
         fun expectLiteral(byte: Byte)
 
         fun expectOneInRange(from: Byte, to: Byte)
+
+        fun expectContext(context: String)
     }
 
     private class DefaultBinaryParseFailureFixture : DefaultParseFailureFixture(), BinaryParseFailureFixture {
         var offset = 0
+        private var context: String? = null
 
         override fun expectLiteral(byte: Byte) {
             expect.expectLiteral(byte)
@@ -1147,6 +1151,19 @@ abstract class AbstractParseTest {
         override fun failAt(offset: Int) {
             this.offset = offset
         }
-    }
 
+        override fun expectContext(context: String) {
+            this.context = context
+        }
+
+        fun failureContext(input: ByteArray): String {
+            return if (context != null) {
+                context!!
+            } else if (offset >= input.size) {
+                "end of input"
+            } else {
+                format(input[offset])
+            }
+        }
+    }
 }

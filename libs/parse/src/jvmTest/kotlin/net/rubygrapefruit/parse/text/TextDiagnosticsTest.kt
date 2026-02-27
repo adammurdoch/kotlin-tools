@@ -1,10 +1,9 @@
-package net.rubygrapefruit.parse
+package net.rubygrapefruit.parse.text
 
+import net.rubygrapefruit.parse.AbstractParseTest
 import net.rubygrapefruit.parse.combinators.prefixed
 import net.rubygrapefruit.parse.combinators.sequence
 import net.rubygrapefruit.parse.combinators.zeroOrMore
-import net.rubygrapefruit.parse.text.literal
-import net.rubygrapefruit.parse.text.oneOf
 import kotlin.test.Test
 
 class TextDiagnosticsTest : AbstractParseTest() {

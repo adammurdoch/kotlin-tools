@@ -43,6 +43,7 @@ class BinaryPushParserTest : AbstractParseTest() {
         result.assertIsFail {
             failAt(2)
             expectLiteral(0x1)
+            expectContext("x03")
         }
     }
 
@@ -73,6 +74,7 @@ class BinaryPushParserTest : AbstractParseTest() {
         result1.assertIsFail {
             failAt(2)
             expectLiteral(0x1)
+            expectContext("x03")
         }
 
         val result2 = pushParser.input(byteArrayOf(0, 0))

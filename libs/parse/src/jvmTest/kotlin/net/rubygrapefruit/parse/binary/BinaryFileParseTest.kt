@@ -30,6 +30,7 @@ class BinaryFileParseTest : AbstractFileParseTest() {
             failAt(2)
             expectOneInRange(0x1, 0x10)
             expectEndOfInput()
+            expectContext("x0")
         }
     }
 }

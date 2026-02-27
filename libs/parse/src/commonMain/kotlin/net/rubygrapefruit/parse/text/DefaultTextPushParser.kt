@@ -7,13 +7,13 @@ import net.rubygrapefruit.parse.PullParser
 internal class DefaultTextPushParser<OUT>(parser: PullParser<CharStream, OUT>) : DefaultPushParser<TextFailureContext, AdvancingCharStream, OUT>(parser), TextPushParser<OUT> {
     private val input = BufferingCharStream()
 
-    override fun input(chars: CharArray, offset: Int, count: Int) {
+    override fun input(chars: CharArray, offset: Int, count: Int): ParseResult.Fail<TextFailureContext>? {
         if (count == 0) {
-            return
+            return null
         }
 
         input.append(chars, offset, count)
-        inputAvailable(input)
+        return inputAvailable(input, ::failureFactory)
     }
 
     override fun endOfInput(): ParseResult<TextFailureContext, OUT> {

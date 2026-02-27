@@ -12,7 +12,7 @@ internal class DefaultBinaryPushParser<OUT>(parser: PullParser<ByteStream, OUT>)
             return
         }
         input.append(bytes, offset, count)
-        inputAvailable(input)
+        inputAvailable(input, ::failureFactory)
     }
 
     override fun endOfInput(): ParseResult<BinaryFailureContext, OUT> {

@@ -110,7 +110,10 @@ abstract class AbstractParseTest {
     private fun <T> Parser<TextInput, T>.pushParse(chunks: List<CharArray>): ParseResult<TextFailureContext, T> {
         val pushParser = pushParser()
         for (chunk in chunks) {
-            pushParser.input(chunk)
+            val failure = pushParser.input(chunk)
+            if (failure != null) {
+                return failure
+            }
         }
         return pushParser.endOfInput()
     }

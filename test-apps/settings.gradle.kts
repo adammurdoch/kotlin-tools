@@ -102,6 +102,10 @@ samples {
         expectedOutput("key-1 = value 1")
         deriveNative("parse-toml-native-cli-app")
     }
+    jvmCliApp("parse-exe-jvm-cli-app") {
+        cliArgs("--help")
+        deriveNative("parse-exe-native-cli-app")
+    }
 
     jvmCliApp("cli-args-parameters") { cliArgs("--help") }
     jvmCliApp("cli-args-options") { cliArgs("--help") }

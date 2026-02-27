@@ -7,7 +7,7 @@ application {
     common {
         implementation("net.rubygrapefruit:cli-app:1.0")
         implementation("net.rubygrapefruit:file-io:1.0")
-        implementation(project(":parse-kmp-lib"))
+        implementation("net.rubygrapefruit:parse:1.0")
         implementation(project(":kmp-lib-render"))
     }
 }

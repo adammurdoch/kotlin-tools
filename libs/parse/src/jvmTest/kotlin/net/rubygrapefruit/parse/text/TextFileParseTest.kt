@@ -17,4 +17,20 @@ class TextFileParseTest : AbstractFileParseTest() {
         val result = parser.parse(file.file(), Charsets.UTF_8)
         result.assertIsSuccess(3)
     }
+
+    @Test
+    fun `reports parse failure`() {
+        val file = fixture.file("text.txt")
+        file.writeText("abX\nc")
+
+        val parser = map(zeroOrMore(oneInRange('a'..'z'))) { it.size }
+
+        val result = parser.parse(file.file(), Charsets.UTF_8)
+        result.assertIsFail {
+            failAt(2)
+            expectOneInRange('a', 'z')
+            expectEndOfInput()
+            expectContext("abX", "")
+        }
+    }
 }

@@ -76,7 +76,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v5
       - name: Execute Gradle build
         run: ./gradlew build --continue --stacktrace
-        timeout-minutes: 30
+        timeout-minutes: 45
   macos-samples:
     runs-on: macos-latest
     steps:

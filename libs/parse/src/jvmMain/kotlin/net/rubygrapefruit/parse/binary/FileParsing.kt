@@ -10,13 +10,16 @@ import java.io.File
 fun <OUT> Parser<BinaryInput, OUT>.parse(file: File): ParseResult<BinaryFailureContext, OUT> {
     return file.inputStream().use { inputStream ->
         val parser = pushParser()
-        val buffer = ByteArray(1024)
+        val buffer = ByteArray(16 * 1024)
         while (true) {
             val nread = inputStream.read(buffer)
             if (nread < 0) {
                 break
             }
-            parser.input(buffer, 0, nread)
+            val failure = parser.input(buffer, 0, nread)
+            if (failure != null) {
+                return failure
+            }
         }
         parser.endOfInput()
     }

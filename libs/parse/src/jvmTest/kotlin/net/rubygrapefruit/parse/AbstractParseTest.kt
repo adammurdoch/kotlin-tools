@@ -64,8 +64,8 @@ abstract class AbstractParseTest {
         }
     }
 
-    fun Parser<TextInput, *>.doesNotMatch(input: String, config: CharParseFailureFixture.() -> Unit = {}) {
-        val fixture = DefaultCharParseFailureFixture()
+    fun Parser<TextInput, *>.doesNotMatch(input: String, config: TextParseFailureFixture.() -> Unit = {}) {
+        val fixture = DefaultTextParseFailureFixture()
         fixture.config()
 
         fixture.tracing(this, fixture.steps) {
@@ -76,13 +76,13 @@ abstract class AbstractParseTest {
         }
     }
 
-    private fun Parser<TextInput, *>.doesNotMatchString(input: String, fixture: DefaultCharParseFailureFixture) {
+    private fun Parser<TextInput, *>.doesNotMatchString(input: String, fixture: DefaultTextParseFailureFixture) {
         fixture.debug("PARSE \"$input\"")
         val result = parse(input)
         result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.lineText(input), fixture.message())
     }
 
-    private fun Parser<TextInput, *>.doesNotMatchChunks(input: String, fixture: DefaultCharParseFailureFixture) {
+    private fun Parser<TextInput, *>.doesNotMatchChunks(input: String, fixture: DefaultTextParseFailureFixture) {
         fixture.debug("PARSE \"$input\"")
         val result = parse(input)
         result.assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.lineText(input), fixture.message())
@@ -208,8 +208,8 @@ abstract class AbstractParseTest {
         }
     }
 
-    fun Parser<BinaryInput, *>.doesNotMatch(vararg input: Byte, config: ByteParseFailureFixture.() -> Unit = {}) {
-        val fixture = DefaultByteParseFailureFixture()
+    fun Parser<BinaryInput, *>.doesNotMatch(vararg input: Byte, config: BinaryParseFailureFixture.() -> Unit = {}) {
+        val fixture = DefaultBinaryParseFailureFixture()
         fixture.config()
 
         fixture.tracing(this, fixture.steps) {
@@ -220,13 +220,13 @@ abstract class AbstractParseTest {
         }
     }
 
-    private fun Parser<BinaryInput, *>.doesNotMatchArray(fixture: DefaultByteParseFailureFixture, vararg input: Byte) {
+    private fun Parser<BinaryInput, *>.doesNotMatchArray(fixture: DefaultBinaryParseFailureFixture, vararg input: Byte) {
         fixture.debug("PARSE [${input.joinToString { format(it) }}]")
         val result = parse(input)
         result.assertIsFail(fixture.offset, fixture.message())
     }
 
-    private fun Parser<BinaryInput, *>.doesNotMatchChunks(fixture: DefaultByteParseFailureFixture, vararg input: Byte) {
+    private fun Parser<BinaryInput, *>.doesNotMatchChunks(fixture: DefaultBinaryParseFailureFixture, vararg input: Byte) {
         fixture.debug("PARSE [${input.joinToString { format(it) }}]")
         val result = parse(input)
         result.assertIsFail(fixture.offset, fixture.message())
@@ -310,10 +310,11 @@ abstract class AbstractParseTest {
         }
     }
 
-    protected fun ParseResult<TextFailureContext, *>?.assertIsFail(config: CharParseFailureFixture.() -> Unit) {
+    @JvmName("assertIsTextFail")
+    protected fun ParseResult<TextFailureContext, *>?.assertIsFail(config: TextParseFailureFixture.() -> Unit) {
         assertNotNull(this)
 
-        val fixture = DefaultCharParseFailureFixture()
+        val fixture = DefaultTextParseFailureFixture()
         fixture.config()
 
         assertIsFail(fixture.offset, fixture.line, fixture.col, fixture.lineText(""), fixture.message())
@@ -339,6 +340,16 @@ abstract class AbstractParseTest {
                 }
             }
         }
+    }
+
+    @JvmName("assertIsBinaryFail")
+    protected fun ParseResult<BinaryFailureContext, *>?.assertIsFail(config: BinaryParseFailureFixture.() -> Unit) {
+        assertNotNull(this)
+
+        val fixture = DefaultBinaryParseFailureFixture()
+        fixture.config()
+
+        assertIsFail(fixture.offset, fixture.message())
     }
 
     private fun ParseResult<BinaryFailureContext, *>.assertIsFail(offset: Int, message: String) {
@@ -1065,7 +1076,7 @@ abstract class AbstractParseTest {
         }
     }
 
-    interface CharParseFailureFixture : ParseFailureFixture {
+    interface TextParseFailureFixture : ParseFailureFixture {
         fun failAt(offset: Int, line: Int = 1, col: Int = offset + 1)
 
         fun expectContext(textBeforeFailure: String, textAfterFailure: String)
@@ -1079,7 +1090,7 @@ abstract class AbstractParseTest {
         fun expectLiteral(text: String)
     }
 
-    private class DefaultCharParseFailureFixture : DefaultParseFailureFixture(), CharParseFailureFixture {
+    private class DefaultTextParseFailureFixture : DefaultParseFailureFixture(), TextParseFailureFixture {
         var offset = 0
         var line = 1
         var col = 1
@@ -1114,7 +1125,7 @@ abstract class AbstractParseTest {
         }
     }
 
-    interface ByteParseFailureFixture : ParseFailureFixture {
+    interface BinaryParseFailureFixture : ParseFailureFixture {
         fun failAt(offset: Int)
 
         fun expectLiteral(byte: Byte)
@@ -1122,7 +1133,7 @@ abstract class AbstractParseTest {
         fun expectOneInRange(from: Byte, to: Byte)
     }
 
-    private class DefaultByteParseFailureFixture : DefaultParseFailureFixture(), ByteParseFailureFixture {
+    private class DefaultBinaryParseFailureFixture : DefaultParseFailureFixture(), BinaryParseFailureFixture {
         var offset = 0
 
         override fun expectLiteral(byte: Byte) {

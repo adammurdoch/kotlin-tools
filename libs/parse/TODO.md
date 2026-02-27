@@ -5,7 +5,7 @@ Parsers
 - Repeat, `take(parser<int>)`, `drop(parser<int>)`
 - `oneExcept(parser...)` convenience
 - `oneOrMore()` and `zeroOrMore()` allow optional trailing separator
-- `upTo()`
+- `upTo(parser)`
 - `accept()` does not call function on a failed branch
 - Improve expected message for `not()` e.g: expecting any character but not "x"  
 
@@ -24,14 +24,14 @@ Performance
 - Choice continuation is deeply nested 
 - Discard buffered input once it is not required
 - Choice matches common prefix of options
+- Read from file/stream in parallel with parsing
 
 Features
-- Push parse indicates that parsing has already failed, prior to end of input being received
 - Parse input stream
 - Parse kotlinx-io Source
 - Parser file-io files
 - Match location/region
 - Semantic errors
-- Android and iOS
+- Android, iOS and wasm targets
 - Sync on parse failure
 - Left recursion

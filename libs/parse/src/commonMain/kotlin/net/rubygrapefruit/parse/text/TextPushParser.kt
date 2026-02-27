@@ -10,7 +10,7 @@ interface TextPushParser<OUT> : PushParser<TextFailureContext, OUT> {
     /**
      * Signals that more input is available.
      *
-     * If the parsing has failed, returns the failure.
+     * If the parsing fails, returns the failure. Returns `null` to signal that more input is required.
      */
     fun input(chars: CharArray): ParseResult.Fail<TextFailureContext>? {
         return input(chars, 0, chars.size)
@@ -19,7 +19,7 @@ interface TextPushParser<OUT> : PushParser<TextFailureContext, OUT> {
     /**
      * Signals that more input is available.
      *
-     * If the parsing has failed, returns the failure.
+     * If the parsing fails, returns the failure. Returns `null` to signal that more input is required.
      */
     fun input(chars: CharArray, offset: Int, count: Int): ParseResult.Fail<TextFailureContext>?
 }

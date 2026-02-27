@@ -10,12 +10,12 @@ internal class DefaultBinaryPushParser<OUT>(
 ) : DefaultPushParser<BinaryFailureContext, AdvancingByteStream, OUT>(parser, failureFormatter), BinaryPushParser<OUT> {
     private val input = BufferingByteStream()
 
-    override fun input(bytes: ByteArray, offset: Int, count: Int) {
+    override fun input(bytes: ByteArray, offset: Int, count: Int): ParseResult.Fail<BinaryFailureContext>? {
         if (count == 0) {
-            return
+            return maybeFailed()
         }
         input.append(bytes, offset, count)
-        inputAvailable(input)
+        return inputAvailable(input)
     }
 
     override fun endOfInput(): ParseResult<BinaryFailureContext, OUT> {

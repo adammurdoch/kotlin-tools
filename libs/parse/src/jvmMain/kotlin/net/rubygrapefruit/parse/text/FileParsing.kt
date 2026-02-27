@@ -15,7 +15,7 @@ fun <OUT> Parser<TextInput, OUT>.parse(file: File, charset: Charset): ParseResul
 
 private fun <OUT> Parser<TextInput, OUT>.parse(reader: InputStreamReader): ParseResult<TextFailureContext, OUT> {
     val parser = pushParser()
-    val buffer = CharArray(1024)
+    val buffer = CharArray(16 * 1024)
     while (true) {
         val nread = reader.read(buffer)
         if (nread < 0) {

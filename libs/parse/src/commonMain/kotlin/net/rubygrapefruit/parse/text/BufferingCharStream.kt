@@ -22,8 +22,8 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
         return tail.posAt(index + pos)
     }
 
-    override fun contextAt(index: Int): TextFailureContext {
-        return tail.contextAt(index + pos)
+    override fun contextAt(index: Int): TextFailureContext? {
+        return tail.contextAt(index + pos, finished)
     }
 
     fun append(chars: CharArray) {
@@ -98,52 +98,62 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
             }
         }
 
-        fun contextAt(index: Int): TextFailureContext {
-            return if (index >= startIndex || previous == null) {
-                var line = startLine
-                var col = startCol
-                var startLine = 0
-
-                val contentIndex = index - startIndex
-                for (i in 0 until contentIndex) {
-                    if (content[i] == '\n') {
-                        line++
-                        col = 1
-                        startLine = i + 1
-                    } else {
-                        col++
-                    }
-                }
-                val builder = ContextBuilder(this)
-                if (startLine == 0 && previous != null) {
-                    previous.findStartLastLine(builder)
-                } else {
-                    builder.startLine = startIndex + startLine
-                }
-
-                var endLine = -1
-                for (i in contentIndex until writeIndex) {
-                    if (content[i] == '\n') {
-                        endLine = i
-                        break
-                    }
-                }
-                if (endLine < 0) {
-                    val next = next
-                    if (next == null) {
-                        builder.endLine = startIndex + writeIndex
-                    } else {
-                        next.findEndFirstLine(builder)
-                    }
-                } else {
-                    builder.endLine = startIndex + endLine
-                }
-
-                val pos = CharPosition(index, line, col)
-                AdvancingCharStream.TextStreamContext(pos, builder.endBuffer.get(builder.startLine, builder.endLine))
-            } else {
-                previous.contextAt(index)
+        fun contextAt(index: Int, finished: Boolean): TextFailureContext? {
+            if (index < startIndex && previous != null) {
+                return previous.contextAt(index, finished)
             }
+
+            // Context starts in this buffer
+
+            var line = startLine
+            var col = startCol
+            var startLine = 0
+
+            // Find the start of the context line
+
+            val contentIndex = index - startIndex
+            for (i in 0 until contentIndex) {
+                if (content[i] == '\n') {
+                    line++
+                    col = 1
+                    startLine = i + 1
+                } else {
+                    col++
+                }
+            }
+
+            val builder = ContextBuilder(this)
+            if (startLine == 0 && previous != null) {
+                previous.findStartLastLine(builder)
+            } else {
+                builder.startLine = startIndex + startLine
+            }
+
+            var endLine = -1
+            for (i in contentIndex until writeIndex) {
+                if (content[i] == '\n') {
+                    endLine = i
+                    break
+                }
+            }
+            if (endLine < 0) {
+                val next = next
+                if (next == null) {
+                    if (!finished) {
+                        return null
+                    }
+                    builder.endLine = startIndex + writeIndex
+                } else {
+                    if (!next.findEndFirstLine(builder, finished)) {
+                        return null
+                    }
+                }
+            } else {
+                builder.endLine = startIndex + endLine
+            }
+
+            val pos = CharPosition(index, line, col)
+            return AdvancingCharStream.TextStreamContext(pos, builder.endBuffer.get(builder.startLine, builder.endLine))
         }
 
         private fun findStartLastLine(builder: ContextBuilder) {
@@ -162,20 +172,21 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
             }
         }
 
-        private fun findEndFirstLine(builder: ContextBuilder) {
+        private fun findEndFirstLine(builder: ContextBuilder, finished: Boolean): Boolean {
             for (i in 0 until writeIndex) {
                 if (content[i] == '\n') {
                     builder.endLine = startIndex + i
                     builder.endBuffer = this
-                    return
+                    return true
                 }
             }
             val next = next
-            if (next != null) {
-                next.findEndFirstLine(builder)
+            return if (next != null) {
+                next.findEndFirstLine(builder, finished)
             } else {
                 builder.endLine = startIndex + writeIndex
                 builder.endBuffer = this
+                finished
             }
         }
 

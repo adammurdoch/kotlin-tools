@@ -31,13 +31,26 @@ class TextPushParserTest : AbstractParseTest() {
     }
 
     @Test
-    fun `returns failure when parse fails`() {
+    fun `returns failure when parse fails and end of line has been supplied`() {
         val parser = zeroOrMore(literal("a", 1), separator = literal(","))
 
         val pushParser = parser.pushParser()
 
-        val result = pushParser.input("a,X".toCharArray())
+        val result = pushParser.input("a,X\n".toCharArray())
         assertIs<ParseResult.Fail<*>>(result)
+    }
+
+    @Test
+    fun `continues when parse fails and end of line has not been supplied`() {
+        val parser = zeroOrMore(literal("a", 1), separator = literal(","))
+
+        val pushParser = parser.pushParser()
+
+        val result1 = pushParser.input("a,X".toCharArray())
+        assertNull(result1)
+
+        val result2 = pushParser.input("X\n".toCharArray())
+        assertIs<ParseResult.Fail<*>>(result2)
     }
 
     @Test
@@ -59,12 +72,13 @@ class TextPushParserTest : AbstractParseTest() {
 
         val pushParser = parser.pushParser()
 
-        val result1 = pushParser.input("a,X".toCharArray())
+        val result1 = pushParser.input("a,X\n".toCharArray())
         assertIs<ParseResult.Fail<*>>(result1)
 
         val result2 = pushParser.input("XX".toCharArray())
         assertIs<ParseResult.Fail<*>>(result2)
 
+        // empty
         val result3 = pushParser.input(CharArray(0))
         assertIs<ParseResult.Fail<*>>(result3)
 

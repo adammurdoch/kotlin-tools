@@ -14,7 +14,7 @@ internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>,
             val currentState = state
             when (currentState) {
                 is PullParser.Matched -> return null
-                is PullParser.Failed -> return failure!!
+                is PullParser.Failed -> return mapFailed(input, currentState)
 
                 is PullParser -> {
                     val result = currentState.parse(input, input.available)
@@ -25,7 +25,6 @@ internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>,
                             } else {
                                 result
                             }
-                            failure = mapFailed(input, effectiveFailure)
                             state = effectiveFailure
                         }
 
@@ -56,11 +55,11 @@ internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>,
     fun endOfInput(input: IN): ParseResult<CONTEXT, OUT> {
         inputAvailable(input)
 
-        val result = state
-        return when (result) {
-            is PullParser.Matched -> ParseResult.Success(result.value)
-            is PullParser.Failed -> failure!!
-            is PullParser -> throw IllegalStateException("Expected parsing to be finished, but is $result")
+        val finalState = state
+        return when (finalState) {
+            is PullParser.Matched -> ParseResult.Success(finalState.value)
+            is PullParser.Failed -> mapFailed(input, finalState)!!
+            is PullParser -> throw IllegalStateException("Expected parsing to be finished, but is $finalState")
         }
     }
 
@@ -68,8 +67,17 @@ internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>,
         return failure
     }
 
-    private fun mapFailed(input: IN, result: PullParser.Failed): ParseResult.Fail<CONTEXT> {
+    private fun mapFailed(input: IN, result: PullParser.Failed): ParseResult.Fail<CONTEXT>? {
+        if (failure != null) {
+            return failure
+        }
         val context = input.contextAt(result.index)
-        return ParseResult.Fail(context, result.expected.expectation().format(), failureFormatter)
+        return if (context == null) {
+            null
+        } else {
+            val mapped = ParseResult.Fail<CONTEXT>(context, result.expected.expectation().format(), failureFormatter)
+            failure = mapped
+            mapped
+        }
     }
 }

@@ -96,3 +96,11 @@ fun <IN> oneOrMore(parser: Parser<IN, Unit>): Parser<IN, Unit> {
 fun <IN> oneOrMore(parser: Parser<IN, Unit>, separator: Parser<IN, *>): Parser<IN, Unit> {
     return OneOrMoreProduceNothingParser(parser, discard(separator))
 }
+
+/**
+ * Returns a parser that applies the given parser the given number of times.
+ * Produces a list containing the results.
+ */
+fun <IN, OUT> repeat(count: Int, parser: Parser<IN, OUT>): Parser<IN, List<OUT>> {
+    return RepeatParser(count, parser)
+}

@@ -363,7 +363,7 @@ abstract class AbstractParseTest {
                 try {
                     get()
                 } catch (e: ParseException) {
-                    assertEquals("Offset: $offset: $message, found: $failureContext", e.message)
+                    assertEquals("Offset: $offset: $message. Found: $failureContext", e.message)
                 }
             }
         }

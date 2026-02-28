@@ -408,9 +408,11 @@ abstract class AbstractParseTest {
 
         fun expectZeroOrMore(hasResult: Boolean = true, config: CompiledParserFixture.() -> Unit)
 
+        fun expectZeroOrMoreSingleInput(hasResult: Boolean = true, config: CompiledParserFixture.() -> Unit)
+
         fun expectOneOrMore(hasResult: Boolean = true, config: CompiledParserFixture.() -> Unit)
 
-        fun expectZeroOrMoreSingleInput(hasResult: Boolean = true, config: CompiledParserFixture.() -> Unit)
+        fun expectRepeat(count: Int, hasResult: Boolean = true, config: CompiledParserFixture.() -> Unit)
 
         fun expectMap(config: CompiledParserFixture.() -> Unit)
 
@@ -675,6 +677,24 @@ abstract class AbstractParseTest {
             }
         }
 
+        class IsRepeat(val count: Int, val inspector: Inspector, val hasResult: Boolean) : Inspector {
+            override val expected: List<String>
+                get() = inspector.expected
+
+            override val mayBeEmpty: Boolean
+                get() = inspector.mayBeEmpty
+
+            override fun inspect(parser: CompiledParser<*, *>) {
+                assertIs<RepeatParser.RepeatCompiledParser<*, *>>(parser)
+                inspector.inspect(parser.parser)
+                if (hasResult) {
+                    assertIs<ListAccumulator<*>>(parser.initial)
+                } else {
+                    assertIs<UnitAccumulator>(parser.initial)
+                }
+            }
+        }
+
         data class IsCharLiteral(val text: String, val result: Any) : Inspector {
             override val expected: List<String>
                 get() {
@@ -924,6 +944,12 @@ abstract class AbstractParseTest {
             fixture.config()
             val choices = fixture.choices()
             inspectors.add(Inspector.IsOneOrMore(choices.first(), choices.getOrNull(1), hasResult))
+        }
+
+        override fun expectRepeat(count: Int, hasResult: Boolean, config: CompiledParserFixture.() -> Unit) {
+            val fixture = DefaultCompiledParserFixture()
+            fixture.config()
+            inspectors.add(Inspector.IsRepeat(count, fixture.inspector(), hasResult))
         }
 
         override fun expectConsume(config: CompiledParserFixture.() -> Unit) {

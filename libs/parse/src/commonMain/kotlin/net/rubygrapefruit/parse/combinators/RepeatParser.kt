@@ -1,21 +1,28 @@
 package net.rubygrapefruit.parse.combinators
 
 import net.rubygrapefruit.parse.*
+import net.rubygrapefruit.parse.general.SucceedParser
 
 internal class RepeatParser<IN, OUT>(
     private val count: Int,
     private val parser: Parser<IN, OUT>
 ) : Parser<IN, List<OUT>>, CombinatorBuilder<List<OUT>> {
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, List<OUT>> {
-        return RepeatCompiledParser(count, compiler.compile(parser))
+        val initial = ListAccumulator.Empty<OUT>()
+        return if (count == 0) {
+            SucceedParser.SucceedCompiledParser(initial)
+        } else {
+            RepeatCompiledParser(count, compiler.compile(parser), initial)
+        }
     }
 
     class RepeatCompiledParser<IN, OUT>(
         val count: Int,
-        val parser: CompiledParser<IN, OUT>
+        val parser: CompiledParser<IN, OUT>,
+        val initial: Accumulator<OUT, List<OUT>>
     ) : CompiledParser<IN, List<OUT>> {
         override fun <NEXT> start(next: ParseContinuation<IN, List<OUT>, NEXT>): PullParser<IN, NEXT> {
-            return parser.start(continuation(count - 1, ListAccumulator.Empty(), next))
+            return parser.start(continuation(count - 1, initial, next))
         }
 
         private fun <NEXT> continuation(count: Int, accumulator: Accumulator<OUT, List<OUT>>, next: ParseContinuation<IN, List<OUT>, NEXT>): ParseContinuation<IN, OUT, NEXT> {

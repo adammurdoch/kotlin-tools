@@ -37,9 +37,26 @@ class Parser {
 
     private fun cpu(cpuType: UInt, subType: UInt): CPU {
         return when (cpuType) {
-            0x01000007.toUInt() -> CPU("64-bit x86")
-            0x0100000C.toUInt() -> CPU("64-bit ARM")
+            0x01000007u -> cpuX64(subType)
+            0x0100000Cu -> cpuArm64(subType)
             else -> throw IllegalArgumentException("Unknown CPU type: ${cpuType.toHexString(HexFormat.UpperCase)}")
         }
+    }
+
+    private fun cpuX64(subType: UInt): CPU {
+        val subTypeStr = when (subType) {
+            0x3u -> "All"
+            else -> throw IllegalArgumentException("Unknown CPU sub-type: ${subType.toHexString(HexFormat.UpperCase)}")
+        }
+        return CPU("64-bit x86 - $subTypeStr")
+    }
+
+    private fun cpuArm64(subType: UInt): CPU {
+        val subTypeStr = when (subType) {
+            0u -> "All"
+            0x2u, 0x80000002u -> "ARM-A500 and later"
+            else -> throw IllegalArgumentException("Unknown CPU sub-type: ${subType.toHexString(HexFormat.UpperCase)}")
+        }
+        return CPU("64-bit ARM - $subTypeStr")
     }
 }

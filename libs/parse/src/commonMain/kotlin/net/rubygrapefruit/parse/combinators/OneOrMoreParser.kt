@@ -18,7 +18,7 @@ internal class OneOrMoreParser<IN, OUT>(
             val tail = Sequence2Parser(separator, parser) { _, b -> b }
             compiler.compile(tail)
         }
-        return OneOrMoreCompiledParser(option, tail, ListAccumulator.Empty())
+        return of(option, tail, ListAccumulator.Empty())
     }
 
     companion object {

@@ -111,6 +111,7 @@ Repeating parsers:
 - oneOrMore(parser, parser) - matches one or more of first parser, separated by second parser, produces a list
     - oneOrMore(unitParser, parser) - produces nothing
 - repeat(count, parser) - produces a list 
+  - repeat(unitParser, parser) - produces nothing
 
 Mapping parsers:
 

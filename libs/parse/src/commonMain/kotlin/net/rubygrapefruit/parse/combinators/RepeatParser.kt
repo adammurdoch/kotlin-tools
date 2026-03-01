@@ -12,20 +12,26 @@ internal class RepeatParser<IN, OUT>(
         return if (count == 0) {
             SucceedParser.SucceedCompiledParser(initial)
         } else {
-            RepeatCompiledParser(count, compiler.compile(parser), initial)
+            of(count, compiler.compile(parser), initial)
         }
     }
 
-    class RepeatCompiledParser<IN, OUT>(
+    companion object {
+        fun <IN, ITEM, OUT> of(count: Int, parser: CompiledParser<IN, ITEM>, initial: Accumulator<ITEM, OUT>): CompiledParser<IN, OUT> {
+            return RepeatCompiledParser(count, parser, initial)
+        }
+    }
+
+    class RepeatCompiledParser<IN, ITEM, OUT>(
         val count: Int,
-        val parser: CompiledParser<IN, OUT>,
-        val initial: Accumulator<OUT, List<OUT>>
-    ) : CompiledParser<IN, List<OUT>> {
-        override fun <NEXT> start(next: ParseContinuation<IN, List<OUT>, NEXT>): PullParser<IN, NEXT> {
+        val parser: CompiledParser<IN, ITEM>,
+        val initial: Accumulator<ITEM, OUT>
+    ) : CompiledParser<IN, OUT> {
+        override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
             return parser.start(continuation(count - 1, initial, next))
         }
 
-        private fun <NEXT> continuation(count: Int, accumulator: Accumulator<OUT, List<OUT>>, next: ParseContinuation<IN, List<OUT>, NEXT>): ParseContinuation<IN, OUT, NEXT> {
+        private fun <NEXT> continuation(count: Int, accumulator: Accumulator<ITEM, OUT>, next: ParseContinuation<IN, OUT, NEXT>): ParseContinuation<IN, ITEM, NEXT> {
             return if (count == 0) {
                 next.map { length, value ->
                     val result = accumulator.add(value, length)

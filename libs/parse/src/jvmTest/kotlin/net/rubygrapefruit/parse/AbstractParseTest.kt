@@ -685,7 +685,8 @@ abstract class AbstractParseTest {
                 get() = inspector.mayBeEmpty
 
             override fun inspect(parser: CompiledParser<*, *>) {
-                assertIs<RepeatParser.RepeatCompiledParser<*, *>>(parser)
+                assertIs<RepeatParser.RepeatCompiledParser<*, *, *>>(parser)
+                assertEquals(count, parser.count)
                 inspector.inspect(parser.parser)
                 if (hasResult) {
                     assertIs<ListAccumulator<*>>(parser.initial)

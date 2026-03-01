@@ -1,8 +1,10 @@
 Parsers
 - "literal" -> "text" and "bytes"?
+- `repeat(parser, parser)` where first parser produces the count
+- `repeat()` with a separator
 - `concat(parser<string>)`
 - Binary ints
-- Repeat, `take(parser<int>)`, `drop(parser<int>)`
+- `take(n)`, `drop(n)`, `take(parser<int>)`, `drop(parser<int>)` to match n input values
 - `oneExcept(parser...)` convenience
 - `oneOrMore()` and `zeroOrMore()` allow optional trailing separator
 - `upTo(parser)`
@@ -13,6 +15,7 @@ Performance
 - Optimized implementation for `not(single-input)`
 - Optimized implementation for `optional(single-input)`
 - Optimized implementation for `oneOrMore(single-input)`
+- Optimized implementation for `repeat(single-input)`
 - `literal(one-value)` is a single input parser
 - `oneOf(single-input...)` is a single input parser
 - `sequence(not(single-input), single-input)` is a single input parser

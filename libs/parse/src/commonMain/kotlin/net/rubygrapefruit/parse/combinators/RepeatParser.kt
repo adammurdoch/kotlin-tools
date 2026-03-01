@@ -6,7 +6,11 @@ import net.rubygrapefruit.parse.general.SucceedParser
 internal class RepeatParser<IN, OUT>(
     private val count: Int,
     private val parser: Parser<IN, OUT>
-) : Parser<IN, List<OUT>>, CombinatorBuilder<List<OUT>> {
+) : Parser<IN, List<OUT>>, CombinatorBuilder<List<OUT>>, DiscardableParser<IN> {
+    override fun withNoResult(): Parser<IN, Unit> {
+        return RepeatProduceNothingParser(count, DiscardParser(parser))
+    }
+
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, List<OUT>> {
         val initial = ListAccumulator.Empty<OUT>()
         return if (count == 0) {

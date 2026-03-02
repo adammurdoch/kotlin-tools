@@ -18,7 +18,7 @@ class Parser {
 
         val lineComment = sequence(
             literal("#"),
-            discard(zeroOrMore(sequence(not(endLine), one()))),
+            discard(zeroOrMore(oneExcept(endLine))),
         )
         val blankLine = sequence(
             optionalWhitespace,
@@ -72,6 +72,7 @@ class Parser {
         val arraySeparator = sequence(arrayWhitespace, literal(","), arrayWhitespace)
         val arrayItem = sequence(value, arraySeparator)
         val arrayLastItem = sequence(value, arrayWhitespace)
+        // allow optional trailing ','
         val arrayItems = sequence(zeroOrMore(arrayItem), optional(arrayLastItem)) { a, b -> if (b == null) a else a + b }
         val arraySuffix = literal("]")
         val array = sequence(arrayPrefix, arrayItems, arraySuffix)

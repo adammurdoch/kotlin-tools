@@ -4,15 +4,16 @@ import net.rubygrapefruit.parse.combinators.sequence
 import net.rubygrapefruit.parse.text.literal
 import kotlin.test.Test
 
-class Sequence4Test : AbstractParseTest() {
+class Sequence5Test : AbstractParseTest() {
     @Test
     fun `matches sequence of char literals`() {
         val parser = sequence(
             literal("a", 1),
             literal("b", 2),
             literal("c", 3),
-            literal("d", 4)
-        ) { a, b, c, d -> listOf(a, b, c, d) }
+            literal("d", 4),
+            literal("e", 5)
+        ) { a, b, c, d, e -> listOf(a, b, c, d, e) }
 
         parser.expecting {
             expectSequence {
@@ -21,13 +22,16 @@ class Sequence4Test : AbstractParseTest() {
                     expectLiteral("b", result = 2)
                     expectSequence {
                         expectLiteral("c", result = 3)
-                        expectLiteral("d", result = 4)
+                        expectSequence {
+                            expectLiteral("d", result = 4)
+                            expectLiteral("e", result = 5)
+                        }
                     }
                 }
             }
         }
 
-        parser.matches("abcd", expected = listOf(1, 2, 3, 4))
+        parser.matches("abcde", expected = listOf(1, 2, 3, 4, 5))
 
         // missing
         parser.doesNotMatch("") {
@@ -45,16 +49,20 @@ class Sequence4Test : AbstractParseTest() {
             failAt(3)
             expectLiteral("d")
         }
+        parser.doesNotMatch("abcd") {
+            failAt(4)
+            expectLiteral("e")
+        }
 
         // unexpected
-        parser.doesNotMatch("abXd") {
+        parser.doesNotMatch("abXde") {
             failAt(2)
             expectLiteral("c")
         }
 
         // extra
-        parser.doesNotMatch("abcdX") {
-            failAt(4)
+        parser.doesNotMatch("abcdeX") {
+            failAt(5)
             expectEndOfInput()
         }
     }

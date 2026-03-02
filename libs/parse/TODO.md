@@ -8,7 +8,7 @@ Parsers
 - `oneExcept(parser...)` convenience
 - `oneOrMore()` and `zeroOrMore()` allow optional trailing separator
 - `upTo(parser)`
-- `accept()` does not call function on a failed branch
+- `accept()` should not call function on a failed branch
 - Improve expected message for `not()` e.g: expecting any character but not "x"  
 
 Performance
@@ -21,6 +21,7 @@ Performance
 - `sequence(not(single-input), single-input)` is a single input parser
 - `describedAs(single-input)` is a single input parser
 - `oneExcept(single-input)` is a single input parser
+- More efficient implementation of 3+ sequence
 - Allow `CompiledParser.start()` to fail or complete parsing
 - Choice exits when there is one remaining candidate that has not failed
   - Need to know that candidate will not fail before/at other failed options

@@ -3,7 +3,7 @@ Parsers
 - `repeat(parser, parser)` where first parser produces the count
 - `repeat()` with a separator
 - `concat(parser<string>)`
-- Binary ints
+- 32 bit binary ints
 - `take(n)`, `drop(n)`, `take(parser<int>)`, `drop(parser<int>)` to match n input values
 - `oneExcept(parser...)` convenience
 - `oneOrMore()` and `zeroOrMore()` allow optional trailing separator
@@ -21,11 +21,12 @@ Performance
 - `sequence(not(single-input), single-input)` is a single input parser
 - `describedAs(single-input)` is a single input parser
 - `oneExcept(single-input)` is a single input parser
-- More efficient implementation of 3+ sequence
+- More efficient implementation of 3+ sequences
 - Allow `CompiledParser.start()` to fail or complete parsing
 - Choice exits when there is one remaining candidate that has not failed
   - Need to know that candidate will not fail before/at other failed options
-- Choice continuation is deeply nested 
+- Choice continuation is deeply nested
+- Binary int parsers do not box values
 - Discard buffered input once it is not required
 - Choice matches common prefix of options
 - Read from file/stream in parallel with parsing

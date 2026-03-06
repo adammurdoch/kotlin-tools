@@ -1,18 +1,16 @@
 package sample
 
 import net.rubygrapefruit.file.RegularFile
-import net.rubygrapefruit.parse.binary.literal
-import net.rubygrapefruit.parse.binary.one
-import net.rubygrapefruit.parse.binary.parse
+import net.rubygrapefruit.parse.binary.*
 import net.rubygrapefruit.parse.combinators.*
 
 class Parser {
     fun parse(file: RegularFile): List<Image> {
-        val u16le = sequence(one(), one()) { b1, b2 -> b2.toUByte().toUInt().rotateLeft(8).or(b1.toUByte().toUInt()) }
-        val u32le = sequence(u16le, u16le) { w1, w2 -> w2.rotateLeft(16).or(w1) }
+        val u16le = uint16LittleEndian()
+        val u32le = sequence(u16le, u16le) { w1, w2 -> w2.toUInt().rotateLeft(16).or(w1.toUInt()) }
 
-        val u16be = sequence(one(), one()) { b1, b2 -> b1.toUByte().toUInt().rotateLeft(8).or(b2.toUByte().toUInt()) }
-        val u32be = sequence(u16be, u16be) { w1, w2 -> w1.rotateLeft(16).or(w2) }
+        val u16be = uint16BigEndian()
+        val u32be = sequence(u16be, u16be) { w1, w2 -> w1.toUInt().rotateLeft(16).or(w2.toUInt()) }
 
         val magic64le = literal(byteArrayOf(0xcf.toByte(), 0xfa.toByte(), 0xed.toByte(), 0xfe.toByte()))
 

@@ -57,6 +57,9 @@ Parsers that operate on binary input:
     - oneOf(collection)
 - oneInRange(byteRange) - produces matched input byte
 
+- uint16LittleEndian() - parses a 16 bit unsigned int in little endian order
+- uint16BigEndian() - parses a 16 bit unsigned int in big endian order
+
 Binary combinators:
 
 - oneExcept(parser) - produces matched input char

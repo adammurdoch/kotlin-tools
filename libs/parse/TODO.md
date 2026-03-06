@@ -18,6 +18,7 @@ Performance
 - Optimized implementation for `repeat(single-input)`
 - `literal(one-value)` is a single input parser
 - `oneOf(single-input...)` is a single input parser
+- `digit()` is a single input parser
 - `sequence(not(single-input), single-input)` is a single input parser
 - `describedAs(single-input)` is a single input parser
 - `oneExcept(single-input)` is a single input parser

@@ -40,6 +40,8 @@ Parsers that operate on text input:
     - oneOf(collection)
 - oneInRange(charRange) - produces matched input char
 
+- digit() - matches '0'..'9', produces matched input char
+
 Text combinators:
 
 - oneExcept(parser) - produces matched input char
@@ -57,8 +59,8 @@ Parsers that operate on binary input:
     - oneOf(collection)
 - oneInRange(byteRange) - produces matched input byte
 
-- uint16LittleEndian() - parses a 16 bit unsigned int in little endian order
-- uint16BigEndian() - parses a 16 bit unsigned int in big endian order
+- uint16LittleEndian() - parses a 16 bit unsigned int in little endian order, produces `UShort`
+- uint16BigEndian() - parses a 16 bit unsigned int in big endian order, produces `UShort`
 
 Binary combinators:
 

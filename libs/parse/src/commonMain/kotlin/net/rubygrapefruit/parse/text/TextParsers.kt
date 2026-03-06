@@ -1,6 +1,7 @@
 package net.rubygrapefruit.parse.text
 
 import net.rubygrapefruit.parse.Parser
+import net.rubygrapefruit.parse.combinators.describedAs
 import net.rubygrapefruit.parse.combinators.discard
 import net.rubygrapefruit.parse.combinators.not
 import net.rubygrapefruit.parse.combinators.sequence
@@ -46,6 +47,13 @@ fun oneOf(chars: Collection<Char>): Parser<TextInput, Char> {
  */
 fun oneInRange(chars: CharRange): Parser<TextInput, Char> {
     return OneInCharRangeParser(chars)
+}
+
+/**
+ * Returns a parser that matches a digit (0..9)
+ */
+fun digit(): Parser<TextInput, Char> {
+    return describedAs(oneInRange('0'..'9'), "a digit")
 }
 
 /**

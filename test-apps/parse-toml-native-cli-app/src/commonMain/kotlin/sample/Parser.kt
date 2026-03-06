@@ -59,8 +59,7 @@ class Parser {
         val literalStringBody = match(zeroOrMore(oneExcept(oneOf(singleQuote, endLine))))
         val literalString = sequence(singleQuote, literalStringBody, singleQuote)
 
-        val digit = describedAs(oneInRange('0'..'9'), "a digit")
-        val digits = match(oneOrMore(digit))
+        val digits = match(oneOrMore(digit()))
         val number = map(digits) { it.toInt() }
 
         val boolean = oneOf(literal("true", true), literal("false", false))

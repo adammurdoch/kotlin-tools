@@ -21,7 +21,7 @@ class BytecodeReader {
         }
         u2() // minor version
         val major = u2()
-        if (major > 68u) { // Java 24
+        if (major > 69u) { // Java 25
             throw IllegalArgumentException("Unrecognized major version: $major")
         }
         val constantPool = ConstantPool()

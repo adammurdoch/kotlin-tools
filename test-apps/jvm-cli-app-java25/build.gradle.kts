@@ -3,7 +3,7 @@ plugins {
 }
 
 application {
-    targetJvmVersion = 24
+    targetJvmVersion = 25
     dependencies {
         implementation(project(":kmp-lib"))
         implementation(project(":kmp-lib-render"))

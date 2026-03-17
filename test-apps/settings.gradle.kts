@@ -71,7 +71,7 @@ samples {
             requiresJvm(11)
         }
         derive("jvm-cli-app-java25") {
-            requiresJvm(24)
+            requiresJvm(25)
         }
         deriveNative("native-cli-app") {
             derive("native-cli-app-customized") {

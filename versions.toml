@@ -1,5 +1,10 @@
+#
+# Versions of various dependencies, plus target versions for plugins, libraries and applications.
+# Also defines some constants.
+#
+
 [kotlin]
-version = "2.3.10"
+version = "2.3.20"
 
 [kotlin.plugin]
 coordinatesBase = "org.jetbrains.kotlin:kotlin-gradle-plugin"
@@ -9,6 +14,9 @@ coordinatesBase = "org.jetbrains.kotlin:kotlin-test"
 
 [kotlin.test.junit]
 coordinatesBase = "org.jetbrains.kotlin:kotlin-test-junit"
+
+# Version defined in `gradle/wrapper`
+[gradle]
 
 [plugins.jvm]
 version = 17
@@ -22,6 +30,7 @@ group = "net.rubygrapefruit"
 [libs.jvm]
 version = 17
 
+# Also hard coded in `stage0` and `stage1`
 [foojay.plugin]
 version = "1.0.0"
 id = "org.gradle.toolchains.foojay-resolver-convention"

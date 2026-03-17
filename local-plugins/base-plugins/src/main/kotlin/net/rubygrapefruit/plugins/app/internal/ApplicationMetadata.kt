@@ -59,8 +59,8 @@ internal fun Application.metadata(): ApplicationMetadata {
     }
     return ApplicationMetadata(
         appName.get(),
-        if (devDistribution != null) distributionsById[devDistribution] else null,
-        if (releaseDistribution != null) distributionsById[releaseDistribution] else null,
+        distributionsById[devDistribution],
+        distributionsById[releaseDistribution],
         distributionsById.values.toList(),
         mappedInstallations
     )

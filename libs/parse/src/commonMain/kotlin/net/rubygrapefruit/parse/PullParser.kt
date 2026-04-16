@@ -39,8 +39,12 @@ internal interface PullParser<in IN, out OUT> : ParseState<IN, OUT> {
 
         companion object {
             fun merged(failures: List<Failed>): Failed {
-                val largestIndex = failures.maxOf { it.index }
-                return Failed(largestIndex, MergedFailures(largestIndex, failures))
+                return if (failures.isEmpty()) {
+                    Failed(0, Expectation.Nothing)
+                } else {
+                    val largestIndex = failures.maxOf { it.index }
+                    Failed(largestIndex, MergedFailures(largestIndex, failures))
+                }
             }
         }
     }

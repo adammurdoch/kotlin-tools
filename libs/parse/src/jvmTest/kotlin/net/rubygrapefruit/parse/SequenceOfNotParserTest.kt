@@ -2,10 +2,10 @@ package net.rubygrapefruit.parse
 
 import net.rubygrapefruit.parse.binary.literal
 import net.rubygrapefruit.parse.binary.oneOf
-import net.rubygrapefruit.parse.combinators.not
-import net.rubygrapefruit.parse.combinators.sequence
-import net.rubygrapefruit.parse.combinators.zeroOrMore
+import net.rubygrapefruit.parse.combinators.*
 import net.rubygrapefruit.parse.general.endOfInput
+import net.rubygrapefruit.parse.text.literal
+import net.rubygrapefruit.parse.text.one
 import kotlin.test.Test
 
 class SequenceOfNotParserTest : AbstractParseTest() {
@@ -278,5 +278,20 @@ class SequenceOfNotParserTest : AbstractParseTest() {
             expectLiteral(0x1)
             expectLiteral(0x2)
         }
+    }
+
+    @Test
+    fun `matches not of choices with common prefix followed by chars`() {
+        val parser = sequence(
+            not(
+                oneOf(
+                    literal("a!"),
+                    literal("a?")
+                )
+            ),
+            oneOrMore(one())
+        )
+
+        parser.matches("ab", expected = listOf('a', 'b'))
     }
 }

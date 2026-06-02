@@ -123,6 +123,7 @@ Repeating parsers:
 Mapping parsers:
 
 - map(parser, map) - produces result of map function
+- check(parser, map) - map function can produce a result or failure
 - discard(parser) - discards result of parser, produces nothing
 - replace(parser, result) - replaces result of parser with fixed value
 

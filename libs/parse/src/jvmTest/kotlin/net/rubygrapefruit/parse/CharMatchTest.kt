@@ -20,5 +20,14 @@ class CharMatchTest : AbstractParseTest() {
         parser.doesNotMatch("") {
             expectLiteral("abc")
         }
+
+        parser.doesNotMatch("aX") {
+            expectLiteral("abc")
+        }
+
+        parser.doesNotMatch("abcX") {
+            failAt(3)
+            expectEndOfInput()
+        }
     }
 }

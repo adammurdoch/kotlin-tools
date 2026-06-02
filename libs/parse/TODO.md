@@ -1,15 +1,25 @@
 Parsers
 - "literal" -> "text" and "bytes"?
+- `ParseResult` and `MappingResult` use consistent names, e.g. "success" and "failure" or "succeeded" and "failed"
+- Case-insensitive text literal
 - `repeat(parser, parser)` where first parser produces the count
 - `repeat()` with a separator
-- `concat(parser<string>)`
+- `concat(parser<list<string>>)` - collect result of parser into a string
 - 32 bit binary ints
 - `take(n)`, `drop(n)`, `take(parser<int>)`, `drop(parser<int>)` to match n input values
 - `oneExcept(parser...)` convenience
 - `oneOrMore()` and `zeroOrMore()` allow optional trailing separator
 - `upTo(parser)`
 - `accept()` should not call function on a failed branch
-- Improve expected message for `not()` e.g: expecting any character but not "x"  
+- Improve expected message for `not()` e.g: expecting any character but not "x"
+- `sequence(parser<unit>...)` 
+- `discard(parser<unit>...)` - alias for above?
+- `prefixed(prefix, parser, parser)`
+- `separated(parser, sep, parser, sep, parser)`
+- `integer(parser)` or `integer(minLen, maxLen)` - converts matching input to int
+- `check(parser, map)` - converts value to success or failure
+- Line comment convenience
+- Quoted string convenience
 
 Performance
 - Optimized implementation for `not(single-input)`
@@ -35,9 +45,9 @@ Performance
 Features
 - Parse input stream
 - Parse kotlinx-io Source
-- Parser file-io files
+- Parse file-io files
 - Match location/region
 - Semantic errors
 - Android, iOS and wasm targets
-- Sync on parse failure
+- Sync and continue on parse failure
 - Left recursion

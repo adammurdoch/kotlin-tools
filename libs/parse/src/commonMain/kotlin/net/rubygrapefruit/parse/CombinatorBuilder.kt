@@ -5,7 +5,7 @@ package net.rubygrapefruit.parse
  */
 internal interface CombinatorBuilder<out OUT> {
     /**
-     * Compiles this parser.
+     * Compiles this parser for the given type of input.
      */
     fun <IN : Input<*>> compile(compiler: Compiler<IN>): CompiledParser<IN, OUT>
 

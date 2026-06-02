@@ -9,6 +9,22 @@ fun <IN, INTERMEDIATE, OUT> map(parser: Parser<IN, INTERMEDIATE>, map: (INTERMED
     return MapParser(parser, map)
 }
 
+sealed class MappingResult<out T> {
+    class Success<out T> internal constructor(val value: T) : MappingResult<T>()
+
+    class Fail internal constructor(val expected: String) : MappingResult<Nothing>()
+
+    companion object {
+        fun <T> of(value: T) = Success(value)
+
+        fun expected(expected: String) = Fail(expected)
+    }
+}
+
+fun <IN, INTERMEDIATE, OUT> check(parser: Parser<IN, INTERMEDIATE>, map: (INTERMEDIATE) -> MappingResult<OUT>): Parser<IN, OUT> {
+    return CheckParser(parser, map)
+}
+
 /**
  * Returns a parser that applies the given parser but does not produce a result.
  *

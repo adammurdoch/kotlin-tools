@@ -12,16 +12,16 @@ internal class TextLiteralParser<OUT>(
         return TextLiteralParser(text, Unit)
     }
 
-    override fun <NEXT> start(next: ParseContinuation<CharStream, OUT, NEXT>): PullParser<CharStream, NEXT> {
+    override fun start(next: ParseContinuation<CharStream, OUT>): PullParser<CharStream> {
         return CharLiteralPullParser(text, provider, expectation, next)
     }
 
-    private class CharLiteralPullParser<OUT, NEXT>(
+    private class CharLiteralPullParser<OUT>(
         private val text: String,
         private val result: ValueProvider<OUT>,
         private val startExpectation: Expectation,
-        private val next: ParseContinuation<CharStream, OUT, NEXT>,
-    ) : PullParser<CharStream, NEXT> {
+        private val next: ParseContinuation<CharStream, OUT>,
+    ) : PullParser<CharStream> {
         private var matched = 0
 
         override fun toString(): String {
@@ -32,7 +32,7 @@ internal class TextLiteralParser<OUT>(
             return PullParser.Failed(-matched, startExpectation)
         }
 
-        override fun parse(input: CharStream, max: Int): PullParser.Result<CharStream, NEXT> {
+        override fun parse(input: CharStream, max: Int): PullParser.Result<CharStream> {
             var index = 0
             val remaining = text.length - matched
             while (index < remaining) {

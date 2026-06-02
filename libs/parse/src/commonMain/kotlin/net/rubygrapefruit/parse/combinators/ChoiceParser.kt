@@ -27,28 +27,28 @@ internal class ChoiceParser<IN, OUT>(
             return ChoiceCompiledParser(effective)
         }
 
-        fun <IN, NEXT> of(options: List<Option<IN, *, NEXT>>): PullParser<IN, NEXT> {
+        fun <IN> of(options: List<Option<IN, *>>): PullParser<IN> {
             return ChoicePullParser(options)
         }
     }
 
-    class Option<IN, OUT, NEXT>(val parser: CompiledParser<IN, OUT>, val continuation: ParseContinuation<IN, OUT, NEXT>) {
-        internal fun start(): OptionState<IN, NEXT> {
+    class Option<IN, OUT>(val parser: CompiledParser<IN, OUT>, val continuation: ParseContinuation<IN, OUT>) {
+        internal fun start(): OptionState<IN> {
             val continuation = OptionContinuation(continuation)
             return OptionState(parser.start(continuation), continuation)
         }
     }
 
     class ChoiceCompiledParser<IN, OUT>(val options: List<CompiledParser<IN, OUT>>) : CompiledParser<IN, OUT> {
-        override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
+        override fun start(next: ParseContinuation<IN, OUT>): PullParser<IN> {
             return ChoicePullParser(options.map { Option(it, next) })
         }
     }
 
-    private class ChoicePullParser<IN, NEXT>(
-        options: List<Option<IN, *, NEXT>>
-    ) : PullParser<IN, NEXT> {
-        private val states: Array<OptionState<IN, NEXT>>
+    private class ChoicePullParser<IN>(
+        options: List<Option<IN, *>>
+    ) : PullParser<IN> {
+        private val states: Array<OptionState<IN>>
         private var matched = 0
 
         init {
@@ -70,7 +70,7 @@ internal class ChoiceParser<IN, OUT>(
             })
         }
 
-        override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
+        override fun parse(input: IN, max: Int): PullParser.Result<IN> {
             val maxAdvance = min(max, 1)
             var waitingFor = 0
             var hasZeroAdvance = false
@@ -108,7 +108,13 @@ internal class ChoiceParser<IN, OUT>(
                                         val expected = ExpectationProvider.oneOfOrNull(failures)
                                         PullParser.RequireMore(0, option.commit, option.continuation.next.matches, optionResult.parser, expected)
                                     } else {
-                                        PullParser.RequireMore(optionResult.advance, option.commit, option.continuation.next.matches, optionResult.parser, optionResult.failedChoice)
+                                        PullParser.RequireMore(
+                                            optionResult.advance,
+                                            option.commit,
+                                            option.continuation.next.matches,
+                                            optionResult.parser,
+                                            optionResult.failedChoice
+                                        )
                                     }
                                 }
                             }
@@ -170,7 +176,7 @@ internal class ChoiceParser<IN, OUT>(
         }
     }
 
-    internal class OptionState<IN, NEXT> internal constructor(var state: ParseState<IN, NEXT>, internal val continuation: OptionContinuation<*, *, *>) {
+    internal class OptionState<IN> internal constructor(var state: ParseState<IN>, internal val continuation: OptionContinuation<*, *>) {
         var matched = 0
         var commit = 0
         var successful = false
@@ -181,14 +187,14 @@ internal class ChoiceParser<IN, OUT>(
         }
     }
 
-    internal class OptionContinuation<IN, OUT, NEXT>(val next: ParseContinuation<IN, OUT, NEXT>) : ParseContinuation<IN, OUT, NEXT> {
+    internal class OptionContinuation<IN, OUT>(val next: ParseContinuation<IN, OUT>) : ParseContinuation<IN, OUT> {
         override fun toString(): String {
             return "{choice-option-continuation $next}"
         }
 
         override var matches: Boolean = true
 
-        override fun next(length: Int, value: ValueProvider<OUT>): PullParser<IN, NEXT> {
+        override fun next(length: Int, value: ValueProvider<OUT>): PullParser<IN> {
             return next.next(length, value)
         }
     }

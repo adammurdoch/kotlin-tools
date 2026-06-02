@@ -32,7 +32,7 @@ internal class OneOrMoreParser<IN, OUT>(
         val tail: CompiledParser<IN, ITEM>,
         val initial: Accumulator<ITEM, OUT>
     ) : CompiledParser<IN, OUT> {
-        override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
+        override fun start(next: ParseContinuation<IN, OUT>): PullParser<IN> {
             return parser.start(ParseContinuation.then { length, value ->
                 val result = initial.add(value, length)
                 if (length == 0) {

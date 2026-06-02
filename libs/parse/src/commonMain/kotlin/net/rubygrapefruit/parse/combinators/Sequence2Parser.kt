@@ -26,7 +26,7 @@ internal class Sequence2Parser<IN, A, B, OUT>(
             return "{sequence $a $b}"
         }
 
-        override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
+        override fun start(next: ParseContinuation<IN, OUT>): PullParser<IN> {
             return a.then { lengthA, valueA ->
                 b.start(next.map { lengthB, valueB ->
                     val value = valueA.zip(valueB, map)

@@ -16,16 +16,16 @@ internal class BinaryLiteralParser<OUT>(
         return BinaryLiteralParser(bytes, Unit)
     }
 
-    override fun <NEXT> start(next: ParseContinuation<ByteStream, OUT, NEXT>): PullParser<ByteStream, NEXT> {
+    override fun start(next: ParseContinuation<ByteStream, OUT>): PullParser<ByteStream> {
         return ByteLiteralPullParser(bytes, provider, expectations, next)
     }
 
-    private class ByteLiteralPullParser<OUT, NEXT>(
+    private class ByteLiteralPullParser<OUT>(
         private val bytes: ByteArray,
         private val result: ValueProvider<OUT>,
         private val expectations: List<Expectation>,
-        private val next: ParseContinuation<ByteStream, OUT, NEXT>
-    ) : PullParser<ByteStream, NEXT> {
+        private val next: ParseContinuation<ByteStream, OUT>
+    ) : PullParser<ByteStream> {
         private var matched = 0
 
         override fun toString(): String {
@@ -36,7 +36,7 @@ internal class BinaryLiteralParser<OUT>(
             return PullParser.Failed(0, expectations[matched])
         }
 
-        override fun parse(input: ByteStream, max: Int): PullParser.Result<ByteStream, NEXT> {
+        override fun parse(input: ByteStream, max: Int): PullParser.Result<ByteStream> {
             var index = 0
             val remaining = bytes.size - matched
             while (index < remaining) {

@@ -79,16 +79,16 @@ internal class DiagnosticParser<IN, OUT> private constructor(
             return "{d $parser}"
         }
 
-        override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
+        override fun start(next: ParseContinuation<IN, OUT>): PullParser<IN> {
             return DiagnosticPullParser(parser.start(next), logger, listener)
         }
     }
 
-    private class DiagnosticPullParser<IN, OUT>(
-        private val parser: PullParser<IN, OUT>,
+    private class DiagnosticPullParser<IN>(
+        private val parser: PullParser<IN>,
         private val logger: Logger,
         private val listener: Listener
-    ) : PullParser<IN, OUT> {
+    ) : PullParser<IN> {
         private val id = nextId++
 
         override fun toString(): String {
@@ -99,7 +99,7 @@ internal class DiagnosticParser<IN, OUT> private constructor(
             return parser.stop()
         }
 
-        override fun parse(input: IN, max: Int): PullParser.Result<IN, OUT> {
+        override fun parse(input: IN, max: Int): PullParser.Result<IN> {
             if (parser is DiagnosticPullParser) {
                 return parser.parse(input, max)
             }

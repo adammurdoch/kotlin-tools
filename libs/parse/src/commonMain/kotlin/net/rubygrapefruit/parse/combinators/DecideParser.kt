@@ -20,7 +20,7 @@ internal class DecideParser<IN, INTERMEDIATE, OUT>(
         private val factory: (INTERMEDIATE) -> Parser<*, OUT>,
         private val compiler: CombinatorBuilder.Compiler<IN>
     ) : CompiledParser<IN, OUT> {
-        override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
+        override fun start(next: ParseContinuation<IN, OUT>): PullParser<IN> {
             return parser.then { lengthA, valueA ->
                 val nextParser: CompiledParser<IN, OUT> = compiler.compile(factory(valueA.get()))
                 nextParser.start(next.map { lengthB, valueB ->

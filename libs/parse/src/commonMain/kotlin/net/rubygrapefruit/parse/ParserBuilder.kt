@@ -13,5 +13,5 @@ internal interface ParserBuilder<IN, OUT> {
     /**
      * Starts parsing.
      */
-    fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT>
+    fun start(next: ParseContinuation<IN, OUT>): PullParser<IN>
 }

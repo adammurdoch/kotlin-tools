@@ -5,7 +5,7 @@ package net.rubygrapefruit.parse
  *
  * Implementations may have mutable state and must not be reused.
  */
-internal interface PullParser<in IN, out OUT> : ParseState<IN, OUT> {
+internal interface PullParser<in IN> : ParseState<IN> {
     /**
      * Forces this parser to stop at the current position.
      */
@@ -16,23 +16,23 @@ internal interface PullParser<in IN, out OUT> : ParseState<IN, OUT> {
      *
      * @param max May be 0
      */
-    fun parse(input: IN, max: Int): Result<IN, OUT>
+    fun parse(input: IN, max: Int): Result<IN>
 
-    sealed interface Result<in IN, out OUT>
+    sealed interface Result<in IN>
 
-    sealed interface Finished<in IN, out OUT> : Result<IN, OUT>, ParseState<IN, OUT>
+    sealed interface Finished<in IN> : Result<IN>, ParseState<IN>
 
     /**
      * Parser has successfully matched
      */
-    data class Matched<out OUT>(val value: OUT) : Finished<Any?, OUT>
+    data object Matched : Finished<Any?>
 
     /**
      * Parser stopped matching
      *
      * @param index Relative to the start of input to [parse]. Can be positive or negative. Must be < max passed to [parse].
      */
-    data class Failed(val index: Int, val expected: ExpectationProvider) : Finished<Any?, Nothing> {
+    data class Failed(val index: Int, val expected: ExpectationProvider) : Finished<Any?> {
         fun map(map: (Expectation) -> Expectation): Failed {
             return Failed(index, expected.map(map))
         }
@@ -67,11 +67,11 @@ internal interface PullParser<in IN, out OUT> : ParseState<IN, OUT> {
      * @param commit The parser will not fail in the given inputs
      * @param matched Parser has matched and moved to next parser, or will definitely match.
      */
-    data class RequireMore<in IN, out OUT>(
+    data class RequireMore<in IN>(
         val advance: Int,
         val commit: Int,
         val matched: Boolean,
-        val parser: PullParser<IN, OUT>,
+        val parser: PullParser<IN>,
         val failedChoice: ExpectationProvider? = null
-    ) : Result<IN, OUT>
+    ) : Result<IN>
 }

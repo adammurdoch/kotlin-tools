@@ -19,15 +19,15 @@ internal class DescribingParser<IN, OUT>(
         val parser: CompiledParser<IN, OUT>,
         private val expectation: Expectation
     ) : CompiledParser<IN, OUT> {
-        override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
+        override fun start(next: ParseContinuation<IN, OUT>): PullParser<IN> {
             return DescribingPullParser(parser.start(next), expectation)
         }
     }
 
-    private class DescribingPullParser<IN, NEXT>(
-        private var parser: PullParser<IN, NEXT>,
+    private class DescribingPullParser<IN>(
+        private var parser: PullParser<IN>,
         private val expectation: Expectation
-    ) : PullParser<IN, NEXT> {
+    ) : PullParser<IN> {
         private var advanced = 0
 
         override fun toString(): String {
@@ -39,7 +39,7 @@ internal class DescribingParser<IN, OUT>(
             return mapFailure(failure)
         }
 
-        override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
+        override fun parse(input: IN, max: Int): PullParser.Result<IN> {
             val result = parser.parse(input, max)
             return when (result) {
                 is PullParser.Matched -> result

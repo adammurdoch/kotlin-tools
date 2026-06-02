@@ -7,15 +7,15 @@ internal class SingleInputCompiledParser<IN : Input<*>, OUT>(
     val parser: SingleInputParser<IN>,
     val extractor: Extractor<IN, OUT>
 ) : CompiledParser<IN, OUT> {
-    override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
+    override fun start(next: ParseContinuation<IN, OUT>): PullParser<IN> {
         return SingleInputPullParser(parser, extractor, next)
     }
 
-    private class SingleInputPullParser<IN : Input<*>, OUT, NEXT>(
+    private class SingleInputPullParser<IN : Input<*>, OUT>(
         private val parser: SingleInputParser<IN>,
         private val extractor: Extractor<IN, OUT>,
-        private val next: ParseContinuation<IN, OUT, NEXT>
-    ) : PullParser<IN, NEXT> {
+        private val next: ParseContinuation<IN, OUT>
+    ) : PullParser<IN> {
         override fun toString(): String {
             return "{one $parser}"
         }
@@ -24,7 +24,7 @@ internal class SingleInputCompiledParser<IN : Input<*>, OUT>(
             return PullParser.Failed(0, parser.expectation)
         }
 
-        override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
+        override fun parse(input: IN, max: Int): PullParser.Result<IN> {
             return if (max == 0) {
                 if (input.available == 0 && input.finished) {
                     stop()

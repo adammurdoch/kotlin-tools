@@ -20,15 +20,15 @@ internal class SucceedParser<OUT>(
     internal class SucceedCompiledParser<IN, OUT>(
         val result: ValueProvider<OUT>
     ) : CompiledParser<IN, OUT> {
-        override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
+        override fun start(next: ParseContinuation<IN, OUT>): PullParser<IN> {
             return SucceedPullParser(result, next)
         }
     }
 
-    private class SucceedPullParser<IN, OUT, NEXT>(
+    private class SucceedPullParser<IN, OUT>(
         val result: ValueProvider<OUT>,
-        val next: ParseContinuation<IN, OUT, NEXT>
-    ) : PullParser<IN, NEXT> {
+        val next: ParseContinuation<IN, OUT>
+    ) : PullParser<IN> {
         override fun toString(): String {
             return "{succeed}"
         }
@@ -37,7 +37,7 @@ internal class SucceedParser<OUT>(
             return next.next(0, result).stop()
         }
 
-        override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
+        override fun parse(input: IN, max: Int): PullParser.Result<IN> {
             return next.matched(0, 0, result)
         }
     }

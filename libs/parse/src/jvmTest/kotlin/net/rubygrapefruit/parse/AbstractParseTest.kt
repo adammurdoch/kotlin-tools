@@ -286,7 +286,7 @@ abstract class AbstractParseTest {
         pullParser.expecting(fixture)
     }
 
-    private fun PullParser<*, *>.expecting(fixture: DefaultCompiledParserFixture) {
+    private fun PullParser<*>.expecting(fixture: DefaultCompiledParserFixture) {
         val failure = stop()
         assertEquals(0, failure.index)
         assertEquals(fixture.message(), failure.expected.expectation().format())

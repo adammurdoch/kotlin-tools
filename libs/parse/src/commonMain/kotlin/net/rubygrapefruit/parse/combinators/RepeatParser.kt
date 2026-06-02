@@ -31,11 +31,11 @@ internal class RepeatParser<IN, OUT>(
         val parser: CompiledParser<IN, ITEM>,
         val initial: Accumulator<ITEM, OUT>
     ) : CompiledParser<IN, OUT> {
-        override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
+        override fun start(next: ParseContinuation<IN, OUT>): PullParser<IN> {
             return parser.start(continuation(count - 1, initial, next))
         }
 
-        private fun <NEXT> continuation(count: Int, accumulator: Accumulator<ITEM, OUT>, next: ParseContinuation<IN, OUT, NEXT>): ParseContinuation<IN, ITEM, NEXT> {
+        private fun continuation(count: Int, accumulator: Accumulator<ITEM, OUT>, next: ParseContinuation<IN, OUT>): ParseContinuation<IN, ITEM> {
             return if (count == 0) {
                 next.map { length, value ->
                     val result = accumulator.add(value, length)

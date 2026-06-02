@@ -6,15 +6,15 @@ internal class ZeroOrMoreSingleInputCompiledParser<IN : Input<*>, OUT>(
     val parser: SingleInputParser<IN>,
     val accumulator: RangeAccumulator<IN, OUT>
 ) : CompiledParser<IN, OUT> {
-    override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
+    override fun start(next: ParseContinuation<IN, OUT>): PullParser<IN> {
         return ZeroOrMorePullParser(parser, accumulator, next)
     }
 
-    private class ZeroOrMorePullParser<IN : Input<*>, OUT, NEXT>(
+    private class ZeroOrMorePullParser<IN : Input<*>, OUT>(
         val parser: SingleInputParser<IN>,
         private var accumulator: RangeAccumulator<IN, OUT>,
-        val next: ParseContinuation<IN, OUT, NEXT>
-    ) : PullParser<IN, NEXT> {
+        val next: ParseContinuation<IN, OUT>
+    ) : PullParser<IN> {
         private var matched = 0
 
         override fun toString(): String {
@@ -25,7 +25,7 @@ internal class ZeroOrMoreSingleInputCompiledParser<IN : Input<*>, OUT>(
             return PullParser.Failed.merged(listOf(PullParser.Failed(0, parser.expectation), next.next(matched, accumulator).stop()))
         }
 
-        override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
+        override fun parse(input: IN, max: Int): PullParser.Result<IN> {
             var index = 0
             while (index < max) {
                 if (!parser.match(input, index)) {

@@ -7,19 +7,19 @@ internal interface CompiledParser<IN, out OUT> {
     /**
      * Starts parsing.
      */
-    fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT>
+    fun start(next: ParseContinuation<IN, OUT>): PullParser<IN>
 
     /**
      * A convenience for [start].
      */
-    fun <NEXT> then(next: (length: Int, value: ValueProvider<OUT>) -> PullParser<IN, NEXT>): PullParser<IN, NEXT> {
+    fun then(next: (length: Int, value: ValueProvider<OUT>) -> PullParser<IN>): PullParser<IN> {
         return start(ParseContinuation.then(next))
     }
 
     /**
      * Starts this parser as the last parser.
      */
-    fun start(): PullParser<IN, OUT> {
+    fun start(): PullParser<IN> {
         return start(ParseContinuation.end())
     }
 }

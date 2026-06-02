@@ -8,7 +8,7 @@ internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>,
     private val failureFormatter: (CONTEXT, String) -> String
 ) {
     private val end = ValueReceivingContinuation<IN, OUT>()
-    private var state: ParseState<IN, OUT> = parser.start()
+    private var state: ParseState<IN> = parser.start()
     private var failedChoice: ExpectationProvider? = null
     private var failedChoiceIndex = 0
     private var failure: ParseResult.Fail<CONTEXT>? = null
@@ -85,13 +85,13 @@ internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>,
         }
     }
 
-    private fun Parser<*, OUT>.start(): PullParser<IN, OUT> {
+    private fun Parser<*, OUT>.start(): PullParser<IN> {
         val all = suffixed(this, endOfInput())
         return all.compile<IN, OUT>().start(end)
     }
 }
 
-private class ValueReceivingContinuation<IN, OUT> : ParseContinuation<IN, OUT, OUT> {
+private class ValueReceivingContinuation<IN, OUT> : ParseContinuation<IN, OUT> {
     private var value: ValueProvider<OUT>? = null
 
     override val matches: Boolean
@@ -101,18 +101,8 @@ private class ValueReceivingContinuation<IN, OUT> : ParseContinuation<IN, OUT, O
         return value!!.get()
     }
 
-    override fun next(length: Int, value: ValueProvider<OUT>): PullParser<IN, OUT> {
+    override fun next(length: Int, value: ValueProvider<OUT>): PullParser<IN> {
         this.value = value
-        return Ended(value)
-    }
-}
-
-private class Ended<IN, OUT>(val value: ValueProvider<OUT>) : PullParser<IN, OUT> {
-    override fun stop(): PullParser.Failed {
-        return PullParser.Failed(0, Expectation.Nothing)
-    }
-
-    override fun parse(input: IN, max: Int): PullParser.Result<IN, OUT> {
-        return PullParser.Matched(value.get())
+        return ParseContinuation.end<IN, OUT>().next(length, value)
     }
 }

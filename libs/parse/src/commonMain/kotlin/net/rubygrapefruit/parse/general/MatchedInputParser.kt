@@ -14,17 +14,17 @@ internal class MatchedInputParser<IN, OUT>(
     }
 
     internal class MatchedInputCompiledParser<OUT>(val parser: CompiledParser<SlicingInput<OUT>, Unit>) : CompiledParser<SlicingInput<OUT>, OUT> {
-        override fun <NEXT> start(next: ParseContinuation<SlicingInput<OUT>, OUT, NEXT>): PullParser<SlicingInput<OUT>, NEXT> {
+        override fun start(next: ParseContinuation<SlicingInput<OUT>, OUT>): PullParser<SlicingInput<OUT>> {
             return parser.then { length, _ ->
                 CollectMatchedInputPullParser(length, next)
             }
         }
     }
 
-    private class CollectMatchedInputPullParser<OUT, NEXT>(
+    private class CollectMatchedInputPullParser<OUT>(
         private val length: Int,
-        private val next: ParseContinuation<SlicingInput<OUT>, OUT, NEXT>
-    ) : PullParser<SlicingInput<OUT>, NEXT> {
+        private val next: ParseContinuation<SlicingInput<OUT>, OUT>
+    ) : PullParser<SlicingInput<OUT>> {
         override fun toString(): String {
             return "{collect-matched-input length=$length}"
         }
@@ -33,7 +33,7 @@ internal class MatchedInputParser<IN, OUT>(
             return PullParser.Failed(0, Expectation.Nothing)
         }
 
-        override fun parse(input: SlicingInput<OUT>, max: Int): PullParser.Result<SlicingInput<OUT>, NEXT> {
+        override fun parse(input: SlicingInput<OUT>, max: Int): PullParser.Result<SlicingInput<OUT>> {
             return next.matched(-length, 0, input.get(-length, 0))
         }
     }

@@ -12,12 +12,12 @@ internal class EndOfInputParser<OUT>(val result: OUT) : Parser<Any, OUT>, Combin
     }
 
     internal class EndOfInputCompiledParser<IN : Input<*>, OUT>(val result: OUT) : CompiledParser<IN, OUT> {
-        override fun <NEXT> start(next: ParseContinuation<IN, OUT, NEXT>): PullParser<IN, NEXT> {
+        override fun start(next: ParseContinuation<IN, OUT>): PullParser<IN> {
             return EndOfInputPullParser(result, next)
         }
     }
 
-    private class EndOfInputPullParser<IN : Input<*>, OUT, NEXT>(val result: OUT, val next: ParseContinuation<IN, OUT, NEXT>) : PullParser<IN, NEXT> {
+    private class EndOfInputPullParser<IN : Input<*>, OUT>(val result: OUT, val next: ParseContinuation<IN, OUT>) : PullParser<IN> {
         private val expectation: Expectation = Expectation.One("end of input")
 
         override fun toString(): String {
@@ -28,7 +28,7 @@ internal class EndOfInputParser<OUT>(val result: OUT) : Parser<Any, OUT>, Combin
             return PullParser.Failed(0, expectation)
         }
 
-        override fun parse(input: IN, max: Int): PullParser.Result<IN, NEXT> {
+        override fun parse(input: IN, max: Int): PullParser.Result<IN> {
             return if (input.available > 0) {
                 PullParser.Failed(0, expectation)
             } else if (input.finished) {

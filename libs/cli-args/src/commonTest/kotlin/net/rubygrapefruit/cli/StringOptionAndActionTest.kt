@@ -46,11 +46,11 @@ class StringOptionAndActionTest : AbstractActionTest() {
         }
 
         parse(WithSub(), listOf("sub", "-o", "123")) { action ->
-            assertEquals("123", (action.sub as SubAction).option)
+            assertEquals("123", action.sub.option)
         }
 
         parse(WithSub(), listOf("sub")) { action ->
-            assertNull((action.sub as SubAction).option)
+            assertNull(action.sub.option)
         }
     }
 }

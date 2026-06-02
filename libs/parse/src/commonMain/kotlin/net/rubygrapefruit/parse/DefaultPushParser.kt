@@ -1,10 +1,10 @@
 package net.rubygrapefruit.parse
 
 internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>, OUT>(
-    parser: PullParser<IN, OUT>,
+    parser: Parser<*, OUT>,
     private val failureFormatter: (CONTEXT, String) -> String
 ) {
-    private var state: ParseState<IN, OUT> = parser
+    private var state: ParseState<IN, OUT> = parser.start()
     private var failedChoice: ExpectationProvider? = null
     private var failedChoiceIndex = 0
     private var failure: ParseResult.Fail<CONTEXT>? = null

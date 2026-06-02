@@ -2,10 +2,10 @@ package net.rubygrapefruit.parse.binary
 
 import net.rubygrapefruit.parse.DefaultPushParser
 import net.rubygrapefruit.parse.ParseResult
-import net.rubygrapefruit.parse.PullParser
+import net.rubygrapefruit.parse.Parser
 
 internal class DefaultBinaryPushParser<OUT>(
-    parser: PullParser<ByteStream, OUT>,
+    parser: Parser<BinaryInput, OUT>,
     failureFormatter: (BinaryFailureContext, String) -> String
 ) : DefaultPushParser<BinaryFailureContext, AdvancingByteStream, OUT>(parser, failureFormatter), BinaryPushParser<OUT> {
     private val input = BufferingByteStream()

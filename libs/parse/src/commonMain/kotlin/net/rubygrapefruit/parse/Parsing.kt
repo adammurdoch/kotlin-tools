@@ -7,7 +7,7 @@ import net.rubygrapefruit.parse.general.SingleInputCompiledParser
 import net.rubygrapefruit.parse.general.endOfInput
 
 internal fun <CONTEXT, IN : ContextualInput<CONTEXT, *>, OUT> parse(
-    parser: PullParser<IN, OUT>,
+    parser: Parser<*, OUT>,
     input: IN,
     failureFormatter: (CONTEXT, String) -> String
 ): ParseResult<CONTEXT, OUT> {

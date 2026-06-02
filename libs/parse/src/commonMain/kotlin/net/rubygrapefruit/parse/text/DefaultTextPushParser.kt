@@ -2,10 +2,10 @@ package net.rubygrapefruit.parse.text
 
 import net.rubygrapefruit.parse.DefaultPushParser
 import net.rubygrapefruit.parse.ParseResult
-import net.rubygrapefruit.parse.PullParser
+import net.rubygrapefruit.parse.Parser
 
 internal class DefaultTextPushParser<OUT>(
-    parser: PullParser<CharStream, OUT>,
+    parser: Parser<TextInput, OUT>,
     failureFormatter: (TextFailureContext, String) -> String
 ) : DefaultPushParser<TextFailureContext, AdvancingCharStream, OUT>(parser, failureFormatter), TextPushParser<OUT> {
     private val input = BufferingCharStream()

@@ -1,9 +1,13 @@
 package net.rubygrapefruit.parse
 
+import net.rubygrapefruit.parse.combinators.suffixed
+import net.rubygrapefruit.parse.general.endOfInput
+
 internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>, OUT>(
     parser: Parser<*, OUT>,
     private val failureFormatter: (CONTEXT, String) -> String
 ) {
+    private val end = ValueReceivingContinuation<IN, OUT>()
     private var state: ParseState<IN, OUT> = parser.start()
     private var failedChoice: ExpectationProvider? = null
     private var failedChoiceIndex = 0
@@ -57,7 +61,7 @@ internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>,
 
         val finalState = state
         return when (finalState) {
-            is PullParser.Matched -> ParseResult.Success(finalState.value)
+            is PullParser.Matched -> ParseResult.Success(end.get())
             is PullParser.Failed -> mapFailed(input, finalState)!!
             is PullParser -> throw IllegalStateException("Expected parsing to be finished, but is $finalState")
         }
@@ -79,5 +83,36 @@ internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>,
             failure = mapped
             mapped
         }
+    }
+
+    private fun Parser<*, OUT>.start(): PullParser<IN, OUT> {
+        val all = suffixed(this, endOfInput())
+        return all.compile<IN, OUT>().start(end)
+    }
+}
+
+private class ValueReceivingContinuation<IN, OUT> : ParseContinuation<IN, OUT, OUT> {
+    private var value: ValueProvider<OUT>? = null
+
+    override val matches: Boolean
+        get() = true
+
+    fun get(): OUT {
+        return value!!.get()
+    }
+
+    override fun next(length: Int, value: ValueProvider<OUT>): PullParser<IN, OUT> {
+        this.value = value
+        return Ended(value)
+    }
+}
+
+private class Ended<IN, OUT>(val value: ValueProvider<OUT>) : PullParser<IN, OUT> {
+    override fun stop(): PullParser.Failed {
+        return PullParser.Failed(0, Expectation.Nothing)
+    }
+
+    override fun parse(input: IN, max: Int): PullParser.Result<IN, OUT> {
+        return PullParser.Matched(value.get())
     }
 }

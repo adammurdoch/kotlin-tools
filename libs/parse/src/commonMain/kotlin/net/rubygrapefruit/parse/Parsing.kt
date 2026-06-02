@@ -21,11 +21,6 @@ internal fun Expectation.format(): String {
     return "Expected ${expected.sorted().joinToString(", ")}"
 }
 
-internal fun <IN : Input<*>, OUT> Parser<*, OUT>.start(): PullParser<IN, OUT> {
-    val all = suffixed(this, endOfInput())
-    return DefaultCompiler<IN>().compile(all).start()
-}
-
 internal fun <IN : Input<*>, OUT> Parser<*, OUT>.compile(): CompiledParser<IN, OUT> {
     return DefaultCompiler<IN>().compile(this)
 }

@@ -57,6 +57,9 @@
 - Native macOS bundle plugin
 - Configurable bundle id, app display name, app version
 - Handle missing main class or multiple main classes
+- Build services/servers
+  - Bundle into several docker layers (JVM, dependencies, app resources)
+  - Use JVM's percentage based memory flags
 - Module-info
     - Default module name to top-most package
     - Only export packages that contain public non-internal types

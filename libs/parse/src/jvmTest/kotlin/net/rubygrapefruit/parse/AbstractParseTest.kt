@@ -325,7 +325,7 @@ abstract class AbstractParseTest {
             is ParseResult.Success -> fail("Expected parse failure at offset $offset with message: $message")
             is ParseResult.Fail -> {
                 assertEquals(message, this.message)
-                assertEquals(Offset(offset), context.position.offset, "unexpected offset for failure $message")
+                assertEquals(Position(offset), context.position.offset, "unexpected offset for failure $message")
                 assertEquals(line, context.position.line, "unexpected line")
                 assertEquals(col, context.position.col, "unexpected column")
                 assertEquals(failureLine, context.lineText, "unexpected line text")
@@ -357,7 +357,7 @@ abstract class AbstractParseTest {
             is ParseResult.Success -> fail("Expected parse failure at offset $offset with message: $message")
             is ParseResult.Fail -> {
                 assertEquals(message, this.message)
-                assertEquals(Offset(offset), context.position.offset, "unexpected offset for failure $message")
+                assertEquals(Position(offset), context.position.offset, "unexpected offset for failure $message")
                 assertEquals(failureContext, context.found)
 
                 try {

@@ -1,38 +1,38 @@
 package net.rubygrapefruit.parse.text
 
-import net.rubygrapefruit.parse.Offset
+import net.rubygrapefruit.parse.Position
 import net.rubygrapefruit.parse.minus
 import net.rubygrapefruit.parse.plus
 
 internal class StringCharStream(val text: String) : AdvancingCharStream {
-    override var offset = Offset.Zero
+    override var position = Position.Zero
         private set
 
     override val available: Int
-        get() = text.length - offset
+        get() = text.length - position
 
     override val finished: Boolean
         get() = true
 
     override fun get(index: Int): Char {
-        return text[index + offset]
+        return text[index + position]
     }
 
     override fun get(start: Int, end: Int): String {
-        return text.substring(start + offset, end + offset)
+        return text.substring(start + position, end + position)
     }
 
     override fun advance(count: Int) {
-        offset += count
+        position += count
     }
 
     override fun posAt(index: Int): CharPosition {
-        val offset = index + offset
+        val offset = index + position
         return text.posAt(offset)
     }
 
     override fun contextAt(index: Int): TextFailureContext {
-        val offset = index + offset
+        val offset = index + position
         val pos = text.posAt(offset)
         val lineText = text.line(offset)
         return AdvancingCharStream.TextStreamContext(pos, lineText)
@@ -51,7 +51,7 @@ internal class StringCharStream(val text: String) : AdvancingCharStream {
             }
         }
 
-        return CharPosition(Offset(index), line, col)
+        return CharPosition(Position(index), line, col)
     }
 
     private fun CharSequence.line(index: Int): String {

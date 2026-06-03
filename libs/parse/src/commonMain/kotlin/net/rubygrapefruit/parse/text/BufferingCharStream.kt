@@ -1,34 +1,34 @@
 package net.rubygrapefruit.parse.text
 
-import net.rubygrapefruit.parse.Offset
+import net.rubygrapefruit.parse.Position
 import net.rubygrapefruit.parse.minus
 import net.rubygrapefruit.parse.plus
 
 
 internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharStream {
     private var tail = Buffer(null, 0, 1, 1, bufferLen)
-    override var offset = Offset.Zero
+    override var position = Position.Zero
         private set
     override var finished: Boolean = false
         private set
 
     override val available: Int
-        get() = tail.endIndex - offset
+        get() = tail.endIndex - position
 
     override fun get(index: Int): Char {
-        return tail.get(index + offset)
+        return tail.get(index + position)
     }
 
     override fun get(start: Int, end: Int): String {
-        return tail.get(start + offset, end + offset)
+        return tail.get(start + position, end + position)
     }
 
     override fun posAt(index: Int): CharPosition {
-        return tail.posAt(index + offset)
+        return tail.posAt(index + position)
     }
 
     override fun contextAt(index: Int): TextFailureContext? {
-        return tail.contextAt(index + offset, finished)
+        return tail.contextAt(index + position, finished)
     }
 
     fun append(chars: CharArray) {
@@ -40,7 +40,7 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
     }
 
     override fun advance(count: Int) {
-        offset += count
+        position += count
     }
 
     fun end() {
@@ -157,7 +157,7 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
                 builder.endLine = startIndex + endLine
             }
 
-            val pos = CharPosition(Offset(index), line, col)
+            val pos = CharPosition(Position(index), line, col)
             return AdvancingCharStream.TextStreamContext(pos, builder.endBuffer.get(builder.startLine, builder.endLine))
         }
 
@@ -208,7 +208,7 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
                 }
             }
 
-            return CharPosition(Offset(index), line, col)
+            return CharPosition(Position(index), line, col)
         }
 
         fun append(chars: CharArray, start: Int, end: Int): Buffer {

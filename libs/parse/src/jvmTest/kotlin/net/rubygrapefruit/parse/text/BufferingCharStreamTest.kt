@@ -1,6 +1,6 @@
 package net.rubygrapefruit.parse.text
 
-import net.rubygrapefruit.parse.Offset
+import net.rubygrapefruit.parse.Position
 import kotlin.test.*
 
 class BufferingCharStreamTest {
@@ -188,7 +188,7 @@ class BufferingCharStreamTest {
         val stream = BufferingCharStream()
 
         val pos = stream.posAt(0)
-        assertEquals(Offset.Zero, pos.offset)
+        assertEquals(Position.Zero, pos.offset)
         assertEquals(1, pos.line)
         assertEquals(1, pos.col)
     }
@@ -205,7 +205,7 @@ class BufferingCharStreamTest {
 
         stream.contextAt(0).apply {
             assertNotNull(this)
-            assertEquals(Offset.Zero, position.offset)
+            assertEquals(Position.Zero, position.offset)
             assertEquals(1, position.line)
             assertEquals(1, position.col)
             assertEquals("", lineText)
@@ -219,7 +219,7 @@ class BufferingCharStreamTest {
         stream.append("123".toCharArray())
 
         val pos = stream.posAt(0)
-        assertEquals(Offset.Zero, pos.offset)
+        assertEquals(Position.Zero, pos.offset)
         assertEquals(1, pos.line)
         assertEquals(1, pos.col)
     }
@@ -231,13 +231,13 @@ class BufferingCharStreamTest {
         stream.append("1\n2\n\n456".toCharArray())
 
         stream.posAt(5).apply {
-            assertEquals(Offset(5), offset)
+            assertEquals(Position(5), offset)
             assertEquals(4, line)
             assertEquals(1, col)
         }
 
         stream.posAt(7).apply {
-            assertEquals(Offset(7), offset)
+            assertEquals(Position(7), offset)
             assertEquals(4, line)
             assertEquals(3, col)
         }
@@ -251,7 +251,7 @@ class BufferingCharStreamTest {
 
         stream.contextAt(5).apply {
             assertNotNull(this)
-            assertEquals(Offset(5), position.offset)
+            assertEquals(Position(5), position.offset)
             assertEquals(3, position.line)
             assertEquals(1, position.col)
             assertEquals("45", lineText)
@@ -259,7 +259,7 @@ class BufferingCharStreamTest {
 
         stream.contextAt(6).apply {
             assertNotNull(this)
-            assertEquals(Offset(6), position.offset)
+            assertEquals(Position(6), position.offset)
             assertEquals(3, position.line)
             assertEquals(2, position.col)
             assertEquals("45", lineText)
@@ -283,7 +283,7 @@ class BufferingCharStreamTest {
 
         stream.contextAt(5).apply {
             assertNotNull(this)
-            assertEquals(Offset(5), position.offset)
+            assertEquals(Position(5), position.offset)
             assertEquals(4, position.line)
             assertEquals(1, position.col)
             assertEquals("456", lineText)
@@ -291,7 +291,7 @@ class BufferingCharStreamTest {
 
         stream.contextAt(7).apply {
             assertNotNull(this)
-            assertEquals(Offset(7), position.offset)
+            assertEquals(Position(7), position.offset)
             assertEquals(4, position.line)
             assertEquals(3, position.col)
             assertEquals("456", lineText)
@@ -305,13 +305,13 @@ class BufferingCharStreamTest {
         stream.append("1\n23456".toCharArray())
 
         stream.posAt(2).apply {
-            assertEquals(Offset(2), offset)
+            assertEquals(Position(2), offset)
             assertEquals(2, line)
             assertEquals(1, col)
         }
 
         stream.posAt(3).apply {
-            assertEquals(Offset(3), offset)
+            assertEquals(Position(3), offset)
             assertEquals(2, line)
             assertEquals(2, col)
         }
@@ -325,14 +325,14 @@ class BufferingCharStreamTest {
 
         stream.contextAt(1).apply {
             assertNotNull(this)
-            assertEquals(Offset(1), position.offset)
+            assertEquals(Position(1), position.offset)
             assertEquals(2, position.line)
             assertEquals(1, position.col)
             assertEquals("12", lineText)
         }
         stream.contextAt(2).apply {
             assertNotNull(this)
-            assertEquals(Offset(2), position.offset)
+            assertEquals(Position(2), position.offset)
             assertEquals(2, position.line)
             assertEquals(2, position.col)
             assertEquals("12", lineText)
@@ -356,21 +356,21 @@ class BufferingCharStreamTest {
 
         stream.contextAt(3).apply {
             assertNotNull(this)
-            assertEquals(Offset(3), position.offset)
+            assertEquals(Position(3), position.offset)
             assertEquals(3, position.line)
             assertEquals(1, position.col)
             assertEquals("23456789", lineText)
         }
         stream.contextAt(7).apply {
             assertNotNull(this)
-            assertEquals(Offset(7), position.offset)
+            assertEquals(Position(7), position.offset)
             assertEquals(3, position.line)
             assertEquals(5, position.col)
             assertEquals("23456789", lineText)
         }
         stream.contextAt(10).apply {
             assertNotNull(this)
-            assertEquals(Offset(10), position.offset)
+            assertEquals(Position(10), position.offset)
             assertEquals(3, position.line)
             assertEquals(8, position.col)
             assertEquals("23456789", lineText)
@@ -385,28 +385,28 @@ class BufferingCharStreamTest {
 
         stream.contextAt(0).apply {
             assertNotNull(this)
-            assertEquals(Offset.Zero, position.offset)
+            assertEquals(Position.Zero, position.offset)
             assertEquals(1, position.line)
             assertEquals(1, position.col)
             assertEquals("123456789", lineText)
         }
         stream.contextAt(2).apply {
             assertNotNull(this)
-            assertEquals(Offset(2), position.offset)
+            assertEquals(Position(2), position.offset)
             assertEquals(1, position.line)
             assertEquals(3, position.col)
             assertEquals("123456789", lineText)
         }
         stream.contextAt(5).apply {
             assertNotNull(this)
-            assertEquals(Offset(5), position.offset)
+            assertEquals(Position(5), position.offset)
             assertEquals(1, position.line)
             assertEquals(6, position.col)
             assertEquals("123456789", lineText)
         }
         stream.contextAt(8).apply {
             assertNotNull(this)
-            assertEquals(Offset(8), position.offset)
+            assertEquals(Position(8), position.offset)
             assertEquals(1, position.line)
             assertEquals(9, position.col)
             assertEquals("123456789", lineText)
@@ -420,13 +420,13 @@ class BufferingCharStreamTest {
         stream.append("1\n2\n\n".toCharArray())
 
         stream.posAt(1).apply {
-            assertEquals(Offset(1), offset)
+            assertEquals(Position(1), offset)
             assertEquals(1, line)
             assertEquals(2, col)
         }
 
         stream.posAt(4).apply {
-            assertEquals(Offset(4), offset)
+            assertEquals(Position(4), offset)
             assertEquals(3, line)
             assertEquals(1, col)
         }
@@ -440,7 +440,7 @@ class BufferingCharStreamTest {
 
         stream.contextAt(1).apply {
             assertNotNull(this)
-            assertEquals(Offset(1), position.offset)
+            assertEquals(Position(1), position.offset)
             assertEquals(1, position.line)
             assertEquals(2, position.col)
             assertEquals("1", lineText)
@@ -448,7 +448,7 @@ class BufferingCharStreamTest {
 
         stream.contextAt(4).apply {
             assertNotNull(this)
-            assertEquals(Offset(4), position.offset)
+            assertEquals(Position(4), position.offset)
             assertEquals(3, position.line)
             assertEquals(1, position.col)
             assertEquals("", lineText)
@@ -462,7 +462,7 @@ class BufferingCharStreamTest {
         stream.append("1\n2\n34".toCharArray())
 
         stream.posAt(6).apply {
-            assertEquals(Offset(6), offset)
+            assertEquals(Position(6), offset)
             assertEquals(3, line)
             assertEquals(3, col)
         }
@@ -482,7 +482,7 @@ class BufferingCharStreamTest {
 
         stream.contextAt(6).apply {
             assertNotNull(this)
-            assertEquals(Offset(6), position.offset)
+            assertEquals(Position(6), position.offset)
             assertEquals(3, position.line)
             assertEquals(3, position.col)
             assertEquals("34", lineText)

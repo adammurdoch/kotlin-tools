@@ -8,7 +8,7 @@ internal interface Input<POS> {
 
     val finished: Boolean
 
-    val offset: Offset
+    val position: Position
 
     fun posAt(index: Int): POS
 }

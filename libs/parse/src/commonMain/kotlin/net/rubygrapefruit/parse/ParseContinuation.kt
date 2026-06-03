@@ -12,11 +12,11 @@ internal interface ParseContinuation<in IN, in OUT> {
     }
 
     fun matched(start: Int, end: Int, value: ValueProvider<OUT>, failedChoice: ExpectationProvider?): PullParser.RequireMore<IN> {
-        return PullParser.RequireMore(end, end, matches, next(end - start, value), failedChoice)
+        return matched(end, end, end - start, value, failedChoice)
     }
 
-    fun matched(start: Int, end: Int, commit: Int, value: ValueProvider<OUT>, failedChoice: ExpectationProvider?): PullParser.RequireMore<IN> {
-        return PullParser.RequireMore(end, commit, matches, next(end - start, value), failedChoice)
+    fun matched(advance: Int, commit: Int, length: Int, value: ValueProvider<OUT>, failedChoice: ExpectationProvider?): PullParser.RequireMore<IN> {
+        return PullParser.RequireMore(advance, commit, matches, next(length, value), failedChoice)
     }
 
     fun <T> map(map: (Int, ValueProvider<T>) -> Pair<Int, ValueProvider<OUT>>): ParseContinuation<IN, T> {

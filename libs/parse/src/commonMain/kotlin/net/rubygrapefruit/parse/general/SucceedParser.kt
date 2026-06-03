@@ -34,7 +34,7 @@ internal class SucceedParser<OUT>(
         }
 
         override fun stop(): PullParser.Failed {
-            return next.next(0, result).stop()
+            return next.matched(0, 0, result).parser.stop()
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN> {

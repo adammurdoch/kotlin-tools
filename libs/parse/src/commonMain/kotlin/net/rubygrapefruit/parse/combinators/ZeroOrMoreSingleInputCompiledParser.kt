@@ -22,7 +22,7 @@ internal class ZeroOrMoreSingleInputCompiledParser<IN : Input<*>, OUT>(
         }
 
         override fun stop(): PullParser.Failed {
-            return PullParser.Failed.merged(listOf(PullParser.Failed(0, parser.expectation), next.next(matched, accumulator).stop()))
+            return PullParser.Failed.merged(listOf(PullParser.Failed(0, parser.expectation), next.matched(-matched, 0, accumulator).parser.stop()))
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN> {

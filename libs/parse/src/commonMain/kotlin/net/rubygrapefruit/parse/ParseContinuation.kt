@@ -15,6 +15,10 @@ internal interface ParseContinuation<in IN, in OUT> {
         return PullParser.RequireMore(end, end, matches, next(end - start, value), failedChoice)
     }
 
+    fun matched(start: Int, end: Int, commit: Int, value: ValueProvider<OUT>, failedChoice: ExpectationProvider?): PullParser.RequireMore<IN> {
+        return PullParser.RequireMore(end, commit, matches, next(end - start, value), failedChoice)
+    }
+
     fun <T> map(map: (Int, ValueProvider<T>) -> Pair<Int, ValueProvider<OUT>>): ParseContinuation<IN, T> {
         val self = this
         return object : ParseContinuation<IN, T> {

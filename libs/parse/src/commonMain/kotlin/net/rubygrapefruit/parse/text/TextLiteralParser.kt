@@ -49,8 +49,7 @@ internal class TextLiteralParser<OUT>(
                 }
                 index++
             }
-            val parser = next.next(text.length, result)
-            return PullParser.RequireMore(index, text.length, next.matches, parser)
+            return next.matched(-matched, index, text.length, result, null)
         }
     }
 }

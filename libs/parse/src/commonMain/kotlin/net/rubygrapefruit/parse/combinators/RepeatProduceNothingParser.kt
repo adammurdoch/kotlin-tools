@@ -11,6 +11,6 @@ internal class RepeatProduceNothingParser<IN>(
     }
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, Unit> {
-        return RepeatParser.of(count, compiler.compile(parser), UnitAccumulator.Empty)
+        return RepeatParser.of(count, parser, compiler, UnitAccumulator.Empty)
     }
 }

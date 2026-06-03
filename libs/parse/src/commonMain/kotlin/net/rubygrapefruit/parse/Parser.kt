@@ -5,5 +5,4 @@ package net.rubygrapefruit.parse
  *
  * A parser that does not produce a result is represented using an [OUT] of `Unit`.
  */
-interface Parser<in IN, out OUT> {
-}
+interface Parser<in IN, out OUT>

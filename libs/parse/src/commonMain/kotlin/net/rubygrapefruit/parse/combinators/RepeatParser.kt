@@ -12,17 +12,16 @@ internal class RepeatParser<IN, OUT>(
     }
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, List<OUT>> {
-        val initial = ListAccumulator.Empty<OUT>()
-        return if (count == 0) {
-            SucceedParser.SucceedCompiledParser(initial)
-        } else {
-            of(count, compiler.compile(parser), initial)
-        }
+        return of(count, parser, compiler, ListAccumulator.Empty())
     }
 
     companion object {
-        fun <IN, ITEM, OUT> of(count: Int, parser: CompiledParser<IN, ITEM>, initial: Accumulator<ITEM, OUT>): CompiledParser<IN, OUT> {
-            return RepeatCompiledParser(count, parser, initial)
+        fun <IN, ITEM, OUT> of(count: Int, parser: Parser<*, ITEM>, compiler: CombinatorBuilder.Compiler<IN>, initial: Accumulator<ITEM, OUT>): CompiledParser<IN, OUT> {
+            return if (count == 0) {
+                SucceedParser.SucceedCompiledParser(initial)
+            } else {
+                RepeatCompiledParser(count, compiler.compile(parser), initial)
+            }
         }
     }
 

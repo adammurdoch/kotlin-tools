@@ -39,4 +39,23 @@ class RepeatProduceNothingTest : AbstractParseTest() {
             expectEndOfInput()
         }
     }
+
+    @Test
+    fun `parses 0 byte literals`() {
+        val parser = repeat(0, literal(byteArrayOf(0x1, 0x2)))
+
+        parser.expecting {
+            expectSucceed()
+        }
+
+        parser.matches()
+
+        // extra
+        parser.doesNotMatch(0x3) {
+            expectEndOfInput()
+        }
+        parser.doesNotMatch(0x1, 0x2) {
+            expectEndOfInput()
+        }
+    }
 }

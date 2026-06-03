@@ -1,29 +1,34 @@
 package net.rubygrapefruit.parse.text
 
+import net.rubygrapefruit.parse.Offset
+import net.rubygrapefruit.parse.minus
+import net.rubygrapefruit.parse.plus
+
 
 internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharStream {
     private var tail = Buffer(null, 0, 1, 1, bufferLen)
-    private var pos = 0
+    override var offset = Offset.Zero
+        private set
     override var finished: Boolean = false
         private set
 
     override val available: Int
-        get() = tail.endIndex - pos
+        get() = tail.endIndex - offset
 
     override fun get(index: Int): Char {
-        return tail.get(index + pos)
+        return tail.get(index + offset)
     }
 
     override fun get(start: Int, end: Int): String {
-        return tail.get(start + pos, end + pos)
+        return tail.get(start + offset, end + offset)
     }
 
     override fun posAt(index: Int): CharPosition {
-        return tail.posAt(index + pos)
+        return tail.posAt(index + offset)
     }
 
     override fun contextAt(index: Int): TextFailureContext? {
-        return tail.contextAt(index + pos, finished)
+        return tail.contextAt(index + offset, finished)
     }
 
     fun append(chars: CharArray) {
@@ -35,7 +40,7 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
     }
 
     override fun advance(count: Int) {
-        pos += count
+        offset += count
     }
 
     fun end() {
@@ -152,7 +157,7 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
                 builder.endLine = startIndex + endLine
             }
 
-            val pos = CharPosition(index, line, col)
+            val pos = CharPosition(Offset(index), line, col)
             return AdvancingCharStream.TextStreamContext(pos, builder.endBuffer.get(builder.startLine, builder.endLine))
         }
 
@@ -203,7 +208,7 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
                 }
             }
 
-            return CharPosition(index, line, col)
+            return CharPosition(Offset(index), line, col)
         }
 
         fun append(chars: CharArray, start: Int, end: Int): Buffer {

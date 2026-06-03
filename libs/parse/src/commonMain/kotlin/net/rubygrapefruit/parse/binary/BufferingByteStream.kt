@@ -1,25 +1,30 @@
 package net.rubygrapefruit.parse.binary
 
+import net.rubygrapefruit.parse.Offset
+import net.rubygrapefruit.parse.minus
+import net.rubygrapefruit.parse.plus
+
 internal class BufferingByteStream : AdvancingByteStream {
     private var tail = Buffer(null, 0)
-    private var pos = 0
+    override var offset = Offset.Zero
+        private set
 
     override var finished: Boolean = false
         private set
 
     override val available: Int
-        get() = tail.endIndex - pos
+        get() = tail.endIndex - offset
 
     override fun get(index: Int): Byte {
-        return tail.get(pos + index)
+        return tail.get(index + offset)
     }
 
     override fun get(start: Int, end: Int): ByteArray {
-        return tail.get(start + pos, end + pos)
+        return tail.get(start + offset, end + offset)
     }
 
     override fun posAt(index: Int): BytePosition {
-        return BytePosition(index + pos)
+        return BytePosition(offset + index)
     }
 
     fun append(bytes: ByteArray) {
@@ -31,7 +36,7 @@ internal class BufferingByteStream : AdvancingByteStream {
     }
 
     override fun advance(count: Int) {
-        pos += count
+        offset += count
     }
 
     fun end() {

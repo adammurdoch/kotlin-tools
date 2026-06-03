@@ -34,8 +34,8 @@ internal class RepeatParser<IN, OUT>(
             return parser.start(continuation(count - 1, initial, next))
         }
 
-        private fun continuation(count: Int, accumulator: Accumulator<ITEM, OUT>, next: ParseContinuation<IN, OUT>): ParseContinuation<IN, ITEM> {
-            return if (count == 0) {
+        private fun continuation(remaining: Int, accumulator: Accumulator<ITEM, OUT>, next: ParseContinuation<IN, OUT>): ParseContinuation<IN, ITEM> {
+            return if (remaining == 0) {
                 next.map { length, value ->
                     val result = accumulator.add(value, length)
                     Pair(result.length, result)
@@ -43,7 +43,7 @@ internal class RepeatParser<IN, OUT>(
             } else {
                 ParseContinuation.then { length, value ->
                     val result = accumulator.add(value, length)
-                    parser.start(continuation(count - 1, result, next))
+                    parser.start(continuation(remaining - 1, result, next))
                 }
             }
         }

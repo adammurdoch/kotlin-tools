@@ -103,10 +103,9 @@ internal class ChoiceParser<IN, OUT>(
                                     } else {
                                         optionResult.failedChoice
                                     }
-                                    return PullParser.RequireMore(
+                                    return option.continuation.next.selected(
                                         optionResult.advance,
                                         option.commit,
-                                        option.continuation.next.matches,
                                         optionResult.parser,
                                         expected
                                     )

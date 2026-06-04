@@ -188,7 +188,7 @@ internal class ChoiceParser<IN, OUT>(
         private var connected = true
 
         override val matches: Boolean
-            get() = connected
+            get() = connected || next.matches
 
         override fun matched(advance: Int, commit: Int, length: Int, value: ValueProvider<OUT>, failedChoice: ExpectationProvider?): PullParser.RequireMore<IN> {
             val result = next.matched(advance, commit, length, value, failedChoice)

@@ -82,7 +82,6 @@ abstract class AbstractParseTest {
             doesNotMatchString(input, fixture)
         }
         fixture.tracing(this, null) {
-            println("-> CHAR PER CHUNK")
             doesNotMatchChunks(input, fixture)
         }
     }

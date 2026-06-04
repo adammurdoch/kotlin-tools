@@ -5,7 +5,17 @@ import net.rubygrapefruit.parse.*
 internal class CheckParser<IN, INTERMEDIATE, OUT>(
     val parser: Parser<IN, INTERMEDIATE>,
     val map: (INTERMEDIATE) -> MappingResult<OUT>
-) : Parser<IN, OUT>, CombinatorBuilder<OUT> {
+) : Parser<IN, OUT>, CombinatorBuilder<OUT>, DiscardableParser<IN> {
+    override fun withNoResult(): Parser<IN, Unit> {
+        return CheckParser(parser) { value ->
+            val result = map(value)
+            when (result) {
+                is MappingResult.Success -> MappingResult.of(Unit)
+                is MappingResult.Fail -> result
+            }
+        }
+    }
+
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, OUT> {
         return CheckCompiledParser(compiler.compile(parser), map)
     }

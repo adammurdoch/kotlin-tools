@@ -3,7 +3,6 @@ package net.rubygrapefruit.parse
 import net.rubygrapefruit.parse.binary.literal
 import net.rubygrapefruit.parse.combinators.MappingResult
 import net.rubygrapefruit.parse.combinators.check
-import net.rubygrapefruit.parse.combinators.map
 import net.rubygrapefruit.parse.text.literal
 import net.rubygrapefruit.parse.text.parse
 import kotlin.test.Test
@@ -62,6 +61,11 @@ class CheckTest : AbstractParseTest() {
 
         parser.doesNotMatch("abc") {
             expect("not 1")
+        }
+
+        // missing
+        parser.doesNotMatch("") {
+            expectLiteral("abc")
         }
     }
 

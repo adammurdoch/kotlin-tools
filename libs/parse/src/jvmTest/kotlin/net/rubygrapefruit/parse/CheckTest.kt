@@ -3,8 +3,9 @@ package net.rubygrapefruit.parse
 import net.rubygrapefruit.parse.binary.literal
 import net.rubygrapefruit.parse.combinators.MappingResult
 import net.rubygrapefruit.parse.combinators.check
+import net.rubygrapefruit.parse.combinators.map
 import net.rubygrapefruit.parse.text.literal
-import kotlin.test.Ignore
+import net.rubygrapefruit.parse.text.parse
 import kotlin.test.Test
 
 class CheckTest : AbstractParseTest() {
@@ -55,7 +56,7 @@ class CheckTest : AbstractParseTest() {
         }
     }
 
-    @Test @Ignore
+    @Test
     fun `mapping function can reject value`() {
         val parser = check(literal("abc", 1)) { MappingResult.expected("not $it") }
 
@@ -63,4 +64,18 @@ class CheckTest : AbstractParseTest() {
             expect("not 1")
         }
     }
+
+    @Test
+    fun `rethrows mapping failure`() {
+        val failure = RuntimeException()
+        val parser = check<_, _, String>(literal("abc")) {
+            failure.fillInStackTrace()
+            throw failure
+        }
+
+        failsWith(failure) {
+            parser.parse("abc")
+        }
+    }
+
 }

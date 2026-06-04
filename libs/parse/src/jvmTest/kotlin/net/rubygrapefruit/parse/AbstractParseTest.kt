@@ -18,6 +18,16 @@ abstract class AbstractParseTest {
         return items.toList()
     }
 
+    fun failsWith(failure: Exception, block: () -> Unit) {
+        try {
+            block()
+        } catch (e: RuntimeException) {
+            assertSame(failure, e)
+            return
+        }
+        fail()
+    }
+
     @JvmName("expectingChars")
     fun <T> Parser<*, T>.expecting(config: CompiledParserFixture.() -> Unit) {
         val fixture = DefaultCompiledParserFixture()
@@ -72,6 +82,7 @@ abstract class AbstractParseTest {
             doesNotMatchString(input, fixture)
         }
         fixture.tracing(this, null) {
+            println("-> CHAR PER CHUNK")
             doesNotMatchChunks(input, fixture)
         }
     }

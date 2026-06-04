@@ -16,7 +16,7 @@ internal class CheckParser<IN, INTERMEDIATE, OUT>(
     ) : CompiledParser<IN, OUT> {
         override fun start(next: ParseContinuation<IN, OUT>): PullParser<IN> {
             val continuation = CheckContinuation(next, map)
-            return CheckPullParser(parser.start(continuation), continuation)
+            return parser.start(continuation)
         }
     }
 
@@ -24,8 +24,6 @@ internal class CheckParser<IN, INTERMEDIATE, OUT>(
         val next: ParseContinuation<IN, OUT>,
         val map: (INTERMEDIATE) -> MappingResult<OUT>
     ) : ParseContinuation<IN, INTERMEDIATE> {
-        var advance = 0
-
         override val matches: Boolean
             get() = next.matches
 
@@ -34,7 +32,7 @@ internal class CheckParser<IN, INTERMEDIATE, OUT>(
             return when (result) {
                 is MappingResult.Success -> next.matched(advance, commit, length, ValueProvider.of(result.value), failedChoice)
                 is MappingResult.Fail -> {
-                    val parser = BrokenPullParser(PullParser.Failed(-this.advance, Expectation.One(result.expected)))
+                    val parser = BrokenPullParser(PullParser.Failed(advance - length, Expectation.One(result.expected)))
                     PullParser.RequireMore(0, 0, false, parser, failedChoice)
                 }
             }
@@ -48,23 +46,6 @@ internal class CheckParser<IN, INTERMEDIATE, OUT>(
 
         override fun parse(input: Any?, max: Int): PullParser.Result<Any?> {
             return failure
-        }
-    }
-
-    private class CheckPullParser<IN, INTERMEDIATE, OUT>(
-        val parser: PullParser<IN>,
-        val continuation: CheckContinuation<IN, INTERMEDIATE, OUT>
-    ) : PullParser<IN> {
-        override fun stop(): PullParser.Failed {
-            return parser.stop()
-        }
-
-        override fun parse(input: IN, max: Int): PullParser.Result<IN> {
-            val result = parser.parse(input, max)
-            if (result is PullParser.RequireMore) {
-                continuation.advance += result.advance
-            }
-            return result
         }
     }
 }

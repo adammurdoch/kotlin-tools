@@ -2,6 +2,8 @@ package net.rubygrapefruit.parse
 
 import net.rubygrapefruit.parse.binary.literal
 import net.rubygrapefruit.parse.combinators.map
+import net.rubygrapefruit.parse.text.literal
+import net.rubygrapefruit.parse.text.parse
 import kotlin.test.Test
 
 class MapTest : AbstractParseTest() {
@@ -30,6 +32,19 @@ class MapTest : AbstractParseTest() {
         parser.doesNotMatch(0x1, 0x2, 0x3) {
             failAt(2)
             expectEndOfInput()
+        }
+    }
+
+    @Test
+    fun `rethrows mapping failure`() {
+        val failure = RuntimeException()
+        val parser = map(literal("abc")) {
+            failure.fillInStackTrace()
+            throw failure
+        }
+
+        failsWith(failure) {
+            parser.parse("abc")
         }
     }
 }

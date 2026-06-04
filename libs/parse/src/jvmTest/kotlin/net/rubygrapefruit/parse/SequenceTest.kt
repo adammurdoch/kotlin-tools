@@ -5,8 +5,6 @@ import net.rubygrapefruit.parse.combinators.sequence
 import net.rubygrapefruit.parse.text.literal
 import net.rubygrapefruit.parse.text.parse
 import kotlin.test.Test
-import kotlin.test.assertSame
-import kotlin.test.fail
 
 class SequenceTest : AbstractParseTest() {
     @Test
@@ -30,7 +28,7 @@ class SequenceTest : AbstractParseTest() {
         // missing
         parser.doesNotMatch("") {
             expectLiteral("a")
-            steps {  }
+            steps { }
         }
         parser.doesNotMatch("a") {
             failAt(1)
@@ -43,7 +41,7 @@ class SequenceTest : AbstractParseTest() {
         // unexpected
         parser.doesNotMatch("X") {
             expectLiteral("a")
-            steps {  }
+            steps { }
         }
         parser.doesNotMatch("aX") {
             failAt(1)
@@ -85,7 +83,7 @@ class SequenceTest : AbstractParseTest() {
         // missing
         parser.doesNotMatch {
             expectLiteral(0x1)
-            steps {  }
+            steps { }
         }
         parser.doesNotMatch(0x1) {
             failAt(1)
@@ -106,7 +104,7 @@ class SequenceTest : AbstractParseTest() {
         // unexpected
         parser.doesNotMatch(0x3) {
             expectLiteral(0x1)
-            steps {  }
+            steps { }
         }
         parser.doesNotMatch(0x1, 0x2, 0x3, 0x1) {
             failAt(3)
@@ -135,12 +133,8 @@ class SequenceTest : AbstractParseTest() {
             throw failure
         }
 
-        try {
+        failsWith(failure) {
             parser.parse("ab")
-        } catch (e: RuntimeException) {
-            assertSame(failure, e)
-            return
         }
-        fail()
     }
 }

@@ -64,9 +64,6 @@ internal class ZeroOrMoreParser<IN, OUT>(
         private val previous: Accumulator<ITEM, OUT>,
         private val next: ParseContinuation<IN, OUT>
     ) : ParseContinuation<IN, ITEM> {
-        override val matches: Boolean
-            get() = false
-
         override fun matched(advance: Int, commit: Int, length: Int, value: ValueProvider<ITEM>, failedChoice: ExpectationProvider?): PullParser.RequireMore<IN> {
             val result = previous.add(value, length)
             return if (length == 0) {
@@ -75,6 +72,10 @@ internal class ZeroOrMoreParser<IN, OUT>(
                 val parser = of(parser, parser, result, next)
                 PullParser.RequireMore(advance, commit, false, parser, failedChoice)
             }
+        }
+
+        override fun <T> selected(advance: Int, commit: Int, parser: PullParser<T>, failedChoice: ExpectationProvider?): PullParser.RequireMore<T> {
+            return next.selected(advance, commit, parser, failedChoice)
         }
     }
 

@@ -186,15 +186,20 @@ internal class ChoiceParser<IN, OUT>(
 
         private var connected = true
 
-        override val matches: Boolean
-            get() = connected || next.matches
-
         override fun matched(advance: Int, commit: Int, length: Int, value: ValueProvider<OUT>, failedChoice: ExpectationProvider?): PullParser.RequireMore<IN> {
             val result = next.matched(advance, commit, length, value, failedChoice)
             return if (connected && !result.matched) {
                 PullParser.RequireMore(result.advance, result.commit, true, result.parser, result.failedChoice)
             } else {
                 result
+            }
+        }
+
+        override fun <T> selected(advance: Int, commit: Int, parser: PullParser<T>, failedChoice: ExpectationProvider?): PullParser.RequireMore<T> {
+            return if (connected) {
+                PullParser.RequireMore(advance, commit, true, parser, failedChoice)
+            } else {
+                next.selected(advance, commit, parser, failedChoice)
             }
         }
 

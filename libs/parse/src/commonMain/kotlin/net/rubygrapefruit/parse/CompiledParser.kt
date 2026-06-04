@@ -13,7 +13,7 @@ internal interface CompiledParser<IN, out OUT> {
      * A convenience for [start].
      */
     fun then(next: (length: Int, value: ValueProvider<OUT>) -> PullParser<IN>): PullParser<IN> {
-        return start(ParseContinuation.suffix(next))
+        return start(ParseContinuation.prefix(next))
     }
 
     /**

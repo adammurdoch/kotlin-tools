@@ -94,9 +94,6 @@ internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>,
 private class ValueReceivingContinuation<IN, OUT> : ParseContinuation<IN, OUT> {
     private var value: ValueProvider<OUT>? = null
 
-    override val matches: Boolean
-        get() = true
-
     fun get(): OUT {
         return value!!.get()
     }
@@ -104,5 +101,9 @@ private class ValueReceivingContinuation<IN, OUT> : ParseContinuation<IN, OUT> {
     override fun matched(advance: Int, commit: Int, length: Int, value: ValueProvider<OUT>, failedChoice: ExpectationProvider?): PullParser.RequireMore<IN> {
         this.value = value
         return ParseContinuation.end<IN, OUT>().matched(advance, commit, length, value, failedChoice)
+    }
+
+    override fun <T> selected(advance: Int, commit: Int, parser: PullParser<T>, failedChoice: ExpectationProvider?): PullParser.RequireMore<T> {
+        return ParseContinuation.end<IN, OUT>().selected(advance, commit, parser, failedChoice)
     }
 }

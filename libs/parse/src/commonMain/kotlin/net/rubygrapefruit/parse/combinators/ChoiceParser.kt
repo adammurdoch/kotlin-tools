@@ -48,12 +48,8 @@ internal class ChoiceParser<IN, OUT>(
     private class ChoicePullParser<IN>(
         options: List<Option<IN, *>>
     ) : PullParser<IN> {
-        private val states: Array<OptionState<IN>>
+        private val states: Array<OptionState<IN>> = Array(options.size) { index -> options[index].start() }
         private var matched = 0
-
-        init {
-            states = Array(options.size) { index -> options[index].start() }
-        }
 
         override fun toString(): String {
             return "{choice}"
@@ -100,9 +96,7 @@ internal class ChoiceParser<IN, OUT>(
                         is PullParser.RequireMore -> {
                             option.commit += optionResult.commit
                             if (optionResult.matched) {
-                                if (waitingFor > 0) {
-                                    option.successful = true
-                                } else {
+                                if (waitingFor == 0) {
                                     return if (optionResult.advance == 0) {
                                         val failures = failedChoices(matched) + if (optionResult.failedChoice != null) listOf(optionResult.failedChoice) else emptyList()
                                         val expected = ExpectationProvider.oneOfOrNull(failures)
@@ -179,11 +173,10 @@ internal class ChoiceParser<IN, OUT>(
     internal class OptionState<IN> internal constructor(var state: ParseState<IN>, internal val continuation: OptionContinuation<*, *>) {
         var matched = 0
         var commit = 0
-        var successful = false
         var failedChoice: ExpectationProvider? = null
 
         override fun toString(): String {
-            return "{$state matched=$matched commit=$commit successful=$successful failedChoice=$failedChoice}"
+            return "{$state matched=$matched commit=$commit failedChoice=$failedChoice}"
         }
     }
 

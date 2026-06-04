@@ -33,7 +33,7 @@ internal class OneOrMoreParser<IN, OUT>(
         val initial: Accumulator<ITEM, OUT>
     ) : CompiledParser<IN, OUT> {
         override fun start(next: ParseContinuation<IN, OUT>): PullParser<IN> {
-            return parser.start(ParseContinuation.then { length, value ->
+            return parser.start(ParseContinuation.suffix { length, value ->
                 val result = initial.add(value, length)
                 if (length == 0) {
                     next.matched(0, result.length, result).parser

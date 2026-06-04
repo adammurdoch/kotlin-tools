@@ -69,12 +69,12 @@ internal class ZeroOrMoreParser<IN, OUT>(
 
         override fun matched(advance: Int, commit: Int, length: Int, value: ValueProvider<ITEM>, failedChoice: ExpectationProvider?): PullParser.RequireMore<IN> {
             val result = previous.add(value, length)
-            val parser = if (length == 0) {
-                EmptyPullParser(result, next)
+            return if (length == 0) {
+                next.matched(advance, commit, result, failedChoice)
             } else {
-                of(parser, parser, result, next)
+                val parser = of(parser, parser, result, next)
+                PullParser.RequireMore(advance, commit, false, parser, failedChoice)
             }
-            return PullParser.RequireMore(advance, commit, false, parser, failedChoice)
         }
     }
 

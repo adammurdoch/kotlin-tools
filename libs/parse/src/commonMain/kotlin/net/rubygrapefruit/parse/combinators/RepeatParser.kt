@@ -41,7 +41,7 @@ internal class RepeatParser<IN, OUT>(
                     Pair(result.length, result)
                 }
             } else {
-                ParseContinuation.then { length, value ->
+                ParseContinuation.suffix { length, value ->
                     val result = accumulator.add(value, length)
                     parser.start(continuation(remaining - 1, result, next))
                 }

@@ -39,7 +39,7 @@ internal interface ParseContinuation<in IN, in OUT> {
             return EndParseContinuation()
         }
 
-        fun <IN, OUT> then(next: (length: Int, value: ValueProvider<OUT>) -> PullParser<IN>): ParseContinuation<IN, OUT> {
+        fun <IN, OUT> suffix(next: (length: Int, value: ValueProvider<OUT>) -> PullParser<IN>): ParseContinuation<IN, OUT> {
             return object : ParseContinuation<IN, OUT> {
                 override val matches: Boolean
                     get() = false

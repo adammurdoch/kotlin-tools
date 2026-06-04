@@ -97,19 +97,19 @@ internal class ChoiceParser<IN, OUT>(
                             option.commit += optionResult.commit
                             if (optionResult.matched) {
                                 if (waitingFor == 0) {
-                                    return if (optionResult.advance == 0) {
+                                    val expected = if (optionResult.advance == 0) {
                                         val failures = failedChoices(matched) + if (optionResult.failedChoice != null) listOf(optionResult.failedChoice) else emptyList()
-                                        val expected = ExpectationProvider.oneOfOrNull(failures)
-                                        PullParser.RequireMore(0, option.commit, option.continuation.next.matches, optionResult.parser, expected)
+                                        ExpectationProvider.oneOfOrNull(failures)
                                     } else {
-                                        PullParser.RequireMore(
-                                            optionResult.advance,
-                                            option.commit,
-                                            option.continuation.next.matches,
-                                            optionResult.parser,
-                                            optionResult.failedChoice
-                                        )
+                                        optionResult.failedChoice
                                     }
+                                    return PullParser.RequireMore(
+                                        optionResult.advance,
+                                        option.commit,
+                                        option.continuation.next.matches,
+                                        optionResult.parser,
+                                        expected
+                                    )
                                 }
                             }
                             waitingFor++

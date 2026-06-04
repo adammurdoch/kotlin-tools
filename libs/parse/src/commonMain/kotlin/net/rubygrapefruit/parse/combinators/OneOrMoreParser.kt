@@ -36,7 +36,7 @@ internal class OneOrMoreParser<IN, OUT>(
             return parser.start(ParseContinuation.then { length, value ->
                 val result = initial.add(value, length)
                 if (length == 0) {
-                    next.next(result.length, result)
+                    next.matched(0, result.length, result).parser
                 } else {
                     ZeroOrMoreParser.of(tail, tail, result, next)
                 }

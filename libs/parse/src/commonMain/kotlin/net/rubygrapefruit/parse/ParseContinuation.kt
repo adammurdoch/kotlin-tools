@@ -15,9 +15,7 @@ internal interface ParseContinuation<in IN, in OUT> {
         return matched(end, end, end - start, value, failedChoice)
     }
 
-    fun matched(advance: Int, commit: Int, length: Int, value: ValueProvider<OUT>, failedChoice: ExpectationProvider?): PullParser.RequireMore<IN> {
-        return PullParser.RequireMore(advance, commit, matches, next(length, value), failedChoice)
-    }
+    fun matched(advance: Int, commit: Int, length: Int, value: ValueProvider<OUT>, failedChoice: ExpectationProvider?): PullParser.RequireMore<IN>
 
     fun <T> map(map: (Int, ValueProvider<T>) -> Pair<Int, ValueProvider<OUT>>): ParseContinuation<IN, T> {
         val self = this
@@ -29,17 +27,12 @@ internal interface ParseContinuation<in IN, in OUT> {
                 return "{map $self}"
             }
 
-            override fun next(length: Int, value: ValueProvider<T>): PullParser<IN> {
+            override fun matched(advance: Int, commit: Int, length: Int, value: ValueProvider<T>, failedChoice: ExpectationProvider?): PullParser.RequireMore<IN> {
                 val mapped = map(length, value)
-                return self.next(mapped.first, mapped.second)
+                return self.matched(advance, commit, mapped.first, mapped.second, failedChoice)
             }
         }
     }
-
-    /**
-     * Returns the next parser, given a match.
-     */
-    fun next(length: Int, value: ValueProvider<OUT>): PullParser<IN>
 
     companion object {
         fun <IN, OUT> end(): ParseContinuation<IN, OUT> {
@@ -55,8 +48,9 @@ internal interface ParseContinuation<in IN, in OUT> {
                     return "{then $next}"
                 }
 
-                override fun next(length: Int, value: ValueProvider<OUT>): PullParser<IN> {
-                    return next(length, value)
+                override fun matched(advance: Int, commit: Int, length: Int, value: ValueProvider<OUT>, failedChoice: ExpectationProvider?): PullParser.RequireMore<IN> {
+                    val parser = next(length, value)
+                    return PullParser.RequireMore(advance, commit, matches, parser, failedChoice)
                 }
             }
         }
@@ -66,8 +60,8 @@ internal interface ParseContinuation<in IN, in OUT> {
         override val matches: Boolean
             get() = true
 
-        override fun next(length: Int, value: ValueProvider<OUT>): PullParser<IN> {
-            return EndMatchPullParser
+        override fun matched(advance: Int, commit: Int, length: Int, value: ValueProvider<OUT>, failedChoice: ExpectationProvider?): PullParser.RequireMore<IN> {
+            return PullParser.RequireMore(advance, commit, matches, EndMatchPullParser, failedChoice)
         }
     }
 
@@ -84,8 +78,4 @@ internal interface ParseContinuation<in IN, in OUT> {
             return PullParser.Matched
         }
     }
-}
-
-internal fun <IN> ParseContinuation<IN, Unit>.next(length: Int): PullParser<IN> {
-    return next(length, ValueProvider.Nothing)
 }

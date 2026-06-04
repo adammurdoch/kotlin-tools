@@ -29,21 +29,24 @@ internal class CheckParser<IN, INTERMEDIATE, OUT>(
         override val matches: Boolean
             get() = next.matches
 
-        override fun next(length: Int, value: ValueProvider<INTERMEDIATE>): PullParser<IN> {
+        override fun matched(advance: Int, commit: Int, length: Int, value: ValueProvider<INTERMEDIATE>, failedChoice: ExpectationProvider?): PullParser.RequireMore<IN> {
             val result = map(value.get())
             return when (result) {
-                is MappingResult.Success -> next.next(length, ValueProvider.of(result.value))
-                is MappingResult.Fail -> BrokenPullParser(PullParser.Failed(-advance, Expectation.One(result.expected)))
+                is MappingResult.Success -> next.matched(advance, commit, length, ValueProvider.of(result.value), failedChoice)
+                is MappingResult.Fail -> {
+                    val parser = BrokenPullParser(PullParser.Failed(-this.advance, Expectation.One(result.expected)))
+                    PullParser.RequireMore(0, 0, false, parser, failedChoice)
+                }
             }
         }
     }
 
-    private class BrokenPullParser<IN>(val failure: PullParser.Failed) : PullParser<IN> {
+    private class BrokenPullParser(val failure: PullParser.Failed) : PullParser<Any?> {
         override fun stop(): PullParser.Failed {
             return failure
         }
 
-        override fun parse(input: IN, max: Int): PullParser.Result<IN> {
+        override fun parse(input: Any?, max: Int): PullParser.Result<Any?> {
             return failure
         }
     }

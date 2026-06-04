@@ -194,8 +194,13 @@ internal class ChoiceParser<IN, OUT>(
 
         override var matches: Boolean = true
 
-        override fun next(length: Int, value: ValueProvider<OUT>): PullParser<IN> {
-            return next.next(length, value)
+        override fun matched(advance: Int, commit: Int, length: Int, value: ValueProvider<OUT>, failedChoice: ExpectationProvider?): PullParser.RequireMore<IN> {
+            val result = next.matched(advance, commit, length, value, failedChoice)
+            return if (result.matched != matches) {
+                PullParser.RequireMore(result.advance, result.commit, matches, result.parser, result.failedChoice)
+            } else {
+                result
+            }
         }
     }
 }

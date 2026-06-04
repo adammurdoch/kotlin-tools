@@ -101,8 +101,8 @@ private class ValueReceivingContinuation<IN, OUT> : ParseContinuation<IN, OUT> {
         return value!!.get()
     }
 
-    override fun next(length: Int, value: ValueProvider<OUT>): PullParser<IN> {
+    override fun matched(advance: Int, commit: Int, length: Int, value: ValueProvider<OUT>, failedChoice: ExpectationProvider?): PullParser.RequireMore<IN> {
         this.value = value
-        return ParseContinuation.end<IN, OUT>().next(length, value)
+        return ParseContinuation.end<IN, OUT>().matched(advance, commit, length, value, failedChoice)
     }
 }

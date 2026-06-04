@@ -25,7 +25,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
         private val continuation: ParseContinuation<IN, Unit>
     ) : PullParser<IN> {
         private var predicate = parser.start()
-        private var next = continuation.next(0)
+        private var next = continuation.matched(0, 0, ValueProvider.Nothing).parser
         private var nextAdvance = 1
         private var nextCommit = 0
         private var totalAdvanced = 0
@@ -45,7 +45,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
                 when (checkResult) {
                     is PullParser.Matched -> {
                         val predicateExpectation = parser.start().stop().map { Expectation.Not(it) }
-                        val nextExpectation = continuation.next(0).stop()
+                        val nextExpectation = continuation.matched(0, 0, ValueProvider.Nothing).parser.stop()
                         val failure = PullParser.Failed.merged(listOf(predicateExpectation, nextExpectation))
                         return PullParser.Failed(failure.index - totalAdvanced, failure.expected)
                     }

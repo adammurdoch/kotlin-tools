@@ -59,7 +59,7 @@ internal class ZeroOrMoreParser<IN, OUT>(
         }
     }
 
-    private class OptionContinuation<IN, ITEM, OUT>(
+    internal class OptionContinuation<IN, ITEM, OUT>(
         private val parser: CompiledParser<IN, ITEM>,
         private val previous: Accumulator<ITEM, OUT>,
         private val next: ParseContinuation<IN, OUT>

@@ -87,7 +87,7 @@ internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>,
 
     private fun Parser<*, OUT>.start(): PullParser<IN> {
         val all = suffixed(this, endOfInput())
-        return all.compile<IN, OUT>().start(end)
+        return all.compile<IN, OUT>().start(Position.Zero, end)
     }
 }
 

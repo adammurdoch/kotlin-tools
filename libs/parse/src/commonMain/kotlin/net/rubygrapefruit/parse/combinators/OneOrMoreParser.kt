@@ -32,8 +32,8 @@ internal class OneOrMoreParser<IN, OUT>(
         val tail: CompiledParser<IN, ITEM>,
         val initial: Accumulator<ITEM, OUT>
     ) : CompiledParser<IN, OUT> {
-        override fun start(next: ParseContinuation<IN, OUT>): PullParser<IN> {
-            return parser.start(ZeroOrMoreParser.OptionContinuation(tail, initial, next))
+        override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
+            return parser.start(start, ZeroOrMoreParser.OptionContinuation(start, tail, initial, next))
         }
     }
 }

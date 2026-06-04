@@ -19,8 +19,8 @@ internal class DescribingParser<IN, OUT>(
         val parser: CompiledParser<IN, OUT>,
         private val expectation: Expectation
     ) : CompiledParser<IN, OUT> {
-        override fun start(next: ParseContinuation<IN, OUT>): PullParser<IN> {
-            return DescribingPullParser(parser.start(next), expectation)
+        override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
+            return DescribingPullParser(parser.start(start, next), expectation)
         }
     }
 

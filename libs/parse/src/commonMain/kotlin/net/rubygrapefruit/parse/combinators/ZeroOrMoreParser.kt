@@ -34,6 +34,7 @@ internal class ZeroOrMoreParser<IN, OUT>(
         }
 
         fun <IN, ITEM, OUT> of(
+            start: Position,
             option: CompiledParser<IN, ITEM>,
             tail: CompiledParser<IN, ITEM>,
             initial: Accumulator<ITEM, OUT>,
@@ -41,8 +42,9 @@ internal class ZeroOrMoreParser<IN, OUT>(
         ): PullParser<IN> {
             val empty = EmptyCompiledParser<IN, ITEM, OUT>(initial)
             return ChoiceParser.of(
+                start,
                 listOf(
-                    ChoiceParser.Option(option, OptionContinuation(tail, initial, next)),
+                    ChoiceParser.Option(option, OptionContinuation(start, tail, initial, next)),
                     ChoiceParser.Option(empty, next)
                 )
             )
@@ -54,12 +56,13 @@ internal class ZeroOrMoreParser<IN, OUT>(
         val tail: CompiledParser<IN, ITEM>,
         val initial: Accumulator<ITEM, OUT>
     ) : CompiledParser<IN, OUT> {
-        override fun start(next: ParseContinuation<IN, OUT>): PullParser<IN> {
-            return of(option, tail, initial, next)
+        override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
+            return of(start, option, tail, initial, next)
         }
     }
 
     internal class OptionContinuation<IN, ITEM, OUT>(
+        private val start: Position,
         private val parser: CompiledParser<IN, ITEM>,
         private val previous: Accumulator<ITEM, OUT>,
         private val next: ParseContinuation<IN, OUT>
@@ -69,7 +72,7 @@ internal class ZeroOrMoreParser<IN, OUT>(
             return if (length == 0) {
                 next.matched(advance, commit, result, failedChoice)
             } else {
-                val parser = of(parser, parser, result, next)
+                val parser = of(start + length, parser, parser, result, next)
                 PullParser.RequireMore(advance, commit, false, parser, failedChoice)
             }
         }
@@ -80,7 +83,7 @@ internal class ZeroOrMoreParser<IN, OUT>(
     }
 
     internal class EmptyCompiledParser<IN, ITEM, OUT>(private val result: Accumulator<ITEM, OUT>) : CompiledParser<IN, OUT> {
-        override fun start(next: ParseContinuation<IN, OUT>): PullParser<IN> {
+        override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
             return EmptyPullParser(result, next)
         }
     }

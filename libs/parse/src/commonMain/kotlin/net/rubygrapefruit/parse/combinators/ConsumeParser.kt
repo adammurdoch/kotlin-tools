@@ -15,8 +15,8 @@ internal class ConsumeParser<IN, OUT>(
     }
 
     internal class ConsumeCompiledParser<IN, OUT>(val parser: CompiledParser<IN, OUT>, private val consumer: (OUT) -> Unit) : CompiledParser<IN, Unit> {
-        override fun start(next: ParseContinuation<IN, Unit>): PullParser<IN> {
-            return parser.start(next.map { length, value ->
+        override fun start(start: Position, next: ParseContinuation<IN, Unit>): PullParser<IN> {
+            return parser.start(start, next.map { length, value ->
                 consumer(value.get())
                 Pair(length, ValueProvider.Nothing)
             })

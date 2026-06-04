@@ -24,9 +24,9 @@ internal class CheckParser<IN, INTERMEDIATE, OUT>(
         val parser: CompiledParser<IN, INTERMEDIATE>,
         val map: (INTERMEDIATE) -> MappingResult<OUT>
     ) : CompiledParser<IN, OUT> {
-        override fun start(next: ParseContinuation<IN, OUT>): PullParser<IN> {
+        override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
             val continuation = CheckContinuation(next, map)
-            return parser.start(continuation)
+            return parser.start(start, continuation)
         }
     }
 

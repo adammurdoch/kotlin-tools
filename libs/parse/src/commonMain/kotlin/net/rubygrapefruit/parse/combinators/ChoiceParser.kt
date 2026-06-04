@@ -27,28 +27,29 @@ internal class ChoiceParser<IN, OUT>(
             return ChoiceCompiledParser(effective)
         }
 
-        fun <IN> of(options: List<Option<IN, *>>): PullParser<IN> {
-            return ChoicePullParser(options)
+        fun <IN> of(start: Position, options: List<Option<IN, *>>): PullParser<IN> {
+            return ChoicePullParser(start, options)
         }
     }
 
     class Option<IN, OUT>(val parser: CompiledParser<IN, OUT>, val continuation: ParseContinuation<IN, OUT>) {
-        internal fun start(): OptionState<IN> {
+        internal fun start(start: Position): OptionState<IN> {
             val continuation = OptionContinuation(continuation)
-            return OptionState(parser.start(continuation), continuation)
+            return OptionState(parser.start(start, continuation), continuation)
         }
     }
 
     class ChoiceCompiledParser<IN, OUT>(val options: List<CompiledParser<IN, OUT>>) : CompiledParser<IN, OUT> {
-        override fun start(next: ParseContinuation<IN, OUT>): PullParser<IN> {
-            return ChoicePullParser(options.map { Option(it, next) })
+        override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
+            return ChoicePullParser(start, options.map { Option(it, next) })
         }
     }
 
     private class ChoicePullParser<IN>(
+        start: Position,
         options: List<Option<IN, *>>
     ) : PullParser<IN> {
-        private val states: Array<OptionState<IN>> = Array(options.size) { index -> options[index].start() }
+        private val states: Array<OptionState<IN>> = Array(options.size) { index -> options[index].start(start) }
         private var matched = 0
 
         override fun toString(): String {

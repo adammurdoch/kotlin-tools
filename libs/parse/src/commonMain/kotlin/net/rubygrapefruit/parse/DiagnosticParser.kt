@@ -79,8 +79,8 @@ internal class DiagnosticParser<IN, OUT> private constructor(
             return "{d $parser}"
         }
 
-        override fun start(next: ParseContinuation<IN, OUT>): PullParser<IN> {
-            return DiagnosticPullParser(parser.start(next), logger, listener)
+        override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
+            return DiagnosticPullParser(parser.start(start, next), logger, listener)
         }
     }
 

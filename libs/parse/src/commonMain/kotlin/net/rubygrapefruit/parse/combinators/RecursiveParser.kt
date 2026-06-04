@@ -27,8 +27,8 @@ internal class DefaultRecursiveParser<IN, OUT>(
     internal class RecursiveCompiledParser<IN, OUT> : CompiledParser<IN, OUT> {
         var parser: CompiledParser<IN, OUT>? = null
 
-        override fun start(next: ParseContinuation<IN, OUT>): PullParser<IN> {
-            return parser!!.start(next)
+        override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
+            return parser!!.start(start, next)
         }
     }
 }

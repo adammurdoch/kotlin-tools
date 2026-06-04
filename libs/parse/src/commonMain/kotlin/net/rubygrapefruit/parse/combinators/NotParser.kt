@@ -15,16 +15,17 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
     internal class NotCompiledParser<IN>(
         val parser: CompiledParser<IN, Unit>
     ) : CompiledParser<IN, Unit> {
-        override fun start(next: ParseContinuation<IN, Unit>): PullParser<IN> {
-            return NotPullParser(parser, next)
+        override fun start(start: Position, next: ParseContinuation<IN, Unit>): PullParser<IN> {
+            return NotPullParser(parser, start, next)
         }
     }
 
     private class NotPullParser<IN>(
         private val parser: CompiledParser<IN, Unit>,
+        private val start: Position,
         private val continuation: ParseContinuation<IN, Unit>
     ) : PullParser<IN> {
-        private var predicate = parser.start()
+        private var predicate = parser.start(start, ParseContinuation.end())
         private var next = continuation.matched(0, 0, ValueProvider.Nothing).parser
         private var nextAdvance = 1
         private var nextCommit = 0
@@ -44,7 +45,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
                 val checkResult = predicate.parse(input, maxAdvance)
                 when (checkResult) {
                     is PullParser.Matched -> {
-                        val predicateExpectation = parser.start().stop().map { Expectation.Not(it) }
+                        val predicateExpectation = parser.start(start, ParseContinuation.end()).stop().map { Expectation.Not(it) }
                         val nextExpectation = continuation.matched(0, 0, ValueProvider.Nothing).parser.stop()
                         val failure = PullParser.Failed.merged(listOf(predicateExpectation, nextExpectation))
                         return PullParser.Failed(failure.index - totalAdvanced, failure.expected)
@@ -65,7 +66,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
                 is PullParser.Matched -> return result
                 is PullParser.Failed -> {
                     return if (result.index == -totalAdvanced) {
-                        val predicateExpectation = parser.start().stop().expected.map { Expectation.Not(it) }
+                        val predicateExpectation = parser.start(start, ParseContinuation.end()).stop().expected.map { Expectation.Not(it) }
                         PullParser.Failed(result.index, ExpectationProvider.oneOf(predicateExpectation, result.expected))
                     } else {
                         result

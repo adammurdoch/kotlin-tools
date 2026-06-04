@@ -292,7 +292,7 @@ abstract class AbstractParseTest {
     private fun CompiledParser<*, *>.expecting(fixture: DefaultCompiledParserFixture) {
         fixture.inspect(this)
 
-        val pullParser = start()
+        val pullParser = start(Position.Zero, ParseContinuation.end())
         pullParser.expecting(fixture)
     }
 

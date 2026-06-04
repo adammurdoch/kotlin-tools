@@ -12,7 +12,7 @@ internal class EndOfInputParser<OUT>(val result: OUT) : Parser<Any, OUT>, Combin
     }
 
     internal class EndOfInputCompiledParser<IN : Input<*>, OUT>(val result: OUT) : CompiledParser<IN, OUT> {
-        override fun start(next: ParseContinuation<IN, OUT>): PullParser<IN> {
+        override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
             return EndOfInputPullParser(result, next)
         }
     }

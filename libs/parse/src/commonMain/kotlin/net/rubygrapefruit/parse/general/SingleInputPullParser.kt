@@ -7,7 +7,7 @@ internal class SingleInputCompiledParser<IN : Input<*>, OUT>(
     val parser: SingleInputParser<IN>,
     val extractor: Extractor<IN, OUT>
 ) : CompiledParser<IN, OUT> {
-    override fun start(next: ParseContinuation<IN, OUT>): PullParser<IN> {
+    override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
         return SingleInputPullParser(parser, extractor, next)
     }
 

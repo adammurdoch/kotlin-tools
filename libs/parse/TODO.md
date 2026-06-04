@@ -17,7 +17,6 @@ Parsers
 - `prefixed(prefix, parser, parser)`
 - `separated(parser, sep, parser, sep, parser)`
 - `integer(parser)` or `integer(minLen, maxLen)` - converts matching input to int
-- `check(parser, map)` - converts value to success or failure
 - Line comment convenience
 - Quoted string convenience
 

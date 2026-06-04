@@ -4,8 +4,8 @@ A Kotlin multi-platform library for parsing text and binary files and streams.
 
 ## Features
 
-- Parse text or binary inputs
-- Push parsing, allows the content of a stream to be parsed as it becomes available
+- Parse text or binary input
+- Push parsing, which allows the content of a stream to be parsed as it becomes available
 - Provides a library of parsers that can be composed to produce higher level parsers
 - Good quality diagnostics
 - Good performance
@@ -120,10 +120,10 @@ Repeating parsers:
 - repeat(count, parser) - produces a list 
   - repeat(unitParser, parser) - produces nothing
 
-Mapping parsers:
+Result modifying parsers:
 
-- map(parser, map) - produces result of map function
-- check(parser, map) - map function can produce a result or failure
+- map(parser, map) - maps the result of parser to some other value
+- check(parser, map) - map the result of parser to some other value or a failure
 - discard(parser) - discards result of parser, produces nothing
 - replace(parser, result) - replaces result of parser with fixed value
 

@@ -12,6 +12,12 @@ class DiscardOfCheckTest : AbstractParseTest() {
         val check = check(literal("abc", 1)) { MappingResult.of(it + 1) }
         val parser = discard(check)
 
+        parser.expecting {
+            expectCheck {
+                expectLiteral("abc", result = 1)
+            }
+        }
+
         parser.matches("abc")
 
         // unexpected

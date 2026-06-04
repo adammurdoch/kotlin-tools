@@ -12,6 +12,12 @@ class CheckTest : AbstractParseTest() {
     fun `matches char literal and applies mapping function`() {
         val parser = check(literal("abc", 1)) { MappingResult.of("[$it]") }
 
+        parser.expecting {
+            expectCheck {
+                expectLiteral("abc", result = 1)
+            }
+        }
+
         parser.matches("abc", expected = "[1]")
 
         // missing

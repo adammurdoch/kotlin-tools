@@ -129,7 +129,7 @@ internal class ChoiceParser<IN, OUT>(
                 val maxFailureIndex = failures.maxOf { it.matched }
                 if (option.commit > maxFailureIndex) {
                     val failedChoices = ExpectationProvider.oneOfOrNull(failedChoices(option.matched))
-                    option.continuation.matches = option.continuation.next.matches
+                    option.continuation.disconnect()
                     return PullParser.RequireMore(option.matched - matched, option.commit, false, option.state as PullParser, failedChoices)
                 }
             }
@@ -185,15 +185,22 @@ internal class ChoiceParser<IN, OUT>(
             return "{choice-option-continuation $next}"
         }
 
-        override var matches: Boolean = true
+        private var connected = true
+
+        override val matches: Boolean
+            get() = connected
 
         override fun matched(advance: Int, commit: Int, length: Int, value: ValueProvider<OUT>, failedChoice: ExpectationProvider?): PullParser.RequireMore<IN> {
             val result = next.matched(advance, commit, length, value, failedChoice)
-            return if (result.matched != matches) {
-                PullParser.RequireMore(result.advance, result.commit, matches, result.parser, result.failedChoice)
+            return if (connected && !result.matched) {
+                PullParser.RequireMore(result.advance, result.commit, true, result.parser, result.failedChoice)
             } else {
                 result
             }
+        }
+
+        fun disconnect() {
+            connected = false
         }
     }
 }

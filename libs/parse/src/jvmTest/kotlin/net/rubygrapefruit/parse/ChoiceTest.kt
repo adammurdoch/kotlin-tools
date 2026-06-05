@@ -22,11 +22,8 @@ class ChoiceTest : AbstractParseTest() {
 
         parser.matches("abcd", expected = 1) {
             steps {
-                // char literal does not commit until it matches the entire literal
                 advance(1)
-                advance(1)
-                advance(1)
-                advance(1, commit = 4)
+                advance(3, commit = 4)
             }
         }
         parser.matches("12", expected = 2) {
@@ -64,9 +61,7 @@ class ChoiceTest : AbstractParseTest() {
             expectEndOfInput()
             steps {
                 advance(1)
-                advance(1)
-                advance(1)
-                advance(1, commit = 4)
+                advance(3, commit = 4)
             }
         }
         parser.doesNotMatch("12X") {

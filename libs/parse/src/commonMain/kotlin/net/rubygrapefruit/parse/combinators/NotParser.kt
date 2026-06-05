@@ -36,7 +36,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
         }
 
         override fun stop(): PullParser.Failed {
-            return PullParser.Failed.merged(listOf(predicate.stop().map { Expectation.Not(it) }, next.stop()))
+            return PullParser.Failed(predicate.stop().map { Expectation.Not(it) }.failures + next.stop().failures)
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN> {
@@ -47,15 +47,17 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
                     is PullParser.Matched -> {
                         val predicateExpectation = parser.start(start, ParseContinuation.end()).stop().map { Expectation.Not(it) }
                         val nextExpectation = continuation.matched(0, 0, ValueProvider.Nothing).parser.stop()
-                        val failure = PullParser.Failed.merged(listOf(predicateExpectation, nextExpectation))
-                        return PullParser.Failed(failure.index - totalAdvanced, failure.expected)
+                        val failures = (predicateExpectation.failures + nextExpectation.failures).map { failure ->
+                            PullParser.Failure(failure.index - totalAdvanced, failure.expected)
+                        }
+                        return PullParser.Failed(failures)
                     }
 
-                    is PullParser.Failed -> return continuation.selected(0, nextCommit, next, predicate.stop().expected.map { Expectation.Not(it) })
+                    is PullParser.Failed -> return continuation.selected(0, nextCommit, next, predicate.stop().map { Expectation.Not(it) }.failures)
                     is PullParser.RequireMore -> {
                         predicate = checkResult.parser
                         if (checkResult.advance == 0) {
-                            return PullParser.RequireMore(0, 0, false, this, null)
+                            return PullParser.RequireMore(0, 0, false, this, emptyList())
                         }
                     }
                 }
@@ -65,12 +67,11 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
             when (result) {
                 is PullParser.Matched -> return result
                 is PullParser.Failed -> {
-                    return if (result.index == -totalAdvanced) {
-                        val predicateExpectation = parser.start(start, ParseContinuation.end()).stop().expected.map { Expectation.Not(it) }
-                        PullParser.Failed(result.index, ExpectationProvider.oneOf(predicateExpectation, result.expected))
-                    } else {
-                        result
+                    val predicateExpectation = parser.start(start, ParseContinuation.end()).stop().map { Expectation.Not(it) }
+                    val predicateFailures = predicateExpectation.failures.map { failure ->
+                        PullParser.Failure(failure.index - totalAdvanced, failure.expected)
                     }
+                    return PullParser.Failed(predicateFailures + result.failures)
                 }
 
                 is PullParser.RequireMore -> {

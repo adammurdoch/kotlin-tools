@@ -21,8 +21,7 @@ class OptionalTest : AbstractParseTest() {
             steps {
                 advance(0) // missing branch succeeds
                 advance(1)
-                advance(1)
-                advance(1, commit = 3)
+                advance(2, commit = 3)
             }
         }
         parser.matches("", expected = null) {
@@ -47,8 +46,7 @@ class OptionalTest : AbstractParseTest() {
             steps {
                 advance(0)
                 advance(1)
-                advance(1)
-                advance(1, commit = 3)
+                advance(2, commit = 3)
             }
         }
         parser.doesNotMatch("X") {

@@ -50,16 +50,20 @@ internal class DescribingParser<IN, OUT>(
                     } else {
                         advanced += result.advance
                         parser = result.parser
-                        PullParser.RequireMore(result.advance, result.commit, result.matched, this, result.failedChoice)
+                        PullParser.RequireMore(result.advance, result.commit, result.matched, this, result.failedChoices)
                     }
                 }
             }
         }
 
-        private fun mapFailure(result: PullParser.Failed): PullParser.Failed = if (result.index == -advanced) {
-            PullParser.Failed(result.index, expectation)
-        } else {
-            result
+        private fun mapFailure(result: PullParser.Failed): PullParser.Failed {
+            return PullParser.Failed(result.failures.map { failure ->
+                if (failure.index == -advanced) {
+                    PullParser.Failure(failure.index, expectation)
+                } else {
+                    failure
+                }
+            })
         }
     }
 }

@@ -117,7 +117,9 @@ internal class DiagnosticParser<IN, OUT> private constructor(
                 is PullParser.Matched -> result
 
                 is PullParser.Failed -> {
-                    require(result.index <= max)
+                    for (failure in result.failures) {
+                        require(failure.index <= max)
+                    }
                     result
                 }
 
@@ -130,7 +132,7 @@ internal class DiagnosticParser<IN, OUT> private constructor(
                         parser -> this
                         else -> DiagnosticPullParser(result.parser, logger, listener)
                     }
-                    PullParser.RequireMore(result.advance, result.commit, result.matched, effective, result.failedChoice)
+                    PullParser.RequireMore(result.advance, result.commit, result.matched, effective, result.failedChoices)
                 }
             }
         }

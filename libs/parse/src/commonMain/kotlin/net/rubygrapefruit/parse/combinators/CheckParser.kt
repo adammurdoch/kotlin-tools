@@ -34,19 +34,19 @@ internal class CheckParser<IN, INTERMEDIATE, OUT>(
         val next: ParseContinuation<IN, OUT>,
         val map: (INTERMEDIATE) -> MappingResult<OUT>
     ) : ParseContinuation<IN, INTERMEDIATE> {
-        override fun matched(advance: Int, commit: Int, length: Int, value: ValueProvider<INTERMEDIATE>, failedChoice: ExpectationProvider?): PullParser.RequireMore<IN> {
+        override fun matched(advance: Int, commit: Int, length: Int, value: ValueProvider<INTERMEDIATE>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<IN> {
             val result = map(value.get())
             return when (result) {
-                is MappingResult.Success -> next.matched(advance, commit, length, ValueProvider.of(result.value), failedChoice)
+                is MappingResult.Success -> next.matched(advance, commit, length, ValueProvider.of(result.value), failedChoices)
                 is MappingResult.Fail -> {
                     val parser = BrokenPullParser(PullParser.Failed(advance - length, Expectation.One(result.expected)))
-                    PullParser.RequireMore(0, 0, false, parser, failedChoice)
+                    PullParser.RequireMore(0, 0, false, parser, failedChoices)
                 }
             }
         }
 
-        override fun <T> selected(advance: Int, commit: Int, parser: PullParser<T>, failedChoice: ExpectationProvider?): PullParser.RequireMore<T> {
-            return next.selected(advance, commit, parser, failedChoice)
+        override fun <T> selected(advance: Int, commit: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<T> {
+            return next.selected(advance, commit, parser, failedChoices)
         }
     }
 

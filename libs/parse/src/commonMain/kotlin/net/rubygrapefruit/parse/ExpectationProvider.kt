@@ -8,14 +8,6 @@ internal interface ExpectationProvider {
     }
 
     companion object {
-        fun oneOfOrNull(providers: List<ExpectationProvider>): ExpectationProvider? {
-            return when (providers.size) {
-                0 -> null
-                1 -> providers.first()
-                else -> OneOfListExpectationProvider(providers)
-            }
-        }
-
         fun oneOf(providers: List<ExpectationProvider>): ExpectationProvider {
             return when (providers.size) {
                 0 -> Expectation.Nothing

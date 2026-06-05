@@ -41,47 +41,16 @@ internal interface PullParser<in IN> : ParseState<IN> {
     }
 
     /**
-     * Parser stopped matching
+     * Parser stopped matching.
      */
-    data class Failed(val failure: Failure) : Finished<Any?> {
+    data class Failed(val failures: List<Failure>) : Finished<Any?> {
         /**
          * @param index Relative to the start of input to [parse]. Can be positive or negative. Must be < max passed to [parse].
          */
-        constructor(index: Int, expected: ExpectationProvider) : this(Failure(index, expected))
-
-        val index: Int get() = failure.index
-
-        val expected: ExpectationProvider get() = failure.expected
-
-        /**
-         * Returns the absolute position of this failure.
-         */
-        fun position(base: Position) = failure.position(base)
+        constructor(index: Int, expected: ExpectationProvider) : this(listOf(Failure(index, expected)))
 
         fun map(map: (Expectation) -> Expectation): Failed {
-            return Failed(failure.map(map))
-        }
-
-        companion object {
-            fun merged(failures: List<Failed>): Failed {
-                return if (failures.isEmpty()) {
-                    Failed(0, Expectation.Nothing)
-                } else {
-                    val largestIndex = failures.maxOf { it.index }
-                    Failed(largestIndex, MergedFailures(largestIndex, failures))
-                }
-            }
-        }
-    }
-
-    private class MergedFailures(val largestIndex: Int, val failures: List<Failed>) : ExpectationProvider {
-        override fun toString(): String {
-            return "{merged $failures}"
-        }
-
-        override fun expectation(): Expectation {
-            val relevantFailures = failures.filter { it.index == largestIndex }
-            return Expectation.oneOf(relevantFailures.map { it.expected.expectation() })
+            return Failed(failures.map { it.map(map) })
         }
     }
 
@@ -97,6 +66,6 @@ internal interface PullParser<in IN> : ParseState<IN> {
         val commit: Int,
         val matched: Boolean,
         val parser: PullParser<IN>,
-        val failedChoice: ExpectationProvider? = null
+        val failedChoices: List<Failure> = emptyList()
     ) : Result<IN>
 }

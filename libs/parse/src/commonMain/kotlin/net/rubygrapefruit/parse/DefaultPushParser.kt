@@ -18,15 +18,20 @@ internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>,
             val currentState = state
             when (currentState) {
                 is PullParser.Matched -> return null
-                is PullParser.Failed -> return mapFailed(input, currentState)
+                is PullParser.Failed -> return mapFailed(input)
 
                 is PullParser -> {
                     val result = currentState.parse(input, input.available)
                     when (result) {
-                        is PullParser.Failed -> state = result
                         is PullParser.Matched -> state = result
+
+                        is PullParser.Failed -> {
+                            collectFailedChoices(result.failures, input)
+                            state = result
+                        }
+
                         is PullParser.RequireMore -> {
-                            collectFailedChoices(result, input)
+                            collectFailedChoices(result.failedChoices, input)
                             input.advance(result.advance)
                             state = result.parser
                             if (input.available == 0 && !input.finished) {
@@ -39,25 +44,13 @@ internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>,
         }
     }
 
-    private fun collectFailedChoices(result: PullParser.RequireMore<*>, input: IN) {
-        if (result.failedChoice != null) {
-            val currentFailure = failedChoice
-            if (result.advance == 0 && failedChoicePosition == input.position) {
-                failedChoice = ExpectationProvider.oneOf(currentFailure, result.failedChoice)
-            } else {
-                failedChoice = result.failedChoice
-                failedChoicePosition = input.position + result.advance
-            }
-        }
-    }
-
     fun endOfInput(input: IN): ParseResult<CONTEXT, OUT> {
         inputAvailable(input)
 
         val finalState = state
         return when (finalState) {
             is PullParser.Matched -> ParseResult.Success(end.get())
-            is PullParser.Failed -> mapFailed(input, finalState)!!
+            is PullParser.Failed -> mapFailed(input)!!
             is PullParser -> throw IllegalStateException("Expected parsing to be finished, but is $finalState")
         }
     }
@@ -66,22 +59,28 @@ internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>,
         return failure
     }
 
-    private fun mapFailed(input: IN, result: PullParser.Failed): ParseResult.Fail<CONTEXT>? {
+    private fun collectFailedChoices(failures: List<PullParser.Failure>, input: IN) {
+        for (failure in failures) {
+            val failurePosition = failure.position(input.position)
+            if (failurePosition == failedChoicePosition) {
+                failedChoice = ExpectationProvider.oneOf(failedChoice, failure.expected)
+            } else if (failurePosition > failedChoicePosition) {
+                failedChoice = failure.expected
+                failedChoicePosition = failurePosition
+            }
+        }
+    }
+
+    private fun mapFailed(input: IN): ParseResult.Fail<CONTEXT>? {
         if (failure != null) {
             return failure
         }
-        val failurePosition = result.failure.position(input.position)
-        val context = input.contextAt(failurePosition - input.position)
+        val context = input.contextAt(failedChoicePosition - input.position)
         return if (context == null) {
             // Context is not yet available (e.g. failure is on current line and end-of-line not yet available) so wait for more input
             null
         } else {
-            val expectation = if (failurePosition > failedChoicePosition) {
-                result.failure.expected
-            } else {
-                ExpectationProvider.oneOf(failedChoice, result.failure.expected)
-            }
-            val mapped = ParseResult.Fail<CONTEXT>(context, expectation.expectation().format(), failureFormatter)
+            val mapped = ParseResult.Fail<CONTEXT>(context, failedChoice.expectation().format(), failureFormatter)
             failure = mapped
             mapped
         }
@@ -100,12 +99,12 @@ private class ValueReceivingContinuation<IN, OUT> : ParseContinuation<IN, OUT> {
         return value!!.get()
     }
 
-    override fun matched(advance: Int, commit: Int, length: Int, value: ValueProvider<OUT>, failedChoice: ExpectationProvider?): PullParser.RequireMore<IN> {
+    override fun matched(advance: Int, commit: Int, length: Int, value: ValueProvider<OUT>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<IN> {
         this.value = value
-        return ParseContinuation.end<IN, OUT>().matched(advance, commit, length, value, failedChoice)
+        return ParseContinuation.end<IN, OUT>().matched(advance, commit, length, value, failedChoices)
     }
 
-    override fun <T> selected(advance: Int, commit: Int, parser: PullParser<T>, failedChoice: ExpectationProvider?): PullParser.RequireMore<T> {
-        return ParseContinuation.end<IN, OUT>().selected(advance, commit, parser, failedChoice)
+    override fun <T> selected(advance: Int, commit: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<T> {
+        return ParseContinuation.end<IN, OUT>().selected(advance, commit, parser, failedChoices)
     }
 }

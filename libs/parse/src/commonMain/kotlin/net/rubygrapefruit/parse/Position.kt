@@ -6,7 +6,11 @@ import kotlin.jvm.JvmInline
  * An absolute position in the input stream.
  */
 @JvmInline
-value class Position(val value: Int): Comparable<Position> {
+value class Position(val value: Int) : Comparable<Position> {
+    override fun toString(): String {
+        return value.toString()
+    }
+
     override fun compareTo(other: Position): Int {
         return value.compareTo(other.value)
     }

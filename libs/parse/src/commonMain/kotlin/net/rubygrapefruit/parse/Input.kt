@@ -9,6 +9,4 @@ internal interface Input<POS> {
     val finished: Boolean
 
     val position: Position
-
-    fun posAt(index: Int): POS
 }

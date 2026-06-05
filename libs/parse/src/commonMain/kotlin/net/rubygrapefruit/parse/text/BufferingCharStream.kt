@@ -23,12 +23,8 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
         return tail.get(start + position, end + position)
     }
 
-    override fun posAt(index: Int): CharPosition {
-        return tail.posAt(index + position)
-    }
-
-    override fun contextAt(index: Int): TextFailureContext? {
-        return tail.contextAt(index + position, finished)
+    override fun contextAt(position: Position): TextFailureContext? {
+        return tail.contextAt(position.value, finished)
     }
 
     fun append(chars: CharArray) {

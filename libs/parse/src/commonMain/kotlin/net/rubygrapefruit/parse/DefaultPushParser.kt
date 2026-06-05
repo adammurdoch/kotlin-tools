@@ -75,7 +75,7 @@ internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>,
         if (failure != null) {
             return failure
         }
-        val context = input.contextAt(failedChoicePosition - input.position)
+        val context = input.contextAt(failedChoicePosition)
         return if (context == null) {
             // Context is not yet available (e.g. failure is on current line and end-of-line not yet available) so wait for more input
             null

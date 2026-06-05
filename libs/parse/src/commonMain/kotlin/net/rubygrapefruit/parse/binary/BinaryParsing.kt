@@ -20,5 +20,5 @@ fun <OUT> Parser<BinaryInput, OUT>.pushParser(): BinaryPushParser<OUT> {
 }
 
 private fun failureFormatter(context: BinaryFailureContext, message: String): String {
-    return "Offset: ${context.position.offset.value}: $message. Found: ${context.found}"
+    return "Offset: ${context.position.position.value}: $message. Found: ${context.found}"
 }

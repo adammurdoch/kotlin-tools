@@ -49,7 +49,7 @@ internal class TextLiteralParser<OUT>(
                 }
                 index++
             }
-            return next.matched(index, text.length, text.length, result, emptyList())
+            return next.matched(index, text.length, result)
         }
     }
 }

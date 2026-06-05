@@ -34,10 +34,10 @@ internal class CheckParser<IN, INTERMEDIATE, OUT>(
         val next: ParseContinuation<IN, OUT>,
         val map: (INTERMEDIATE) -> MappingResult<OUT>
     ) : ParseContinuation<IN, INTERMEDIATE> {
-        override fun matched(advance: Int, commit: Int, length: Int, value: ValueProvider<INTERMEDIATE>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<IN> {
+        override fun matched(advance: Int, length: Int, value: ValueProvider<INTERMEDIATE>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<IN> {
             val result = map(value.get())
             return when (result) {
-                is MappingResult.Success -> next.matched(advance, commit, length, ValueProvider.of(result.value), failedChoices)
+                is MappingResult.Success -> next.matched(advance, length, ValueProvider.of(result.value), failedChoices)
                 is MappingResult.Fail -> {
                     val parser = BrokenPullParser(PullParser.Failed(advance - length, Expectation.One(result.expected)))
                     PullParser.RequireMore(0, false, parser, failedChoices)

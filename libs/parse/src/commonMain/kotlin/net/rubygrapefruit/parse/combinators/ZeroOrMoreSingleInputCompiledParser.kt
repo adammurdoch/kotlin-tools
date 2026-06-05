@@ -38,7 +38,7 @@ internal class ZeroOrMoreSingleInputCompiledParser<IN : Input<*>, OUT>(
                 accumulator = accumulator.extract(input, 0, index)
             }
             return if (index < max || index == input.available && input.finished) {
-                next.matched(index - matched, index, accumulator, parser.expectation)
+                next.matched(index, matched, accumulator, parser.expectation)
             } else {
                 PullParser.RequireMore(index, false, this)
             }

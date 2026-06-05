@@ -9,8 +9,8 @@ internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>,
 ) {
     private val end = ValueReceivingContinuation<IN, OUT>()
     private var state: ParseState<IN> = parser.start()
-    private var failedChoice: ExpectationProvider? = null
-    private var failedChoiceIndex = 0
+    private var failedChoice: ExpectationProvider = Expectation.Nothing
+    private var failedChoicePosition = Position.Zero
     private var failure: ParseResult.Fail<CONTEXT>? = null
 
     fun inputAvailable(input: IN): ParseResult.Fail<CONTEXT>? {
@@ -23,28 +23,11 @@ internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>,
                 is PullParser -> {
                     val result = currentState.parse(input, input.available)
                     when (result) {
-                        is PullParser.Failed -> {
-                            val effectiveFailure = if (failedChoice != null) {
-                                PullParser.Failed.merged(listOf(PullParser.Failed(failedChoiceIndex, failedChoice!!), result))
-                            } else {
-                                result
-                            }
-                            state = effectiveFailure
-                        }
-
+                        is PullParser.Failed -> state = mergeFailure(result, input)
                         is PullParser.Matched -> state = result
                         is PullParser.RequireMore -> {
+                            collectFailedChoices(result, input)
                             input.advance(result.advance)
-                            if (result.failedChoice != null) {
-                                if (result.advance == 0 && failedChoiceIndex == 0 && failedChoice != null) {
-                                    failedChoice = ExpectationProvider.oneOf(failedChoice!!, result.failedChoice)
-                                } else {
-                                    failedChoice = result.failedChoice
-                                    failedChoiceIndex = 0
-                                }
-                            } else {
-                                failedChoiceIndex -= result.advance
-                            }
                             state = result.parser
                             if (input.available == 0 && !input.finished) {
                                 return null
@@ -52,6 +35,27 @@ internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>,
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private fun mergeFailure(failure: PullParser.Failed, input: IN): PullParser.Failed {
+        val failurePosition = failure.position(input.position)
+        return if (failurePosition > failedChoicePosition) {
+            failure
+        } else {
+            PullParser.Failed(failure.index, ExpectationProvider.oneOf(failedChoice, failure.expected))
+        }
+    }
+
+    private fun collectFailedChoices(result: PullParser.RequireMore<*>, input: IN) {
+        if (result.failedChoice != null) {
+            val currentFailure = failedChoice
+            if (result.advance == 0 && failedChoicePosition == input.position) {
+                failedChoice = ExpectationProvider.oneOf(currentFailure, result.failedChoice)
+            } else {
+                failedChoice = result.failedChoice
+                failedChoicePosition = input.position + result.advance
             }
         }
     }

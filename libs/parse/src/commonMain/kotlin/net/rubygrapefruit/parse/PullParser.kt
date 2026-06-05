@@ -33,6 +33,11 @@ internal interface PullParser<in IN> : ParseState<IN> {
      * @param index Relative to the start of input to [parse]. Can be positive or negative. Must be < max passed to [parse].
      */
     data class Failed(val index: Int, val expected: ExpectationProvider) : Finished<Any?> {
+        /**
+         * Returns the absolute position of this failure.
+         */
+        fun position(base: Position) = base + index
+
         fun map(map: (Expectation) -> Expectation): Failed {
             return Failed(index, expected.map(map))
         }

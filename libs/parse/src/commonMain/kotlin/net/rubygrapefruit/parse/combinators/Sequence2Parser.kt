@@ -1,6 +1,7 @@
 package net.rubygrapefruit.parse.combinators
 
 import net.rubygrapefruit.parse.*
+import net.rubygrapefruit.parse.stream.Input
 
 internal class Sequence2Parser<IN, A, B, OUT>(
     private val a: Parser<IN, A>,

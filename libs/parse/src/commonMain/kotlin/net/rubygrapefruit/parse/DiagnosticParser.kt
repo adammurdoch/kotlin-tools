@@ -1,5 +1,7 @@
 package net.rubygrapefruit.parse
 
+import net.rubygrapefruit.parse.stream.Input
+
 internal class DiagnosticParser<IN, OUT> private constructor(
     private val parser: Parser<IN, OUT>,
     private val logger: Logger,

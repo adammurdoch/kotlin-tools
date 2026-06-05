@@ -1,6 +1,6 @@
 package net.rubygrapefruit.parse.combinators
 
-import net.rubygrapefruit.parse.BoxingInput
+import net.rubygrapefruit.parse.stream.BoxingInput
 import net.rubygrapefruit.parse.ValueProvider
 
 /**

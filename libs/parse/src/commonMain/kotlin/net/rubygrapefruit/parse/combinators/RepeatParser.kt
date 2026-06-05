@@ -2,6 +2,7 @@ package net.rubygrapefruit.parse.combinators
 
 import net.rubygrapefruit.parse.*
 import net.rubygrapefruit.parse.general.SucceedParser
+import net.rubygrapefruit.parse.stream.Input
 
 internal class RepeatParser<IN, OUT>(
     private val count: Int,

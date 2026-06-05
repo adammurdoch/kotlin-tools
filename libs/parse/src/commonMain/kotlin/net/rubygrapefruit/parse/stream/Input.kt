@@ -1,4 +1,6 @@
-package net.rubygrapefruit.parse
+package net.rubygrapefruit.parse.stream
+
+import net.rubygrapefruit.parse.Position
 
 /**
  * A read-only mutable stream of input values.

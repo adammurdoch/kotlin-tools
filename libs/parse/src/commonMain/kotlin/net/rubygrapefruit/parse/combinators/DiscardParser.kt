@@ -1,6 +1,7 @@
 package net.rubygrapefruit.parse.combinators
 
 import net.rubygrapefruit.parse.*
+import net.rubygrapefruit.parse.stream.Input
 
 internal class DiscardParser<IN>(private val parser: Parser<IN, *>) : Parser<IN, Unit>, CombinatorBuilder<Unit>, CombinatorSingleInputBuilder, DiscardableParser<IN> {
     override fun withNoResult(): Parser<IN, Unit> {

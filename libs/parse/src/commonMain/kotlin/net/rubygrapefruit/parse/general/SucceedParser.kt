@@ -1,6 +1,7 @@
 package net.rubygrapefruit.parse.general
 
 import net.rubygrapefruit.parse.*
+import net.rubygrapefruit.parse.stream.Input
 
 internal class SucceedParser<OUT>(
     private val result: OUT

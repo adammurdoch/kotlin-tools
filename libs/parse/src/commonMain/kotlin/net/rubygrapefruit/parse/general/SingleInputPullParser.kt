@@ -2,6 +2,7 @@ package net.rubygrapefruit.parse.general
 
 import net.rubygrapefruit.parse.*
 import net.rubygrapefruit.parse.combinators.Extractor
+import net.rubygrapefruit.parse.stream.Input
 
 internal class SingleInputCompiledParser<IN : Input<*>, OUT>(
     val parser: SingleInputParser<IN>,

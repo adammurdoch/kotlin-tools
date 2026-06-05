@@ -1,6 +1,6 @@
 package net.rubygrapefruit.parse.text
 
-import net.rubygrapefruit.parse.ContextualInput
+import net.rubygrapefruit.parse.stream.ContextualInput
 
 internal interface AdvancingCharStream : CharStream, ContextualInput<TextFailureContext, CharPosition> {
     class TextStreamContext(override val position: CharPosition, override val lineText: String) : TextFailureContext {

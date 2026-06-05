@@ -1,6 +1,7 @@
 package net.rubygrapefruit.parse.combinators
 
 import net.rubygrapefruit.parse.*
+import net.rubygrapefruit.parse.stream.Input
 import kotlin.math.min
 
 internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, Unit>, CombinatorBuilder<Unit>, DiscardableParser<IN> {
@@ -44,6 +45,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
                 val checkResult = predicate.parse(input, maxAdvance)
                 when (checkResult) {
                     is PullParser.Matched -> {
+                        // Fail at the start
                         val predicateExpectation = parser.start(start, ParseContinuation.end()).stop().map { Expectation.Not(it) }
                         val nextExpectation = continuation.matched(0, 0, ValueProvider.Nothing).parser.stop()
                         val failures = (predicateExpectation.failures + nextExpectation.failures).map { failure ->

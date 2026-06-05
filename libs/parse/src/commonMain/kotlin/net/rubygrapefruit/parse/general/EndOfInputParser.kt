@@ -1,6 +1,7 @@
 package net.rubygrapefruit.parse.general
 
 import net.rubygrapefruit.parse.*
+import net.rubygrapefruit.parse.stream.Input
 
 internal class EndOfInputParser<OUT>(val result: OUT) : Parser<Any, OUT>, CombinatorBuilder<OUT>, DiscardableParser<Any> {
     override fun withNoResult(): Parser<Any, Unit> {

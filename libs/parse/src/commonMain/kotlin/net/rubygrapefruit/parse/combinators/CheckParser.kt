@@ -1,6 +1,7 @@
 package net.rubygrapefruit.parse.combinators
 
 import net.rubygrapefruit.parse.*
+import net.rubygrapefruit.parse.stream.Input
 
 internal class CheckParser<IN, INTERMEDIATE, OUT>(
     val parser: Parser<IN, INTERMEDIATE>,

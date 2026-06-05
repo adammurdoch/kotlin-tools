@@ -1,6 +1,7 @@
 package net.rubygrapefruit.parse.combinators
 
 import net.rubygrapefruit.parse.*
+import net.rubygrapefruit.parse.stream.Input
 
 interface RecursiveParser<IN, OUT> : Parser<IN, OUT> {
     fun parser(parser: Parser<IN, OUT>)

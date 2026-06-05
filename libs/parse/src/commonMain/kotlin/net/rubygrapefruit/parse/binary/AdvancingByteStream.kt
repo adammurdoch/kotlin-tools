@@ -1,6 +1,6 @@
 package net.rubygrapefruit.parse.binary
 
-import net.rubygrapefruit.parse.ContextualInput
+import net.rubygrapefruit.parse.stream.ContextualInput
 import net.rubygrapefruit.parse.Position
 
 internal interface AdvancingByteStream : ByteStream, ContextualInput<BinaryFailureContext, BytePosition> {

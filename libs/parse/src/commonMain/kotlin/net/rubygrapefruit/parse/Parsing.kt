@@ -3,6 +3,8 @@ package net.rubygrapefruit.parse
 import net.rubygrapefruit.parse.combinators.NextValueExtractor
 import net.rubygrapefruit.parse.combinators.UnitExtractor
 import net.rubygrapefruit.parse.general.SingleInputCompiledParser
+import net.rubygrapefruit.parse.stream.ContextualInput
+import net.rubygrapefruit.parse.stream.Input
 
 internal fun <CONTEXT, IN : ContextualInput<CONTEXT, *>, OUT> parse(
     parser: Parser<*, OUT>,

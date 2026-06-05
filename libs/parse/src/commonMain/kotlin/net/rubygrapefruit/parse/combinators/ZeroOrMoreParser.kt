@@ -1,6 +1,7 @@
 package net.rubygrapefruit.parse.combinators
 
 import net.rubygrapefruit.parse.*
+import net.rubygrapefruit.parse.stream.BoxingInput
 
 internal class ZeroOrMoreParser<IN, OUT>(
     private val parser: Parser<IN, OUT>,

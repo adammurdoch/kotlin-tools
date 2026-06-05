@@ -1,6 +1,7 @@
 package net.rubygrapefruit.parse.combinators
 
 import net.rubygrapefruit.parse.*
+import net.rubygrapefruit.parse.stream.Input
 
 internal class ZeroOrMoreProduceNothingParser<IN>(
     private val parser: Parser<IN, Unit>,

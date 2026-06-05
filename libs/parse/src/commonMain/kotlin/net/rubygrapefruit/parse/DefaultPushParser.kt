@@ -2,6 +2,7 @@ package net.rubygrapefruit.parse
 
 import net.rubygrapefruit.parse.combinators.suffixed
 import net.rubygrapefruit.parse.general.endOfInput
+import net.rubygrapefruit.parse.stream.ContextualInput
 
 internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>, OUT>(
     parser: Parser<*, OUT>,

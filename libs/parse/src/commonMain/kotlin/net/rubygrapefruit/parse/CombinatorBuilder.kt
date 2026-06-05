@@ -1,5 +1,7 @@
 package net.rubygrapefruit.parse
 
+import net.rubygrapefruit.parse.stream.Input
+
 /**
  * A parser that can be compiled into a [CompiledParser].
  */

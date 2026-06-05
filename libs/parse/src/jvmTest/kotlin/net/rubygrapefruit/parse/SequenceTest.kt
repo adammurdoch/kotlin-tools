@@ -20,8 +20,8 @@ class SequenceTest : AbstractParseTest() {
 
         parser.matches("ab", expected = listOf(1, 2)) {
             steps {
-                commit(1)
-                commit(1)
+                advance(1)
+                advance(1)
             }
         }
 
@@ -34,7 +34,7 @@ class SequenceTest : AbstractParseTest() {
             failAt(1)
             expectLiteral("b")
             steps {
-                commit(1)
+                advance(1)
             }
         }
 
@@ -47,7 +47,7 @@ class SequenceTest : AbstractParseTest() {
             failAt(1)
             expectLiteral("b")
             steps {
-                commit(1)
+                advance(1)
             }
         }
 
@@ -56,8 +56,8 @@ class SequenceTest : AbstractParseTest() {
             failAt(2)
             expectEndOfInput()
             steps {
-                commit(1)
-                commit(1)
+                advance(1)
+                advance(1)
             }
         }
     }
@@ -75,8 +75,8 @@ class SequenceTest : AbstractParseTest() {
 
         parser.matches(0x1, 0x2, 0x3, 0x4, expected = listOf(1, 2)) {
             steps {
-                commit(2)
-                commit(2)
+                advance(2)
+                advance(2)
             }
         }
 
@@ -89,15 +89,15 @@ class SequenceTest : AbstractParseTest() {
             failAt(1)
             expectLiteral(0x2)
             steps {
-                commit(1)
+                advance(1)
             }
         }
         parser.doesNotMatch(0x1, 0x2, 0x3) {
             failAt(3)
             expectLiteral(0x4)
             steps {
-                commit(2)
-                commit(1)
+                advance(2)
+                advance(1)
             }
         }
 
@@ -110,7 +110,7 @@ class SequenceTest : AbstractParseTest() {
             failAt(3)
             expectLiteral(0x4)
             steps {
-                commit(2)
+                advance(2)
             }
         }
 
@@ -119,8 +119,8 @@ class SequenceTest : AbstractParseTest() {
             failAt(4)
             expectEndOfInput()
             steps {
-                commit(2)
-                commit(2)
+                advance(2)
+                advance(2)
             }
         }
     }

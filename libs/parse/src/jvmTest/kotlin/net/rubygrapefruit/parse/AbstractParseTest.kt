@@ -1066,8 +1066,8 @@ abstract class AbstractParseTest {
         fun <IN, OUT> tracing(parser: Parser<IN, OUT>, expectedSteps: DefaultParseStepsFixture?, action: Parser<IN, OUT>.() -> Unit) {
             val steps = mutableListOf<Step>()
             val tracingListener = object : DiagnosticParser.Listener {
-                override fun requireMore(advance: Int, commit: Int) {
-                    steps.add(Step(advance, commit))
+                override fun requireMore(advance: Int) {
+                    steps.add(Step(advance))
                 }
             }
             if (log) {
@@ -1084,14 +1084,9 @@ abstract class AbstractParseTest {
 
     interface ParseStepsFixture {
         /**
-         * Advances and commits the given number of input values.
-         */
-        fun commit(count: Int)
-
-        /**
          * Advances the given number of input values.
          */
-        fun advance(count: Int, commit: Int = 0)
+        fun advance(count: Int)
     }
 
     private class DefaultParseStepsFixture(val fails: Boolean) : ParseStepsFixture {
@@ -1101,20 +1096,16 @@ abstract class AbstractParseTest {
             return if (fails) {
                 steps
             } else {
-                steps + listOf(Step(0, 0))
+                steps + listOf(Step(0))
             }
         }
 
-        override fun commit(count: Int) {
-            steps.add(Step(count, count))
-        }
-
-        override fun advance(count: Int, commit: Int) {
-            steps.add(Step(count, commit))
+        override fun advance(count: Int) {
+            steps.add(Step(count))
         }
     }
 
-    private data class Step(val advance: Int, val commit: Int)
+    private data class Step(val advance: Int)
 
     interface ParseFailureFixture : ParseFixture {
         fun expect(text: String)

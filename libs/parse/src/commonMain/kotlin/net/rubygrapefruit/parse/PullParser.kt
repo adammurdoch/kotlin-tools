@@ -58,12 +58,10 @@ internal interface PullParser<in IN> : ParseState<IN> {
      * Move the input forward the given number of values and try again with the given parser.
      *
      * @param advance Move forward the given number of input values. Can be 0. Must be <= max passed to [parse].
-     * @param commit The parser will not fail in the given inputs
      * @param matched Parser has matched and moved to its next parser.
      */
     data class RequireMore<in IN>(
         val advance: Int,
-        val commit: Int,
         val matched: Boolean,
         val parser: PullParser<IN>,
         val failedChoices: List<Failure> = emptyList()

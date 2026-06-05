@@ -15,8 +15,19 @@ class ZeroOrMoreTest : AbstractParseTest() {
             }
         }
 
-        parser.matches("", expected = emptyList())
-        parser.matches("abc", expected = listOf(1))
+        parser.matches("", expected = emptyList()) {
+            steps {
+                advance(0) // missing branch succeeds
+            }
+        }
+        parser.matches("abc", expected = listOf(1)) {
+            steps {
+                advance(0) // missing branch succeeds
+                advance(1)
+                advance(2)
+                advance(0) // missing branch succeeds
+            }
+        }
         parser.matches("abcabc", expected = listOf(1, 1))
 
         // missing

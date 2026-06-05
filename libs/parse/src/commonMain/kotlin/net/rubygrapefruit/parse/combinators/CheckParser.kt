@@ -40,13 +40,13 @@ internal class CheckParser<IN, INTERMEDIATE, OUT>(
                 is MappingResult.Success -> next.matched(advance, commit, length, ValueProvider.of(result.value), failedChoices)
                 is MappingResult.Fail -> {
                     val parser = BrokenPullParser(PullParser.Failed(advance - length, Expectation.One(result.expected)))
-                    PullParser.RequireMore(0, 0, false, parser, failedChoices)
+                    PullParser.RequireMore(0, false, parser, failedChoices)
                 }
             }
         }
 
-        override fun <T> selected(advance: Int, commit: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<T> {
-            return next.selected(advance, commit, parser, failedChoices)
+        override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<T> {
+            return next.selected(advance, parser, failedChoices)
         }
     }
 

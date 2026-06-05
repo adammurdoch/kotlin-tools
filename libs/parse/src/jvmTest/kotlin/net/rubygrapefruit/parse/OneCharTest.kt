@@ -14,7 +14,7 @@ class OneCharTest : AbstractParseTest() {
 
         parser.matches("a", expected = 'a') {
             steps {
-                commit(1)
+                advance(1)
             }
         }
         parser.matches("b", expected = 'b')

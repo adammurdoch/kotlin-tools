@@ -14,12 +14,12 @@ class SucceedTest : AbstractParseTest() {
 
         parser.matches("") {
             steps {
-                commit(0)
+                advance(0)
             }
         }
         parser.matches {
             steps {
-                commit(0)
+                advance(0)
             }
         }
 

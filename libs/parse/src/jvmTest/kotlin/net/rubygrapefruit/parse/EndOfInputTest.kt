@@ -14,7 +14,7 @@ class EndOfInputTest : AbstractParseTest() {
 
         parser.matches {
             steps {
-                commit(0)
+                advance(0)
             }
         }
 

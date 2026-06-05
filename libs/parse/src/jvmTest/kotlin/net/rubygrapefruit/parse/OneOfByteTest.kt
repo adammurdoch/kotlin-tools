@@ -15,7 +15,7 @@ class OneOfByteTest : AbstractParseTest() {
 
         parser.matches(0x1, expected = 0x1) {
             steps {
-                commit(1)
+                advance(1)
             }
         }
         parser.matches(0x2, expected = 0x2)

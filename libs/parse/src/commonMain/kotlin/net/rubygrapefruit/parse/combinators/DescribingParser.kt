@@ -45,13 +45,9 @@ internal class DescribingParser<IN, OUT>(
                 is PullParser.Failed -> mapFailure(result)
 
                 is PullParser.RequireMore -> {
-                    if (result.commit > 0) {
-                        result
-                    } else {
-                        advanced += result.advance
-                        parser = result.parser
-                        PullParser.RequireMore(result.advance, result.commit, result.matched, this, result.failedChoices)
-                    }
+                    advanced += result.advance
+                    parser = result.parser
+                    PullParser.RequireMore(result.advance, result.matched, this, result.failedChoices)
                 }
             }
         }

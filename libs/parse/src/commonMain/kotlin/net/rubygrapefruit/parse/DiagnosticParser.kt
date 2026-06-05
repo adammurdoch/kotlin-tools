@@ -28,7 +28,7 @@ internal class DiagnosticParser<IN, OUT> private constructor(
         private var nextId = 0
 
         private object NoOpListener : Listener {
-            override fun requireMore(advance: Int, commit: Int) {
+            override fun requireMore(advance: Int) {
             }
         }
 
@@ -39,7 +39,7 @@ internal class DiagnosticParser<IN, OUT> private constructor(
     }
 
     interface Listener {
-        fun requireMore(advance: Int, commit: Int)
+        fun requireMore(advance: Int)
     }
 
     private class DiagnosticCompiler<IN>(
@@ -126,13 +126,13 @@ internal class DiagnosticParser<IN, OUT> private constructor(
                 is PullParser.RequireMore -> {
                     require(result.advance <= max) { "$parserState returned $result when max=$max" }
                     logger.whenTopLevel {
-                        listener.requireMore(result.advance, result.commit)
+                        listener.requireMore(result.advance)
                     }
                     val effective = when (result.parser) {
                         parser -> this
                         else -> DiagnosticPullParser(result.parser, logger, listener)
                     }
-                    PullParser.RequireMore(result.advance, result.commit, result.matched, effective, result.failedChoices)
+                    PullParser.RequireMore(result.advance,  result.matched, effective, result.failedChoices)
                 }
             }
         }

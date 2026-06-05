@@ -35,7 +35,7 @@ class ChoiceOfSequenceTest : AbstractParseTest() {
             steps {
                 advance(1)
                 advance(1)
-                advance(1, commit = 3)
+                advance(1)
             }
         }
         parser.matches("ab", expected = listOf(5, 6))

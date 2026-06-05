@@ -21,7 +21,7 @@ class OptionalTest : AbstractParseTest() {
             steps {
                 advance(0) // missing branch succeeds
                 advance(1)
-                advance(2, commit = 3)
+                advance(2)
             }
         }
         parser.matches("", expected = null) {
@@ -46,7 +46,7 @@ class OptionalTest : AbstractParseTest() {
             steps {
                 advance(0)
                 advance(1)
-                advance(2, commit = 3)
+                advance(2)
             }
         }
         parser.doesNotMatch("X") {
@@ -72,8 +72,8 @@ class OptionalTest : AbstractParseTest() {
         parser.matches(0x1, 0x2, 0x3, expected = 1) {
             steps {
                 advance(0) // missing branch succeeds
-                commit(1)
-                commit(2)
+                advance(1)
+                advance(2)
             }
         }
         parser.matches(expected = null) {
@@ -87,7 +87,24 @@ class OptionalTest : AbstractParseTest() {
     fun `produces value when match not present`() {
         val parser = optional(literal("ab", 1), 0)
 
-        parser.matches("ab", expected = 1)
-        parser.matches("", expected = 0)
+        parser.expecting {
+            expectChoice {
+                expectLiteral("ab", result = 1)
+                expectSucceed(result = 0)
+            }
+        }
+
+        parser.matches("ab", expected = 1) {
+            steps {
+                advance(0) // missing branch succeeds
+                advance(1)
+                advance(1)
+            }
+        }
+        parser.matches("", expected = 0) {
+            steps {
+                advance(0)
+            }
+        }
     }
 }

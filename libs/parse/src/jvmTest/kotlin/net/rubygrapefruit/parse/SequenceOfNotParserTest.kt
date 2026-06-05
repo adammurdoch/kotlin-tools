@@ -29,20 +29,20 @@ class SequenceOfNotParserTest : AbstractParseTest() {
 
         parser.matches(expected = emptyList()) {
             steps {
-                commit(0)
-                commit(0)
+                advance(0)
+                advance(0)
             }
         }
         parser.matches(0x2, expected = bytes(0x2)) {
             steps {
-                commit(0)
-                commit(1)
+                advance(0)
+                advance(1)
             }
         }
         parser.matches(0x2, 0x1, expected = bytes(0x2, 0x1)) {
             steps {
-                commit(0)
-                commit(2)
+                advance(0)
+                advance(2)
             }
         }
 
@@ -95,40 +95,40 @@ class SequenceOfNotParserTest : AbstractParseTest() {
 
         parser.matches(expected = emptyList()) {
             steps {
-                commit(0)
-                commit(0)
+                advance(0)
+                advance(0)
             }
         }
         parser.matches(0x2, expected = bytes(0x2)) {
             steps {
-                commit(0)
-                commit(1)
+                advance(0)
+                advance(1)
             }
         }
         parser.matches(0x2, 0x1, expected = bytes(0x2, 0x1)) {
             steps {
-                commit(0)
-                commit(2)
+                advance(0)
+                advance(2)
             }
         }
         parser.matches(0x1, expected = bytes(0x1)) {
             steps {
                 advance(1)
-                advance(0, commit = 1)
+                advance(0)
             }
         }
         parser.matches(0x1, 0x1, expected = bytes(0x1, 0x1)) {
             steps {
                 advance(1)
-                advance(0, commit = 1)
-                commit(1)
+                advance(0)
+                advance(1)
             }
         }
         parser.matches(0x1, 0x1, 0x2, expected = bytes(0x1, 0x1, 0x2)) {
             steps {
                 advance(1)
-                advance(0, commit = 1)
-                commit(2)
+                advance(0)
+                advance(2)
             }
         }
 

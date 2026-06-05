@@ -18,7 +18,7 @@ class DescribedAsTest : AbstractParseTest() {
 
         parser.matches("abc", expected = 1) {
             steps {
-                commit(3)
+                advance(3)
             }
         }
 
@@ -54,7 +54,7 @@ class DescribedAsTest : AbstractParseTest() {
 
         parser.matches(0x1, 0x2, expected = 1) {
             steps {
-                commit(2)
+                advance(2)
             }
         }
 

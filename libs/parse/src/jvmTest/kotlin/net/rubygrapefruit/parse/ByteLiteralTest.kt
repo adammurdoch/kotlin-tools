@@ -14,7 +14,7 @@ class ByteLiteralTest : AbstractParseTest() {
 
         parser.matches(0x1) {
             steps {
-                commit(1)
+                advance(1)
             }
         }
 
@@ -74,7 +74,7 @@ class ByteLiteralTest : AbstractParseTest() {
 
         parser.matches(0x1, 0x2) {
             steps {
-                commit(2)
+                advance(2)
             }
         }
 

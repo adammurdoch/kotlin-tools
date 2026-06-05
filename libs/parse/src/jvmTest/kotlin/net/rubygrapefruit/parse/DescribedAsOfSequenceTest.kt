@@ -24,8 +24,8 @@ class DescribedAsOfSequenceTest : AbstractParseTest() {
 
         parser.matches("ab") {
             steps {
-                commit(1)
-                commit(1)
+                advance(1)
+                advance(1)
             }
         }
 

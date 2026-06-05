@@ -14,7 +14,7 @@ class CharLiteralTest : AbstractParseTest() {
 
         parser.matches("a") {
             steps {
-                commit(1)
+                advance(1)
             }
         }
 
@@ -117,7 +117,7 @@ class CharLiteralTest : AbstractParseTest() {
 
         parser.matches("ab") {
             steps {
-                commit(2)
+                advance(2)
             }
         }
 

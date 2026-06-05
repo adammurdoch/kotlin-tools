@@ -15,7 +15,7 @@ internal interface ParseContinuation<in IN, in OUT> {
 
     fun matched(advance: Int, commit: Int, length: Int, value: ValueProvider<OUT>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<IN>
 
-    fun <T> selected(advance: Int, commit: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<T>
+    fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<T>
 
     fun <T> map(map: (Int, ValueProvider<T>) -> Pair<Int, ValueProvider<OUT>>): ParseContinuation<IN, T> {
         val self = this
@@ -29,8 +29,8 @@ internal interface ParseContinuation<in IN, in OUT> {
                 return self.matched(advance, commit, mapped.first, mapped.second, failedChoices)
             }
 
-            override fun <T> selected(advance: Int, commit: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<T> {
-                return self.selected(advance, commit, parser, failedChoices)
+            override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<T> {
+                return self.selected(advance, parser, failedChoices)
             }
         }
     }
@@ -48,11 +48,11 @@ internal interface ParseContinuation<in IN, in OUT> {
 
                 override fun matched(advance: Int, commit: Int, length: Int, value: ValueProvider<OUT>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<IN> {
                     val parser = next(length, value)
-                    return PullParser.RequireMore(advance, commit, false, parser, failedChoices)
+                    return PullParser.RequireMore(advance, false, parser, failedChoices)
                 }
 
-                override fun <T> selected(advance: Int, commit: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<T> {
-                    return PullParser.RequireMore(advance, commit, false, parser, failedChoices)
+                override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<T> {
+                    return PullParser.RequireMore(advance, false, parser, failedChoices)
                 }
             }
         }
@@ -60,11 +60,11 @@ internal interface ParseContinuation<in IN, in OUT> {
 
     private class EndParseContinuation<IN, OUT> : ParseContinuation<IN, OUT> {
         override fun matched(advance: Int, commit: Int, length: Int, value: ValueProvider<OUT>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<IN> {
-            return PullParser.RequireMore(advance, commit, true, EndMatchPullParser, failedChoices)
+            return PullParser.RequireMore(advance, true, EndMatchPullParser, failedChoices)
         }
 
-        override fun <T> selected(advance: Int, commit: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<T> {
-            return PullParser.RequireMore(advance, commit, true, parser, failedChoices)
+        override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<T> {
+            return PullParser.RequireMore(advance, true, parser, failedChoices)
         }
     }
 

@@ -17,7 +17,7 @@ class NotTest : AbstractParseTest() {
 
         parser.matches {
             steps {
-                commit(0)
+                advance(0)
             }
         }
 
@@ -38,7 +38,7 @@ class NotTest : AbstractParseTest() {
             expectEndOfInput()
             expect("not x01")
             steps {
-                commit(0)
+                advance(0)
             }
         }
     }

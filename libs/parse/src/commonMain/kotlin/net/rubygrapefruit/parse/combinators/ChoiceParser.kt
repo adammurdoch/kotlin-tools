@@ -89,12 +89,10 @@ internal class ChoiceParser<IN, OUT>(
                         }
 
                         is PullParser.RequireMore -> {
-                            option.commit += optionResult.commit
                             if (optionResult.matched) {
                                 if (waitingFor == 0) {
                                     return option.continuation.next.selected(
                                         optionResult.advance,
-                                        option.commit,
                                         optionResult.parser,
                                         failedChoices + optionResult.failedChoices
                                     )
@@ -114,14 +112,14 @@ internal class ChoiceParser<IN, OUT>(
             if (waitingFor == 1) {
                 val option = states.first { it.state is PullParser }
                 option.continuation.disconnect()
-                return PullParser.RequireMore(option.matched - matched, option.commit, false, option.state as PullParser, failedChoices)
+                return PullParser.RequireMore(option.matched - matched, false, option.state as PullParser, failedChoices)
             }
             return if (waitingFor > 0) {
                 if (hasZeroAdvance) {
-                    PullParser.RequireMore(0, 0, false, this, failedChoices)
+                    PullParser.RequireMore(0, false, this, failedChoices)
                 } else {
                     matched++
-                    PullParser.RequireMore(1, 0, false, this, failedChoices)
+                    PullParser.RequireMore(1, false, this, failedChoices)
                 }
             } else {
                 PullParser.Failed(failedChoices)
@@ -131,10 +129,9 @@ internal class ChoiceParser<IN, OUT>(
 
     internal class OptionState<IN> internal constructor(var state: ParseState<IN>, internal val continuation: OptionContinuation<*, *>) {
         var matched = 0
-        var commit = 0
 
         override fun toString(): String {
-            return "{$state matched=$matched commit=$commit"
+            return "{$state matched=$matched}"
         }
     }
 
@@ -148,17 +145,17 @@ internal class ChoiceParser<IN, OUT>(
         override fun matched(advance: Int, commit: Int, length: Int, value: ValueProvider<OUT>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<IN> {
             val result = next.matched(advance, commit, length, value, failedChoices)
             return if (connected && !result.matched) {
-                PullParser.RequireMore(result.advance, result.commit, true, result.parser, result.failedChoices)
+                PullParser.RequireMore(result.advance, true, result.parser, result.failedChoices)
             } else {
                 result
             }
         }
 
-        override fun <T> selected(advance: Int, commit: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<T> {
+        override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<T> {
             return if (connected) {
-                PullParser.RequireMore(advance, commit, true, parser, failedChoices)
+                PullParser.RequireMore(advance, true, parser, failedChoices)
             } else {
-                next.selected(advance, commit, parser, failedChoices)
+                next.selected(advance, parser, failedChoices)
             }
         }
 

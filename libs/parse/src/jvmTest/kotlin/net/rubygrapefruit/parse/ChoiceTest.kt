@@ -23,13 +23,13 @@ class ChoiceTest : AbstractParseTest() {
         parser.matches("abcd", expected = 1) {
             steps {
                 advance(1)
-                advance(3, commit = 4)
+                advance(3)
             }
         }
         parser.matches("12", expected = 2) {
             steps {
                 advance(1)
-                advance(1, commit = 2)
+                advance(1)
             }
         }
 
@@ -61,7 +61,7 @@ class ChoiceTest : AbstractParseTest() {
             expectEndOfInput()
             steps {
                 advance(1)
-                advance(3, commit = 4)
+                advance(3)
             }
         }
         parser.doesNotMatch("12X") {
@@ -69,7 +69,7 @@ class ChoiceTest : AbstractParseTest() {
             expectEndOfInput()
             steps {
                 advance(1)
-                advance(1, commit = 2)
+                advance(1)
             }
         }
     }
@@ -90,14 +90,14 @@ class ChoiceTest : AbstractParseTest() {
 
         parser.matches(0x1, 0x2, 0x3, 0x4, expected = 1) {
             steps {
-                commit(1)
-                commit(3)
+                advance(1)
+                advance(3)
             }
         }
         parser.matches(0x10, 0x11, expected = 2) {
             steps {
-                commit(1)
-                commit(1)
+                advance(1)
+                advance(1)
             }
         }
 
@@ -113,16 +113,16 @@ class ChoiceTest : AbstractParseTest() {
             failAt(2)
             expectLiteral(0x3)
             steps {
-                commit(1)
+                advance(1)
                 // byte literal does not look ahead for end of input
-                commit(1)
+                advance(1)
             }
         }
         parser.doesNotMatch(0x10) {
             failAt(1)
             expectLiteral(0x11)
             steps {
-                commit(1)
+                advance(1)
             }
         }
     }
@@ -145,14 +145,14 @@ class ChoiceTest : AbstractParseTest() {
             steps {
                 advance(1)
                 advance(1)
-                advance(1, 3)
+                advance(1)
             }
         }
         parser.matches("abd", expected = 2) {
             steps {
                 advance(1)
                 advance(1)
-                advance(1, 3)
+                advance(1)
             }
         }
 
@@ -184,13 +184,13 @@ class ChoiceTest : AbstractParseTest() {
             steps {
                 advance(1)
                 advance(1)
-                advance(1, 3)
+                advance(1)
             }
         }
         parser.matches("ab", expected = 2) {
             steps {
                 advance(1)
-                advance(1, 2)
+                advance(1)
             }
         }
 
@@ -215,7 +215,7 @@ class ChoiceTest : AbstractParseTest() {
             steps {
                 advance(1)
                 advance(1)
-                advance(1, commit = 3)
+                advance(1)
             }
         }
         parser.doesNotMatch("abX") {
@@ -248,19 +248,19 @@ class ChoiceTest : AbstractParseTest() {
             steps {
                 advance(1)
                 advance(1)
-                advance(1, commit = 3)
+                advance(1)
             }
         }
         parser.matches("ad", expected = 2) {
             steps {
                 advance(1)
-                advance(1, commit = 2)
+                advance(1)
             }
         }
         parser.matches("ab", expected = 3) {
             steps {
                 advance(1)
-                advance(1, commit = 2)
+                advance(1)
             }
         }
 

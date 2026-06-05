@@ -41,7 +41,7 @@ internal class TextLiteralParser<OUT>(
                         stop()
                     } else {
                         matched += index
-                        PullParser.RequireMore(index, 0, false, this)
+                        PullParser.RequireMore(index, false, this)
                     }
                 }
                 if (input.get(index) != text[matched + index]) {

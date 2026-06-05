@@ -15,6 +15,10 @@ value class Position(val value: Int): Comparable<Position> {
         return Position(value + count)
     }
 
+    operator fun minus(other: Position): Int {
+        return value - other.value
+    }
+
     companion object {
         val Zero = Position(0)
     }

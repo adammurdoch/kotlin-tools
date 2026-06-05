@@ -23,7 +23,7 @@ internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>,
                 is PullParser -> {
                     val result = currentState.parse(input, input.available)
                     when (result) {
-                        is PullParser.Failed -> state = mergeFailure(result, input)
+                        is PullParser.Failed -> state = result
                         is PullParser.Matched -> state = result
                         is PullParser.RequireMore -> {
                             collectFailedChoices(result, input)
@@ -36,15 +36,6 @@ internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>,
                     }
                 }
             }
-        }
-    }
-
-    private fun mergeFailure(failure: PullParser.Failed, input: IN): PullParser.Failed {
-        val failurePosition = failure.position(input.position)
-        return if (failurePosition > failedChoicePosition) {
-            failure
-        } else {
-            PullParser.Failed(failure.index, ExpectationProvider.oneOf(failedChoice, failure.expected))
         }
     }
 
@@ -79,11 +70,18 @@ internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>,
         if (failure != null) {
             return failure
         }
-        val context = input.contextAt(result.index)
+        val failurePosition = result.failure.position(input.position)
+        val context = input.contextAt(failurePosition - input.position)
         return if (context == null) {
+            // Context is not yet available (e.g. failure is on current line and end-of-line not yet available) so wait for more input
             null
         } else {
-            val mapped = ParseResult.Fail<CONTEXT>(context, result.expected.expectation().format(), failureFormatter)
+            val expectation = if (failurePosition > failedChoicePosition) {
+                result.failure.expected
+            } else {
+                ExpectationProvider.oneOf(failedChoice, result.failure.expected)
+            }
+            val mapped = ParseResult.Fail<CONTEXT>(context, expectation.expectation().format(), failureFormatter)
             failure = mapped
             mapped
         }

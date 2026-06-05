@@ -28,18 +28,38 @@ internal interface PullParser<in IN> : ParseState<IN> {
     data object Matched : Finished<Any?>
 
     /**
-     * Parser stopped matching
-     *
      * @param index Relative to the start of input to [parse]. Can be positive or negative. Must be < max passed to [parse].
      */
-    data class Failed(val index: Int, val expected: ExpectationProvider) : Finished<Any?> {
+    data class Failure(val index: Int, val expected: ExpectationProvider) {
+        fun position(base: Position): Position {
+            return base + index
+        }
+
+        fun map(map: (Expectation) -> Expectation): Failure {
+            return Failure(index, expected.map(map))
+        }
+    }
+
+    /**
+     * Parser stopped matching
+     */
+    data class Failed(val failure: Failure) : Finished<Any?> {
+        /**
+         * @param index Relative to the start of input to [parse]. Can be positive or negative. Must be < max passed to [parse].
+         */
+        constructor(index: Int, expected: ExpectationProvider) : this(Failure(index, expected))
+
+        val index: Int get() = failure.index
+
+        val expected: ExpectationProvider get() = failure.expected
+
         /**
          * Returns the absolute position of this failure.
          */
-        fun position(base: Position) = base + index
+        fun position(base: Position) = failure.position(base)
 
         fun map(map: (Expectation) -> Expectation): Failed {
-            return Failed(index, expected.map(map))
+            return Failed(failure.map(map))
         }
 
         companion object {
@@ -70,7 +90,7 @@ internal interface PullParser<in IN> : ParseState<IN> {
      *
      * @param advance Move forward the given number of input values. Can be 0. Must be <= max passed to [parse].
      * @param commit The parser will not fail in the given inputs
-     * @param matched Parser has matched and moved to next parser, or will definitely match.
+     * @param matched Parser has matched and moved to its next parser.
      */
     data class RequireMore<in IN>(
         val advance: Int,

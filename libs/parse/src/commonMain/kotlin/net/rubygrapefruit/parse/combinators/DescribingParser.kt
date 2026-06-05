@@ -14,7 +14,6 @@ internal class DescribingParser<IN, OUT>(
         return DescribingCompiledParser(compiler.compile(parser), Expectation.One(description))
     }
 
-
     internal class DescribingCompiledParser<IN, OUT>(
         val parser: CompiledParser<IN, OUT>,
         private val expectation: Expectation

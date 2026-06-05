@@ -11,12 +11,12 @@ Parsers
 - `oneOrMore()` and `zeroOrMore()` allow optional trailing separator
 - `upTo(parser)`
 - `accept()` should not call function on a failed branch
-- Improve expected message for `not()` e.g: expecting any character but not "x"
 - `sequence(parser<unit>...)` 
 - `discard(parser<unit>...)` - alias for above?
 - `prefixed(prefix, parser, parser)`
 - `separated(parser, sep, parser, sep, parser)`
 - `integer(parser)` or `integer(minLen, maxLen)` - converts matching input to int
+- Improve expected message for `not()` or perhaps `oneExcept()`
 - Line comment convenience
 - Quoted string convenience
 

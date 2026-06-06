@@ -852,7 +852,7 @@ abstract class AbstractParseTest {
 
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<DefaultRecursiveParser.RecursiveCompiledParser<*, *>>(parser)
-                inspector.inspect(parser.parser!!)
+                inspector.inspect(parser.parser)
             }
         }
 

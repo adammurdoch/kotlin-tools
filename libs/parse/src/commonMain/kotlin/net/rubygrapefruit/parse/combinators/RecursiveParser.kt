@@ -35,10 +35,10 @@ internal class DefaultRecursiveParser<IN, OUT>(
     }
 
     internal class RecursiveCompiledParser<IN, OUT> : CompiledParser<IN, OUT> {
-        var parser: CompiledParser<IN, OUT>? = null
+        lateinit var parser: CompiledParser<IN, OUT>
 
         override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
-            return parser!!.start(start, next)
+            return parser.start(start, next)
         }
     }
 }

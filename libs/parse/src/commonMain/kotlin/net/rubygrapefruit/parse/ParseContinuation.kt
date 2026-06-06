@@ -1,19 +1,19 @@
 package net.rubygrapefruit.parse
 
 internal interface ParseContinuation<in IN, in OUT> {
-    fun matched(input: IN, advance: Int, length: Int, value: OUT): PullParser.RequireMore<IN> {
+    fun matched(input: IN, advance: Int, length: Int, value: OUT): PullParser.Result<IN> {
         return matched(input, advance, length, ValueProvider.of(value), emptyList())
     }
 
-    fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<OUT>): PullParser.RequireMore<IN> {
+    fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<OUT>): PullParser.Result<IN> {
         return matched(input, advance, length, value, emptyList())
     }
 
-    fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<OUT>, failedChoice: ExpectationProvider): PullParser.RequireMore<IN> {
+    fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<OUT>, failedChoice: ExpectationProvider): PullParser.Result<IN> {
         return matched(input, advance, length, value, listOf(PullParser.Failure(advance, failedChoice)))
     }
 
-    fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<OUT>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<IN>
+    fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<OUT>, failedChoices: List<PullParser.Failure>): PullParser.Result<IN>
 
     fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<T>
 
@@ -24,7 +24,7 @@ internal interface ParseContinuation<in IN, in OUT> {
                 return "{map $self}"
             }
 
-            override fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<T>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<IN> {
+            override fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<T>, failedChoices: List<PullParser.Failure>): PullParser.Result<IN> {
                 val mapped = map(length, value)
                 return self.matched(input, advance, mapped.first, mapped.second, failedChoices)
             }

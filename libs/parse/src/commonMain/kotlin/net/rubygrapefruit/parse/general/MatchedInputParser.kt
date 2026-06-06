@@ -28,7 +28,7 @@ internal class MatchedInputParser<IN, OUT>(
             length: Int,
             value: ValueProvider<Unit>,
             failedChoices: List<PullParser.Failure>
-        ): PullParser.RequireMore<SlicingInput<OUT>> {
+        ): PullParser.Result<SlicingInput<OUT>> {
             val slice = input.get(advance - length, advance)
             return next.matched(input, advance, length, ValueProvider.of(slice), failedChoices)
         }

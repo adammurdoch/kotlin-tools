@@ -143,9 +143,9 @@ internal class ChoiceParser<IN, OUT>(
 
         private var connected = true
 
-        override fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<OUT>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<IN> {
+        override fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<OUT>, failedChoices: List<PullParser.Failure>): PullParser.Result<IN> {
             val result = next.matched(input, advance, length, value, failedChoices)
-            return if (connected && !result.matched) {
+            return if (connected && result is PullParser.RequireMore && !result.matched) {
                 PullParser.RequireMore(result.advance, true, result.parser, result.failedChoices)
             } else {
                 result

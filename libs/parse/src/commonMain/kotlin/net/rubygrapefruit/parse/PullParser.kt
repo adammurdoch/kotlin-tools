@@ -18,14 +18,20 @@ internal interface PullParser<in IN> : ParseState<IN> {
      */
     fun parse(input: IN, max: Int): Result<IN>
 
-    sealed interface Result<in IN>
+    sealed interface Result<in IN> {
+        fun stop(input: IN): Failed
+    }
 
     sealed interface Finished<in IN> : Result<IN>, ParseState<IN>
 
     /**
      * Parser has successfully matched
      */
-    data object Matched : Finished<Any?>
+    data object Matched : Finished<Any?> {
+        override fun stop(input: Any?): Failed {
+            return Failed(emptyList())
+        }
+    }
 
     /**
      * @param index Relative to the start of input to [parse]. Can be positive or negative. Must be < max passed to [parse].
@@ -49,6 +55,10 @@ internal interface PullParser<in IN> : ParseState<IN> {
          */
         constructor(index: Int, expected: ExpectationProvider) : this(listOf(Failure(index, expected)))
 
+        override fun stop(input: Any?): Failed {
+            return this
+        }
+
         fun map(map: (Expectation) -> Expectation): Failed {
             return Failed(failures.map { it.map(map) })
         }
@@ -65,5 +75,9 @@ internal interface PullParser<in IN> : ParseState<IN> {
         val matched: Boolean,
         val parser: PullParser<IN>,
         val failedChoices: List<Failure> = emptyList()
-    ) : Result<IN>
+    ) : Result<IN> {
+        override fun stop(input: IN): Failed {
+            return parser.stop(input)
+        }
+    }
 }

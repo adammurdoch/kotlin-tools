@@ -23,7 +23,10 @@ internal class ZeroOrMoreSingleInputCompiledParser<IN : Input<*>, OUT>(
         }
 
         override fun stop(input: IN): PullParser.Failed {
-            return PullParser.Failed(listOf(PullParser.Failure(0, parser.expectation)) + next.matched(input,-matched, 0, accumulator).parser.stop(input).failures)
+            return PullParser.Failed(
+                listOf(PullParser.Failure(0, parser.expectation)) +
+                        next.matched(input, -matched, 0, accumulator).stop(input).failures
+            )
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN> {
@@ -39,7 +42,7 @@ internal class ZeroOrMoreSingleInputCompiledParser<IN : Input<*>, OUT>(
                 accumulator = accumulator.extract(input, 0, index)
             }
             return if (index < max || index == input.available && input.finished) {
-                next.matched(input,index, matched, accumulator, parser.expectation)
+                next.matched(input, index, matched, accumulator, parser.expectation)
             } else {
                 PullParser.RequireMore(index, false, this)
             }

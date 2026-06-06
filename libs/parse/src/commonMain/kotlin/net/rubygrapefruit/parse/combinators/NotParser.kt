@@ -55,7 +55,13 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
                         return PullParser.Failed(failures)
                     }
 
-                    is PullParser.Failed -> return continuation.selected(0, next, predicate.stop(input).map { Expectation.Not(it) }.failures)
+                    is PullParser.Failed -> {
+                        val predicateExpectation = parser.start(start, ParseContinuation.end()).stop(input).map { Expectation.Not(it) }
+                        val predicateFailures = predicateExpectation.failures.map { failure ->
+                            PullParser.Failure(failure.index - totalAdvanced, failure.expected)
+                        }
+                        return continuation.selected(0, next, predicateFailures)
+                    }
                     is PullParser.RequireMore -> {
                         predicate = checkResult.parser
                         if (checkResult.advance == 0) {

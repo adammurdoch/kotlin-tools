@@ -162,7 +162,6 @@ class SequenceOfNotParserTest : AbstractParseTest() {
         parser.doesNotMatch(0x1, 0x3) {
             failAt(1)
             expectEndOfInput()
-            expect("not x02")
             expectLiteral(0x1)
             expectLiteral(0x2)
         }

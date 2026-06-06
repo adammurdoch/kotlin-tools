@@ -68,10 +68,10 @@ internal class ZeroOrMoreParser<IN, OUT>(
         private val previous: Accumulator<ITEM, OUT>,
         private val next: ParseContinuation<IN, OUT>
     ) : ParseContinuation<IN, ITEM> {
-        override fun matched(advance: Int, length: Int, value: ValueProvider<ITEM>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<IN> {
+        override fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<ITEM>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<IN> {
             val result = previous.add(value, length)
             return if (length == 0) {
-                next.matched(advance, length, result, failedChoices)
+                next.matched(input, advance, length, result, failedChoices)
             } else {
                 val parser = of(start + length, parser, parser, result, next)
                 PullParser.RequireMore(advance, false, parser, failedChoices)
@@ -95,11 +95,11 @@ internal class ZeroOrMoreParser<IN, OUT>(
         }
 
         override fun stop(input: IN): PullParser.Failed {
-            return next.matched(0, result.length, result).parser.stop(input)
+            return next.matched(input,0, result.length, result).parser.stop(input)
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN> {
-            return next.matched(0, result.length, result)
+            return next.matched(input,0, result.length, result)
         }
     }
 }

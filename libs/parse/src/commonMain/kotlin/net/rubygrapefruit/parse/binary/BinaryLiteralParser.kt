@@ -55,7 +55,7 @@ internal class BinaryLiteralParser<OUT>(
                 }
                 index++
             }
-            return next.matched(index, bytes.size, result)
+            return next.matched(input, index, bytes.size, result)
         }
     }
 }

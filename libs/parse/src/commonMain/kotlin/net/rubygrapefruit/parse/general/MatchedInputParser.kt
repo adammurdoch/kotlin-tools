@@ -34,7 +34,7 @@ internal class MatchedInputParser<IN, OUT>(
         }
 
         override fun parse(input: SlicingInput<OUT>, max: Int): PullParser.Result<SlicingInput<OUT>> {
-            return next.matched(0, length, input.get(-length, 0))
+            return next.matched(input,0, length, input.get(-length, 0))
         }
     }
 }

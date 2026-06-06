@@ -27,7 +27,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
         private val continuation: ParseContinuation<IN, Unit>
     ) : PullParser<IN> {
         private var predicate = parser.start(start, ParseContinuation.end())
-        private var next = continuation.matched(0, 0, ValueProvider.Nothing).parser
+        private var next: PullParser<IN>? = null
         private var nextAdvance = 1
         private var totalAdvanced = 0
 
@@ -36,10 +36,11 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
         }
 
         override fun stop(input: IN): PullParser.Failed {
-            return PullParser.Failed(predicate.stop(input).map { Expectation.Not(it) }.failures + next.stop(input).failures)
+            return PullParser.Failed(predicate.stop(input).map { Expectation.Not(it) }.failures + next(input).stop(input).failures)
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN> {
+            val next = next(input)
             val maxAdvance = min(max, 1)
             if (nextAdvance > 0) {
                 val checkResult = predicate.parse(input, maxAdvance)
@@ -47,7 +48,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
                     is PullParser.Matched -> {
                         // Fail at the start
                         val predicateExpectation = parser.start(start, ParseContinuation.end()).stop(input).map { Expectation.Not(it) }
-                        val nextExpectation = continuation.matched(0, 0, ValueProvider.Nothing).parser.stop(input)
+                        val nextExpectation = continuation.matched(input, 0, 0, ValueProvider.Nothing).parser.stop(input)
                         val failures = (predicateExpectation.failures + nextExpectation.failures).map { failure ->
                             PullParser.Failure(failure.index - totalAdvanced, failure.expected)
                         }
@@ -76,12 +77,19 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
                 }
 
                 is PullParser.RequireMore -> {
-                    next = result.parser
+                    this.next = result.parser
                     nextAdvance = result.advance
                 }
             }
             totalAdvanced += nextAdvance
             return PullParser.RequireMore(nextAdvance, false, this)
+        }
+
+        private fun next(input: IN): PullParser<IN> {
+            if (next == null) {
+                next = continuation.matched(input, 0, 0, ValueProvider.Nothing).parser
+            }
+            return this.next!!
         }
     }
 }

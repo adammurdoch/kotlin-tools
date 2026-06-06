@@ -35,7 +35,7 @@ internal class SingleInputCompiledParser<IN : Input<*>, OUT>(
             } else {
                 if (parser.match(input, 0)) {
                     val result = extractor.extract(input)
-                    next.matched(1, 1, result)
+                    next.matched(input,1, 1, result)
                 } else {
                     stop()
                 }

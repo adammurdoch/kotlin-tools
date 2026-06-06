@@ -49,7 +49,7 @@ internal class TextLiteralParser<OUT>(
                 }
                 index++
             }
-            return next.matched(index, text.length, result)
+            return next.matched(input, index, text.length, result)
         }
 
         private fun stop(): PullParser.Failed {

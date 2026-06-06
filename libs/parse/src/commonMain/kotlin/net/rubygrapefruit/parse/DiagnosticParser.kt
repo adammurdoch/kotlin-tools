@@ -97,8 +97,8 @@ internal class DiagnosticParser<IN, OUT> private constructor(
             return "{d $parser}"
         }
 
-        override fun stop(): PullParser.Failed {
-            return parser.stop()
+        override fun stop(input: IN): PullParser.Failed {
+            return parser.stop(input)
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN> {

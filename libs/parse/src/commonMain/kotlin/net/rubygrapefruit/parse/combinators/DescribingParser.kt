@@ -34,8 +34,8 @@ internal class DescribingParser<IN, OUT>(
             return "{described-as $parser}"
         }
 
-        override fun stop(): PullParser.Failed {
-            val failure = parser.stop()
+        override fun stop(input: IN): PullParser.Failed {
+            val failure = parser.stop(input)
             return mapFailure(failure)
         }
 

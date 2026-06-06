@@ -28,8 +28,8 @@ internal class TextLiteralParser<OUT>(
             return "{literal ${format(text)} matched=$matched}"
         }
 
-        override fun stop(): PullParser.Failed {
-            return PullParser.Failed(-matched, startExpectation)
+        override fun stop(input: CharStream): PullParser.Failed {
+            return stop()
         }
 
         override fun parse(input: CharStream, max: Int): PullParser.Result<CharStream> {
@@ -50,6 +50,10 @@ internal class TextLiteralParser<OUT>(
                 index++
             }
             return next.matched(index, text.length, result)
+        }
+
+        private fun stop(): PullParser.Failed {
+            return PullParser.Failed(-matched, startExpectation)
         }
     }
 }

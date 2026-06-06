@@ -22,8 +22,8 @@ internal class ZeroOrMoreSingleInputCompiledParser<IN : Input<*>, OUT>(
             return "{zero-or-more-of-one $parser}"
         }
 
-        override fun stop(): PullParser.Failed {
-            return PullParser.Failed(listOf(PullParser.Failure(0, parser.expectation)) + next.matched(-matched, 0, accumulator).parser.stop().failures)
+        override fun stop(input: IN): PullParser.Failed {
+            return PullParser.Failed(listOf(PullParser.Failure(0, parser.expectation)) + next.matched(-matched, 0, accumulator).parser.stop(input).failures)
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN> {

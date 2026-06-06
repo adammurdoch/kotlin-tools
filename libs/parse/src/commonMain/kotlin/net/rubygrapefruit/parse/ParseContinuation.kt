@@ -69,8 +69,8 @@ internal interface ParseContinuation<in IN, in OUT> {
     }
 
     private object EndMatchPullParser : PullParser<Any?> {
-        override fun stop(): PullParser.Failed {
-            return PullParser.Failed(0, Expectation.Nothing)
+        override fun stop(input: Any?): PullParser.Failed {
+            return PullParser.Failed(emptyList())
         }
 
         override fun toString(): String {

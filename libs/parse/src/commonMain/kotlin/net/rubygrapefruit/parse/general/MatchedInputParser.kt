@@ -29,7 +29,7 @@ internal class MatchedInputParser<IN, OUT>(
             return "{collect-matched-input length=$length}"
         }
 
-        override fun stop(): PullParser.Failed {
+        override fun stop(input: SlicingInput<OUT>): PullParser.Failed {
             return PullParser.Failed(0, Expectation.Nothing)
         }
 

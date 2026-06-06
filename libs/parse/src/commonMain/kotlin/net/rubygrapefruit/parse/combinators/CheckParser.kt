@@ -52,7 +52,7 @@ internal class CheckParser<IN, INTERMEDIATE, OUT>(
     }
 
     private class BrokenPullParser(val failure: PullParser.Failed) : PullParser<Any?> {
-        override fun stop(): PullParser.Failed {
+        override fun stop(input: Any?): PullParser.Failed {
             return failure
         }
 

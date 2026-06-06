@@ -6,6 +6,7 @@ import net.rubygrapefruit.parse.general.EndOfInputParser
 import net.rubygrapefruit.parse.general.MatchedInputParser
 import net.rubygrapefruit.parse.general.SingleInputCompiledParser
 import net.rubygrapefruit.parse.general.SucceedParser
+import net.rubygrapefruit.parse.stream.Input
 import net.rubygrapefruit.parse.text.*
 import kotlin.test.*
 
@@ -33,7 +34,7 @@ abstract class AbstractParseTest {
         val fixture = DefaultCompiledParserFixture()
         fixture.config()
         val compiledParser = compile<CharStream, T>()
-        compiledParser.expecting(fixture)
+        compiledParser.expecting(fixture, StringCharStream(""))
     }
 
     fun <T> Parser<TextInput, T>.matches(input: String, expected: T, config: ParseFixture.() -> Unit = {}) {
@@ -150,7 +151,7 @@ abstract class AbstractParseTest {
         fixture.config()
 
         val compiledParser = compile<ByteStream, T>()
-        compiledParser.expecting(fixture)
+        compiledParser.expecting(fixture, ArrayByteStream(byteArrayOf()))
     }
 
     fun Parser<BinaryInput, Unit>.matches(vararg input: Byte, config: ParseFixture.() -> Unit = {}) {
@@ -289,16 +290,15 @@ abstract class AbstractParseTest {
         return pushParser.endOfInput()
     }
 
-    private fun CompiledParser<*, *>.expecting(fixture: DefaultCompiledParserFixture) {
+    private fun <IN: Input<*>> CompiledParser<IN, *>.expecting(fixture: DefaultCompiledParserFixture, emptyInput: IN) {
         fixture.inspect(this)
 
-        val pullParser = start(Position.Zero, ParseContinuation.end())
-        pullParser.expecting(fixture)
+        val pullParser = start(emptyInput.position, ParseContinuation.end())
+        pullParser.expecting(fixture, emptyInput)
     }
 
-    private fun PullParser<*>.expecting(fixture: DefaultCompiledParserFixture) {
-        val failed = stop()
-        assertTrue(failed.failures.isNotEmpty())
+    private fun <IN> PullParser<IN>.expecting(fixture: DefaultCompiledParserFixture, emptyInput: IN) {
+        val failed = stop(emptyInput)
         for (failure in failed.failures) {
             assertEquals(0, failure.index)
         }

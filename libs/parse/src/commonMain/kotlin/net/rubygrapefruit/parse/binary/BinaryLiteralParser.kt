@@ -32,7 +32,7 @@ internal class BinaryLiteralParser<OUT>(
             return "{literal ${bytes.map { format(it) }} matched=$matched}"
         }
 
-        override fun stop(): PullParser.Failed {
+        override fun stop(input: ByteStream): PullParser.Failed {
             return PullParser.Failed(0, expectations[matched])
         }
 

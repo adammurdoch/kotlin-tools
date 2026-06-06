@@ -94,8 +94,8 @@ internal class ZeroOrMoreParser<IN, OUT>(
             return "{end-zero-or-more}"
         }
 
-        override fun stop(): PullParser.Failed {
-            return next.matched(0, result.length, result).parser.stop()
+        override fun stop(input: IN): PullParser.Failed {
+            return next.matched(0, result.length, result).parser.stop(input)
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN> {

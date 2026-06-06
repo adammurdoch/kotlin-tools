@@ -21,8 +21,8 @@ internal class SingleInputCompiledParser<IN : Input<*>, OUT>(
             return "{one $parser}"
         }
 
-        override fun stop(): PullParser.Failed {
-            return PullParser.Failed(0, parser.expectation)
+        override fun stop(input: IN): PullParser.Failed {
+            return stop()
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN> {
@@ -40,6 +40,10 @@ internal class SingleInputCompiledParser<IN : Input<*>, OUT>(
                     stop()
                 }
             }
+        }
+
+        private fun stop(): PullParser.Failed {
+            return PullParser.Failed(0, parser.expectation)
         }
     }
 }

@@ -57,11 +57,11 @@ internal class ChoiceParser<IN, OUT>(
             return "{choice}"
         }
 
-        override fun stop(): PullParser.Failed {
+        override fun stop(input: IN): PullParser.Failed {
             return PullParser.Failed(states.flatMap {
                 val state = it.state
                 when (state) {
-                    is PullParser -> state.stop().failures
+                    is PullParser -> state.stop(input).failures
                     else -> emptyList()
                 }
             })

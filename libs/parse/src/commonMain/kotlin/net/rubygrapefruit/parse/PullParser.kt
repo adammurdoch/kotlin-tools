@@ -9,7 +9,7 @@ internal interface PullParser<in IN> : ParseState<IN> {
     /**
      * Forces this parser to stop at the current position.
      */
-    fun stop(): Failed
+    fun stop(input: IN): Failed
 
     /**
      * Attempts to parse the given inputs, up to the given max number of values.

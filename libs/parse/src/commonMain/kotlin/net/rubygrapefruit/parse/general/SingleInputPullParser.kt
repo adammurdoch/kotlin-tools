@@ -30,12 +30,12 @@ internal class SingleInputCompiledParser<IN : Input<*>, OUT>(
                 if (input.available == 0 && input.finished) {
                     stop()
                 } else {
-                    PullParser.RequireMore(0, false, this)
+                    PullParser.RequireMore(0, this)
                 }
             } else {
                 if (parser.match(input, 0)) {
                     val result = extractor.extract(input)
-                    next.matched(input,1, 1, result)
+                    next.matched(input, 1, 1, result)
                 } else {
                     stop()
                 }

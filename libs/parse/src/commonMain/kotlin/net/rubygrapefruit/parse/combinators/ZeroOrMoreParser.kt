@@ -74,11 +74,11 @@ internal class ZeroOrMoreParser<IN, OUT>(
                 next.matched(input, advance, length, result, failedChoices)
             } else {
                 val parser = of(start + length, parser, parser, result, next)
-                PullParser.RequireMore(advance, false, parser, failedChoices)
+                PullParser.RequireMore(advance, parser, failedChoices)
             }
         }
 
-        override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<T> {
+        override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.Continuing<T> {
             return next.selected(advance, parser, failedChoices)
         }
     }

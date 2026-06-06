@@ -43,7 +43,7 @@ internal class CheckParser<IN, INTERMEDIATE, OUT>(
             }
         }
 
-        override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<T> {
+        override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.Continuing<T> {
             return next.selected(advance, parser, failedChoices)
         }
     }

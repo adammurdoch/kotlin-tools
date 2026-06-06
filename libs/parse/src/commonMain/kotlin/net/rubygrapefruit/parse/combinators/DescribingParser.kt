@@ -48,7 +48,7 @@ internal class DescribingParser<IN, OUT>(
                 is PullParser.RequireMore -> {
                     advanced += result.advance
                     parser = result.parser
-                    PullParser.RequireMore(result.advance, result.matched, this, result.failedChoices)
+                    PullParser.RequireMore(result.advance, this, result.failedChoices)
                 }
             }
         }

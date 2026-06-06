@@ -33,7 +33,7 @@ internal class MatchedInputParser<IN, OUT>(
             return next.matched(input, advance, length, ValueProvider.of(slice), failedChoices)
         }
 
-        override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<T> {
+        override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.Continuing<T> {
             return next.selected(advance, parser, failedChoices)
         }
     }

@@ -320,7 +320,9 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
         }
 
         parser.matches("!!", expected = emptyList())
+        parser.matches("a!!", expected = listOf('a'))
         parser.matches("abc!!", expected = listOf('a', 'b', 'c'))
+        parser.matches("!a!!", expected = listOf('!', 'a'))
 
         // missing
         parser.doesNotMatch("") {

@@ -30,32 +30,7 @@ internal interface PullParser<in IN> : ParseState<IN> {
         fun parser(): PullParser<IN>
     }
 
-    sealed class Finished<in IN> : Result<IN>, ParseState<IN> {
-        private val parser = FinishedPullParser(this)
-
-        override fun parser(): PullParser<IN> {
-            return parser
-        }
-    }
-
-    private class FinishedPullParser<in IN>(val state: Finished<IN>) : PullParser<IN> {
-        override fun stop(input: IN): Failed {
-            return state.stop(input)
-        }
-
-        override fun parse(input: IN, max: Int): Result<IN> {
-            return state
-        }
-    }
-
-    /**
-     * Parser has successfully matched
-     */
-    data object Matched : Finished<Any?>() {
-        override fun stop(input: Any?): Failed {
-            return Failed(emptyList())
-        }
-    }
+    sealed interface Continuing<in IN>: Result<IN>
 
     /**
      * @param index Relative to the start of input to [parse]. Can be positive or negative. Must be < max passed to [parse].
@@ -73,11 +48,17 @@ internal interface PullParser<in IN> : ParseState<IN> {
     /**
      * Parser stopped matching.
      */
-    data class Failed(val failures: List<Failure>) : Finished<Any?>() {
+    data class Failed(val failures: List<Failure>) : Result<Any?>, ParseState<Any?> {
+        private val parser = FinishedPullParser(this)
+
         /**
          * @param index Relative to the start of input to [parse]. Can be positive or negative. Must be < max passed to [parse].
          */
         constructor(index: Int, expected: ExpectationProvider) : this(listOf(Failure(index, expected)))
+
+        override fun parser(): PullParser<Any?> {
+            return parser
+        }
 
         override fun stop(input: Any?): Failed {
             return this
@@ -88,18 +69,45 @@ internal interface PullParser<in IN> : ParseState<IN> {
         }
     }
 
+    private class FinishedPullParser<in IN>(val state: Result<IN>) : PullParser<IN> {
+        override fun stop(input: IN): Failed {
+            return state.stop(input)
+        }
+
+        override fun parse(input: IN, max: Int): Result<IN> {
+            return state
+        }
+    }
+
     /**
+     * Parser has successfully matched.
+     * Move the input forward the given number of values and continue with the tail.
+     */
+    data class Matched<in IN>(
+        val advance: Int,
+        val parser: PullParser<IN>,
+        val failedChoices: List<Failure> = emptyList()
+    ) : Result<IN>, ParseState<IN>, Continuing<IN> {
+        override fun stop(input: IN): Failed {
+            return parser.stop(input)
+        }
+
+        override fun parser(): PullParser<IN> {
+            return parser
+        }
+    }
+
+    /**
+     * Parser has not matched yet.
      * Move the input forward the given number of values and try again with the given parser.
      *
      * @param advance Move forward the given number of input values. Can be 0. Must be <= max passed to [parse].
-     * @param matched Parser has matched and moved to its next parser.
      */
     data class RequireMore<in IN>(
         val advance: Int,
-        val matched: Boolean,
         val parser: PullParser<IN>,
         val failedChoices: List<Failure> = emptyList()
-    ) : Result<IN> {
+    ) : Result<IN>, Continuing<IN> {
         override fun stop(input: IN): Failed {
             return parser.stop(input)
         }

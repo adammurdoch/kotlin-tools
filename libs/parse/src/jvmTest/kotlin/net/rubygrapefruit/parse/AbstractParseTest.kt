@@ -1096,7 +1096,7 @@ abstract class AbstractParseTest {
             return if (fails) {
                 steps
             } else {
-                steps + listOf(Step(0))
+                steps
             }
         }
 

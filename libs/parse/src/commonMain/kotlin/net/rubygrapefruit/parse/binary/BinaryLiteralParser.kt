@@ -43,11 +43,11 @@ internal class BinaryLiteralParser<OUT>(
                 if (index >= max) {
                     return if (index > 0) {
                         matched += index
-                        PullParser.RequireMore(index, false, this)
+                        PullParser.RequireMore(index, this)
                     } else if (input.available == 0 && input.finished) {
                         PullParser.Failed(0, expectations[matched])
                     } else {
-                        PullParser.RequireMore(0, false, this)
+                        PullParser.RequireMore(0, this)
                     }
                 }
                 if (input.get(index) != bytes[matched + index]) {

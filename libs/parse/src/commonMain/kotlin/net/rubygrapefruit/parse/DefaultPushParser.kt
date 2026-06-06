@@ -105,7 +105,7 @@ private class ValueReceivingContinuation<IN, OUT> : ParseContinuation<IN, OUT> {
         return ParseContinuation.end<IN, OUT>().matched(input, advance, length, value, failedChoices)
     }
 
-    override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<T> {
+    override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.Continuing<T> {
         return ParseContinuation.end<IN, OUT>().selected(advance, parser, failedChoices)
     }
 }

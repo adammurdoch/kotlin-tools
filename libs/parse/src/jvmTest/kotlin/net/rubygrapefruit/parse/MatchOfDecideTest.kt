@@ -25,7 +25,7 @@ class MatchOfDecideTest : AbstractParseTest() {
         parser.expecting {
             expectMatch {
                 expectDecide {
-                    expectZeroOrMoreSingleInput { parser
+                    expectZeroOrMoreSingleInput {
                         expectOneOf("a", "b")
                     }
                     expectLiteral("!")

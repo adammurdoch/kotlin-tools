@@ -292,6 +292,38 @@ class SequenceOfNotParserTest : AbstractParseTest() {
             oneOrMore(one())
         )
 
+        parser.expecting {
+            expectSequence {
+                expectNot {
+                    expectChoice {
+                        expectLiteral("a!")
+                        expectLiteral("a?")
+                    }
+                }
+                expectOneOrMore {
+                    expectOneChar()
+                }
+            }
+        }
+
         parser.matches("ab", expected = listOf('a', 'b'))
+        parser.matches("a", expected = listOf('a'))
+
+        parser.doesNotMatch("a!") {
+            expect("not \"a!\"")
+            expect("not \"a?\"")
+            expectOneChar()
+        }
+        parser.doesNotMatch("a?") {
+            expect("not \"a!\"")
+            expect("not \"a?\"")
+            expectOneChar()
+        }
+
+        parser.doesNotMatch("a!X") {
+            expect("not \"a!\"")
+            expect("not \"a?\"")
+            expectOneChar()
+        }
     }
 }

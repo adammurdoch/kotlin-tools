@@ -6,7 +6,7 @@ import kotlin.test.Test
 
 class NotOfEndOfInputTest : AbstractParseTest() {
     @Test
-    fun `does not match anything`() {
+    fun `never matches`() {
         val parser = not(endOfInput())
 
         parser.expecting {

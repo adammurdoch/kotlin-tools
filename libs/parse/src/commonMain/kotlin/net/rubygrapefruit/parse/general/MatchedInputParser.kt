@@ -15,26 +15,26 @@ internal class MatchedInputParser<IN, OUT>(
 
     internal class MatchedInputCompiledParser<OUT>(val parser: CompiledParser<SlicingInput<OUT>, Unit>) : CompiledParser<SlicingInput<OUT>, OUT> {
         override fun start(start: Position, next: ParseContinuation<SlicingInput<OUT>, OUT>): PullParser<SlicingInput<OUT>> {
-            return parser.then(start) { length, _ ->
-                CollectMatchedInputPullParser(length, next)
-            }
+            return parser.start(start, CollectMatchedInputParseContinuation(next))
         }
     }
 
-    private class CollectMatchedInputPullParser<OUT>(
-        private val length: Int,
+    private class CollectMatchedInputParseContinuation<OUT>(
         private val next: ParseContinuation<SlicingInput<OUT>, OUT>
-    ) : PullParser<SlicingInput<OUT>> {
-        override fun toString(): String {
-            return "{collect-matched-input length=$length}"
+    ) : ParseContinuation<SlicingInput<OUT>, Unit> {
+        override fun matched(
+            input: SlicingInput<OUT>,
+            advance: Int,
+            length: Int,
+            value: ValueProvider<Unit>,
+            failedChoices: List<PullParser.Failure>
+        ): PullParser.RequireMore<SlicingInput<OUT>> {
+            val slice = input.get(advance - length, advance)
+            return next.matched(input, advance, length, ValueProvider.of(slice), failedChoices)
         }
 
-        override fun stop(input: SlicingInput<OUT>): PullParser.Failed {
-            return PullParser.Failed(0, Expectation.Nothing)
-        }
-
-        override fun parse(input: SlicingInput<OUT>, max: Int): PullParser.Result<SlicingInput<OUT>> {
-            return next.matched(input,0, length, input.get(-length, 0))
+        override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<T> {
+            return next.selected(advance, parser, failedChoices)
         }
     }
 }

@@ -19,15 +19,39 @@ internal interface PullParser<in IN> : ParseState<IN> {
     fun parse(input: IN, max: Int): Result<IN>
 
     sealed interface Result<in IN> {
+        /**
+         * Forces parsing to stop at the current location, if not already stopped.
+         */
         fun stop(input: IN): Failed
+
+        /**
+         * Forces parsing to continue, even if stopped.
+         */
+        fun parser(): PullParser<IN>
     }
 
-    sealed interface Finished<in IN> : Result<IN>, ParseState<IN>
+    sealed class Finished<in IN> : Result<IN>, ParseState<IN> {
+        private val parser = FinishedPullParser(this)
+
+        override fun parser(): PullParser<IN> {
+            return parser
+        }
+    }
+
+    private class FinishedPullParser<in IN>(val state: Finished<IN>) : PullParser<IN> {
+        override fun stop(input: IN): Failed {
+            return state.stop(input)
+        }
+
+        override fun parse(input: IN, max: Int): Result<IN> {
+            return state
+        }
+    }
 
     /**
      * Parser has successfully matched
      */
-    data object Matched : Finished<Any?> {
+    data object Matched : Finished<Any?>() {
         override fun stop(input: Any?): Failed {
             return Failed(emptyList())
         }
@@ -49,7 +73,7 @@ internal interface PullParser<in IN> : ParseState<IN> {
     /**
      * Parser stopped matching.
      */
-    data class Failed(val failures: List<Failure>) : Finished<Any?> {
+    data class Failed(val failures: List<Failure>) : Finished<Any?>() {
         /**
          * @param index Relative to the start of input to [parse]. Can be positive or negative. Must be < max passed to [parse].
          */
@@ -78,6 +102,10 @@ internal interface PullParser<in IN> : ParseState<IN> {
     ) : Result<IN> {
         override fun stop(input: IN): Failed {
             return parser.stop(input)
+        }
+
+        override fun parser(): PullParser<IN> {
+            return parser
         }
     }
 }

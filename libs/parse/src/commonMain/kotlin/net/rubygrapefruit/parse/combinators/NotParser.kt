@@ -93,7 +93,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
 
         private fun next(input: IN): PullParser<IN> {
             if (next == null) {
-                next = (continuation.matched(input, 0, 0, ValueProvider.Nothing) as PullParser.RequireMore).parser
+                next = continuation.matched(input, 0, 0, ValueProvider.Nothing).parser()
             }
             return this.next!!
         }

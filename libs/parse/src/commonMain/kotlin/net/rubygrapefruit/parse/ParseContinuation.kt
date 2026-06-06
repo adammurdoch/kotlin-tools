@@ -60,25 +60,11 @@ internal interface ParseContinuation<in IN, in OUT> {
 
     private class EndParseContinuation<IN, OUT> : ParseContinuation<IN, OUT> {
         override fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<OUT>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<IN> {
-            return PullParser.RequireMore(advance, true, EndMatchPullParser, failedChoices)
+            return PullParser.RequireMore(advance, true, PullParser.Matched.parser(), failedChoices)
         }
 
         override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<T> {
             return PullParser.RequireMore(advance, true, parser, failedChoices)
-        }
-    }
-
-    private object EndMatchPullParser : PullParser<Any?> {
-        override fun stop(input: Any?): PullParser.Failed {
-            return PullParser.Failed(emptyList())
-        }
-
-        override fun toString(): String {
-            return "{end}"
-        }
-
-        override fun parse(input: Any?, max: Int): PullParser.Result<Any?> {
-            return PullParser.Matched
         }
     }
 }

@@ -6,9 +6,9 @@ import net.rubygrapefruit.parse.text.match
 import net.rubygrapefruit.parse.text.oneOf
 import kotlin.test.Test
 
-class CharMatchOfSequenceTest : AbstractParseTest() {
+class MatchOfSequenceTest : AbstractParseTest() {
     @Test
-    fun `matches sequence of literal then one of char`() {
+    fun `matches sequence of char literal then one of char`() {
         val parser = match(
             sequence(
                 literal("12"),

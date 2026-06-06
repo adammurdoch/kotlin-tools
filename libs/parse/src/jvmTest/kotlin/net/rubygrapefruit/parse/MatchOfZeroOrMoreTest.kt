@@ -6,7 +6,7 @@ import net.rubygrapefruit.parse.text.match
 import net.rubygrapefruit.parse.text.oneOf
 import kotlin.test.Test
 
-class CharMatchOfZeroOrMoreTest : AbstractParseTest() {
+class MatchOfZeroOrMoreTest : AbstractParseTest() {
     @Test
     fun `matches zero or more one char literal`() {
         val parser = match(zeroOrMore(literal("12", 1)))

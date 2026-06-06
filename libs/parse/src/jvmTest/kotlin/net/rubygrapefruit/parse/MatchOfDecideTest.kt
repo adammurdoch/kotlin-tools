@@ -7,9 +7,9 @@ import net.rubygrapefruit.parse.text.match
 import net.rubygrapefruit.parse.text.oneOf
 import kotlin.test.Test
 
-class CharMatchOfDecideTest : AbstractParseTest() {
+class MatchOfDecideTest : AbstractParseTest() {
     @Test
-    fun `matches zero or more of char followed by literal`() {
+    fun `matches zero or more of char followed by char literal`() {
         val parser = match(
             decide(
                 zeroOrMore(oneOf('a', 'b'))

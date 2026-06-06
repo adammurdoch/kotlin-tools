@@ -5,9 +5,9 @@ import net.rubygrapefruit.parse.text.literal
 import net.rubygrapefruit.parse.text.match
 import kotlin.test.Test
 
-class CharMatchOfChoiceTest : AbstractParseTest() {
+class MatchOfChoiceTest : AbstractParseTest() {
     @Test
-    fun `matches choice of literals`() {
+    fun `matches choice of char literals`() {
         val parser = match(
             oneOf(
                 literal("abc", 1),

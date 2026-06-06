@@ -130,38 +130,59 @@ class ChoiceTest : AbstractParseTest() {
     @Test
     fun `matches literals with common prefix`() {
         val parser = oneOf(
-            literal("abc", 1),
-            literal("abd", 2)
+            literal("a---", 1),
+            literal("a...", 2)
         )
 
         parser.expecting {
             expectChoice {
-                expectLiteral("abc", result = 1)
-                expectLiteral("abd", result = 2)
+                expectLiteral("a---", result = 1)
+                expectLiteral("a...", result = 2)
             }
         }
 
-        parser.matches("abc", expected = 1) {
+        parser.matches("a---", expected = 1) {
             steps {
                 advance(1)
                 advance(1)
-                advance(1)
+                advance(2) // discards failed branch
             }
         }
-        parser.matches("abd", expected = 2) {
+        parser.matches("a...", expected = 2) {
             steps {
                 advance(1)
                 advance(1)
-                advance(1)
+                advance(2) // discards failed branch
             }
         }
 
-        parser.doesNotMatch("ab") {
-            expectLiteral("abc")
-            expectLiteral("abd")
+        // missing
+        parser.doesNotMatch("a") {
+            expectLiteral("a---")
+            expectLiteral("a...")
             steps {
-                advance(1)
                 // char literal looks ahead for end of input
+            }
+        }
+
+        // unexpected
+        parser.doesNotMatch("a..X") {
+            expectLiteral("a---")
+            expectLiteral("a...")
+            steps {
+                advance(1)
+                advance(1)
+            }
+        }
+
+        // extra
+        parser.doesNotMatch("a...X") {
+            failAt(4)
+            expectEndOfInput()
+            steps {
+                advance(1)
+                advance(1)
+                advance(2)
             }
         }
     }
@@ -223,7 +244,7 @@ class ChoiceTest : AbstractParseTest() {
             expectEndOfInput()
             steps {
                 advance(1)
-                advance(1) // does not commit as reaches failure on matched branch and earlier branch on same input value
+                advance(1)
             }
         }
     }
@@ -269,13 +290,13 @@ class ChoiceTest : AbstractParseTest() {
             expectLiteral("ab")
             expectLiteral("abc")
             expectLiteral("ad")
-            steps {  }
+            steps { }
         }
         parser.doesNotMatch("a") {
             expectLiteral("ab")
             expectLiteral("abc")
             expectLiteral("ad")
-            steps {  }
+            steps { }
         }
     }
 

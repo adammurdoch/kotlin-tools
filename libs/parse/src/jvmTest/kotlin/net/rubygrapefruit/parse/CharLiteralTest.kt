@@ -22,26 +22,35 @@ class CharLiteralTest : AbstractParseTest() {
         parser.doesNotMatch("") {
             // don't use expectLiteral() here, to check formatting
             expect("\"a\"")
+            steps {}
         }
 
         // unexpected char
         parser.doesNotMatch("X") {
             expect("\"a\"")
+            steps {}
         }
 
         // extra char
         parser.doesNotMatch("aX") {
             failAt(1)
             expectEndOfInput()
+            steps {
+                advance(1)
+            }
         }
         parser.doesNotMatch("aXXX") {
             failAt(1)
             expectEndOfInput()
+            steps {
+                advance(1)
+            }
         }
 
         // incorrect case
         parser.doesNotMatch("A") {
             expect("\"a\"")
+            steps {}
         }
     }
 
@@ -125,56 +134,77 @@ class CharLiteralTest : AbstractParseTest() {
         parser.doesNotMatch("") {
             // don't use expectLiteral() here, to check formatting
             expect("\"ab\"")
+            steps {}
         }
         parser.doesNotMatch("a") {
             expect("\"ab\"")
+            steps {}
         }
         parser.doesNotMatch("b") {
             expect("\"ab\"")
+            steps {}
         }
 
         // unexpected char
         parser.doesNotMatch("X") {
             expect("\"ab\"")
+            steps {}
         }
         parser.doesNotMatch("aX") {
             expect("\"ab\"")
+            steps {}
         }
         parser.doesNotMatch("Xb") {
             expect("\"ab\"")
+            steps {}
         }
         parser.doesNotMatch("Xab") {
             expect("\"ab\"")
+            steps {}
         }
         parser.doesNotMatch("aXb") {
             expect("\"ab\"")
+            steps {}
         }
 
         // extra char
         parser.doesNotMatch("abX") {
             failAt(2)
             expectEndOfInput()
+            steps {
+                advance(2)
+            }
         }
         parser.doesNotMatch("abXX") {
             failAt(2)
             expectEndOfInput()
+            steps {
+                advance(2)
+            }
         }
 
         // incorrect case
         parser.doesNotMatch("AB") {
             expect("\"ab\"")
+            steps {}
         }
         parser.doesNotMatch("Ab") {
             expect("\"ab\"")
+            steps {}
         }
         parser.doesNotMatch("aB") {
             expect("\"ab\"")
+            steps {}
         }
     }
 
     @Test
     fun `matches multi-char literal and produces result`() {
         val parser = literal("ab", 1)
+
+        parser.expecting {
+            expectLiteral("ab", result = 1)
+        }
 
         parser.matches("ab", expected = 1)
     }

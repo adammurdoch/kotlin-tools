@@ -10,7 +10,7 @@ import kotlin.test.Test
 
 class SequenceOfNotParserTest : AbstractParseTest() {
     @Test
-    fun `matches not single byte literal followed by bytes`() {
+    fun `matches not single byte literal followed by zero or more bytes`() {
         val parser = sequence(
             not(literal(byteArrayOf(0x1), 1)),
             zeroOrMore(oneOf(0x1, 0x2))
@@ -76,7 +76,7 @@ class SequenceOfNotParserTest : AbstractParseTest() {
     }
 
     @Test
-    fun `matches not multi-byte literal followed by bytes`() {
+    fun `matches not multi-byte literal followed by zero or more bytes`() {
         val parser = sequence(
             not(literal(byteArrayOf(0x1, 0x2), 1)),
             zeroOrMore(oneOf(0x1, 0x2))
@@ -175,7 +175,7 @@ class SequenceOfNotParserTest : AbstractParseTest() {
     }
 
     @Test
-    fun `matches not one of byte followed by bytes`() {
+    fun `matches not one of byte followed by zero or more bytes`() {
         val parser = sequence(
             not(oneOf(0x1, 0x2)),
             zeroOrMore(oneOf(0x1, 0x2, 0x3, 0x4))
@@ -237,7 +237,7 @@ class SequenceOfNotParserTest : AbstractParseTest() {
     }
 
     @Test
-    fun `matches not end of input followed by bytes`() {
+    fun `matches not end of input followed by zero or more bytes`() {
         val parser = sequence(
             not(endOfInput(1)),
             zeroOrMore(oneOf(0x1, 0x2))
@@ -281,7 +281,7 @@ class SequenceOfNotParserTest : AbstractParseTest() {
     }
 
     @Test
-    fun `matches not of choices with common prefix followed by chars`() {
+    fun `matches not of choices with common prefix followed by one or more chars`() {
         val parser = sequence(
             not(
                 oneOf(
@@ -323,6 +323,39 @@ class SequenceOfNotParserTest : AbstractParseTest() {
         parser.doesNotMatch("a!X") {
             expect("not \"a!\"")
             expect("not \"a?\"")
+            expectOneChar()
+        }
+    }
+
+    @Test
+    fun `matches not of decide followed by one or more chars`() {
+        val parser = sequence(
+            not(
+                decide(optional(literal("a!", 1))) {
+                    if (it == null) literal("0") else literal(it.toString())
+                }
+            ),
+            oneOrMore(one())
+        )
+
+        parser.matches("X", expected = listOf('X'))
+        parser.matches("a!", expected = listOf('a', '!'))
+        parser.matches("a!2", expected = listOf('a', '!', '2'))
+
+        parser.doesNotMatch("a!1") {
+            expect("not \"a!\"")
+            expect("not \"0\"")
+            expectOneChar()
+        }
+        parser.doesNotMatch("0") {
+            expect("not \"a!\"")
+            expect("not \"0\"")
+            expectOneChar()
+        }
+
+        parser.doesNotMatch("a!1X") {
+            expect("not \"a!\"")
+            expect("not \"0\"")
             expectOneChar()
         }
     }

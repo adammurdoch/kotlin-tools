@@ -15,7 +15,13 @@ class RepeatOfSuccessTest : AbstractParseTest() {
             }
         }
 
-        parser.matches(expected = listOf(1, 1, 1))
+        parser.matches(expected = listOf(1, 1, 1)) {
+            steps {
+                advance(0)
+                advance(0)
+                advance(0)
+            }
+        }
 
         parser.doesNotMatch(0x1) {
             expectEndOfInput()

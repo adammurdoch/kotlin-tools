@@ -7,42 +7,74 @@ import kotlin.test.Test
 class RepeatTest : AbstractParseTest() {
     @Test
     fun `parses n char literals`() {
-        val parser = repeat(4, literal("a", 1))
+        val parser = repeat(3, literal("a.", 1))
 
         parser.expecting {
-            expectRepeat(4) {
-                expectLiteral("a", result = 1)
+            expectRepeat(3) {
+                expectLiteral("a.", result = 1)
             }
         }
 
-        parser.matches("aaaa", listOf(1, 1, 1, 1))
+        parser.matches("a.a.a.", listOf(1, 1, 1)) {
+            steps {
+                advance(2)
+                advance(2)
+                advance(2)
+            }
+        }
 
         // missing
         parser.doesNotMatch("") {
-            expectLiteral("a")
+            expectLiteral("a.")
+            steps {}
         }
-        parser.doesNotMatch("aaa") {
-            failAt(3)
-            expectLiteral("a")
+        parser.doesNotMatch("a.a.") {
+            failAt(4)
+            expectLiteral("a.")
+            steps {
+                advance(2)
+                advance(2)
+            }
+        }
+        parser.doesNotMatch("a.a") {
+            failAt(2)
+            expectLiteral("a.")
+            steps {
+                advance(2)
+            }
         }
 
         // unexpected
         parser.doesNotMatch("X") {
-            expectLiteral("a")
+            expectLiteral("a.")
+            steps { }
         }
-        parser.doesNotMatch("aaXa") {
+        parser.doesNotMatch("a.Xa") {
             failAt(2)
-            expectLiteral("a")
+            expectLiteral("a.")
+            steps {
+                advance(2)
+            }
         }
 
         // extra
-        parser.doesNotMatch("aaaaa") {
-            failAt(4)
+        parser.doesNotMatch("a.a.a.a") {
+            failAt(6)
             expectEndOfInput()
+            steps {
+                advance(2)
+                advance(2)
+                advance(2)
+            }
         }
-        parser.doesNotMatch("aaaaXX") {
-            failAt(4)
+        parser.doesNotMatch("a.a.a.XX") {
+            failAt(6)
             expectEndOfInput()
+            steps {
+                advance(2)
+                advance(2)
+                advance(2)
+            }
         }
     }
 
@@ -54,7 +86,11 @@ class RepeatTest : AbstractParseTest() {
             expectSucceed(result = emptyList<Int>())
         }
 
-        parser.matches("", expected = listOf())
+        parser.matches("", expected = listOf()) {
+            steps {
+                advance(0) // uses success parser
+            }
+        }
 
         // unexpected
         parser.doesNotMatch("X") {

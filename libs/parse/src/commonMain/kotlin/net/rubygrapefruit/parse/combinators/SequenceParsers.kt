@@ -3,6 +3,10 @@ package net.rubygrapefruit.parse.combinators
 import net.rubygrapefruit.parse.Parser
 import kotlin.jvm.JvmName
 
+/*
+ * 2 PART SEQUENCES
+ */
+
 /**
  * Returns a parser that applies the given parsers in order.
  * Uses the given mapping function to produce the result.
@@ -60,6 +64,10 @@ fun <IN> sequence(a: Parser<IN, Unit>, b: Parser<IN, Unit>, vararg additional: P
     }
 }
 
+/*
+ * 3 PART SEQUENCES
+ */
+
 /**
  * Returns a parser that applies the given parsers in order.
  * Uses the given mapping function to produce the result.
@@ -67,6 +75,14 @@ fun <IN> sequence(a: Parser<IN, Unit>, b: Parser<IN, Unit>, vararg additional: P
 fun <IN, A, B, C, OUT> sequence(a: Parser<IN, A>, b: Parser<IN, B>, c: Parser<IN, C>, map: (A, B, C) -> OUT): Parser<IN, OUT> {
     val tail = Sequence2Parser(b, c) { b, c -> Pair(b, c) }
     return Sequence2Parser(a, tail) { a, tail -> map(a, tail.first, tail.second) }
+}
+
+/**
+ * Returns a parser that applies the given parsers in order.
+ * Uses the given mapping function to produce the result from the results of the second and third parsers.
+ */
+fun <IN, A, B, OUT> prefixed(prefix: Parser<IN, *>, a: Parser<IN, A>, b: Parser<IN, B>, map: (A, B) -> OUT): Parser<IN, OUT> {
+    return sequence(discard(prefix), a, b) { _, a, b -> map(a, b) }
 }
 
 /**
@@ -102,6 +118,10 @@ fun <IN, A, B, OUT> sequence(a: Parser<IN, A>, separator: Parser<IN, Unit>, b: P
     return sequence(a, separator, b) { a, _, b -> map(a, b) }
 }
 
+/*
+ * 4 PART SEQUENCES
+ */
+
 /**
  * Returns a parser that applies the given parsers in order.
  * Uses the given mapping function to produce the result.
@@ -117,6 +137,10 @@ fun <IN, A, B, C, D, OUT> sequence(
     val tail2 = Sequence2Parser(b, tail1) { b, tail -> Pair(b, tail) }
     return Sequence2Parser(a, tail2) { a, tail -> map(a, tail.first, tail.second.first, tail.second.second) }
 }
+
+/*
+ * 5 PART SEQUENCES
+ */
 
 /**
  * Returns a parser that applies the given parsers in order.

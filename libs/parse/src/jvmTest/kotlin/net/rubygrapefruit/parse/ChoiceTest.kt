@@ -15,8 +15,8 @@ class ChoiceTest : AbstractParseTest() {
 
         parser.expecting {
             expectChoice {
-                expectLiteral("12", result = 1)
-                expectLiteral("abcd", result = 2)
+                expectLiteral("abcd", result = 1)
+                expectLiteral("12", result = 2)
             }
         }
 
@@ -196,8 +196,8 @@ class ChoiceTest : AbstractParseTest() {
 
         parser.expecting {
             expectChoice {
-                expectLiteral("ab", result = 1)
-                expectLiteral("abc", result = 2)
+                expectLiteral("abc", result = 1)
+                expectLiteral("ab", result = 2)
             }
         }
 
@@ -259,9 +259,9 @@ class ChoiceTest : AbstractParseTest() {
 
         parser.expecting {
             expectChoice {
-                expectLiteral("ab", result = 1)
-                expectLiteral("abc", result = 2)
-                expectLiteral("ad", result = 3)
+                expectLiteral("abc", result = 1)
+                expectLiteral("ad", result = 2)
+                expectLiteral("ab", result = 3)
             }
         }
 

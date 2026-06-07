@@ -78,7 +78,7 @@ class ByteLiteralTest : AbstractParseTest() {
         val parser = literal(byteArrayOf(0x1, 0x2))
 
         parser.expecting {
-            expectLiteral(0x1)
+            expectLiteral(0x1, 0x2)
         }
 
         parser.matches(0x1, 0x2) {

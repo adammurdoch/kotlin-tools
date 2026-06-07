@@ -3,7 +3,7 @@ package net.rubygrapefruit.parse.binary
 import net.rubygrapefruit.parse.*
 
 internal class BinaryLiteralParser<OUT>(
-    private val bytes: ByteArray,
+    val bytes: ByteArray,
     val result: OUT
 ) : Parser<BinaryInput, OUT>, ParserBuilder<ByteStream, OUT>, DiscardableParser<BinaryInput> {
     private val expectations = bytes.map { Expectation.One(format(it)) }

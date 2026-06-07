@@ -290,7 +290,7 @@ abstract class AbstractParseTest {
         return pushParser.endOfInput()
     }
 
-    private fun <IN: Input<*>> CompiledParser<IN, *>.expecting(fixture: DefaultCompiledParserFixture, emptyInput: IN) {
+    private fun <IN : Input<*>> CompiledParser<IN, *>.expecting(fixture: DefaultCompiledParserFixture, emptyInput: IN) {
         fixture.inspect(this)
 
         val pullParser = start(emptyInput.position, ParseContinuation.end())
@@ -736,6 +736,7 @@ abstract class AbstractParseTest {
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<ParserBuilderAdaptor<*, *>>(parser)
                 assertIs<TextLiteralParser<*>>(parser.parser)
+                assertEquals(text, parser.parser.text)
                 assertEquals(result, parser.parser.result)
             }
         }
@@ -751,6 +752,7 @@ abstract class AbstractParseTest {
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<ParserBuilderAdaptor<*, *>>(parser)
                 assertIs<BinaryLiteralParser<*>>(parser.parser)
+                assertContentEquals(bytes, parser.parser.bytes)
                 assertEquals(result, parser.parser.result)
             }
         }

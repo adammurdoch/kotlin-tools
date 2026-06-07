@@ -17,11 +17,11 @@ class ChoiceOfZeroOrMoreTest : AbstractParseTest() {
         parser.expecting {
             expectChoice {
                 expectZeroOrMore {
-                    expectLiteral(0x1, result = 1)
+                    expectLiteral(0x1, 0x2, result = 1)
                 }
                 // should discard everything after the first choice
                 expectZeroOrMore {
-                    expectLiteral(0x11, result = 2)
+                    expectLiteral(0x11, 0x12, result = 2)
                 }
             }
         }

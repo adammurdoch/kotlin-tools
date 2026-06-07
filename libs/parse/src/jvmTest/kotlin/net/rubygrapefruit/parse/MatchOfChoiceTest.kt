@@ -18,8 +18,8 @@ class MatchOfChoiceTest : AbstractParseTest() {
         parser.expecting {
             expectMatch {
                 expectChoice {
-                    expectLiteral("12")
                     expectLiteral("abc")
+                    expectLiteral("12")
                 }
             }
         }

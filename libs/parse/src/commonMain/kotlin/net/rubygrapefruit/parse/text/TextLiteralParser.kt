@@ -3,7 +3,7 @@ package net.rubygrapefruit.parse.text
 import net.rubygrapefruit.parse.*
 
 internal class TextLiteralParser<OUT>(
-    private val text: String, val result: OUT
+    val text: String, val result: OUT
 ) : Parser<TextInput, OUT>, ParserBuilder<CharStream, OUT>, DiscardableParser<TextInput> {
     override val expectation = Expectation.One(format(text))
     private val provider = ValueProvider.of(result)

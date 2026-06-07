@@ -38,7 +38,7 @@ class MatchTest : AbstractParseTest() {
 
         parser.expecting {
             expectMatch {
-                expectLiteral(0x1)
+                expectLiteral(0x1, 0x2)
             }
         }
 

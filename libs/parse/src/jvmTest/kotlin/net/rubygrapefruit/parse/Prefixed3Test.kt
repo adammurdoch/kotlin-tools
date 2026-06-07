@@ -4,19 +4,22 @@ import net.rubygrapefruit.parse.combinators.prefixed
 import net.rubygrapefruit.parse.text.literal
 import kotlin.test.Test
 
-class PrefixedTest : AbstractParseTest() {
+class Prefixed3Test : AbstractParseTest() {
     @Test
-    fun `matches literal then literal`() {
-        val parser = prefixed(literal("a", 1), literal("b", 2))
+    fun `matches literal then literal then literal`() {
+        val parser = prefixed(literal("a", 1), literal("b", 2), literal("c", 3)) { a, b -> a + b }
 
         parser.expecting {
             expectSequence {
                 expectLiteral("a")
-                expectLiteral("b", result = 2)
+                expectSequence {
+                    expectLiteral("b", result = 2)
+                    expectLiteral("c", result = 3)
+                }
             }
         }
 
-        parser.matches("ab", expected = 2)
+        parser.matches("abc", expected = 5)
 
         // missing
         parser.doesNotMatch("") {
@@ -25,6 +28,10 @@ class PrefixedTest : AbstractParseTest() {
         parser.doesNotMatch("a") {
             failAt(1)
             expectLiteral("b")
+        }
+        parser.doesNotMatch("ab") {
+            failAt(2)
+            expectLiteral("c")
         }
 
         // unexpected
@@ -35,10 +42,14 @@ class PrefixedTest : AbstractParseTest() {
             failAt(1)
             expectLiteral("b")
         }
-
-        // extra
         parser.doesNotMatch("abX") {
             failAt(2)
+            expectLiteral("c")
+        }
+
+        // extra
+        parser.doesNotMatch("abcX") {
+            failAt(3)
             expectEndOfInput()
         }
     }

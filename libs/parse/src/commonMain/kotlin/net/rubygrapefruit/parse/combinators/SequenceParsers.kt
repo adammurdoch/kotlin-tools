@@ -82,7 +82,16 @@ fun <IN, A, B, C, OUT> sequence(a: Parser<IN, A>, b: Parser<IN, B>, c: Parser<IN
  * Uses the given mapping function to produce the result from the results of the second and third parsers.
  */
 fun <IN, A, B, OUT> prefixed(prefix: Parser<IN, *>, a: Parser<IN, A>, b: Parser<IN, B>, map: (A, B) -> OUT): Parser<IN, OUT> {
-    return sequence(discard(prefix), a, b) { _, a, b -> map(a, b) }
+    return sequence(discard(prefix), a, b, map)
+}
+
+/**
+ * Returns a parser that applies the given parsers in order.
+ * Uses the given mapping function to produce the result from the results of the second and third parsers.
+ */
+@JvmName("prefixSequence")
+fun <IN, A, B, OUT> sequence(prefix: Parser<IN, Unit>, a: Parser<IN, A>, b: Parser<IN, B>, map: (A, B) -> OUT): Parser<IN, OUT> {
+    return sequence(prefix, a, b) { _, a, b -> map(a, b) }
 }
 
 /**

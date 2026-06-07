@@ -12,7 +12,6 @@ Parsers
 - `upTo(parser)`
 - `accept()` should not call function on a failed branch
 - `discard(parser<unit>...)` - alias for `sequence(parser<unit>...)`?
-- `prefixed(prefix, parser, parser)`
 - `separated(parser, sep, parser, sep, parser)`
 - `integer(parser)` or `integer(minLen, maxLen)` - converts matching input to int
 - Improve expected message for `not()` or perhaps `oneExcept()`

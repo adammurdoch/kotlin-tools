@@ -10,31 +10,31 @@ class ChoiceOfSequence3Test : AbstractParseTest() {
     @Test
     fun `matches choice of sequence with common prefix`() {
         val parser = oneOf(
-            sequence(literal("a"), literal("b"), literal("?")),
-            sequence(literal("a"), literal("b"), literal("!"))
+            sequence(literal("a", 1), literal("b", 2), literal("?", 3)) { a, b, c -> a + b + c },
+            sequence(literal("a", 4), literal("b", 5), literal("!", 6)) { a, b, c -> a + b + c }
         )
 
         parser.expecting {
             expectChoice {
                 expectSequence {
-                    expectLiteral("a")
+                    expectLiteral("a", 1)
                     expectSequence {
-                        expectLiteral("b")
-                        expectLiteral("?")
+                        expectLiteral("b", 2)
+                        expectLiteral("?", 3)
                     }
                 }
                 expectSequence {
-                    expectLiteral("a")
+                    expectLiteral("a", 4)
                     expectSequence {
-                        expectLiteral("b")
-                        expectLiteral("!")
+                        expectLiteral("b", 5)
+                        expectLiteral("!", 6)
                     }
                 }
             }
         }
 
-        parser.matches("ab?")
-        parser.matches("ab!")
+        parser.matches("ab?", 6)
+        parser.matches("ab!", 15)
 
         // missing
         parser.doesNotMatch("") {

@@ -48,8 +48,16 @@ fun <IN, OUT> sequence(parser: Parser<IN, OUT>, suffixed: Parser<IN, Unit>): Par
 /**
  * Returns a parser that applies the given parsers in order. Produces no result.
  */
-fun <IN> sequence(a: Parser<IN, Unit>, b: Parser<IN, Unit>): Parser<IN, Unit> {
-    return sequence(a, b) { _, _ -> }
+fun <IN> sequence(a: Parser<IN, Unit>, b: Parser<IN, Unit>, vararg additional: Parser<IN, Unit>): Parser<IN, Unit> {
+    return if (additional.isEmpty()) {
+        sequence(a, b) { _, _ -> }
+    } else {
+        var tail = additional.last()
+        for (parser in additional.reversed().drop(1)) {
+            tail = sequence(parser, tail) { _, _ -> }
+        }
+        sequence(a, b, tail) { _, _, _ -> }
+    }
 }
 
 /**
@@ -92,13 +100,6 @@ fun <IN, A, B, OUT> separated(a: Parser<IN, A>, separator: Parser<IN, *>, b: Par
  */
 fun <IN, A, B, OUT> sequence(a: Parser<IN, A>, separator: Parser<IN, Unit>, b: Parser<IN, B>, map: (A, B) -> OUT): Parser<IN, OUT> {
     return sequence(a, separator, b) { a, _, b -> map(a, b) }
-}
-
-/**
- * Returns a parser that applies the given parsers in order. Produces no result.
- */
-fun <IN> sequence(a: Parser<IN, Unit>, b: Parser<IN, Unit>, c: Parser<IN, Unit>): Parser<IN, Unit> {
-    return sequence(a, b, c) { _, _, _ -> }
 }
 
 /**

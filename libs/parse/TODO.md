@@ -11,8 +11,7 @@ Parsers
 - `oneOrMore()` and `zeroOrMore()` allow optional trailing separator
 - `upTo(parser)`
 - `accept()` should not call function on a failed branch
-- `sequence(parser<unit>...)` 
-- `discard(parser<unit>...)` - alias for above?
+- `discard(parser<unit>...)` - alias for `sequence(parser<unit>...)`?
 - `prefixed(prefix, parser, parser)`
 - `separated(parser, sep, parser, sep, parser)`
 - `integer(parser)` or `integer(minLen, maxLen)` - converts matching input to int
@@ -33,10 +32,7 @@ Performance
 - `oneExcept(single-input)` is a single input parser
 - More efficient implementation of 3+ sequences
 - Allow `CompiledParser.start()` to fail or complete parsing
-- Choice exits when there is one remaining candidate that has not failed
-  - Need to know that candidate will not fail before/at other failed options
-- Choice continuation is deeply nested
-- Binary int parsers do not box values
+- Binary int parsers should not box values
 - Discard buffered input once it is not required
 - Choice matches common prefix of options
 - Read from file/stream in parallel with parsing

@@ -1,10 +1,13 @@
 package net.rubygrapefruit.parse.combinators
 
-import net.rubygrapefruit.parse.*
+import net.rubygrapefruit.parse.CombinatorBuilder
+import net.rubygrapefruit.parse.CompiledParser
+import net.rubygrapefruit.parse.DiscardableParser
+import net.rubygrapefruit.parse.Parser
 import net.rubygrapefruit.parse.stream.Input
 
 internal class ZeroOrMoreProduceNothingParser<IN>(
-    private val parser: Parser<IN, Unit>,
+    private val item: Parser<IN, Unit>,
     private val separator: Parser<IN, Unit>?
 ) : Parser<IN, Unit>, CombinatorBuilder<Unit>, DiscardableParser<IN> {
     override fun withNoResult(): Parser<IN, Unit> {
@@ -13,18 +16,11 @@ internal class ZeroOrMoreProduceNothingParser<IN>(
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, Unit> {
         if (separator == null) {
-            val singleValueOption = compiler.maybeAsSingleInputParser(parser)
+            val singleValueOption = compiler.maybeAsSingleInputParser(item)
             if (singleValueOption != null) {
                 return ZeroOrMoreSingleInputCompiledParser(singleValueOption, UnitRangeAccumulator)
             }
         }
-        val option = compiler.compile(parser)
-        val tail = if (separator == null) {
-            option
-        } else {
-            val tail = Sequence2Parser(separator, parser) { _, _ -> }
-            compiler.compile(tail)
-        }
-        return ZeroOrMoreParser.of(option, tail, UnitAccumulator.Empty)
+        return ZeroOrMoreParser.of(item, separator, compiler, UnitAccumulator.Empty)
     }
 }

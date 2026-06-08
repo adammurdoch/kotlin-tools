@@ -1,5 +1,6 @@
 Parsers
 - "literal" -> "text" and "bytes"?
+- `literal(char)` and `literal(byte)` convenience
 - `ParseResult` and `MappingResult` use consistent names, e.g. "success" and "failure" or "succeeded" and "failed"
 - Case-insensitive text literal
 - `repeat(parser, parser)` where first parser produces the count
@@ -10,6 +11,7 @@ Parsers
 - `oneExcept(parser...)` convenience
 - `oneOrMore()` and `zeroOrMore()` allow optional trailing separator
 - `upTo(parser)`
+- `oneOf(pair<String, OUT>...)` convenience
 - `accept()` should not call function on a failed branch
 - `discard(parser<unit>...)` - alias for `sequence(parser<unit>...)`?
 - `separated(parser, sep, parser, sep, parser)`
@@ -23,7 +25,8 @@ Performance
 - Optimized implementation for `optional(single-input)`
 - Optimized implementation for `oneOrMore(single-input)`
 - Optimized implementation for `repeat(single-input)`
-- `literal(one-value)` is a single input parser
+- Optimized implementation for `literal(one-value)`
+  - `discard(literal(one-value))` is a single input parser
 - `oneOf(single-input...)` is a single input parser
 - `digit()` is a single input parser
 - `sequence(not(single-input), single-input)` is a single input parser

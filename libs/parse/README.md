@@ -105,21 +105,22 @@ Sequence parsers:
 
 Repeating parsers:
 
-- optional(parser) - matches zero or one, produces null when missing
+- optional(parser) - matches the parser zero or one times, produces `null` when missing
     - optional(parser, result) - produces given default value when missing
     - optional(unitParser) - produces nothing
-- zeroOrMore(parser) - matches zero or more, produces a list
+- zeroOrMore(parser) - matches the parser zero or more times, produces a list
     - Stops if the parser matches zero input values
     - zeroOrMore(unitParser) - produces nothing
-- zeroOrMore(parser, parser) - matches zero or more of first parser, separated by second parser, produces a list
+- zeroOrMore(parser, parser) - matches the first parser zero or more time, separated by second parser, produces a list
     - zeroOrMore(unitParser, parser) - produces nothing
-- oneOrMore(parser) - matches one or more, produces a list
+- oneOrMore(parser) - matches the parser one or more times, produces a list
     - Stops if the parser matches zero input values
     - oneOrMore(unitParser) - produces nothing
-- oneOrMore(parser, parser) - matches one or more of first parser, separated by second parser, produces a list
+- oneOrMore(parser, parser) - matches the first parser one or more times, separated by second parser, produces a list
     - oneOrMore(unitParser, parser) - produces nothing
-- repeat(count, parser) - produces a list 
+- repeat(count, parser) - matches the parser the given number of times, produces a list 
   - repeat(unitParser, parser) - produces nothing
+- repeat(count, parser, parser) - matches the first parser the given number of times, separated by second parser, produces a list
 
 Result modifying parsers:
 

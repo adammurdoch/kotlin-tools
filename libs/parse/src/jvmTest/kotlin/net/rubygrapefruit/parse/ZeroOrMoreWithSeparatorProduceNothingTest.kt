@@ -30,6 +30,19 @@ class ZeroOrMoreWithSeparatorProduceNothingTest : AbstractParseTest() {
             expectLiteral("ab")
         }
 
+        // prefix missing
+        parser.doesNotMatch(",ab") {
+            expectLiteral("ab")
+            expectEndOfInput()
+        }
+
+        // separator missing
+        parser.doesNotMatch("abab") {
+            failAt(2)
+            expectLiteral(",")
+            expectEndOfInput()
+        }
+
         // unexpected
         parser.doesNotMatch("X") {
             expectLiteral("ab")
@@ -43,6 +56,10 @@ class ZeroOrMoreWithSeparatorProduceNothingTest : AbstractParseTest() {
             failAt(2)
             expectLiteral(",")
             expectEndOfInput()
+        }
+        parser.doesNotMatch("ab,X") {
+            failAt(3)
+            expectLiteral("ab")
         }
     }
 }

@@ -3,6 +3,7 @@ package net.rubygrapefruit.parse
 import net.rubygrapefruit.parse.combinators.oneOrMore
 import net.rubygrapefruit.parse.text.literal
 import kotlin.test.Test
+import kotlin.test.fail
 
 class OneOrMoreWithSeparatorTest : AbstractParseTest() {
     @Test
@@ -33,6 +34,18 @@ class OneOrMoreWithSeparatorTest : AbstractParseTest() {
         parser.doesNotMatch("ab,a") {
             failAt(3)
             expectLiteral("ab")
+        }
+
+        // prefix missing
+        parser.doesNotMatch(",ab") {
+            expectLiteral("ab")
+        }
+
+        // separator missing
+        parser.doesNotMatch("abab") {
+            failAt(2)
+            expectLiteral(",")
+            expectEndOfInput()
         }
 
         // unexpected

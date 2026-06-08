@@ -4,39 +4,44 @@ import net.rubygrapefruit.parse.*
 import net.rubygrapefruit.parse.stream.BoxingInput
 
 internal class ZeroOrMoreParser<IN, OUT>(
-    private val parser: Parser<IN, OUT>,
+    private val item: Parser<IN, OUT>,
     private val separator: Parser<IN, Unit>?
 ) : Parser<IN, List<OUT>>, TypedInputCombinatorBuilder<BoxingInput<*, OUT>, List<OUT>>, DiscardableParser<IN> {
     override fun withNoResult(): Parser<IN, Unit> {
-        return ZeroOrMoreProduceNothingParser(DiscardParser(parser), separator)
+        return ZeroOrMoreProduceNothingParser(DiscardParser(item), separator)
     }
 
     override fun compile(compiler: CombinatorBuilder.Compiler<BoxingInput<*, OUT>>): CompiledParser<BoxingInput<*, OUT>, List<OUT>> {
         if (separator == null) {
-            val singleValueOption = compiler.maybeAsSingleInputParser(parser)
+            val singleValueOption = compiler.maybeAsSingleInputParser(item)
             if (singleValueOption != null) {
                 return ZeroOrMoreSingleInputCompiledParser(singleValueOption, ListRangeAccumulator.Empty())
             }
         }
 
-        val option = compiler.compile(parser)
-        val tail = if (separator == null) {
-            option
-        } else {
-            val tail = Sequence2Parser(separator, parser) { _, v -> v }
-            compiler.compile(tail)
-        }
-        return of(option, tail, ListAccumulator.Empty())
+        return of(item, separator, compiler, ListAccumulator.Empty())
     }
 
     companion object {
-        fun <IN, ITEM, OUT> of(option: CompiledParser<IN, ITEM>, tail: CompiledParser<IN, ITEM>, initial: Accumulator<ITEM, OUT>): CompiledParser<IN, OUT> {
-            return ZeroOrMoreCompiledParser(option, tail, initial)
+        fun <IN, ITEM, OUT> of(
+            item: Parser<*, ITEM>,
+            separator: Parser<*, Unit>?,
+            compiler: CombinatorBuilder.Compiler<IN>,
+            initial: Accumulator<ITEM, OUT>
+        ): CompiledParser<IN, OUT> {
+            val head = compiler.compile(item)
+            val tail = if (separator == null) {
+                head
+            } else {
+                val tail = Sequence2Parser(separator, item) { _, v -> v }
+                compiler.compile(tail)
+            }
+            return ZeroOrMoreCompiledParser(head, tail, initial)
         }
 
         fun <IN, ITEM, OUT> of(
             start: Position,
-            option: CompiledParser<IN, ITEM>,
+            head: CompiledParser<IN, ITEM>,
             tail: CompiledParser<IN, ITEM>,
             initial: Accumulator<ITEM, OUT>,
             next: ParseContinuation<IN, OUT>
@@ -45,7 +50,7 @@ internal class ZeroOrMoreParser<IN, OUT>(
             return ChoiceParser.of(
                 start,
                 listOf(
-                    ChoiceParser.Option(option, OptionContinuation(start, tail, initial, next)),
+                    ChoiceParser.Option(head, OptionContinuation(start, tail, initial, next)),
                     ChoiceParser.Option(empty, next)
                 )
             )

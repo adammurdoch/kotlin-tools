@@ -6,7 +6,7 @@ import kotlin.test.Test
 
 class SeparatedTest : AbstractParseTest() {
     @Test
-    fun `matches literal then literal then literal`() {
+    fun `matches literal then separator then literal`() {
         val parser = separated(
             literal(byteArrayOf(0x1), 1),
             literal(byteArrayOf(0x2), 2),

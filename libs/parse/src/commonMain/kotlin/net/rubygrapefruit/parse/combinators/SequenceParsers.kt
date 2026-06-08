@@ -168,3 +168,18 @@ fun <IN, A, B, C, D, E, OUT> sequence(
     val tail3 = Sequence2Parser(b, tail2) { b, tail -> Pair(b, tail) }
     return Sequence2Parser(a, tail3) { a, tail -> map(a, tail.first, tail.second.first, tail.second.second.first, tail.second.second.second) }
 }
+
+/**
+ * Returns a parser that applies the given parsers in order.
+ * Produces the result of applying the given mapping function to the result of the first, third and last parsers.
+ */
+fun <IN, A, B, C, OUT> separated(
+    a: Parser<IN, A>,
+    separator1: Parser<IN, *>,
+    b: Parser<IN, B>,
+    separator2: Parser<IN, *>,
+    c: Parser<IN, C>,
+    map: (A, B, C) -> OUT
+): Parser<IN, OUT> {
+    return sequence(a, discard(separator1), b, discard(separator2), c) { a, _, b, _, c -> map(a, b, c) }
+}

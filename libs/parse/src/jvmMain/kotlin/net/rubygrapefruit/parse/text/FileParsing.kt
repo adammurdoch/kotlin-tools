@@ -3,17 +3,20 @@ package net.rubygrapefruit.parse.text
 import net.rubygrapefruit.parse.ParseResult
 import net.rubygrapefruit.parse.Parser
 import java.io.File
-import java.io.InputStreamReader
+import java.io.Reader
 import java.nio.charset.Charset
 
 /**
- * Attempts to parse the given file as text. Fails when the parser cannot match the entire input.
+ * Attempts to parse the given file. Fails when the parser cannot match the entire input.
  */
 fun <OUT> Parser<TextInput, OUT>.parse(file: File, charset: Charset): ParseResult<TextFailureContext, OUT> {
     return file.reader(charset).use { reader -> parse(reader) }
 }
 
-private fun <OUT> Parser<TextInput, OUT>.parse(reader: InputStreamReader): ParseResult<TextFailureContext, OUT> {
+/**
+ * Attempts to parse the given reader. Fails when the parser cannot match the entire input.
+ */
+fun <OUT> Parser<TextInput, OUT>.parse(reader: Reader): ParseResult<TextFailureContext, OUT> {
     val parser = pushParser()
     val buffer = CharArray(16 * 1024)
     while (true) {

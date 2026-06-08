@@ -8,7 +8,7 @@ import kotlin.test.Test
 
 class BinaryFileParseTest : AbstractFileParseTest() {
     @Test
-    fun `parses the contents of a file as binary`() {
+    fun `parses the contents of a file`() {
         val file = fixture.file("binary.bin")
         file.writeBytes(byteArrayOf(0x1, 0x2, 0x3))
 

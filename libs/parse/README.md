@@ -22,11 +22,15 @@ The implementation is a bottom-up parser, meaning that grammars can be deeply ne
 
 - `parser.parse(string)` to parse a string
 - `parser.parse(byte-array)` to parse a byte array
-- `parser.parse(file, charset)` to parse a text file
-- `parser.parse(file)` to parse a binary file
 - `parser.pushParser()` to create a push parser
     - Call `pushParser.input(array)` to add more input
     - Call `pushParser.endOfInput()` to finish parsing
+
+JVM specific functions
+- `parser.parse(file, charset)` to parse a text file
+- `parser.parse(file)` to parse a binary file
+- `parser.parse(reader)` to parse the contents of a text stream
+- `parser.parse(inputStream)` to parse an input stream
 
 ## Text parsers
 

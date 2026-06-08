@@ -8,7 +8,7 @@ import kotlin.test.Test
 
 class TextFileParseTest : AbstractFileParseTest() {
     @Test
-    fun `parses the contents of a file as text`() {
+    fun `parses the contents of a file`() {
         val file = fixture.file("text.txt")
         file.writeText("abc")
 

@@ -4,12 +4,11 @@ Parsers
 - `ParseResult` and `MappingResult` use consistent names, e.g. "success" and "failure" or "succeeded" and "failed"
 - Case-insensitive text literal
 - `repeat(parser, parser)` where first parser produces the count
-- `repeat()` with a separator
 - `concat(parser<list<string>>)` - collect result of parser into a string
 - 32 bit binary ints
 - `take(n)`, `drop(n)`, `take(parser<int>)`, `drop(parser<int>)` to match n input values
 - `oneExcept(parser...)` convenience
-- `oneOrMore()` and `zeroOrMore()` allow optional trailing separator
+- `oneOrMore()`, `zeroOrMore()` and `repeat()` allow optional trailing separator
 - `upTo(parser)`
 - `oneOf(pair<String, OUT>...)` convenience
 - `accept()` should not call function on a failed branch
@@ -34,6 +33,8 @@ Performance
 - `oneExcept(single-input)` is a single input parser
 - More efficient implementation of 3+ sequences
 - Allow `CompiledParser.start()` to fail or complete parsing
+  - This requires the parser to look ahead
+  - Passing input stream to `start()` means parse continuation will need the steam in the correct state to start next parser
 - Binary int parsers should not box values
 - Discard buffered input once it is not required
 - Choice matches common prefix of options

@@ -10,7 +10,7 @@ internal class RepeatParser<IN, OUT>(
     private val separator: Parser<IN, Unit>?
 ) : Parser<IN, List<OUT>>, CombinatorBuilder<List<OUT>>, DiscardableParser<IN> {
     override fun withNoResult(): Parser<IN, Unit> {
-        return RepeatProduceNothingParser(count, DiscardParser(item))
+        return RepeatProduceNothingParser(count, DiscardParser(item), separator)
     }
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, List<OUT>> {

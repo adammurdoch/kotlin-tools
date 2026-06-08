@@ -119,5 +119,14 @@ fun <IN, OUT> repeat(count: Int, parser: Parser<IN, OUT>, separator: Parser<IN, 
  */
 @JvmName("repeatProduceNothing")
 fun <IN> repeat(count: Int, parser: Parser<IN, Unit>): Parser<IN, Unit> {
-    return RepeatProduceNothingParser(count, parser)
+    return RepeatProduceNothingParser(count, parser, null)
+}
+
+/**
+ * Returns a parser that applies the given parser the given number of times, with the given separator.
+ * Produces no result.
+ */
+@JvmName("repeatProduceNothing")
+fun <IN> repeat(count: Int, parser: Parser<IN, Unit>, separator: Parser<IN, *>): Parser<IN, Unit> {
+    return RepeatProduceNothingParser(count, parser, discard(separator))
 }

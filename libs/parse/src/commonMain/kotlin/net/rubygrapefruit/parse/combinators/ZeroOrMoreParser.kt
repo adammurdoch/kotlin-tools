@@ -13,9 +13,9 @@ internal class ZeroOrMoreParser<IN, OUT>(
 
     override fun compile(compiler: CombinatorBuilder.Compiler<BoxingInput<*, OUT>>): CompiledParser<BoxingInput<*, OUT>, List<OUT>> {
         if (separator == null) {
-            val singleValueOption = compiler.maybeAsSingleInputParser(item)
-            if (singleValueOption != null) {
-                return ZeroOrMoreSingleInputCompiledParser(singleValueOption, ListRangeAccumulator.Empty())
+            val singleValueItem = compiler.maybeAsSingleInputParser(item)
+            if (singleValueItem != null) {
+                return ZeroOrMoreSingleInputCompiledParser(singleValueItem, ListRangeAccumulator.Empty())
             }
         }
 
@@ -50,7 +50,7 @@ internal class ZeroOrMoreParser<IN, OUT>(
             return ChoiceParser.of(
                 start,
                 listOf(
-                    ChoiceParser.Option(head, OptionContinuation(start, tail, initial, next)),
+                    ChoiceParser.Option(head, ItemContinuation(start, tail, initial, next)),
                     ChoiceParser.Option(empty, next)
                 )
             )
@@ -58,16 +58,16 @@ internal class ZeroOrMoreParser<IN, OUT>(
     }
 
     class ZeroOrMoreCompiledParser<IN, ITEM, OUT>(
-        val option: CompiledParser<IN, ITEM>,
+        val head: CompiledParser<IN, ITEM>,
         val tail: CompiledParser<IN, ITEM>,
         val initial: Accumulator<ITEM, OUT>
     ) : CompiledParser<IN, OUT> {
         override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
-            return of(start, option, tail, initial, next)
+            return of(start, head, tail, initial, next)
         }
     }
 
-    internal class OptionContinuation<IN, ITEM, OUT>(
+    internal class ItemContinuation<IN, ITEM, OUT>(
         private val start: Position,
         private val parser: CompiledParser<IN, ITEM>,
         private val previous: Accumulator<ITEM, OUT>,

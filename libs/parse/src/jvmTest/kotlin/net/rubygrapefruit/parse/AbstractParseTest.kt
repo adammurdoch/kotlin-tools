@@ -651,7 +651,7 @@ abstract class AbstractParseTest {
 
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<ZeroOrMoreParser.ZeroOrMoreCompiledParser<*, *, *>>(parser)
-                inspector.inspect(parser.option)
+                inspector.inspect(parser.head)
                 if (separator != null) {
                     IsSequence(separator, inspector).inspect(parser.tail)
                 } else {
@@ -692,7 +692,7 @@ abstract class AbstractParseTest {
 
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<OneOrMoreParser.OneOrMoreCompiledParser<*, *, *>>(parser)
-                inspector.inspect(parser.parser)
+                inspector.inspect(parser.head)
                 if (separator != null) {
                     IsSequence(separator, inspector).inspect(parser.tail)
                 } else {
@@ -706,7 +706,7 @@ abstract class AbstractParseTest {
             }
         }
 
-        class IsRepeat(val count: Int, val inspector: Inspector, val hasResult: Boolean) : Inspector {
+        class IsRepeat(val count: Int, val inspector: Inspector, val separator: Inspector?, val hasResult: Boolean) : Inspector {
             override val expected: List<String>
                 get() = inspector.expected
 
@@ -717,6 +717,11 @@ abstract class AbstractParseTest {
                 assertIs<RepeatParser.RepeatCompiledParser<*, *, *>>(parser)
                 assertEquals(count, parser.count)
                 inspector.inspect(parser.head)
+                if (separator != null) {
+                    IsSequence(separator, inspector).inspect(parser.tail)
+                } else {
+                    inspector.inspect(parser.tail)
+                }
                 if (hasResult) {
                     assertIs<ListAccumulator<*>>(parser.initial)
                 } else {
@@ -981,7 +986,8 @@ abstract class AbstractParseTest {
         override fun expectRepeat(count: Int, hasResult: Boolean, config: CompiledParserFixture.() -> Unit) {
             val fixture = DefaultCompiledParserFixture()
             fixture.config()
-            inspectors.add(Inspector.IsRepeat(count, fixture.inspector(), hasResult))
+            val choices = fixture.choices()
+            inspectors.add(Inspector.IsRepeat(count, choices.first(), choices.getOrNull(1), hasResult))
         }
 
         override fun expectConsume(config: CompiledParserFixture.() -> Unit) {

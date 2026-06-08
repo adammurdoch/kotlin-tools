@@ -3,7 +3,6 @@ package net.rubygrapefruit.parse
 import net.rubygrapefruit.parse.combinators.oneOrMore
 import net.rubygrapefruit.parse.text.literal
 import kotlin.test.Test
-import kotlin.test.fail
 
 class OneOrMoreWithSeparatorTest : AbstractParseTest() {
     @Test

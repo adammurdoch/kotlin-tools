@@ -13,7 +13,6 @@ Parsers
 - `oneOf(pair<String, OUT>...)` convenience
 - `accept()` should not call function on a failed branch
 - `discard(parser<unit>...)` - alias for `sequence(parser<unit>...)`?
-- `separated(parser, sep, parser, sep, parser)`
 - `integer(parser)` or `integer(minLen, maxLen)` - converts matching input to int
 - Improve expected message for `not()` or perhaps `oneExcept()`
 - Line comment convenience

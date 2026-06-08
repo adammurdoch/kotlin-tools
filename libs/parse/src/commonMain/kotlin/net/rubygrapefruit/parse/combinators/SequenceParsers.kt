@@ -181,5 +181,20 @@ fun <IN, A, B, C, OUT> separated(
     c: Parser<IN, C>,
     map: (A, B, C) -> OUT
 ): Parser<IN, OUT> {
-    return sequence(a, discard(separator1), b, discard(separator2), c) { a, _, b, _, c -> map(a, b, c) }
+    return sequence(a, discard(separator1), b, discard(separator2), c, map)
+}
+
+/**
+ * Returns a parser that applies the given parsers in order.
+ * Produces the result of applying the given mapping function to the result of the first, third and last parsers.
+ */
+fun <IN, A, B, C, OUT> sequence(
+    a: Parser<IN, A>,
+    separator1: Parser<IN, Unit>,
+    b: Parser<IN, B>,
+    separator2: Parser<IN, Unit>,
+    c: Parser<IN, C>,
+    map: (A, B, C) -> OUT
+): Parser<IN, OUT> {
+    return sequence(a, separator1, b, separator2, c) { a, _, b, _, c -> map(a, b, c) }
 }

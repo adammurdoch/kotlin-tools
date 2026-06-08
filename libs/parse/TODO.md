@@ -41,7 +41,6 @@ Performance
 - Read from file/stream in parallel with parsing
 
 Features
-- Parse input stream
 - Parse kotlinx-io Source
 - Parse file-io files
 - Match location/region

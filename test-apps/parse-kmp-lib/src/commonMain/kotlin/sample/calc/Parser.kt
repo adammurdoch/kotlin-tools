@@ -6,27 +6,27 @@ import net.rubygrapefruit.parse.text.*
 
 class Parser {
     fun parse(text: String): ParseResult<*, List<Expression>> {
-        val whitespace = zeroOrMore(literal(" "))
+        val optionalWhitespace = zeroOrMore(literal(" "))
 
         val digits = match(oneOrMore(digit()))
         val number = map(digits) { Number(it.toInt()) }
 
         val expression = recursive<TextInput, Expression>()
 
-        val openParen = sequence(literal("("), whitespace)
-        val closeParen = sequence(whitespace, literal(")"))
+        val openParen = sequence(literal("("), optionalWhitespace)
+        val closeParen = sequence(optionalWhitespace, literal(")"))
         val parenExpression = sequence(openParen, expression, closeParen)
         val operand = oneOf(number, parenExpression)
 
-        val plus = sequence(whitespace, literal("+"), whitespace)
-        val minus = sequence(whitespace, literal("-"), whitespace)
+        val plus = sequence(optionalWhitespace, literal("+"), optionalWhitespace)
+        val minus = sequence(optionalWhitespace, literal("-"), optionalWhitespace)
 
         val addition = sequence(operand, plus, operand) { a, b -> Addition(a, b) }
         val subtraction = sequence(operand, minus, operand) { a, b -> Subtraction(a, b) }
 
         expression.parser(oneOf(addition, subtraction, operand))
 
-        val statement = sequence(whitespace, expression, whitespace)
+        val statement = sequence(optionalWhitespace, expression, optionalWhitespace)
 
         // expression = operand ("+" operand | "-" operand)*
         // operand = number | "(" expression ")"
@@ -37,8 +37,10 @@ class Parser {
         // expression = plus | minus | operand
 
         val separator = oneOf(',', '\n')
-        val blankLine = sequence(whitespace, literal("\n"))
-        val parser = sequence(statement, zeroOrMore(prefixed(separator, statement)), zeroOrMore(blankLine)) { a, b, _ -> listOf(a) + b }
+        val blankLine = sequence(optionalWhitespace, literal("\n"))
+        val blankLines = zeroOrMore(blankLine)
+        val statements = oneOrMore(statement, separator = separator)
+        val parser = sequence(blankLines, statements, blankLines)
 
         return parser.parse(text)
     }

@@ -85,7 +85,7 @@ class Parser {
 
         val tablePath = sequence(literal("["), key, literal("]"))
         val tableHeader = sequence(tablePath, blankLine)
-        val table = sequence(blankLines, tableHeader, pairs) { _, header, pairs -> TableTree(header, pairs) }
+        val table = sequence(blankLines, tableHeader, pairs) { header, pairs -> TableTree(header, pairs) }
 
         val tomlFile = sequence(pairs, zeroOrMore(table)) { a, b -> FileTree(a, b) }
 

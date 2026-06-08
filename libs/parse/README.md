@@ -45,6 +45,7 @@ Parsers that operate on text input:
 - oneInRange(charRange) - produces matched input char
 
 - digit() - matches '0'..'9', produces matched input char
+- integer() - matches '1'..'9' ('0'..'9')*, produces an int
 
 Text combinators:
 

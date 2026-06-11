@@ -8,8 +8,7 @@ class Parser {
     fun parse(text: String): ParseResult<*, List<Expression>> {
         val optionalWhitespace = zeroOrMore(literal(" "))
 
-        val digits = match(oneOrMore(digit()))
-        val number = map(digits) { Number(it.toInt()) }
+        val number = map(integer()) { Number(it) }
 
         val expression = recursive<TextInput, Expression>()
 

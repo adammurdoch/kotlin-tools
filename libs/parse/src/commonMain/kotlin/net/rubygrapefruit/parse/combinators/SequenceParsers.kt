@@ -45,8 +45,8 @@ fun <IN, OUT> suffixed(parser: Parser<IN, OUT>, suffix: Parser<IN, *>): Parser<I
  * Produces the result of the first parser.
  */
 @JvmName("suffixSequence")
-fun <IN, OUT> sequence(parser: Parser<IN, OUT>, suffixed: Parser<IN, Unit>): Parser<IN, OUT> {
-    return sequence(parser, suffixed) { a, _ -> a }
+fun <IN, OUT> sequence(parser: Parser<IN, OUT>, suffix: Parser<IN, Unit>): Parser<IN, OUT> {
+    return sequence(parser, suffix) { a, _ -> a }
 }
 
 /**

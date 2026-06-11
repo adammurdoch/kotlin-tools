@@ -13,8 +13,16 @@ Parsers
 - `oneOf(pair<String, OUT>...)` convenience
 - `accept()` should not call function on a failed branch
 - `discard(parser<unit>...)` - alias for `sequence(parser<unit>...)`?
-- parse negative integers
-- `integer(len)` - integer with given length
+- `sequence(prefix, parser, map)`, `sequence(parser, suffix, map)`, `sequence(prefix, parser, suffix, map)` conveniences for consistency
+- `sequence(prefix, parser, separator, parser, suffix, map)`
+- More convenient way to have a long sequence with the same separator, for example:
+  - `sequence(..., separator = x, map)`, eg `sequence(a, b, c, d, separator = literal(",")) { ... }`
+  - Or, `sequence()`, `oneOrMore()`, etc return Parser subtype that can have a prefix, separator, etc applied
+- `oneOf(list)`
+- Negative integers
+- `integer(len)` and `integer(range)` - integer with given length
+- `long()`
+- Thousands separator in integers
 - Improve expected message for `not()` or perhaps `oneExcept()`
 - Line comment convenience
 - Quoted string convenience

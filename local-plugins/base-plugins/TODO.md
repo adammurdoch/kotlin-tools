@@ -60,6 +60,7 @@
 - Build services/servers
   - Bundle into several docker layers (JVM, dependencies, app resources)
   - Use JVM's percentage based memory flags
+  - https://github.com/apple/container
 - Module-info
     - Default module name to top-most package
     - Only export packages that contain public non-internal types

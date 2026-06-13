@@ -33,7 +33,7 @@ internal class BinaryLiteralParser<OUT>(
         }
 
         override fun stop(input: ByteStream): PullParser.Failed {
-            return PullParser.Failed(0, expectations[matched])
+            return next.failed(0, matched, expectations[matched])
         }
 
         override fun parse(input: ByteStream, max: Int): PullParser.Result<ByteStream> {
@@ -45,13 +45,14 @@ internal class BinaryLiteralParser<OUT>(
                         matched += index
                         PullParser.RequireMore(index, this)
                     } else if (input.available == 0 && input.finished) {
-                        PullParser.Failed(0, expectations[matched])
+                        next.failed(0, matched, expectations[matched])
                     } else {
                         PullParser.RequireMore(0, this)
                     }
                 }
-                if (input.get(index) != bytes[matched + index]) {
-                    return PullParser.Failed(index, expectations[matched + index])
+                val currentByte = matched + index
+                if (input.get(index) != bytes[currentByte]) {
+                    return next.failed(index, currentByte, expectations[currentByte])
                 }
                 index++
             }

@@ -20,47 +20,38 @@ internal class DescribingParser<IN, OUT>(
         private val expectation: Expectation
     ) : CompiledParser<IN, OUT> {
         override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
-            return DescribingPullParser(parser.start(start, next), expectation)
+            return parser.start(start, DescribingParseContinuation(expectation, next))
         }
     }
 
-    private class DescribingPullParser<IN>(
-        private var parser: PullParser<IN>,
-        private val expectation: Expectation
-    ) : PullParser<IN> {
-        private var advanced = 0
-
-        override fun toString(): String {
-            return "{described-as $parser}"
+    private class DescribingParseContinuation<IN, OUT>(
+        private val expectation: Expectation,
+        private val next: ParseContinuation<IN, OUT>
+    ) : ParseContinuation<IN, OUT> {
+        override fun matched(
+            input: IN,
+            advance: Int,
+            length: Int,
+            value: ValueProvider<OUT>,
+            failedChoices: List<PullParser.Failure>
+        ): PullParser.Result<IN> {
+            return next.matched(input, advance, length, value, failedChoices)
         }
 
-        override fun stop(input: IN): PullParser.Failed {
-            val failure = parser.stop(input)
-            return mapFailure(failure)
+        override fun <T> selected(
+            advance: Int,
+            parser: PullParser<T>,
+            failedChoices: List<PullParser.Failure>
+        ): PullParser.Continuing<T> {
+            return next.selected(advance, parser, failedChoices)
         }
 
-        override fun parse(input: IN, max: Int): PullParser.Result<IN> {
-            val result = parser.parse(input, max)
-            return when (result) {
-                is PullParser.Matched -> result
-                is PullParser.Failed -> mapFailure(result)
-
-                is PullParser.RequireMore -> {
-                    advanced += result.advance
-                    parser = result.parser
-                    PullParser.RequireMore(result.advance, this, result.failedChoices)
-                }
+        override fun failed(index: Int, length: Int, expected: ExpectationProvider): PullParser.Failed {
+            return if (length == 0) {
+                PullParser.Failed(index, expectation)
+            } else {
+                next.failed(index, length, expected)
             }
-        }
-
-        private fun mapFailure(result: PullParser.Failed): PullParser.Failed {
-            return PullParser.Failed(result.failures.map { failure ->
-                if (failure.index == -advanced) {
-                    PullParser.Failure(failure.index, expectation)
-                } else {
-                    failure
-                }
-            })
         }
     }
 }

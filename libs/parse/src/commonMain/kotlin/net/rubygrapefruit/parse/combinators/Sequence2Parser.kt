@@ -28,12 +28,47 @@ internal class Sequence2Parser<IN, A, B, OUT>(
         }
 
         override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
-            return a.then(start) { lengthA, valueA ->
-                b.start(start + lengthA, next.map { lengthB, valueB ->
-                    val value = valueA.zip(valueB, map)
-                    Pair(lengthA + lengthB, value)
-                })
-            }
+            return a.start(start, AParseContinuation(start, b, map, next))
+        }
+    }
+
+    private class AParseContinuation<IN, A, B, OUT>(
+        private val start: Position,
+        private val b: CompiledParser<IN, B>,
+        private val map: (A, B) -> OUT,
+        private val next: ParseContinuation<IN, OUT>,
+    ) : ParseContinuation<IN, A> {
+        override fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<A>, failedChoices: List<PullParser.Failure>): PullParser.Result<IN> {
+            val parser = b.start(start + length, BParseContinuation(length, value, map, next))
+            return PullParser.RequireMore(advance, parser, failedChoices)
+        }
+
+        override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.Continuing<T> {
+            return PullParser.RequireMore(advance, parser, failedChoices)
+        }
+
+        override fun failed(index: Int, length: Int, expected: ExpectationProvider): PullParser.Failed {
+            return next.failed(index, length, expected)
+        }
+    }
+
+    private class BParseContinuation<IN, A, B, OUT>(
+        private val lengthA: Int,
+        private val valueA: ValueProvider<A>,
+        private val map: (A, B) -> OUT,
+        private val next: ParseContinuation<IN, OUT>,
+    ) : ParseContinuation<IN, B> {
+        override fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<B>, failedChoices: List<PullParser.Failure>): PullParser.Result<IN> {
+            val mappedValue = valueA.zip(value, map)
+            return next.matched(input, advance, lengthA + length, mappedValue, failedChoices)
+        }
+
+        override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.Continuing<T> {
+            return next.selected(advance, parser, failedChoices)
+        }
+
+        override fun failed(index: Int, length: Int, expected: ExpectationProvider): PullParser.Failed {
+            return next.failed(index, lengthA + length, expected)
         }
     }
 }

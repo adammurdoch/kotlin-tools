@@ -17,6 +17,10 @@ internal interface ParseContinuation<in IN, in OUT> {
 
     fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.Continuing<T>
 
+    fun failed(index: Int, length: Int, expected: ExpectationProvider): PullParser.Failed {
+        return PullParser.Failed(index, expected)
+    }
+
     fun <T> map(map: (Int, ValueProvider<T>) -> Pair<Int, ValueProvider<OUT>>): ParseContinuation<IN, T> {
         val self = this
         return object : ParseContinuation<IN, T> {

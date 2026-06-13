@@ -53,7 +53,7 @@ internal class TextLiteralParser<OUT>(
         }
 
         private fun stop(): PullParser.Failed {
-            return PullParser.Failed(-matched, startExpectation)
+            return next.failed(-matched, 0, startExpectation)
         }
     }
 }

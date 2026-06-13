@@ -29,9 +29,18 @@ class DescribedAsTest : AbstractParseTest() {
         parser.doesNotMatch("a") {
             expect("<literal>")
         }
+        parser.doesNotMatch("ab") {
+            expect("<literal>")
+        }
 
         // unexpected
         parser.doesNotMatch("X") {
+            expect("<literal>")
+        }
+        parser.doesNotMatch("aX") {
+            expect("<literal>")
+        }
+        parser.doesNotMatch("abX") {
             expect("<literal>")
         }
 
@@ -63,6 +72,15 @@ class DescribedAsTest : AbstractParseTest() {
             expect("<literal>")
         }
         parser.doesNotMatch(0x1) {
+            failAt(1)
+            expectLiteral(0x2)
+        }
+
+        // unexpected
+        parser.doesNotMatch(0x3, 0x2) {
+            expect("<literal>")
+        }
+        parser.doesNotMatch(0x1, 0x3) {
             failAt(1)
             expectLiteral(0x2)
         }

@@ -43,7 +43,7 @@ internal class SingleInputCompiledParser<IN : Input<*>, OUT>(
         }
 
         private fun stop(): PullParser.Failed {
-            return PullParser.Failed(0, parser.expectation)
+            return next.failed(0, 0, parser.expectation)
         }
     }
 }

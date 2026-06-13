@@ -167,6 +167,10 @@ internal class ChoiceParser<IN, OUT>(
             }
         }
 
+        override fun failed(index: Int, length: Int, expected: ExpectationProvider): PullParser.Failed {
+            return next.failed(index, length, expected)
+        }
+
         fun disconnect() {
             connected = false
         }

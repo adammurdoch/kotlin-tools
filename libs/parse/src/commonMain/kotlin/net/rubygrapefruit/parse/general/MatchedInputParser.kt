@@ -20,25 +20,11 @@ internal class MatchedInputParser<IN, OUT>(
     }
 
     private class CollectMatchedInputParseContinuation<OUT>(
-        private val next: ParseContinuation<SlicingInput<OUT>, OUT>
-    ) : ParseContinuation<SlicingInput<OUT>, Unit> {
-        override fun matched(
-            input: SlicingInput<OUT>,
-            advance: Int,
-            length: Int,
-            value: ValueProvider<Unit>,
-            failedChoices: List<PullParser.Failure>
-        ): PullParser.Result<SlicingInput<OUT>> {
-            val slice = input.get(advance - length, advance)
-            return next.matched(input, advance, length, ValueProvider.of(slice), failedChoices)
-        }
-
-        override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.Continuing<T> {
-            return next.selected(advance, parser, failedChoices)
-        }
-
-        override fun failed(index: Int, length: Int, expected: ExpectationProvider): PullParser.Failed {
-            return next.failed(index, length, expected)
+        next: ParseContinuation<SlicingInput<OUT>, OUT>
+    ) : ParseContinuation.MappingParseContinuation<SlicingInput<OUT>, Unit, OUT>(next) {
+        override fun map(input: SlicingInput<OUT>, start: Int, end: Int, value: ValueProvider<Unit>): ValueProvider<OUT> {
+            val slice = input.get(start, end)
+            return ValueProvider.of(slice)
         }
     }
 }

@@ -17,10 +17,17 @@ internal class ConsumeParser<IN, OUT>(
 
     internal class ConsumeCompiledParser<IN, OUT>(val parser: CompiledParser<IN, OUT>, private val consumer: (OUT) -> Unit) : CompiledParser<IN, Unit> {
         override fun start(start: Position, next: ParseContinuation<IN, Unit>): PullParser<IN> {
-            return parser.start(start, next.map { length, value ->
-                consumer(value.get())
-                Pair(length, ValueProvider.Nothing)
-            })
+            return parser.start(start, ConsumeParserContinuation(consumer, next))
+        }
+    }
+
+    private class ConsumeParserContinuation<IN, OUT>(
+        private val consumer: (OUT) -> Unit,
+        next: ParseContinuation<IN, Unit>
+    ) : ParseContinuation.MappingParseContinuation<IN, OUT, Unit>(next) {
+        override fun map(input: IN, start: Int, end: Int, value: ValueProvider<OUT>): ValueProvider<Unit> {
+            consumer(value.get())
+            return ValueProvider.Nothing
         }
     }
 }

@@ -26,7 +26,7 @@ internal class MapParser<IN, INTERMEDIATE, OUT>(
         private val map: (INTERMEDIATE) -> OUT,
         next: ParseContinuation<IN, OUT>
     ) : ParseContinuation.MappingParseContinuation<IN, INTERMEDIATE, OUT>(next) {
-        override fun map(input: IN, value: ValueProvider<INTERMEDIATE>): ValueProvider<OUT> {
+        override fun map(input: IN, start: Int, end: Int, value: ValueProvider<INTERMEDIATE>): ValueProvider<OUT> {
             return value.map(map)
         }
     }

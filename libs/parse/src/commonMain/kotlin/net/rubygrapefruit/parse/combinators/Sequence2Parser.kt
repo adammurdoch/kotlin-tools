@@ -36,19 +36,10 @@ internal class Sequence2Parser<IN, A, B, OUT>(
         private val start: Position,
         private val b: CompiledParser<IN, B>,
         private val map: (A, B) -> OUT,
-        private val next: ParseContinuation<IN, OUT>,
-    ) : ParseContinuation<IN, A> {
-        override fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<A>, failedChoices: List<PullParser.Failure>): PullParser.Result<IN> {
-            val parser = b.start(start + length, BParseContinuation(length, value, map, next))
-            return PullParser.RequireMore(advance, parser, failedChoices)
-        }
-
-        override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.Continuing<T> {
-            return PullParser.RequireMore(advance, parser, failedChoices)
-        }
-
-        override fun failed(index: Int, length: Int, expected: ExpectationProvider): PullParser.Failed {
-            return next.failed(index, length, expected)
+        next: ParseContinuation<IN, OUT>
+    ) : ParseContinuation.FirstSegmentParseContinuation<IN, A, OUT>(next) {
+        override fun map(input: IN, length: Int, value: ValueProvider<A>): PullParser<IN> {
+            return b.start(start + length, BParseContinuation(length, value, map, next))
         }
     }
 

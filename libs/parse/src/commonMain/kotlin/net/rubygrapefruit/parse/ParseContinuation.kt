@@ -66,7 +66,7 @@ internal interface ParseContinuation<in IN, in OUT> {
         private val next: ParseContinuation<IN, OUT>,
     ) : ParseContinuation<IN, INTERMEDIATE> {
         override fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<INTERMEDIATE>, failedChoices: List<PullParser.Failure>): PullParser.Result<IN> {
-            val mappedValue = map(input, value)
+            val mappedValue = map(input, advance - length, advance, value)
             return next.matched(input, advance, length, mappedValue, failedChoices)
         }
 
@@ -78,7 +78,26 @@ internal interface ParseContinuation<in IN, in OUT> {
             return next.failed(index, length, expected)
         }
 
-        abstract fun map(input: IN, value: ValueProvider<INTERMEDIATE>): ValueProvider<OUT>
+        protected abstract fun map(input: IN, start: Int, end: Int, value: ValueProvider<INTERMEDIATE>): ValueProvider<OUT>
+    }
+
+    abstract class FirstSegmentParseContinuation<IN, INTERMEDIATE, OUT>(
+        protected val next: ParseContinuation<IN, OUT>,
+    ) : ParseContinuation<IN, INTERMEDIATE> {
+        override fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<INTERMEDIATE>, failedChoices: List<PullParser.Failure>): PullParser.Result<IN> {
+            val parser = map(input, length, value)
+            return PullParser.RequireMore(advance, parser, failedChoices)
+        }
+
+        override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.Continuing<T> {
+            return PullParser.RequireMore(advance, parser, failedChoices)
+        }
+
+        override fun failed(index: Int, length: Int, expected: ExpectationProvider): PullParser.Failed {
+            return next.failed(index, length, expected)
+        }
+
+        protected abstract fun map(input: IN, length: Int, value: ValueProvider<INTERMEDIATE>): PullParser<IN>
     }
 
     private class EndParseContinuation<IN, OUT> : ParseContinuation<IN, OUT> {

@@ -22,12 +22,21 @@ internal class DecideParser<IN, INTERMEDIATE, OUT>(
         private val compiler: CombinatorBuilder.Compiler<IN>
     ) : CompiledParser<IN, OUT> {
         override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
-            return parser.then(start) { lengthA, valueA ->
-                val nextParser: CompiledParser<IN, OUT> = compiler.compile(factory(valueA.get()))
-                nextParser.start(start + lengthA, next.map { lengthB, valueB ->
-                    Pair(lengthA + lengthB, valueB)
-                })
-            }
+            return parser.start(start, DecideParserContinuation(start, factory, compiler, next))
+        }
+    }
+
+    private class DecideParserContinuation<IN, INTERMEDIATE, OUT>(
+        private val start: Position,
+        private val factory: (INTERMEDIATE) -> Parser<*, OUT>,
+        private val compiler: CombinatorBuilder.Compiler<IN>,
+        next: ParseContinuation<IN, OUT>
+    ) : ParseContinuation.FirstSegmentParseContinuation<IN, INTERMEDIATE, OUT>(next) {
+        override fun map(input: IN, length: Int, value: ValueProvider<INTERMEDIATE>): PullParser<IN> {
+            val nextParser: CompiledParser<IN, OUT> = compiler.compile(factory(value.get()))
+            return nextParser.start(start + length, next.map { lengthB, valueB ->
+                Pair(length + lengthB, valueB)
+            })
         }
     }
 }

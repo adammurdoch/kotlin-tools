@@ -25,23 +25,6 @@ internal interface ParseContinuation<in IN, in OUT> {
         fun <IN, OUT> end(): ParseContinuation<IN, OUT> {
             return EndParseContinuation()
         }
-
-        fun <IN, OUT> prefix(next: (length: Int, value: ValueProvider<OUT>) -> PullParser<IN>): ParseContinuation<IN, OUT> {
-            return object : ParseContinuation<IN, OUT> {
-                override fun toString(): String {
-                    return "{then $next}"
-                }
-
-                override fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<OUT>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<IN> {
-                    val parser = next(length, value)
-                    return PullParser.RequireMore(advance, parser, failedChoices)
-                }
-
-                override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.RequireMore<T> {
-                    return PullParser.RequireMore(advance, parser, failedChoices)
-                }
-            }
-        }
     }
 
     /**

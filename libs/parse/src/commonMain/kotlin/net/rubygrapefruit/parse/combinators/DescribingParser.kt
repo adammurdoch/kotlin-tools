@@ -48,7 +48,7 @@ internal class DescribingParser<IN, OUT>(
 
         override fun failed(index: Int, length: Int, expected: ExpectationProvider): PullParser.Failed {
             return if (length == 0) {
-                PullParser.Failed(index, expectation)
+                next.failed(index, length, expectation)
             } else {
                 next.failed(index, length, expected)
             }

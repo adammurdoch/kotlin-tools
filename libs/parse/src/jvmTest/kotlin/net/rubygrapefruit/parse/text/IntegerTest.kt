@@ -31,7 +31,7 @@ class IntegerTest : AbstractParseTest() {
         // extra
         parser.doesNotMatch("12X") {
             failAt(2)
-            expectOneInRange('0', '9')
+            expect("a digit")
             expectEndOfInput()
         }
     }

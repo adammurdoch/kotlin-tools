@@ -62,6 +62,25 @@ internal interface ParseContinuation<in IN, in OUT> {
         }
     }
 
+    abstract class MappingParseContinuation<IN, INTERMEDIATE, OUT>(
+        private val next: ParseContinuation<IN, OUT>,
+    ) : ParseContinuation<IN, INTERMEDIATE> {
+        override fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<INTERMEDIATE>, failedChoices: List<PullParser.Failure>): PullParser.Result<IN> {
+            val mappedValue = map(input, value)
+            return next.matched(input, advance, length, mappedValue, failedChoices)
+        }
+
+        override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.Continuing<T> {
+            return next.selected(advance, parser, failedChoices)
+        }
+
+        override fun failed(index: Int, length: Int, expected: ExpectationProvider): PullParser.Failed {
+            return next.failed(index, length, expected)
+        }
+
+        abstract fun map(input: IN, value: ValueProvider<INTERMEDIATE>): ValueProvider<OUT>
+    }
+
     private class EndParseContinuation<IN, OUT> : ParseContinuation<IN, OUT> {
         override fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<OUT>, failedChoices: List<PullParser.Failure>): PullParser.Matched<IN> {
             return PullParser.Matched(advance, EndPullParser, failedChoices)

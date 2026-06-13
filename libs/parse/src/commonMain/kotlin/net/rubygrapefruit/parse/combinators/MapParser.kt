@@ -18,9 +18,16 @@ internal class MapParser<IN, INTERMEDIATE, OUT>(
 
     internal class MapCompiledParser<IN, INTERMEDIATE, OUT>(val parser: CompiledParser<IN, INTERMEDIATE>, private val map: (INTERMEDIATE) -> OUT) : CompiledParser<IN, OUT> {
         override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
-            return parser.start(start, next.map { length, value ->
-                Pair(length, value.map(map))
-            })
+            return parser.start(start, MapParserContinuation(map, next))
+        }
+    }
+
+    private class MapParserContinuation<IN, INTERMEDIATE, OUT>(
+        private val map: (INTERMEDIATE) -> OUT,
+        next: ParseContinuation<IN, OUT>
+    ) : ParseContinuation.MappingParseContinuation<IN, INTERMEDIATE, OUT>(next) {
+        override fun map(input: IN, value: ValueProvider<INTERMEDIATE>): ValueProvider<OUT> {
+            return value.map(map)
         }
     }
 }

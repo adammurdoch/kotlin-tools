@@ -21,24 +21,6 @@ internal interface ParseContinuation<in IN, in OUT> {
         return PullParser.Failed(index, expected)
     }
 
-    fun <T> map(map: (Int, ValueProvider<T>) -> Pair<Int, ValueProvider<OUT>>): ParseContinuation<IN, T> {
-        val self = this
-        return object : ParseContinuation<IN, T> {
-            override fun toString(): String {
-                return "{map $self}"
-            }
-
-            override fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<T>, failedChoices: List<PullParser.Failure>): PullParser.Result<IN> {
-                val mapped = map(length, value)
-                return self.matched(input, advance, mapped.first, mapped.second, failedChoices)
-            }
-
-            override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.Continuing<T> {
-                return self.selected(advance, parser, failedChoices)
-            }
-        }
-    }
-
     companion object {
         fun <IN, OUT> end(): ParseContinuation<IN, OUT> {
             return EndParseContinuation()
@@ -62,6 +44,9 @@ internal interface ParseContinuation<in IN, in OUT> {
         }
     }
 
+    /**
+     * Continuation for a parser that wraps another and modifies its result.
+     */
     abstract class MappingParseContinuation<IN, INTERMEDIATE, OUT>(
         private val next: ParseContinuation<IN, OUT>,
     ) : ParseContinuation<IN, INTERMEDIATE> {
@@ -81,6 +66,9 @@ internal interface ParseContinuation<in IN, in OUT> {
         protected abstract fun map(input: IN, start: Int, end: Int, value: ValueProvider<INTERMEDIATE>): ValueProvider<OUT>
     }
 
+    /**
+     * Continuation for a parser that is the first in a sequence.
+     */
     abstract class FirstSegmentParseContinuation<IN, INTERMEDIATE, OUT>(
         protected val next: ParseContinuation<IN, OUT>,
     ) : ParseContinuation<IN, INTERMEDIATE> {
@@ -98,6 +86,29 @@ internal interface ParseContinuation<in IN, in OUT> {
         }
 
         protected abstract fun map(input: IN, length: Int, value: ValueProvider<INTERMEDIATE>): PullParser<IN>
+    }
+
+    /**
+     * Continuation for a parser that is the last in a sequence.
+     */
+    abstract class LastSegmentParseContinuation<IN, INTERMEDIATE, OUT>(
+        private val previousLength: Int,
+        private val next: ParseContinuation<IN, OUT>,
+    ) : ParseContinuation<IN, INTERMEDIATE> {
+        override fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<INTERMEDIATE>, failedChoices: List<PullParser.Failure>): PullParser.Result<IN> {
+            val mappedValue = map(length, value)
+            return next.matched(input, advance, previousLength + length, mappedValue, failedChoices)
+        }
+
+        override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.Continuing<T> {
+            return next.selected(advance, parser, failedChoices)
+        }
+
+        override fun failed(index: Int, length: Int, expected: ExpectationProvider): PullParser.Failed {
+            return next.failed(index, previousLength + length, expected)
+        }
+
+        protected abstract fun map(length: Int, value: ValueProvider<INTERMEDIATE>): ValueProvider<OUT>
     }
 
     private class EndParseContinuation<IN, OUT> : ParseContinuation<IN, OUT> {

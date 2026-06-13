@@ -22,11 +22,11 @@ internal class DecideParser<IN, INTERMEDIATE, OUT>(
         private val compiler: CombinatorBuilder.Compiler<IN>
     ) : CompiledParser<IN, OUT> {
         override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
-            return parser.start(start, DecideParserContinuation(start, factory, compiler, next))
+            return parser.start(start, FirstParseContinuation(start, factory, compiler, next))
         }
     }
 
-    private class DecideParserContinuation<IN, INTERMEDIATE, OUT>(
+    private class FirstParseContinuation<IN, INTERMEDIATE, OUT>(
         private val start: Position,
         private val factory: (INTERMEDIATE) -> Parser<*, OUT>,
         private val compiler: CombinatorBuilder.Compiler<IN>,
@@ -34,9 +34,13 @@ internal class DecideParser<IN, INTERMEDIATE, OUT>(
     ) : ParseContinuation.FirstSegmentParseContinuation<IN, INTERMEDIATE, OUT>(next) {
         override fun map(input: IN, length: Int, value: ValueProvider<INTERMEDIATE>): PullParser<IN> {
             val nextParser: CompiledParser<IN, OUT> = compiler.compile(factory(value.get()))
-            return nextParser.start(start + length, next.map { lengthB, valueB ->
-                Pair(length + lengthB, valueB)
-            })
+            return nextParser.start(start + length, SecondParseContinuation(length, next))
+        }
+    }
+
+    private class SecondParseContinuation<IN, OUT>(lengthA: Int, next: ParseContinuation<IN, OUT>) : ParseContinuation.LastSegmentParseContinuation<IN, OUT, OUT>(lengthA, next) {
+        override fun map(length: Int, value: ValueProvider<OUT>): ValueProvider<OUT> {
+            return value
         }
     }
 }

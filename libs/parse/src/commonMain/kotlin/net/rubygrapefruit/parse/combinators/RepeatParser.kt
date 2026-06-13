@@ -52,10 +52,7 @@ internal class RepeatParser<IN, OUT>(
 
         private fun continuation(start: Position, remaining: Int, accumulator: Accumulator<ITEM, OUT>, next: ParseContinuation<IN, OUT>): ParseContinuation<IN, ITEM> {
             return if (remaining == 0) {
-                next.map { length, value ->
-                    val result = accumulator.add(value, length)
-                    Pair(result.length, result)
-                }
+                LastParseContinuation(accumulator.length, accumulator, next)
             } else {
                 ParseContinuation.prefix { length, value ->
                     val result = accumulator.add(value, length)
@@ -63,6 +60,13 @@ internal class RepeatParser<IN, OUT>(
                     tail.start(startNext, continuation(startNext, remaining - 1, result, next))
                 }
             }
+        }
+    }
+
+    private class LastParseContinuation<IN, ITEM, OUT>(previousLength: Int, private val initial: Accumulator<ITEM, OUT>, next: ParseContinuation<IN, OUT>) :
+        ParseContinuation.LastSegmentParseContinuation<IN, ITEM, OUT>(previousLength, next) {
+        override fun map(length: Int, value: ValueProvider<ITEM>): ValueProvider<OUT> {
+            return initial.add(value, length)
         }
     }
 }

@@ -89,6 +89,29 @@ internal interface ParseContinuation<in IN, in OUT> {
     }
 
     /**
+     * Continuation for a parser that is in the middle in a sequence.
+     */
+    abstract class MiddleSegmentParseContinuation<IN, INTERMEDIATE, OUT>(
+        protected val previousLength: Int,
+        protected val next: ParseContinuation<IN, OUT>,
+    ) : ParseContinuation<IN, INTERMEDIATE> {
+        override fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<INTERMEDIATE>, failedChoices: List<PullParser.Failure>): PullParser.Result<IN> {
+            val parser = map(input, length, value)
+            return PullParser.RequireMore(advance, parser, failedChoices)
+        }
+
+        override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.Continuing<T> {
+            return PullParser.RequireMore(advance, parser, failedChoices)
+        }
+
+        override fun failed(index: Int, length: Int, expected: ExpectationProvider): PullParser.Failed {
+            return next.failed(index, previousLength + length, expected)
+        }
+
+        protected abstract fun map(input: IN, length: Int, value: ValueProvider<INTERMEDIATE>): PullParser<IN>
+    }
+
+    /**
      * Continuation for a parser that is the last in a sequence.
      */
     abstract class LastSegmentParseContinuation<IN, INTERMEDIATE, OUT>(

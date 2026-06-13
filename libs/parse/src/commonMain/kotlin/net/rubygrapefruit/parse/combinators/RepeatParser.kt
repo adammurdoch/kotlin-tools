@@ -47,26 +47,38 @@ internal class RepeatParser<IN, OUT>(
         val initial: Accumulator<ITEM, OUT>
     ) : CompiledParser<IN, OUT> {
         override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
-            return head.start(start, continuation(start, count - 1, initial, next))
+            return head.start(start, continuation(start, count - 1, 0, initial, next))
         }
 
-        private fun continuation(start: Position, remaining: Int, accumulator: Accumulator<ITEM, OUT>, next: ParseContinuation<IN, OUT>): ParseContinuation<IN, ITEM> {
+        fun continuation(start: Position, remaining: Int, previousLength: Int, previous: Accumulator<ITEM, OUT>, next: ParseContinuation<IN, OUT>): ParseContinuation<IN, ITEM> {
             return if (remaining == 0) {
-                LastParseContinuation(accumulator.length, accumulator, next)
+                LastParseContinuation(previousLength, previous, next)
             } else {
-                ParseContinuation.prefix { length, value ->
-                    val result = accumulator.add(value, length)
-                    val startNext = start + length
-                    tail.start(startNext, continuation(startNext, remaining - 1, result, next))
-                }
+                MiddleParseContinuation(start, remaining, previousLength, previous, this, next)
             }
         }
     }
 
-    private class LastParseContinuation<IN, ITEM, OUT>(previousLength: Int, private val initial: Accumulator<ITEM, OUT>, next: ParseContinuation<IN, OUT>) :
+    private class MiddleParseContinuation<IN, ITEM, OUT>(
+        private val start: Position,
+        private val remaining: Int,
+        previousLength: Int,
+        private val previous: Accumulator<ITEM, OUT>,
+        private val owner: RepeatCompiledParser<IN, ITEM, OUT>,
+        next: ParseContinuation<IN, OUT>
+    ) :
+        ParseContinuation.MiddleSegmentParseContinuation<IN, ITEM, OUT>(previousLength, next) {
+        override fun map(input: IN, length: Int, value: ValueProvider<ITEM>): PullParser<IN> {
+            val result = previous.add(value, length)
+            val startNext = start + length
+            return owner.tail.start(startNext, owner.continuation(startNext, remaining - 1, previousLength + length, result, next))
+        }
+    }
+
+    private class LastParseContinuation<IN, ITEM, OUT>(previousLength: Int, private val previous: Accumulator<ITEM, OUT>, next: ParseContinuation<IN, OUT>) :
         ParseContinuation.LastSegmentParseContinuation<IN, ITEM, OUT>(previousLength, next) {
         override fun map(length: Int, value: ValueProvider<ITEM>): ValueProvider<OUT> {
-            return initial.add(value, length)
+            return previous.add(value, length)
         }
     }
 }

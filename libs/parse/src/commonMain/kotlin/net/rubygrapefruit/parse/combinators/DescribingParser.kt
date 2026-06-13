@@ -35,7 +35,14 @@ internal class DescribingParser<IN, OUT>(
             value: ValueProvider<OUT>,
             failedChoices: List<PullParser.Failure>
         ): PullParser.Result<IN> {
-            return next.matched(input, advance, length, value, failedChoices)
+            return next.matched(input, advance, length, value, failedChoices.map { failure ->
+                val start = advance - length
+                if (failure.index == start) {
+                    PullParser.Failure(failure.index, expectation)
+                } else {
+                    failure
+                }
+            })
         }
 
         override fun <T> selected(

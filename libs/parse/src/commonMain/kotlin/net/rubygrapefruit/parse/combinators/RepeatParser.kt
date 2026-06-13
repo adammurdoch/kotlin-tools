@@ -69,7 +69,7 @@ internal class RepeatParser<IN, OUT>(
     ) :
         ParseContinuation.MiddleSegmentParseContinuation<IN, ITEM, OUT>(previousLength, next) {
         override fun map(input: IN, length: Int, value: ValueProvider<ITEM>): PullParser<IN> {
-            val result = previous.add(value, length)
+            val result = previous.add(value)
             val startNext = start + length
             return owner.tail.start(startNext, owner.continuation(startNext, remaining - 1, previousLength + length, result, next))
         }
@@ -78,7 +78,7 @@ internal class RepeatParser<IN, OUT>(
     private class LastParseContinuation<IN, ITEM, OUT>(previousLength: Int, private val previous: Accumulator<ITEM, OUT>, next: ParseContinuation<IN, OUT>) :
         ParseContinuation.LastSegmentParseContinuation<IN, ITEM, OUT>(previousLength, next) {
         override fun map(length: Int, value: ValueProvider<ITEM>): ValueProvider<OUT> {
-            return previous.add(value, length)
+            return previous.add(value)
         }
     }
 }

@@ -24,7 +24,7 @@ internal class ZeroOrMoreSingleInputCompiledParser<IN : Input<*>, OUT>(
 
         override fun stop(input: IN): PullParser.Failed {
             return PullParser.Failed(
-                listOf(PullParser.Failure(0, parser.expectation)) +
+                next.failed(0, matched, parser.expectation).failures +
                         next.matched(input, -matched, 0, accumulator).stop(input).failures
             )
         }

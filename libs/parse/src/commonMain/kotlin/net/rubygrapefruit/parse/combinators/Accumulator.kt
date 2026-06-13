@@ -6,14 +6,14 @@ import net.rubygrapefruit.parse.ValueProvider
  * Accumulates a sequence of values into a final value.
  */
 internal interface Accumulator<ITEM, OUT> : ValueProvider<OUT> {
-    fun add(item: ValueProvider<ITEM>, length: Int): Accumulator<ITEM, OUT>
+    fun add(item: ValueProvider<ITEM>): Accumulator<ITEM, OUT>
 }
 
 internal object UnitAccumulator : Accumulator<Unit, Unit> {
     override fun get() {
     }
 
-    override fun add(item: ValueProvider<Unit>, length: Int): Accumulator<Unit, Unit> {
+    override fun add(item: ValueProvider<Unit>): Accumulator<Unit, Unit> {
         return this
     }
 }
@@ -29,7 +29,7 @@ internal interface ListAccumulator<T> : Accumulator<T, List<T>> {
         override fun collectInto(list: MutableList<T>) {
         }
 
-        override fun add(item: ValueProvider<T>, length: Int): ListAccumulator<T> {
+        override fun add(item: ValueProvider<T>): ListAccumulator<T> {
             return ListItem(item, this)
         }
     }
@@ -47,7 +47,7 @@ private class ListItem<T>(val item: ValueProvider<T>, val prev: ListAccumulator<
         list.add(item.get())
     }
 
-    override fun add(item: ValueProvider<T>, length: Int): ListItem<T> {
+    override fun add(item: ValueProvider<T>): ListItem<T> {
         return ListItem(item, this)
     }
 }

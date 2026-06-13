@@ -43,14 +43,15 @@ internal class ZeroOrMoreParser<IN, OUT>(
             start: Position,
             head: CompiledParser<IN, ITEM>,
             tail: CompiledParser<IN, ITEM>,
-            initial: Accumulator<ITEM, OUT>,
+            previousLength: Int,
+            previous: Accumulator<ITEM, OUT>,
             next: ParseContinuation<IN, OUT>
         ): PullParser<IN> {
-            val empty = EmptyCompiledParser<IN, ITEM, OUT>(initial)
+            val empty = EmptyCompiledParser<IN, OUT>(previousLength, previous)
             return ChoiceParser.of(
                 start,
                 listOf(
-                    ChoiceParser.Option(head, ItemContinuation(start, tail, initial, next)),
+                    ChoiceParser.Option(head, ItemContinuation(start, previousLength, previous, tail, next)),
                     ChoiceParser.Option(empty, next)
                 )
             )
@@ -63,14 +64,15 @@ internal class ZeroOrMoreParser<IN, OUT>(
         val initial: Accumulator<ITEM, OUT>
     ) : CompiledParser<IN, OUT> {
         override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
-            return of(start, head, tail, initial, next)
+            return of(start, head, tail, 0, initial, next)
         }
     }
 
     internal class ItemContinuation<IN, ITEM, OUT>(
         private val start: Position,
-        private val parser: CompiledParser<IN, ITEM>,
+        private val previousLength: Int,
         private val previous: Accumulator<ITEM, OUT>,
+        private val parser: CompiledParser<IN, ITEM>,
         private val next: ParseContinuation<IN, OUT>
     ) : ParseContinuation<IN, ITEM> {
         override fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<ITEM>, failedChoices: List<PullParser.Failure>): PullParser.Result<IN> {
@@ -78,7 +80,7 @@ internal class ZeroOrMoreParser<IN, OUT>(
             return if (length == 0) {
                 next.matched(input, advance, length, result, failedChoices)
             } else {
-                val parser = of(start + length, parser, parser, result, next)
+                val parser = of(start + length, parser, parser, previousLength + length, result, next)
                 PullParser.RequireMore(advance, parser, failedChoices)
             }
         }
@@ -88,27 +90,27 @@ internal class ZeroOrMoreParser<IN, OUT>(
         }
 
         override fun failed(index: Int, length: Int, expected: ExpectationProvider): PullParser.Failed {
-            return next.failed(index, previous.length + length, expected)
+            return next.failed(index, previousLength + length, expected)
         }
     }
 
-    internal class EmptyCompiledParser<IN, ITEM, OUT>(private val result: Accumulator<ITEM, OUT>) : CompiledParser<IN, OUT> {
+    internal class EmptyCompiledParser<IN, OUT>(val length: Int, val result: ValueProvider<OUT>) : CompiledParser<IN, OUT> {
         override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
-            return EmptyPullParser(result, next)
+            return EmptyPullParser(length, result, next)
         }
     }
 
-    private class EmptyPullParser<IN, ITEM, OUT>(val result: Accumulator<ITEM, OUT>, val next: ParseContinuation<IN, OUT>) : PullParser<IN> {
+    private class EmptyPullParser<IN, OUT>(val length: Int, val result: ValueProvider<OUT>, val next: ParseContinuation<IN, OUT>) : PullParser<IN> {
         override fun toString(): String {
             return "{end-zero-or-more}"
         }
 
         override fun stop(input: IN): PullParser.Failed {
-            return next.matched(input, 0, result.length, result).stop(input)
+            return next.matched(input, 0, length, result).stop(input)
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN> {
-            return next.matched(input, 0, result.length, result)
+            return next.matched(input, 0, length, result)
         }
     }
 }

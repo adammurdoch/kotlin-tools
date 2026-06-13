@@ -15,6 +15,6 @@ internal class OneOrMoreProduceNothingParser<IN>(
     }
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, Unit> {
-        return OneOrMoreParser.of(item, separator, compiler, UnitAccumulator.Empty)
+        return OneOrMoreParser.of(item, separator, compiler, UnitAccumulator)
     }
 }

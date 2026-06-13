@@ -21,6 +21,6 @@ internal class ZeroOrMoreProduceNothingParser<IN>(
                 return ZeroOrMoreSingleInputCompiledParser(singleValueItem, UnitRangeAccumulator)
             }
         }
-        return ZeroOrMoreParser.of(item, separator, compiler, UnitAccumulator.Empty)
+        return ZeroOrMoreParser.of(item, separator, compiler, UnitAccumulator)
     }
 }

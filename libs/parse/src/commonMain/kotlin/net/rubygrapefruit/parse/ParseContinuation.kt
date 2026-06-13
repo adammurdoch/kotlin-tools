@@ -27,23 +27,27 @@ internal interface ParseContinuation<in IN, in OUT> {
         }
     }
 
-    /**
-     * Continuation for a parser that wraps another and modifies its result.
-     */
-    abstract class MappingParseContinuation<IN, INTERMEDIATE, OUT>(
-        private val next: ParseContinuation<IN, OUT>,
+    abstract class WrappingParseContinuation<IN, INTERMEDIATE, OUT>(
+        protected val next: ParseContinuation<IN, OUT>,
     ) : ParseContinuation<IN, INTERMEDIATE> {
-        override fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<INTERMEDIATE>, failedChoices: List<PullParser.Failure>): PullParser.Result<IN> {
-            val mappedValue = map(input, advance - length, advance, value)
-            return next.matched(input, advance, length, mappedValue, failedChoices)
-        }
-
         override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.Continuing<T> {
             return next.selected(advance, parser, failedChoices)
         }
 
         override fun failed(index: Int, length: Int, expected: ExpectationProvider): PullParser.Failed {
             return next.failed(index, length, expected)
+        }
+    }
+
+    /**
+     * Continuation for a parser that wraps another and modifies its result.
+     */
+    abstract class MappingParseContinuation<IN, INTERMEDIATE, OUT>(
+        next: ParseContinuation<IN, OUT>,
+    ) : WrappingParseContinuation<IN, INTERMEDIATE, OUT>(next) {
+        override fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<INTERMEDIATE>, failedChoices: List<PullParser.Failure>): PullParser.Result<IN> {
+            val mappedValue = map(input, advance - length, advance, value)
+            return next.matched(input, advance, length, mappedValue, failedChoices)
         }
 
         protected abstract fun map(input: IN, start: Int, end: Int, value: ValueProvider<INTERMEDIATE>): ValueProvider<OUT>

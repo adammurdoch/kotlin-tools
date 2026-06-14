@@ -8,7 +8,7 @@ import kotlin.test.Test
 
 class DiscardOfZeroOrMoreTest : AbstractParseTest() {
     @Test
-    fun `discards result of zero or more of char literal`() {
+    fun `discards result of zero or more of text literal`() {
         val parser = discard(
             zeroOrMore(
                 literal("abc", 1)
@@ -32,7 +32,7 @@ class DiscardOfZeroOrMoreTest : AbstractParseTest() {
     }
 
     @Test
-    fun `discards result of zero or more of char literal with no result`() {
+    fun `discards result of zero or more of text literal with no result`() {
         val parser = discard(
             zeroOrMore(
                 literal("abc")
@@ -56,7 +56,7 @@ class DiscardOfZeroOrMoreTest : AbstractParseTest() {
     }
 
     @Test
-    fun `discards result of zero or more of byte literal with separator`() {
+    fun `discards result of zero or more of binary literal with separator`() {
         val parser = discard(
             zeroOrMore(
                 literal(byteArrayOf(0x1, 0x2), 1),

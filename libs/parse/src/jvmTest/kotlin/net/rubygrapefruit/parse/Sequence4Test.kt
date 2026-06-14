@@ -6,7 +6,7 @@ import kotlin.test.Test
 
 class Sequence4Test : AbstractParseTest() {
     @Test
-    fun `matches sequence of char literals`() {
+    fun `matches sequence of text literals`() {
         val parser = sequence(
             literal("a", 1),
             literal("b", 2),

@@ -7,7 +7,7 @@ import kotlin.test.Test
 
 class MatchTest : AbstractParseTest() {
     @Test
-    fun `matches char literal and produces matching input`() {
+    fun `matches text literal and produces matching input`() {
         val parser = match(literal("abc", 1))
 
         parser.expecting {
@@ -33,7 +33,7 @@ class MatchTest : AbstractParseTest() {
     }
 
     @Test
-    fun `matches byte literal and produces matching input`() {
+    fun `matches binary literal and produces matching input`() {
         val parser = net.rubygrapefruit.parse.binary.match(literal(byteArrayOf(0x1, 0x2), 1))
 
         parser.expecting {

@@ -6,7 +6,7 @@ import kotlin.test.Test
 
 class DiscardOfDiscardTest : AbstractParseTest() {
     @Test
-    fun `discards the result of char literal`() {
+    fun `discards the result of text literal`() {
         val parser = discard(
             discard(
                 literal("abc", 1)

@@ -6,7 +6,7 @@ import kotlin.test.Test
 
 class DecideTest : AbstractParseTest() {
     @Test
-    fun `produces char literal parser from char literal`() {
+    fun `produces text literal parser from text literal`() {
         val parser = decide(literal("ab", 2)) { literal(it.toString()) }
 
         parser.expecting {

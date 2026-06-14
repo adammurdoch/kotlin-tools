@@ -6,7 +6,7 @@ import kotlin.test.Test
 
 class OneOrMoreTest : AbstractParseTest() {
     @Test
-    fun `matches one or more char literals`() {
+    fun `matches one or more text literals`() {
         val parser = oneOrMore(literal("a.", 1))
 
         parser.expecting {

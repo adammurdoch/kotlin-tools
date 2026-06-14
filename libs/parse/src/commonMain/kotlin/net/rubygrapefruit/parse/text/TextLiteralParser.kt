@@ -13,10 +13,10 @@ internal class TextLiteralParser<OUT>(
     }
 
     override fun start(next: ParseContinuation<CharStream, OUT>): PullParser<CharStream> {
-        return CharLiteralPullParser(text, provider, expectation, next)
+        return TextLiteralPullParser(text, provider, expectation, next)
     }
 
-    private class CharLiteralPullParser<OUT>(
+    private class TextLiteralPullParser<OUT>(
         private val text: String,
         private val result: ValueProvider<OUT>,
         private val startExpectation: Expectation,

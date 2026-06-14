@@ -17,10 +17,10 @@ internal class BinaryLiteralParser<OUT>(
     }
 
     override fun start(next: ParseContinuation<ByteStream, OUT>): PullParser<ByteStream> {
-        return ByteLiteralPullParser(bytes, provider, expectations, next)
+        return BinaryLiteralPullParser(bytes, provider, expectations, next)
     }
 
-    private class ByteLiteralPullParser<OUT>(
+    private class BinaryLiteralPullParser<OUT>(
         private val bytes: ByteArray,
         private val result: ValueProvider<OUT>,
         private val expectations: List<Expectation>,

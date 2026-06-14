@@ -7,7 +7,7 @@ import kotlin.test.Test
 
 class ChoiceOfRepeatTest : AbstractParseTest() {
     @Test
-    fun `matches choice of repeated char literals`() {
+    fun `matches choice of repeated text literals`() {
         val parser = oneOf(
             repeat(3, literal("a", 1)),
             repeat(2, literal("a", 2))

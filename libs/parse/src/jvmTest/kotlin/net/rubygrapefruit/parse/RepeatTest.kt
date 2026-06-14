@@ -6,7 +6,7 @@ import kotlin.test.Test
 
 class RepeatTest : AbstractParseTest() {
     @Test
-    fun `parses n char literals`() {
+    fun `parses n text literals`() {
         val parser = repeat(3, literal("a.", 1))
 
         parser.expecting {

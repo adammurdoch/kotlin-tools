@@ -3,7 +3,7 @@ package net.rubygrapefruit.parse
 import net.rubygrapefruit.parse.text.literal
 import kotlin.test.Test
 
-class CharLiteralTest : AbstractParseTest() {
+class TextLiteralTest : AbstractParseTest() {
     @Test
     fun `matches single char literal`() {
         val parser = literal("a")

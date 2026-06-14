@@ -6,7 +6,7 @@ import kotlin.test.Test
 
 class ReplaceTest : AbstractParseTest() {
     @Test
-    fun `replaces value of char literal`() {
+    fun `replaces value of text literal`() {
         val parser = replace(literal("ab", 1), 2)
 
         parser.expecting {
@@ -30,7 +30,7 @@ class ReplaceTest : AbstractParseTest() {
     }
 
     @Test
-    fun `replaces value of char literal with no value`() {
+    fun `replaces value of text literal with no value`() {
         val parser = replace(literal("ab"), 2)
 
         parser.expecting {

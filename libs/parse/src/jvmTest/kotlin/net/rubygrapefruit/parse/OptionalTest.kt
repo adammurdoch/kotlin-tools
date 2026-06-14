@@ -7,7 +7,7 @@ import kotlin.test.Test
 
 class OptionalTest : AbstractParseTest() {
     @Test
-    fun `parses optional char literal`() {
+    fun `parses optional text literal`() {
         val parser = optional(literal("abc", 1))
 
         parser.expecting {
@@ -59,7 +59,7 @@ class OptionalTest : AbstractParseTest() {
     }
 
     @Test
-    fun `parses optional byte literal`() {
+    fun `parses optional binary literal`() {
         val parser = optional(literal(byteArrayOf(0x1, 0x2, 0x3), 1))
 
         parser.expecting {

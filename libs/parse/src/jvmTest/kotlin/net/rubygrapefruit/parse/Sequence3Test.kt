@@ -6,7 +6,7 @@ import kotlin.test.Test
 
 class Sequence3Test : AbstractParseTest() {
     @Test
-    fun `matches sequence of byte literals`() {
+    fun `matches sequence of binary literals`() {
         val parser = sequence(
             literal(byteArrayOf(0x1), 1),
             literal(byteArrayOf(0x2), 2),

@@ -7,7 +7,7 @@ import kotlin.test.Test
 
 class DescribedAsOfOptionalTest : AbstractParseTest() {
     @Test
-    fun `replaces expectation of optional byte literal`() {
+    fun `replaces expectation of optional binary literal`() {
         val parser = describedAs(optional(literal(byteArrayOf(0x1, 0x2), 1)), "<optional>")
 
         parser.expecting {

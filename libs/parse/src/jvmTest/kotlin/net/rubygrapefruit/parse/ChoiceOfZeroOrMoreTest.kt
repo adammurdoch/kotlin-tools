@@ -8,7 +8,7 @@ import kotlin.test.Test
 
 class ChoiceOfZeroOrMoreTest : AbstractParseTest() {
     @Test
-    fun `matches choice of zero or more byte literals`() {
+    fun `matches choice of zero or more binary literals`() {
         val parser = oneOf(
             zeroOrMore(literal(byteArrayOf(0x1, 0x2), 1)),
             zeroOrMore(literal(byteArrayOf(0x11, 0x12), 2))

@@ -41,7 +41,7 @@ class ZeroOrMoreOfZeroOrMoreTest : AbstractParseTest() {
     }
 
     @Test
-    fun `matches zero or more of zero or more char literal`() {
+    fun `matches zero or more of zero or more text literal`() {
         val parser = zeroOrMore(
             zeroOrMore(
                 literal("12", 1)

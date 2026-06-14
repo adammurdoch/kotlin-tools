@@ -6,7 +6,7 @@ import kotlin.test.Test
 
 class RepeatProduceNothingTest : AbstractParseTest() {
     @Test
-    fun `parses n byte literals`() {
+    fun `parses n binary literals`() {
         val parser = repeat(3, literal(byteArrayOf(0x1, 0x2)))
 
         parser.expecting {
@@ -41,7 +41,7 @@ class RepeatProduceNothingTest : AbstractParseTest() {
     }
 
     @Test
-    fun `parses 0 byte literals`() {
+    fun `parses 0 binary literals`() {
         val parser = repeat(0, literal(byteArrayOf(0x1, 0x2)))
 
         parser.expecting {

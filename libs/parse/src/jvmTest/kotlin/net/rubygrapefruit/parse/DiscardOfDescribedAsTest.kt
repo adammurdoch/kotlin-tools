@@ -7,7 +7,7 @@ import kotlin.test.Test
 
 class DiscardOfDescribedAsTest : AbstractParseTest() {
     @Test
-    fun `discards result of char literal with description`() {
+    fun `discards result of text literal with description`() {
         val parser = discard(describedAs(literal("abc", 2), "<literal>"))
 
         parser.expecting {

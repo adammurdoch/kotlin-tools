@@ -7,7 +7,7 @@ import kotlin.test.Test
 
 class MatchOfChoiceTest : AbstractParseTest() {
     @Test
-    fun `matches choice of char literals`() {
+    fun `matches choice of text literals`() {
         val parser = match(
             oneOf(
                 literal("abc", 1),

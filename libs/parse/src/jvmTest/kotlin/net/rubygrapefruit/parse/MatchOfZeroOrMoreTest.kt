@@ -8,7 +8,7 @@ import kotlin.test.Test
 
 class MatchOfZeroOrMoreTest : AbstractParseTest() {
     @Test
-    fun `matches zero or more one char literal`() {
+    fun `matches zero or more one text literal`() {
         val parser = match(zeroOrMore(literal("12", 1)))
 
         parser.expecting {

@@ -7,7 +7,7 @@ import kotlin.test.Test
 
 class ChoiceTest : AbstractParseTest() {
     @Test
-    fun `matches char literals with no common prefix`() {
+    fun `matches text literals with no common prefix`() {
         val parser = oneOf(
             literal("abcd", 1),
             literal("12", 2)
@@ -75,7 +75,7 @@ class ChoiceTest : AbstractParseTest() {
     }
 
     @Test
-    fun `matches byte literals with no common prefix`() {
+    fun `matches binary literals with no common prefix`() {
         val parser = oneOf(
             literal(byteArrayOf(0x1, 0x2, 0x3, 0x4), 1),
             literal(byteArrayOf(0x10, 0x11), 2)
@@ -114,7 +114,7 @@ class ChoiceTest : AbstractParseTest() {
             expectLiteral(0x3)
             steps {
                 advance(1)
-                // byte literal does not look ahead for end of input
+                // binary literal does not look ahead for end of input
                 advance(1)
             }
         }
@@ -161,7 +161,7 @@ class ChoiceTest : AbstractParseTest() {
             expectLiteral("a---")
             expectLiteral("a...")
             steps {
-                // char literal looks ahead for end of input
+                // text literal looks ahead for end of input
             }
         }
 
@@ -225,7 +225,7 @@ class ChoiceTest : AbstractParseTest() {
             expectLiteral("ab")
             expectLiteral("abc")
             steps {
-                // char literal looks ahead for end of input
+                // text literal looks ahead for end of input
             }
         }
 

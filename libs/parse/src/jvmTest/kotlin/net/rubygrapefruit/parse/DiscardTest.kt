@@ -7,7 +7,7 @@ import kotlin.test.Test
 
 class DiscardTest : AbstractParseTest() {
     @Test
-    fun `discards the result of char literal`() {
+    fun `discards the result of text literal`() {
         val parser = discard(literal("abc", 1))
 
         parser.expecting {
@@ -22,7 +22,7 @@ class DiscardTest : AbstractParseTest() {
     }
 
     @Test
-    fun `does nothing for char literal that does not produce a result`() {
+    fun `does nothing for text literal that does not produce a result`() {
         val parser = discard(literal("abc"))
 
         parser.expecting {
@@ -37,7 +37,7 @@ class DiscardTest : AbstractParseTest() {
     }
 
     @Test
-    fun `discards the result of byte literal`() {
+    fun `discards the result of binary literal`() {
         val parser = discard(literal(byteArrayOf(0x1, 0x2), 1))
 
         parser.expecting {

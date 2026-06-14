@@ -3,7 +3,7 @@ package net.rubygrapefruit.parse
 import net.rubygrapefruit.parse.binary.literal
 import kotlin.test.Test
 
-class ByteLiteralTest : AbstractParseTest() {
+class BinaryLiteralTest : AbstractParseTest() {
     @Test
     fun `matches single byte literal`() {
         val parser = literal(byteArrayOf(0x1))

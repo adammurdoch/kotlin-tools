@@ -8,7 +8,7 @@ import kotlin.test.fail
 
 class NotOfSequenceTest : AbstractParseTest() {
     @Test
-    fun `matches nothing and discards result of sequence of char literals`() {
+    fun `matches nothing and discards result of sequence of text literals`() {
         val parser = not(
             sequence(
                 literal("a", 1),

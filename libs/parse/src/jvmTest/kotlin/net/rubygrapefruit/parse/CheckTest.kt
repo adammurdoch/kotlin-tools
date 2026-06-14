@@ -9,7 +9,7 @@ import kotlin.test.Test
 
 class CheckTest : AbstractParseTest() {
     @Test
-    fun `matches char literal and applies mapping function`() {
+    fun `matches text literal and applies mapping function`() {
         val parser = check(literal("abc", 1)) { MappingResult.of("[$it]") }
 
         parser.expecting {
@@ -38,7 +38,7 @@ class CheckTest : AbstractParseTest() {
     }
 
     @Test
-    fun `matches byte literal and applies mapping function`() {
+    fun `matches binary literal and applies mapping function`() {
         val parser = check(literal(byteArrayOf(0x1, 0x2), 1)) { MappingResult.of("[$it]") }
 
         parser.matches(0x1, 0x2, expected = "[1]")

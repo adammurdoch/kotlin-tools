@@ -8,7 +8,7 @@ import kotlin.test.Test
 
 class CheckOfOptionalTest : AbstractParseTest() {
     @Test
-    fun `maps optional char literal`() {
+    fun `maps optional text literal`() {
         val parser = check(
             optional(
                 literal("abc", 1)

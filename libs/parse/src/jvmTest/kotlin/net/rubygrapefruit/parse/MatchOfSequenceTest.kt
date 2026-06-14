@@ -8,7 +8,7 @@ import kotlin.test.Test
 
 class MatchOfSequenceTest : AbstractParseTest() {
     @Test
-    fun `matches sequence of char literal then one of char`() {
+    fun `matches sequence of text literal then one of char`() {
         val parser = match(
             sequence(
                 literal("12"),

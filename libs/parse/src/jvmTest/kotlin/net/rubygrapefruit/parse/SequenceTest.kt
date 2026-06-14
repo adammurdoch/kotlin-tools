@@ -8,7 +8,7 @@ import kotlin.test.Test
 
 class SequenceTest : AbstractParseTest() {
     @Test
-    fun `matches single char literals`() {
+    fun `matches single text literals`() {
         val parser = sequence(literal("a", 1), literal("b", 2)) { a, b -> listOf(a, b) }
 
         parser.expecting {

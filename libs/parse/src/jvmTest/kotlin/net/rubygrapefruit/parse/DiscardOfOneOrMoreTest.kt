@@ -7,7 +7,7 @@ import kotlin.test.Test
 
 class DiscardOfOneOrMoreTest : AbstractParseTest() {
     @Test
-    fun `discards result of one or more of char literal`() {
+    fun `discards result of one or more of text literal`() {
         val parser = discard(
             oneOrMore(
                 literal("a.", 1)
@@ -31,7 +31,7 @@ class DiscardOfOneOrMoreTest : AbstractParseTest() {
     }
 
     @Test
-    fun `discards result of one or more of char literal with no result`() {
+    fun `discards result of one or more of text literal with no result`() {
         val parser = discard(
             oneOrMore(
                 literal("a.")
@@ -55,7 +55,7 @@ class DiscardOfOneOrMoreTest : AbstractParseTest() {
     }
 
     @Test
-    fun `discards result of one or more of char literal with separator`() {
+    fun `discards result of one or more of text literal with separator`() {
         val parser = discard(
             oneOrMore(
                 literal("a", 1),

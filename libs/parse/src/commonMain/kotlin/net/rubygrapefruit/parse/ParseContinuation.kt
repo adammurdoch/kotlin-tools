@@ -132,6 +132,10 @@ internal interface ParseContinuation<in IN, in OUT> {
     }
 
     private object EndPullParser : PullParser<Any?> {
+        override fun toString(): String {
+            return "{end}"
+        }
+
         override fun stop(input: Any?): PullParser.Failed {
             return PullParser.Failed(emptyList())
         }

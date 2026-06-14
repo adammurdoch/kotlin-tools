@@ -6,7 +6,7 @@ import kotlin.test.Test
 
 class OneByteExceptTest : AbstractParseTest() {
     @Test
-    fun `matches any byte except single byte literal`() {
+    fun `matches any byte except single binary literal`() {
         val parser = oneExcept(literal(byteArrayOf(0)))
 
         parser.expecting {

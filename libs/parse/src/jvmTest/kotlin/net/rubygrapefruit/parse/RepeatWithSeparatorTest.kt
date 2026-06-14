@@ -6,7 +6,7 @@ import kotlin.test.Test
 
 class RepeatWithSeparatorTest : AbstractParseTest() {
     @Test
-    fun `matches n char literals with separator`() {
+    fun `matches n text literals with separator`() {
         val parser = repeat(3, literal("ab", 1), literal(",", 2))
 
         parser.expecting {

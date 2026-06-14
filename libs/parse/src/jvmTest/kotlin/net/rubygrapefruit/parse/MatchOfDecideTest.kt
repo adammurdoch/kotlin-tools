@@ -9,7 +9,7 @@ import kotlin.test.Test
 
 class MatchOfDecideTest : AbstractParseTest() {
     @Test
-    fun `matches zero or more of char followed by char literal`() {
+    fun `matches zero or more of char followed by text literal`() {
         val parser = match(
             decide(
                 zeroOrMore(oneOf('a', 'b'))

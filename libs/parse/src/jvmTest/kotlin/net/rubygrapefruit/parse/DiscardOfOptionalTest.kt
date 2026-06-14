@@ -7,7 +7,7 @@ import kotlin.test.Test
 
 class DiscardOfOptionalTest : AbstractParseTest() {
     @Test
-    fun `discards result of optional byte literal`() {
+    fun `discards result of optional binary literal`() {
         val parser = discard(optional(literal(byteArrayOf(0x1, 0x2), 1), 0))
 
         parser.expecting {

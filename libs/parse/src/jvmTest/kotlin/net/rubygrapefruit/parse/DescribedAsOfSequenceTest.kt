@@ -7,7 +7,7 @@ import kotlin.test.Test
 
 class DescribedAsOfSequenceTest : AbstractParseTest() {
     @Test
-    fun `replaces expectation at start of sequence of char literals`() {
+    fun `replaces expectation at start of sequence of text literals`() {
         val parser = describedAs(
             sequence(literal("a"), literal("b")),
             "<literal>"

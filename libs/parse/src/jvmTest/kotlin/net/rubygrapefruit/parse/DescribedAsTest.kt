@@ -7,7 +7,7 @@ import kotlin.test.Test
 
 class DescribedAsTest : AbstractParseTest() {
     @Test
-    fun `replaces expectation of char literal`() {
+    fun `replaces expectation of text literal`() {
         val parser = describedAs(literal("abc", 1), "<literal>")
 
         parser.expecting {

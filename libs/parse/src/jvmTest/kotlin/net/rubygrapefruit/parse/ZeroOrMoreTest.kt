@@ -6,7 +6,7 @@ import kotlin.test.Test
 
 class ZeroOrMoreTest : AbstractParseTest() {
     @Test
-    fun `matches zero or more char literals`() {
+    fun `matches zero or more text literals`() {
         val parser = zeroOrMore(literal("abc", 1))
 
         parser.expecting {

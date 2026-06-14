@@ -7,7 +7,7 @@ import kotlin.test.Test
 
 class DescribedAsOfRepeatTest : AbstractParseTest() {
     @Test
-    fun `replaces expectation of repeat of char literal`() {
+    fun `replaces expectation of repeat of text literal`() {
         val parser = describedAs(repeat(2, literal("a,")), "<chars>")
 
         parser.expecting {

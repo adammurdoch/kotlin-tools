@@ -6,7 +6,7 @@ import kotlin.test.Test
 
 class OneOrMoreWithSeparatorTest : AbstractParseTest() {
     @Test
-    fun `matches one or more char literals with separator`() {
+    fun `matches one or more text literals with separator`() {
         val parser = oneOrMore(literal("ab", 1), separator = literal(",", 2))
 
         parser.expecting {

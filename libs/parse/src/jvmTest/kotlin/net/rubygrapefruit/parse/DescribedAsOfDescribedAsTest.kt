@@ -8,7 +8,7 @@ import kotlin.test.Test
 
 class DescribedAsOfDescribedAsTest : AbstractParseTest() {
     @Test
-    fun `replaces expectation of byte literal`() {
+    fun `replaces expectation of binary literal`() {
         val parser = describedAs(describedAs(literal(byteArrayOf(0x1, 0x2)), "<ignored>"), "<bytes>")
 
         parser.expecting {

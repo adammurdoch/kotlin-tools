@@ -5,32 +5,30 @@ import net.rubygrapefruit.parse.stream.Input
 
 internal class DescribingParser<IN, OUT>(
     private val parser: Parser<IN, OUT>,
-    private val description: String
+    private val expectation: Expectation
 ) : Parser<IN, OUT>, CombinatorBuilder<OUT>, DiscardableParser<IN>, CombinatorSingleInputBuilder<OUT> {
+
     override fun withNoResult(): Parser<IN, Unit> {
-        return DescribingParser(DiscardParser(parser), description)
+        return DescribingParser(DiscardParser(parser), expectation)
     }
 
     override fun <IN> maybeAsSingleInputParser(compiler: CombinatorSingleInputBuilder.Compiler<IN>): SingleInputParser<IN, OUT>? {
         val singleInputParser = compiler.maybeAsSingleInputParser(parser)
         return if (singleInputParser != null) {
-            object : SingleInputParser<IN, OUT> {
-                override val predicate: InputPredicate<IN>
-                    get() = singleInputParser.predicate
-
-                override val expectation: Expectation = Expectation.One(description)
-
-                override val extractor: Extractor<IN, OUT>
-                    get() = singleInputParser.extractor
-            }
+            DescribingSingleInputParser(singleInputParser, expectation)
         } else {
             null
         }
     }
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, OUT> {
-        return DescribingCompiledParser(compiler.compile(parser), Expectation.One(description))
+        return DescribingCompiledParser(compiler.compile(parser), expectation)
     }
+
+    private class DescribingSingleInputParser<IN, OUT>(
+        val delegate: SingleInputParser<IN, OUT>,
+        override val expectation: Expectation
+    ) : SingleInputParser<IN, OUT> by delegate
 
     internal class DescribingCompiledParser<IN, OUT>(
         val parser: CompiledParser<IN, OUT>,
@@ -84,5 +82,5 @@ internal class DescribingParser<IN, OUT>(
  * Returns a parser that applies the given parser and uses the given description in error messages.
  */
 fun <IN, OUT> describedAs(parser: Parser<IN, OUT>, description: String): Parser<IN, OUT> {
-    return DescribingParser(parser, description)
+    return DescribingParser(parser, Expectation.One(description))
 }

@@ -9,31 +9,31 @@ import net.rubygrapefruit.parse.stream.Input
 
 internal class MatchOneInputParser<IN, ITEM, OUT, STREAM : BoxingInput<*, ITEM>>(
     override val predicate: InputPredicate<STREAM>,
+    override val expectation: Expectation,
     override val extractor: Extractor<STREAM, OUT> = NextValueExtractor.of()
 ) : Parser<IN, OUT>, TypedInputCombinatorBuilder<STREAM, OUT>, DiscardableParser<IN>, SingleInputParser<STREAM, OUT> {
 
-    override val expectation: Expectation
-        get() = predicate.expectation
-
     override fun withNoResult(): Parser<IN, Unit> {
-        return MatchOneInputParser(predicate, UnitExtractor)
+        return MatchOneInputParser(predicate, expectation, UnitExtractor)
     }
 
     override fun compile(compiler: CombinatorBuilder.Compiler<STREAM>): CompiledParser<STREAM, OUT> {
-        return SingleInputCompiledParser(predicate, extractor)
+        return SingleInputCompiledParser(predicate, expectation, extractor)
     }
 
     internal class SingleInputCompiledParser<IN : Input<*>, OUT>(
         val parser: InputPredicate<IN>,
+        val expectation: Expectation,
         val extractor: Extractor<IN, OUT>
     ) : CompiledParser<IN, OUT> {
         override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
-            return SingleInputPullParser(parser, extractor, next)
+            return SingleInputPullParser(parser, expectation, extractor, next)
         }
     }
 
     private class SingleInputPullParser<IN : Input<*>, OUT>(
         private val parser: InputPredicate<IN>,
+        private val expectation: Expectation,
         private val extractor: Extractor<IN, OUT>,
         private val next: ParseContinuation<IN, OUT>
     ) : PullParser<IN> {
@@ -63,7 +63,7 @@ internal class MatchOneInputParser<IN, ITEM, OUT, STREAM : BoxingInput<*, ITEM>>
         }
 
         private fun stop(): PullParser.Failed {
-            return next.failed(0, 0, parser.expectation)
+            return next.failed(0, 0, expectation)
         }
     }
 

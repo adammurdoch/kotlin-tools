@@ -1,17 +1,18 @@
 package net.rubygrapefruit.parse.binary
 
+import net.rubygrapefruit.parse.Expectation
 import net.rubygrapefruit.parse.Parser
 import net.rubygrapefruit.parse.combinators.discard
 import net.rubygrapefruit.parse.combinators.not
 import net.rubygrapefruit.parse.combinators.sequence
-import net.rubygrapefruit.parse.general.MatchedInputParser
 import net.rubygrapefruit.parse.general.MatchOneInputParser
+import net.rubygrapefruit.parse.general.MatchedInputParser
 
 /**
  * Returns a parser that matches a single byte and produces the matched byte as a result.
  */
 fun one(): Parser<BinaryInput, Byte> {
-    return MatchOneInputParser(AnyBytePredicate)
+    return MatchOneInputParser(AnyBytePredicate, Expectation.One("any byte"))
 }
 
 /**
@@ -32,14 +33,20 @@ fun <OUT> literal(bytes: ByteArray, result: OUT): Parser<BinaryInput, OUT> {
  * Returns a parser that matches one of the given bytes and produces the matched byte as a result.
  */
 fun oneOf(first: Byte, second: Byte, vararg additional: Byte): Parser<BinaryInput, Byte> {
-    return MatchOneInputParser(OneOfBytePredicate.of(listOf(first, second) + additional.toList()))
+    return oneOf(listOf(first, second) + additional.toList())
 }
 
 /**
  * Returns a parser that matches one of the given bytes and produces the matched byte as a result.
  */
 fun oneOf(bytes: Collection<Byte>): Parser<BinaryInput, Byte> {
-    return MatchOneInputParser(OneOfBytePredicate.of(bytes))
+    val effective = bytes.distinct()
+    if (effective.size < 2) {
+        throw IllegalArgumentException("2 or more bytes required.")
+    }
+
+    val expectation = Expectation.oneOf(effective.map { Expectation.One(format(it)) })
+    return MatchOneInputParser(OneOfBytePredicate(effective.toByteArray()), expectation)
 }
 
 /**
@@ -49,7 +56,7 @@ fun oneOf(bytes: Collection<Byte>): Parser<BinaryInput, Byte> {
  * @param to inclusive
  */
 fun oneInRange(from: Byte, to: Byte): Parser<BinaryInput, Byte> {
-    return MatchOneInputParser(ByteInRangePredicate(from, to))
+    return MatchOneInputParser(ByteInRangePredicate(from, to), Expectation.One("${format(from)}..${format(to)}"))
 }
 
 /**

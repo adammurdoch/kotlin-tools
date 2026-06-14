@@ -22,12 +22,12 @@ internal class DiscardParser<IN>(private val parser: Parser<IN, *>) : Parser<IN,
     }
 
     private class SingleInputParserNoResult<IN>(
-        private val singleInputParser: SingleInputParser<IN, *>,
+        private val delegate: SingleInputParser<IN, *>,
     ) : SingleInputParser<IN, Unit> {
         override val predicate: InputPredicate<IN>
-            get() = singleInputParser.predicate
+            get() = delegate.predicate
         override val expectation: Expectation
-            get() = singleInputParser.expectation
+            get() = delegate.expectation
 
         override val extractor: Extractor<Any?, Unit>
             get() = UnitExtractor

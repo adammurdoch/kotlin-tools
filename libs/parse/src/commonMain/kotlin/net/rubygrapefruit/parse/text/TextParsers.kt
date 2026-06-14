@@ -1,18 +1,19 @@
 package net.rubygrapefruit.parse.text
 
+import net.rubygrapefruit.parse.Expectation
 import net.rubygrapefruit.parse.Parser
 import net.rubygrapefruit.parse.combinators.describedAs
 import net.rubygrapefruit.parse.combinators.discard
 import net.rubygrapefruit.parse.combinators.not
 import net.rubygrapefruit.parse.combinators.sequence
-import net.rubygrapefruit.parse.general.MatchedInputParser
 import net.rubygrapefruit.parse.general.MatchOneInputParser
+import net.rubygrapefruit.parse.general.MatchedInputParser
 
 /**
  * Returns a parser that matches a single character and produces the matched character as a result.
  */
 fun one(): Parser<TextInput, Char> {
-    return MatchOneInputParser(AnyCharPredicate)
+    return MatchOneInputParser(AnyCharPredicate, Expectation.One("any character"))
 }
 
 /**
@@ -33,21 +34,26 @@ fun <OUT> literal(text: String, result: OUT): Parser<TextInput, OUT> {
  * Returns a parser that matches one of the given characters and produces the matched character as a result.
  */
 fun oneOf(first: Char, second: Char, vararg additionalChars: Char): Parser<TextInput, Char> {
-    return MatchOneInputParser(OneOfCharPredicate.of(listOf(first, second) + additionalChars.toList()))
+    return oneOf(listOf(first, second) + additionalChars.toList())
 }
 
 /**
  * Returns a parser that matches one of the given characters and produces the matched character as a result.
  */
 fun oneOf(chars: Collection<Char>): Parser<TextInput, Char> {
-    return MatchOneInputParser(OneOfCharPredicate.of(chars))
+    val effective = chars.distinct()
+    if (effective.size < 2) {
+        throw IllegalArgumentException("2 or more characters required.")
+    }
+    val expectation = Expectation.oneOf(effective.map { Expectation.One(format(it)) })
+    return MatchOneInputParser(OneOfCharPredicate(effective.toCharArray()), expectation)
 }
 
 /**
  * Returns a parser that matches a character in the given range and produces the matched character as a result.
  */
 fun oneInRange(chars: CharRange): Parser<TextInput, Char> {
-    return MatchOneInputParser(CharInRangePredicate(chars))
+    return MatchOneInputParser(CharInRangePredicate(chars), Expectation.One("${format(chars.first)}..${format(chars.last)}"))
 }
 
 /**

@@ -19,35 +19,63 @@ internal object UnitAccumulator : Accumulator<Unit, Unit> {
 }
 
 internal interface ListAccumulator<T> : Accumulator<T, List<T>> {
-    fun collectInto(list: MutableList<T>)
-
     class Empty<T> : ListAccumulator<T> {
         override fun get(): List<T> {
             return emptyList()
         }
 
-        override fun collectInto(list: MutableList<T>) {
-        }
-
         override fun add(item: ValueProvider<T>): ListAccumulator<T> {
-            return ListItem(item, this)
+            return OneItem(item)
         }
     }
 }
 
-private class ListItem<T>(val item: ValueProvider<T>, val prev: ListAccumulator<T>) : ListAccumulator<T> {
+private interface CollectingListAccumulator<T> : ListAccumulator<T> {
+    val length: Int
+
+    fun collectInto(dest: MutableList<T>): CollectingListAccumulator<T>?
+}
+
+private class OneItem<T>(val item: ValueProvider<T>) : CollectingListAccumulator<T> {
+    override val length: Int
+        get() = 1
+
     override fun get(): List<T> {
-        val list = mutableListOf<T>()
-        collectInto(list)
+        return listOf(item.get())
+    }
+
+    override fun add(item: ValueProvider<T>): Accumulator<T, List<T>> {
+        return ListItem(2, item, this)
+    }
+
+    override fun collectInto(dest: MutableList<T>): CollectingListAccumulator<T>? {
+        dest.add(item.get())
+        return null
+    }
+}
+
+private class ListItem<T>(
+    override val length: Int,
+    val item: ValueProvider<T>,
+    val prev: CollectingListAccumulator<T>
+) : CollectingListAccumulator<T> {
+    override fun get(): List<T> {
+        // Builds list by walking back along the chain iteratively, rather than recursively
+        val list = ArrayList<T>(length)
+        var current: CollectingListAccumulator<T>? = this
+        while (current != null) {
+            current = current.collectInto(list)
+        }
+        list.reverse()
         return list
     }
 
-    override fun collectInto(list: MutableList<T>) {
-        prev.collectInto(list)
-        list.add(item.get())
+    override fun collectInto(dest: MutableList<T>): CollectingListAccumulator<T> {
+        dest.add(item.get())
+        return prev
     }
 
     override fun add(item: ValueProvider<T>): ListItem<T> {
-        return ListItem(item, this)
+        return ListItem(length + 1, item, this)
     }
 }

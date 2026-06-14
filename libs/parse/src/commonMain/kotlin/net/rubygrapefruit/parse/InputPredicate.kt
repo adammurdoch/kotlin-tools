@@ -1,6 +1,6 @@
 package net.rubygrapefruit.parse
 
-internal interface SingleInputParser<in IN> {
+internal interface InputPredicate<in IN> {
     /**
      * What does this parser expect as the next input value?
      */

@@ -1,10 +1,9 @@
 package net.rubygrapefruit.parse.text
 
 import net.rubygrapefruit.parse.Expectation
-import net.rubygrapefruit.parse.Parser
-import net.rubygrapefruit.parse.SingleInputParser
+import net.rubygrapefruit.parse.InputPredicate
 
-internal object OneCharParser : Parser<TextInput, Char>, SingleInputParser<CharStream> {
+internal object OneCharPredicate : InputPredicate<CharStream> {
     override val expectation: Expectation = Expectation.One("any character")
 
     override fun toString(): String {

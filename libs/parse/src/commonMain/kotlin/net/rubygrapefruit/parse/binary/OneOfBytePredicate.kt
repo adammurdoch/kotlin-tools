@@ -1,10 +1,9 @@
 package net.rubygrapefruit.parse.binary
 
 import net.rubygrapefruit.parse.Expectation
-import net.rubygrapefruit.parse.Parser
-import net.rubygrapefruit.parse.SingleInputParser
+import net.rubygrapefruit.parse.InputPredicate
 
-internal class OneOfByteParser private constructor(private val bytes: ByteArray) : Parser<BinaryInput, Byte>, SingleInputParser<ByteStream> {
+internal class OneOfBytePredicate private constructor(private val bytes: ByteArray) : InputPredicate<ByteStream> {
     override val expectation = Expectation.oneOf(bytes.map { Expectation.One(format(it)) })
 
     override fun toString(): String {
@@ -16,12 +15,12 @@ internal class OneOfByteParser private constructor(private val bytes: ByteArray)
     }
 
     companion object {
-        fun of(bytes: Iterable<Byte>): OneOfByteParser {
+        fun of(bytes: Iterable<Byte>): OneOfBytePredicate {
             val effective = bytes.distinct()
             if (effective.size < 2) {
                 throw IllegalArgumentException("2 or more bytes required.")
             }
-            return OneOfByteParser(effective.toByteArray())
+            return OneOfBytePredicate(effective.toByteArray())
         }
     }
 }

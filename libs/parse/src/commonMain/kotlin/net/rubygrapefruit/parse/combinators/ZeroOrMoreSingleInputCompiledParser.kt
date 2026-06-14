@@ -4,7 +4,7 @@ import net.rubygrapefruit.parse.*
 import net.rubygrapefruit.parse.stream.Input
 
 internal class ZeroOrMoreSingleInputCompiledParser<IN : Input<*>, OUT>(
-    val parser: SingleInputParser<IN>,
+    val parser: InputPredicate<IN>,
     val accumulator: RangeAccumulator<IN, OUT>
 ) : CompiledParser<IN, OUT> {
     override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
@@ -12,7 +12,7 @@ internal class ZeroOrMoreSingleInputCompiledParser<IN : Input<*>, OUT>(
     }
 
     private class ZeroOrMorePullParser<IN : Input<*>, OUT>(
-        val parser: SingleInputParser<IN>,
+        val parser: InputPredicate<IN>,
         private var accumulator: RangeAccumulator<IN, OUT>,
         val next: ParseContinuation<IN, OUT>
     ) : PullParser<IN> {

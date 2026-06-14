@@ -1,10 +1,9 @@
 package net.rubygrapefruit.parse.binary
 
 import net.rubygrapefruit.parse.Expectation
-import net.rubygrapefruit.parse.Parser
-import net.rubygrapefruit.parse.SingleInputParser
+import net.rubygrapefruit.parse.InputPredicate
 
-internal class OneInByteRangeParser(private val from: Byte, private val to: Byte) : Parser<BinaryInput, Byte>, SingleInputParser<ByteStream> {
+internal class OneInByteRangePredicate(private val from: Byte, private val to: Byte) : InputPredicate<ByteStream> {
     override val expectation = Expectation.One("${format(from)}..${format(to)}")
 
     override fun toString(): String {

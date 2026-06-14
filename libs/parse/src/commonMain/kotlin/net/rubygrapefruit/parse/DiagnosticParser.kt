@@ -67,7 +67,7 @@ internal class DiagnosticParser<IN, OUT> private constructor(
             }
         }
 
-        override fun maybeAsSingleInputParser(parser: Parser<*, *>): SingleInputParser<IN>? {
+        override fun maybeAsSingleInputParser(parser: Parser<*, *>): InputPredicate<IN>? {
             return compiler.maybeAsSingleInputParser(parser)
         }
     }

@@ -763,7 +763,7 @@ abstract class AbstractParseTest {
         }
 
         sealed class IsSingleInput(val hasResult: Boolean) : Inspector {
-            abstract fun inspect(parser: SingleInputParser<*>)
+            abstract fun inspect(parser: InputPredicate<*>)
 
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<SingleInputCompiledParser<*, *>>(parser)
@@ -780,8 +780,8 @@ abstract class AbstractParseTest {
             override val expected: List<String>
                 get() = listOf("any character")
 
-            override fun inspect(parser: SingleInputParser<*>) {
-                assertIs<OneCharParser>(parser)
+            override fun inspect(parser: InputPredicate<*>) {
+                assertIs<OneCharPredicate>(parser)
             }
         }
 
@@ -789,8 +789,8 @@ abstract class AbstractParseTest {
             override val expected: List<String>
                 get() = listOf("any byte")
 
-            override fun inspect(parser: SingleInputParser<*>) {
-                assertIs<OneByteParser>(parser)
+            override fun inspect(parser: InputPredicate<*>) {
+                assertIs<OneBytePredicate>(parser)
             }
         }
 
@@ -804,8 +804,8 @@ abstract class AbstractParseTest {
                     return expected.expect
                 }
 
-            override fun inspect(parser: SingleInputParser<*>) {
-                assertIs<OneOfCharParser>(parser)
+            override fun inspect(parser: InputPredicate<*>) {
+                assertIs<OneOfCharPredicate>(parser)
             }
         }
 
@@ -817,8 +817,8 @@ abstract class AbstractParseTest {
                     return expected.expect
                 }
 
-            override fun inspect(parser: SingleInputParser<*>) {
-                assertIs<OneInCharRangeParser>(parser)
+            override fun inspect(parser: InputPredicate<*>) {
+                assertIs<OneInCharRangePredicate>(parser)
             }
         }
 
@@ -832,8 +832,8 @@ abstract class AbstractParseTest {
                     return expected.expect
                 }
 
-            override fun inspect(parser: SingleInputParser<*>) {
-                assertIs<OneOfByteParser>(parser)
+            override fun inspect(parser: InputPredicate<*>) {
+                assertIs<OneOfBytePredicate>(parser)
             }
         }
 
@@ -845,8 +845,8 @@ abstract class AbstractParseTest {
                     return expected.expect
                 }
 
-            override fun inspect(parser: SingleInputParser<*>) {
-                assertIs<OneInByteRangeParser>(parser)
+            override fun inspect(parser: InputPredicate<*>) {
+                assertIs<OneInByteRangePredicate>(parser)
             }
         }
 

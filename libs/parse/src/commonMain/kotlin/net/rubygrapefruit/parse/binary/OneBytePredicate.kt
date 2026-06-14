@@ -1,10 +1,9 @@
 package net.rubygrapefruit.parse.binary
 
 import net.rubygrapefruit.parse.Expectation
-import net.rubygrapefruit.parse.Parser
-import net.rubygrapefruit.parse.SingleInputParser
+import net.rubygrapefruit.parse.InputPredicate
 
-internal object OneByteParser : Parser<BinaryInput, Byte>, SingleInputParser<ByteStream> {
+internal object OneBytePredicate : InputPredicate<ByteStream> {
     override val expectation: Expectation = Expectation.One("any byte")
 
     override fun toString(): String {

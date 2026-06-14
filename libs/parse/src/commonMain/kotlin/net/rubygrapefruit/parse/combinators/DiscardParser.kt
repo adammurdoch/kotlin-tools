@@ -8,7 +8,7 @@ internal class DiscardParser<IN>(private val parser: Parser<IN, *>) : Parser<IN,
         return this
     }
 
-    override fun <IN> maybeAsSingleInputParser(compiler: CombinatorSingleInputBuilder.Compiler<IN>): SingleInputParser<IN>? {
+    override fun <IN> maybeAsSingleInputParser(compiler: CombinatorSingleInputBuilder.Compiler<IN>): InputPredicate<IN>? {
         return compiler.maybeAsSingleInputParser(parser)
     }
 

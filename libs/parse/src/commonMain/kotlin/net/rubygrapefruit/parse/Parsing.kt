@@ -3,6 +3,7 @@ package net.rubygrapefruit.parse
 import net.rubygrapefruit.parse.combinators.NextValueExtractor
 import net.rubygrapefruit.parse.combinators.UnitExtractor
 import net.rubygrapefruit.parse.general.SingleInputCompiledParser
+import net.rubygrapefruit.parse.general.SingleInputParser
 import net.rubygrapefruit.parse.stream.ContextualInput
 import net.rubygrapefruit.parse.stream.Input
 
@@ -29,11 +30,15 @@ private class DefaultCompiler<IN : Input<*>> : CombinatorBuilder.Compiler<IN>, C
     private val compiledParsers = mutableMapOf<Parser<*, *>, CompiledParser<IN, *>>()
     private val compiledNoResultParsers = mutableMapOf<Parser<*, *>, CompiledParser<IN, *>>()
 
-    override fun maybeAsSingleInputParser(parser: Parser<*, *>): SingleInputParser<IN>? {
+    override fun maybeAsSingleInputParser(parser: Parser<*, *>): InputPredicate<IN>? {
         return when (parser) {
-            is SingleInputParser<*> -> {
+            is SingleInputParser<*, *, *, *> -> {
                 @Suppress("UNCHECKED_CAST")
-                parser as SingleInputParser<IN>
+                parser.predicate as InputPredicate<IN>
+            }
+            is InputPredicate<*> -> {
+                @Suppress("UNCHECKED_CAST")
+                parser as InputPredicate<IN>
             }
 
             is CombinatorSingleInputBuilder -> {
@@ -55,9 +60,9 @@ private class DefaultCompiler<IN : Input<*>> : CombinatorBuilder.Compiler<IN>, C
 
     private fun doCompileNoResult(parser: Parser<*, *>): CompiledParser<IN, Unit> {
         return when (parser) {
-            is SingleInputParser<*> -> {
+            is InputPredicate<*> -> {
                 @Suppress("UNCHECKED_CAST")
-                SingleInputCompiledParser(parser as SingleInputParser<IN>, UnitExtractor)
+                SingleInputCompiledParser(parser as InputPredicate<IN>, UnitExtractor)
             }
 
             is DiscardableParser<*> -> {
@@ -87,9 +92,9 @@ private class DefaultCompiler<IN : Input<*>> : CombinatorBuilder.Compiler<IN>, C
                 ParserBuilderAdaptor(parser as ParserBuilder<IN, OUT>)
             }
 
-            is SingleInputParser<*> -> {
+            is InputPredicate<*> -> {
                 @Suppress("UNCHECKED_CAST")
-                SingleInputCompiledParser(parser as SingleInputParser<IN>, NextValueExtractor.of<_, OUT>()) as CompiledParser<IN, OUT>
+                SingleInputCompiledParser(parser as InputPredicate<IN>, NextValueExtractor.of<_, OUT>()) as CompiledParser<IN, OUT>
             }
 
             is CombinatorBuilder<*> -> {

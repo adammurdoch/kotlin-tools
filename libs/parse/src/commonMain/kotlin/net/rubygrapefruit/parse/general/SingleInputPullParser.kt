@@ -5,7 +5,7 @@ import net.rubygrapefruit.parse.combinators.Extractor
 import net.rubygrapefruit.parse.stream.Input
 
 internal class SingleInputCompiledParser<IN : Input<*>, OUT>(
-    val parser: SingleInputParser<IN>,
+    val parser: InputPredicate<IN>,
     val extractor: Extractor<IN, OUT>
 ) : CompiledParser<IN, OUT> {
     override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
@@ -13,7 +13,7 @@ internal class SingleInputCompiledParser<IN : Input<*>, OUT>(
     }
 
     private class SingleInputPullParser<IN : Input<*>, OUT>(
-        private val parser: SingleInputParser<IN>,
+        private val parser: InputPredicate<IN>,
         private val extractor: Extractor<IN, OUT>,
         private val next: ParseContinuation<IN, OUT>
     ) : PullParser<IN> {

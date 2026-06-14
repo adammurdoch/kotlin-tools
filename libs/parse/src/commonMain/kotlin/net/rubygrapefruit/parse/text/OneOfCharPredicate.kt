@@ -1,10 +1,9 @@
 package net.rubygrapefruit.parse.text
 
 import net.rubygrapefruit.parse.Expectation
-import net.rubygrapefruit.parse.Parser
-import net.rubygrapefruit.parse.SingleInputParser
+import net.rubygrapefruit.parse.InputPredicate
 
-internal class OneOfCharParser private constructor(private val chars: CharArray) : Parser<TextInput, Char>, SingleInputParser<CharStream> {
+internal class OneOfCharPredicate private constructor(private val chars: CharArray) : InputPredicate<CharStream> {
     override val expectation = Expectation.oneOf(chars.map { Expectation.One(format(it)) })
 
     override fun toString(): String {
@@ -16,12 +15,12 @@ internal class OneOfCharParser private constructor(private val chars: CharArray)
     }
 
     companion object {
-        fun of(chars: Iterable<Char>): OneOfCharParser {
+        fun of(chars: Iterable<Char>): OneOfCharPredicate {
             val effective = chars.distinct()
             if (effective.size < 2) {
                 throw IllegalArgumentException("2 or more characters required.")
             }
-            return OneOfCharParser(effective.toCharArray())
+            return OneOfCharPredicate(effective.toCharArray())
         }
     }
 }

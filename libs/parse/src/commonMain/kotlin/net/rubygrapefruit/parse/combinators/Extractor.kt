@@ -6,17 +6,17 @@ import net.rubygrapefruit.parse.stream.BoxingInput
  * Extracts a value from the next input value.
  */
 internal interface Extractor<in IN, out OUT> {
-    fun extract(input: IN): OUT
+    fun extract(input: IN, index: Int): OUT
 }
 
 internal object UnitExtractor : Extractor<Any, Unit> {
-    override fun extract(input: Any) {
+    override fun extract(input: Any, index: Int) {
     }
 }
 
 internal class NextValueExtractor<IN : BoxingInput<*, OUT>, OUT> : Extractor<IN, OUT> {
-    override fun extract(input: IN): OUT {
-        return input.getBoxed(0)
+    override fun extract(input: IN, index: Int): OUT {
+        return input.getBoxed(index)
     }
 
     companion object {

@@ -4,6 +4,8 @@ import net.rubygrapefruit.parse.ValueProvider
 
 /**
  * Accumulates a sequence of values into a final value.
+ *
+ * Implementations are immutable.
  */
 internal interface Accumulator<ITEM, OUT> : ValueProvider<OUT> {
     fun add(item: ValueProvider<ITEM>): Accumulator<ITEM, OUT>

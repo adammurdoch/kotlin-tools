@@ -15,7 +15,7 @@ internal class ZeroOrMoreParser<IN, OUT>(
         if (separator == null) {
             val singleValueItem = compiler.maybeAsSingleInputParser(item)
             if (singleValueItem != null) {
-                return ZeroOrMoreSingleInputCompiledParser(singleValueItem, ListRangeAccumulator.Empty())
+                return ZeroOrMoreSingleInputCompiledParser(singleValueItem, ListRangeAccumulator.Empty(NextValueExtractor.of()))
             }
         }
 

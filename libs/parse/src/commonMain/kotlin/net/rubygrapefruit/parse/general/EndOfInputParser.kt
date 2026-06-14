@@ -40,7 +40,7 @@ internal class EndOfInputParser<OUT>(val result: OUT) : Parser<Any, OUT>, Combin
         }
 
         private fun stop(): PullParser.Failed {
-            return PullParser.Failed(0, expectation)
+            return next.failed(0, 0, expectation)
         }
     }
 }

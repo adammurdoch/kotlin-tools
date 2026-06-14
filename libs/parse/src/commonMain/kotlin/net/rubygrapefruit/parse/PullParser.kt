@@ -30,7 +30,7 @@ internal interface PullParser<in IN> : ParseState<IN> {
         fun parser(): PullParser<IN>
     }
 
-    sealed interface Continuing<in IN>: Result<IN>
+    sealed interface Continuing<in IN> : Result<IN>
 
     /**
      * @param index Relative to the start of input to [parse]. Can be positive or negative. Must be < max passed to [parse].
@@ -50,11 +50,6 @@ internal interface PullParser<in IN> : ParseState<IN> {
      */
     data class Failed(val failures: List<Failure>) : Result<Any?>, ParseState<Any?> {
         private val parser = FinishedPullParser(this)
-
-        /**
-         * @param index Relative to the start of input to [parse]. Can be positive or negative. Must be < max passed to [parse].
-         */
-        constructor(index: Int, expected: ExpectationProvider) : this(listOf(Failure(index, expected)))
 
         override fun parser(): PullParser<Any?> {
             return parser

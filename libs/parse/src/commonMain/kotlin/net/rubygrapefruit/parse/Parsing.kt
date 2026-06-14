@@ -1,9 +1,5 @@
 package net.rubygrapefruit.parse
 
-import net.rubygrapefruit.parse.combinators.NextValueExtractor
-import net.rubygrapefruit.parse.combinators.UnitExtractor
-import net.rubygrapefruit.parse.general.SingleInputCompiledParser
-import net.rubygrapefruit.parse.general.SingleInputParser
 import net.rubygrapefruit.parse.stream.ContextualInput
 import net.rubygrapefruit.parse.stream.Input
 
@@ -32,24 +28,18 @@ private class DefaultCompiler<IN : Input<*>> : CombinatorBuilder.Compiler<IN>, C
 
     override fun maybeAsSingleInputParser(parser: Parser<*, *>): InputPredicate<IN>? {
         return when (parser) {
-            is SingleInputParser<*, *, *, *> -> {
-                @Suppress("UNCHECKED_CAST")
-                parser.predicate as InputPredicate<IN>
-            }
-            is InputPredicate<*> -> {
-                @Suppress("UNCHECKED_CAST")
-                parser as InputPredicate<IN>
-            }
-
             is CombinatorSingleInputBuilder -> {
                 @Suppress("UNCHECKED_CAST")
                 (parser as CombinatorSingleInputBuilder).maybeAsSingleInputParser(this)
             }
 
-            else -> {
-                null
-            }
+            else -> null
         }
+    }
+
+    override fun compile(predicate: InputPredicate<*>): InputPredicate<IN> {
+        @Suppress("UNCHECKED_CAST")
+        return predicate as InputPredicate<IN>
     }
 
     override fun compileWithNoResult(parser: Parser<*, *>): CompiledParser<IN, Unit> {
@@ -60,11 +50,6 @@ private class DefaultCompiler<IN : Input<*>> : CombinatorBuilder.Compiler<IN>, C
 
     private fun doCompileNoResult(parser: Parser<*, *>): CompiledParser<IN, Unit> {
         return when (parser) {
-            is InputPredicate<*> -> {
-                @Suppress("UNCHECKED_CAST")
-                SingleInputCompiledParser(parser as InputPredicate<IN>, UnitExtractor)
-            }
-
             is DiscardableParser<*> -> {
                 @Suppress("UNCHECKED_CAST")
                 doCompile((parser as DiscardableParser<IN>).withNoResult())
@@ -90,11 +75,6 @@ private class DefaultCompiler<IN : Input<*>> : CombinatorBuilder.Compiler<IN>, C
             is ParserBuilder<*, *> -> {
                 @Suppress("UNCHECKED_CAST")
                 ParserBuilderAdaptor(parser as ParserBuilder<IN, OUT>)
-            }
-
-            is InputPredicate<*> -> {
-                @Suppress("UNCHECKED_CAST")
-                SingleInputCompiledParser(parser as InputPredicate<IN>, NextValueExtractor.of<_, OUT>()) as CompiledParser<IN, OUT>
             }
 
             is CombinatorBuilder<*> -> {

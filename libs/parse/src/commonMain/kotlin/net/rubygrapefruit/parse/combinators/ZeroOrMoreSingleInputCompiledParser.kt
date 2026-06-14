@@ -5,14 +5,16 @@ import net.rubygrapefruit.parse.stream.Input
 
 internal class ZeroOrMoreSingleInputCompiledParser<IN : Input<*>, OUT>(
     val parser: InputPredicate<IN>,
+    val expectation: Expectation,
     val accumulator: RangeAccumulator<IN, OUT>
 ) : CompiledParser<IN, OUT> {
     override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
-        return ZeroOrMorePullParser(parser, accumulator, next)
+        return ZeroOrMorePullParser(parser, expectation, accumulator, next)
     }
 
     private class ZeroOrMorePullParser<IN : Input<*>, OUT>(
         val parser: InputPredicate<IN>,
+        val expectation: Expectation,
         private var accumulator: RangeAccumulator<IN, OUT>,
         val next: ParseContinuation<IN, OUT>
     ) : PullParser<IN> {
@@ -24,7 +26,7 @@ internal class ZeroOrMoreSingleInputCompiledParser<IN : Input<*>, OUT>(
 
         override fun stop(input: IN): PullParser.Failed {
             return PullParser.Failed(
-                next.failed(0, matched, parser.expectation).failures +
+                next.failed(0, matched, expectation).failures +
                         next.matched(input, -matched, 0, accumulator).stop(input).failures
             )
         }
@@ -42,7 +44,7 @@ internal class ZeroOrMoreSingleInputCompiledParser<IN : Input<*>, OUT>(
                 accumulator = accumulator.extract(input, 0, index)
             }
             return if (index < max || index == input.available && input.finished) {
-                next.matched(input, index, matched, accumulator, parser.expectation)
+                next.matched(input, index, matched, accumulator, expectation)
             } else {
                 PullParser.RequireMore(index, this)
             }

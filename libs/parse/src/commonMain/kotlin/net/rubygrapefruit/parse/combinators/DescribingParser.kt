@@ -6,9 +6,26 @@ import net.rubygrapefruit.parse.stream.Input
 internal class DescribingParser<IN, OUT>(
     private val parser: Parser<IN, OUT>,
     private val description: String
-) : Parser<IN, OUT>, CombinatorBuilder<OUT>, DiscardableParser<IN> {
+) : Parser<IN, OUT>, CombinatorBuilder<OUT>, DiscardableParser<IN>, CombinatorSingleInputBuilder<OUT> {
     override fun withNoResult(): Parser<IN, Unit> {
         return DescribingParser(DiscardParser(parser), description)
+    }
+
+    override fun <IN> maybeAsSingleInputParser(compiler: CombinatorSingleInputBuilder.Compiler<IN>): SingleInputParser<IN, OUT>? {
+        val singleInputParser = compiler.maybeAsSingleInputParser(parser)
+        return if (singleInputParser != null) {
+            object : SingleInputParser<IN, OUT> {
+                override val predicate: InputPredicate<IN>
+                    get() = singleInputParser.predicate
+
+                override val expectation: Expectation = Expectation.One(description)
+
+                override val extractor: Extractor<IN, OUT>
+                    get() = singleInputParser.extractor
+            }
+        } else {
+            null
+        }
     }
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, OUT> {

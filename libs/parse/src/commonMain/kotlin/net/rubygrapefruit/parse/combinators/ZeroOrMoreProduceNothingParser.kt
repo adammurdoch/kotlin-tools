@@ -16,9 +16,9 @@ internal class ZeroOrMoreProduceNothingParser<IN>(
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, Unit> {
         if (separator == null) {
-            val singleValueItem = compiler.maybeAsSingleInputParser(item)
-            if (singleValueItem != null) {
-                return ZeroOrMoreSingleInputCompiledParser(singleValueItem.predicate, UnitRangeAccumulator)
+            val singleValueParser = compiler.maybeAsSingleInputParser(item)
+            if (singleValueParser != null) {
+                return ZeroOrMoreSingleInputCompiledParser(singleValueParser.predicate, singleValueParser.expectation, UnitRangeAccumulator)
             }
         }
         return ZeroOrMoreParser.of(item, separator, compiler, UnitAccumulator)

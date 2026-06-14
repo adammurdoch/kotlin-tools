@@ -13,9 +13,9 @@ internal class ZeroOrMoreParser<IN, OUT>(
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, List<OUT>> {
         if (separator == null) {
-            val singleValueItem = compiler.maybeAsSingleInputParser(item)
-            if (singleValueItem != null) {
-                return ZeroOrMoreSingleInputCompiledParser(singleValueItem.predicate, ListRangeAccumulator.Empty(singleValueItem.extractor))
+            val singleValueParser = compiler.maybeAsSingleInputParser(item)
+            if (singleValueParser != null) {
+                return ZeroOrMoreSingleInputCompiledParser(singleValueParser.predicate, singleValueParser.expectation, ListRangeAccumulator.Empty(singleValueParser.extractor))
             }
         }
 

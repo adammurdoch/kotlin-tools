@@ -3,8 +3,8 @@ package net.rubygrapefruit.parse
 import net.rubygrapefruit.parse.binary.*
 import net.rubygrapefruit.parse.combinators.*
 import net.rubygrapefruit.parse.general.EndOfInputParser
-import net.rubygrapefruit.parse.general.MatchedInputParser
 import net.rubygrapefruit.parse.general.MatchOneInputParser
+import net.rubygrapefruit.parse.general.MatchedInputParser
 import net.rubygrapefruit.parse.general.SucceedParser
 import net.rubygrapefruit.parse.stream.Input
 import net.rubygrapefruit.parse.text.*
@@ -422,7 +422,7 @@ abstract class AbstractParseTest {
 
         fun expectZeroOrMore(hasResult: Boolean = true, config: CompiledParserFixture.() -> Unit)
 
-        fun expectZeroOrMoreSingleInput(hasResult: Boolean = true, config: CompiledParserFixture.() -> Unit)
+        fun expectZeroOrMoreSingleInput(hasResult: Boolean = true, expect: String? = null, config: CompiledParserFixture.() -> Unit)
 
         fun expectOneOrMore(hasResult: Boolean = true, config: CompiledParserFixture.() -> Unit)
 
@@ -665,9 +665,9 @@ abstract class AbstractParseTest {
             }
         }
 
-        data class IsZeroOrMoreSingleInput(val inspector: IsSingleInput, val hasResult: Boolean) : Inspector {
+        data class IsZeroOrMoreSingleInput(val inspector: IsSingleInput, val hasResult: Boolean, val expect: String?) : Inspector {
             override val expected: List<String>
-                get() = inspector.expected
+                get() = if (expect != null) listOf(expect) else inspector.expected
 
             override val mayBeEmpty: Boolean
                 get() = true
@@ -970,10 +970,10 @@ abstract class AbstractParseTest {
             inspectors.add(Inspector.IsZeroOrMore(choices.first(), choices.getOrNull(1), hasResult))
         }
 
-        override fun expectZeroOrMoreSingleInput(hasResult: Boolean, config: CompiledParserFixture.() -> Unit) {
+        override fun expectZeroOrMoreSingleInput(hasResult: Boolean, expect: String?, config: CompiledParserFixture.() -> Unit) {
             val fixture = DefaultCompiledParserFixture()
             fixture.config()
-            inspectors.add(Inspector.IsZeroOrMoreSingleInput(fixture.inspector() as Inspector.IsSingleInput, hasResult))
+            inspectors.add(Inspector.IsZeroOrMoreSingleInput(fixture.inspector() as Inspector.IsSingleInput, hasResult, expect))
         }
 
         override fun expectOneOrMore(hasResult: Boolean, config: CompiledParserFixture.() -> Unit) {

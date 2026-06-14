@@ -11,6 +11,10 @@ internal class MatchOneInputParser<IN, ITEM, OUT, STREAM : BoxingInput<*, ITEM>>
     override val predicate: InputPredicate<STREAM>,
     override val extractor: Extractor<STREAM, OUT> = NextValueExtractor.of()
 ) : Parser<IN, OUT>, TypedInputCombinatorBuilder<STREAM, OUT>, DiscardableParser<IN>, SingleInputParser<STREAM, OUT> {
+
+    override val expectation: Expectation
+        get() = predicate.expectation
+
     override fun withNoResult(): Parser<IN, Unit> {
         return MatchOneInputParser(predicate, UnitExtractor)
     }

@@ -18,7 +18,7 @@ internal class ZeroOrMoreProduceNothingParser<IN>(
         if (separator == null) {
             val singleValueItem = compiler.maybeAsSingleInputParser(item)
             if (singleValueItem != null) {
-                return ZeroOrMoreSingleInputCompiledParser(singleValueItem, UnitRangeAccumulator)
+                return ZeroOrMoreSingleInputCompiledParser(singleValueItem.predicate, UnitRangeAccumulator)
             }
         }
         return ZeroOrMoreParser.of(item, separator, compiler, UnitAccumulator)

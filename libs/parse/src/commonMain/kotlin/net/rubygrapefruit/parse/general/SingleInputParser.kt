@@ -8,19 +8,15 @@ import net.rubygrapefruit.parse.stream.BoxingInput
 import net.rubygrapefruit.parse.stream.Input
 
 internal class SingleInputParser<IN, ITEM, OUT, STREAM : BoxingInput<*, ITEM>>(
-    private val predicate: InputPredicate<STREAM>,
-    private val extractor: Extractor<STREAM, OUT> = NextValueExtractor.of()
-) : Parser<IN, OUT>, TypedInputCombinatorBuilder<STREAM, OUT>, DiscardableParser<IN>, CombinatorSingleInputBuilder {
+    override val predicate: InputPredicate<STREAM>,
+    override val extractor: Extractor<STREAM, OUT> = NextValueExtractor.of()
+) : Parser<IN, OUT>, TypedInputCombinatorBuilder<STREAM, OUT>, DiscardableParser<IN>, LookaheadOneParser<STREAM, OUT> {
     override fun withNoResult(): Parser<IN, Unit> {
         return SingleInputParser(predicate, UnitExtractor)
     }
 
     override fun compile(compiler: CombinatorBuilder.Compiler<STREAM>): CompiledParser<STREAM, OUT> {
         return SingleInputCompiledParser(predicate, extractor)
-    }
-
-    override fun <IN> maybeAsSingleInputParser(compiler: CombinatorSingleInputBuilder.Compiler<IN>): InputPredicate<IN> {
-        return compiler.compile(predicate)
     }
 
     internal class SingleInputCompiledParser<IN : Input<*>, OUT>(

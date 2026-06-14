@@ -1,7 +1,6 @@
 package net.rubygrapefruit.parse.combinators
 
 import net.rubygrapefruit.parse.ValueProvider
-import net.rubygrapefruit.parse.stream.BoxingInput
 
 /**
  * Implementations are immutable.
@@ -10,7 +9,7 @@ internal interface RangeAccumulator<in IN, out OUT> : ValueProvider<OUT> {
     fun extract(input: IN, start: Int, end: Int): RangeAccumulator<IN, OUT>
 }
 
-internal abstract class ListRangeAccumulator<IN : BoxingInput<*, T>, T> : RangeAccumulator<IN, List<T>> {
+internal abstract class ListRangeAccumulator<IN, T> : RangeAccumulator<IN, List<T>> {
     protected abstract val extractor: Extractor<IN, T>
 
     override fun extract(input: IN, start: Int, end: Int): RangeAccumulator<IN, List<T>> {
@@ -23,7 +22,7 @@ internal abstract class ListRangeAccumulator<IN : BoxingInput<*, T>, T> : RangeA
 
     protected abstract fun collectInto(list: MutableList<T>)
 
-    class Empty<IN : BoxingInput<*, T>, T>(override val extractor: Extractor<IN, T>) : ListRangeAccumulator<IN, T>() {
+    class Empty<IN, T>(override val extractor: Extractor<IN, T>) : ListRangeAccumulator<IN, T>() {
         override fun get(): List<T> {
             return emptyList()
         }
@@ -32,7 +31,7 @@ internal abstract class ListRangeAccumulator<IN : BoxingInput<*, T>, T> : RangeA
         }
     }
 
-    private class Matched<IN : BoxingInput<*, T>, T>(
+    private class Matched<IN, T>(
         private val items: List<T>,
         override val extractor: Extractor<IN, T>,
         private val prev: ListRangeAccumulator<IN, T>

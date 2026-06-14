@@ -9,8 +9,8 @@ internal interface Extractor<in IN, out OUT> {
     fun extract(input: IN, index: Int): OUT
 }
 
-internal object UnitExtractor : Extractor<Any, Unit> {
-    override fun extract(input: Any, index: Int) {
+internal object UnitExtractor : Extractor<Any?, Unit> {
+    override fun extract(input: Any?, index: Int) {
     }
 }
 

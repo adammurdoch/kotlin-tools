@@ -1,13 +1,13 @@
 package net.rubygrapefruit.parse
 
 /**
- * A parser that may be converted to an [InputPredicate].
+ * A parser that may be converted to a [LookaheadOneParser].
  */
-internal interface CombinatorSingleInputBuilder {
-    fun <IN> maybeAsSingleInputParser(compiler: Compiler<IN>): InputPredicate<IN>?
+internal interface CombinatorSingleInputBuilder<OUT> {
+    fun <IN> maybeAsSingleInputParser(compiler: Compiler<IN>): LookaheadOneParser<IN, OUT>?
 
     interface Compiler<IN> {
-        fun maybeAsSingleInputParser(parser: Parser<*, *>): InputPredicate<IN>?
+        fun <OUT> maybeAsSingleInputParser(parser: Parser<*, OUT>): LookaheadOneParser<IN, OUT>?
 
         fun compile(predicate: InputPredicate<*>): InputPredicate<IN>
     }

@@ -1,21 +1,21 @@
 package net.rubygrapefruit.parse.combinators
 
 import net.rubygrapefruit.parse.*
-import net.rubygrapefruit.parse.stream.BoxingInput
+import net.rubygrapefruit.parse.stream.Input
 
 internal class ZeroOrMoreParser<IN, OUT>(
     private val item: Parser<IN, OUT>,
     private val separator: Parser<IN, Unit>?
-) : Parser<IN, List<OUT>>, TypedInputCombinatorBuilder<BoxingInput<*, OUT>, List<OUT>>, DiscardableParser<IN> {
+) : Parser<IN, List<OUT>>, CombinatorBuilder<List<OUT>>, DiscardableParser<IN> {
     override fun withNoResult(): Parser<IN, Unit> {
         return ZeroOrMoreProduceNothingParser(DiscardParser(item), separator)
     }
 
-    override fun compile(compiler: CombinatorBuilder.Compiler<BoxingInput<*, OUT>>): CompiledParser<BoxingInput<*, OUT>, List<OUT>> {
+    override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, List<OUT>> {
         if (separator == null) {
             val singleValueItem = compiler.maybeAsSingleInputParser(item)
             if (singleValueItem != null) {
-                return ZeroOrMoreSingleInputCompiledParser(singleValueItem, ListRangeAccumulator.Empty(NextValueExtractor.of()))
+                return ZeroOrMoreSingleInputCompiledParser(singleValueItem.predicate, ListRangeAccumulator.Empty(singleValueItem.extractor))
             }
         }
 

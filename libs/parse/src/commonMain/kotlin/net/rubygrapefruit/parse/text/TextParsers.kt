@@ -12,7 +12,7 @@ import net.rubygrapefruit.parse.general.SingleInputParser
  * Returns a parser that matches a single character and produces the matched character as a result.
  */
 fun one(): Parser<TextInput, Char> {
-    return SingleInputParser(OneCharPredicate)
+    return SingleInputParser(AnyCharPredicate)
 }
 
 /**
@@ -47,7 +47,7 @@ fun oneOf(chars: Collection<Char>): Parser<TextInput, Char> {
  * Returns a parser that matches a character in the given range and produces the matched character as a result.
  */
 fun oneInRange(chars: CharRange): Parser<TextInput, Char> {
-    return SingleInputParser(OneInCharRangePredicate(chars))
+    return SingleInputParser(CharInRangePredicate(chars))
 }
 
 /**

@@ -11,7 +11,7 @@ import net.rubygrapefruit.parse.general.SingleInputParser
  * Returns a parser that matches a single byte and produces the matched byte as a result.
  */
 fun one(): Parser<BinaryInput, Byte> {
-    return SingleInputParser(OneBytePredicate)
+    return SingleInputParser(AnyBytePredicate)
 }
 
 /**
@@ -49,7 +49,7 @@ fun oneOf(bytes: Collection<Byte>): Parser<BinaryInput, Byte> {
  * @param to inclusive
  */
 fun oneInRange(from: Byte, to: Byte): Parser<BinaryInput, Byte> {
-    return SingleInputParser(OneInByteRangePredicate(from, to))
+    return SingleInputParser(ByteInRangePredicate(from, to))
 }
 
 /**

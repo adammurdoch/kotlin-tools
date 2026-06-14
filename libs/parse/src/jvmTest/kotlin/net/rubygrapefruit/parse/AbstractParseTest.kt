@@ -781,7 +781,7 @@ abstract class AbstractParseTest {
                 get() = listOf("any character")
 
             override fun inspect(parser: InputPredicate<*>) {
-                assertIs<OneCharPredicate>(parser)
+                assertIs<AnyCharPredicate>(parser)
             }
         }
 
@@ -790,7 +790,7 @@ abstract class AbstractParseTest {
                 get() = listOf("any byte")
 
             override fun inspect(parser: InputPredicate<*>) {
-                assertIs<OneBytePredicate>(parser)
+                assertIs<AnyBytePredicate>(parser)
             }
         }
 
@@ -818,7 +818,7 @@ abstract class AbstractParseTest {
                 }
 
             override fun inspect(parser: InputPredicate<*>) {
-                assertIs<OneInCharRangePredicate>(parser)
+                assertIs<CharInRangePredicate>(parser)
             }
         }
 
@@ -846,7 +846,7 @@ abstract class AbstractParseTest {
                 }
 
             override fun inspect(parser: InputPredicate<*>) {
-                assertIs<OneInByteRangePredicate>(parser)
+                assertIs<ByteInRangePredicate>(parser)
             }
         }
 

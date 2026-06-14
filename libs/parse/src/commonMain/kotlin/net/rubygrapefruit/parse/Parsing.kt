@@ -26,11 +26,11 @@ private class DefaultCompiler<IN : Input<*>> : CombinatorBuilder.Compiler<IN>, C
     private val compiledParsers = mutableMapOf<Parser<*, *>, CompiledParser<IN, *>>()
     private val compiledNoResultParsers = mutableMapOf<Parser<*, *>, CompiledParser<IN, *>>()
 
-    override fun <OUT> maybeAsSingleInputParser(parser: Parser<*, OUT>): LookaheadOneParser<IN, OUT>? {
+    override fun <OUT> maybeAsSingleInputParser(parser: Parser<*, OUT>): SingleInputParser<IN, OUT>? {
         return when (parser) {
-            is LookaheadOneParser<*, *> -> {
+            is SingleInputParser<*, *> -> {
                 @Suppress("UNCHECKED_CAST")
-                parser as LookaheadOneParser<IN, OUT>
+                parser as SingleInputParser<IN, OUT>
             }
 
             is CombinatorSingleInputBuilder<*> -> {

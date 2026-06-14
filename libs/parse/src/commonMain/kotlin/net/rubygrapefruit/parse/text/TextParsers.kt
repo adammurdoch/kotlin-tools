@@ -6,13 +6,13 @@ import net.rubygrapefruit.parse.combinators.discard
 import net.rubygrapefruit.parse.combinators.not
 import net.rubygrapefruit.parse.combinators.sequence
 import net.rubygrapefruit.parse.general.MatchedInputParser
-import net.rubygrapefruit.parse.general.SingleInputParser
+import net.rubygrapefruit.parse.general.MatchOneInputParser
 
 /**
  * Returns a parser that matches a single character and produces the matched character as a result.
  */
 fun one(): Parser<TextInput, Char> {
-    return SingleInputParser(AnyCharPredicate)
+    return MatchOneInputParser(AnyCharPredicate)
 }
 
 /**
@@ -33,21 +33,21 @@ fun <OUT> literal(text: String, result: OUT): Parser<TextInput, OUT> {
  * Returns a parser that matches one of the given characters and produces the matched character as a result.
  */
 fun oneOf(first: Char, second: Char, vararg additionalChars: Char): Parser<TextInput, Char> {
-    return SingleInputParser(OneOfCharPredicate.of(listOf(first, second) + additionalChars.toList()))
+    return MatchOneInputParser(OneOfCharPredicate.of(listOf(first, second) + additionalChars.toList()))
 }
 
 /**
  * Returns a parser that matches one of the given characters and produces the matched character as a result.
  */
 fun oneOf(chars: Collection<Char>): Parser<TextInput, Char> {
-    return SingleInputParser(OneOfCharPredicate.of(chars))
+    return MatchOneInputParser(OneOfCharPredicate.of(chars))
 }
 
 /**
  * Returns a parser that matches a character in the given range and produces the matched character as a result.
  */
 fun oneInRange(chars: CharRange): Parser<TextInput, Char> {
-    return SingleInputParser(CharInRangePredicate(chars))
+    return MatchOneInputParser(CharInRangePredicate(chars))
 }
 
 /**

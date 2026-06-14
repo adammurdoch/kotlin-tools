@@ -8,15 +8,10 @@ internal class DiscardParser<IN>(private val parser: Parser<IN, *>) : Parser<IN,
         return this
     }
 
-    override fun <IN> maybeAsSingleInputParser(compiler: CombinatorSingleInputBuilder.Compiler<IN>): LookaheadOneParser<IN, Unit>? {
+    override fun <IN> maybeAsSingleInputParser(compiler: CombinatorSingleInputBuilder.Compiler<IN>): SingleInputParser<IN, Unit>? {
         val singleInputParser = compiler.maybeAsSingleInputParser(parser)
         return if (singleInputParser != null) {
-            object : LookaheadOneParser<IN, Unit> {
-                override val predicate: InputPredicate<IN>
-                    get() = singleInputParser.predicate
-                override val extractor: Extractor<Any?, Unit>
-                    get() = UnitExtractor
-            }
+            SingleInputParserNoResult(singleInputParser.predicate)
         } else {
             null
         }
@@ -24,6 +19,13 @@ internal class DiscardParser<IN>(private val parser: Parser<IN, *>) : Parser<IN,
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, Unit> {
         return compiler.compileWithNoResult(parser)
+    }
+
+    private class SingleInputParserNoResult<IN>(
+        override val predicate: InputPredicate<IN>,
+    ) : SingleInputParser<IN, Unit> {
+        override val extractor: Extractor<Any?, Unit>
+            get() = UnitExtractor
     }
 }
 

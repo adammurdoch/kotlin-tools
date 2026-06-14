@@ -4,7 +4,7 @@ import net.rubygrapefruit.parse.binary.*
 import net.rubygrapefruit.parse.combinators.*
 import net.rubygrapefruit.parse.general.EndOfInputParser
 import net.rubygrapefruit.parse.general.MatchedInputParser
-import net.rubygrapefruit.parse.general.SingleInputParser
+import net.rubygrapefruit.parse.general.MatchOneInputParser
 import net.rubygrapefruit.parse.general.SucceedParser
 import net.rubygrapefruit.parse.stream.Input
 import net.rubygrapefruit.parse.text.*
@@ -766,7 +766,7 @@ abstract class AbstractParseTest {
             abstract fun inspect(parser: InputPredicate<*>)
 
             override fun inspect(parser: CompiledParser<*, *>) {
-                assertIs<SingleInputParser.SingleInputCompiledParser<*, *>>(parser)
+                assertIs<MatchOneInputParser.SingleInputCompiledParser<*, *>>(parser)
                 inspect(parser.parser)
                 if (hasResult) {
                     assertIs<NextValueExtractor<*, *>>(parser.extractor)

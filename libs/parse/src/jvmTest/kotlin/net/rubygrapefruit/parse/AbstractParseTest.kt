@@ -1201,6 +1201,10 @@ abstract class AbstractParseTest {
 
         fun expectLiteral(byte: Byte)
 
+        fun expectOneByte() {
+            expect("any byte")
+        }
+
         fun expectOneInRange(from: Byte, to: Byte)
 
         fun expectContext(context: String)

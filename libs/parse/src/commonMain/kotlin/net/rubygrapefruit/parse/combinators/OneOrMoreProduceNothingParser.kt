@@ -15,6 +15,12 @@ internal class OneOrMoreProduceNothingParser<IN>(
     }
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, Unit> {
+        if (separator == null) {
+            val singleInputParser = compiler.maybeAsSingleInputParser(item)
+            if (singleInputParser != null) {
+                return RepeatingSingleInputCompiledParser(1, singleInputParser.predicate, singleInputParser.expectation, UnitRangeAccumulator)
+            }
+        }
         return OneOrMoreParser.of(item, separator, compiler, UnitAccumulator)
     }
 }

@@ -12,7 +12,7 @@ class MatchOfRepeatTest : AbstractParseTest() {
 
         parser.expecting {
             expectMatch {
-                expectRepeat(3, hasResult = false) {
+                expectRepeatSingleInput(3, hasResult = false) {
                     expectOneChar(hasResult = false)
                 }
             }

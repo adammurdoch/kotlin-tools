@@ -1,6 +1,10 @@
 package net.rubygrapefruit.parse.combinators
 
-import net.rubygrapefruit.parse.*
+import net.rubygrapefruit.parse.CombinatorBuilder
+import net.rubygrapefruit.parse.CompiledParser
+import net.rubygrapefruit.parse.DiscardableParser
+import net.rubygrapefruit.parse.Parser
+import net.rubygrapefruit.parse.general.SucceedParser
 import net.rubygrapefruit.parse.stream.Input
 
 internal class RepeatProduceNothingParser<IN>(
@@ -13,6 +17,10 @@ internal class RepeatProduceNothingParser<IN>(
     }
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, Unit> {
-        return RepeatParser.of(count, item, separator, compiler, UnitAccumulator)
+        return if (count == 0) {
+            SucceedParser.SucceedCompiledParser(UnitAccumulator)
+        } else {
+            rangeParser(Range.Exact(count), item, separator, compiler)
+        }
     }
 }

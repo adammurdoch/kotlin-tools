@@ -34,7 +34,6 @@ Performance
 - Optimize `oneExcept(oneOf(quote, endOfLine, endOfInput))`
 - Optimized implementation for `not(single-input)`
 - Optimized implementation for `optional(single-input)`
-- Optimized implementation for `repeat(single-input)`
 - `literal(one-value)` is a single input parser
 - `map(single-input)` is a single input parser
 - `check(single-input)` is a single input parser

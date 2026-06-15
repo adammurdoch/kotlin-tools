@@ -16,23 +16,7 @@ internal class ZeroOrMoreParser<IN, OUT>(
     }
 
     companion object {
-        fun <IN, ITEM, OUT> of(
-            item: Parser<*, ITEM>,
-            separator: Parser<*, Unit>?,
-            compiler: CombinatorBuilder.Compiler<IN>,
-            initial: Accumulator<ITEM, OUT>
-        ): CompiledParser<IN, OUT> {
-            val head = compiler.compile(item)
-            val tail = if (separator == null) {
-                head
-            } else {
-                val tail = Sequence2Parser(separator, item) { _, v -> v }
-                compiler.compile(tail)
-            }
-            return ZeroOrMoreCompiledParser(head, tail, initial)
-        }
-
-        fun <IN, ITEM, OUT> of(
+        private fun <IN, ITEM, OUT> nextItem(
             start: Position,
             head: CompiledParser<IN, ITEM>,
             tail: CompiledParser<IN, ITEM>,
@@ -57,7 +41,7 @@ internal class ZeroOrMoreParser<IN, OUT>(
         val initial: Accumulator<ITEM, OUT>
     ) : CompiledParser<IN, OUT> {
         override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
-            return of(start, head, tail, 0, initial, next)
+            return nextItem(start, head, tail, 0, initial, next)
         }
     }
 
@@ -73,7 +57,7 @@ internal class ZeroOrMoreParser<IN, OUT>(
             return if (length == 0) {
                 next.matched(input, advance, length, result, failedChoices)
             } else {
-                val parser = of(start + length, parser, parser, previousLength + length, result, next)
+                val parser = nextItem(start + length, parser, parser, previousLength + length, result, next)
                 PullParser.RequireMore(advance, parser, failedChoices)
             }
         }

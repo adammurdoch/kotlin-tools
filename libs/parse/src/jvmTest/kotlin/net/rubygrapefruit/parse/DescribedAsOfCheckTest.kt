@@ -22,7 +22,7 @@ class DescribedAsOfCheckTest : AbstractParseTest() {
         parser.expecting {
             expectDescribed("<chars>") {
                 expectCheck {
-                    expectRepeat(2) {
+                    expectRepeatSingleInput(2) {
                         expectOneInRange('a', 'z')
                     }
                 }

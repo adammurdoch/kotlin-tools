@@ -14,7 +14,11 @@ internal class RepeatParser<IN, OUT>(
     }
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, List<OUT>> {
-        return of(count, item, separator, compiler, ListAccumulator.Empty())
+        return if (count == 0) {
+            SucceedParser.SucceedCompiledParser(ListAccumulator.Empty())
+        } else {
+            rangeParser(Range.Exact(count), item, separator, compiler)
+        }
     }
 
     companion object {

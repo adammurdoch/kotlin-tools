@@ -36,6 +36,7 @@ internal fun <IN : Input<*>, ITEM> rangeParser(
     return when (range) {
         is Range.ZeroOrMoreMore -> ZeroOrMoreCompiledParser(head, tail, ListAccumulator.Empty())
         is Range.OneOrMoreMore -> OneOrMoreCompiledParser(head, tail, ListAccumulator.Empty())
+        is Range.Exact -> RepeatParser.RepeatCompiledParser(range.count, head, tail, ListAccumulator.Empty())
     }
 }
 
@@ -68,5 +69,6 @@ internal fun <IN : Input<*>> rangeParser(
     return when (range) {
         is Range.ZeroOrMoreMore -> ZeroOrMoreCompiledParser(head, tail, UnitAccumulator)
         is Range.OneOrMoreMore -> OneOrMoreCompiledParser(head, tail, UnitAccumulator)
+        is Range.Exact -> RepeatParser.RepeatCompiledParser(range.count, head, tail, UnitAccumulator)
     }
 }

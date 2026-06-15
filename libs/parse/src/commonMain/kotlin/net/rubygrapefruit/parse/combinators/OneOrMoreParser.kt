@@ -15,24 +15,6 @@ internal class OneOrMoreParser<IN, OUT>(
         return rangeParser(Range.OneOrMoreMore, item, separator, compiler)
     }
 
-    companion object {
-        fun <IN, ITEM, OUT> of(
-            item: Parser<*, ITEM>,
-            separator: Parser<*, Unit>?,
-            compiler: CombinatorBuilder.Compiler<IN>,
-            initial: Accumulator<ITEM, OUT>
-        ): CompiledParser<IN, OUT> {
-            val head = compiler.compile(item)
-            val tail = if (separator == null) {
-                head
-            } else {
-                val tail = Sequence2Parser(separator, item) { _, v -> v }
-                compiler.compile(tail)
-            }
-            return OneOrMoreCompiledParser(head, tail, initial)
-        }
-    }
-
     class OneOrMoreCompiledParser<IN, ITEM, OUT>(
         val head: CompiledParser<IN, ITEM>,
         val tail: CompiledParser<IN, ITEM>,

@@ -10,10 +10,10 @@ internal class RangeSingleInputCompiledParser<IN : Input<*>, OUT>(
     val accumulator: RangeAccumulator<IN, OUT>
 ) : CompiledParser<IN, OUT> {
     override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
-        return RepeatingPullParser(range, predicate, expectation, accumulator, next)
+        return RangePullParser(range, predicate, expectation, accumulator, next)
     }
 
-    private class RepeatingPullParser<IN : Input<*>, OUT>(
+    private class RangePullParser<IN : Input<*>, OUT>(
         val range: Range,
         val predicate: InputPredicate<IN>,
         val expectation: Expectation,
@@ -37,7 +37,8 @@ internal class RangeSingleInputCompiledParser<IN : Input<*>, OUT>(
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN> {
             var index = 0
-            while (index < max) {
+            val remaining = range.remaining(matched, max)
+            while (index < remaining) {
                 if (!predicate.match(input, index)) {
                     break
                 }
@@ -47,7 +48,9 @@ internal class RangeSingleInputCompiledParser<IN : Input<*>, OUT>(
                 matched += index
                 accumulator = accumulator.extract(input, 0, index)
             }
-            return if (index < max || index == input.available && input.finished) {
+            return if (range.stop(matched)) {
+                next.matched(input, index, matched, accumulator)
+            } else if (index < remaining || index == input.available && input.finished) {
                 // Found all the matching inputs - either found an input that does not match or the end of the inputs
                 if (matched < range.min) {
                     next.failed(index, matched, expectation)

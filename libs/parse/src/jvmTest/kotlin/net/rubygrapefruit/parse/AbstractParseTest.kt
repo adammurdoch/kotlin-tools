@@ -430,6 +430,8 @@ abstract class AbstractParseTest {
 
         fun expectRepeat(count: Int, hasResult: Boolean = true, config: CompiledParserFixture.() -> Unit)
 
+        fun expectRepeatSingleInput(count: Int, hasResult: Boolean = true, config: CompiledParserFixture.() -> Unit)
+
         fun expectMap(config: CompiledParserFixture.() -> Unit)
 
         fun expectCheck(config: CompiledParserFixture.() -> Unit)
@@ -997,6 +999,12 @@ abstract class AbstractParseTest {
             fixture.config()
             val choices = fixture.choices()
             inspectors.add(Inspector.IsRepeat(count, choices.first(), choices.getOrNull(1), hasResult))
+        }
+
+        override fun expectRepeatSingleInput(count: Int, hasResult: Boolean, config: CompiledParserFixture.() -> Unit) {
+            val fixture = DefaultCompiledParserFixture()
+            fixture.config()
+            inspectors.add(Inspector.IsRepeatingSingleInput(fixture.inspector() as Inspector.IsSingleInput, Range.Exact(count), hasResult, null))
         }
 
         override fun expectConsume(config: CompiledParserFixture.() -> Unit) {

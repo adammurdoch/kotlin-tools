@@ -12,14 +12,7 @@ internal class ZeroOrMoreParser<IN, OUT>(
     }
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, List<OUT>> {
-        if (separator == null) {
-            val singleValueParser = compiler.maybeAsSingleInputParser(item)
-            if (singleValueParser != null) {
-                return RepeatingSingleInputCompiledParser(Range.ZeroOrMoreMore, singleValueParser.predicate, singleValueParser.expectation, ListRangeAccumulator.Empty(singleValueParser.extractor))
-            }
-        }
-
-        return of(item, separator, compiler, ListAccumulator.Empty())
+        return rangeParser(Range.ZeroOrMoreMore, item, separator, compiler)
     }
 
     companion object {

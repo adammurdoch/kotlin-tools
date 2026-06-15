@@ -3,7 +3,7 @@ package net.rubygrapefruit.parse.combinators
 import net.rubygrapefruit.parse.*
 import net.rubygrapefruit.parse.stream.Input
 
-internal class RepeatingSingleInputCompiledParser<IN : Input<*>, OUT>(
+internal class RangeSingleInputCompiledParser<IN : Input<*>, OUT>(
     val range: Range,
     val predicate: InputPredicate<IN>,
     val expectation: Expectation,

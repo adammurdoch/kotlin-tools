@@ -12,13 +12,7 @@ internal class OneOrMoreParser<IN, OUT>(
     }
 
     override fun <IN : Input<*>> compile(compiler: CombinatorBuilder.Compiler<IN>): CompiledParser<IN, List<OUT>> {
-        if (separator == null) {
-            val singleInputParser = compiler.maybeAsSingleInputParser(item)
-            if (singleInputParser != null) {
-                return RepeatingSingleInputCompiledParser(Range.OneOrMoreMore, singleInputParser.predicate, singleInputParser.expectation, ListRangeAccumulator.Empty(singleInputParser.extractor))
-            }
-        }
-        return of(item, separator, compiler, ListAccumulator.Empty())
+        return rangeParser(Range.OneOrMoreMore, item, separator, compiler)
     }
 
     companion object {

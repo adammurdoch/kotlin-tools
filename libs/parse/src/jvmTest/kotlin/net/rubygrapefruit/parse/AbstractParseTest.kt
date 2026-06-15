@@ -675,7 +675,7 @@ abstract class AbstractParseTest {
                 get() = range.min == 0
 
             override fun inspect(parser: CompiledParser<*, *>) {
-                assertIs<RepeatingSingleInputCompiledParser<*, *>>(parser)
+                assertIs<RangeSingleInputCompiledParser<*, *>>(parser)
                 assertEquals(range, parser.range)
                 inspector.inspect(parser.predicate)
                 if (hasResult) {

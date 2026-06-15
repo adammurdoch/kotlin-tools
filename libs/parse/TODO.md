@@ -1,4 +1,5 @@
 Parsers
+
 - "literal" -> "text" and "bytes"?
 - `literal(char)` and `literal(byte)` convenience
 - `ParseResult` and `MappingResult` use consistent names, e.g. "success" and "failure" or "succeeded" and "failed"
@@ -16,8 +17,8 @@ Parsers
 - `sequence(prefix, parser, map)`, `sequence(parser, suffix, map)`, `sequence(prefix, parser, suffix, map)` conveniences for consistency
 - `sequence(prefix, parser, separator, parser, suffix, map)`
 - More convenient way to have a long sequence with the same separator, for example:
-  - `sequence(..., separator = x, map)`, eg `sequence(a, b, c, d, separator = literal(",")) { ... }`
-  - Or, `sequence()`, `oneOrMore()`, etc return Parser subtype that can have a prefix, separator, etc applied
+    - `sequence(..., separator = x, map)`, eg `sequence(a, b, c, d, separator = literal(",")) { ... }`
+    - Or, `sequence()`, `oneOrMore()`, etc return Parser subtype that can have a prefix, separator, etc applied
 - `oneOf(list)`
 - Negative integers
 - `integer(len)` and `integer(range)` - integer with given length
@@ -28,27 +29,29 @@ Parsers
 - Quoted string convenience
 
 Performance
+
+- Lazy failure collection
+- Optimize `oneExcept(oneOf(quote, endOfLine, endOfInput))`
 - Optimized implementation for `not(single-input)`
 - Optimized implementation for `optional(single-input)`
-- Optimized implementation for `oneOrMore(single-input)`
 - Optimized implementation for `repeat(single-input)`
-- Optimized implementation for `literal(one-value)`
-  - `discard(literal(one-value))` is a single input parser
+- `literal(one-value)` is a single input parser
+- `map(single-input)` is a single input parser
+- `check(single-input)` is a single input parser
 - `oneOf(single-input...)` is a single input parser
-- `digit()` is a single input parser
 - `sequence(not(single-input), single-input)` is a single input parser
-- `describedAs(single-input)` is a single input parser
 - `oneExcept(single-input)` is a single input parser
-- More efficient implementation of 3+ sequences
 - Allow `CompiledParser.start()` to fail or complete parsing
-  - This requires the parser to look ahead
-  - Passing input stream to `start()` means parse continuation will need the steam in the correct state to start next parser
+    - This requires the parser to look ahead
+    - Passing input stream to `start()` means parse continuation will need the steam in the correct state to start next parser
+    - Alternatively: CompiledParser is-a PullParser?
 - Binary int parsers should not box values
 - Discard buffered input once it is not required
 - Choice matches common prefix of options
 - Read from file/stream in parallel with parsing
 
 Features
+
 - Parse kotlinx-io Source
 - Parse file-io files
 - Match location/region

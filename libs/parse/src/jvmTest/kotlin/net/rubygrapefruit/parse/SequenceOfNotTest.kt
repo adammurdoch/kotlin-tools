@@ -8,7 +8,7 @@ import net.rubygrapefruit.parse.text.literal
 import net.rubygrapefruit.parse.text.one
 import kotlin.test.Test
 
-class SequenceOfNotParserTest : AbstractParseTest() {
+class SequenceOfNotTest : AbstractParseTest() {
     @Test
     fun `matches not single byte literal followed by zero or more bytes`() {
         val parser = sequence(
@@ -299,7 +299,7 @@ class SequenceOfNotParserTest : AbstractParseTest() {
                         expectLiteral("a?")
                     }
                 }
-                expectOneOrMore {
+                expectOneOrMoreSingleInput {
                     expectOneChar()
                 }
             }

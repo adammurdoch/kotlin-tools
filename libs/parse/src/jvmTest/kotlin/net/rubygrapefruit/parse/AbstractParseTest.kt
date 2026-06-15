@@ -426,6 +426,8 @@ abstract class AbstractParseTest {
 
         fun expectOneOrMore(hasResult: Boolean = true, config: CompiledParserFixture.() -> Unit)
 
+        fun expectOneOrMoreSingleInput(hasResult: Boolean = true, config: CompiledParserFixture.() -> Unit)
+
         fun expectRepeat(count: Int, hasResult: Boolean = true, config: CompiledParserFixture.() -> Unit)
 
         fun expectMap(config: CompiledParserFixture.() -> Unit)
@@ -665,16 +667,17 @@ abstract class AbstractParseTest {
             }
         }
 
-        data class IsZeroOrMoreSingleInput(val inspector: IsSingleInput, val hasResult: Boolean, val expect: String?) : Inspector {
+        data class IsRepeatingSingleInput(val inspector: IsSingleInput, val min: Int, val hasResult: Boolean, val expect: String?) : Inspector {
             override val expected: List<String>
                 get() = if (expect != null) listOf(expect) else inspector.expected
 
             override val mayBeEmpty: Boolean
-                get() = true
+                get() = min == 0
 
             override fun inspect(parser: CompiledParser<*, *>) {
-                assertIs<ZeroOrMoreSingleInputCompiledParser<*, *>>(parser)
-                inspector.inspect(parser.parser)
+                assertIs<RepeatingSingleInputCompiledParser<*, *>>(parser)
+                assertEquals(min, parser.min)
+                inspector.inspect(parser.predicate)
                 if (hasResult) {
                     assertIs<ListRangeAccumulator<*, *>>(parser.accumulator)
                 } else {
@@ -973,7 +976,7 @@ abstract class AbstractParseTest {
         override fun expectZeroOrMoreSingleInput(hasResult: Boolean, expect: String?, config: CompiledParserFixture.() -> Unit) {
             val fixture = DefaultCompiledParserFixture()
             fixture.config()
-            inspectors.add(Inspector.IsZeroOrMoreSingleInput(fixture.inspector() as Inspector.IsSingleInput, hasResult, expect))
+            inspectors.add(Inspector.IsRepeatingSingleInput(fixture.inspector() as Inspector.IsSingleInput, 0, hasResult, expect))
         }
 
         override fun expectOneOrMore(hasResult: Boolean, config: CompiledParserFixture.() -> Unit) {
@@ -981,6 +984,12 @@ abstract class AbstractParseTest {
             fixture.config()
             val choices = fixture.choices()
             inspectors.add(Inspector.IsOneOrMore(choices.first(), choices.getOrNull(1), hasResult))
+        }
+
+        override fun expectOneOrMoreSingleInput(hasResult: Boolean, config: CompiledParserFixture.() -> Unit) {
+            val fixture = DefaultCompiledParserFixture()
+            fixture.config()
+            inspectors.add(Inspector.IsRepeatingSingleInput(fixture.inspector() as Inspector.IsSingleInput, 1, hasResult, null))
         }
 
         override fun expectRepeat(count: Int, hasResult: Boolean, config: CompiledParserFixture.() -> Unit) {

@@ -5,6 +5,9 @@ import net.rubygrapefruit.parse.binary.one
 import kotlin.test.Test
 
 class ZeroOrMoreOfOneByteTest : AbstractParseTest() {
+    /**
+     * NOTE: this is in a separate class to the text equivalent because importing both `one()` overloads in the same class is painful.
+     */
     @Test
     fun `matches zero or more of one byte`() {
         val parser = zeroOrMore(

@@ -47,7 +47,7 @@ class DescribedAsOfDescribedAsTest : AbstractParseTest() {
         parser.expecting {
             expectDescribed("<chars>") {
                 expectDescribed("<ignored>") {
-                    expectOneOrMore {
+                    expectOneOrMoreSingleInput {
                         expectOneInRange('a', 'z')
                     }
                 }

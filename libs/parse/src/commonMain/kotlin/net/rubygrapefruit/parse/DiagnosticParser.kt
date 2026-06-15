@@ -119,7 +119,7 @@ internal class DiagnosticParser<IN, OUT> private constructor(
                 is PullParser.Matched -> result
 
                 is PullParser.Failed -> {
-                    for (failure in result.failures) {
+                    for (failure in result.failures()) {
                         require(failure.index <= max)
                     }
                     result

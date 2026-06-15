@@ -58,13 +58,16 @@ internal class ChoiceParser<IN, OUT>(
         }
 
         override fun stop(input: IN): PullParser.Failed {
-            return PullParser.Failed(states.flatMap {
+            val failures = states.mapNotNull {
                 val state = it.state
                 when (state) {
-                    is PullParser -> state.stop(input).failures
-                    else -> emptyList()
+                    is PullParser -> state.stop(input)
+                    else -> null
                 }
-            })
+            }
+            return PullParser.Failed.Lazy {
+                failures.flatMap { it.failures() }
+            }
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN> {
@@ -100,7 +103,7 @@ internal class ChoiceParser<IN, OUT>(
                         }
 
                         is PullParser.Failed -> {
-                            failedChoices.addAll(optionResult.failures)
+                            failedChoices.addAll(optionResult.failures())
                             option.state = optionResult
                         }
 
@@ -129,7 +132,7 @@ internal class ChoiceParser<IN, OUT>(
                     PullParser.RequireMore(1, this, failedChoices)
                 }
             } else {
-                PullParser.Failed(failedChoices)
+                PullParser.Failed.Some(failedChoices)
             }
         }
     }

@@ -8,6 +8,8 @@ package net.rubygrapefruit.parse
 internal interface PullParser<in IN> : ParseState<IN> {
     /**
      * Forces this parser to stop at the current position.
+     *
+     * This parser must not be used after calling this method
      */
     fun stop(input: IN): Failed
 
@@ -48,11 +50,11 @@ internal interface PullParser<in IN> : ParseState<IN> {
     /**
      * Parser stopped matching.
      */
-    data class Failed(val failures: List<Failure>) : Result<Any?>, ParseState<Any?> {
-        private val parser = FinishedPullParser(this)
+    sealed class Failed : Result<Any?>, ParseState<Any?> {
+        abstract fun failures(): List<Failure>
 
         override fun parser(): PullParser<Any?> {
-            return parser
+            return FinishedPullParser(this)
         }
 
         override fun stop(input: Any?): Failed {
@@ -60,7 +62,32 @@ internal interface PullParser<in IN> : ParseState<IN> {
         }
 
         fun map(map: (Expectation) -> Expectation): Failed {
-            return Failed(failures.map { it.map(map) })
+            val self = this
+            return Lazy { self.failures().map { it.map(map) } }
+        }
+
+        data object None : Failed() {
+            override fun failures(): List<Failure> {
+                return emptyList()
+            }
+        }
+
+        class One(val index: Int, val expected: ExpectationProvider) : Failed() {
+            override fun failures(): List<Failure> {
+                return listOf(Failure(index, expected))
+            }
+        }
+
+        class Some(val failures: List<Failure>) : Failed() {
+            override fun failures(): List<Failure> {
+                return failures
+            }
+        }
+
+        class Lazy(val producer: () -> List<Failure>) : Failed() {
+            override fun failures(): List<Failure> {
+                return producer()
+            }
         }
     }
 

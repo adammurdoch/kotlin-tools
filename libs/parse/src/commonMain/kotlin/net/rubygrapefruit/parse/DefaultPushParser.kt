@@ -27,7 +27,7 @@ internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>,
                         is PullParser.Matched -> state = result
 
                         is PullParser.Failed -> {
-                            collectFailedChoices(result.failures, input)
+                            collectFailedChoices(result.failures(), input)
                             state = result
                         }
 

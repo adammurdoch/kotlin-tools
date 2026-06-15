@@ -299,10 +299,10 @@ abstract class AbstractParseTest {
 
     private fun <IN> PullParser<IN>.expecting(fixture: DefaultCompiledParserFixture, emptyInput: IN) {
         val failed = stop(emptyInput)
-        for (failure in failed.failures) {
+        for (failure in failed.failures()) {
             assertEquals(0, failure.index)
         }
-        val merged = failed.failures.fold(Expectation.Nothing as ExpectationProvider) { a, b -> ExpectationProvider.oneOf(a, b.expected) }
+        val merged = failed.failures().fold(Expectation.Nothing as ExpectationProvider) { a, b -> ExpectationProvider.oneOf(a, b.expected) }
         assertEquals(fixture.message(), merged.expectation().format())
     }
 

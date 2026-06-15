@@ -18,7 +18,7 @@ internal interface ParseContinuation<in IN, in OUT> {
     fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.Continuing<T>
 
     fun failed(index: Int, length: Int, expected: ExpectationProvider): PullParser.Failed {
-        return PullParser.Failed(listOf(PullParser.Failure(index, expected)))
+        return PullParser.Failed.One(index, expected)
     }
 
     companion object {
@@ -137,7 +137,7 @@ internal interface ParseContinuation<in IN, in OUT> {
         }
 
         override fun stop(input: Any?): PullParser.Failed {
-            return PullParser.Failed(emptyList())
+            return PullParser.Failed.None
         }
 
         override fun parse(input: Any?, max: Int): PullParser.Result<Any?> {

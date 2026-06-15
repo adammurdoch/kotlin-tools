@@ -15,7 +15,7 @@ internal class OneOrMoreParser<IN, OUT>(
         if (separator == null) {
             val singleInputParser = compiler.maybeAsSingleInputParser(item)
             if (singleInputParser != null) {
-                return RepeatingSingleInputCompiledParser(1, singleInputParser.predicate, singleInputParser.expectation, ListRangeAccumulator.Empty(singleInputParser.extractor))
+                return RepeatingSingleInputCompiledParser(Range.OneOrMoreMore, singleInputParser.predicate, singleInputParser.expectation, ListRangeAccumulator.Empty(singleInputParser.extractor))
             }
         }
         return of(item, separator, compiler, ListAccumulator.Empty())

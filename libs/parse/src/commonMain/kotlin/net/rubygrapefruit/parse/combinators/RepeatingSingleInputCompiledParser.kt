@@ -4,17 +4,17 @@ import net.rubygrapefruit.parse.*
 import net.rubygrapefruit.parse.stream.Input
 
 internal class RepeatingSingleInputCompiledParser<IN : Input<*>, OUT>(
-    val min: Int,
+    val range: Range,
     val predicate: InputPredicate<IN>,
     val expectation: Expectation,
     val accumulator: RangeAccumulator<IN, OUT>
 ) : CompiledParser<IN, OUT> {
     override fun start(start: Position, next: ParseContinuation<IN, OUT>): PullParser<IN> {
-        return RepeatingPullParser(min, predicate, expectation, accumulator, next)
+        return RepeatingPullParser(range, predicate, expectation, accumulator, next)
     }
 
     private class RepeatingPullParser<IN : Input<*>, OUT>(
-        val min: Int,
+        val range: Range,
         val predicate: InputPredicate<IN>,
         val expectation: Expectation,
         private var accumulator: RangeAccumulator<IN, OUT>,
@@ -23,12 +23,12 @@ internal class RepeatingSingleInputCompiledParser<IN : Input<*>, OUT>(
         private var matched = 0
 
         override fun toString(): String {
-            return "{repeating-of-one min=$min $predicate}"
+            return "{${range.diagnostic} $predicate}"
         }
 
         override fun stop(input: IN): PullParser.Failed {
             val failure = next.failed(0, matched, expectation)
-            return if (matched < min) {
+            return if (matched < range.min) {
                 failure
             } else {
                 PullParser.Failed(failure.failures + next.matched(input, -matched, 0, accumulator).stop(input).failures)
@@ -49,7 +49,7 @@ internal class RepeatingSingleInputCompiledParser<IN : Input<*>, OUT>(
             }
             return if (index < max || index == input.available && input.finished) {
                 // Found all the matching inputs - either found an input that does not match or the end of the inputs
-                if (matched < min) {
+                if (matched < range.min) {
                     next.failed(index, matched, expectation)
                 } else {
                     next.matched(input, index, matched, accumulator, expectation)

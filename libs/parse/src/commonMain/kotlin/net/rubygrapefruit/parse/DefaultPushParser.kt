@@ -27,7 +27,7 @@ internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>,
                         is PullParser.Matched -> state = result
 
                         is PullParser.Failed -> {
-                            collectFailedChoices(result.failures(), input)
+                            collectFailedChoices(result, input)
                             state = result
                         }
 
@@ -60,8 +60,8 @@ internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>,
         return failure
     }
 
-    private fun collectFailedChoices(failures: List<PullParser.Failure>, input: IN) {
-        for (failure in failures) {
+    private fun collectFailedChoices(failures: PullParser.Failed, input: IN) {
+        for (failure in failures.failures()) {
             val failurePosition = failure.position(input.position)
             if (failurePosition == failedChoicePosition) {
                 failedChoice = ExpectationProvider.oneOf(failedChoice, failure.expected)
@@ -100,12 +100,12 @@ private class ValueReceivingContinuation<IN, OUT> : ParseContinuation<IN, OUT> {
         return value!!.get()
     }
 
-    override fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<OUT>, failedChoices: List<PullParser.Failure>): PullParser.Result<IN> {
+    override fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<OUT>, failedChoices: PullParser.Failed): PullParser.Result<IN> {
         this.value = value
         return ParseContinuation.end<IN, OUT>().matched(input, advance, length, value, failedChoices)
     }
 
-    override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.Continuing<T> {
+    override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: PullParser.Failed): PullParser.Continuing<T> {
         return ParseContinuation.end<IN, OUT>().selected(advance, parser, failedChoices)
     }
 }

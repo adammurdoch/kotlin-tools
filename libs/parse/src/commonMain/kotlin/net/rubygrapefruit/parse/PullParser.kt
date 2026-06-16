@@ -61,12 +61,16 @@ internal interface PullParser<in IN> : ParseState<IN> {
             return this
         }
 
-        fun map(map: (Expectation) -> Expectation): Failed {
+        open fun map(map: (Failure) -> Failure): Failed {
             val self = this
-            return Lazy { self.failures().map { it.map(map) } }
+            return Lazy { self.failures().map { map(it) } }
         }
 
         data object None : Failed() {
+            override fun map(map: (Failure) -> Failure): Failed {
+                return this
+            }
+
             override fun failures(): List<Failure> {
                 return emptyList()
             }
@@ -81,6 +85,12 @@ internal interface PullParser<in IN> : ParseState<IN> {
         class Some(val failures: List<Failure>) : Failed() {
             override fun failures(): List<Failure> {
                 return failures
+            }
+        }
+
+        class Flatten(val producers: List<Failed>) : Failed() {
+            override fun failures(): List<Failure> {
+                return producers.flatMap { it.failures() }
             }
         }
 
@@ -108,7 +118,7 @@ internal interface PullParser<in IN> : ParseState<IN> {
     data class Matched<in IN>(
         val advance: Int,
         val parser: PullParser<IN>,
-        val failedChoices: List<Failure> = emptyList()
+        val failedChoices: Failed = Failed.None
     ) : Result<IN>, ParseState<IN>, Continuing<IN> {
         override fun stop(input: IN): Failed {
             return parser.stop(input)
@@ -128,7 +138,7 @@ internal interface PullParser<in IN> : ParseState<IN> {
     data class RequireMore<in IN>(
         val advance: Int,
         val parser: PullParser<IN>,
-        val failedChoices: List<Failure> = emptyList()
+        val failedChoices: Failed = Failed.None
     ) : Result<IN>, Continuing<IN> {
         override fun stop(input: IN): Failed {
             return parser.stop(input)

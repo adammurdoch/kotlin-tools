@@ -65,16 +65,14 @@ internal class ChoiceParser<IN, OUT>(
                     else -> null
                 }
             }
-            return PullParser.Failed.Lazy {
-                failures.flatMap { it.failures() }
-            }
+            return PullParser.Failed.Flatten(failures)
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN> {
             val maxAdvance = min(max, 1)
             var waitingFor = 0
             var hasZeroAdvance = false
-            val failedChoices = mutableListOf<PullParser.Failure>()
+            val failedChoices = mutableListOf<PullParser.Failed>()
             for (index in states.indices) {
                 val option = states[index]
                 val optionState = option.state
@@ -90,11 +88,11 @@ internal class ChoiceParser<IN, OUT>(
                                 return option.continuation.next.selected(
                                     optionResult.advance,
                                     optionResult.parser,
-                                    failedChoices + optionResult.failedChoices
+                                    PullParser.Failed.Flatten(failedChoices + optionResult.failedChoices)
                                 )
                             }
                             waitingFor++
-                            failedChoices.addAll(optionResult.failedChoices)
+                            failedChoices.add(optionResult.failedChoices)
                             option.state = optionResult.parser
                             option.advanced += optionResult.advance
                             if (optionResult.advance == 0) {
@@ -103,13 +101,13 @@ internal class ChoiceParser<IN, OUT>(
                         }
 
                         is PullParser.Failed -> {
-                            failedChoices.addAll(optionResult.failures())
+                            failedChoices.add(optionResult)
                             option.state = optionResult
                         }
 
                         is PullParser.RequireMore -> {
                             waitingFor++
-                            failedChoices.addAll(optionResult.failedChoices)
+                            failedChoices.add(optionResult.failedChoices)
                             option.state = optionResult.parser
                             option.advanced += optionResult.advance
                             if (optionResult.advance == 0) {
@@ -119,20 +117,21 @@ internal class ChoiceParser<IN, OUT>(
                     }
                 }
             }
+            val merged = PullParser.Failed.Flatten(failedChoices)
             if (waitingFor == 1) {
                 val option = states.first { it.state is PullParser }
                 option.continuation.disconnect()
-                return PullParser.RequireMore(option.advanced - advanced, option.state as PullParser, failedChoices)
+                return PullParser.RequireMore(option.advanced - advanced, option.state as PullParser, merged)
             }
             return if (waitingFor > 0) {
                 if (hasZeroAdvance) {
-                    PullParser.RequireMore(0, this, failedChoices)
+                    PullParser.RequireMore(0, this, merged)
                 } else {
                     advanced++
-                    PullParser.RequireMore(1, this, failedChoices)
+                    PullParser.RequireMore(1, this, merged)
                 }
             } else {
-                PullParser.Failed.Some(failedChoices)
+                merged
             }
         }
     }
@@ -152,7 +151,7 @@ internal class ChoiceParser<IN, OUT>(
 
         private var connected = true
 
-        override fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<OUT>, failedChoices: List<PullParser.Failure>): PullParser.Result<IN> {
+        override fun matched(input: IN, advance: Int, length: Int, value: ValueProvider<OUT>, failedChoices: PullParser.Failed): PullParser.Result<IN> {
             val result = next.matched(input, advance, length, value, failedChoices)
             return if (connected && result is PullParser.RequireMore) {
                 PullParser.Matched(result.advance, result.parser, result.failedChoices)
@@ -161,7 +160,7 @@ internal class ChoiceParser<IN, OUT>(
             }
         }
 
-        override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: List<PullParser.Failure>): PullParser.Continuing<T> {
+        override fun <T> selected(advance: Int, parser: PullParser<T>, failedChoices: PullParser.Failed): PullParser.Continuing<T> {
             // called when option parser selects a specific alternative
             return if (connected) {
                 PullParser.Matched(advance, parser, failedChoices)

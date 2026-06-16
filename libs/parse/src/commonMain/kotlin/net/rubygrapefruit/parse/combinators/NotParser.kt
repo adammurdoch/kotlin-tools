@@ -36,7 +36,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
         }
 
         override fun stop(input: IN): PullParser.Failed {
-            return PullParser.Failed.Some(predicate.stop(input).map { Expectation.Not(it) }.failures() + next(input).stop(input).failures())
+            return PullParser.Failed.Flatten(listOf(predicate.stop(input).map { failure -> failure.map { Expectation.Not(it) } }, next(input).stop(input)))
         }
 
         override fun parse(input: IN, max: Int): PullParser.Result<IN> {
@@ -46,7 +46,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
                 when (checkResult) {
                     is PullParser.Matched -> {
                         // Fail at the start
-                        val predicateExpectation = parser.start(start, ParseContinuation.end()).stop(input).map { Expectation.Not(it) }
+                        val predicateExpectation = predicateExpectationAtStart(input)
                         val nextExpectation = continuation.matched(input, 0, 0, ValueProvider.Nothing).stop(input)
                         val failures = (predicateExpectation.failures() + nextExpectation.failures()).map { failure ->
                             PullParser.Failure(failure.index - totalAdvanced, failure.expected)
@@ -55,8 +55,8 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
                     }
 
                     is PullParser.Failed -> {
-                        val predicateExpectation = parser.start(start, ParseContinuation.end()).stop(input).map { Expectation.Not(it) }
-                        val predicateFailures = predicateExpectation.failures().map { failure ->
+                        val predicateExpectation = predicateExpectationAtStart(input)
+                        val predicateFailures = predicateExpectation.map { failure ->
                             PullParser.Failure(failure.index - totalAdvanced, failure.expected)
                         }
                         return continuation.selected(0, next(input), predicateFailures)
@@ -65,7 +65,7 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
                     is PullParser.RequireMore -> {
                         predicate = checkResult.parser
                         if (checkResult.advance == 0) {
-                            return PullParser.RequireMore(0, this, emptyList())
+                            return PullParser.RequireMore(0, this)
                         }
                     }
                 }
@@ -75,11 +75,11 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
             val result = next.parse(input, maxAdvance)
             when (result) {
                 is PullParser.Failed -> {
-                    val predicateExpectation = parser.start(start, ParseContinuation.end()).stop(input).map { Expectation.Not(it) }
-                    val predicateFailures = predicateExpectation.failures().map { failure ->
+                    val predicateExpectation = predicateExpectationAtStart(input)
+                    val predicateFailures = predicateExpectation.map { failure ->
                         PullParser.Failure(failure.index - totalAdvanced, failure.expected)
                     }
-                    return PullParser.Failed.Some(predicateFailures + result.failures())
+                    return PullParser.Failed.Flatten(listOf(predicateFailures, result))
                 }
 
                 is PullParser.Matched -> {
@@ -95,6 +95,9 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
             totalAdvanced += nextAdvance
             return PullParser.RequireMore(nextAdvance, this)
         }
+
+        private fun predicateExpectationAtStart(input: IN): PullParser.Failed =
+            parser.start(start, ParseContinuation.end()).stop(input).map { failure -> failure.map { Expectation.Not(it) } }
 
         private fun next(input: IN): PullParser<IN> {
             if (next == null) {

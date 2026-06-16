@@ -61,7 +61,7 @@ internal open class DefaultPushParser<CONTEXT, IN : ContextualInput<CONTEXT, *>,
     }
 
     private fun collectFailedChoices(failures: PullParser.Failed, input: IN) {
-        for (failure in failures.failures()) {
+        failures.accept { failure ->
             val failurePosition = failure.position(input.position)
             if (failurePosition == failedChoicePosition) {
                 failedChoice = ExpectationProvider.oneOf(failedChoice, failure.expected)

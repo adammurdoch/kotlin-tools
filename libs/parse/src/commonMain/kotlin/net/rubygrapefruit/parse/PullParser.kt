@@ -51,7 +51,7 @@ internal interface PullParser<in IN> : ParseState<IN> {
      * Parser stopped matching.
      */
     sealed class Failed : Result<Any?>, ParseState<Any?> {
-        abstract fun failures(): List<Failure>
+        abstract fun accept(visitor: (Failure) -> Unit)
 
         open operator fun plus(other: Failed): Failed {
             return Flatten(listOf(this, other))
@@ -66,8 +66,7 @@ internal interface PullParser<in IN> : ParseState<IN> {
         }
 
         open fun map(map: (Failure) -> Failure): Failed {
-            val self = this
-            return Lazy { self.failures().map { map(it) } }
+            return Mapping(this, map)
         }
 
         data object None : Failed() {
@@ -79,14 +78,13 @@ internal interface PullParser<in IN> : ParseState<IN> {
                 return this
             }
 
-            override fun failures(): List<Failure> {
-                return emptyList()
+            override fun accept(visitor: (Failure) -> Unit) {
             }
         }
 
         class One(val index: Int, val expected: ExpectationProvider) : Failed() {
-            override fun failures(): List<Failure> {
-                return listOf(Failure(index, expected))
+            override fun accept(visitor: (Failure) -> Unit) {
+                visitor(Failure(index, expected))
             }
         }
 
@@ -95,14 +93,16 @@ internal interface PullParser<in IN> : ParseState<IN> {
                 return Flatten(producers + other)
             }
 
-            override fun failures(): List<Failure> {
-                return producers.flatMap { it.failures() }
+            override fun accept(visitor: (Failure) -> Unit) {
+                for (failed in producers) {
+                    failed.accept(visitor)
+                }
             }
         }
 
-        class Lazy(val producer: () -> List<Failure>) : Failed() {
-            override fun failures(): List<Failure> {
-                return producer()
+        private class Mapping(val delegate: Failed, val map: (Failure) -> Failure) : Failed() {
+            override fun accept(visitor: (Failure) -> Unit) {
+                delegate.accept { visitor(map(it)) }
             }
         }
     }

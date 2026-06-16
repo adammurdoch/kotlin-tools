@@ -72,7 +72,7 @@ internal class ChoiceParser<IN, OUT>(
             val maxAdvance = min(max, 1)
             var waitingFor = 0
             var hasZeroAdvance = false
-            val failedChoices = mutableListOf<PullParser.Failed>()
+            var failedChoices: PullParser.Failed = PullParser.Failed.None
             for (index in states.indices) {
                 val option = states[index]
                 val optionState = option.state
@@ -88,11 +88,11 @@ internal class ChoiceParser<IN, OUT>(
                                 return option.continuation.next.selected(
                                     optionResult.advance,
                                     optionResult.parser,
-                                    PullParser.Failed.Flatten(failedChoices + optionResult.failedChoices)
+                                    failedChoices + optionResult.failedChoices
                                 )
                             }
                             waitingFor++
-                            failedChoices.add(optionResult.failedChoices)
+                            failedChoices += optionResult.failedChoices
                             option.state = optionResult.parser
                             option.advanced += optionResult.advance
                             if (optionResult.advance == 0) {
@@ -101,13 +101,13 @@ internal class ChoiceParser<IN, OUT>(
                         }
 
                         is PullParser.Failed -> {
-                            failedChoices.add(optionResult)
+                            failedChoices += optionResult
                             option.state = optionResult
                         }
 
                         is PullParser.RequireMore -> {
                             waitingFor++
-                            failedChoices.add(optionResult.failedChoices)
+                            failedChoices += optionResult.failedChoices
                             option.state = optionResult.parser
                             option.advanced += optionResult.advance
                             if (optionResult.advance == 0) {
@@ -117,21 +117,20 @@ internal class ChoiceParser<IN, OUT>(
                     }
                 }
             }
-            val merged = PullParser.Failed.Flatten(failedChoices)
             if (waitingFor == 1) {
                 val option = states.first { it.state is PullParser }
                 option.continuation.disconnect()
-                return PullParser.RequireMore(option.advanced - advanced, option.state as PullParser, merged)
+                return PullParser.RequireMore(option.advanced - advanced, option.state as PullParser, failedChoices)
             }
             return if (waitingFor > 0) {
                 if (hasZeroAdvance) {
-                    PullParser.RequireMore(0, this, merged)
+                    PullParser.RequireMore(0, this, failedChoices)
                 } else {
                     advanced++
-                    PullParser.RequireMore(1, this, merged)
+                    PullParser.RequireMore(1, this, failedChoices)
                 }
             } else {
-                merged
+                failedChoices
             }
         }
     }

@@ -30,7 +30,7 @@ Parsers
 
 Performance
 
-- Lazy failure collection
+- ParseContinuation.failed() chains up and along the grammar to the end continuation
 - Optimize `oneExcept(oneOf(quote, endOfLine, endOfInput))`
 - Optimized implementation for `not(single-input)`
 - Optimized implementation for `optional(single-input)`

@@ -53,6 +53,10 @@ internal interface PullParser<in IN> : ParseState<IN> {
     sealed class Failed : Result<Any?>, ParseState<Any?> {
         abstract fun failures(): List<Failure>
 
+        open operator fun plus(other: Failed): Failed {
+            return Flatten(listOf(this, other))
+        }
+
         override fun parser(): PullParser<Any?> {
             return FinishedPullParser(this)
         }
@@ -67,6 +71,10 @@ internal interface PullParser<in IN> : ParseState<IN> {
         }
 
         data object None : Failed() {
+            override fun plus(other: Failed): Failed {
+                return other
+            }
+
             override fun map(map: (Failure) -> Failure): Failed {
                 return this
             }
@@ -83,6 +91,10 @@ internal interface PullParser<in IN> : ParseState<IN> {
         }
 
         class Flatten(val producers: List<Failed>) : Failed() {
+            override fun plus(other: Failed): Failed {
+                return Flatten(producers + other)
+            }
+
             override fun failures(): List<Failure> {
                 return producers.flatMap { it.failures() }
             }

@@ -82,12 +82,6 @@ internal interface PullParser<in IN> : ParseState<IN> {
             }
         }
 
-        class Some(val failures: List<Failure>) : Failed() {
-            override fun failures(): List<Failure> {
-                return failures
-            }
-        }
-
         class Flatten(val producers: List<Failed>) : Failed() {
             override fun failures(): List<Failure> {
                 return producers.flatMap { it.failures() }

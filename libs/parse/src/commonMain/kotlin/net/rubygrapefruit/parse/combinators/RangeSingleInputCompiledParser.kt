@@ -31,7 +31,7 @@ internal class RangeSingleInputCompiledParser<IN : Input<*>, OUT>(
             return if (matched < range.min) {
                 failure
             } else {
-                PullParser.Failed.Some(failure.failures() + next.matched(input, -matched, 0, accumulator).stop(input).failures())
+                PullParser.Failed.Flatten(listOf(failure, next.matched(input, -matched, 0, accumulator).stop(input)))
             }
         }
 

@@ -46,20 +46,20 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
                 when (checkResult) {
                     is PullParser.Matched -> {
                         // Fail at the start
-                        val predicateExpectation = predicateExpectationAtStart(input)
-                        val nextExpectation = continuation.matched(input, 0, 0, ValueProvider.Nothing).stop(input)
-                        val failures = (predicateExpectation.failures() + nextExpectation.failures()).map { failure ->
+                        val predicateExpectation = predicateExpectationAtStart(input).map { failure ->
                             PullParser.Failure(failure.index - totalAdvanced, failure.expected)
                         }
-                        return PullParser.Failed.Some(failures)
+                        val nextExpectation = continuation.matched(input, 0, 0, ValueProvider.Nothing).stop(input).map { failure ->
+                            PullParser.Failure(failure.index - totalAdvanced, failure.expected)
+                        }
+                        return PullParser.Failed.Flatten(listOf(predicateExpectation, nextExpectation))
                     }
 
                     is PullParser.Failed -> {
-                        val predicateExpectation = predicateExpectationAtStart(input)
-                        val predicateFailures = predicateExpectation.map { failure ->
+                        val predicateExpectation = predicateExpectationAtStart(input).map { failure ->
                             PullParser.Failure(failure.index - totalAdvanced, failure.expected)
                         }
-                        return continuation.selected(0, next(input), predicateFailures)
+                        return continuation.selected(0, next(input), predicateExpectation)
                     }
 
                     is PullParser.RequireMore -> {
@@ -75,11 +75,10 @@ internal class NotParser<IN>(private val parser: Parser<IN, Unit>) : Parser<IN, 
             val result = next.parse(input, maxAdvance)
             when (result) {
                 is PullParser.Failed -> {
-                    val predicateExpectation = predicateExpectationAtStart(input)
-                    val predicateFailures = predicateExpectation.map { failure ->
+                    val predicateExpectation = predicateExpectationAtStart(input).map { failure ->
                         PullParser.Failure(failure.index - totalAdvanced, failure.expected)
                     }
-                    return PullParser.Failed.Flatten(listOf(predicateFailures, result))
+                    return PullParser.Failed.Flatten(listOf(predicateExpectation, result))
                 }
 
                 is PullParser.Matched -> {

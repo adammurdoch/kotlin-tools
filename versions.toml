@@ -4,7 +4,7 @@
 #
 
 [kotlin]
-version = "2.3.10"
+version = "2.4.0"
 
 [kotlin.plugin]
 coordinatesBase = "org.jetbrains.kotlin:kotlin-gradle-plugin"
@@ -37,31 +37,31 @@ id = "org.gradle.toolchains.foojay-resolver-convention"
 coordinatesBase = "org.gradle.toolchains:foojay-resolver"
 
 [serialization.plugin]
-version = "2.3.10"
+version = "2.4.0"
 id = "org.jetbrains.kotlin.plugin.serialization"
 coordinatesBase = "org.jetbrains.kotlin:kotlin-serialization"
 
 [serialization.library]
-version = "1.10.0"
+version = "1.11.0"
 coordinatesBase = "org.jetbrains.kotlinx:kotlinx-serialization-core"
 
 [serialization.library.json]
 coordinatesBase = "org.jetbrains.kotlinx:kotlinx-serialization-json"
 
 [coroutines]
-version = "1.10.2"
+version = "1.11.0"
 coordinatesBase = "org.jetbrains.kotlinx:kotlinx-coroutines-core"
 
 [dateTime]
-version = "0.7.1"
+version = "0.8.0"
 coordinatesBase = "org.jetbrains.kotlinx:kotlinx-datetime"
 
 [io]
-version = "0.8.2"
+version = "0.9.0"
 coordinatesBase = "org.jetbrains.kotlinx:kotlinx-io-core"
 
 [ksp]
-version = "2.3.6"
+version = "2.3.9"
 
 [ksp.library]
 coordinatesBase = "com.google.devtools.ksp:symbol-processing-api"

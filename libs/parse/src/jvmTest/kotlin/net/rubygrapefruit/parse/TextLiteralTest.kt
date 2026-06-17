@@ -117,6 +117,59 @@ class TextLiteralTest : AbstractParseTest() {
     }
 
     @Test
+    fun `matches single char literal provided as a char`() {
+        val parser = literal('a')
+
+        parser.expecting {
+            expectLiteral("a")
+        }
+
+        parser.matches("a") {
+            steps {
+                advance(1)
+            }
+        }
+
+        // missing
+        parser.doesNotMatch("") {
+            expectLiteral("a")
+            steps {}
+        }
+
+        // unexpected char
+        parser.doesNotMatch("X") {
+            expectLiteral("a")
+            steps {}
+        }
+
+        // extra char
+        parser.doesNotMatch("aX") {
+            failAt(1)
+            expectEndOfInput()
+            steps {
+                advance(1)
+            }
+        }
+
+        // incorrect case
+        parser.doesNotMatch("A") {
+            expectLiteral("a")
+            steps {}
+        }
+    }
+
+    @Test
+    fun `matches single char literal provided as a char and produces result`() {
+        val parser = literal('a', 1)
+
+        parser.expecting {
+            expectLiteral("a", result = 1)
+        }
+
+        parser.matches("a", expected = 1)
+    }
+
+    @Test
     fun `matches multi-char literal`() {
         val parser = literal("ab")
 

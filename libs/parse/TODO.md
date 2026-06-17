@@ -1,7 +1,6 @@
 Parsers
 
 - "literal" -> "text" and "bytes"?
-- `literal(char)` and `literal(byte)` convenience
 - `ParseResult` and `MappingResult` use consistent names, e.g. "success" and "failure" or "succeeded" and "failed"
 - Case-insensitive text literal
 - `repeat(parser, parser)` where first parser produces the count
@@ -14,7 +13,6 @@ Parsers
 - `oneOf(pair<String, OUT>...)` convenience
 - `accept()` should not call function on a failed branch
 - `discard(parser<unit>...)` - alias for `sequence(parser<unit>...)`?
-- `sequence(prefix, parser, map)`, `sequence(parser, suffix, map)`, `sequence(prefix, parser, suffix, map)` conveniences for consistency
 - `sequence(prefix, parser, separator, parser, suffix, map)`
 - More convenient way to have a long sequence with the same separator, for example:
     - `sequence(..., separator = x, map)`, eg `sequence(a, b, c, d, separator = literal(",")) { ... }`
@@ -27,6 +25,9 @@ Parsers
 - Improve expected message for `not()` or perhaps `oneExcept()`
 - Line comment convenience
 - Quoted string convenience
+- `not()` discards failed choices of next and matched when it iterates
+- add checks to matched branch in diagnostic parser, wrap parser
+- start position passed to `start()` is not used?
 
 Performance
 

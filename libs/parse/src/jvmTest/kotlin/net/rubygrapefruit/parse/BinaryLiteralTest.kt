@@ -74,6 +74,53 @@ class BinaryLiteralTest : AbstractParseTest() {
     }
 
     @Test
+    fun `matches single byte literal provided as a byte`() {
+        val parser = literal(0x1)
+
+        parser.expecting {
+            expectLiteral(0x1)
+        }
+
+        parser.matches(0x1) {
+            steps {
+                advance(1)
+            }
+        }
+
+        // missing
+        parser.doesNotMatch {
+            expectLiteral(0x1)
+            steps {}
+        }
+
+        // unexpected
+        parser.doesNotMatch(0x2) {
+            expectLiteral(0x1)
+            steps {}
+        }
+
+        // extra
+        parser.doesNotMatch(0x1, 0x2) {
+            failAt(1)
+            expectEndOfInput()
+            steps {
+                advance(1)
+            }
+        }
+    }
+
+    @Test
+    fun `matches single byte literal provided as byte and produces result`() {
+        val parser = literal(0x1, result = "one")
+
+        parser.expecting {
+            expectLiteral(0x1, result = "one")
+        }
+
+        parser.matches(0x1, expected = "one")
+    }
+
+    @Test
     fun `matches multi-byte literal`() {
         val parser = literal(byteArrayOf(0x1, 0x2))
 

@@ -9,7 +9,7 @@ import kotlin.jvm.JvmName
 
 /**
  * Returns a parser that applies the given parsers in order.
- * Uses the given mapping function to produce the result.
+ * Uses the given mapping function to produce the result from the result of the parsers.
  */
 fun <IN, A, B, OUT> sequence(a: Parser<IN, A>, b: Parser<IN, B>, map: (A, B) -> OUT): Parser<IN, OUT> {
     return Sequence2Parser(a, b, map)
@@ -34,6 +34,15 @@ fun <IN, OUT> sequence(prefix: Parser<IN, Unit>, parser: Parser<IN, OUT>): Parse
 
 /**
  * Returns a parser that applies the given parsers in order.
+ * Uses the given mapping function to produce the result from the result of the second parser.
+ */
+@JvmName("prefixSequence")
+fun <IN, INTERMEDIATE, OUT> sequence(prefix: Parser<IN, Unit>, parser: Parser<IN, INTERMEDIATE>, map: (INTERMEDIATE) -> OUT): Parser<IN, OUT> {
+    return sequence(prefix, parser) { _, b -> map(b) }
+}
+
+/**
+ * Returns a parser that applies the given parsers in order.
  * Produces the result of the first parser.
  */
 fun <IN, OUT> suffixed(parser: Parser<IN, OUT>, suffix: Parser<IN, *>): Parser<IN, OUT> {
@@ -47,6 +56,15 @@ fun <IN, OUT> suffixed(parser: Parser<IN, OUT>, suffix: Parser<IN, *>): Parser<I
 @JvmName("suffixSequence")
 fun <IN, OUT> sequence(parser: Parser<IN, OUT>, suffix: Parser<IN, Unit>): Parser<IN, OUT> {
     return sequence(parser, suffix) { a, _ -> a }
+}
+
+/**
+ * Returns a parser that applies the given parsers in order.
+ * Uses the given mapping function to produce the result from the result of the first parser.
+ */
+@JvmName("suffixSequence")
+fun <IN, INTERMEDIATE, OUT> sequence(parser: Parser<IN, INTERMEDIATE>, suffix: Parser<IN, Unit>, map: (INTERMEDIATE) -> OUT): Parser<IN, OUT> {
+    return sequence(parser, suffix) { a, _ -> map(a) }
 }
 
 /**
@@ -70,7 +88,7 @@ fun <IN> sequence(a: Parser<IN, Unit>, b: Parser<IN, Unit>, vararg additional: P
 
 /**
  * Returns a parser that applies the given parsers in order.
- * Uses the given mapping function to produce the result.
+ * Uses the given mapping function to produce the result from the result of the parsers.
  */
 fun <IN, A, B, C, OUT> sequence(a: Parser<IN, A>, b: Parser<IN, B>, c: Parser<IN, C>, map: (A, B, C) -> OUT): Parser<IN, OUT> {
     val tail = Sequence2Parser(b, c) { b, c -> Pair(b, c) }
@@ -113,6 +131,15 @@ fun <IN, OUT> sequence(prefix: Parser<IN, Unit>, parser: Parser<IN, OUT>, suffix
 
 /**
  * Returns a parser that applies the given parsers in order.
+ * Uses the given mapping function to produce the result from the result of the middle parser.
+ */
+@JvmName("quotedSequence")
+fun <IN, INTERMEDIATE, OUT> sequence(prefix: Parser<IN, Unit>, parser: Parser<IN, INTERMEDIATE>, suffix: Parser<IN, Unit>, map: (INTERMEDIATE) -> OUT): Parser<IN, OUT> {
+    return sequence(discard(prefix), parser, discard(suffix)) { _, b, _ -> map(b) }
+}
+
+/**
+ * Returns a parser that applies the given parsers in order.
  * Produces the result of applying the given mapping function to the result of the first and last parsers.
  */
 fun <IN, A, B, OUT> separated(a: Parser<IN, A>, separator: Parser<IN, *>, b: Parser<IN, B>, map: (A, B) -> OUT): Parser<IN, OUT> {
@@ -133,7 +160,7 @@ fun <IN, A, B, OUT> sequence(a: Parser<IN, A>, separator: Parser<IN, Unit>, b: P
 
 /**
  * Returns a parser that applies the given parsers in order.
- * Uses the given mapping function to produce the result.
+ * Uses the given mapping function to produce the result from the result of the parsers.
  */
 fun <IN, A, B, C, D, OUT> sequence(
     a: Parser<IN, A>,
@@ -153,7 +180,7 @@ fun <IN, A, B, C, D, OUT> sequence(
 
 /**
  * Returns a parser that applies the given parsers in order.
- * Uses the given mapping function to produce the result.
+ * Uses the given mapping function to produce the result from the result of the parsers.
  */
 fun <IN, A, B, C, D, E, OUT> sequence(
     a: Parser<IN, A>,

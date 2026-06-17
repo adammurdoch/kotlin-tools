@@ -37,7 +37,9 @@ JVM specific functions
 Parsers that operate on text input:
 
 - literal(string) - produces nothing
-    - literal(string, result) - produces result
+    - literal(string, result) - produces given result
+    - literal(char) - alias
+    - literal(char, result) - alias
 - one() - produces matched input char
 - oneOf(chars) - produces matched input char
     - oneOf(char...)
@@ -57,7 +59,9 @@ Text combinators:
 Parsers that operate on binary input:
 
 - literal(bytes) - produces nothing
-    - literal(bytes, result) - produces result
+    - literal(bytes, result) - produces given result
+    - literal(byte) - alias
+    - literal(byte, result) - alias
 - one() - produces matched input byte
 - oneOf(bytes) - produces matched input byte
     - oneOf(byte...)
@@ -97,15 +101,18 @@ Sequence parsers:
 - sequence(parser, parser, parser, parser, parser, map) - produces result of map function
 - prefixed(parser, parser) - produces result of the second parser
     - sequence(unitParser, parser) - an alias
+    - sequence(unitParser, parser, map) - produces result of map function applied to result of second parser
 - prefixed(parser, parser, parser, map) - produces result of the second and third parsers
-  - sequence(unitParser, parser, parser, map) - an alias
+    - sequence(unitParser, parser, parser, map) - an alias
 - suffixed(parser, parser) - produces result of the first parser
     - sequence(parser, unitParser) - an alias
+    - sequence(parser, unitParser, map) - produces result of map function applied to result of first parser
 - quoted(parser, parser, parser) - produces result of the middle parser
     - sequence(unitParser, parser, unitParser) - an alias
+    - sequence(unitParser, parser, unitParser, map) - produces result of map function applied to result of middle parser
 - separated(parser, parser, parser, map) - produces result of map function applied to result of first and last parser
     - sequence(parser, unitParser, parser, map) - an alias
-- separated(parser, parser, parser, parser, parser, parser, map) - produces result of map function applied to result of first, third and last parser
+- separated(parser, parser, parser, parser, parser, map) - produces result of map function applied to result of first, third and last parser
   - sequence(parser, unitParser, parser, unitParser, parser, map) - an alias
 - sequence(unitParser, unitParser, unitParser...) - produces no result
 - decide(parser, factory) - uses factory to create second parser from the result of the first parser

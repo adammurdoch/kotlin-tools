@@ -17,6 +17,20 @@ fun one(): Parser<TextInput, Char> {
 }
 
 /**
+ * Returns a parser that matches the given character. Does not produce a result.
+ */
+fun literal(ch: Char): Parser<TextInput, Unit> {
+    return literal(ch.toString())
+}
+
+/**
+ * Returns a parser that matches the given text and produces the given result.
+ */
+fun <OUT> literal(ch: Char, result: OUT): Parser<TextInput, OUT> {
+    return literal(ch.toString(), result)
+}
+
+/**
  * Returns a parser that matches the given text. Does not produce a result.
  */
 fun literal(text: String): Parser<TextInput, Unit> {

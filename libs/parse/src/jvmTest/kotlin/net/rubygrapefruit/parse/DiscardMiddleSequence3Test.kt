@@ -4,7 +4,7 @@ import net.rubygrapefruit.parse.binary.literal
 import net.rubygrapefruit.parse.combinators.sequence
 import kotlin.test.Test
 
-class DiscardMiddleSequenceTest : AbstractParseTest() {
+class DiscardMiddleSequence3Test : AbstractParseTest() {
     @Test
     fun `matches literal then literal then literal`() {
         val parser = sequence(

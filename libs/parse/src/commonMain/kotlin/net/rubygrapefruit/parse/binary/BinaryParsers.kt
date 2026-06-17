@@ -16,6 +16,20 @@ fun one(): Parser<BinaryInput, Byte> {
 }
 
 /**
+ * Returns a parser that matches the given byte. Does not produce a result.
+ */
+fun literal(byte: Byte): Parser<BinaryInput, Unit> {
+    return literal(byteArrayOf(byte))
+}
+
+/**
+ * Returns a parser that matches the given byte and produces the given result.
+ */
+fun <OUT> literal(byte: Byte, result: OUT): Parser<BinaryInput, OUT> {
+    return literal(byteArrayOf(byte), result)
+}
+
+/**
  * Returns a parser that matches the given sequence of bytes. Does not produce a result.
  */
 fun literal(bytes: ByteArray): Parser<BinaryInput, Unit> {

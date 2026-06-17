@@ -39,11 +39,12 @@ class Parser {
         val bareKeys = oneOrMore(bareKey, separator = literal("."))
         val key = map(bareKeys) { Path(it) }
 
-        val quote = literal("\"")
+        val quote = literal('"')
         val escape = literal("\\")
         // not complete
         val escapes = sequence(
-            escape, oneOf(
+            escape,
+            oneOf(
                 literal("\"", "\""),
                 literal("\\", "\\")
             )

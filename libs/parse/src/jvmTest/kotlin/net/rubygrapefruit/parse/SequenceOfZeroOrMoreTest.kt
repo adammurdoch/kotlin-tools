@@ -359,4 +359,48 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
             expectEndOfInput()
         }
     }
+
+    @Test
+    fun `matches zero or more of zero or more then literal`() {
+        val parser = sequence(zeroOrMore(zeroOrMore(literal("a"))), literal("."))
+
+        parser.expecting {
+            expectSequence {
+                expectZeroOrMore(hasResult = false) {
+                    expectZeroOrMore(hasResult = false) {
+                        expectLiteral("a")
+                    }
+                }
+                expectLiteral(".")
+            }
+        }
+
+        parser.matches(".")
+        parser.matches("a.")
+        parser.matches("aa.")
+
+        // missing
+        parser.doesNotMatch("") {
+            expectLiteral("a")
+            expectLiteral(".")
+        }
+        parser.doesNotMatch("a") {
+            failAt(1)
+            expectLiteral("a")
+            expectLiteral(".")
+        }
+
+        // unexpected
+        parser.doesNotMatch("X") {
+            expectLiteral("a")
+            expectLiteral(".")
+        }
+
+        // extra
+        parser.doesNotMatch("a.X") {
+            failAt(2)
+            expectEndOfInput()
+        }
+    }
+
 }

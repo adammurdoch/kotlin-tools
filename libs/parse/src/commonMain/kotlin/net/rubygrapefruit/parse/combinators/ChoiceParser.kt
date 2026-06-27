@@ -85,6 +85,7 @@ internal class ChoiceParser<IN, OUT>(
                     when (optionResult) {
                         is PullParser.Matched -> {
                             if (waitingFor == 0) {
+                                option.continuation.disconnect()
                                 return option.continuation.next.selected(
                                     optionResult.advance,
                                     optionResult.parser,

@@ -1,5 +1,6 @@
 Parsers
 
+- Include file name in error message
 - "literal" -> "text" and "bytes"?
 - `ParseResult` and `MappingResult` use consistent names, e.g. "success" and "failure" or "succeeded" and "failed"
 - Case-insensitive text literal
@@ -14,6 +15,7 @@ Parsers
 - `accept()` should not call function on a failed branch
 - `discard(parser<unit>...)` - alias for `sequence(parser<unit>...)`?
 - `sequence(prefix, parser, separator, parser, suffix, map)`
+- `blankLine()` ?
 - More convenient way to have a long sequence with the same separator, for example:
     - `sequence(..., separator = x, map)`, eg `sequence(a, b, c, d, separator = literal(",")) { ... }`
     - Or, `sequence()`, `oneOrMore()`, etc return Parser subtype that can have a prefix, separator, etc applied

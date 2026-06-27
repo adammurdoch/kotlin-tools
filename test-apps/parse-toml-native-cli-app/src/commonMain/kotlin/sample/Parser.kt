@@ -43,7 +43,8 @@ class Parser {
         val escape = literal("\\")
         // not complete
         val escapes = sequence(
-            escape, oneOf(
+            escape,
+            oneOf(
                 literal("\"", "\""),
                 literal("\\", "\\")
             )

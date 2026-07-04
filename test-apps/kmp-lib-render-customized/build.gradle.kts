@@ -7,6 +7,7 @@ library {
         module.name = "sample.render"
         targetJvmVersion = 11
     }
+    nativeDesktop()
     desktop {
         dependencies {
             implementation(project(":kmp-lib-customized"))

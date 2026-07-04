@@ -4,6 +4,7 @@ plugins {
 
 application {
     entryPoint = "sample.main"
+    nativeDesktop()
     common {
         implementation(project(":kmp-lib"))
         implementation(project(":kmp-lib-render"))

@@ -10,6 +10,8 @@ library {
     jvm {
         targetJvmVersion = 11
     }
+    nativeDesktop()
+    browser()
 }
 
 component {

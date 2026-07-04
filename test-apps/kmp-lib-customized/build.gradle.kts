@@ -7,4 +7,5 @@ library {
         module.name = "sample.calc"
         targetJvmVersion = 11
     }
+    nativeDesktop()
 }

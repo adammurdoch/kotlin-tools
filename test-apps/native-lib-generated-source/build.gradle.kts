@@ -1,5 +1,5 @@
 plugins {
-    id("net.rubygrapefruit.native.desktop-lib")
+    id("net.rubygrapefruit.kmp.lib")
 }
 
 val generatorTask = tasks.register<SourceGeneratorTask>("generateSource") {
@@ -7,6 +7,7 @@ val generatorTask = tasks.register<SourceGeneratorTask>("generateSource") {
 }
 
 library {
+    nativeDesktop()
     macOS {
         generatedSource.add(generatorTask.flatMap { it.outputDir })
     }

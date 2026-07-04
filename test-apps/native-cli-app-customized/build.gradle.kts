@@ -5,6 +5,7 @@ plugins {
 application {
     appName = "app"
     entryPoint = "sample.main"
+    nativeDesktop()
     common {
         implementation(project(":kmp-lib-customized"))
         implementation(project(":kmp-lib-render"))

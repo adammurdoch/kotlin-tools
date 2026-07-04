@@ -1,3 +1,7 @@
 plugins {
-    id("net.rubygrapefruit.native.desktop-lib")
+    id("net.rubygrapefruit.kmp.lib")
+}
+
+library {
+    nativeDesktop()
 }

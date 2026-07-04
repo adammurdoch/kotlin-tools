@@ -1,7 +1,7 @@
 import net.rubygrapefruit.plugins.app.internal.HostMachine
 
 plugins {
-    id("net.rubygrapefruit.kmp.base-lib")
+    id("net.rubygrapefruit.kmp.lib")
 }
 
 group = versions.libs.group

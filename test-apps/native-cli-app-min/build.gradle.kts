@@ -4,4 +4,5 @@ plugins {
 
 application {
     entryPoint = "sample.main"
+    nativeDesktop()
 }

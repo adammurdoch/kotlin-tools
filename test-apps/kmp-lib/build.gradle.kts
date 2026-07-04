@@ -6,4 +6,6 @@ library {
     jvm {
         module.name = "sample.calc"
     }
+    nativeDesktop()
+    browser()
 }

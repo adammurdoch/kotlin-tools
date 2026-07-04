@@ -3,6 +3,7 @@ plugins {
 }
 
 application {
+    nativeDesktop()
     common {
         implementation(project(":cli-app"))
         implementation(project(":stream-io"))

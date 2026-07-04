@@ -1,5 +1,5 @@
 plugins {
-    id("net.rubygrapefruit.kmp.base-lib")
+    id("net.rubygrapefruit.kmp.lib")
     id("net.rubygrapefruit.bootstrap.release")
     id("net.rubygrapefruit.bootstrap.docs")
 }

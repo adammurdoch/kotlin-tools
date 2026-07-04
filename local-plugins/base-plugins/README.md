@@ -13,21 +13,14 @@ A settings plugin that must be applied to the settings of any build that uses th
 
 - Applies the foojay toolchain convention plugin.
 
-## Native desktop applications and libraries
-
-### `net.rubygrapefruit.native.desktop-lib`
-
-Builds a library implemented in Kotlin multiplatform that targets native desktop platforms.
-
-- Adds Linux and Windows x64 targets and macOS x64 and arm64 targets.
-- Adds `unixMain` and `unixTest` source sets for Kotlin code that is shared by macOS and Linux targets.
-- Adds a `library { }` block.
+## Native applications
 
 ### `net.rubygrapefruit.native.cli-app`
 
 Builds a command-line application implemented in Kotlin multiplatform that targets native desktop platforms.
 
-- Adds Linux and Windows x64 targets and macOS x64 and arm64 targets.
+- Supports Linux and Windows x64 targets and macOS x64 and arm64 targets.
+- Does not define any targets, these have to be explicitly defined.
 - Adds `unixMain` and `unixTest` source sets for Kotlin code that is shared by macOS and Linux targets.
 - Adds an `application { }` block, see below for the available settings.
 - Add `dist` and `install` tasks.
@@ -42,31 +35,18 @@ Builds a UI application implemented in Kotlin multiplatform that targets native 
 - Adds an `application { }` block, see below for the available settings.
 - Add `dist` task.
 
-### `net.rubygrapefruit.native.base-cli-app`
-
-Builds a command-line application implemented in Kotlin multiplatform.
-Does not define any targets, these have to be explicitly defined.
-
 ## Native and JVM libraries
 
 ### `net.rubygrapefruit.kmp.lib`
 
 Builds a library implemented in Kotlin multiplatform that targets the JVM, browser and native desktop platforms.
 
-- Add JVM target.
-- Add browser target.
-- Adds Linux and Windows x64 targets and macOS x64 and arm64 targets.
+- Supports JVM, browser, Linux and Windows x64 targets and macOS x64 and arm64 targets.
+- Does not define any targets, these have to be explicitly defined.
 - Adds `library { }` block, see below for the available settings.
 - Adds `unixMain` and `unixTest` source sets for Kotlin code that is shared by macOS and Linux targets.
 - Adds `desktopMain` and `desktopTest` source sets for Kotlin code that is shared by JVM, macOS, Linux and Windows targets.
 - Generates a `module-info` for the JVM target.
-
-This uses the `net.rubygrapefruit.kmp.base-lib` plugin and adds the targets. 
-
-### `net.rubygrapefruit.kmp.base-lib`
-
-Builds a library implemented in Kotlin multiplatform.
-Does not define any targets, these have to be explicitly defined.
 
 ## JVM applications and libraries
 
@@ -136,7 +116,7 @@ A convention plugin for implementing Gradle plugins using Kotlin/JVM.
 - Adds `application { }` block
   - `application.mainClass` - defaults to main class determined by inspecting the bytecode
   - `application.module.name` - defaults to the application name
-  - `application.targetJvmVersion` - defaults to 17
+  - `application.targetJvmVersion` - defaults to 21
   - `application.dependencies { }` - production dependencies
   - `application.test { }` - test dependencies
 
@@ -154,13 +134,18 @@ A convention plugin for implementing Gradle plugins using Kotlin/JVM.
 ## Native application settings
 
 - Adds `application { }` block
+  - `application.desktopNative()` - adds Windows, Linux, and macOS as targets 
+  - `application.macOS()` - adds macOS as a target 
   - `application.common { }` - production dependencies common to all targets
   - `application.test { }` - test dependencies common to all targets
 
 ## Multi-platform library settings
 
 - Adds `library { }` block
-  - `library.jvm { }` - JVM target settings (same as JVM library above) 
+  - `library.jvm { }` - Adds the JVM as a target with the given settings (same as JVM library above) 
+  - `library.desktopNative()` - adds Windows, Linux, and macOS as targets
+  - `library.macOS()` - adds macOS as a target
+  - `library.browser()` - adds the browser as a target
   - `library.common { }` - production dependencies common to all targets
   - `library.test { }` - test dependencies common to all targets
 

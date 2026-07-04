@@ -15,9 +15,11 @@ library {
     jvm {
         generatedSource.add(jvmGeneratorTask.flatMap { it.outputDir })
     }
+    nativeDesktop()
     macOS {
         generatedSource.add(macOSGeneratorTask.flatMap { it.outputDir })
     }
+    browser()
 }
 
 abstract class SourceGeneratorTask : DefaultTask() {

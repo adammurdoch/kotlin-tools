@@ -1,7 +1,7 @@
 import net.rubygrapefruit.plugins.app.BuildType
 
 plugins {
-    id("net.rubygrapefruit.native.base-cli-app")
+    id("net.rubygrapefruit.native.cli-app")
 }
 
 group = versions.plugins.group

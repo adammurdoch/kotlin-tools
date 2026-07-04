@@ -41,7 +41,7 @@ Builds a UI application implemented in Kotlin multiplatform that targets native 
 
 Builds a library implemented in Kotlin multiplatform that targets the JVM, browser and native desktop platforms.
 
-- Supports JVM, browser, Linux and Windows x64 targets and macOS x64 and arm64 targets.
+- Supports JVM (versions 11-26), browser, Linux and Windows x64 targets and macOS x64 and arm64 targets.
 - Does not define any targets, these have to be explicitly defined.
 - Adds `library { }` block, see below for the available settings.
 - Adds `unixMain` and `unixTest` source sets for Kotlin code that is shared by macOS and Linux targets.
@@ -49,6 +49,8 @@ Builds a library implemented in Kotlin multiplatform that targets the JVM, brows
 - Generates a `module-info` for the JVM target.
 
 ## JVM applications and libraries
+
+Supports JVM versions 11-26.
 
 ### `net.rubygrapefruit.jvm.lib`
 
@@ -116,7 +118,7 @@ A convention plugin for implementing Gradle plugins using Kotlin/JVM.
 - Adds `application { }` block
   - `application.mainClass` - defaults to main class determined by inspecting the bytecode
   - `application.module.name` - defaults to the application name
-  - `application.targetJvmVersion` - defaults to 21
+  - `application.targetJvmVersion` - defaults to 25
   - `application.dependencies { }` - production dependencies
   - `application.test { }` - test dependencies
 

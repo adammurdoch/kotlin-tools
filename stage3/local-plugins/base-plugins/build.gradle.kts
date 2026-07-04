@@ -20,10 +20,7 @@ dependencies {
 pluginBundle {
     plugin("net.rubygrapefruit.kotlin-base", "net.rubygrapefruit.plugins.app.internal.plugins.KotlinBasePlugin")
     plugin("net.rubygrapefruit.gradle-plugin", "net.rubygrapefruit.plugins.app.internal.plugins.GradlePluginPlugin")
-    plugin("net.rubygrapefruit.kmp.base-lib", "net.rubygrapefruit.plugins.app.internal.plugins.KmpBaseLibraryPlugin")
     plugin("net.rubygrapefruit.kmp.lib", "net.rubygrapefruit.plugins.app.internal.plugins.KmpLibraryPlugin")
-    plugin("net.rubygrapefruit.native.desktop-lib", "net.rubygrapefruit.plugins.app.internal.plugins.NativeDesktopLibraryPlugin")
-    plugin("net.rubygrapefruit.native.base-cli-app", "net.rubygrapefruit.plugins.app.internal.plugins.NativeCliApplicationBasePlugin")
     plugin("net.rubygrapefruit.native.cli-app", "net.rubygrapefruit.plugins.app.internal.plugins.NativeCliApplicationPlugin")
     plugin("net.rubygrapefruit.jvm.lib", "net.rubygrapefruit.plugins.app.internal.plugins.JvmLibraryPlugin")
     plugin("net.rubygrapefruit.jvm.cli-app", "net.rubygrapefruit.plugins.app.internal.plugins.JvmCliApplicationPlugin")

@@ -1,7 +1,7 @@
 Stage 2
 -------
 
-Plugins implemented using Kotlin that provide support for writing and releasing libraries and Gradle plugins implemented using Kotlin.
+Gradle plugins implemented using Kotlin that provide support for writing and releasing libraries and Gradle plugins implemented using Kotlin.
 
 Gradle plugin plugin
     - Produces releasable plugins

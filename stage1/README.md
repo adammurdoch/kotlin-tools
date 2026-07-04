@@ -1,7 +1,7 @@
 Stage 1
 -------
 
-Plugins implemented using Java that provide basic support for writing non-released Gradle plugins implemented using Kotlin.
+Gradle plugins implemented using Java that provide basic support for writing plugins implemented using Kotlin.
 
 - JVM base plugin
   - Makes build constants available to plugin implementation via extension and API.

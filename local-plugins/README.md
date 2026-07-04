@@ -1,4 +1,4 @@
-# Bootstrap plugins
+# Local plugins
 
 Gradle plugins that can build the Kotlin tools plugins and the JVM libraries that they use as dependencies.
 

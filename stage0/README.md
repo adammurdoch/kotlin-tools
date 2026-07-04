@@ -1,7 +1,7 @@
 Stage 0
 -------
 
-Plugins implemented using Java that provide basic support for writing non-released Gradle plugins using Java:
+Gradle plugins implemented using Java that provide basic support for writing Gradle plugins using Java:
 
 - Build constants plugin
   - Provides access to build constants via an extension and API

@@ -26,7 +26,14 @@ Kotlin tools includes several Kotlin multiplatform libraries:
 
 The source tree is arranged as follows:
 
-- [`local-plugins`](local-plugins/) contains Gradle plugins that are used to build the other Gradle plugins. 
+- [`local-plugins`](local-plugins/) contains some Gradle plugins
   - Also contains some Kotlin libraries that are used by the Gradle plugins.
+  - Some of these plugins are also used to build the Gradle plugins and libraries, via `stage3` below. 
 - [`libs`](libs/) contains some Kotlin libraries.
 - [`test-apps`](test-apps/) contains some sample applications and libraries that use the Gradle plugins.
+- [`stage0`](stage0/) contains Gradle plugins that can build plugins implemented using Java. They are also implemented using Java
+- [`stage1`](stage1/) contains Gradle plugins that can build plugins implemented using Kotlin. They are implemented using Java.
+- [`stage2`](stage2/) contains Gradle plugins that can build and release libraries and Gradle plugins implemented using Kotlin.
+- [`stage3`](stage3/) wraps libraries and plugins from `local-plugins` so that they can be used to build themselves.
+
+The file [`versions.toml`](versions.toml) defines the versions of all the dependencies of the build, the plugins and libraries and conventions for libraries and applications built by these plugins.

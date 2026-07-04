@@ -67,11 +67,11 @@ samples {
             nativeBinaries()
             launcher("app")
         }
-        derive("jvm-cli-app-java11") {
+        derive("jvm-cli-app-java-min") {
             requiresJvm(11)
         }
-        derive("jvm-cli-app-java25") {
-            requiresJvm(25)
+        derive("jvm-cli-app-java-max") {
+            requiresJvm(26)
         }
         deriveNative("native-cli-app") {
             derive("native-cli-app-customized") {

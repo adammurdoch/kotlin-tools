@@ -2,8 +2,8 @@ package net.rubygrapefruit.plugins.internal
 
 sealed class CliAppBuilder {
     internal val cliArgs = mutableListOf<String>()
-    internal var expectedOutput: String? = null
-        private set
+    internal val expectedOutput: List<String>
+        field = mutableListOf()
 
     fun cliArgs(vararg args: String) {
         cliArgs.clear()
@@ -11,7 +11,7 @@ sealed class CliAppBuilder {
     }
 
     fun expectedOutput(text: String) {
-        expectedOutput = text
+        expectedOutput.add(text)
     }
 }
 

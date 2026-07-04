@@ -31,7 +31,7 @@ class CliAppDistribution(
             distDir: Path,
             launcher: String?,
             args: List<String>,
-            expectedOutput: String?,
+            expectedOutput: List<String>,
             architecture: Architecture
         ): CliAppDistribution {
             val invocation = BinaryInvocation.of(name, distDir, launcher, args, expectedOutput)

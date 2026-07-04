@@ -45,7 +45,7 @@ class NativeCliApp internal constructor(
     sampleDir: Path,
     launcher: String?,
     args: List<String>,
-    expectedOutput: String?,
+    expectedOutput: List<String>,
     override val sourceTree: SourceTree
 ) : CliApp {
     override val distribution: CliAppDistribution

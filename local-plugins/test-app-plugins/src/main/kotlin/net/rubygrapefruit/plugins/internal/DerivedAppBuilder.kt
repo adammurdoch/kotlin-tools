@@ -3,7 +3,14 @@ package net.rubygrapefruit.plugins.internal
 import net.rubygrapefruit.machine.info.Machine
 
 sealed class DerivedCliAppBuilder {
-    internal abstract fun register(cliArgs: List<String>, expectedOutput: String?, derivedFrom: SourceTree?): Sample
+    internal val expectedOutput: List<String>
+        field = mutableListOf()
+
+    fun expectedOutput(text: String) {
+        expectedOutput.add(text)
+    }
+
+    internal abstract fun register(cliArgs: List<String>, expectedOutput: List<String>, derivedFrom: SourceTree?): Sample
 }
 
 class DerivedJvmCliAppBuilder internal constructor(
@@ -35,25 +42,26 @@ class DerivedJvmCliAppBuilder internal constructor(
         native = true
     }
 
-    override fun register(cliArgs: List<String>, expectedOutput: String?, derivedFrom: SourceTree?): JvmCliApp {
+    override fun register(cliArgs: List<String>, expectedOutput: List<String>, derivedFrom: SourceTree?): JvmCliApp {
+        val mergedExpectedOutput = expectedOutput + this.expectedOutput
         return container.add(name) { name, sampleDir ->
             val distDir = sampleDir.resolve("build/dist")
             val distribution = when {
                 embedded -> {
-                    val invocation = ScriptInvocation.of(name, distDir, launcher, cliArgs, expectedOutput)
+                    val invocation = ScriptInvocation.of(name, distDir, launcher, cliArgs, mergedExpectedOutput)
                     val javaLauncher = distDir.resolve(Machine.thisMachine.executableName("jvm/bin/java"))
                     val binaries = AppDistribution.Binaries(Machine.thisMachine.architecture, listOf(javaLauncher))
                     CliAppDistribution("dist", distDir, binaries, invocation)
                 }
 
                 native -> {
-                    val invocation = BinaryInvocation.of(name, distDir, launcher, cliArgs, expectedOutput)
+                    val invocation = BinaryInvocation.of(name, distDir, launcher, cliArgs, mergedExpectedOutput)
                     val binaries = AppDistribution.Binaries(Machine.thisMachine.architecture, listOf(invocation.binary))
                     CliAppDistribution("dist", distDir, binaries, invocation)
                 }
 
                 else -> {
-                    val invocation = ScriptInvocationWithInstalledJvm.of(name, distDir, launcher, cliArgs, expectedOutput, jvmVersion)
+                    val invocation = ScriptInvocationWithInstalledJvm.of(name, distDir, launcher, cliArgs, mergedExpectedOutput, jvmVersion)
                     CliAppDistribution("dist", distDir, null, invocation)
                 }
             }
@@ -80,13 +88,13 @@ class DerivedNativeCliAppBuilder internal constructor(
         derived.add(builder)
     }
 
-    override fun register(cliArgs: List<String>, expectedOutput: String?, derivedFrom: SourceTree?): NativeCliApp {
+    override fun register(cliArgs: List<String>, expectedOutput: List<String>, derivedFrom: SourceTree?): NativeCliApp {
         val app = container.add(name) { name, sampleDir ->
             val sourceDir = derivedFrom.generatedInto(sampleDir, "src/commonMain")
             NativeCliApp(name, sampleDir, launcher, cliArgs, expectedOutput, sourceDir)
         }
         for (builder in derived) {
-            builder.register(cliArgs, expectedOutput, app.sourceTree)
+            builder.register(cliArgs, expectedOutput + this.expectedOutput, app.sourceTree)
         }
         return app
     }

@@ -13,13 +13,13 @@ sealed interface CliAppInvocation {
 
     val commandLine: List<String>
 
-    val expectedOutput: String?
+    val expectedOutput: List<String>
 }
 
 sealed class AbstractScriptInvocation(
     val script: Path,
     val args: List<String>,
-    override val expectedOutput: String?
+    override val expectedOutput: List<String>
 ) : CliAppInvocation {
     override val launcher: Path
         get() = script
@@ -31,10 +31,10 @@ sealed class AbstractScriptInvocation(
 class ScriptInvocation(
     script: Path,
     args: List<String>,
-    expectedOutput: String?
+    expectedOutput: List<String>
 ) : AbstractScriptInvocation(script, args, expectedOutput) {
     companion object {
-        fun of(name: String, distDir: Path, launcher: String?, args: List<String>, expectedOutput: String?): ScriptInvocation {
+        fun of(name: String, distDir: Path, launcher: String?, args: List<String>, expectedOutput: List<String>): ScriptInvocation {
             val scriptPath = Machine.thisMachine.scriptName(launcher ?: name)
             return ScriptInvocation(distDir.resolve(scriptPath), args, expectedOutput)
         }
@@ -44,11 +44,11 @@ class ScriptInvocation(
 class ScriptInvocationWithInstalledJvm(
     script: Path,
     args: List<String>,
-    expectedOutput: String?,
+    expectedOutput: List<String>,
     val jvmVersion: Int
 ) : AbstractScriptInvocation(script, args, expectedOutput) {
     companion object {
-        fun of(name: String, distDir: Path, launcher: String?, args: List<String>, expectedOutput: String?, jvmVersion: Int?): ScriptInvocationWithInstalledJvm {
+        fun of(name: String, distDir: Path, launcher: String?, args: List<String>, expectedOutput: List<String>, jvmVersion: Int?): ScriptInvocationWithInstalledJvm {
             val scriptPath = Machine.thisMachine.scriptName(launcher ?: name)
             return ScriptInvocationWithInstalledJvm(distDir.resolve(scriptPath), args, expectedOutput, jvmVersion ?: BuildConstants.constants.apps.jvm.version)
         }
@@ -58,7 +58,7 @@ class ScriptInvocationWithInstalledJvm(
 class BinaryInvocation(
     val binary: Path,
     val args: List<String>,
-    override val expectedOutput: String?
+    override val expectedOutput: List<String>
 ) : CliAppInvocation {
     override val launcher: Path
         get() = binary
@@ -67,7 +67,7 @@ class BinaryInvocation(
         get() = listOf(binary.absolutePathString()) + args
 
     companion object {
-        fun of(name: String, distDir: Path, launcher: String?, args: List<String>, expectedOutput: String?): BinaryInvocation {
+        fun of(name: String, distDir: Path, launcher: String?, args: List<String>, expectedOutput: List<String>): BinaryInvocation {
             val binPath = Machine.thisMachine.executableName(launcher ?: name)
             return BinaryInvocation(distDir.resolve(binPath), args, expectedOutput)
         }

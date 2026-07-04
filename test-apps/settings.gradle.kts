@@ -69,9 +69,11 @@ samples {
         }
         derive("jvm-cli-app-java-min") {
             requiresJvm(11)
+            expectedOutput("JVM: 11.")
         }
         derive("jvm-cli-app-java-max") {
             requiresJvm(26)
+            expectedOutput("JVM: 26.")
         }
         deriveNative("native-cli-app") {
             derive("native-cli-app-customized") {

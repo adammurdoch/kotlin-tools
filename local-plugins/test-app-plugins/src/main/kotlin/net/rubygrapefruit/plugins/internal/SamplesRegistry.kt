@@ -210,8 +210,10 @@ private fun verify(app: App, distribution: AppDistribution, toolchainService: Ja
             result.assertNormalExitValue()
 
             val expectedOutput = distribution.invocation.expectedOutput
-            if (expectedOutput != null && !outputText.contains(expectedOutput)) {
-                throw IllegalStateException("Expected text '$expectedOutput' not found in output.")
+            for (text in expectedOutput) {
+                if (!outputText.contains(text)) {
+                    throw IllegalStateException("Expected text '$expectedOutput' not found in output.")
+                }
             }
         }
 

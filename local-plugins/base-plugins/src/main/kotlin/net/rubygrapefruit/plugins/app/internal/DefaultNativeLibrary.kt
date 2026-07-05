@@ -26,12 +26,6 @@ abstract class DefaultNativeLibrary @Inject constructor(
         }
     }
 
-    fun attach() {
-        sourceSets.withSourceSet(mainSourceSetName) { mainSourceSet, _ ->
-            mainSourceSet.kotlin.srcDirs(generatedSource)
-        }
-    }
-
     private class DependenciesImpl : LibraryDependencies {
         val api = mutableListOf<Any>()
         val implementation = mutableListOf<Any>()

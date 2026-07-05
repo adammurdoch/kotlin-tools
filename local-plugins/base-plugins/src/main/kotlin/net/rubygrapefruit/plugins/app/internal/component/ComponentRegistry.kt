@@ -17,16 +17,12 @@ open class ComponentRegistry(private val project: Project) {
         }
         main = component
         project.afterEvaluate {
-            val queue = mutableListOf<Any>()
-            queue.add(component)
             val sourceSets = SourceSets(project)
-            val context = DefaultContext(queue, sourceSets)
-            while (queue.isNotEmpty()) {
-                val value = queue.removeFirst()
-                realize(value, context)
-            }
-            applyActions.clear()
-            deriveActions.clear()
+            val context = DefaultContext(sourceSets) { value, context -> realize(value, context) }
+            context.derive(component)
+            context.realize()
+//            applyActions.clear()
+//            deriveActions.clear()
         }
     }
 
@@ -89,7 +85,22 @@ open class ComponentRegistry(private val project: Project) {
         fun deriveFromSourceSet(name: String, action: Context.(KotlinSourceSet) -> Unit)
     }
 
-    private class DefaultContext(val queue: MutableList<Any>, val sourceSets: SourceSets) : Context {
+    private class DefaultContext(val sourceSets: SourceSets, val realizeAction: (Any, Context) -> Unit) : Context {
+        private val queue = mutableListOf<Any>()
+        private var realizing = false
+
+        fun realize() {
+            if (realizing) {
+                return
+            }
+            realizing = true
+            while (queue.isNotEmpty()) {
+                val value = queue.removeFirst()
+                realizeAction(value, this)
+            }
+            realizing = false
+        }
+
         override fun derive(value: Any) {
             queue.add(value)
         }
@@ -97,6 +108,7 @@ open class ComponentRegistry(private val project: Project) {
         override fun deriveFromSourceSet(name: String, action: Context.(KotlinSourceSet) -> Unit) {
             sourceSets.withSourceSet(name) { sourceSet, _ ->
                 action(sourceSet)
+                realize()
             }
         }
     }

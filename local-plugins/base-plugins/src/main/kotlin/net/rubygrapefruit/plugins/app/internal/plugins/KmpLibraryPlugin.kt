@@ -35,7 +35,7 @@ class KmpLibraryPlugin : Plugin<Project> {
             }
             componentRegistry.deriveFrom<DefaultNativeLibrary> { lib ->
                 deriveFromSourceSet(lib.mainSourceSetName) { sourceSet ->
-                    lib.attach()
+                    derive(RealizedNativeComponent(sourceSet, lib.generatedSource))
                 }
             }
 

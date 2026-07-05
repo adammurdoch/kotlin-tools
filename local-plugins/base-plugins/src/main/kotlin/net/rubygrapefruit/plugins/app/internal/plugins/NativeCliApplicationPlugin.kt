@@ -31,7 +31,7 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
             }
             componentRegistry.deriveFrom<DefaultNativeComponent> { component ->
                 deriveFromSourceSet(component.mainSourceSetName) { sourceSet ->
-                    sourceSet.kotlin.srcDirs(component.generatedSource)
+                    derive(RealizedNativeComponent(sourceSet, component.generatedSource))
                 }
             }
 

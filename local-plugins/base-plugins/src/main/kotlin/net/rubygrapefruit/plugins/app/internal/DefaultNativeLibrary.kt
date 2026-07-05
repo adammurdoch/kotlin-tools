@@ -8,7 +8,7 @@ import javax.inject.Inject
 
 abstract class DefaultNativeLibrary @Inject constructor(
     private val sourceSets: SourceSets,
-    private val mainSourceSetName: String
+    val mainSourceSetName: String
 ) : NativeLibrary {
     override fun dependencies(config: LibraryDependencies.() -> Unit) {
         val dependencies = DependenciesImpl()

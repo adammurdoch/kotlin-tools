@@ -11,12 +11,12 @@ abstract class DefaultJvmComponent<D : Dependencies> @Inject constructor(
     private val project: Project,
     private val mainSourceSetName: String,
     private val testSourceSetName: String
-) : JvmComponent<D> {
-    val mainSourceSet
+) : JvmComponent<D>, HasGeneratedSource {
+    override val sourceSet
         get() = project.extensions.getByType(KotlinProjectExtension::class.java).sourceSets.getByName(mainSourceSetName)
 
     override fun dependencies(config: D.() -> Unit) {
-        mainSourceSet.dependencies { config(wrap(this)) }
+        sourceSet.dependencies { config(wrap(this)) }
     }
 
     override fun test(config: D.() -> Unit) {

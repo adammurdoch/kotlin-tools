@@ -14,7 +14,7 @@ class KmpLibraryPlugin : Plugin<Project> {
         with(target) {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
             plugins.apply(LibraryBasePlugin::class.java)
-            plugins.apply(JvmComponentPlugin::class.java)
+            plugins.apply(ComponentBasePlugin::class.java)
             plugins.apply(JvmConventionsPlugin::class.java)
 
             JvmConventionsPlugin.addApiConstraints(project, "commonMainApi")

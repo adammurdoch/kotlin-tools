@@ -33,13 +33,6 @@ open class ComponentRegistry(private val project: Project) {
         deriveFrom(T::class, action)
     }
 
-    inline fun <reified T : Any> maybeDeriveFrom(noinline action: (T) -> Any?) {
-        deriveFrom(T::class) {
-            val result = action(it)
-            if (result == null) emptyList() else listOf(result)
-        }
-    }
-
     /**
      * Applies a configured object of type [T] to the project.
      */

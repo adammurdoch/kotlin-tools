@@ -17,7 +17,7 @@ class JvmLibraryPlugin : Plugin<Project> {
             plugins.apply("java-library")
             plugins.apply("org.jetbrains.kotlin.jvm")
             plugins.apply(LibraryBasePlugin::class.java)
-            plugins.apply(JvmComponentPlugin::class.java)
+            plugins.apply(ComponentBasePlugin::class.java)
             plugins.apply(JvmConventionsPlugin::class.java)
 
             val lib = extensions.create(JvmLibrary::class.java, "library", DefaultJvmLibrary::class.java, "main", "test") as DefaultJvmLibrary

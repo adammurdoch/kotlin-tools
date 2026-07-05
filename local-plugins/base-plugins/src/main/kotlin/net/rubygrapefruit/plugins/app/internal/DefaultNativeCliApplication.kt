@@ -6,6 +6,7 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.jetbrains.kotlin.gradle.dsl.KotlinNativeBinaryContainer
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import javax.inject.Inject
 
 abstract class DefaultNativeCliApplication @Inject constructor(
@@ -13,11 +14,15 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     objects: ObjectFactory,
     providers: ProviderFactory,
     project: Project
-) : MutableApplication, MutableNativeApplication, NativeApplication {
+) : MutableApplication, MutableNativeApplication, NativeApplication, HasGeneratedSource {
     val targets = NativeTargetsContainer(objects, providers, project.tasks)
     private val appTargets = NativeApplicationTargets(componentRegistry, objects, project)
 
-    override val distributionContainer = targets.distributions
+    override val sourceSet: KotlinSourceSet
+        get() = appTargets.mainSourceSet
+
+    override val distributionContainer
+        get() = targets.distributions
 
     override val executables: Provider<List<NativeExecutable>>
         get() = targets.executables
@@ -46,9 +51,5 @@ abstract class DefaultNativeCliApplication @Inject constructor(
 
     override fun test(config: Dependencies.() -> Unit) {
         appTargets.test(config)
-    }
-
-    fun attach() {
-        appTargets.mainSourceSet.kotlin.srcDirs(generatedSource)
     }
 }

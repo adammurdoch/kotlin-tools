@@ -71,8 +71,7 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
 
     private fun createMacOS(): DefaultNativeLibrary {
         if (macOs == null) {
-            val lib = factory.newInstance(DefaultNativeLibrary::class.java, componentRegistry.sourceSets, "macosMain")
-            macOs = lib
+            macOs = factory.newInstance(DefaultNativeLibrary::class.java, componentRegistry.sourceSets, "macosMain")
         }
         return macOs!!
     }

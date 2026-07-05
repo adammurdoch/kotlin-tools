@@ -13,9 +13,9 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
         with(target) {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
             plugins.apply(CliApplicationBasePlugin::class.java)
+            plugins.apply(ComponentBasePlugin::class.java)
 
             applications.withApp<DefaultNativeCliApplication> { app ->
-                app.attach()
                 app.entryPoint.convention("main")
                 multiplatformComponents.eachNativeExecutable { machine, buildType, binaryFile, executable ->
                     app.targets.attachExecutable(machine, buildType, binaryFile)

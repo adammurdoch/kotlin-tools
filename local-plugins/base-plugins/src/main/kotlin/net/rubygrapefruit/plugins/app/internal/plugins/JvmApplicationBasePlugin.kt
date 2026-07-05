@@ -17,7 +17,7 @@ class JvmApplicationBasePlugin : Plugin<Project> {
         with(target) {
             plugins.apply("org.jetbrains.kotlin.jvm")
             plugins.apply(ApplicationBasePlugin::class.java)
-            plugins.apply(JvmComponentPlugin::class.java)
+            plugins.apply(ComponentBasePlugin::class.java)
             plugins.apply(JvmConventionsPlugin::class.java)
 
             applications.withApp<MutableJvmApplication> { app ->

@@ -11,9 +11,10 @@ class JvmCliApplicationPlugin : Plugin<Project> {
         with(target) {
             plugins.apply(JvmApplicationBasePlugin::class.java)
             plugins.apply(CliApplicationBasePlugin::class.java)
-            applications.withApp<DefaultJvmCliApplication> { app ->
+            componentRegistry.applyToProject<DefaultJvmCliApplication> { app ->
                 app.attach()
-
+            }
+            applications.withApp<DefaultJvmCliApplication> { app ->
                 val libsDirPath = "lib"
 
                 val libNames = app.runtimeModulePath.elements.map { it.map { f -> f.asFile.name } }

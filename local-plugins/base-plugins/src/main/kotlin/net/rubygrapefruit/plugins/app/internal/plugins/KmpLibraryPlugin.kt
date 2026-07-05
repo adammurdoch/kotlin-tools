@@ -3,6 +3,7 @@ package net.rubygrapefruit.plugins.app.internal.plugins
 import net.rubygrapefruit.plugins.app.MultiPlatformLibrary
 import net.rubygrapefruit.plugins.app.internal.DefaultMultiPlatformLibrary
 import net.rubygrapefruit.plugins.app.internal.JvmModuleRegistry
+import net.rubygrapefruit.plugins.app.internal.componentRegistry
 import net.rubygrapefruit.plugins.app.internal.kotlin
 import net.rubygrapefruit.plugins.app.internal.multiplatformComponents
 import org.gradle.api.Plugin
@@ -29,6 +30,7 @@ class KmpLibraryPlugin : Plugin<Project> {
                 objects,
                 project
             ) as DefaultMultiPlatformLibrary
+            componentRegistry.register(lib)
 
             multiplatformComponents.jvmTarget {
                 val extension = kotlin

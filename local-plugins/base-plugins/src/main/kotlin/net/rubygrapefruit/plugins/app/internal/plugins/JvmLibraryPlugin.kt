@@ -4,6 +4,7 @@ import net.rubygrapefruit.plugins.app.JvmLibrary
 import net.rubygrapefruit.plugins.app.Versions
 import net.rubygrapefruit.plugins.app.internal.DefaultJvmLibrary
 import net.rubygrapefruit.plugins.app.internal.JvmModuleRegistry
+import net.rubygrapefruit.plugins.app.internal.componentRegistry
 import net.rubygrapefruit.plugins.app.internal.toModuleName
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -19,6 +20,7 @@ class JvmLibraryPlugin : Plugin<Project> {
             plugins.apply(JvmConventionsPlugin::class.java)
 
             val lib = extensions.create(JvmLibrary::class.java, "library", DefaultJvmLibrary::class.java, "main", "test") as DefaultJvmLibrary
+            componentRegistry.register(lib)
             lib.module.name.convention(toModuleName(project.name))
             lib.targetJvmVersion.convention(Versions.libs.jvm.version)
 
@@ -35,7 +37,9 @@ class JvmLibraryPlugin : Plugin<Project> {
 
             val classesDir = files(tasks.named("compileKotlin", KotlinCompile::class.java).map { it.destinationDirectory })
 
-            val moduleInfoCp = extensions.getByType(JvmModuleRegistry::class.java).inspectClassPathsFor(lib.module, null, classesDir, apiClasspath, runtimeClasspath).moduleInfoClasspath
+            val moduleInfoCp = extensions.getByType(JvmModuleRegistry::class.java)
+                .inspectClassPathsFor(lib.module, null, classesDir, apiClasspath, runtimeClasspath)
+                .moduleInfoClasspath
 
             val sourceSet = extensions.getByType(SourceSetContainer::class.java).getByName("main")
             sourceSet.output.dir(moduleInfoCp)

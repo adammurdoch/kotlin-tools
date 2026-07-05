@@ -1,11 +1,15 @@
 package net.rubygrapefruit.plugins.app.internal
 
+import net.rubygrapefruit.plugins.app.internal.component.ComponentRegistry
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+
+val Project.componentRegistry: ComponentRegistry
+    get() = extensions.getByType(ComponentRegistry::class.java)
 
 val Project.applications: ApplicationRegistry
     get() = extensions.getByType(ApplicationRegistry::class.java)

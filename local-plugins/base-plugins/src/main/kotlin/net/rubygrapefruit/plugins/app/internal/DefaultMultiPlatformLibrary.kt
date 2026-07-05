@@ -1,6 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal
 
 import net.rubygrapefruit.plugins.app.*
+import net.rubygrapefruit.plugins.app.internal.component.MutableComponent
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
 import javax.inject.Inject
@@ -9,7 +10,7 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
     private val componentRegistry: MultiPlatformComponentRegistry,
     private val factory: ObjectFactory,
     private val project: Project
-) : MultiPlatformLibrary {
+) : MultiPlatformLibrary, MutableComponent {
     private var jvm: JvmLibrary? = null
     private var macOs: DefaultNativeLibrary? = null
 

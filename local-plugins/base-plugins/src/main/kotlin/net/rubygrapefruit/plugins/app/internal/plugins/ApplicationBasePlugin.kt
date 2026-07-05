@@ -2,6 +2,7 @@ package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.internal.ApplicationRegistry
 import net.rubygrapefruit.plugins.app.internal.MultiPlatformComponentRegistry
+import net.rubygrapefruit.plugins.app.internal.component.ComponentRegistry
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -13,7 +14,8 @@ class ApplicationBasePlugin : Plugin<Project> {
             repositories.mavenCentral()
 
             target.extensions.create("multiplatformComponents", MultiPlatformComponentRegistry::class.java)
-            target.extensions.create("applications", ApplicationRegistry::class.java)
+            val componentRegistry = target.extensions.create("componentRegistry", ComponentRegistry::class.java)
+            target.extensions.create("applicationRegistry", ApplicationRegistry::class.java, componentRegistry)
         }
     }
 }

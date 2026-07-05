@@ -1,11 +1,12 @@
 package net.rubygrapefruit.plugins.app.internal
 
 import net.rubygrapefruit.plugins.app.Application
+import net.rubygrapefruit.plugins.app.internal.component.ComponentRegistry
 import net.rubygrapefruit.plugins.app.internal.tasks.Distributions
 import net.rubygrapefruit.plugins.app.internal.tasks.ShowApplication
 import org.gradle.api.Project
 
-open class ApplicationRegistry(private val project: Project) {
+open class ApplicationRegistry(private val project: Project, private val componentRegistry: ComponentRegistry) {
     private var main: MutableApplication? = null
     private val whenAppSet = mutableListOf<Project.(Application) -> Unit>()
 
@@ -14,6 +15,7 @@ open class ApplicationRegistry(private val project: Project) {
             throw UnsupportedOperationException("Support for multiple applications in the same project is not implemented.")
         }
         main = app
+        componentRegistry.register(app)
 
         app.appName.convention(project.name)
 
@@ -72,7 +74,7 @@ open class ApplicationRegistry(private val project: Project) {
     }
 
     fun applyToApp(builder: Project.(Application) -> Unit) {
-        val main = this.main
+        val main = main
         if (main != null) {
             builder(project, main)
         } else {

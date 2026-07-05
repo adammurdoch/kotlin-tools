@@ -1,10 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.NativeApplication
-import net.rubygrapefruit.plugins.app.internal.DefaultNativeCliApplication
-import net.rubygrapefruit.plugins.app.internal.HostMachine
-import net.rubygrapefruit.plugins.app.internal.applications
-import net.rubygrapefruit.plugins.app.internal.multiplatformComponents
+import net.rubygrapefruit.plugins.app.internal.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -26,6 +23,11 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
                         executable.entryPoint = app.entryPoint.get()
                     }
                 }
+            }
+
+            componentRegistry.deriveFrom<DefaultNativeCliApplication> { app -> listOfNotNull(app.macOs) }
+            componentRegistry.applyToProject<DefaultNativeComponent> { component ->
+                component.attach()
             }
 
             val app = extensions.create(NativeApplication::class.java, "application", DefaultNativeCliApplication::class.java, multiplatformComponents)

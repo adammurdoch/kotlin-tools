@@ -6,7 +6,7 @@ import javax.inject.Inject
 
 abstract class DefaultNativeComponent @Inject constructor(
     private val sourceSets: SourceSets,
-    private val mainSourceSetName: String
+    val mainSourceSetName: String
 ) : NativeComponent<Dependencies> {
 
     override fun dependencies(config: Dependencies.() -> Unit) {

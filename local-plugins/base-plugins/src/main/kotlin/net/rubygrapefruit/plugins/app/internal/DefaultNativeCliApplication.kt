@@ -17,6 +17,8 @@ abstract class DefaultNativeCliApplication @Inject constructor(
 ) : MutableApplication, MutableNativeApplication, NativeApplication, HasGeneratedSource {
     val targets = NativeTargetsContainer(objects, providers, project.tasks)
     private val appTargets = NativeApplicationTargets(componentRegistry, objects, project)
+    val macOs: DefaultNativeComponent?
+        get() = appTargets.macOS
 
     override val sourceSet: KotlinSourceSet
         get() = appTargets.mainSourceSet

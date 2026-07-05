@@ -10,7 +10,8 @@ class NativeApplicationTargets @Inject constructor(
     private val objects: ObjectFactory,
     private val project: Project
 ) {
-    private var macOS: DefaultNativeComponent? = null
+    var macOS: DefaultNativeComponent? = null
+        private set
 
     val mainSourceSet get() = project.kotlin.sourceSets.getByName("commonMain")
 
@@ -26,7 +27,6 @@ class NativeApplicationTargets @Inject constructor(
         if (macOS == null) {
             val component = objects.newInstance(DefaultNativeComponent::class.java, componentRegistry.sourceSets, "macosMain")
             macOS = component
-            component.attach()
         }
         return macOS!!
     }

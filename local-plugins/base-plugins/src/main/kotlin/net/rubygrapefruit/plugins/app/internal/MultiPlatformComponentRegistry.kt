@@ -17,21 +17,24 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
     private val machines = mutableSetOf<NativeMachine>()
     private val machineActions = mutableListOf<(NativeMachine, KotlinNativeTarget) -> Unit>()
     private val jvm = SimpleContainer<Boolean>()
+    private var hasSourceSets = false
     val sourceSets = SourceSets(project)
 
-    init {
-        project.afterEvaluate {
-            val hasJvm = jvm.all.isNotEmpty()
-            val hasNative = machines.isNotEmpty()
-            val desktop = hasJvm && hasNative
-            if (unixSourceSets.isNotEmpty() || unixTestSourceSets.isNotEmpty() || desktop) {
-                project.kotlin.applyDefaultHierarchyTemplate()
-                createIntermediateSourceSet("unixMain", "nativeMain", unixSourceSets)
-                createIntermediateSourceSet("unixTest", "nativeTest", unixTestSourceSets)
-                if (desktop) {
-                    createIntermediateSourceSet("desktopMain", "commonMain", setOf("jvmMain", "nativeMain"))
-                    createIntermediateSourceSet("desktopTest", "commonTest", setOf("jvmTest", "nativeTest"))
-                }
+    fun createSourceSets() {
+        if (hasSourceSets) {
+            return
+        }
+        hasSourceSets = true
+        val hasJvm = jvm.all.isNotEmpty()
+        val hasNative = machines.isNotEmpty()
+        val desktop = hasJvm && hasNative
+        if (unixSourceSets.isNotEmpty() || unixTestSourceSets.isNotEmpty() || desktop) {
+            project.kotlin.applyDefaultHierarchyTemplate()
+            createIntermediateSourceSet("unixMain", "nativeMain", unixSourceSets)
+            createIntermediateSourceSet("unixTest", "nativeTest", unixTestSourceSets)
+            if (desktop) {
+                createIntermediateSourceSet("desktopMain", "commonMain", setOf("jvmMain", "nativeMain"))
+                createIntermediateSourceSet("desktopTest", "commonTest", setOf("jvmTest", "nativeTest"))
             }
         }
     }

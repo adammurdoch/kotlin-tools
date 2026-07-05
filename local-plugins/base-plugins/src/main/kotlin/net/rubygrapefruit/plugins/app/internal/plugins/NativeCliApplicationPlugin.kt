@@ -5,6 +5,7 @@ import net.rubygrapefruit.plugins.app.internal.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
+@Suppress("unused")
 open class NativeCliApplicationPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
@@ -25,9 +26,13 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
                 }
             }
 
-            componentRegistry.deriveFrom<DefaultNativeCliApplication> { app -> listOfNotNull(app.macOs) }
-            componentRegistry.applyToProject<DefaultNativeComponent> { component ->
-                component.attach()
+            componentRegistry.deriveFrom<DefaultNativeCliApplication> { app ->
+                deriveNullable(app.macOs)
+            }
+            componentRegistry.deriveFrom<DefaultNativeComponent> { component ->
+                deriveFromSourceSet(component.mainSourceSetName) { sourceSet ->
+                    sourceSet.kotlin.srcDirs(component.generatedSource)
+                }
             }
 
             val app = extensions.create(NativeApplication::class.java, "application", DefaultNativeCliApplication::class.java, multiplatformComponents)

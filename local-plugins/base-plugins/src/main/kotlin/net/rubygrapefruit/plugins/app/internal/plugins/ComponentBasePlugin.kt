@@ -10,9 +10,8 @@ import org.gradle.api.Project
 class ComponentBasePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            componentRegistry.deriveFrom<MutableComponent> { component ->
+            componentRegistry.applyToProject<MutableComponent> { _ ->
                 multiplatformComponents.createSourceSets()
-                emptyList()
             }
             componentRegistry.applyToProject<HasGeneratedSource> { component ->
                 component.sourceSet.kotlin.srcDirs(component.generatedSource)

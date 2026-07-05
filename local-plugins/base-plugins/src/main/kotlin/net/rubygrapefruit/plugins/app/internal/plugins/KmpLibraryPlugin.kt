@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import kotlin.math.max
 
+@Suppress("unused")
 class KmpLibraryPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
@@ -28,9 +29,14 @@ class KmpLibraryPlugin : Plugin<Project> {
                 project
             ) as DefaultMultiPlatformLibrary
             componentRegistry.register(lib)
-            componentRegistry.deriveFrom<DefaultMultiPlatformLibrary> { lib -> listOfNotNull(lib.jvm, lib.macOs) }
-            componentRegistry.applyToProject<DefaultNativeLibrary> { lib ->
-                lib.attach()
+            componentRegistry.deriveFrom<DefaultMultiPlatformLibrary> { lib ->
+                deriveNullable(lib.jvm)
+                deriveNullable(lib.macOs)
+            }
+            componentRegistry.deriveFrom<DefaultNativeLibrary> { lib ->
+                deriveFromSourceSet(lib.mainSourceSetName) { sourceSet ->
+                    lib.attach()
+                }
             }
 
             multiplatformComponents.jvmTarget {

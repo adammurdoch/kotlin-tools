@@ -16,10 +16,4 @@ abstract class DefaultNativeComponent @Inject constructor(
             }
         }
     }
-
-    fun attach() {
-        sourceSets.withSourceSet(mainSourceSetName) { mainSourceSet, _ ->
-            mainSourceSet.kotlin.srcDirs(generatedSource)
-        }
-    }
 }

@@ -122,6 +122,8 @@ samples {
             launcher("App")
         }
     }
+    jvmUiApp("jvm-ui-app-generated-source") {
+    }
 
     nativeUiApp("native-ui-app") {
         derive("native-ui-app-customized") {

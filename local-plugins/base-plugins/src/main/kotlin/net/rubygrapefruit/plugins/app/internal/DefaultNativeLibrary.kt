@@ -27,10 +27,8 @@ abstract class DefaultNativeLibrary @Inject constructor(
     }
 
     fun attach() {
-        sourceSets.withSourceSet(mainSourceSetName) { sourceSet, _ ->
-            sourceSets.withSourceSet(mainSourceSetName) { mainSourceSet, _ ->
-                mainSourceSet.kotlin.srcDirs(generatedSource)
-            }
+        sourceSets.withSourceSet(mainSourceSetName) { mainSourceSet, _ ->
+            mainSourceSet.kotlin.srcDirs(generatedSource)
         }
     }
 

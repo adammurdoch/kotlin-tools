@@ -11,7 +11,8 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
     private val factory: ObjectFactory,
     private val project: Project
 ) : MultiPlatformLibrary, MutableComponent {
-    private var jvm: JvmLibrary? = null
+    var jvm: JvmLibrary? = null
+        private set
     private var macOs: DefaultNativeLibrary? = null
 
     val module: JvmModule
@@ -63,7 +64,6 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
             jvm = lib
             // This can call back to query JVM object
             componentRegistry.jvm(lib.targetJvmVersion)
-            lib.attach()
         }
         return jvm!!
     }

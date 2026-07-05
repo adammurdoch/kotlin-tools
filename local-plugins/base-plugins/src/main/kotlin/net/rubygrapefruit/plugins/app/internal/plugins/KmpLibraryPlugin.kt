@@ -1,11 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.MultiPlatformLibrary
-import net.rubygrapefruit.plugins.app.internal.DefaultMultiPlatformLibrary
-import net.rubygrapefruit.plugins.app.internal.JvmModuleRegistry
-import net.rubygrapefruit.plugins.app.internal.componentRegistry
-import net.rubygrapefruit.plugins.app.internal.kotlin
-import net.rubygrapefruit.plugins.app.internal.multiplatformComponents
+import net.rubygrapefruit.plugins.app.internal.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.jvm.tasks.Jar
@@ -18,6 +14,7 @@ class KmpLibraryPlugin : Plugin<Project> {
         with(target) {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
             plugins.apply(LibraryBasePlugin::class.java)
+            plugins.apply(JvmComponentPlugin::class.java)
             plugins.apply(JvmConventionsPlugin::class.java)
 
             JvmConventionsPlugin.addApiConstraints(project, "commonMainApi")
@@ -31,6 +28,7 @@ class KmpLibraryPlugin : Plugin<Project> {
                 project
             ) as DefaultMultiPlatformLibrary
             componentRegistry.register(lib)
+            componentRegistry.maybeDeriveFrom<DefaultMultiPlatformLibrary> { lib -> lib.jvm }
 
             multiplatformComponents.jvmTarget {
                 val extension = kotlin

@@ -2,12 +2,13 @@ package net.rubygrapefruit.plugins.app.internal
 
 import net.rubygrapefruit.plugins.app.Dependencies
 import net.rubygrapefruit.plugins.app.NativeComponent
+import net.rubygrapefruit.plugins.app.internal.component.MutableComponent
 import javax.inject.Inject
 
 abstract class DefaultNativeComponent @Inject constructor(
     private val sourceSets: SourceSets,
     val mainSourceSetName: String
-) : NativeComponent<Dependencies> {
+) : NativeComponent<Dependencies>, MutableComponent {
 
     override fun dependencies(config: Dependencies.() -> Unit) {
         sourceSets.withSourceSet(mainSourceSetName) { mainSourceSet, _ ->

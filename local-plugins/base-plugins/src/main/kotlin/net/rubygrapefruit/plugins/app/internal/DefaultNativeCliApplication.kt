@@ -1,6 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal
 
 import net.rubygrapefruit.plugins.app.*
+import net.rubygrapefruit.plugins.app.internal.component.MutableComponent
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
@@ -14,11 +15,9 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     objects: ObjectFactory,
     providers: ProviderFactory,
     project: Project
-) : MutableApplication, MutableNativeApplication, NativeApplication, HasGeneratedSource {
+) : MutableApplication, MutableNativeApplication, NativeApplication, HasGeneratedSource, HasTargets {
     val targets = NativeTargetsContainer(objects, providers, project.tasks)
     private val appTargets = NativeApplicationTargets(componentRegistry, objects, project)
-    val macOs: DefaultNativeComponent?
-        get() = appTargets.macOS
 
     override val sourceSet: KotlinSourceSet
         get() = appTargets.mainSourceSet
@@ -28,6 +27,10 @@ abstract class DefaultNativeCliApplication @Inject constructor(
 
     override val executables: Provider<List<NativeExecutable>>
         get() = targets.executables
+
+    override fun visitTargets(consumer: (MutableComponent) -> Unit) {
+        appTargets.visitTargets(consumer)
+    }
 
     override fun macOS() {
         componentRegistry.macOS { register(it) }

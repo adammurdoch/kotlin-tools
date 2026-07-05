@@ -2,6 +2,7 @@ package net.rubygrapefruit.plugins.app.internal
 
 import net.rubygrapefruit.plugins.app.LibraryDependencies
 import net.rubygrapefruit.plugins.app.NativeLibrary
+import net.rubygrapefruit.plugins.app.internal.component.MutableComponent
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ExternalModuleDependency
 import javax.inject.Inject
@@ -9,7 +10,7 @@ import javax.inject.Inject
 abstract class DefaultNativeLibrary @Inject constructor(
     private val sourceSets: SourceSets,
     val mainSourceSetName: String
-) : NativeLibrary {
+) : NativeLibrary, MutableComponent {
     override fun dependencies(config: LibraryDependencies.() -> Unit) {
         val dependencies = DependenciesImpl()
         config(dependencies)

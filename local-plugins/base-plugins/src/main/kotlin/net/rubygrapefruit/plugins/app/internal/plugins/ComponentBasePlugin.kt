@@ -1,6 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.internal.HasGeneratedSource
+import net.rubygrapefruit.plugins.app.internal.HasTargets
 import net.rubygrapefruit.plugins.app.internal.component.MutableComponent
 import net.rubygrapefruit.plugins.app.internal.componentRegistry
 import net.rubygrapefruit.plugins.app.internal.multiplatformComponents
@@ -12,6 +13,11 @@ class ComponentBasePlugin : Plugin<Project> {
         with(target) {
             componentRegistry.applyToProject<MutableComponent> { _ ->
                 multiplatformComponents.createSourceSets()
+            }
+            componentRegistry.deriveFrom<HasTargets> { component ->
+                component.visitTargets { target ->
+                    derive(target)
+                }
             }
             componentRegistry.applyToProject<HasGeneratedSource> { component ->
                 component.sourceSet.kotlin.srcDirs(component.generatedSource)

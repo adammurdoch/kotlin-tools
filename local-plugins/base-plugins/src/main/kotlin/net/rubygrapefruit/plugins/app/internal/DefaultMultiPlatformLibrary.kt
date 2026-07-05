@@ -10,14 +10,21 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
     private val componentRegistry: MultiPlatformComponentRegistry,
     private val factory: ObjectFactory,
     private val project: Project
-) : MultiPlatformLibrary, MutableComponent {
-    var jvm: JvmLibrary? = null
-        private set
-    var macOs: DefaultNativeLibrary? = null
-        private set
+) : MultiPlatformLibrary, MutableComponent, HasTargets {
+    private var jvm: DefaultJvmLibrary? = null
+    private var macOs: DefaultNativeLibrary? = null
 
     val module: JvmModule
         get() = createJvm().module
+
+    override fun visitTargets(consumer: (MutableComponent) -> Unit) {
+        if (jvm != null) {
+            consumer(jvm!!)
+        }
+        if (macOs != null) {
+            consumer(macOs!!)
+        }
+    }
 
     override fun jvm() {
         jvm {}

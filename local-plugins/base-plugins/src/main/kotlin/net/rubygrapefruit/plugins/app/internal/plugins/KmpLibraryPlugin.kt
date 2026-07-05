@@ -25,14 +25,9 @@ class KmpLibraryPlugin : Plugin<Project> {
                 "library",
                 DefaultMultiPlatformLibrary::class.java,
                 multiplatformComponents,
-                objects,
-                project
+                objects
             ) as DefaultMultiPlatformLibrary
             componentRegistry.register(lib)
-            componentRegistry.deriveFrom<DefaultMultiPlatformLibrary> { lib ->
-                deriveNullable(lib.jvm)
-                deriveNullable(lib.macOs)
-            }
             componentRegistry.deriveFrom<DefaultNativeLibrary> { lib ->
                 deriveFromSourceSet(lib.mainSourceSetName) { sourceSet ->
                     derive(RealizedNativeComponent(sourceSet, lib.generatedSource))

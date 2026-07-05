@@ -26,9 +26,6 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
                 }
             }
 
-            componentRegistry.deriveFrom<DefaultNativeCliApplication> { app ->
-                deriveNullable(app.macOs)
-            }
             componentRegistry.deriveFrom<DefaultNativeComponent> { component ->
                 deriveFromSourceSet(component.mainSourceSetName) { sourceSet ->
                     derive(RealizedNativeComponent(sourceSet, component.generatedSource))

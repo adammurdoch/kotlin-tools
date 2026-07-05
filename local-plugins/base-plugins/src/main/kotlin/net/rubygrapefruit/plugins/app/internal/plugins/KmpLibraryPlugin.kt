@@ -28,7 +28,8 @@ class KmpLibraryPlugin : Plugin<Project> {
                 project
             ) as DefaultMultiPlatformLibrary
             componentRegistry.register(lib)
-            componentRegistry.maybeDeriveFrom<DefaultMultiPlatformLibrary> { lib -> lib.jvm }
+            componentRegistry.deriveFrom<DefaultMultiPlatformLibrary> { lib -> listOfNotNull(lib.jvm, lib.macOs) }
+            componentRegistry.applyToProject<DefaultNativeLibrary> { lib -> lib.attach() }
 
             multiplatformComponents.jvmTarget {
                 val extension = kotlin

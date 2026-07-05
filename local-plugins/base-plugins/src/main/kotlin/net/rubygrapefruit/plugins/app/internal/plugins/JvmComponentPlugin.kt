@@ -9,7 +9,7 @@ class JvmComponentPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             componentRegistry.applyToProject<DefaultJvmComponent<*>> { component ->
-                component.attach()
+                component.mainSourceSet.kotlin.srcDirs(component.generatedSource)
             }
         }
     }

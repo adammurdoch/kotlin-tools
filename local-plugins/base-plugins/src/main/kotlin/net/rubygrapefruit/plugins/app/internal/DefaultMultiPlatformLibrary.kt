@@ -13,7 +13,8 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
 ) : MultiPlatformLibrary, MutableComponent {
     var jvm: JvmLibrary? = null
         private set
-    private var macOs: DefaultNativeLibrary? = null
+    var macOs: DefaultNativeLibrary? = null
+        private set
 
     val module: JvmModule
         get() = createJvm().module
@@ -72,9 +73,7 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
         if (macOs == null) {
             val lib = factory.newInstance(DefaultNativeLibrary::class.java, componentRegistry.sourceSets, "macosMain")
             macOs = lib
-            lib.attach()
         }
         return macOs!!
     }
-
 }

@@ -11,9 +11,6 @@ class JvmCliApplicationPlugin : Plugin<Project> {
         with(target) {
             plugins.apply(JvmApplicationBasePlugin::class.java)
             plugins.apply(CliApplicationBasePlugin::class.java)
-            componentRegistry.applyToProject<DefaultJvmCliApplication> { app ->
-                app.attach()
-            }
             applications.withApp<DefaultJvmCliApplication> { app ->
                 val libsDirPath = "lib"
 

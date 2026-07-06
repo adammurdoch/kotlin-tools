@@ -9,4 +9,7 @@ application {
         implementation(project(":kmp-lib"))
         implementation(project(":jvm-lib"))
     }
+    test {
+        implementation(versions.test.coordinates)
+    }
 }

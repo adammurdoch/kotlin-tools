@@ -61,7 +61,11 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
     fun browser() {
         with(project.kotlin) {
             js {
-                browser()
+                browser {
+                    testTask { task ->
+                        task.useMocha()
+                    }
+                }
             }
         }
     }

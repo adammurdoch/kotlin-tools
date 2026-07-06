@@ -5,4 +5,7 @@ plugins {
 library {
     module.name = "sample.system"
     targetJvmVersion = 11
+    test {
+        implementation(versions.test.coordinates)
+    }
 }

@@ -4,4 +4,7 @@ plugins {
 
 application {
     entryPoint = "sample.main"
+    test {
+        implementation(versions.test.coordinates)
+    }
 }

@@ -8,4 +8,7 @@ library {
     }
     nativeDesktop()
     browser()
+    test {
+        implementation(versions.test.coordinates)
+    }
 }

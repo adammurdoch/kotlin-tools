@@ -7,6 +7,7 @@ import net.rubygrapefruit.plugins.app.internal.tasks.NativeLauncher
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
+@Suppress("unused")
 class NativeUiApplicationPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {

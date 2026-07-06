@@ -15,9 +15,15 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     objects: ObjectFactory,
     providers: ProviderFactory,
     project: Project
-) : MutableApplication, MutableNativeApplication, NativeApplication, HasGeneratedSource, HasTargets {
+) : MutableApplication, NativeApplication, HasGeneratedSource, HasTargets {
     val targets = NativeTargetsContainer(objects, providers, project.tasks)
     private val appTargets = NativeApplicationTargets(objects, project)
+
+    override val common: DefaultDependencies
+        get() = appTargets.common
+
+    override val test: DefaultDependencies
+        get() = appTargets.test
 
     override val sourceSet: KotlinSourceSet
         get() = appTargets.mainSourceSet
@@ -38,7 +44,7 @@ abstract class DefaultNativeCliApplication @Inject constructor(
 
     override fun macOS(config: NativeComponent<Dependencies>.() -> Unit) {
         macOS()
-        config(appTargets.macOS())
+        appTargets.macOS().config()
     }
 
     override fun nativeDesktop() {
@@ -51,10 +57,10 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     }
 
     override fun common(config: Dependencies.() -> Unit) {
-        appTargets.common(config)
+        appTargets.common.config()
     }
 
     override fun test(config: Dependencies.() -> Unit) {
-        appTargets.test(config)
+        appTargets.test.config()
     }
 }

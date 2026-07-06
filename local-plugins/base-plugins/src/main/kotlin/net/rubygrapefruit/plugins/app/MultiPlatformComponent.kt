@@ -9,5 +9,5 @@ interface MultiPlatformComponent<D : Dependencies> {
     /**
      * Configures common test dependencies for this component.
      */
-    fun test(config: D.() -> Unit)
+    fun test(config: Dependencies.() -> Unit)
 }

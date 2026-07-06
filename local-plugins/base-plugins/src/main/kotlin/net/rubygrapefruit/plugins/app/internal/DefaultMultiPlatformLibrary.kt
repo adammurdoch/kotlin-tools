@@ -13,6 +13,8 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
 ) : MultiPlatformLibrary, MutableComponent, HasTargets {
     private var jvm: DefaultJvmLibrary? = null
     private var macOs: DefaultNativeLibrary? = null
+    override val common = DefaultLibraryDependencies()
+    override val test = DefaultDependencies()
 
     val module: JvmModule
         get() = createJvm().module
@@ -31,7 +33,7 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
     }
 
     override fun jvm(config: JvmLibrary.() -> Unit) {
-        config(createJvm())
+        createJvm().config()
     }
 
     override fun browser() {
@@ -44,12 +46,12 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
 
     override fun macOS(config: NativeLibrary.() -> Unit) {
         componentRegistry.macOS()
-        config(createMacOS())
+        createMacOS().config()
     }
 
     override fun desktop(config: NativeLibrary.() -> Unit) {
         val lib = factory.newInstance(DefaultNativeLibrary::class.java, "desktopMain")
-        config(lib)
+        lib.config()
     }
 
     override fun nativeDesktop() {
@@ -57,11 +59,11 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
     }
 
     override fun common(config: LibraryDependencies.() -> Unit) {
-        project.kotlin.sourceSets.getByName("commonMain").dependencies { config(KotlinHandlerBackedLibraryDependencies(this)) }
+        common.config()
     }
 
-    override fun test(config: LibraryDependencies.() -> Unit) {
-        project.kotlin.sourceSets.getByName("commonTest").dependencies { config(KotlinHandlerBackedLibraryDependencies(this)) }
+    override fun test(config: Dependencies.() -> Unit) {
+        test.config()
     }
 
     private fun createJvm(): JvmLibrary {

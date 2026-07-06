@@ -11,6 +11,8 @@ class NativeApplicationTargets @Inject constructor(
     private val project: Project
 ) {
     private var macOS: DefaultNativeComponent? = null
+    val common = DefaultDependencies()
+    val test = DefaultDependencies()
 
     val mainSourceSet get() = project.kotlin.sourceSets.getByName("commonMain")
 
@@ -21,11 +23,11 @@ class NativeApplicationTargets @Inject constructor(
     }
 
     fun common(config: Dependencies.() -> Unit) {
-        mainSourceSet.dependencies { config(KotlinHandlerBackedDependencies(this)) }
+        common.config()
     }
 
     fun test(config: Dependencies.() -> Unit) {
-        project.kotlin.sourceSets.getByName("commonTest").dependencies { config(KotlinHandlerBackedDependencies(this)) }
+        test.config()
     }
 
     fun macOS(): DefaultNativeComponent {

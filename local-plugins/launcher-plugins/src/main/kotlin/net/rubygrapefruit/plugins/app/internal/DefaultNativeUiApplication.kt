@@ -13,22 +13,28 @@ abstract class DefaultNativeUiApplication @Inject constructor(
     objects: ObjectFactory,
     providers: ProviderFactory,
     project: Project
-) : DefaultUiApplication(objects, providers, project), MutableNativeApplication, NativeUIApplication, HasTargets {
+) : DefaultUiApplication(objects, providers, project), NativeUIApplication, HasTargets {
     private val appTargets = NativeApplicationTargets(objects, project)
+
+    override val common: DefaultDependencies
+        get() = appTargets.common
+
+    override val test: DefaultDependencies
+        get() = appTargets.test
 
     override fun visitTargets(consumer: (MutableComponent) -> Unit) {
         appTargets.visitTargets(consumer)
     }
 
     override fun macOS(config: NativeComponent<Dependencies>.() -> Unit) {
-        config(appTargets.macOS())
+        appTargets.macOS().config()
     }
 
     override fun common(config: Dependencies.() -> Unit) {
-        appTargets.common(config)
+        appTargets.common.config()
     }
 
     override fun test(config: Dependencies.() -> Unit) {
-        appTargets.test(config)
+        appTargets.test.config()
     }
 }

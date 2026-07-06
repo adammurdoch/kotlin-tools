@@ -1,10 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
-import net.rubygrapefruit.plugins.app.internal.HasGeneratedSource
-import net.rubygrapefruit.plugins.app.internal.HasTargets
+import net.rubygrapefruit.plugins.app.internal.*
 import net.rubygrapefruit.plugins.app.internal.component.MutableComponent
-import net.rubygrapefruit.plugins.app.internal.componentRegistry
-import net.rubygrapefruit.plugins.app.internal.multiplatformComponents
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -15,6 +12,12 @@ class ComponentBasePlugin : Plugin<Project> {
                 multiplatformComponents.createSourceSets()
             }
             componentRegistry.deriveFrom<HasTargets> { component ->
+                kotlin.sourceSets.getByName("commonMain").dependencies {
+                    component.common.applyTo(this)
+                }
+                kotlin.sourceSets.getByName("commonTest").dependencies {
+                    component.test.applyTo(this)
+                }
                 component.visitTargets { target ->
                     derive(target)
                 }

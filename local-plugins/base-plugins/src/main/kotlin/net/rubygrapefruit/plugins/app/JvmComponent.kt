@@ -5,7 +5,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Nested
 
-interface JvmComponent<D: Dependencies> {
+interface JvmComponent<D : Dependencies> {
     /**
      * The target JVM version for this component.
      */
@@ -25,7 +25,7 @@ interface JvmComponent<D: Dependencies> {
     /**
      * Configures test dependencies for this component.
      */
-    fun test(config: D.() -> Unit)
+    fun test(config: Dependencies.() -> Unit)
 
     /**
      * Generated Kotlin source directories for this component.

@@ -22,8 +22,20 @@ class ComponentBasePlugin : Plugin<Project> {
                     derive(target)
                 }
             }
-            componentRegistry.applyToProject<HasGeneratedSource> { component ->
-                component.sourceSet.kotlin.srcDirs(component.generatedSource)
+            componentRegistry.deriveFrom<HasTests> { component ->
+                derive(component.test)
+            }
+            componentRegistry.deriveFrom<HasDependencies> { component ->
+                deriveFromSourceSet(component.sourceSetName) { sourceSet ->
+                    sourceSet.dependencies {
+                        component.dependencies.applyTo(this)
+                    }
+                }
+            }
+            componentRegistry.deriveFrom<HasGeneratedSource> { component ->
+                deriveFromSourceSet(component.sourceSetName) { sourceSet ->
+                    sourceSet.kotlin.srcDirs(component.generatedSource)
+                }
             }
         }
     }

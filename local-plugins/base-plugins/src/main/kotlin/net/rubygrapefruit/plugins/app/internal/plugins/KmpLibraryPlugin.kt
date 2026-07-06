@@ -28,11 +28,6 @@ class KmpLibraryPlugin : Plugin<Project> {
                 objects
             ) as DefaultMultiPlatformLibrary
             componentRegistry.register(lib)
-            componentRegistry.deriveFrom<DefaultNativeLibrary> { lib ->
-                deriveFromSourceSet(lib.mainSourceSetName) { sourceSet ->
-                    derive(RealizedNativeComponent(sourceSet, lib.generatedSource))
-                }
-            }
 
             multiplatformComponents.jvmTarget {
                 val extension = kotlin

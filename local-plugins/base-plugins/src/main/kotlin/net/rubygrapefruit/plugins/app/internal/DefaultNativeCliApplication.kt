@@ -25,8 +25,8 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     override val test: DefaultDependencies
         get() = appTargets.test
 
-    override val sourceSet: KotlinSourceSet
-        get() = appTargets.mainSourceSet
+    override val sourceSetName: String
+        get() = appTargets.mainSourceSet.name
 
     override val distributionContainer
         get() = targets.distributions

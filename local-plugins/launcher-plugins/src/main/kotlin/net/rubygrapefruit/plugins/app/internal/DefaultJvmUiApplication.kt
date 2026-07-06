@@ -6,7 +6,6 @@ import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ProviderFactory
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import javax.inject.Inject
 
 abstract class DefaultJvmUiApplication @Inject constructor(
@@ -17,8 +16,8 @@ abstract class DefaultJvmUiApplication @Inject constructor(
 
     override val runtimeModulePath: ConfigurableFileCollection = objects.fileCollection()
 
-    override val sourceSet: KotlinSourceSet
-        get() = project.jvmKotlin.sourceSets.getByName("main")
+    override val sourceSetName: String
+        get() = "main"
 
     override fun dependencies(config: Dependencies.() -> Unit) {
         project.jvmKotlin.sourceSets.getByName("main").dependencies { config(KotlinHandlerBackedDependencies(this)) }

@@ -31,7 +31,7 @@ class NativeApplicationTargets @Inject constructor(
 
     fun macOS(): DefaultNativeComponent {
         if (macOS == null) {
-            val component = objects.newInstance(DefaultNativeComponent::class.java, componentRegistry.sourceSets, "macosMain")
+            val component = objects.newInstance(DefaultNativeComponent::class.java, "macosMain")
             macOS = component
         }
         return macOS!!

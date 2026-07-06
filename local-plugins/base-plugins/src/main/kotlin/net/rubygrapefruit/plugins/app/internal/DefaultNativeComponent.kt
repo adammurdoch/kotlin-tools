@@ -5,16 +5,10 @@ import net.rubygrapefruit.plugins.app.NativeComponent
 import net.rubygrapefruit.plugins.app.internal.component.MutableComponent
 import javax.inject.Inject
 
-abstract class DefaultNativeComponent @Inject constructor(
-    private val sourceSets: SourceSets,
-    val mainSourceSetName: String
-) : NativeComponent<Dependencies>, MutableComponent {
+abstract class DefaultNativeComponent @Inject constructor(val mainSourceSetName: String) : NativeComponent<Dependencies>, MutableComponent {
+    val dependencies = DefaultDependencies()
 
     override fun dependencies(config: Dependencies.() -> Unit) {
-        sourceSets.withSourceSet(mainSourceSetName) { mainSourceSet, _ ->
-            mainSourceSet.dependencies {
-                KotlinHandlerBackedDependencies(this).config()
-            }
-        }
+        dependencies.config()
     }
 }

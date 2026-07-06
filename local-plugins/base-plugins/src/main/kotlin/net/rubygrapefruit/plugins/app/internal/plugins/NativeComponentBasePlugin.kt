@@ -11,6 +11,9 @@ class NativeComponentBasePlugin : Plugin<Project> {
         with(target) {
             componentRegistry.deriveFrom<DefaultNativeComponent> { component ->
                 deriveFromSourceSet(component.mainSourceSetName) { sourceSet ->
+                    sourceSet.dependencies {
+                        component.dependencies.applyTo(this)
+                    }
                     derive(RealizedNativeComponent(sourceSet, component.generatedSource))
                 }
             }

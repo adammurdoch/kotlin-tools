@@ -17,10 +17,7 @@ abstract class DefaultNativeCliApplication @Inject constructor(
 ) : MutableApplication, NativeApplication, HasGeneratedSource, HasTests, HasTargets {
     val targets = NativeTargetsContainer(objects, providers, project.tasks)
     private val appTargets = NativeApplicationTargets(objects, project)
-
-    override val common: DefaultDependencies
-        get() = appTargets.common
-
+    override val common = DefaultHasDependencies("commonMain")
     override val test = DefaultHasDependencies("commonTest")
 
     override val sourceSetName: String
@@ -55,7 +52,7 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     }
 
     override fun common(config: Dependencies.() -> Unit) {
-        appTargets.common.config()
+        common.dependencies.config()
     }
 
     override fun test(config: Dependencies.() -> Unit) {

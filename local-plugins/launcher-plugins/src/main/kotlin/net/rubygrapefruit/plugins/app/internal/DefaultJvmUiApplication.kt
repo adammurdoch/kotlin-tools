@@ -15,10 +15,10 @@ abstract class DefaultJvmUiApplication @Inject constructor(
 ) : DefaultUiApplication(objects, providers, project), MutableJvmApplication, JvmUiApplication, HasDependencies, HasGeneratedSource, HasTests {
     override val test: HasDependencies = DefaultHasDependencies("test")
     override val runtimeModulePath: ConfigurableFileCollection = objects.fileCollection()
+    override val dependencies = DefaultDependencies()
 
     override val sourceSetName: String
         get() = "main"
-    override val dependencies = DefaultDependencies()
 
     override fun dependencies(config: Dependencies.() -> Unit) {
         dependencies.config()

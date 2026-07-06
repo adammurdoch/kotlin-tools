@@ -15,10 +15,7 @@ abstract class DefaultNativeUiApplication @Inject constructor(
     project: Project
 ) : DefaultUiApplication(objects, providers, project), NativeUIApplication, HasTests, HasTargets {
     private val appTargets = NativeApplicationTargets(objects, project)
-
-    override val common: DefaultDependencies
-        get() = appTargets.common
-
+    override val common = DefaultHasDependencies("commonMain")
     override val test = DefaultHasDependencies("commonTest")
 
     override fun visitTargets(consumer: (MutableComponent) -> Unit) {
@@ -30,7 +27,7 @@ abstract class DefaultNativeUiApplication @Inject constructor(
     }
 
     override fun common(config: Dependencies.() -> Unit) {
-        appTargets.common.config()
+        common.dependencies.config()
     }
 
     override fun test(config: Dependencies.() -> Unit) {

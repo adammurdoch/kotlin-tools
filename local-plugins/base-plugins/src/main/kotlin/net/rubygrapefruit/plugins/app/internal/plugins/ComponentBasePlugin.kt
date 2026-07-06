@@ -12,9 +12,7 @@ class ComponentBasePlugin : Plugin<Project> {
                 multiplatformComponents.createSourceSets()
             }
             componentRegistry.deriveFrom<HasTargets> { component ->
-                kotlin.sourceSets.getByName("commonMain").dependencies {
-                    component.common.applyTo(this)
-                }
+                derive(component.common)
                 component.visitTargets { target ->
                     derive(target)
                 }

@@ -13,7 +13,7 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
 ) : MultiPlatformLibrary, MutableComponent, HasTests, HasTargets {
     private var jvm: DefaultJvmLibrary? = null
     private var macOs: DefaultNativeLibrary? = null
-    override val common = DefaultLibraryDependencies()
+    override val common = DefaultHasLibraryDependencies("commonMain")
     override val test = DefaultHasDependencies("commonTest")
 
     val module: JvmModule
@@ -59,7 +59,7 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
     }
 
     override fun common(config: LibraryDependencies.() -> Unit) {
-        common.config()
+        common.dependencies.config()
     }
 
     override fun test(config: Dependencies.() -> Unit) {

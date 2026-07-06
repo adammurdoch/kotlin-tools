@@ -14,4 +14,7 @@ application {
         implementation(project(":kmp-lib-render-customized"))
         implementation(project(":jvm-lib-customized"))
     }
+    test {
+        implementation(versions.test.coordinates)
+    }
 }

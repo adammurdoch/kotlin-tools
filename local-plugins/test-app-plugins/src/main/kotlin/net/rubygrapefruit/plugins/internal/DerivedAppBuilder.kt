@@ -65,7 +65,7 @@ class DerivedJvmCliAppBuilder internal constructor(
                     CliAppDistribution("dist", distDir, null, invocation)
                 }
             }
-            val sourceDir = derivedFrom.generatedInto(sampleDir, "src/main")
+            val sourceDir = derivedFrom.generatedInto(sampleDir, "src/main", "src/test")
             JvmCliApp(name, distribution, sourceDir)
         }
     }
@@ -90,7 +90,7 @@ class DerivedNativeCliAppBuilder internal constructor(
 
     override fun register(cliArgs: List<String>, expectedOutput: List<String>, derivedFrom: SourceTree?): NativeCliApp {
         val app = container.add(name) { name, sampleDir ->
-            val sourceDir = derivedFrom.generatedInto(sampleDir, "src/commonMain")
+            val sourceDir = derivedFrom.generatedInto(sampleDir, "src/commonMain", "src/commonTest")
             NativeCliApp(name, sampleDir, launcher, cliArgs, expectedOutput, sourceDir)
         }
         for (builder in derived) {
@@ -114,7 +114,7 @@ class DerivedJvmUiAppBuilder internal constructor(
 ) : DerivedUiAppBuilder() {
     fun register(derivedFrom: SourceTree?): JvmUiApp {
         return container.add(name) { name, sampleDir ->
-            val sourceDir = derivedFrom.generatedInto(sampleDir, "src/main")
+            val sourceDir = derivedFrom.generatedInto(sampleDir, "src/main", "src/test")
             JvmUiApp(name, sampleDir, launcher, sourceDir)
         }
     }
@@ -126,7 +126,7 @@ class DerivedNativeUiAppBuilder internal constructor(
 ) : DerivedUiAppBuilder() {
     fun register(derivedFrom: SourceTree?): NativeUiApp {
         return container.add(name) { name, sampleDir ->
-            val sourceDir = derivedFrom.generatedInto(sampleDir, "src/macosMain")
+            val sourceDir = derivedFrom.generatedInto(sampleDir, "src/macosMain", "src/macosTest")
             NativeUiApp(name, sampleDir, launcher, sourceDir)
         }
     }

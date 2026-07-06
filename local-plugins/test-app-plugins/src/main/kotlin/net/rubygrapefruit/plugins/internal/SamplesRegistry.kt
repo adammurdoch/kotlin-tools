@@ -143,6 +143,7 @@ private fun App.applyVerificationToTask(distribution: AppDistribution, task: Tas
         return
     }
     task.dependsOn(distribution.distTask)
+    task.dependsOn("check")
     task.doLast {
         verify(this, distribution, toolchainService, execOperations)
     }
@@ -242,7 +243,12 @@ private fun verify(sample: Sample, sourceTree: SourceTree) {
         if (dir is GeneratedSourceDir) {
             dir.visitContents({ source, dest ->
                 if (!dest.exists()) {
-                    throw IllegalStateException("Source file missing, maybe regenerate samples: $dest")
+                    val type = if (source.isDirectory()) {
+                        "directory"
+                    } else {
+                        "file"
+                    }
+                    throw IllegalStateException("Source $type missing, maybe regenerate samples: $dest")
                 }
                 if (source.isRegularFile()) {
                     val srcHash = source.hash()
@@ -294,7 +300,6 @@ private fun generateSamples(samples: List<Sample>) {
     }
 }
 
-@OptIn(ExperimentalPathApi::class)
 private fun GeneratedSourceDir.visitContents(action: (Path, Path) -> Unit, extraAction: (Path) -> Unit) {
     val sourceDir = origin.srcDir
     val destDir = srcDir

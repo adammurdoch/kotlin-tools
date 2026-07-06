@@ -9,13 +9,9 @@ sealed class LibBuilder {
         sourceDirs = false
     }
 
-    protected fun sourceTree(sampleDir: Path, vararg paths: String): SourceTree {
+    protected fun sourceTree(sampleDir: Path, main: String, test: String, vararg additionalPaths: String): SourceTree {
         return if (sourceDirs) {
-            if (paths.size == 1) {
-                OriginSourceDir(sampleDir, paths.first())
-            } else {
-                CandidateSourceDirs(paths.map { OriginSourceDir(sampleDir, it) })
-            }
+            OriginSourceTree(sampleDir, main, test, additionalPaths.toList())
         } else {
             NoSourceDirs
         }
@@ -34,7 +30,7 @@ class JvmLibBuilder internal constructor(
 
     internal fun register(): JvmLib {
         val lib = container.add(name) { name, sampleDir ->
-            val sourceTree = sourceTree(sampleDir, "src/main")
+            val sourceTree = sourceTree(sampleDir, main = "src/main", test = "src/test")
             JvmLib(name, sourceTree)
         }
         for (name in derived) {
@@ -58,7 +54,7 @@ class KmpLibBuilder internal constructor(
 
     internal fun register(): KmpLib {
         val lib = container.add(name) { name, sampleDir ->
-            val sourceTree = sourceTree(sampleDir, "src/commonMain", "src/desktopMain", "src/jvmMain", "src/mingwMain", "src/unixMain")
+            val sourceTree = sourceTree(sampleDir, main = "src/commonMain", test = "src/commonTest", "src/desktopMain", "src/jvmMain", "src/mingwMain", "src/unixMain")
             KmpLib(name, sourceTree)
         }
         for (name in derived) {

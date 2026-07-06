@@ -5,7 +5,7 @@ import java.nio.file.Path
 sealed interface SourceTree {
     fun generatedInto(sampleDir: Path): SourceTree
 
-    fun generatedInto(sampleDir: Path, path: String): SourceTree
+    fun generatedInto(sampleDir: Path, main: String, test: String): SourceTree
 
     fun visit(visitor: (SourceDir) -> Unit)
 }
@@ -15,7 +15,7 @@ object NoSourceDirs : SourceTree {
         return this
     }
 
-    override fun generatedInto(sampleDir: Path, path: String): SourceTree {
+    override fun generatedInto(sampleDir: Path, main: String, test: String): SourceTree {
         return this
     }
 
@@ -23,59 +23,62 @@ object NoSourceDirs : SourceTree {
     }
 }
 
-sealed class SourceDir : SourceTree {
+sealed class SourceDir {
     abstract val srcDir: Path
+}
 
-    abstract override fun generatedInto(sampleDir: Path): SourceDir
+data class OriginSourceDir(val dir: Path, val path: String) : SourceDir() {
+    override val srcDir: Path get() = dir.resolve(path)
+}
+
+data class GeneratedSourceDir(val dir: Path, val path: String, val origin: OriginSourceDir) : SourceDir() {
+    override val srcDir: Path get() = dir.resolve(path)
+}
+
+class OriginSourceTree(sampleDir: Path, mainPath: String, testPath: String, additionalPaths: List<String> = emptyList()) : SourceTree {
+    val main = OriginSourceDir(sampleDir, mainPath)
+    val test = OriginSourceDir(sampleDir, testPath)
+    val additional = additionalPaths.map { OriginSourceDir(sampleDir, it) }
 
     override fun visit(visitor: (SourceDir) -> Unit) {
-        visitor(this)
+        visitor(main)
+        visitor(test)
+        for (dir in additional) {
+            visitor(dir)
+        }
+    }
+
+    override fun generatedInto(sampleDir: Path): SourceTree {
+        return generatedInto(sampleDir, main.path, test.path)
+    }
+
+    override fun generatedInto(sampleDir: Path, main: String, test: String): SourceTree {
+        return GeneratedSourceTree(sampleDir, main, test, this)
     }
 }
 
-class OriginSourceDir(val sampleDir: Path, val path: String) : SourceDir() {
-    override val srcDir: Path
-        get() = sampleDir.resolve(path)
-
-    override fun generatedInto(sampleDir: Path): SourceDir {
-        return generatedInto(sampleDir, path)
+class GeneratedSourceTree(val srcDir: Path, val main: String, val test: String, val origin: OriginSourceTree) : SourceTree {
+    override fun visit(visitor: (SourceDir) -> Unit) {
+        visitor(GeneratedSourceDir(srcDir, main, origin.main))
+        visitor(GeneratedSourceDir(srcDir, test, origin.test))
+        for (dir in origin.additional) {
+            visitor(GeneratedSourceDir(srcDir, dir.path, dir))
+        }
     }
 
-    override fun generatedInto(sampleDir: Path, path: String): SourceDir {
-        return GeneratedSourceDir(sampleDir.resolve(path), this)
-    }
-}
-
-class GeneratedSourceDir(override val srcDir: Path, val origin: OriginSourceDir) : SourceDir() {
-    override fun generatedInto(sampleDir: Path): SourceDir {
+    override fun generatedInto(sampleDir: Path): SourceTree {
         return origin.generatedInto(sampleDir)
     }
 
-    override fun generatedInto(sampleDir: Path, path: String): SourceTree {
-        return origin.generatedInto(sampleDir, path)
+    override fun generatedInto(sampleDir: Path, main: String, test: String): SourceTree {
+        return origin.generatedInto(sampleDir, main, test)
     }
 }
 
-class CandidateSourceDirs(val srcDirs: List<SourceDir>) : SourceTree {
-    override fun generatedInto(sampleDir: Path): SourceTree {
-        return CandidateSourceDirs(srcDirs.map { it.generatedInto(sampleDir) })
-    }
-
-    override fun generatedInto(sampleDir: Path, path: String): SourceTree {
-        throw IllegalStateException()
-    }
-
-    override fun visit(visitor: (SourceDir) -> Unit) {
-        for (sourceDir in srcDirs) {
-            sourceDir.visit(visitor)
-        }
-    }
-}
-
-fun SourceTree?.generatedInto(sampleDir: Path, path: String): SourceTree {
+fun SourceTree?.generatedInto(sampleDir: Path, main: String, test: String): SourceTree {
     return if (this == null) {
-        OriginSourceDir(sampleDir, path)
+        OriginSourceTree(sampleDir, main, test, emptyList())
     } else {
-        generatedInto(sampleDir, path)
+        generatedInto(sampleDir, main, test)
     }
 }

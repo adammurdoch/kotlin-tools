@@ -6,20 +6,20 @@ import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ProviderFactory
-import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import javax.inject.Inject
 
 abstract class DefaultJvmCliApplication @Inject constructor(
     objects: ObjectFactory,
     providers: ProviderFactory,
     project: Project
-) : DefaultJvmComponent<Dependencies>(project, "main", "test"), MutableApplication, MutableJvmApplication, JvmApplication {
+) : DefaultJvmComponent<Dependencies>("main", "test"), MutableApplication, MutableJvmApplication, JvmApplication {
 
     final override val distributionContainer = DistributionContainer(project.tasks, objects, providers)
 
     override val runtimeModulePath: ConfigurableFileCollection = objects.fileCollection()
+    override val dependencies = DefaultDependencies()
 
-    override fun wrap(dependencyHandler: KotlinDependencyHandler): Dependencies {
-        return KotlinHandlerBackedDependencies(dependencyHandler)
+    override fun dependencies(config: Dependencies.() -> Unit) {
+        dependencies.config()
     }
 }

@@ -11,19 +11,20 @@ import javax.inject.Inject
 abstract class DefaultJvmUiApplication @Inject constructor(
     objects: ObjectFactory,
     providers: ProviderFactory,
-    private val project: Project
-) : DefaultUiApplication(objects, providers, project), MutableJvmApplication, JvmUiApplication, HasGeneratedSource {
-
+    project: Project
+) : DefaultUiApplication(objects, providers, project), MutableJvmApplication, JvmUiApplication, HasDependencies, HasGeneratedSource, HasTests {
+    override val test = DefaultHasDependencies("test")
     override val runtimeModulePath: ConfigurableFileCollection = objects.fileCollection()
 
     override val sourceSetName: String
         get() = "main"
+    override val dependencies = DefaultDependencies()
 
     override fun dependencies(config: Dependencies.() -> Unit) {
-        project.jvmKotlin.sourceSets.getByName("main").dependencies { config(KotlinHandlerBackedDependencies(this)) }
+        dependencies.config()
     }
 
     override fun test(config: Dependencies.() -> Unit) {
-        project.jvmKotlin.sourceSets.getByName("test").dependencies { config(KotlinHandlerBackedDependencies(this)) }
+        test.dependencies.config()
     }
 }

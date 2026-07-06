@@ -14,7 +14,6 @@ class NativeUiApplicationPlugin : Plugin<Project> {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
             plugins.apply(UiApplicationBasePlugin::class.java)
             plugins.apply(ComponentBasePlugin::class.java)
-            plugins.apply(NativeComponentBasePlugin::class.java)
             applications.withApp<DefaultNativeUiApplication> { app ->
                 app.entryPoint.convention("main")
 

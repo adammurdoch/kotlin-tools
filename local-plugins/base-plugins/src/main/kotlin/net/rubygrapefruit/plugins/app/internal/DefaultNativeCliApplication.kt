@@ -7,7 +7,6 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.jetbrains.kotlin.gradle.dsl.KotlinNativeBinaryContainer
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import javax.inject.Inject
 
 abstract class DefaultNativeCliApplication @Inject constructor(

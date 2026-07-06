@@ -122,12 +122,12 @@ samples {
             launcher("App")
         }
     }
-    jvmUiApp("jvm-ui-app-generated-source") {
-    }
+    jvmUiApp("jvm-ui-app-generated-source")
 
     nativeUiApp("native-ui-app") {
         derive("native-ui-app-customized") {
             launcher("App")
         }
     }
+    nativeUiApp("native-ui-app-generated-source")
 }

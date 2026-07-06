@@ -12,6 +12,7 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
             plugins.apply(CliApplicationBasePlugin::class.java)
             plugins.apply(ComponentBasePlugin::class.java)
+            plugins.apply(NativeComponentBasePlugin::class.java)
 
             applications.withApp<DefaultNativeCliApplication> { app ->
                 app.entryPoint.convention("main")
@@ -23,12 +24,6 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
                     target.afterEvaluate {
                         executable.entryPoint = app.entryPoint.get()
                     }
-                }
-            }
-
-            componentRegistry.deriveFrom<DefaultNativeComponent> { component ->
-                deriveFromSourceSet(component.mainSourceSetName) { sourceSet ->
-                    derive(RealizedNativeComponent(sourceSet, component.generatedSource))
                 }
             }
 

@@ -15,9 +15,6 @@ class ComponentBasePlugin : Plugin<Project> {
                 kotlin.sourceSets.getByName("commonMain").dependencies {
                     component.common.applyTo(this)
                 }
-                kotlin.sourceSets.getByName("commonTest").dependencies {
-                    component.test.applyTo(this)
-                }
                 component.visitTargets { target ->
                     derive(target)
                 }

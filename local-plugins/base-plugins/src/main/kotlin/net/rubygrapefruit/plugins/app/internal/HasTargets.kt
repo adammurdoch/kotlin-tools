@@ -8,7 +8,5 @@ import net.rubygrapefruit.plugins.app.internal.component.MutableComponent
 interface HasTargets {
     val common: DefaultDependencies
 
-    val test: DefaultDependencies
-
     fun visitTargets(consumer: (MutableComponent) -> Unit)
 }

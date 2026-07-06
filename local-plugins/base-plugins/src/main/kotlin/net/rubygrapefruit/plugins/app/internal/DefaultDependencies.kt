@@ -6,7 +6,7 @@ import org.gradle.api.artifacts.ExternalModuleDependency
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 
 open class DefaultDependencies : Dependencies {
-    val implementation = mutableListOf<Any>()
+    private val implementation = mutableListOf<Any>()
 
     override fun implementation(dependencyNotation: String) {
         implementation.add(dependencyNotation)

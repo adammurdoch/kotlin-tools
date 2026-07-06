@@ -10,12 +10,11 @@ import org.gradle.api.provider.ProviderFactory
 import javax.inject.Inject
 
 abstract class DefaultNativeUiApplication @Inject constructor(
-    componentRegistry: MultiPlatformComponentRegistry,
     objects: ObjectFactory,
     providers: ProviderFactory,
     project: Project
 ) : DefaultUiApplication(objects, providers, project), MutableNativeApplication, NativeUIApplication, HasTargets {
-    private val appTargets = NativeApplicationTargets(componentRegistry, objects, project)
+    private val appTargets = NativeApplicationTargets(objects, project)
 
     override fun visitTargets(consumer: (MutableComponent) -> Unit) {
         appTargets.visitTargets(consumer)

@@ -4,9 +4,7 @@ import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 
-class SourceSets(
-    private val project: Project
-) {
+class SourceSets(private val project: Project) {
     /**
      * Runs the given action when the given source set becomes available.
      */

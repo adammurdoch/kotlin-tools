@@ -48,7 +48,7 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
     }
 
     override fun desktop(config: NativeLibrary.() -> Unit) {
-        val lib = factory.newInstance(DefaultNativeLibrary::class.java, componentRegistry.sourceSets, "desktopMain")
+        val lib = factory.newInstance(DefaultNativeLibrary::class.java, "desktopMain")
         config(lib)
     }
 
@@ -78,7 +78,7 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
 
     private fun createMacOS(): DefaultNativeLibrary {
         if (macOs == null) {
-            macOs = factory.newInstance(DefaultNativeLibrary::class.java, componentRegistry.sourceSets, "macosMain")
+            macOs = factory.newInstance(DefaultNativeLibrary::class.java, "macosMain")
         }
         return macOs!!
     }

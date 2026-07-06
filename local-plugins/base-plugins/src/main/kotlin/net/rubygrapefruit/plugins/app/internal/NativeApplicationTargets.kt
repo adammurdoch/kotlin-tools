@@ -7,7 +7,6 @@ import org.gradle.api.model.ObjectFactory
 import javax.inject.Inject
 
 class NativeApplicationTargets @Inject constructor(
-    private val componentRegistry: MultiPlatformComponentRegistry,
     private val objects: ObjectFactory,
     private val project: Project
 ) {

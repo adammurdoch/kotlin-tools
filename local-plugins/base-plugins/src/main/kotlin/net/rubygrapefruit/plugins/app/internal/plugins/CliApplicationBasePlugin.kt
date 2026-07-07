@@ -3,7 +3,7 @@ package net.rubygrapefruit.plugins.app.internal.plugins
 import net.rubygrapefruit.plugins.app.internal.DefaultMutableInstallation
 import net.rubygrapefruit.plugins.app.internal.MutableApplication
 import net.rubygrapefruit.plugins.app.internal.MutableDistribution
-import net.rubygrapefruit.plugins.app.internal.applications
+import net.rubygrapefruit.plugins.app.internal.componentRegistry
 import net.rubygrapefruit.plugins.app.internal.tasks.InstallDistribution
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -13,11 +13,14 @@ open class CliApplicationBasePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             plugins.apply(ApplicationBasePlugin::class.java)
-            applications.withApp<MutableApplication> { app ->
+
+            componentRegistry.deriveFrom<MutableApplication> { app ->
                 val installation = objects.newInstance(DefaultMutableInstallation::class.java)
                 app.localInstallation.set(installation)
                 app.installations.add(app.localInstallation)
-
+                derive(installation)
+            }
+            componentRegistry.applyToProject<MutableApplication, DefaultMutableInstallation> { app, installation ->
                 val targetDirectory = File(System.getProperty("user.home"), "bin")
                 installation.installDirectory.fileProvider(app.appName.map { name -> targetDirectory.resolve("images/$name") })
                 installation.launcherFile.fileProvider(app.devDistribution.flatMap { dist ->

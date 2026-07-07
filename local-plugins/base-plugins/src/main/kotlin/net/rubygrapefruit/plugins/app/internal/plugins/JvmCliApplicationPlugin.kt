@@ -6,7 +6,7 @@ import net.rubygrapefruit.plugins.app.internal.tasks.LauncherBatScript
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
-private val libsDirPath = "lib"
+private const val LIB_DIR_PATH = "lib"
 
 class JvmCliApplicationPlugin : Plugin<Project> {
 
@@ -28,7 +28,7 @@ class JvmCliApplicationPlugin : Plugin<Project> {
                     it.scriptFile.set(layout.buildDirectory.file(dist.buildDirName("scripts") + "/launcher.sh"))
                     it.module.set(app.module.name)
                     it.mainClass.set(app.mainClass)
-                    it.libsDirPath.set(libsDirPath)
+                    it.libsDirPath.set(LIB_DIR_PATH)
                     it.javaLauncherPath.set(dist.javaLauncherPath)
                     it.modulePath.set(libNames)
                 }
@@ -36,7 +36,7 @@ class JvmCliApplicationPlugin : Plugin<Project> {
                     it.scriptFile.set(layout.buildDirectory.file(dist.buildDirName("scripts") + "/launcher.bat"))
                     it.module.set(app.module.name)
                     it.mainClass.set(app.mainClass)
-                    it.libsDirPath.set(libsDirPath)
+                    it.libsDirPath.set(LIB_DIR_PATH)
                     it.javaLauncherPath.set(dist.javaLauncherPath)
                     it.modulePath.set(libNames)
                 }
@@ -58,7 +58,7 @@ class JvmCliApplicationPlugin : Plugin<Project> {
             applications.withApp<DefaultJvmCliApplication> { app ->
                 val dist = app.distributionContainer.add("noJvm", true, DefaultHasLauncherScriptsDistribution::class.java)
                 dist.withImage {
-                    includeFilesInDir(libsDirPath, app.runtimeModulePath)
+                    includeFilesInDir(LIB_DIR_PATH, app.runtimeModulePath)
                 }
             }
 

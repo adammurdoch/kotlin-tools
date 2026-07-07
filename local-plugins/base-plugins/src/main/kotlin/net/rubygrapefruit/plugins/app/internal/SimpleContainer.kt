@@ -4,6 +4,9 @@ class SimpleContainer<T> {
     private val elements = mutableListOf<T>()
     private val actions = mutableListOf<(T) -> Unit>()
 
+    val isEmpty: Boolean
+        get() = elements.isEmpty()
+
     val all: List<T>
         get() = elements
 

@@ -9,7 +9,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import java.io.File
 
-open class CliApplicationBasePlugin : Plugin<Project> {
+class CliApplicationBasePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             plugins.apply(ApplicationBasePlugin::class.java)

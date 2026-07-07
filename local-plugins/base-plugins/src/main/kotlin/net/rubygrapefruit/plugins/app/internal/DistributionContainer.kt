@@ -15,6 +15,9 @@ import org.gradle.api.tasks.TaskContainer
 class DistributionContainer(private val tasks: TaskContainer, private val objects: ObjectFactory, providers: ProviderFactory) {
     private val distContainer = SimpleContainer<MutableDistribution>()
 
+    val empty: Boolean
+        get() = distContainer.isEmpty
+
     val distributions: Provider<List<Distribution>> = providers.provider { distContainer.all }
 
     val dev: Property<Distribution> = objects.property(Distribution::class.java)

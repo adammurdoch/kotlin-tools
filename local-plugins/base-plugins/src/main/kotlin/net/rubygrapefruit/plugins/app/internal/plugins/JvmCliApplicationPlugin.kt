@@ -8,6 +8,7 @@ import org.gradle.api.Project
 
 private const val LIB_DIR_PATH = "lib"
 
+@Suppress("unused")
 class JvmCliApplicationPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
@@ -16,6 +17,9 @@ class JvmCliApplicationPlugin : Plugin<Project> {
             plugins.apply(CliApplicationBasePlugin::class.java)
 
             componentRegistry.deriveFrom<DefaultJvmCliApplication> { app ->
+                if (app.distributionContainer.empty) {
+                    app.distributionContainer.add("noJvm", true, DefaultHasLauncherScriptsDistribution::class.java)
+                }
                 app.distributionContainer.each {
                     derive(this)
                 }
@@ -41,6 +45,10 @@ class JvmCliApplicationPlugin : Plugin<Project> {
                     it.modulePath.set(libNames)
                 }
 
+                dist.withImage {
+                    includeFilesInDir(LIB_DIR_PATH, app.runtimeModulePath)
+                }
+
                 if (HostMachine.current is Windows) {
                     dist.launcherFile.set(batScript.flatMap { it.scriptFile })
                     dist.launcherFilePath.set(app.appName.map { "$it.bat" })
@@ -52,13 +60,6 @@ class JvmCliApplicationPlugin : Plugin<Project> {
                     dist.withImage {
                         includeFile(app.appName.map { "$it.bat" }, batScript.flatMap { it.scriptFile })
                     }
-                }
-            }
-
-            applications.withApp<DefaultJvmCliApplication> { app ->
-                val dist = app.distributionContainer.add("noJvm", true, DefaultHasLauncherScriptsDistribution::class.java)
-                dist.withImage {
-                    includeFilesInDir(LIB_DIR_PATH, app.runtimeModulePath)
                 }
             }
 

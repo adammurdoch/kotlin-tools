@@ -8,28 +8,38 @@ import org.gradle.api.Project
 class ComponentBasePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            componentRegistry.applyToProject<MutableComponent> { _ ->
-                multiplatformComponents.createSourceSets()
-            }
-            componentRegistry.deriveFrom<HasTargets> { component ->
-                derive(component.common)
-                component.visitTargets { target ->
-                    derive(target)
+            componentRegistry.from<MutableComponent> {
+                derive { _ ->
+                    multiplatformComponents.createSourceSets()
                 }
             }
-            componentRegistry.deriveFrom<HasTests> { component ->
-                derive(component.test)
-            }
-            componentRegistry.deriveFrom<HasDependencies> { component ->
-                deriveFromSourceSet(component.sourceSetName) { sourceSet ->
-                    sourceSet.dependencies {
-                        component.dependencies.applyTo(this)
+            componentRegistry.from<HasTargets> {
+                derive { component ->
+                    register(component.common)
+                    component.visitTargets { target ->
+                        register(target)
                     }
                 }
             }
-            componentRegistry.deriveFrom<HasGeneratedSource> { component ->
-                deriveFromSourceSet(component.sourceSetName) { sourceSet ->
-                    sourceSet.kotlin.srcDirs(component.generatedSource)
+            componentRegistry.from<HasTests> {
+                derive { component ->
+                    register(component.test)
+                }
+            }
+            componentRegistry.from<HasDependencies> {
+                derive { component ->
+                    deriveFromSourceSet(component.sourceSetName) { sourceSet ->
+                        sourceSet.dependencies {
+                            component.dependencies.applyTo(this)
+                        }
+                    }
+                }
+            }
+            componentRegistry.from<HasGeneratedSource> {
+                derive { component ->
+                    deriveFromSourceSet(component.sourceSetName) { sourceSet ->
+                        sourceSet.kotlin.srcDirs(component.generatedSource)
+                    }
                 }
             }
         }

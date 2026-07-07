@@ -14,30 +14,34 @@ class CliApplicationBasePlugin : Plugin<Project> {
         with(target) {
             plugins.apply(ApplicationBasePlugin::class.java)
 
-            componentRegistry.deriveFrom<MutableApplication> { app ->
-                val installation = objects.newInstance(DefaultMutableInstallation::class.java)
-                app.localInstallation.set(installation)
-                app.installations.add(app.localInstallation)
-                derive(installation)
-            }
-            componentRegistry.applyToProject<MutableApplication, DefaultMutableInstallation> { app, installation ->
-                val targetDirectory = File(System.getProperty("user.home"), "bin")
-                installation.installDirectory.fileProvider(app.appName.map { name -> targetDirectory.resolve("images/$name") })
-                installation.launcherFile.fileProvider(app.devDistribution.flatMap { dist ->
-                    (dist as MutableDistribution).effectiveLauncherFilePath.map { path ->
-                        targetDirectory.resolve("links/${path.substringAfterLast("/")}")
-                    }
-                })
-
-                val install = tasks.register("install", InstallDistribution::class.java) { task ->
-                    task.description = "Installs the application"
-                    task.devDistribution.set(app.devDistribution.map { it.outputs })
-                    task.releaseDistribution.set(app.releaseDistribution.map { it.outputs })
-                    task.targetImageDirectory.set(installation.installDirectory)
-                    task.targetLauncherLink.set(installation.launcherFile)
+            componentRegistry.from<MutableApplication> {
+                derive { app ->
+                    val installation = objects.newInstance(DefaultMutableInstallation::class.java)
+                    app.localInstallation.set(installation)
+                    app.installations.add(app.localInstallation)
+                    register(installation)
                 }
-                installation.imageOutputDirectory.set(install.flatMap { it.targetImageDirectory })
-                installation.launcherOutputFile.set(install.flatMap { it.targetLauncherLink })
+                from<DefaultMutableInstallation> {
+                    derive { installation, app ->
+                        val targetDirectory = File(System.getProperty("user.home"), "bin")
+                        installation.installDirectory.fileProvider(app.appName.map { name -> targetDirectory.resolve("images/$name") })
+                        installation.launcherFile.fileProvider(app.devDistribution.flatMap { dist ->
+                            (dist as MutableDistribution).effectiveLauncherFilePath.map { path ->
+                                targetDirectory.resolve("links/${path.substringAfterLast("/")}")
+                            }
+                        })
+
+                        val install = tasks.register("install", InstallDistribution::class.java) { task ->
+                            task.description = "Installs the application"
+                            task.devDistribution.set(app.devDistribution.map { it.outputs })
+                            task.releaseDistribution.set(app.releaseDistribution.map { it.outputs })
+                            task.targetImageDirectory.set(installation.installDirectory)
+                            task.targetLauncherLink.set(installation.launcherFile)
+                        }
+                        installation.imageOutputDirectory.set(install.flatMap { it.targetImageDirectory })
+                        installation.launcherOutputFile.set(install.flatMap { it.targetLauncherLink })
+                    }
+                }
             }
         }
     }

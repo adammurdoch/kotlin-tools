@@ -13,7 +13,10 @@ import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.jvm.toolchain.JavaToolchainService
 import kotlin.io.path.pathString
 
-open class EmbeddedJvmLauncherPlugin : Plugin<Project> {
+private const val JVM_PATH_IN_DISTRIBUTION = "jvm"
+
+@Suppress("unused")
+class EmbeddedJvmLauncherPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             plugins.apply(ApplicationBasePlugin::class.java)
@@ -44,12 +47,11 @@ open class EmbeddedJvmLauncherPlugin : Plugin<Project> {
                     )
                 }
 
-                val jvmPathInDistribution = "jvm"
                 app.distributionContainer.eachOfType<HasEmbeddedJvm> {
                     withImage {
-                        includeDir(jvmPathInDistribution, embeddedJvmTask.flatMap { task -> task.imageDirectory })
+                        includeDir(JVM_PATH_IN_DISTRIBUTION, embeddedJvmTask.flatMap { task -> task.imageDirectory })
                     }
-                    javaLauncherPath.set("$jvmPathInDistribution/bin/java")
+                    javaLauncherPath.set("$JVM_PATH_IN_DISTRIBUTION/bin/java")
                 }
             }
         }

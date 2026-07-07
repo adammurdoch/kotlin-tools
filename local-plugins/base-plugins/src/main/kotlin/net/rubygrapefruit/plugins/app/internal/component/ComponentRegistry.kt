@@ -7,8 +7,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.cast
 
 open class ComponentRegistry(private val project: Project) {
-    private val deriveActions = mutableListOf<DeriveAction<*>>()
-    private val applyActions = mutableListOf<ApplyAction>()
+    private val rules = RuleSet()
     private var main: MutableComponent? = null
 
     fun register(component: MutableComponent) {
@@ -19,94 +18,100 @@ open class ComponentRegistry(private val project: Project) {
         project.afterEvaluate {
             val sourceSets = SourceSets(project)
             val context = DefaultContext(sourceSets) { value, context -> realize(value, context) }
-            context.derive(component)
+            context.register(component)
             context.realize()
 //            applyActions.clear()
 //            deriveActions.clear()
         }
     }
 
-    fun <T : Any> deriveFrom(type: KClass<T>, action: Context.(T) -> Unit) {
-        deriveActions.add(DeriveAction(type, action))
+    fun <T : Any> from(type: KClass<T>, action: Rules<T>.() -> Unit) {
+        Rules(type, rules).action()
     }
 
-    inline fun <reified T : Any> deriveFrom(noinline action: Context.(T) -> Unit) {
-        deriveFrom(T::class, action)
-    }
-
-    /**
-     * Applies a configured object of type [T] to the project.
-     */
-    fun <T : Any> applyToProject(type: KClass<T>, action: (T) -> Unit) {
-        applyActions.add(ApplyToType(type, action))
-    }
-
-    /**
-     * Applies a configured object of type [T] to the project.
-     */
-    inline fun <reified T : Any> applyToProject(noinline action: (T) -> Unit) {
-        applyToProject(T::class, action)
-    }
-
-    /**
-     * Applies a configured object of type [T] to the project, for those objects derived from object of type [P].
-     */
-    fun <P : Any, T : Any> applyToProject(parentType: KClass<P>, type: KClass<T>, action: (P, T) -> Unit) {
-        applyActions.add(ApplyToTypeWithParent(parentType, type, action))
-    }
-
-    /**
-     * Applies a configured object of type [T] to the project, for those objects derived from object of type [P].
-     */
-    inline fun <reified P : Any, reified T : Any> applyToProject(noinline action: (P, T) -> Unit) {
-        applyToProject(P::class, T::class, action)
+    inline fun <reified T : Any> from(noinline action: Rules<T>.() -> Unit) {
+        from(T::class, action)
     }
 
     private fun realize(registration: Registration, context: Context) {
-        for (action in deriveActions) {
-            action.maybeDerive(registration.value, context)
-        }
-        for (action in applyActions) {
-            action.maybeApplyToProject(registration.value, registration.parent?.value)
+        for (rule in rules.rules) {
+            rule.maybeApply(registration.value, registration.parent?.value, context)
         }
     }
 
-    private class DeriveAction<T : Any>(val type: KClass<T>, val action: Context.(T) -> Unit) {
-        fun maybeDerive(component: Any, context: Context) {
+    internal sealed class Rule {
+        abstract fun maybeApply(component: Any, parent: Any?, context: Context)
+    }
+
+    private class DeriveFromType<T : Any>(val type: KClass<T>, val action: Context.(T) -> Unit) : Rule() {
+        override fun maybeApply(component: Any, parent: Any?, context: Context) {
             if (type.isInstance(component)) {
                 context.action(type.cast(component))
             }
         }
     }
 
-    private sealed class ApplyAction {
-        abstract fun maybeApplyToProject(component: Any, parent: Any?)
-    }
-
-    private class ApplyToType<T : Any>(val type: KClass<T>, val action: (T) -> Unit) : ApplyAction() {
-        override fun maybeApplyToProject(component: Any, parent: Any?) {
-            if (type.isInstance(component)) {
-                action(type.cast(component))
+    private class DeriveFromTypeWithParent<T : Any, P : Any>(val type: KClass<T>, val parentType: KClass<P>, val action: Context.(T, P) -> Unit) : Rule() {
+        override fun maybeApply(component: Any, parent: Any?, context: Context) {
+            if (parentType.isInstance(parent) && type.isInstance(component)) {
+                context.action(type.cast(component), parentType.cast(parent))
             }
         }
     }
 
-    private class ApplyToTypeWithParent<P : Any, T : Any>(val parentType: KClass<P>, val type: KClass<T>, val action: (P, T) -> Unit) : ApplyAction() {
-        override fun maybeApplyToProject(component: Any, parent: Any?) {
-            if (parentType.isInstance(parent) && type.isInstance(component)) {
-                action(parentType.cast(parent), type.cast(component))
-            }
+    internal class RuleSet {
+        val rules = mutableListOf<Rule>()
+
+        fun add(rule: Rule) {
+            rules.add(rule)
+        }
+    }
+
+    class Rules<T : Any> internal constructor(private val type: KClass<T>, private val rules: RuleSet) {
+        /**
+         * Called after each value of T has been realized.
+         */
+        fun derive(action: Context.(T) -> Unit) {
+            rules.add(DeriveFromType(type, action))
+        }
+
+        fun <S : Any> from(childType: KClass<S>, action: Rules2<S, T>.() -> Unit) {
+            Rules2(childType, type, rules).action()
+        }
+
+        inline fun <reified S : Any> from(noinline action: Rules2<S, T>.() -> Unit) {
+            from(S::class, action)
+        }
+    }
+
+    class Rules2<S : Any, T : Any> internal constructor(private val type: KClass<S>, private val parentType: KClass<T>, private val rules: RuleSet) {
+        /**
+         * Called after each value has been realized.
+         */
+        fun derive(action: Context.(S, T) -> Unit) {
+            rules.add(DeriveFromTypeWithParent(type, parentType, action))
+        }
+
+        fun <U : Any> require(depType: KClass<U>, action: Rules3<S, T, U>.() -> Unit) {
+            TODO()
+        }
+
+        inline fun <reified U : Any> require(noinline action: Rules3<S, T, U>.() -> Unit) {
+            require(U::class, action)
+        }
+    }
+
+    class Rules3<S : Any, T : Any, U : Any> {
+        /**
+         * Called after each value has been realized.
+         */
+        fun derive(action: Context.(S, T, U) -> Unit) {
+            TODO()
         }
     }
 
     interface Context {
-        fun derive(value: Any)
-
-        fun deriveNullable(value: Any?) {
-            if (value != null) {
-                derive(value)
-            }
-        }
+        fun register(value: Any)
 
         fun deriveFromSourceSet(name: String, action: Context.(KotlinSourceSet) -> Unit)
     }
@@ -127,7 +132,7 @@ open class ComponentRegistry(private val project: Project) {
             realizing = null
         }
 
-        override fun derive(value: Any) {
+        override fun register(value: Any) {
             queue.add(Registration(realizing, value))
         }
 

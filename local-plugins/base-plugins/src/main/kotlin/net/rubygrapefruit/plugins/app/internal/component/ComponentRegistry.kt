@@ -8,7 +8,7 @@ import kotlin.reflect.cast
 
 open class ComponentRegistry(private val project: Project) {
     private val deriveActions = mutableListOf<DeriveAction<*>>()
-    private val applyActions = mutableListOf<ApplyAction<*>>()
+    private val applyActions = mutableListOf<ApplyAction>()
     private var main: MutableComponent? = null
 
     fun register(component: MutableComponent) {
@@ -38,7 +38,7 @@ open class ComponentRegistry(private val project: Project) {
      * Applies a configured object of type [T] to the project.
      */
     fun <T : Any> applyToProject(type: KClass<T>, action: (T) -> Unit) {
-        applyActions.add(ApplyAction(type, action))
+        applyActions.add(ApplyToType(type, action))
     }
 
     /**
@@ -48,12 +48,26 @@ open class ComponentRegistry(private val project: Project) {
         applyToProject(T::class, action)
     }
 
-    private fun realize(component: Any, context: Context) {
+    /**
+     * Applies a configured object of type [T] to the project, for those objects derived from object of type [P].
+     */
+    fun <P : Any, T : Any> applyToProject(parentType: KClass<P>, type: KClass<T>, action: (P, T) -> Unit) {
+        applyActions.add(ApplyToTypeWithParent(parentType, type, action))
+    }
+
+    /**
+     * Applies a configured object of type [T] to the project, for those objects derived from object of type [P].
+     */
+    inline fun <reified P : Any, reified T : Any> applyToProject(noinline action: (P, T) -> Unit) {
+        applyToProject(P::class, T::class, action)
+    }
+
+    private fun realize(registration: Registration, context: Context) {
         for (action in deriveActions) {
-            action.maybeDerive(component, context)
+            action.maybeDerive(registration.value, context)
         }
         for (action in applyActions) {
-            action.maybeApplyToProject(component)
+            action.maybeApplyToProject(registration.value, registration.parent?.value)
         }
     }
 
@@ -65,10 +79,22 @@ open class ComponentRegistry(private val project: Project) {
         }
     }
 
-    private class ApplyAction<T : Any>(val type: KClass<T>, val action: (T) -> Unit) {
-        fun maybeApplyToProject(component: Any) {
+    private sealed class ApplyAction {
+        abstract fun maybeApplyToProject(component: Any, parent: Any?)
+    }
+
+    private class ApplyToType<T : Any>(val type: KClass<T>, val action: (T) -> Unit) : ApplyAction() {
+        override fun maybeApplyToProject(component: Any, parent: Any?) {
             if (type.isInstance(component)) {
                 action(type.cast(component))
+            }
+        }
+    }
+
+    private class ApplyToTypeWithParent<P : Any, T : Any>(val parentType: KClass<P>, val type: KClass<T>, val action: (P, T) -> Unit) : ApplyAction() {
+        override fun maybeApplyToProject(component: Any, parent: Any?) {
+            if (parentType.isInstance(parent) && type.isInstance(component)) {
+                action(parentType.cast(parent), type.cast(component))
             }
         }
     }
@@ -85,24 +111,24 @@ open class ComponentRegistry(private val project: Project) {
         fun deriveFromSourceSet(name: String, action: Context.(KotlinSourceSet) -> Unit)
     }
 
-    private class DefaultContext(val sourceSets: SourceSets, val realizeAction: (Any, Context) -> Unit) : Context {
-        private val queue = mutableListOf<Any>()
-        private var realizing = false
+    private class DefaultContext(val sourceSets: SourceSets, val realizeAction: (Registration, Context) -> Unit) : Context {
+        private val queue = mutableListOf<Registration>()
+        private var realizing: Registration? = null
 
         fun realize() {
-            if (realizing) {
+            if (realizing != null) {
                 return
             }
-            realizing = true
             while (queue.isNotEmpty()) {
-                val value = queue.removeFirst()
-                realizeAction(value, this)
+                val registration = queue.removeFirst()
+                realizing = registration
+                realizeAction(registration, this)
             }
-            realizing = false
+            realizing = null
         }
 
         override fun derive(value: Any) {
-            queue.add(value)
+            queue.add(Registration(realizing, value))
         }
 
         override fun deriveFromSourceSet(name: String, action: Context.(KotlinSourceSet) -> Unit) {
@@ -112,4 +138,6 @@ open class ComponentRegistry(private val project: Project) {
             }
         }
     }
+
+    private class Registration(val parent: Registration?, val value: Any)
 }

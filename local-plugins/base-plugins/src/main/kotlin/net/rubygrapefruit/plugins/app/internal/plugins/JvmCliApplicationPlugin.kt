@@ -25,9 +25,7 @@ class JvmCliApplicationPlugin : Plugin<Project> {
                         register(this)
                     }
                 }
-            }
 
-            componentRegistry.from<DefaultJvmCliApplication> {
                 from<HasLauncherScripts> {
                     derive { dist, app ->
                         val libNames = app.runtimeModulePath.elements.map { it.map { f -> f.asFile.name } }

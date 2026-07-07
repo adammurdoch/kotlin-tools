@@ -17,7 +17,10 @@ open class ComponentRegistry(private val project: Project) {
         main = component
         project.afterEvaluate {
             val sourceSets = SourceSets(project)
-            val context = DefaultContext(sourceSets) { value, context -> realize(value, context) }
+            val context = DefaultContext(sourceSets) { value, context ->
+                applyRules(Phase.Prepare, value, context)
+                applyRules(Phase.Derive, value, context)
+            }
             context.register(component)
             context.realize()
 //            applyActions.clear()
@@ -33,22 +36,27 @@ open class ComponentRegistry(private val project: Project) {
         from(T::class, action)
     }
 
-    private fun realize(registration: Registration, context: Context) {
+    private fun applyRules(phase: Phase, registration: Registration, context: Context) {
         for (rule in rules.rules) {
-            rule.maybeApply(registration.value, registration.parent?.value, context)
+            rule.maybeApply(phase, registration.value, registration.parent?.value, context)
         }
     }
 
-    internal sealed class Rule {
-        abstract fun maybeApply(component: Any, parent: Any?, context: Context)
+    internal enum class Phase {
+        Prepare, Derive
     }
 
-    private class DeriveFromType<T : Any>(
+    internal sealed class Rule {
+        abstract fun maybeApply(phase: Phase, component: Any, parent: Any?, context: Context)
+    }
+
+    private class ApplyToType<T : Any>(
+        val phase: Phase,
         val type: KClass<T>,
         val action: Context.(T) -> Unit
     ) : Rule() {
-        override fun maybeApply(component: Any, parent: Any?, context: Context) {
-            if (type.isInstance(component)) {
+        override fun maybeApply(phase: Phase, component: Any, parent: Any?, context: Context) {
+            if (phase == this.phase && type.isInstance(component)) {
                 context.action(type.cast(component))
             }
         }
@@ -59,8 +67,8 @@ open class ComponentRegistry(private val project: Project) {
         val parentType: KClass<P>,
         val action: Context.(T, P) -> Unit
     ) : Rule() {
-        override fun maybeApply(component: Any, parent: Any?, context: Context) {
-            if (parentType.isInstance(parent) && type.isInstance(component)) {
+        override fun maybeApply(phase: Phase, component: Any, parent: Any?, context: Context) {
+            if (phase == Phase.Derive && parentType.isInstance(parent) && type.isInstance(component)) {
                 context.action(type.cast(component), parentType.cast(parent))
             }
         }
@@ -75,24 +83,28 @@ open class ComponentRegistry(private val project: Project) {
         private val deps = mutableMapOf<P, D>()
         private val waiting = mutableMapOf<P, MutableList<T>>()
 
-        override fun maybeApply(component: Any, parent: Any?, context: Context) {
-            if (parentType.isInstance(parent) && type.isInstance(component)) {
-                val dep = deps[parent]
-                val typedComponent = type.cast(component)
-                val typedParent = parentType.cast(parent)
-                if (dep != null) {
-                    context.action(typedComponent, typedParent, dep)
-                } else {
-                    waiting.getOrPut(typedParent) { mutableListOf() }.add(typedComponent)
-                }
+        override fun maybeApply(phase: Phase, component: Any, parent: Any?, context: Context) {
+            if (phase != Phase.Derive) {
+                return
             }
-            if (parentType.isInstance(parent) && depType.isInstance(component)) {
-                val dep = depType.cast(component)
+            if (parentType.isInstance(parent)) {
                 val typedParent = parentType.cast(parent)
-                deps[typedParent] = dep
+                if (type.isInstance(component)) {
+                    val dep = deps[parent]
+                    val typedComponent = type.cast(component)
+                    if (dep != null) {
+                        context.action(typedComponent, typedParent, dep)
+                    } else {
+                        waiting.getOrPut(typedParent) { mutableListOf() }.add(typedComponent)
+                    }
+                }
+                if (depType.isInstance(component)) {
+                    val dep = depType.cast(component)
+                    deps[typedParent] = dep
 
-                waiting.remove(typedParent)?.forEach {
-                    context.action(it, typedParent, dep)
+                    waiting.remove(typedParent)?.forEach {
+                        context.action(it, typedParent, dep)
+                    }
                 }
             }
         }
@@ -110,11 +122,15 @@ open class ComponentRegistry(private val project: Project) {
         private val type: KClass<T>,
         private val rules: RuleSet
     ) {
+        fun prepare(action: (T) -> Unit) {
+            rules.add(ApplyToType(Phase.Prepare, type) { action(it) })
+        }
+
         /**
          * Called after each value of T has been realized.
          */
         fun derive(action: Context.(T) -> Unit) {
-            rules.add(DeriveFromType(type, action))
+            rules.add(ApplyToType(Phase.Derive, type, action))
         }
 
         fun <S : Any> from(childType: KClass<S>, action: Rules2<S, T>.() -> Unit) {

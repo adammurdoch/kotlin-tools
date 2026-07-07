@@ -6,6 +6,7 @@ import net.rubygrapefruit.plugins.app.internal.DefaultJvmUiAppDistribution
 import net.rubygrapefruit.plugins.app.internal.DefaultJvmUiApplication
 import net.rubygrapefruit.plugins.app.internal.HostMachine
 import net.rubygrapefruit.plugins.app.internal.applications
+import net.rubygrapefruit.plugins.app.internal.componentRegistry
 import net.rubygrapefruit.plugins.app.internal.tasks.LauncherConf
 import net.rubygrapefruit.plugins.app.internal.tasks.NativeUiLauncher
 import org.gradle.api.Plugin
@@ -18,6 +19,14 @@ class JvmUiApplicationPlugin : Plugin<Project> {
             plugins.apply(JvmApplicationBasePlugin::class.java)
             plugins.apply(EmbeddedJvmLauncherPlugin::class.java)
             plugins.apply(UiApplicationBasePlugin::class.java)
+
+            componentRegistry.from<DefaultJvmUiApplication> {
+                derive { app ->
+                    app.distributionContainer.each {
+                        register(this)
+                    }
+                }
+            }
 
             applications.withApp<DefaultJvmUiApplication> { app ->
                 val capitalizedAppName = app.capitalizedAppName

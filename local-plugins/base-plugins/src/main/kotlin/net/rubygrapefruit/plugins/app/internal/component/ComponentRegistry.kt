@@ -43,7 +43,10 @@ open class ComponentRegistry(private val project: Project) {
         abstract fun maybeApply(component: Any, parent: Any?, context: Context)
     }
 
-    private class DeriveFromType<T : Any>(val type: KClass<T>, val action: Context.(T) -> Unit) : Rule() {
+    private class DeriveFromType<T : Any>(
+        val type: KClass<T>,
+        val action: Context.(T) -> Unit
+    ) : Rule() {
         override fun maybeApply(component: Any, parent: Any?, context: Context) {
             if (type.isInstance(component)) {
                 context.action(type.cast(component))
@@ -51,10 +54,46 @@ open class ComponentRegistry(private val project: Project) {
         }
     }
 
-    private class DeriveFromTypeWithParent<T : Any, P : Any>(val type: KClass<T>, val parentType: KClass<P>, val action: Context.(T, P) -> Unit) : Rule() {
+    private class DeriveFromTypeWithParent<T : Any, P : Any>(
+        val type: KClass<T>,
+        val parentType: KClass<P>,
+        val action: Context.(T, P) -> Unit
+    ) : Rule() {
         override fun maybeApply(component: Any, parent: Any?, context: Context) {
             if (parentType.isInstance(parent) && type.isInstance(component)) {
                 context.action(type.cast(component), parentType.cast(parent))
+            }
+        }
+    }
+
+    private class DeriveFromTypeWithParentAndDep<T : Any, P : Any, D : Any>(
+        val type: KClass<T>,
+        val parentType: KClass<P>,
+        val depType: KClass<D>,
+        val action: Context.(T, P, D) -> Unit
+    ) : Rule() {
+        private val deps = mutableMapOf<P, D>()
+        private val waiting = mutableMapOf<P, MutableList<T>>()
+
+        override fun maybeApply(component: Any, parent: Any?, context: Context) {
+            if (parentType.isInstance(parent) && type.isInstance(component)) {
+                val dep = deps[parent]
+                val typedComponent = type.cast(component)
+                val typedParent = parentType.cast(parent)
+                if (dep != null) {
+                    context.action(typedComponent, typedParent, dep)
+                } else {
+                    waiting.getOrPut(typedParent) { mutableListOf() }.add(typedComponent)
+                }
+            }
+            if (parentType.isInstance(parent) && depType.isInstance(component)) {
+                val dep = depType.cast(component)
+                val typedParent = parentType.cast(parent)
+                deps[typedParent] = dep
+
+                waiting.remove(typedParent)?.forEach {
+                    context.action(it, typedParent, dep)
+                }
             }
         }
     }
@@ -67,7 +106,10 @@ open class ComponentRegistry(private val project: Project) {
         }
     }
 
-    class Rules<T : Any> internal constructor(private val type: KClass<T>, private val rules: RuleSet) {
+    class Rules<T : Any> internal constructor(
+        private val type: KClass<T>,
+        private val rules: RuleSet
+    ) {
         /**
          * Called after each value of T has been realized.
          */
@@ -84,7 +126,11 @@ open class ComponentRegistry(private val project: Project) {
         }
     }
 
-    class Rules2<S : Any, T : Any> internal constructor(private val type: KClass<S>, private val parentType: KClass<T>, private val rules: RuleSet) {
+    class Rules2<S : Any, T : Any> internal constructor(
+        private val type: KClass<S>,
+        private val parentType: KClass<T>,
+        private val rules: RuleSet
+    ) {
         /**
          * Called after each value has been realized.
          */
@@ -93,7 +139,7 @@ open class ComponentRegistry(private val project: Project) {
         }
 
         fun <U : Any> require(depType: KClass<U>, action: Rules3<S, T, U>.() -> Unit) {
-            TODO()
+            Rules3(type, parentType, depType, rules).action()
         }
 
         inline fun <reified U : Any> require(noinline action: Rules3<S, T, U>.() -> Unit) {
@@ -101,12 +147,17 @@ open class ComponentRegistry(private val project: Project) {
         }
     }
 
-    class Rules3<S : Any, T : Any, U : Any> {
+    class Rules3<S : Any, T : Any, U : Any> internal constructor(
+        private val type: KClass<S>,
+        private val parentType: KClass<T>,
+        private val depType: KClass<U>,
+        private val rules: RuleSet
+    ) {
         /**
          * Called after each value has been realized.
          */
         fun derive(action: Context.(S, T, U) -> Unit) {
-            TODO()
+            rules.add(DeriveFromTypeWithParentAndDep(type, parentType, depType, action))
         }
     }
 

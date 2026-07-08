@@ -21,7 +21,6 @@ sealed class HostMachine {
             return when (machine) {
                 NativeMachine.WindowsX64 -> WindowsX64
                 NativeMachine.LinuxX64 -> LinuxX64
-                NativeMachine.MacOSX64 -> MacOsX64
                 NativeMachine.MacOSArm64 -> MacOsArm64
             }
         }
@@ -90,7 +89,7 @@ sealed class MacOS : HostMachine() {
 
 data object MacOsX64 : MacOS() {
     override val machine: NativeMachine
-        get() = NativeMachine.MacOSX64
+        get() = throw UnsupportedOperationException("Not supported yet")
 }
 
 data object MacOsArm64 : MacOS() {

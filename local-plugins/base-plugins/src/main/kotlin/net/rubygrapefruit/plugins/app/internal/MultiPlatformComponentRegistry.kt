@@ -115,14 +115,6 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
             if (machines.add(target)) {
                 with(project.kotlin) {
                     when (target) {
-                        NativeMachine.MacOSX64 -> {
-                            macosX64 {
-                                config(binaries, NativeMachine.MacOSX64)
-                            }
-                            unixSourceSets.add("macosMain")
-                            unixTestSourceSets.add("macosTest")
-                        }
-
                         NativeMachine.MacOSArm64 -> {
                             macosArm64 {
                                 config(binaries, NativeMachine.MacOSArm64)

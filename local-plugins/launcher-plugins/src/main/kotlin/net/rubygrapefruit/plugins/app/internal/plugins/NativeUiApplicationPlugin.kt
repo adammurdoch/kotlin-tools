@@ -41,7 +41,7 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                     executable.entryPoint = generatedEntryPoint
                 }
 
-                for (machine in listOf(NativeMachine.MacOSArm64, NativeMachine.MacOSX64)) {
+                for (machine in listOf(NativeMachine.MacOSArm64)) {
                     val generatorTask = tasks.register("nativeLauncher${machine.kotlinTarget}", NativeLauncher::class.java) {
                         it.sourceDirectory.set(layout.buildDirectory.dir("generated-main/${machine.kotlinTarget}"))
                         it.entryPoint.set(generatedEntryPoint)

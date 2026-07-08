@@ -45,7 +45,7 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
     }
 
     fun macOS(config: KotlinNativeBinaryContainer.(NativeMachine) -> Unit = {}) {
-        native(setOf(NativeMachine.MacOSX64, NativeMachine.MacOSArm64), config)
+        native(setOf(NativeMachine.MacOSArm64), config)
     }
 
     fun jvm(targetVersion: Provider<Int>) {

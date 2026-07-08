@@ -144,11 +144,20 @@ A convention plugin for implementing Gradle plugins using Kotlin/JVM.
 ## Multi-platform library settings
 
 - Adds `library { }` block
-  - `library.jvm { }` - Adds the JVM as a target with the given settings (same as JVM library above) 
+  - `library.jvm { }` - adds the JVM as a target with the given settings (same as JVM library above) 
   - `library.desktopNative()` - adds Windows, Linux, and macOS as targets
   - `library.macOS()` - adds macOS as a target
   - `library.browser()` - adds the browser as a target
   - `library.common { }` - production dependencies common to all targets
   - `library.test { }` - test dependencies common to all targets
+
+## UI applications
+
+- `$APP_SIGNING_IDENTITY` - signing certificate name in macOS keychain. Should reference a "Developer ID Application" certificate
+- `$APP_NOTARIZATION_PROFILE` - notarization profile in macOS keychain. 
+  - Created using `xcrun notarytool store-credentials`
+    - Team ID is shown in Apple developer membership details
+    - App specific password is created via Apple ID at account.apple.com
+  - Can find by searching for `notary.tool.saved-creds` in keychain, the profile name is the last segment of the account name
 
 See [`../test-apps`](../test-apps/) for some samples.

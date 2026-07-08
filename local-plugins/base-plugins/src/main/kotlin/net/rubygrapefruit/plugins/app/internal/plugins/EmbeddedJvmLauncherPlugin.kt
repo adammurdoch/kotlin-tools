@@ -63,4 +63,4 @@ class EmbeddedJvmLauncherPlugin : Plugin<Project> {
     }
 }
 
-class EmbeddedJvm(val embeddedJvmTask: TaskProvider<EmbeddedJvmLauncher>)
+private class EmbeddedJvm(val embeddedJvmTask: TaskProvider<EmbeddedJvmLauncher>)

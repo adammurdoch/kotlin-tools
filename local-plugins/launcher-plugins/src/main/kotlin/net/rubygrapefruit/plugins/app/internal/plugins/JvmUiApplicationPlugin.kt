@@ -2,11 +2,7 @@ package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.NativeMachine
-import net.rubygrapefruit.plugins.app.internal.DefaultJvmUiAppDistribution
-import net.rubygrapefruit.plugins.app.internal.DefaultJvmUiApplication
-import net.rubygrapefruit.plugins.app.internal.HostMachine
-import net.rubygrapefruit.plugins.app.internal.applications
-import net.rubygrapefruit.plugins.app.internal.componentRegistry
+import net.rubygrapefruit.plugins.app.internal.*
 import net.rubygrapefruit.plugins.app.internal.tasks.LauncherConf
 import net.rubygrapefruit.plugins.app.internal.tasks.NativeUiLauncher
 import org.gradle.api.Plugin
@@ -22,18 +18,9 @@ class JvmUiApplicationPlugin : Plugin<Project> {
             plugins.apply(UiApplicationBasePlugin::class.java)
 
             componentRegistry.from<DefaultJvmUiApplication> {
-                derive { app ->
-                    app.distributionContainer.each {
-                        register(this)
-                    }
-                }
-            }
-
-            applications.withApp<DefaultJvmUiApplication> { app ->
-                val capitalizedAppName = app.capitalizedAppName
-
-                // TODO - 'can build' flag is incorrect - it depends on the JVM to be embedded
-                for (machine in listOf(NativeMachine.MacOSArm64, NativeMachine.MacOSX64)) {
+                prepare { app ->
+                    val machine = NativeMachine.MacOSArm64
+                    // TODO - 'can build' flag is incorrect - it depends on the JVM to be embedded
                     val canBuild = HostMachine.current.canBeBuilt && HostMachine.current.machine == machine
                     app.distributionContainer.add(
                         "unsignedRelease",
@@ -45,35 +32,42 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                         DefaultJvmUiAppDistribution::class.java
                     )
                 }
-
-                app.distributionContainer.eachOfType<DefaultJvmUiAppDistribution> {
-                    val nativeBinary = configurations.create("nativeBinaries${targetMachine.name}") {
-                        it.attributes.attribute(
-                            Usage.USAGE_ATTRIBUTE,
-                            objects.named(Usage::class.java, "native-binary-${targetMachine.kotlinTarget}")
-                        )
-                        it.isCanBeResolved = true
-                        it.isCanBeConsumed = false
+                derive { app ->
+                    app.distributionContainer.each {
+                        register(this)
                     }
-                    dependencies.add(nativeBinary.name, "net.rubygrapefruit.plugins:native-jvm-launcher:1.0-dev")
+                }
 
-                    val launcherTask = tasks.register(taskName("nativeLauncher"), NativeUiLauncher::class.java) {
-                        it.inputFile.set(layout.file(nativeBinary.elements.map { it.first().asFile }))
-                        it.outputFile.set(layout.buildDirectory.file(buildDirName("native-launcher") + "/native-launcher.kexe"))
-                    }
+                from<DefaultJvmUiAppDistribution> {
+                    derive { dist, app ->
+                        val nativeBinary = configurations.create("nativeBinaries${dist.targetMachine.name}") {
+                            it.attributes.attribute(
+                                Usage.USAGE_ATTRIBUTE,
+                                objects.named(Usage::class.java, "native-binary-${dist.targetMachine.kotlinTarget}")
+                            )
+                            it.isCanBeResolved = true
+                            it.isCanBeConsumed = false
+                        }
+                        dependencies.add(nativeBinary.name, "net.rubygrapefruit.plugins:native-jvm-launcher:1.0-dev")
 
-                    val configTask = tasks.register(taskName("launcherConf"), LauncherConf::class.java) {
-                        it.configFile.set(layout.buildDirectory.file(buildDirName("launcher-config") + "/launcher.conf"))
-                        it.applicationDisplayName.set(capitalizedAppName)
-                        it.iconName.set(app.iconName)
-                        it.javaCommand.set(javaLauncherPath)
-                        it.module.set(app.module.name)
-                        it.mainClass.set(app.mainClass)
-                    }
+                        val launcherTask = tasks.register(dist.taskName("nativeLauncher"), NativeUiLauncher::class.java) {
+                            it.inputFile.set(layout.file(nativeBinary.elements.map { it.first().asFile }))
+                            it.outputFile.set(layout.buildDirectory.file(dist.buildDirName("native-launcher") + "/native-launcher.kexe"))
+                        }
 
-                    launcherFile.set(launcherTask.flatMap { it.outputFile })
-                    withImage {
-                        includeFile("Resources/launcher.conf", configTask.flatMap { it.configFile })
+                        val configTask = tasks.register(dist.taskName("launcherConf"), LauncherConf::class.java) {
+                            it.configFile.set(layout.buildDirectory.file(dist.buildDirName("launcher-config") + "/launcher.conf"))
+                            it.applicationDisplayName.set(app.capitalizedAppName)
+                            it.iconName.set(app.iconName)
+                            it.javaCommand.set(dist.javaLauncherPath)
+                            it.module.set(app.module.name)
+                            it.mainClass.set(app.mainClass)
+                        }
+
+                        dist.launcherFile.set(launcherTask.flatMap { it.outputFile })
+                        dist.withImage {
+                            includeFile("Resources/launcher.conf", configTask.flatMap { it.configFile })
+                        }
                     }
                 }
             }

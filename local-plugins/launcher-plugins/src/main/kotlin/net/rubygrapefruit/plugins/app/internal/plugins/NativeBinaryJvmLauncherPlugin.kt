@@ -7,6 +7,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 
+@Suppress("unused")
 class NativeBinaryJvmLauncherPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
@@ -51,4 +52,4 @@ class NativeBinaryJvmLauncherPlugin : Plugin<Project> {
     }
 }
 
-class LauncherExecutable(val binaryTask: TaskProvider<NativeBinary>)
+private class LauncherExecutable(val binaryTask: TaskProvider<NativeBinary>)

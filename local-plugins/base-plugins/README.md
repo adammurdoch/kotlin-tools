@@ -2,7 +2,7 @@
 
 A collection of Gradle plugins for building applications and libraries using Kotlin.
 
-These plugins all target Kotlin 2.3.10 and Java 17 (for Kotlin/JVM libraries and Gradle plugins) or Java 21 (for Kotlin/JVM apps).
+These plugins all target Kotlin 2.4.0 and Java 21 (for Kotlin libraries), Java 25 (for Kotlin apps) and Java 17 (for Gradle plugins).
 The plugins require Gradle 9.0 or later and Java 17 or later.
 
 ## Settings plugins
@@ -19,7 +19,7 @@ A settings plugin that must be applied to the settings of any build that uses th
 
 Builds a command-line application implemented in Kotlin multiplatform that targets native desktop platforms.
 
-- Supports Linux and Windows x64 targets and macOS x64 and arm64 targets.
+- Supports Linux x64, Windows x64 and macOS arm64 targets.
 - Does not define any targets, these have to be explicitly defined.
 - Adds `unixMain` and `unixTest` source sets for Kotlin code that is shared by macOS and Linux targets.
 - Adds an `application { }` block, see below for the available settings.
@@ -31,7 +31,7 @@ This uses the `net.rubygrapefruit.native.base-cli-app` plugin and adds the targe
 
 Builds a UI application implemented in Kotlin multiplatform that targets native desktop platforms.
 
-- Adds macOS x64 and arm64 targets.
+- Adds macOS arm64 target.
 - Adds an `application { }` block, see below for the available settings.
 - Add `dist` task.
 
@@ -99,7 +99,7 @@ Expects that the application uses the JVM module system.
 
 A convention plugin for implementing Gradle plugins using Kotlin/JVM.
 
-- Adds dependencies and repository definitions so that a fixed version of Kotlin (currently 2.0.0) is used to compile the plugin.
+- Adds dependencies and repository definitions so that a fixed version of Kotlin (currently 2.4.0) is used to compile the plugin.
 - Targets Java 17.
 - Adds `versions` extension
 - Adds a dependency on these plugins, so their API can be used in other plugins.

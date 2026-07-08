@@ -17,12 +17,9 @@ class JvmCliApplicationPlugin : Plugin<Project> {
             plugins.apply(CliApplicationBasePlugin::class.java)
 
             componentRegistry.from<DefaultJvmCliApplication> {
-                derive { app ->
+                prepare { app ->
                     if (app.distributionContainer.empty) {
                         app.distributionContainer.add("noJvm", true, DefaultHasLauncherScriptsDistribution::class.java)
-                    }
-                    app.distributionContainer.each {
-                        register(this)
                     }
                 }
 

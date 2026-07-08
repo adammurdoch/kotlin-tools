@@ -62,13 +62,14 @@ open class ComponentRegistry(private val project: Project) {
         }
     }
 
-    private class DeriveFromTypeWithParent<T : Any, P : Any>(
+    private class ApplyToTypeWithParent<T : Any, P : Any>(
+        val phase: Phase,
         val type: KClass<T>,
         val parentType: KClass<P>,
         val action: Context.(T, P) -> Unit
     ) : Rule() {
         override fun maybeApply(phase: Phase, component: Any, parent: Any?, context: Context) {
-            if (phase == Phase.Derive && parentType.isInstance(parent) && type.isInstance(component)) {
+            if (phase == this.phase && parentType.isInstance(parent) && type.isInstance(component)) {
                 context.action(type.cast(component), parentType.cast(parent))
             }
         }
@@ -147,11 +148,15 @@ open class ComponentRegistry(private val project: Project) {
         private val parentType: KClass<T>,
         private val rules: RuleSet
     ) {
+        fun prepare(action: (S, T) -> Unit) {
+            rules.add(ApplyToTypeWithParent(Phase.Prepare, type, parentType) { value, parent -> action(value, parent) })
+        }
+
         /**
          * Called after each value has been realized.
          */
         fun derive(action: Context.(S, T) -> Unit) {
-            rules.add(DeriveFromTypeWithParent(type, parentType, action))
+            rules.add(ApplyToTypeWithParent(Phase.Derive, type, parentType, action))
         }
 
         fun <U : Any> require(depType: KClass<U>, action: Rules3<S, T, U>.() -> Unit) {

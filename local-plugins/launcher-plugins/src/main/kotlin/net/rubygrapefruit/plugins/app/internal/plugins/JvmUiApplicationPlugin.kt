@@ -32,11 +32,6 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                         DefaultJvmUiAppDistribution::class.java
                     )
                 }
-                derive { app ->
-                    app.distributionContainer.each {
-                        register(this)
-                    }
-                }
 
                 from<DefaultJvmUiAppDistribution> {
                     derive { dist, app ->

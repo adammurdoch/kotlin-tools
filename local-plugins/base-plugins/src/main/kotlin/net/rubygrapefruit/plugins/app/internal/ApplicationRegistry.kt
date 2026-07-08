@@ -57,11 +57,6 @@ open class ApplicationRegistry(private val project: Project, private val compone
             val launcherPath = effectiveLauncherFilePath
             launcherOutputFile.set(distTask.flatMap { t -> t.imageDirectory.map { it.file(launcherPath.get()) } })
         }
-        app.distributionContainer.eachOfType<HasDistributionImage> {
-            distTask.configure { t ->
-                t.includeFile(launcherFilePath, launcherFile)
-            }
-        }
 
         project.tasks.register("showApplication", ShowApplication::class.java) { task ->
             task.app.set(project.provider { app.metadata() })

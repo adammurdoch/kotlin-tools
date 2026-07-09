@@ -20,12 +20,6 @@ class ApplicationBasePlugin : Plugin<Project> {
             target.extensions.create("applicationRegistry", ApplicationRegistry::class.java, componentRegistry)
 
             componentRegistry.from<MutableApplication> {
-                derive { app ->
-                    app.distributionContainer.each {
-                        register(this)
-                    }
-                }
-
                 from<HasDistributionImage> {
                     prepare { dist, _ ->
                         dist.distTask.configure { t ->

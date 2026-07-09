@@ -18,11 +18,11 @@ class JvmUiApplicationPlugin : Plugin<Project> {
             plugins.apply(UiApplicationBasePlugin::class.java)
 
             componentRegistry.from<DefaultJvmUiApplication> {
-                prepare { app ->
+                derive { app ->
                     val machine = NativeMachine.MacOSArm64
                     // TODO - 'can build' flag is incorrect - it depends on the JVM to be embedded
                     val canBuild = HostMachine.current.canBeBuilt && HostMachine.current.machine == machine
-                    app.distributionContainer.add(
+                    val dist = app.distributionContainer.add(
                         "unsignedRelease",
                         true,
                         false,
@@ -31,6 +31,7 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                         BuildType.Release,
                         DefaultJvmUiAppDistribution::class.java
                     )
+                    register(dist)
                 }
 
                 from<DefaultJvmUiAppDistribution> {

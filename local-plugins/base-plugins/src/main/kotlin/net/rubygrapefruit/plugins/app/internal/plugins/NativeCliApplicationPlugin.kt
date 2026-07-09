@@ -1,10 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.NativeApplication
-import net.rubygrapefruit.plugins.app.internal.DefaultNativeCliApplication
-import net.rubygrapefruit.plugins.app.internal.HostMachine
-import net.rubygrapefruit.plugins.app.internal.applications
-import net.rubygrapefruit.plugins.app.internal.multiplatformComponents
+import net.rubygrapefruit.plugins.app.internal.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -15,6 +12,14 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
             plugins.apply(CliApplicationBasePlugin::class.java)
             plugins.apply(ComponentBasePlugin::class.java)
+
+            componentRegistry.from<DefaultNativeCliApplication> {
+                derive { app ->
+                    app.distributionContainer.each {
+                        register(this)
+                    }
+                }
+            }
 
             applications.withApp<DefaultNativeCliApplication> { app ->
                 app.entryPoint.convention("main")

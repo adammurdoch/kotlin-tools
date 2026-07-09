@@ -14,16 +14,19 @@ class NativeBinaryJvmLauncherPlugin : Plugin<Project> {
             plugins.apply(ApplicationBasePlugin::class.java)
 
             componentRegistry.from<DefaultJvmCliApplication> {
-                prepare { app ->
-                    app.distributionContainer.add(
-                        null,
-                        true,
-                        true,
-                        HostMachine.current.canBeBuilt,
-                        HostMachine.current.machine,
-                        BuildType.Release,
-                        DefaultHasLauncherExecutableDistribution::class.java
-                    )
+                from<JvmCliApplicationDist> {
+                    prepare { dist, app ->
+                        val binDist = app.distributionContainer.add(
+                            null,
+                            true,
+                            true,
+                            HostMachine.current.canBeBuilt,
+                            HostMachine.current.machine,
+                            BuildType.Release,
+                            DefaultHasLauncherExecutableDistribution::class.java
+                        )
+                        dist.dist = binDist
+                    }
                 }
             }
 

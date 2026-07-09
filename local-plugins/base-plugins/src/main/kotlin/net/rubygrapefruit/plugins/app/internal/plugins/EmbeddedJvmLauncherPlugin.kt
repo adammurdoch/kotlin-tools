@@ -19,18 +19,21 @@ class EmbeddedJvmLauncherPlugin : Plugin<Project> {
             plugins.apply(ApplicationBasePlugin::class.java)
 
             componentRegistry.from<DefaultJvmCliApplication> {
-                prepare { app ->
-                    // TODO - the target machine is not necessarily the host machine; it depends on the JVM being used to run jlink
-                    // Should add distribution for each target, which should be declared
-                    app.distributionContainer.add(
-                        null,
-                        true,
-                        true,
-                        HostMachine.current.canBeBuilt,
-                        HostMachine.current.machine,
-                        BuildType.Release,
-                        DefaultHasEmbeddedJvmAndLauncherScriptsDistribution::class.java
-                    )
+                from<JvmCliApplicationDist> {
+                    prepare { dist, app ->
+                        // TODO - the target machine is not necessarily the host machine; it depends on the JVM being used to run jlink
+                        // Should add distribution for each target, which should be declared
+                        val embeddedJvmDist = app.distributionContainer.add(
+                            null,
+                            true,
+                            true,
+                            HostMachine.current.canBeBuilt,
+                            HostMachine.current.machine,
+                            BuildType.Release,
+                            DefaultHasEmbeddedJvmAndLauncherScriptsDistribution::class.java
+                        )
+                        dist.dist = embeddedJvmDist
+                    }
                 }
             }
 

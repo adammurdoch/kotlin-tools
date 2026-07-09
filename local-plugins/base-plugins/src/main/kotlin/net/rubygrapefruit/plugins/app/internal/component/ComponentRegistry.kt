@@ -21,8 +21,7 @@ open class ComponentRegistry(private val project: Project) {
                 applyRules(Phase.Prepare, value, context)
                 applyRules(Phase.Derive, value, context)
             }
-            context.register(component)
-            context.realize()
+            context.start(component)
 //            applyActions.clear()
 //            deriveActions.clear()
         }
@@ -183,7 +182,12 @@ open class ComponentRegistry(private val project: Project) {
     }
 
     interface Context {
+        /**
+         * Registers a child of the current object.
+         */
         fun register(value: Any)
+
+        fun registerSibling(value: Any)
 
         fun deriveFromSourceSet(name: String, action: Context.(KotlinSourceSet) -> Unit)
     }
@@ -191,6 +195,11 @@ open class ComponentRegistry(private val project: Project) {
     private class DefaultContext(val sourceSets: SourceSets, val realizeAction: (Registration, Context) -> Unit) : Context {
         private val queue = mutableListOf<Registration>()
         private var realizing: Registration? = null
+
+        fun start(value:Any) {
+            queue.add(Registration(null, value))
+            realize()
+        }
 
         fun realize() {
             if (realizing != null) {
@@ -205,7 +214,13 @@ open class ComponentRegistry(private val project: Project) {
         }
 
         override fun register(value: Any) {
+            require(realizing != null)
             queue.add(Registration(realizing, value))
+        }
+
+        override fun registerSibling(value: Any) {
+            require(realizing != null)
+            queue.add(Registration(realizing?.parent, value))
         }
 
         override fun deriveFromSourceSet(name: String, action: Context.(KotlinSourceSet) -> Unit) {

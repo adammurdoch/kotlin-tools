@@ -17,14 +17,24 @@ class JvmCliApplicationPlugin : Plugin<Project> {
             plugins.apply(CliApplicationBasePlugin::class.java)
 
             componentRegistry.from<DefaultJvmCliApplication> {
-                prepare { app ->
-                    if (app.distributionContainer.empty) {
-                        app.distributionContainer.add("noJvm", true, DefaultHasLauncherScriptsDistribution::class.java)
+                derive {
+                    register(JvmCliApplicationDist())
+                }
+
+                from<JvmCliApplicationDist> {
+                    derive { dist, app ->
+                        val declaredDist = dist.dist
+                        if (declaredDist == null) {
+                            val dist = app.distributionContainer.add("noJvm", true, DefaultHasLauncherScriptsDistribution::class.java)
+                            registerSibling(dist)
+                        } else {
+                            registerSibling(declaredDist)
+                        }
                     }
                 }
 
                 from<HasLauncherScripts> {
-                    derive { dist, app ->
+                    prepare { dist, app ->
                         val libNames = app.runtimeModulePath.elements.map { it.map { f -> f.asFile.name } }
 
                         // Generate the scripts per distribution, because each distribution may have a different `java` path
@@ -69,4 +79,8 @@ class JvmCliApplicationPlugin : Plugin<Project> {
             applications.register(app)
         }
     }
+}
+
+class JvmCliApplicationDist {
+    var dist: MutableDistribution? = null
 }

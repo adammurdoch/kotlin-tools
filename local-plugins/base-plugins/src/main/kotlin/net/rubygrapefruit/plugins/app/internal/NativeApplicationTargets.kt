@@ -1,15 +1,20 @@
 package net.rubygrapefruit.plugins.app.internal
 
-import net.rubygrapefruit.plugins.app.internal.component.MutableComponent
+import org.gradle.api.file.Directory
 import org.gradle.api.model.ObjectFactory
-import javax.inject.Inject
+import org.gradle.api.provider.SetProperty
 
-class NativeApplicationTargets @Inject constructor(
-    private val objects: ObjectFactory
+class NativeApplicationTargets(
+    private val objects: ObjectFactory,
+    generatedSource: SetProperty<Directory>
 ) {
+    private val commonMain = DefaultSourceSet("commonMain", DefaultDependencies(), generatedSource)
+    private val commonTest = DefaultHasDependencies("commonTest")
+    val common = DefaultPlatformContribution(commonMain, commonTest)
     private var macOS: DefaultNativeComponent? = null
 
-    fun visitTargets(consumer: (PlatformContribution) -> Unit) {
+    fun visitPlatforms(consumer: (PlatformContribution) -> Unit) {
+        consumer(common)
         if (macOS != null) {
             consumer(macOS!!)
         }

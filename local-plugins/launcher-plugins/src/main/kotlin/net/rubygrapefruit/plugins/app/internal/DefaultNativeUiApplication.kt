@@ -13,14 +13,10 @@ abstract class DefaultNativeUiApplication @Inject constructor(
     providers: ProviderFactory,
     project: Project
 ) : DefaultUiApplication(objects, providers, project), NativeUIApplication, HasTargets {
-    private val appTargets = NativeApplicationTargets(objects)
-    private val commonMain = DefaultHasDependencies("commonMain")
-    private val commonTest = DefaultHasDependencies("commonTest")
-    private val common = DefaultPlatformContribution(commonTest, commonTest)
+    private val appTargets = NativeApplicationTargets(objects, generatedSource)
 
     override fun visitPlatforms(consumer: (PlatformContribution) -> Unit) {
-        consumer(common)
-        appTargets.visitTargets(consumer)
+        appTargets.visitPlatforms(consumer)
     }
 
     override fun macOS(config: NativeComponent<Dependencies>.() -> Unit) {
@@ -28,10 +24,10 @@ abstract class DefaultNativeUiApplication @Inject constructor(
     }
 
     override fun common(config: Dependencies.() -> Unit) {
-        commonMain.dependencies.config()
+        appTargets.common.main.dependencies.config()
     }
 
     override fun test(config: Dependencies.() -> Unit) {
-        commonTest.dependencies.config()
+        appTargets.common.test.dependencies.config()
     }
 }

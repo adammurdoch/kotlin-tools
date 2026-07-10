@@ -15,10 +15,7 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     project: Project
 ) : MutableApplication, NativeApplication, HasTargets {
     val targets = NativeTargetsContainer(objects, providers, project.tasks)
-    private val appTargets = NativeApplicationTargets(objects)
-    private val commonMain = DefaultSourceSet("commonMain", DefaultDependencies(), generatedSource)
-    private val commonTest = DefaultHasDependencies("commonTest")
-    private val common = DefaultPlatformContribution(commonMain, commonTest)
+    private val appTargets = NativeApplicationTargets(objects, generatedSource)
 
     override val distributionContainer
         get() = targets.distributions
@@ -27,8 +24,7 @@ abstract class DefaultNativeCliApplication @Inject constructor(
         get() = targets.executables
 
     override fun visitPlatforms(consumer: (PlatformContribution) -> Unit) {
-        consumer(common)
-        appTargets.visitTargets(consumer)
+        appTargets.visitPlatforms(consumer)
     }
 
     override fun macOS() {
@@ -50,10 +46,10 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     }
 
     override fun common(config: Dependencies.() -> Unit) {
-        commonMain.dependencies.config()
+        appTargets.common.main.dependencies.config()
     }
 
     override fun test(config: Dependencies.() -> Unit) {
-        commonTest.dependencies.config()
+        appTargets.common.test.dependencies.config()
     }
 }

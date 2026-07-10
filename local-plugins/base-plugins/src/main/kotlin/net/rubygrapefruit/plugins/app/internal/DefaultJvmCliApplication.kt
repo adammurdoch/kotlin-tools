@@ -1,7 +1,6 @@
 package net.rubygrapefruit.plugins.app.internal
 
 import net.rubygrapefruit.plugins.app.Dependencies
-import net.rubygrapefruit.plugins.app.JvmApplication
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
@@ -12,12 +11,13 @@ abstract class DefaultJvmCliApplication @Inject constructor(
     objects: ObjectFactory,
     providers: ProviderFactory,
     project: Project
-) : DefaultJvmComponent<Dependencies>("main", "test"), MutableApplication, MutableJvmApplication, JvmApplication {
+) : DefaultJvmComponent<Dependencies>("test"), MutableJvmApplication {
+    private val dependencies = DefaultDependencies()
 
-    final override val distributionContainer = DistributionContainer(project.tasks, objects, providers)
-
+    override val distributionContainer = DistributionContainer(project.tasks, objects, providers)
     override val runtimeModulePath: ConfigurableFileCollection = objects.fileCollection()
-    override val dependencies = DefaultDependencies()
+
+    override val main: HasDependencies = DefaultSourceSet("main", dependencies, generatedSource)
 
     override fun dependencies(config: Dependencies.() -> Unit) {
         dependencies.config()

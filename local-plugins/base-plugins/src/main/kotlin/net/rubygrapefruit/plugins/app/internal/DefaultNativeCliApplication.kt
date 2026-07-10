@@ -1,7 +1,6 @@
 package net.rubygrapefruit.plugins.app.internal
 
 import net.rubygrapefruit.plugins.app.*
-import net.rubygrapefruit.plugins.app.internal.component.MutableComponent
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
@@ -14,14 +13,12 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     objects: ObjectFactory,
     providers: ProviderFactory,
     project: Project
-) : MutableApplication, NativeApplication, HasGeneratedSource, HasTests, HasTargets {
+) : MutableApplication, NativeApplication, HasTargets {
     val targets = NativeTargetsContainer(objects, providers, project.tasks)
-    private val appTargets = NativeApplicationTargets(objects, project)
-    override val common = DefaultHasDependencies("commonMain")
-    override val test = DefaultHasDependencies("commonTest")
-
-    override val sourceSetName: String
-        get() = appTargets.mainSourceSet.name
+    private val appTargets = NativeApplicationTargets(objects)
+    private val commonMain = DefaultSourceSet("commonMain", DefaultDependencies(), generatedSource)
+    private val commonTest = DefaultHasDependencies("commonTest")
+    private val common = DefaultPlatformContribution(commonMain, commonTest)
 
     override val distributionContainer
         get() = targets.distributions
@@ -29,7 +26,8 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     override val executables: Provider<List<NativeExecutable>>
         get() = targets.executables
 
-    override fun visitTargets(consumer: (MutableComponent) -> Unit) {
+    override fun visitPlatforms(consumer: (PlatformContribution) -> Unit) {
+        consumer(common)
         appTargets.visitTargets(consumer)
     }
 
@@ -52,10 +50,10 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     }
 
     override fun common(config: Dependencies.() -> Unit) {
-        common.dependencies.config()
+        commonMain.dependencies.config()
     }
 
     override fun test(config: Dependencies.() -> Unit) {
-        test.dependencies.config()
+        commonTest.dependencies.config()
     }
 }

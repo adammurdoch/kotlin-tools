@@ -9,16 +9,20 @@ class ComponentBasePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             componentRegistry.from<MutableComponent> {
-                derive { _ ->
+                prepare { _ ->
                     multiplatformComponents.createSourceSets()
                 }
             }
             componentRegistry.from<HasTargets> {
                 derive { component ->
-                    register(component.common)
-                    component.visitTargets { target ->
-                        register(target)
+                    component.visitPlatforms { component ->
+                        register(component)
                     }
+                }
+            }
+            componentRegistry.from<PlatformContribution> {
+                derive { component ->
+                    register(component.main)
                 }
             }
             componentRegistry.from<HasTests> {

@@ -8,8 +8,9 @@ import javax.inject.Inject
 abstract class DefaultJvmLibrary @Inject constructor(
     mainSourceSetName: String,
     testSourceSetName: String
-) : DefaultJvmComponent<LibraryDependencies>(mainSourceSetName, testSourceSetName), JvmLibrary, MutableComponent {
-    override val dependencies = DefaultLibraryDependencies()
+) : DefaultJvmComponent<LibraryDependencies>(testSourceSetName), JvmLibrary, MutableComponent {
+    private val dependencies = DefaultLibraryDependencies()
+    override val main = DefaultSourceSet(mainSourceSetName, dependencies, generatedSource)
 
     override fun dependencies(config: LibraryDependencies.() -> Unit) {
         dependencies.config()

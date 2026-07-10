@@ -10,16 +10,18 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
     private val componentRegistry: MultiPlatformComponentRegistry,
     private val factory: ObjectFactory,
     private val project: Project
-) : MultiPlatformLibrary, MutableComponent, HasTests, HasTargets {
+) : MultiPlatformLibrary, MutableComponent, HasTargets {
     private var jvm: DefaultJvmLibrary? = null
     private var macOs: DefaultNativeLibrary? = null
-    override val common = DefaultHasLibraryDependencies("commonMain")
-    override val test = DefaultHasDependencies("commonTest")
+    private val commonSource = DefaultHasLibraryDependencies("commonMain")
+    private val commonTest = DefaultHasDependencies("commonTest")
+    private val common = DefaultPlatformContribution(commonSource, commonTest)
 
     val module: JvmModule
         get() = createJvm().module
 
-    override fun visitTargets(consumer: (MutableComponent) -> Unit) {
+    override fun visitPlatforms(consumer: (PlatformContribution) -> Unit) {
+        consumer(common)
         if (jvm != null) {
             consumer(jvm!!)
         }
@@ -59,11 +61,11 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
     }
 
     override fun common(config: LibraryDependencies.() -> Unit) {
-        common.dependencies.config()
+        commonSource.dependencies.config()
     }
 
     override fun test(config: Dependencies.() -> Unit) {
-        test.dependencies.config()
+        commonTest.dependencies.config()
     }
 
     private fun createJvm(): JvmLibrary {

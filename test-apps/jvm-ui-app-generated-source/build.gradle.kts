@@ -7,6 +7,10 @@ val generatorTask = tasks.register<SourceGeneratorTask>("generateSource") {
 }
 
 application {
+    dependencies {
+        implementation(project(":jvm-lib-generated-source"))
+        implementation(project(":kmp-lib-generated-source"))
+    }
     generatedSource.add(generatorTask.flatMap { it.outputDir })
 }
 

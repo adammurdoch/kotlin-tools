@@ -1,5 +1,8 @@
 package net.rubygrapefruit.plugins.app
 
+import org.gradle.api.file.Directory
+import org.gradle.api.provider.SetProperty
+
 interface MultiPlatformLibrary : MultiPlatformComponent<LibraryDependencies> {
     /**
      * Adds the JVM as a target, if not already, using the defaults.
@@ -35,4 +38,9 @@ interface MultiPlatformLibrary : MultiPlatformComponent<LibraryDependencies> {
      * Adds the browser as a target, if not already.
      */
     fun browser()
+
+    /**
+     * Generated Kotlin source directories for this component.
+     */
+    val generatedSource: SetProperty<Directory>
 }

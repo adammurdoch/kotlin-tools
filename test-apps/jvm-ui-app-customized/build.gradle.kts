@@ -7,7 +7,7 @@ application {
     module.name = "sample.app"
     mainClass = "sample.MainKt"
     module.requires.add("java.desktop")
-    targetJvmVersion = 11
+    targetJvmVersion = 17
 
     dependencies {
         implementation(project(":kmp-lib-customized"))

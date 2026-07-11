@@ -6,13 +6,13 @@ import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
 import javax.inject.Inject
 
-internal open class DefaultMultiPlatformLibrary @Inject constructor(
+internal abstract class DefaultMultiPlatformLibrary @Inject constructor(
     private val componentRegistry: MultiPlatformComponentRegistry,
     private val factory: ObjectFactory,
     private val project: Project
 ) : MultiPlatformLibrary, MutableComponent, HasTargets {
     private var jvm: DefaultJvmLibrary? = null
-    private val commonSource = DefaultHasLibraryDependencies("commonMain")
+    private val commonSource = DefaultLibrarySourceSet("commonMain", generatedSource)
     private val commonTest = DefaultHasDependencies("commonTest")
     private val common = DefaultPlatformContribution(commonSource, commonTest)
     private val osComponents = mutableMapOf<OperatingSystem, DefaultNativeLibrary>()

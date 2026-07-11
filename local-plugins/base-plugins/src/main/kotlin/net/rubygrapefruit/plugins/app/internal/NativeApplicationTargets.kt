@@ -8,7 +8,7 @@ class NativeApplicationTargets(
     private val objects: ObjectFactory,
     generatedSource: SetProperty<Directory>
 ) {
-    private val commonMain = DefaultSourceSet("commonMain", DefaultDependencies(), generatedSource)
+    private val commonMain = DefaultSourceSet("commonMain", generatedSource)
     private val commonTest = DefaultHasDependencies("commonTest")
     val common = DefaultPlatformContribution(commonMain, commonTest)
     private val osComponents = mutableMapOf<OperatingSystem, DefaultNativeComponent>()

@@ -12,14 +12,12 @@ abstract class DefaultJvmCliApplication @Inject constructor(
     providers: ProviderFactory,
     project: Project
 ) : DefaultJvmComponent<Dependencies>("test"), MutableJvmApplication {
-    private val dependencies = DefaultDependencies()
-
     override val distributionContainer = DistributionContainer(project.tasks, objects, providers)
     override val runtimeModulePath: ConfigurableFileCollection = objects.fileCollection()
 
-    override val main: HasDependencies = DefaultSourceSet("main", dependencies, generatedSource)
+    override val main: HasDependencies = DefaultSourceSet("main", generatedSource)
 
     override fun dependencies(config: Dependencies.() -> Unit) {
-        dependencies.config()
+        main.dependencies.config()
     }
 }

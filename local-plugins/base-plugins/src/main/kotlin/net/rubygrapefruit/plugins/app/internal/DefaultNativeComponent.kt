@@ -8,10 +8,9 @@ import javax.inject.Inject
 abstract class DefaultNativeComponent @Inject constructor(
     mainSourceSetName: String
 ) : NativeComponent<Dependencies>, MutableComponent, PlatformContribution {
-    private val dependencies = DefaultDependencies()
-    override val main = DefaultSourceSet(mainSourceSetName, dependencies, generatedSource)
+    override val main = DefaultSourceSet(mainSourceSetName, generatedSource)
 
     override fun dependencies(config: Dependencies.() -> Unit) {
-        dependencies.config()
+        main.dependencies.config()
     }
 }

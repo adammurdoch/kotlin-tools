@@ -1,10 +1,10 @@
 package sample
 
-import sample.lib.jvm.generated.GeneratedJvm
-import sample.lib.kmp.generated.GeneratedKmp
+import sample.lib.jvm.generated.JvmLog
+import sample.lib.kmp.generated.KmpLog
 
 fun main() {
     Generated().log()
-    GeneratedJvm().log()
-    GeneratedKmp().log()
+    JvmLog().log()
+    KmpLog().log()
 }

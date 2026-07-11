@@ -8,10 +8,9 @@ import javax.inject.Inject
 abstract class DefaultNativeLibrary @Inject constructor(
     mainSourceSetName: String
 ) : NativeLibrary, MutableComponent, PlatformContribution {
-    val dependencies = DefaultLibraryDependencies()
-    override val main = DefaultSourceSet(mainSourceSetName, dependencies, generatedSource)
+    override val main = DefaultLibrarySourceSet(mainSourceSetName, generatedSource)
 
     override fun dependencies(config: LibraryDependencies.() -> Unit) {
-        dependencies.config()
+        main.dependencies.config()
     }
 }

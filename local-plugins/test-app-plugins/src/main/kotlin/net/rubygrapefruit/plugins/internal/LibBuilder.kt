@@ -54,7 +54,16 @@ class KmpLibBuilder internal constructor(
 
     internal fun register(): KmpLib {
         val lib = container.add(name) { name, sampleDir ->
-            val sourceTree = sourceTree(sampleDir, main = "src/commonMain", test = "src/commonTest", "src/desktopMain", "src/jvmMain", "src/mingwMain", "src/unixMain")
+            val sourceTree = sourceTree(
+                sampleDir,
+                main = "src/commonMain",
+                test = "src/commonTest",
+                "src/desktopMain",
+                "src/jvmMain",
+                "src/mingwMain",
+                "src/unixMain",
+                "src/jsMain",
+            )
             KmpLib(name, sourceTree)
         }
         for (name in derived) {

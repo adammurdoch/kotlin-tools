@@ -1,9 +1,9 @@
 package sample.render
 
-import platform.posix.isatty
+expect fun isAnsiTerminal(): Boolean
 
 actual fun terminal(): Terminal {
-    return if (isatty(1) != 0) {
+    return if (isAnsiTerminal()) {
         AnsiTerminal
     } else {
         Terminal.Plain

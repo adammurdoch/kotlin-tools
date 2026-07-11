@@ -8,6 +8,7 @@ library {
         targetJvmVersion = 11
     }
     nativeDesktop()
+    browser()
     test {
         implementation(versions.test.coordinates)
     }

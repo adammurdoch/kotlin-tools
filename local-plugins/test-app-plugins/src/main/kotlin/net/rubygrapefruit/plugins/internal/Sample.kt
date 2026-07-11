@@ -89,15 +89,14 @@ class NativeUiApp internal constructor(
 ) : UiApp {
     override val distribution = UiAppDistribution.of(name, "dist", sampleDir.resolve("build/dist"), launcher, Machine.thisMachine.architecture)
 
-    override val otherDistributions: List<UiAppDistribution> = nativeDistributions(sampleDir) { distTask, distDir, architecture ->
-        UiAppDistribution.of(name, distTask, distDir, launcher, architecture)
-    }
+    override val otherDistributions: List<UiAppDistribution>
+        get() = emptyList()
 }
 
 private fun <T : AppDistribution> nativeDistributions(sampleDir: Path, factory: (String, Path, Architecture) -> T): List<T> {
     val host = Machine.thisMachine
     return if (host.isMacOS && host.architecture == Arm64) {
-        listOf(factory("macosX64DebugDist", sampleDir.resolve("build/dist-images/macosX64Debug"), Architecture.X64))
+        listOf(factory("macosArm64ReleaseDist", sampleDir.resolve("build/dist-images/macosArm64Release"), Arm64))
     } else {
         emptyList()
     }

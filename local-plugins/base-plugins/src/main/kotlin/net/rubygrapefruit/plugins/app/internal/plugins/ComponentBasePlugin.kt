@@ -15,8 +15,8 @@ class ComponentBasePlugin : Plugin<Project> {
             }
             componentRegistry.from<HasTargets> {
                 derive { component ->
-                    component.visitPlatforms { component ->
-                        register(component)
+                    component.visitPlatforms { contribution ->
+                        register(contribution)
                     }
                 }
             }

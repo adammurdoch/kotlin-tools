@@ -12,10 +12,10 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
     private val project: Project
 ) : MultiPlatformLibrary, MutableComponent, HasTargets {
     private var jvm: DefaultJvmLibrary? = null
-    private var macOs: DefaultNativeLibrary? = null
     private val commonSource = DefaultHasLibraryDependencies("commonMain")
     private val commonTest = DefaultHasDependencies("commonTest")
     private val common = DefaultPlatformContribution(commonSource, commonTest)
+    private val osComponents = mutableMapOf<OperatingSystem, DefaultNativeLibrary>()
 
     val module: JvmModule
         get() = createJvm().module
@@ -25,8 +25,8 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
         if (jvm != null) {
             consumer(jvm!!)
         }
-        if (macOs != null) {
-            consumer(macOs!!)
+        for (component in osComponents.values) {
+            consumer(component)
         }
     }
 
@@ -43,12 +43,12 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
     }
 
     override fun macOS() {
-        componentRegistry.macOS()
+        macOS {}
     }
 
     override fun macOS(config: NativeLibrary.() -> Unit) {
         componentRegistry.macOS()
-        createMacOS().config()
+        forOS(OperatingSystem.MacOS).config()
     }
 
     override fun desktop(config: NativeLibrary.() -> Unit) {
@@ -58,6 +58,9 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
 
     override fun nativeDesktop() {
         componentRegistry.nativeDesktop()
+        for (os in OperatingSystem.desktop) {
+            forOS(os)
+        }
     }
 
     override fun common(config: LibraryDependencies.() -> Unit) {
@@ -80,10 +83,7 @@ internal open class DefaultMultiPlatformLibrary @Inject constructor(
         return jvm!!
     }
 
-    private fun createMacOS(): DefaultNativeLibrary {
-        if (macOs == null) {
-            macOs = factory.newInstance(DefaultNativeLibrary::class.java, "macosMain")
-        }
-        return macOs!!
+    private fun forOS(operatingSystem: OperatingSystem): DefaultNativeLibrary {
+        return osComponents.getOrPut(operatingSystem) { factory.newInstance(DefaultNativeLibrary::class.java, operatingSystem.mainSourceSetName) }
     }
 }

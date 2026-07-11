@@ -28,16 +28,17 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     }
 
     override fun macOS() {
-        componentRegistry.macOS { register(it) }
+        macOS { }
     }
 
     override fun macOS(config: NativeComponent<Dependencies>.() -> Unit) {
-        macOS()
+        componentRegistry.macOS { register(it) }
         appTargets.macOS().config()
     }
 
     override fun nativeDesktop() {
         componentRegistry.nativeDesktop { register(it) }
+        appTargets.nativeDesktop()
     }
 
     private fun KotlinNativeBinaryContainer.register(target: NativeMachine) {

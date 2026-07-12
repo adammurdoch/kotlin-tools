@@ -1,6 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal
 
 import net.rubygrapefruit.plugins.app.*
+import net.rubygrapefruit.plugins.app.internal.component.ComponentFactory
 import net.rubygrapefruit.plugins.app.internal.component.MutableComponent
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
@@ -9,7 +10,8 @@ import javax.inject.Inject
 internal abstract class DefaultMultiPlatformLibrary @Inject constructor(
     private val componentRegistry: MultiPlatformComponentRegistry,
     private val factory: ObjectFactory,
-    private val project: Project
+    private val project: Project,
+    private val componentFactory: ComponentFactory
 ) : MultiPlatformLibrary, MutableComponent, HasTargets {
     private var jvm: DefaultJvmLibrary? = null
     private var browser: DefaultBrowserLibrary? = null
@@ -80,6 +82,7 @@ internal abstract class DefaultMultiPlatformLibrary @Inject constructor(
     private fun createJvm(): JvmLibrary {
         if (jvm == null) {
             val lib = factory.newInstance(DefaultJvmLibrary::class.java, "jvmMain", "jvmTest")
+            componentFactory.created(lib)
             lib.module.name.convention(toModuleName(project.name))
             lib.targetJvmVersion.convention(Versions.libs.jvm.version)
             jvm = lib

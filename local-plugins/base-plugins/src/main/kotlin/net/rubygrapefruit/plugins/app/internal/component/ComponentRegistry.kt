@@ -8,6 +8,13 @@ import kotlin.reflect.cast
 
 open class ComponentRegistry(private val project: Project) {
     private val rules = RuleSet()
+    private val context = DefaultContext(SourceSets(project)) { value, context ->
+        applyRules(Phase.Prepare, value, context)
+        applyRules(Phase.Derive, value, context)
+    }
+    val factory: ComponentFactory = DefaultComponentFactory { value ->
+        applyRules(Phase.Initialize, Registration(null, value), context)
+    }
     private var main: MutableComponent? = null
 
     fun register(component: MutableComponent) {
@@ -15,13 +22,10 @@ open class ComponentRegistry(private val project: Project) {
             throw UnsupportedOperationException("Support for multiple root components in the same project is not implemented.")
         }
         main = component
+        val registration = Registration(null, component)
+        applyRules(Phase.Initialize, registration, context)
         project.afterEvaluate {
-            val sourceSets = SourceSets(project)
-            val context = DefaultContext(sourceSets) { value, context ->
-                applyRules(Phase.Prepare, value, context)
-                applyRules(Phase.Derive, value, context)
-            }
-            context.start(component)
+            context.start(registration)
 //            applyActions.clear()
 //            deriveActions.clear()
         }
@@ -42,7 +46,20 @@ open class ComponentRegistry(private val project: Project) {
     }
 
     internal enum class Phase {
-        Prepare, Derive
+        /**
+         * Initialize target before user configuration. Runs when component is created.
+         */
+        Initialize,
+
+        /**
+         * Mutates target. Runs after user configuration phase, prior to derive.
+         */
+        Prepare,
+
+        /**
+         * Derives objects from target. Runs after prepare
+         */
+        Derive
     }
 
     internal sealed class Rule {
@@ -122,6 +139,16 @@ open class ComponentRegistry(private val project: Project) {
         private val type: KClass<T>,
         private val rules: RuleSet
     ) {
+        /**
+         * Initializes the target when it is created. Only applied to objects create via [ComponentFactory].
+         */
+        fun initialize(action: (T) -> Unit) {
+            rules.add(ApplyToType(Phase.Initialize, type) { action(it) })
+        }
+
+        /**
+         * Mutates the target. All prepare rules are run before any derive rules.
+         */
         fun prepare(action: (T) -> Unit) {
             rules.add(ApplyToType(Phase.Prepare, type) { action(it) })
         }
@@ -189,6 +216,10 @@ open class ComponentRegistry(private val project: Project) {
 
         fun registerSibling(value: Any)
 
+        /**
+         * Runs the given action when the given source set is available.
+         * This is used because the Kotlin plugin creates some source sets lazily.
+         */
         fun deriveFromSourceSet(name: String, action: Context.(KotlinSourceSet) -> Unit)
     }
 
@@ -196,8 +227,8 @@ open class ComponentRegistry(private val project: Project) {
         private val queue = mutableListOf<Registration>()
         private var realizing: Registration? = null
 
-        fun start(value:Any) {
-            queue.add(Registration(null, value))
+        fun start(registration: Registration) {
+            queue.add(registration)
             realize()
         }
 
@@ -228,6 +259,12 @@ open class ComponentRegistry(private val project: Project) {
                 action(sourceSet)
                 realize()
             }
+        }
+    }
+
+    private class DefaultComponentFactory(private val consumer: (Any) -> Unit) : ComponentFactory {
+        override fun created(component: Any) {
+            consumer(component)
         }
     }
 

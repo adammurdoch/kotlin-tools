@@ -21,11 +21,17 @@ class KmpLibraryPlugin : Plugin<Project> {
             JvmConventionsPlugin.addApiConstraints(project, "commonMainApi")
 
             componentRegistry.from<DefaultJvmLibrary> {
-                derive { component ->
+                initialize { component ->
                     val kotlin = target.kotlin
                     kotlin.jvmToolchain {
-                        it.languageVersion.set(component.targetJvmVersion.map { JavaLanguageVersion.of(it) })
+                        it.languageVersion.convention(component.targetJvmVersion.map { JavaLanguageVersion.of(it) })
                     }
+                    // Register the target with the Kotlin plugin during configuration, so that tasks are created
+                    kotlin.jvm()
+                }
+
+                derive { component ->
+                    val kotlin = target.kotlin
                     val jvmTarget = kotlin.jvm()
                     val apiConfig = configurations.getByName("jvmCompileClasspath")
                     val runtimeClasspath = configurations.getByName("jvmRuntimeClasspath")
@@ -41,10 +47,8 @@ class KmpLibraryPlugin : Plugin<Project> {
                         .inspectClassPathsFor(component.module, null, classesDir, apiClasspath, runtimeClasspath)
                         .moduleInfoClasspath
 
-                    tasks.whenObjectAdded { task ->
-                        if (task.name == jvmTarget.artifactsTaskName) {
-                            (task as Jar).from(moduleInfoCp)
-                        }
+                    tasks.named(jvmTarget.artifactsTaskName, Jar::class.java) { task ->
+                        task.from(moduleInfoCp)
                     }
 
                     jvmTarget.testRuns.configureEach { testRun ->
@@ -72,7 +76,8 @@ class KmpLibraryPlugin : Plugin<Project> {
                 "library",
                 DefaultMultiPlatformLibrary::class.java,
                 multiplatformComponents,
-                objects
+                objects,
+                componentRegistry.factory
             ) as DefaultMultiPlatformLibrary
             componentRegistry.register(lib)
         }

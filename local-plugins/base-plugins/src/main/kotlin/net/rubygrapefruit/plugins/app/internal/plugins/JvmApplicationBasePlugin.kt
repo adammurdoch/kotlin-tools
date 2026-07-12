@@ -4,6 +4,7 @@ import net.rubygrapefruit.plugins.app.Versions
 import net.rubygrapefruit.plugins.app.internal.JvmModuleRegistry
 import net.rubygrapefruit.plugins.app.internal.MutableJvmApplication
 import net.rubygrapefruit.plugins.app.internal.applications
+import net.rubygrapefruit.plugins.app.internal.componentRegistry
 import net.rubygrapefruit.plugins.app.internal.tasks.RuntimeModulePath
 import net.rubygrapefruit.plugins.app.internal.toModuleName
 import org.gradle.api.Plugin
@@ -20,10 +21,15 @@ class JvmApplicationBasePlugin : Plugin<Project> {
             plugins.apply(ComponentBasePlugin::class.java)
             plugins.apply(JvmConventionsPlugin::class.java)
 
-            applications.withApp<MutableJvmApplication> { app ->
-                app.module.name.convention(app.appName.map(::toModuleName))
+            componentRegistry.from<MutableJvmApplication> {
+                initialize { app ->
+                    app.module.name.convention(app.appName.map(::toModuleName))
+                    app.targetJvmVersion.convention(Versions.apps.jvm.version)
+                }
+            }
 
-                app.targetJvmVersion.convention(Versions.apps.jvm.version)
+            applications.withApp<MutableJvmApplication> { app ->
+
                 JvmConventionsPlugin.javaVersion(this, app.targetJvmVersion)
                 JvmConventionsPlugin.addApiConstraints(this, "implementation")
 

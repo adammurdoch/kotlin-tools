@@ -78,7 +78,7 @@ internal abstract class DefaultMultiPlatformLibrary @Inject constructor(
             lib.targetJvmVersion.convention(Versions.libs.jvm.version)
             jvm = lib
             // This can call back to query JVM object
-            componentRegistry.jvm(lib.targetJvmVersion)
+            componentRegistry.jvm()
         }
         return jvm!!
     }

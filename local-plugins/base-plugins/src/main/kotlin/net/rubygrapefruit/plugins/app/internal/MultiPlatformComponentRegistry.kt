@@ -5,7 +5,6 @@ import net.rubygrapefruit.plugins.app.NativeMachine
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
-import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.jetbrains.kotlin.gradle.dsl.KotlinNativeBinaryContainer
 import org.jetbrains.kotlin.gradle.plugin.mpp.Executable
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
@@ -48,13 +47,7 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
         native(setOf(NativeMachine.MacOSArm64), config)
     }
 
-    fun jvm(targetVersion: Provider<Int>) {
-        with(project.kotlin) {
-            jvmToolchain {
-                it.languageVersion.set(targetVersion.map { JavaLanguageVersion.of(it) })
-            }
-            jvm()
-        }
+    fun jvm() {
         jvm.add(true)
     }
 
@@ -88,10 +81,6 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
                 action(machine, buildType, binaryFile, executable)
             }
         }
-    }
-
-    fun jvmTarget(action: () -> Unit) {
-        jvm.each { action() }
     }
 
     private fun createIntermediateSourceSet(name: String, parentName: String, childNames: Set<String>) {

@@ -27,10 +27,6 @@ abstract class DefaultNativeCliApplication @Inject constructor(
         appTargets.visitPlatforms(consumer)
     }
 
-    override fun macOS() {
-        macOS { }
-    }
-
     override fun macOS(config: NativeComponent<Dependencies>.() -> Unit) {
         componentRegistry.macOS { register(it) }
         appTargets.macOS().config()

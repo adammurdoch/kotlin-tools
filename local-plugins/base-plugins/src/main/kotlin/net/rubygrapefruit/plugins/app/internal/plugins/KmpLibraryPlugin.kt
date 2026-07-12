@@ -31,8 +31,7 @@ class KmpLibraryPlugin : Plugin<Project> {
                 }
 
                 derive { component ->
-                    val kotlin = target.kotlin
-                    val jvmTarget = kotlin.jvm()
+                    val jvmTarget = target.kotlin.jvm()
                     val apiConfig = configurations.getByName("jvmCompileClasspath")
                     val runtimeClasspath = configurations.getByName("jvmRuntimeClasspath")
 
@@ -59,6 +58,7 @@ class KmpLibraryPlugin : Plugin<Project> {
                     }
                 }
             }
+
             componentRegistry.from<DefaultBrowserLibrary> {
                 derive { _ ->
                     kotlin.js {

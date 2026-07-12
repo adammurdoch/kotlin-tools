@@ -17,14 +17,9 @@ interface NativeApplication : Application, MultiPlatformComponent<Dependencies> 
     fun nativeDesktop()
 
     /**
-     * Adds macOS as a target, if not already.
-     */
-    fun macOS()
-
-    /**
      * Adds macOS as a target, if not already, and configures it.
      */
-    fun macOS(config: NativeComponent<Dependencies>.() -> Unit)
+    fun macOS(config: NativeComponent<Dependencies>.() -> Unit = {})
 
     /**
      * Generated Kotlin source directories for this component.

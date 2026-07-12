@@ -36,27 +36,17 @@ internal abstract class DefaultMultiPlatformLibrary @Inject constructor(
         }
     }
 
-    override fun jvm() {
-        jvm {}
-    }
-
     override fun jvm(config: JvmLibrary.() -> Unit) {
         createJvm().config()
     }
 
     override fun browser() {
-        if (browser == null) {
-            browser = DefaultBrowserLibrary()
-        }
-    }
-
-    override fun macOS() {
-        macOS {}
+        createBrowser()
     }
 
     override fun macOS(config: NativeLibrary.() -> Unit) {
         componentRegistry.macOS()
-        forOS(OperatingSystem.MacOS).config()
+        createForOS(OperatingSystem.MacOS).config()
     }
 
     override fun desktop(config: NativeLibrary.() -> Unit) {
@@ -67,7 +57,7 @@ internal abstract class DefaultMultiPlatformLibrary @Inject constructor(
     override fun nativeDesktop() {
         componentRegistry.nativeDesktop()
         for (os in OperatingSystem.desktop) {
-            forOS(os)
+            createForOS(os)
         }
     }
 
@@ -81,18 +71,30 @@ internal abstract class DefaultMultiPlatformLibrary @Inject constructor(
 
     private fun createJvm(): JvmLibrary {
         if (jvm == null) {
-            val lib = factory.newInstance(DefaultJvmLibrary::class.java, "jvmMain", "jvmTest")
-            componentFactory.created(lib)
-            lib.module.name.convention(toModuleName(project.name))
-            lib.targetJvmVersion.convention(Versions.libs.jvm.version)
-            jvm = lib
+            val library = factory.newInstance(DefaultJvmLibrary::class.java, "jvmMain", "jvmTest")
+            componentFactory.created(library)
+            library.module.name.convention(toModuleName(project.name))
+            library.targetJvmVersion.convention(Versions.libs.jvm.version)
+            jvm = library
             // This can call back to query JVM object
             componentRegistry.jvm()
         }
         return jvm!!
     }
 
-    private fun forOS(operatingSystem: OperatingSystem): DefaultNativeLibrary {
-        return osComponents.getOrPut(operatingSystem) { factory.newInstance(DefaultNativeLibrary::class.java, operatingSystem.mainSourceSetName) }
+    private fun createBrowser() {
+        if (browser == null) {
+            val library = DefaultBrowserLibrary()
+            componentFactory.created(library)
+            browser = library
+        }
+    }
+
+    private fun createForOS(operatingSystem: OperatingSystem): DefaultNativeLibrary {
+        return osComponents.getOrPut(operatingSystem) {
+            val library = factory.newInstance(DefaultNativeLibrary::class.java, operatingSystem.mainSourceSetName)
+            componentFactory.created(library)
+            library
+        }
     }
 }

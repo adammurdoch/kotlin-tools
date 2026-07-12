@@ -13,7 +13,7 @@ interface NativeUIApplication : Application, UiApplication, MultiPlatformCompone
     /**
      * Adds macOS as a target, if not already, and configures it.
      */
-    fun macOS(config: NativeComponent<Dependencies>.() -> Unit)
+    fun macOS(config: NativeComponent<Dependencies>.() -> Unit = {})
 
     /**
      * Generated Kotlin source directories for this component.

@@ -13,12 +13,13 @@ internal abstract class DefaultMultiPlatformLibrary @Inject constructor(
     private val project: Project,
     private val componentFactory: ComponentFactory
 ) : MultiPlatformLibrary, MutableComponent, HasTargets {
-    private var jvm: DefaultJvmLibrary? = null
-    private var browser: DefaultBrowserLibrary? = null
     private val commonSource = DefaultLibrarySourceSet("commonMain", generatedSource)
     private val commonTest = DefaultHasDependencies("commonTest")
     private val common = DefaultPlatformContribution(commonSource, commonTest)
     private val osComponents = mutableMapOf<OperatingSystem, DefaultNativeLibrary>()
+    private var jvm: DefaultJvmLibrary? = null
+    private var browser: DefaultBrowserLibrary? = null
+    private var desktop: DefaultNativeLibrary? = null
 
     val module: JvmModule
         get() = createJvm().module
@@ -30,6 +31,9 @@ internal abstract class DefaultMultiPlatformLibrary @Inject constructor(
         }
         if (browser != null) {
             consumer(browser!!)
+        }
+        if (desktop != null) {
+            consumer(desktop!!)
         }
         for (component in osComponents.values) {
             consumer(component)
@@ -50,8 +54,7 @@ internal abstract class DefaultMultiPlatformLibrary @Inject constructor(
     }
 
     override fun desktop(config: NativeLibrary.() -> Unit) {
-        val lib = factory.newInstance(DefaultNativeLibrary::class.java, "desktopMain")
-        lib.config()
+        createDesktop().config()
     }
 
     override fun nativeDesktop() {
@@ -67,6 +70,15 @@ internal abstract class DefaultMultiPlatformLibrary @Inject constructor(
 
     override fun test(config: Dependencies.() -> Unit) {
         commonTest.dependencies.config()
+    }
+
+    private fun createDesktop(): DefaultNativeLibrary {
+        if (desktop == null) {
+            val lib = factory.newInstance(DefaultNativeLibrary::class.java, "desktopMain")
+            componentFactory.created(lib)
+            desktop = lib
+        }
+        return desktop!!
     }
 
     private fun createJvm(): JvmLibrary {

@@ -1,11 +1,13 @@
 package net.rubygrapefruit.plugins.app.internal
 
+import net.rubygrapefruit.plugins.app.internal.component.ComponentFactory
 import org.gradle.api.file.Directory
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.SetProperty
 
 class NativeApplicationTargets(
     private val objects: ObjectFactory,
+    private val componentFactory: ComponentFactory,
     generatedSource: SetProperty<Directory>
 ) {
     private val commonMain = DefaultSourceSet("commonMain", generatedSource)
@@ -31,6 +33,10 @@ class NativeApplicationTargets(
     }
 
     private fun forOS(operatingSystem: OperatingSystem): DefaultNativeComponent {
-        return osComponents.getOrPut(operatingSystem) { objects.newInstance(DefaultNativeComponent::class.java, operatingSystem.mainSourceSetName) }
+        return osComponents.getOrPut(operatingSystem) {
+            val component = objects.newInstance(DefaultNativeComponent::class.java, operatingSystem.mainSourceSetName)
+            componentFactory.created(component)
+            component
+        }
     }
 }

@@ -34,7 +34,7 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
                 }
             }
 
-            val app = extensions.create(NativeApplication::class.java, "application", DefaultNativeCliApplication::class.java, multiplatformComponents)
+            val app = extensions.create(NativeApplication::class.java, "application", DefaultNativeCliApplication::class.java, multiplatformComponents, componentRegistry.factory)
             applications.register(app as DefaultNativeCliApplication)
         }
     }

@@ -1,6 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal
 
 import net.rubygrapefruit.plugins.app.*
+import net.rubygrapefruit.plugins.app.internal.component.ComponentFactory
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
@@ -12,10 +13,11 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     private val componentRegistry: MultiPlatformComponentRegistry,
     objects: ObjectFactory,
     providers: ProviderFactory,
+    componentFactory: ComponentFactory,
     project: Project
 ) : MutableApplication, NativeApplication, HasTargets {
     val targets = NativeTargetsContainer(objects, providers, project.tasks)
-    private val appTargets = NativeApplicationTargets(objects, generatedSource)
+    private val appTargets = NativeApplicationTargets(objects, componentFactory, generatedSource)
 
     override val distributionContainer
         get() = targets.distributions

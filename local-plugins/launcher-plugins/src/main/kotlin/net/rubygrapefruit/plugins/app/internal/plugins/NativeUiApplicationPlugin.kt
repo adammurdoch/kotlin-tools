@@ -65,7 +65,7 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                 }
             }
 
-            val app = extensions.create("application", DefaultNativeUiApplication::class.java)
+            val app = extensions.create("application", DefaultNativeUiApplication::class.java, componentRegistry.factory)
             applications.register(app)
         }
     }

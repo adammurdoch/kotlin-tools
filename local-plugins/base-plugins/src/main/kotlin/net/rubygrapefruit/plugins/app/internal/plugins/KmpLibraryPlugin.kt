@@ -55,6 +55,17 @@ class KmpLibraryPlugin : Plugin<Project> {
                     }
                 }
             }
+            componentRegistry.from<DefaultBrowserLibrary> {
+                derive { _ ->
+                    kotlin.js {
+                        browser {
+                            testTask { task ->
+                                task.useMocha()
+                            }
+                        }
+                    }
+                }
+            }
 
             val lib = extensions.create(
                 MultiPlatformLibrary::class.java,

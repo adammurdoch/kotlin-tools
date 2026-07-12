@@ -12,6 +12,7 @@ internal abstract class DefaultMultiPlatformLibrary @Inject constructor(
     private val project: Project
 ) : MultiPlatformLibrary, MutableComponent, HasTargets {
     private var jvm: DefaultJvmLibrary? = null
+    private var browser: DefaultBrowserLibrary? = null
     private val commonSource = DefaultLibrarySourceSet("commonMain", generatedSource)
     private val commonTest = DefaultHasDependencies("commonTest")
     private val common = DefaultPlatformContribution(commonSource, commonTest)
@@ -24,6 +25,9 @@ internal abstract class DefaultMultiPlatformLibrary @Inject constructor(
         consumer(common)
         if (jvm != null) {
             consumer(jvm!!)
+        }
+        if (browser != null) {
+            consumer(browser!!)
         }
         for (component in osComponents.values) {
             consumer(component)
@@ -39,7 +43,9 @@ internal abstract class DefaultMultiPlatformLibrary @Inject constructor(
     }
 
     override fun browser() {
-        componentRegistry.browser()
+        if (browser == null) {
+            browser = DefaultBrowserLibrary()
+        }
     }
 
     override fun macOS() {

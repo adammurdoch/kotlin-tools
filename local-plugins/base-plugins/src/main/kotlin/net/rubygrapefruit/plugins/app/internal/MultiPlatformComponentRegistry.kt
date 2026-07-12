@@ -51,18 +51,6 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
         jvm.add(true)
     }
 
-    fun browser() {
-        with(project.kotlin) {
-            js {
-                browser {
-                    testTask { task ->
-                        task.useMocha()
-                    }
-                }
-            }
-        }
-    }
-
     private fun eachNativeTarget(action: (NativeMachine, KotlinNativeTarget) -> Unit) {
         machineActions.add(action)
         for (machine in machines) {

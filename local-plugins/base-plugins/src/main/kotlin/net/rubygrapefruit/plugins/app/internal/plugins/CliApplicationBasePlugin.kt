@@ -14,14 +14,14 @@ class CliApplicationBasePlugin : Plugin<Project> {
         with(target) {
             plugins.apply(ApplicationBasePlugin::class.java)
 
-            componentRegistry.from<MutableApplication> {
+            componentRegistry.each<MutableApplication> {
                 derive { app ->
                     val installation = objects.newInstance(DefaultMutableInstallation::class.java)
                     app.localInstallation.set(installation)
                     app.installations.add(app.localInstallation)
                     register(installation)
                 }
-                from<DefaultMutableInstallation> {
+                each<DefaultMutableInstallation> {
                     derive { installation, app ->
                         val targetDirectory = File(System.getProperty("user.home"), "bin")
                         installation.installDirectory.fileProvider(app.appName.map { name -> targetDirectory.resolve("images/$name") })

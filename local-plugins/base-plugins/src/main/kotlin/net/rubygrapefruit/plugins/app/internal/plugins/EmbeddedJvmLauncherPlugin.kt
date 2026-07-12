@@ -18,8 +18,8 @@ class EmbeddedJvmLauncherPlugin : Plugin<Project> {
         with(target) {
             plugins.apply(ApplicationBasePlugin::class.java)
 
-            componentRegistry.from<DefaultJvmCliApplication> {
-                from<JvmCliApplicationDist> {
+            componentRegistry.each<DefaultJvmCliApplication> {
+                each<JvmCliApplicationDist> {
                     prepare { dist, app ->
                         // TODO - the target machine is not necessarily the host machine; it depends on the JVM being used to run jlink
                         // Should add distribution for each target, which should be declared
@@ -37,7 +37,7 @@ class EmbeddedJvmLauncherPlugin : Plugin<Project> {
                 }
             }
 
-            componentRegistry.from<MutableJvmApplication> {
+            componentRegistry.each<MutableJvmApplication> {
                 derive { app ->
                     val embeddedJvmTask = tasks.register("embeddedJvm", EmbeddedJvmLauncher::class.java) { t ->
                         t.imageDirectory.set(layout.buildDirectory.dir("embedded-jvm"))
@@ -51,7 +51,7 @@ class EmbeddedJvmLauncherPlugin : Plugin<Project> {
                     register(EmbeddedJvm(embeddedJvmTask))
                 }
 
-                from<HasEmbeddedJvm> {
+                each<HasEmbeddedJvm> {
                     require<EmbeddedJvm> {
                         derive { dist, app, jvm ->
                             dist.withImage {

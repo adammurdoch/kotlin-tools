@@ -19,8 +19,8 @@ class ApplicationBasePlugin : Plugin<Project> {
             val componentRegistry = target.extensions.create("componentRegistry", ComponentRegistry::class.java)
             target.extensions.create("applicationRegistry", ApplicationRegistry::class.java, componentRegistry)
 
-            componentRegistry.from<MutableApplication> {
-                from<HasDistributionImage> {
+            componentRegistry.each<MutableApplication> {
+                each<HasDistributionImage> {
                     prepare { dist, _ ->
                         dist.distTask.configure { t ->
                             t.includeFile(dist.launcherFilePath, dist.launcherFile)

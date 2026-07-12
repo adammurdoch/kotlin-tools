@@ -8,29 +8,29 @@ import org.gradle.api.Project
 class ComponentBasePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            componentRegistry.from<MutableComponent> {
+            componentRegistry.each<MutableComponent> {
                 prepare { _ ->
                     multiplatformComponents.createSourceSets()
                 }
             }
-            componentRegistry.from<HasTargets> {
+            componentRegistry.each<HasTargets> {
                 derive { component ->
                     component.visitPlatforms { contribution ->
                         register(contribution)
                     }
                 }
             }
-            componentRegistry.from<PlatformContribution> {
+            componentRegistry.each<PlatformContribution> {
                 derive { component ->
                     register(component.main)
                 }
             }
-            componentRegistry.from<HasTests> {
+            componentRegistry.each<HasTests> {
                 derive { component ->
                     register(component.test)
                 }
             }
-            componentRegistry.from<HasDependencies> {
+            componentRegistry.each<HasDependencies> {
                 derive { component ->
                     deriveFromSourceSet(component.sourceSetName) { sourceSet ->
                         sourceSet.dependencies {
@@ -39,7 +39,7 @@ class ComponentBasePlugin : Plugin<Project> {
                     }
                 }
             }
-            componentRegistry.from<HasGeneratedSource> {
+            componentRegistry.each<HasGeneratedSource> {
                 derive { component ->
                     deriveFromSourceSet(component.sourceSetName) { sourceSet ->
                         sourceSet.kotlin.srcDirs(component.generatedSource)

@@ -21,7 +21,7 @@ class JvmApplicationBasePlugin : Plugin<Project> {
             plugins.apply(ComponentBasePlugin::class.java)
             plugins.apply(JvmConventionsPlugin::class.java)
 
-            componentRegistry.from<MutableJvmApplication> {
+            componentRegistry.each<MutableJvmApplication> {
                 initialize { app ->
                     app.module.name.convention(app.appName.map(::toModuleName))
                     app.targetJvmVersion.convention(Versions.apps.jvm.version)

@@ -13,7 +13,7 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
             plugins.apply(CliApplicationBasePlugin::class.java)
             plugins.apply(ComponentBasePlugin::class.java)
 
-            componentRegistry.from<DefaultNativeCliApplication> {
+            componentRegistry.each<DefaultNativeCliApplication> {
                 derive { app ->
                     app.distributionContainer.each {
                         register(this)

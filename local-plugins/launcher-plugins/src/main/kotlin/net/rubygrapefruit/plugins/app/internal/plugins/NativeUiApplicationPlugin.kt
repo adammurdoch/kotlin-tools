@@ -15,7 +15,7 @@ class NativeUiApplicationPlugin : Plugin<Project> {
             plugins.apply(UiApplicationBasePlugin::class.java)
             plugins.apply(ComponentBasePlugin::class.java)
 
-            componentRegistry.from<DefaultNativeUiApplication> {
+            componentRegistry.each<DefaultNativeUiApplication> {
                 derive { app ->
                     app.distributionContainer.each {
                         register(this)

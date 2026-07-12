@@ -31,12 +31,12 @@ open class ComponentRegistry(private val project: Project) {
         }
     }
 
-    fun <T : Any> from(type: KClass<T>, action: Rules<T>.() -> Unit) {
+    fun <T : Any> each(type: KClass<T>, action: Rules<T>.() -> Unit) {
         Rules(type, rules).action()
     }
 
-    inline fun <reified T : Any> from(noinline action: Rules<T>.() -> Unit) {
-        from(T::class, action)
+    inline fun <reified T : Any> each(noinline action: Rules<T>.() -> Unit) {
+        each(T::class, action)
     }
 
     private fun applyRules(phase: Phase, registration: Registration, context: Context) {
@@ -160,12 +160,12 @@ open class ComponentRegistry(private val project: Project) {
             rules.add(ApplyToType(Phase.Derive, type, action))
         }
 
-        fun <S : Any> from(childType: KClass<S>, action: Rules2<S, T>.() -> Unit) {
+        fun <S : Any> each(childType: KClass<S>, action: Rules2<S, T>.() -> Unit) {
             Rules2(childType, type, rules).action()
         }
 
-        inline fun <reified S : Any> from(noinline action: Rules2<S, T>.() -> Unit) {
-            from(S::class, action)
+        inline fun <reified S : Any> each(noinline action: Rules2<S, T>.() -> Unit) {
+            each(S::class, action)
         }
     }
 

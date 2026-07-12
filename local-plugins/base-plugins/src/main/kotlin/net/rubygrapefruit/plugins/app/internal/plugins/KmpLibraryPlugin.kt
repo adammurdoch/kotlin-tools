@@ -20,7 +20,7 @@ class KmpLibraryPlugin : Plugin<Project> {
 
             JvmConventionsPlugin.addApiConstraints(project, "commonMainApi")
 
-            componentRegistry.from<DefaultJvmLibrary> {
+            componentRegistry.each<DefaultJvmLibrary> {
                 initialize { component ->
                     val kotlin = target.kotlin
                     kotlin.jvmToolchain {
@@ -59,7 +59,7 @@ class KmpLibraryPlugin : Plugin<Project> {
                 }
             }
 
-            componentRegistry.from<DefaultBrowserLibrary> {
+            componentRegistry.each<DefaultBrowserLibrary> {
                 derive { _ ->
                     kotlin.js {
                         browser {

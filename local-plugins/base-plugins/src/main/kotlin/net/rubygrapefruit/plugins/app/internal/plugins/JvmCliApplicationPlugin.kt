@@ -16,12 +16,12 @@ class JvmCliApplicationPlugin : Plugin<Project> {
             plugins.apply(JvmApplicationBasePlugin::class.java)
             plugins.apply(CliApplicationBasePlugin::class.java)
 
-            componentRegistry.from<DefaultJvmCliApplication> {
+            componentRegistry.each<DefaultJvmCliApplication> {
                 derive {
                     register(JvmCliApplicationDist())
                 }
 
-                from<JvmCliApplicationDist> {
+                each<JvmCliApplicationDist> {
                     derive { dist, app ->
                         val declaredDist = dist.dist
                         if (declaredDist == null) {
@@ -33,7 +33,7 @@ class JvmCliApplicationPlugin : Plugin<Project> {
                     }
                 }
 
-                from<HasLauncherScripts> {
+                each<HasLauncherScripts> {
                     prepare { dist, app ->
                         val libNames = app.runtimeModulePath.elements.map { it.map { f -> f.asFile.name } }
 

@@ -17,7 +17,7 @@ class JvmUiApplicationPlugin : Plugin<Project> {
             plugins.apply(EmbeddedJvmLauncherPlugin::class.java)
             plugins.apply(UiApplicationBasePlugin::class.java)
 
-            componentRegistry.from<DefaultJvmUiApplication> {
+            componentRegistry.each<DefaultJvmUiApplication> {
                 derive { app ->
                     val machine = NativeMachine.MacOSArm64
                     // TODO - 'can build' flag is incorrect - it depends on the JVM to be embedded
@@ -34,7 +34,7 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                     register(dist)
                 }
 
-                from<DefaultJvmUiAppDistribution> {
+                each<DefaultJvmUiAppDistribution> {
                     derive { dist, app ->
                         val nativeBinary = configurations.create("nativeBinaries${dist.targetMachine.name}") {
                             it.attributes.attribute(

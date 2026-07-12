@@ -13,8 +13,8 @@ class NativeBinaryJvmLauncherPlugin : Plugin<Project> {
         with(target) {
             plugins.apply(ApplicationBasePlugin::class.java)
 
-            componentRegistry.from<DefaultJvmCliApplication> {
-                from<JvmCliApplicationDist> {
+            componentRegistry.each<DefaultJvmCliApplication> {
+                each<JvmCliApplicationDist> {
                     prepare { dist, app ->
                         val binDist = app.distributionContainer.add(
                             null,
@@ -30,7 +30,7 @@ class NativeBinaryJvmLauncherPlugin : Plugin<Project> {
                 }
             }
 
-            componentRegistry.from<MutableJvmApplication> {
+            componentRegistry.each<MutableJvmApplication> {
                 derive { app ->
                     val binaryTask = tasks.registering<NativeBinary>("nativeBinary") {
                         launcherFile.set(layout.buildDirectory.file("native-binary/launcher"))
@@ -41,7 +41,7 @@ class NativeBinaryJvmLauncherPlugin : Plugin<Project> {
                     }
                     register(LauncherExecutable(binaryTask))
                 }
-                from<HasLauncherExecutable> {
+                each<HasLauncherExecutable> {
                     require<LauncherExecutable> {
                         derive { dist, app, exe ->
                             dist.launcherFilePath.set(app.appName.map { appName -> HostMachine.current.exeName(appName) })

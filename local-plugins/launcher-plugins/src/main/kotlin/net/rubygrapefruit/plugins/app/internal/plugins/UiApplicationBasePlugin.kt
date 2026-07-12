@@ -16,7 +16,7 @@ class UiApplicationBasePlugin : Plugin<Project> {
         with(target) {
             plugins.apply(ApplicationBasePlugin::class.java)
 
-            componentRegistry.from<DefaultUiApplication> {
+            componentRegistry.each<DefaultUiApplication> {
                 derive { app ->
                     val infoPlistTask = tasks.register("infoPlist", InfoPlist::class.java) {
                         it.plistFile.set(layout.buildDirectory.file("app/Info.plist"))
@@ -34,7 +34,7 @@ class UiApplicationBasePlugin : Plugin<Project> {
 
                     register(ImageAssets(infoPlistTask, iconTask))
                 }
-                from<HasUnsignedUiBundle> {
+                each<HasUnsignedUiBundle> {
                     prepare { dist, app ->
                         val capitalizedAppName = app.capitalizedAppName
                         dist.rootDirPath.set(capitalizedAppName.map { "$it.app/Contents" })

@@ -1,11 +1,9 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
-import net.rubygrapefruit.plugins.app.internal.HasOsTarget
-import net.rubygrapefruit.plugins.app.internal.HasTargets
-import net.rubygrapefruit.plugins.app.internal.NativeTarget
-import net.rubygrapefruit.plugins.app.internal.componentRegistry
+import net.rubygrapefruit.plugins.app.internal.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 class MultiPlatformComponentBasePlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -20,12 +18,8 @@ class MultiPlatformComponentBasePlugin : Plugin<Project> {
             componentRegistry.each<HasOsTarget> {
                 derive { component ->
                     for (machine in component.target.machines) {
-                        register(NativeTarget(machine))
+                        registerSibling(NativeTarget(machine, kotlin.targets.getByName(machine.kotlinTarget) as KotlinNativeTarget))
                     }
-                }
-            }
-            componentRegistry.each<NativeTarget> {
-                derive { _ ->
                 }
             }
         }

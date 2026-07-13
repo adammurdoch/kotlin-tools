@@ -6,7 +6,6 @@ import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
-import org.jetbrains.kotlin.gradle.dsl.KotlinNativeBinaryContainer
 import javax.inject.Inject
 
 abstract class DefaultNativeCliApplication @Inject constructor(
@@ -39,8 +38,7 @@ abstract class DefaultNativeCliApplication @Inject constructor(
         appTargets.nativeDesktop()
     }
 
-    private fun KotlinNativeBinaryContainer.register(target: NativeMachine) {
-        executable()
+    private fun register(target: NativeMachine) {
         targets.add(target, listOf(BuildType.Debug, BuildType.Release), DefaultHasLauncherExecutableDistribution::class.java)
     }
 

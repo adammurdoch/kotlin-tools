@@ -13,7 +13,7 @@ class NativeApplicationTargets(
     private val commonMain = DefaultSourceSet("commonMain", generatedSource)
     private val commonTest = DefaultHasDependencies("commonTest")
     val common = DefaultPlatformContribution(commonMain, commonTest)
-    private val osComponents = mutableMapOf<OperatingSystem, DefaultNativeComponent>()
+    private val osComponents = mutableMapOf<OperatingSystem, DefaultNativeOsComponent>()
 
     fun visitPlatforms(consumer: (PlatformContribution) -> Unit) {
         consumer(common)
@@ -22,7 +22,7 @@ class NativeApplicationTargets(
         }
     }
 
-    fun macOS(): DefaultNativeComponent {
+    fun macOS(): DefaultNativeOsComponent {
         return forOS(OperatingSystem.MacOS)
     }
 
@@ -32,9 +32,9 @@ class NativeApplicationTargets(
         }
     }
 
-    private fun forOS(operatingSystem: OperatingSystem): DefaultNativeComponent {
+    private fun forOS(operatingSystem: OperatingSystem): DefaultNativeOsComponent {
         return osComponents.getOrPut(operatingSystem) {
-            val component = objects.newInstance(DefaultNativeComponent::class.java, operatingSystem.mainSourceSetName)
+            val component = objects.newInstance(DefaultNativeOsComponent::class.java, operatingSystem)
             componentFactory.created(component)
             component
         }

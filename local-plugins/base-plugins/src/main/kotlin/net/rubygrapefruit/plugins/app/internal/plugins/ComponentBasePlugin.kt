@@ -13,13 +13,6 @@ class ComponentBasePlugin : Plugin<Project> {
                     multiplatformComponents.createSourceSets()
                 }
             }
-            componentRegistry.each<HasTargets> {
-                derive { component ->
-                    component.visitPlatforms { contribution ->
-                        register(contribution)
-                    }
-                }
-            }
             componentRegistry.each<PlatformContribution> {
                 derive { component ->
                     register(component.main)

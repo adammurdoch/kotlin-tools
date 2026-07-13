@@ -12,6 +12,7 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
             plugins.apply(CliApplicationBasePlugin::class.java)
             plugins.apply(ComponentBasePlugin::class.java)
+            plugins.apply(MultiPlatformComponentBasePlugin::class.java)
 
             componentRegistry.each<DefaultNativeCliApplication> {
                 derive { app ->

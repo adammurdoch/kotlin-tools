@@ -14,6 +14,7 @@ class NativeUiApplicationPlugin : Plugin<Project> {
             plugins.apply("org.jetbrains.kotlin.multiplatform")
             plugins.apply(UiApplicationBasePlugin::class.java)
             plugins.apply(ComponentBasePlugin::class.java)
+            plugins.apply(MultiPlatformComponentBasePlugin::class.java)
 
             componentRegistry.each<DefaultNativeUiApplication> {
                 derive { app ->

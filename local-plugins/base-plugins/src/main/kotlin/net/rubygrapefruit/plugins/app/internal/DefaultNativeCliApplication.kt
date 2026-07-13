@@ -17,6 +17,7 @@ abstract class DefaultNativeCliApplication @Inject constructor(
 ) : MutableMultiPlatformApplication, NativeApplication, HasTargets {
     val targets = NativeTargetsContainer(objects, providers, project.tasks)
     private val appTargets = NativeApplicationTargets(objects, componentFactory, generatedSource)
+    private val registered = mutableSetOf<OperatingSystem>()
 
     override val distributionContainer
         get() = targets.distributions
@@ -29,13 +30,26 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     }
 
     override fun macOS(config: NativeComponent<Dependencies>.() -> Unit) {
-        componentRegistry.macOS { register(it) }
+        componentRegistry.macOS()
         appTargets.macOS().config()
+        register(OperatingSystem.MacOS)
     }
 
     override fun nativeDesktop() {
-        componentRegistry.nativeDesktop { register(it) }
+        componentRegistry.nativeDesktop()
         appTargets.nativeDesktop()
+        for (os in OperatingSystem.desktop) {
+            register(os)
+        }
+    }
+
+    private fun register(operatingSystem: OperatingSystem) {
+        if (!registered.add(operatingSystem)) {
+            return
+        }
+        for (machine in operatingSystem.machines) {
+            register(machine)
+        }
     }
 
     private fun register(target: NativeMachine) {

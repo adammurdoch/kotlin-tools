@@ -1,7 +1,6 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.BuildType
-import net.rubygrapefruit.plugins.app.NativeMachine
 import net.rubygrapefruit.plugins.app.internal.*
 import net.rubygrapefruit.plugins.app.internal.tasks.NativeLauncher
 import org.gradle.api.Plugin
@@ -20,20 +19,35 @@ class NativeUiApplicationPlugin : Plugin<Project> {
             plugins.apply(MultiPlatformAppBasePlugin::class.java)
 
             componentRegistry.each<DefaultNativeUiApplication> {
+                each<RealizedNativeTarget> {
+                    derive { target, app ->
+                        val generatorTask = tasks.register("generate${target.machine.kotlinTarget}Launcher", NativeLauncher::class.java) {
+                            it.sourceDirectory.set(layout.buildDirectory.dir("generated/ui-launcher/${target.machine.kotlinTarget}"))
+                            it.entryPoint.set(generatedEntryPoint)
+                            it.delegateMethod.set(app.entryPoint)
+                        }
+                        val sourceSet = target.target.compilations.getByName("main").defaultSourceSet
+                        sourceSet.kotlin.srcDir(generatorTask.flatMap { it.sourceDirectory })
+                        sourceSet.dependencies {
+                            implementation("net.rubygrapefruit.plugins:native-launcher:1.0-dev")
+                        }
+                    }
+                }
+
                 each<RealizedNativeExecutable> {
                     derive { executable, app ->
-                        println("-> EXECUTABLE $executable FOR $app")
                         val name = when (executable.buildType) {
                             BuildType.Debug -> executable.buildType.name
                             BuildType.Release -> "unsignedRelease"
                         }
                         executable.executable.entryPoint = generatedEntryPoint
+                        val machine = executable.machine
                         val dist = app.distributionContainer.add(
                             name,
                             executable.buildType == BuildType.Debug,
                             false,
-                            HostMachine.current.canBuild(executable.machine),
-                            executable.machine,
+                            HostMachine.current.canBuild(machine),
+                            machine,
                             executable.buildType,
                             DefaultNativeUiAppDistribution::class.java
                         )
@@ -45,22 +59,8 @@ class NativeUiApplicationPlugin : Plugin<Project> {
 
             applications.withApp<DefaultNativeUiApplication> { app ->
                 app.entryPoint.convention("main")
-
+                app.macOS()
                 multiplatformComponents.macOS()
-
-                for (machine in listOf(NativeMachine.MacOSArm64)) {
-                    val generatorTask = tasks.register("nativeLauncher${machine.kotlinTarget}", NativeLauncher::class.java) {
-                        it.sourceDirectory.set(layout.buildDirectory.dir("generated-main/${machine.kotlinTarget}"))
-                        it.entryPoint.set(generatedEntryPoint)
-                        it.delegateMethod.set(app.entryPoint)
-                    }
-                    project.kotlin.targets.getByName(machine.kotlinTarget).compilations.getByName("main").defaultSourceSet.kotlin.srcDir(generatorTask.flatMap { it.sourceDirectory })
-                }
-                app.macOS {
-                    dependencies {
-                        implementation("net.rubygrapefruit.plugins:native-launcher:1.0-dev")
-                    }
-                }
             }
 
             val app = extensions.create("application", DefaultNativeUiApplication::class.java, componentRegistry.factory)

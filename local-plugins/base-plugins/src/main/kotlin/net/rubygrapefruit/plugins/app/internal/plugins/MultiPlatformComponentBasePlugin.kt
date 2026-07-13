@@ -1,5 +1,6 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
+import net.rubygrapefruit.plugins.app.NativeMachine
 import net.rubygrapefruit.plugins.app.internal.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -16,9 +17,21 @@ class MultiPlatformComponentBasePlugin : Plugin<Project> {
                 }
             }
             componentRegistry.each<HasOsTarget> {
+                initialize { component ->
+                    // Declare the Kotlin targets eagerly at configuration time, so that these are in the appropriate state to allow
+                    // executables to be declared on the target later
+                    for (machine in component.target.machines) {
+                        when (machine) {
+                            NativeMachine.MacOSArm64 -> kotlin.macosArm64()
+                            NativeMachine.LinuxX64 -> kotlin.linuxX64()
+                            NativeMachine.WindowsX64 -> kotlin.mingwX64()
+                        }
+                    }
+                }
                 derive { component ->
                     for (machine in component.target.machines) {
-                        registerSibling(RealizedNativeTarget(machine, kotlin.targets.getByName(machine.kotlinTarget) as KotlinNativeTarget))
+                        val target = kotlin.targets.getByName(machine.kotlinTarget) as KotlinNativeTarget
+                        registerSibling(RealizedNativeTarget(machine, target))
                     }
                 }
             }

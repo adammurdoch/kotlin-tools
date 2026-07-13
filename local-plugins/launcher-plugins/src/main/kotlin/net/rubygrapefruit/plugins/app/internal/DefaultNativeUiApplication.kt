@@ -14,7 +14,7 @@ abstract class DefaultNativeUiApplication @Inject constructor(
     providers: ProviderFactory,
     componentFactory: ComponentFactory,
     project: Project
-) : DefaultUiApplication(objects, providers, project), NativeUIApplication, HasTargets {
+) : DefaultUiApplication(objects, providers, project), NativeUIApplication, MutableMultiPlatformApplication, HasTargets {
     private val appTargets = NativeApplicationTargets(objects, componentFactory, generatedSource)
 
     override fun visitPlatforms(consumer: (PlatformContribution) -> Unit) {

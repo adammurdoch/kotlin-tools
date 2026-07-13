@@ -14,7 +14,7 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     providers: ProviderFactory,
     componentFactory: ComponentFactory,
     project: Project
-) : MutableApplication, NativeApplication, HasTargets {
+) : MutableMultiPlatformApplication, NativeApplication, HasTargets {
     val targets = NativeTargetsContainer(objects, providers, project.tasks)
     private val appTargets = NativeApplicationTargets(objects, componentFactory, generatedSource)
 

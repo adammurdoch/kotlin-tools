@@ -18,7 +18,7 @@ class MultiPlatformComponentBasePlugin : Plugin<Project> {
             componentRegistry.each<HasOsTarget> {
                 derive { component ->
                     for (machine in component.target.machines) {
-                        registerSibling(NativeTarget(machine, kotlin.targets.getByName(machine.kotlinTarget) as KotlinNativeTarget))
+                        registerSibling(RealizedNativeTarget(machine, kotlin.targets.getByName(machine.kotlinTarget) as KotlinNativeTarget))
                     }
                 }
             }

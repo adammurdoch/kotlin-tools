@@ -1,20 +1,13 @@
 package net.rubygrapefruit.plugins.app.internal
 
-import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.NativeMachine
 import org.gradle.api.Project
-import org.gradle.api.file.RegularFile
-import org.gradle.api.provider.Provider
 import org.jetbrains.kotlin.gradle.dsl.KotlinNativeBinaryContainer
-import org.jetbrains.kotlin.gradle.plugin.mpp.Executable
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 
 open class MultiPlatformComponentRegistry(private val project: Project) {
     private val unixSourceSets = mutableSetOf<String>()
     private val unixTestSourceSets = mutableSetOf<String>()
     private val machines = mutableSetOf<NativeMachine>()
-    private val machineActions = mutableListOf<(NativeMachine, KotlinNativeTarget) -> Unit>()
     private val jvm = SimpleContainer<Boolean>()
     private var hasSourceSets = false
     val sourceSets = SourceSets(project)
@@ -49,26 +42,6 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
 
     fun jvm() {
         jvm.add(true)
-    }
-
-    private fun eachNativeTarget(action: (NativeMachine, KotlinNativeTarget) -> Unit) {
-        machineActions.add(action)
-        for (machine in machines) {
-            action(machine, project.kotlin.targets.getByName(machine.kotlinTarget) as KotlinNativeTarget)
-        }
-    }
-
-    fun eachNativeExecutable(action: (NativeMachine, BuildType, Provider<RegularFile>, Executable) -> Unit) {
-        eachNativeTarget { machine, nativeTarget ->
-            for (executable in nativeTarget.binaries.withType(Executable::class.java)) {
-                val binaryFile = project.layout.file(executable.linkTaskProvider.map { it.binary.outputFile })
-                val buildType = when (executable.buildType) {
-                    NativeBuildType.DEBUG -> BuildType.Debug
-                    NativeBuildType.RELEASE -> BuildType.Release
-                }
-                action(machine, buildType, binaryFile, executable)
-            }
-        }
     }
 
     private fun createIntermediateSourceSet(name: String, parentName: String, childNames: Set<String>) {
@@ -114,10 +87,6 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
                             }
                         }
                     }
-                }
-                val nativeTarget = project.kotlin.targets.getByName(target.kotlinTarget) as KotlinNativeTarget
-                for (action in machineActions) {
-                    action(target, nativeTarget)
                 }
             }
         }

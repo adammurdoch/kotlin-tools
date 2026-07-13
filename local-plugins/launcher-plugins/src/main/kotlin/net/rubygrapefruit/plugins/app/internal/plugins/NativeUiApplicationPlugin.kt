@@ -7,6 +7,8 @@ import net.rubygrapefruit.plugins.app.internal.tasks.NativeLauncher
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
+private const val generatedEntryPoint = "uiMain"
+
 @Suppress("unused")
 class NativeUiApplicationPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -15,11 +17,28 @@ class NativeUiApplicationPlugin : Plugin<Project> {
             plugins.apply(UiApplicationBasePlugin::class.java)
             plugins.apply(ComponentBasePlugin::class.java)
             plugins.apply(MultiPlatformComponentBasePlugin::class.java)
+            plugins.apply(MultiPlatformAppBasePlugin::class.java)
 
             componentRegistry.each<DefaultNativeUiApplication> {
-                derive { app ->
-                    app.distributionContainer.each {
-                        register(this)
+                each<RealizedNativeExecutable> {
+                    derive { executable, app ->
+                        println("-> EXECUTABLE $executable FOR $app")
+                        val name = when (executable.buildType) {
+                            BuildType.Debug -> executable.buildType.name
+                            BuildType.Release -> "unsignedRelease"
+                        }
+                        executable.executable.entryPoint = generatedEntryPoint
+                        val dist = app.distributionContainer.add(
+                            name,
+                            executable.buildType == BuildType.Debug,
+                            false,
+                            HostMachine.current.canBuild(executable.machine),
+                            executable.machine,
+                            executable.buildType,
+                            DefaultNativeUiAppDistribution::class.java
+                        )
+                        dist.launcherFile.set(executable.binaryFile)
+                        registerSibling(dist)
                     }
                 }
             }
@@ -27,29 +46,7 @@ class NativeUiApplicationPlugin : Plugin<Project> {
             applications.withApp<DefaultNativeUiApplication> { app ->
                 app.entryPoint.convention("main")
 
-                multiplatformComponents.macOS {
-                    executable { }
-                }
-
-                val generatedEntryPoint = "uiMain"
-
-                multiplatformComponents.eachNativeExecutable { machine, buildType, binaryFile, executable ->
-                    val name = when (buildType) {
-                        BuildType.Debug -> buildType.name
-                        BuildType.Release -> "unsignedRelease"
-                    }
-                    val dist = app.distributionContainer.add(
-                        name,
-                        buildType == BuildType.Debug,
-                        false,
-                        HostMachine.current.canBuild(machine),
-                        machine,
-                        buildType,
-                        DefaultNativeUiAppDistribution::class.java
-                    )
-                    dist.launcherFile.set(binaryFile)
-                    executable.entryPoint = generatedEntryPoint
-                }
+                multiplatformComponents.macOS()
 
                 for (machine in listOf(NativeMachine.MacOSArm64)) {
                     val generatorTask = tasks.register("nativeLauncher${machine.kotlinTarget}", NativeLauncher::class.java) {

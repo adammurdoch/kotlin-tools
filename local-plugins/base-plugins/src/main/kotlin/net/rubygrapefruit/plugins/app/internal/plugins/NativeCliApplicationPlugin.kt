@@ -1,5 +1,6 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
+import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.NativeApplication
 import net.rubygrapefruit.plugins.app.internal.*
 import org.gradle.api.Plugin
@@ -24,11 +25,23 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
 
                 each<RealizedNativeExecutable> {
                     derive { executable, app ->
-                        app.targets.attachExecutable(executable.machine, executable.buildType, executable.binaryFile)
-                        app.targets.configureTarget(executable.machine, executable.buildType) {
-                            launcherFilePath.set(app.appName.map { HostMachine.of(executable.machine).exeName(it) })
-                        }
+                        val buildType = executable.buildType
+                        val machine = executable.machine
+                        app.targets.attachExecutable(machine, buildType, executable.binaryFile)
                         executable.executable.entryPoint = app.entryPoint.get()
+
+                        val distribution = app.distributionContainer.add(
+                            buildType.name,
+                            buildType == BuildType.Debug,
+                            buildType == BuildType.Release,
+                            HostMachine.current.canBeBuilt && HostMachine.current.canBuild(machine),
+                            machine,
+                            buildType,
+                            DefaultHasLauncherExecutableDistribution::class.java
+                        )
+                        distribution.launcherFilePath.set(app.appName.map { HostMachine.of(machine).exeName(it) })
+                        distribution.launcherFile.set(executable.binaryFile)
+                        registerSibling(distribution)
                     }
                 }
             }

@@ -50,7 +50,7 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     }
 
     private fun register(target: NativeMachine) {
-        targets.add(target, listOf(BuildType.Debug, BuildType.Release), DefaultHasLauncherExecutableDistribution::class.java)
+        targets.add(target, listOf(BuildType.Debug, BuildType.Release))
     }
 
     override fun common(config: Dependencies.() -> Unit) {

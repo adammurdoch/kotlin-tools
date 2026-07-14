@@ -14,6 +14,7 @@
 - Share logic between `dist`, `install` and `showApplication` to report where an image is installed and how to run it.
   - Probe the $PATH and report that app can be run in short form?
   - Use relative paths?
+- Remove `NativeApplication.executables`, possibly replaced with an extension API
 - CLI application installer
   - Copy to content-addressed image location, garbage-collect old versions
   - Configurable installation location

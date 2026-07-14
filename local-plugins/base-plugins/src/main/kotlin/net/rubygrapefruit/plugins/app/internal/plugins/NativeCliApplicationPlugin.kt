@@ -27,14 +27,14 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
                     derive { executable, app ->
                         val buildType = executable.buildType
                         val machine = executable.machine
-                        app.targets.attachExecutable(machine, buildType, executable.binaryFile)
+
                         executable.executable.entryPoint = app.entryPoint.get()
 
                         val distribution = app.distributionContainer.add(
                             buildType.name,
                             buildType == BuildType.Debug,
                             buildType == BuildType.Release,
-                            HostMachine.current.canBeBuilt && HostMachine.current.canBuild(machine),
+                            executable.canBuild,
                             machine,
                             buildType,
                             DefaultHasLauncherExecutableDistribution::class.java
@@ -42,6 +42,9 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
                         distribution.launcherFilePath.set(app.appName.map { HostMachine.of(machine).exeName(it) })
                         distribution.launcherFile.set(executable.binaryFile)
                         registerSibling(distribution)
+
+                        val executableInfo = DefaultNativeExecutable(machine, buildType, executable.canBuild, executable.binaryFile)
+                        app.executables.add(executableInfo)
                     }
                 }
             }

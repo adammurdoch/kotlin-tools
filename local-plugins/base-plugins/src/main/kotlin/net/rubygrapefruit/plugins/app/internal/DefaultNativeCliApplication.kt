@@ -1,10 +1,13 @@
 package net.rubygrapefruit.plugins.app.internal
 
-import net.rubygrapefruit.plugins.app.*
+import net.rubygrapefruit.plugins.app.Dependencies
+import net.rubygrapefruit.plugins.app.NativeApplication
+import net.rubygrapefruit.plugins.app.NativeComponent
+import net.rubygrapefruit.plugins.app.NativeExecutable
 import net.rubygrapefruit.plugins.app.internal.component.ComponentFactory
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.Provider
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.ProviderFactory
 import javax.inject.Inject
 
@@ -15,15 +18,11 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     componentFactory: ComponentFactory,
     project: Project
 ) : MutableMultiPlatformApplication, NativeApplication, HasTargets {
-    val targets = NativeTargetsContainer(objects, providers, project.tasks)
     private val appTargets = NativeApplicationTargets(objects, componentFactory, generatedSource)
-    private val registered = mutableSetOf<OperatingSystem>()
 
-    override val distributionContainer
-        get() = targets.distributions
+    override val distributionContainer = DistributionContainer(project.tasks, objects, providers)
 
-    override val executables: Provider<List<NativeExecutable>>
-        get() = targets.executables
+    abstract override val executables: ListProperty<NativeExecutable>
 
     override fun visitPlatforms(consumer: (PlatformContribution) -> Unit) {
         appTargets.visitPlatforms(consumer)
@@ -40,17 +39,8 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     }
 
     private fun register(operatingSystem: OperatingSystem): DefaultNativeOsComponent {
-        if (registered.add(operatingSystem)) {
-            componentRegistry.forOperatingSystem(operatingSystem)
-            for (machine in operatingSystem.machines) {
-                register(machine)
-            }
-        }
+        componentRegistry.forOperatingSystem(operatingSystem)
         return appTargets.forOperatingSystem(operatingSystem)
-    }
-
-    private fun register(target: NativeMachine) {
-        targets.add(target, listOf(BuildType.Debug, BuildType.Release))
     }
 
     override fun common(config: Dependencies.() -> Unit) {

@@ -7,6 +7,7 @@ import org.gradle.api.provider.Provider
 import org.jetbrains.kotlin.gradle.plugin.mpp.Executable
 
 class RealizedNativeExecutable(
+    val canBuild: Boolean,
     val machine: NativeMachine,
     val buildType: BuildType,
     val executable: Executable,

@@ -25,7 +25,7 @@ class MultiPlatformAppBasePlugin : Plugin<Project> {
                                 NativeBuildType.RELEASE -> BuildType.Release
                             }
                             val machine = target.machine
-                            registerSibling(RealizedNativeExecutable(machine, buildType, executable, binaryFile))
+                            registerSibling(RealizedNativeExecutable(target.canBuild, machine, buildType, executable, binaryFile))
                         }
                     }
                 }

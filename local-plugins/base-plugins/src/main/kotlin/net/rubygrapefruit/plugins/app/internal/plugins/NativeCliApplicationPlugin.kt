@@ -42,9 +42,6 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
                         distribution.launcherFilePath.set(app.appName.map { HostMachine.of(machine).exeName(it) })
                         distribution.launcherFile.set(executable.binaryFile)
                         registerSibling(distribution)
-
-                        val executableInfo = DefaultNativeExecutable(machine, buildType, executable.canBuild, executable.binaryFile)
-                        app.executables.add(executableInfo)
                     }
                 }
             }

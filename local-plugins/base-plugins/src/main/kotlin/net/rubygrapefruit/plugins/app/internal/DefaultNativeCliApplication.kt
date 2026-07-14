@@ -3,11 +3,9 @@ package net.rubygrapefruit.plugins.app.internal
 import net.rubygrapefruit.plugins.app.Dependencies
 import net.rubygrapefruit.plugins.app.NativeApplication
 import net.rubygrapefruit.plugins.app.NativeComponent
-import net.rubygrapefruit.plugins.app.NativeExecutable
 import net.rubygrapefruit.plugins.app.internal.component.ComponentFactory
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.ProviderFactory
 import javax.inject.Inject
 
@@ -21,8 +19,6 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     private val appTargets = NativeApplicationTargets(objects, componentFactory, generatedSource)
 
     override val distributionContainer = DistributionContainer(project.tasks, objects, providers)
-
-    abstract override val executables: ListProperty<NativeExecutable>
 
     override fun visitPlatforms(consumer: (PlatformContribution) -> Unit) {
         appTargets.visitPlatforms(consumer)

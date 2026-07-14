@@ -2,7 +2,6 @@ package net.rubygrapefruit.plugins.app
 
 import org.gradle.api.file.Directory
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 
 interface NativeApplication : Application, MultiPlatformComponent<Dependencies> {
@@ -25,9 +24,4 @@ interface NativeApplication : Application, MultiPlatformComponent<Dependencies> 
      * Generated Kotlin source directories for this component.
      */
     val generatedSource: SetProperty<Directory>
-
-    /**
-     * The native executables for this application.
-     */
-    val executables: Provider<List<NativeExecutable>>
 }

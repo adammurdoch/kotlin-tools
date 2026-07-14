@@ -2,6 +2,7 @@ package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.NativeMachine
 import net.rubygrapefruit.plugins.app.internal.*
+import net.rubygrapefruit.plugins.app.internal.component.MutableComponent
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
@@ -9,6 +10,14 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 class MultiPlatformComponentBasePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
+            target.extensions.create("multiplatformComponents", MultiPlatformComponentRegistry::class.java)
+
+            componentRegistry.each<MutableComponent> {
+                prepare { _ ->
+                    multiplatformComponents.createSourceSets()
+                }
+            }
+
             componentRegistry.each<HasTargets> {
                 derive { component ->
                     component.visitPlatforms { contribution ->
@@ -16,6 +25,7 @@ class MultiPlatformComponentBasePlugin : Plugin<Project> {
                     }
                 }
             }
+
             componentRegistry.each<HasOsTarget> {
                 initialize { component ->
                     // Declare the Kotlin targets eagerly at configuration time, so that these are in the appropriate state to allow

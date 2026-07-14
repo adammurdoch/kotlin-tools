@@ -2,7 +2,6 @@
 # TODO
 
 - Add `versions` as a project extension
-- Java 23 and 24 support
 - Fail on duplicate `main()` functions
 - Add `dist --release`
   - use noJvm as the dev release for JVM CLI apps? 
@@ -20,23 +19,22 @@
   - Configurable installation location
   - Allow app-specific installation actions to be contributed, for example, generating a completion script
   - Add tests
-- Native UI app allows generated common source
-- Native library allows generated common source
 - JVM app option to define JVM args when launching JVM
 - JVM app use Application Class Data Sharing
 - JVM app adds stub that checks current JVM version for no-jvm distribution
+- JVM launcher that can locate or provision a JVM
 - Fix `$JAVA_DEBUG` with embedded JVM dist, generated JVM does not have the debugging protocol available
 - Debug JVM UI app
 - Native apps discover `main()` function with or without args, and fix samples
 - Validate app main class and entry point names
 - Add something like `testing { kotlinTest() }`
-- Fix `desktop { }` does not add targets, but for example `jvm { }` does.
+- Fix inconsistency where `desktop { }` does not add targets, but for example `jvm { }` does.
 - Add an "app bundle" plugin, which will include other apps as JVM resources
 - Split app code signing and notarization into separate tasks
 - Fix `.bat` to work from any directory via a link
   - Or replace with binary launcher
 - Figure out why `tasks.registering` is broken for embedded JVM task
-- Add tests for alternate distributions, e.g `noJvm` distribution
+- Add tests for alternate distributions
 - UI app `dist` task should fail on non-mac host machines
 - Don't include `.bat` script for non-windows embedded JVM, or replace with binary launcher
 - Improve failure for `dist` task when nothing can be built
@@ -44,7 +42,6 @@
 - Use correct target machine for embedded JVM distributions
   - Currently, uses whichever JVM architecture that Gradle decides to use
 - Add distribution for each platform for native binary JVM app
-  - Can build both macOS distributions on macOS
 - Move dependency declarations into library and application blocks
     - UI applications 
 - Libraries in this repo should target Java 11?
@@ -96,6 +93,8 @@
   - Changelog and release notes
   - Alpha/Beta/RC releases
   - Run from a Github action
+- Apps
+  - https://scottwillsey.com/building-and-shipping-mac-and-ios-apps-without-ever-opening-xcode/
 
 ### Gradle issues
 

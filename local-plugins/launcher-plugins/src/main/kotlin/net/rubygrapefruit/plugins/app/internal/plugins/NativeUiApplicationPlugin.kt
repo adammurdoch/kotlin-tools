@@ -60,7 +60,7 @@ class NativeUiApplicationPlugin : Plugin<Project> {
             applications.withApp<DefaultNativeUiApplication> { app ->
                 app.entryPoint.convention("main")
                 app.macOS()
-                multiplatformComponents.macOS()
+                multiplatformComponents.forOperatingSystem(OperatingSystem.MacOS)
             }
 
             val app = extensions.create("application", DefaultNativeUiApplication::class.java, componentRegistry.factory)

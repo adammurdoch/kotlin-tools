@@ -8,11 +8,6 @@ import org.gradle.api.Project
 class ComponentBasePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            componentRegistry.each<MutableComponent> {
-                prepare { _ ->
-                    multiplatformComponents.createSourceSets()
-                }
-            }
             componentRegistry.each<PlatformContribution> {
                 derive { component ->
                     register(component.main)

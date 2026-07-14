@@ -22,17 +22,7 @@ class NativeApplicationTargets(
         }
     }
 
-    fun macOS(): DefaultNativeOsComponent {
-        return forOS(OperatingSystem.MacOS)
-    }
-
-    fun nativeDesktop() {
-        for (os in OperatingSystem.desktop) {
-            forOS(os)
-        }
-    }
-
-    private fun forOS(operatingSystem: OperatingSystem): DefaultNativeOsComponent {
+    fun forOperatingSystem(operatingSystem: OperatingSystem): DefaultNativeOsComponent {
         return osComponents.getOrPut(operatingSystem) {
             val component = objects.newInstance(DefaultNativeOsComponent::class.java, operatingSystem)
             componentFactory.created(component)

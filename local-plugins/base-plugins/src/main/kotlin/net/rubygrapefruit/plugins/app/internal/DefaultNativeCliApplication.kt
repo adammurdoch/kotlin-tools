@@ -30,26 +30,23 @@ abstract class DefaultNativeCliApplication @Inject constructor(
     }
 
     override fun macOS(config: NativeComponent<Dependencies>.() -> Unit) {
-        componentRegistry.macOS()
-        appTargets.macOS().config()
-        register(OperatingSystem.MacOS)
+        register(OperatingSystem.MacOS).config()
     }
 
     override fun nativeDesktop() {
-        componentRegistry.nativeDesktop()
-        appTargets.nativeDesktop()
         for (os in OperatingSystem.desktop) {
             register(os)
         }
     }
 
-    private fun register(operatingSystem: OperatingSystem) {
-        if (!registered.add(operatingSystem)) {
-            return
+    private fun register(operatingSystem: OperatingSystem): DefaultNativeOsComponent {
+        if (registered.add(operatingSystem)) {
+            componentRegistry.forOperatingSystem(operatingSystem)
+            for (machine in operatingSystem.machines) {
+                register(machine)
+            }
         }
-        for (machine in operatingSystem.machines) {
-            register(machine)
-        }
+        return appTargets.forOperatingSystem(operatingSystem)
     }
 
     private fun register(target: NativeMachine) {

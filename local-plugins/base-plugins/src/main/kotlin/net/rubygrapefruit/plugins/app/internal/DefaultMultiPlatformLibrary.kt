@@ -3,14 +3,12 @@ package net.rubygrapefruit.plugins.app.internal
 import net.rubygrapefruit.plugins.app.*
 import net.rubygrapefruit.plugins.app.internal.component.ComponentFactory
 import net.rubygrapefruit.plugins.app.internal.component.MutableComponent
-import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
 import javax.inject.Inject
 
 internal abstract class DefaultMultiPlatformLibrary @Inject constructor(
     private val componentRegistry: MultiPlatformComponentRegistry,
     private val factory: ObjectFactory,
-    private val project: Project,
     private val componentFactory: ComponentFactory
 ) : MultiPlatformLibrary, MutableComponent, HasTargets {
     private val commonSource = DefaultLibrarySourceSet("commonMain", generatedSource)
@@ -49,7 +47,6 @@ internal abstract class DefaultMultiPlatformLibrary @Inject constructor(
     }
 
     override fun macOS(config: NativeLibrary.() -> Unit) {
-        componentRegistry.macOS()
         createForOS(OperatingSystem.MacOS).config()
     }
 
@@ -58,7 +55,6 @@ internal abstract class DefaultMultiPlatformLibrary @Inject constructor(
     }
 
     override fun nativeDesktop() {
-        componentRegistry.nativeDesktop()
         for (os in OperatingSystem.desktop) {
             createForOS(os)
         }
@@ -85,11 +81,8 @@ internal abstract class DefaultMultiPlatformLibrary @Inject constructor(
         if (jvm == null) {
             val library = factory.newInstance(DefaultJvmLibrary::class.java, "jvmMain", "jvmTest")
             componentFactory.created(library)
-            library.module.name.convention(toModuleName(project.name))
-            library.targetJvmVersion.convention(Versions.libs.jvm.version)
-            jvm = library
-            // This can call back to query JVM object
             componentRegistry.jvm()
+            jvm = library
         }
         return jvm!!
     }
@@ -106,6 +99,7 @@ internal abstract class DefaultMultiPlatformLibrary @Inject constructor(
         return osComponents.getOrPut(operatingSystem) {
             val library = factory.newInstance(DefaultNativeOsLibrary::class.java, operatingSystem)
             componentFactory.created(library)
+            componentRegistry.forOperatingSystem(operatingSystem)
             library
         }
     }

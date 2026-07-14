@@ -22,7 +22,7 @@ abstract class DefaultNativeUiApplication @Inject constructor(
     }
 
     override fun macOS(config: NativeComponent<Dependencies>.() -> Unit) {
-        appTargets.macOS().config()
+        appTargets.forOperatingSystem(OperatingSystem.MacOS).config()
     }
 
     override fun common(config: Dependencies.() -> Unit) {

@@ -53,9 +53,7 @@ open class ApplicationRegistry(private val project: Project, private val compone
             }
 
             imageOutputDirectory.set(distTask.flatMap { t -> t.imageDirectory })
-
-            val launcherPath = effectiveLauncherFilePath
-            launcherOutputFile.set(distTask.flatMap { t -> t.imageDirectory.map { it.file(launcherPath.get()) } })
+            launcherOutputFile.set(distTask.flatMap { t -> t.imageDirectory.file(effectiveLauncherFilePath) })
         }
 
         project.tasks.register("showApplication", ShowApplication::class.java) { task ->

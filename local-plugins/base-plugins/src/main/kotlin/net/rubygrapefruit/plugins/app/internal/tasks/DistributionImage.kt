@@ -55,7 +55,7 @@ abstract class DistributionImage : AbstractDistributionImage() {
 
                 is FileContribution -> {
                     val sourceFile = contribution.file.orNull
-                    if (sourceFile != null && sourceFile.asFile.name != FileContribution.dummyName) {
+                    if (sourceFile != null) {
                         val targetFile = rootDirectory.resolve(contribution.filePath.get())
                         Files.createDirectories(targetFile.parent)
                         Files.copy(sourceFile.asFile.toPath(), targetFile, StandardCopyOption.COPY_ATTRIBUTES)
@@ -100,12 +100,7 @@ abstract class DistributionImage : AbstractDistributionImage() {
         val filePath: Provider<String>,
         @get:InputFile @get:Optional
         val file: Provider<RegularFile>
-    ) : Contribution() {
-        companion object {
-            // See comment in UiApplicationBasePlugin
-            const val dummyName = "DO_NOT_COPY"
-        }
-    }
+    ) : Contribution()
 
     class DirectoryContribution(
         @get:Input

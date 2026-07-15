@@ -17,12 +17,6 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
             plugins.apply(MultiPlatformAppBasePlugin::class.java)
 
             componentRegistry.each<DefaultNativeCliApplication> {
-                derive { app ->
-                    app.distributionContainer.each {
-                        register(this)
-                    }
-                }
-
                 each<RealizedNativeExecutable> {
                     derive { executable, app ->
                         val buildType = executable.buildType
@@ -34,7 +28,7 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
                             buildType.name,
                             buildType == BuildType.Debug,
                             buildType == BuildType.Release,
-                            executable.canBuild,
+                            executable.canBuildOnHost,
                             machine,
                             buildType,
                             DefaultHasLauncherExecutableDistribution::class.java

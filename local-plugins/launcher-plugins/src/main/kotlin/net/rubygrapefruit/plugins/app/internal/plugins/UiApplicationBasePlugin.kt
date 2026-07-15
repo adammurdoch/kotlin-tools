@@ -3,7 +3,6 @@ package net.rubygrapefruit.plugins.app.internal.plugins
 import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.internal.*
 import net.rubygrapefruit.plugins.app.internal.tasks.AppIcon
-import net.rubygrapefruit.plugins.app.internal.tasks.DistributionImage
 import net.rubygrapefruit.plugins.app.internal.tasks.InfoPlist
 import net.rubygrapefruit.plugins.app.internal.tasks.ReleaseDistribution
 import org.gradle.api.Plugin
@@ -70,14 +69,7 @@ class UiApplicationBasePlugin : Plugin<Project> {
                                         if (it.sourceIcon.get().asFile.exists()) {
                                             it.outputIcon
                                         } else {
-                                            // Should be able to return 'null' here to mean "there is no icon". This works with the
-                                            // Gradle APIs, but is broken for Kotlin compilation
-                                            val dummyFile = layout.buildDirectory.file(DistributionImage.FileContribution.dummyName)
-                                            with(dummyFile.get().asFile) {
-                                                parentFile.mkdirs()
-                                                createNewFile()
-                                            }
-                                            dummyFile
+                                            null
                                         }
                                     })
                             }

@@ -16,7 +16,7 @@ application {
 
 componentRegistry.each<RealizedNativeExecutable> {
     derive { executable ->
-        if (executable.canBuild && executable.buildType == Release) {
+        if (executable.canBuildOnHost && executable.buildType == Release) {
             configurations.create("outgoingNativeBinary${executable.machine.name}") {
                 attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named("native-binary-${executable.machine.kotlinTarget}"))
                 isCanBeResolved = false

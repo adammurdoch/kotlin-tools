@@ -1,6 +1,5 @@
 package net.rubygrapefruit.plugins.app.internal
 
-import net.rubygrapefruit.plugins.app.Application
 import net.rubygrapefruit.plugins.app.internal.component.ComponentRegistry
 import net.rubygrapefruit.plugins.app.internal.tasks.Distributions
 import net.rubygrapefruit.plugins.app.internal.tasks.ShowApplication
@@ -8,7 +7,6 @@ import org.gradle.api.Project
 
 open class ApplicationRegistry(private val project: Project, private val componentRegistry: ComponentRegistry) {
     private var main: MutableApplication? = null
-    private val whenAppSet = mutableListOf<Project.(Application) -> Unit>()
 
     fun register(app: MutableApplication) {
         if (main != null) {
@@ -58,28 +56,6 @@ open class ApplicationRegistry(private val project: Project, private val compone
 
         project.tasks.register("showApplication", ShowApplication::class.java) { task ->
             task.app.set(project.provider { app.metadata() })
-        }
-
-        for (builder in whenAppSet) {
-            builder(project, app)
-        }
-        whenAppSet.clear()
-    }
-
-    fun applyToApp(builder: Project.(Application) -> Unit) {
-        val main = main
-        if (main != null) {
-            builder(project, main)
-        } else {
-            whenAppSet.add(builder)
-        }
-    }
-
-    inline fun <reified T : Application> withApp(crossinline builder: Project.(T) -> Unit) {
-        applyToApp { app ->
-            if (app is T) {
-                builder(project, app)
-            }
         }
     }
 }

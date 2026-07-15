@@ -1,8 +1,11 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.Versions
-import net.rubygrapefruit.plugins.app.internal.*
+import net.rubygrapefruit.plugins.app.internal.JvmModuleRegistry
+import net.rubygrapefruit.plugins.app.internal.MutableJvmApplication
+import net.rubygrapefruit.plugins.app.internal.componentRegistry
 import net.rubygrapefruit.plugins.app.internal.tasks.RuntimeModulePath
+import net.rubygrapefruit.plugins.app.internal.toModuleName
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSetContainer
@@ -22,33 +25,32 @@ class JvmApplicationBasePlugin : Plugin<Project> {
                     app.module.name.convention(app.appName.map(::toModuleName))
                     app.targetJvmVersion.convention(Versions.apps.jvm.version)
                 }
-            }
 
-            applications.withApp<MutableJvmApplication> { app ->
+                derive { app ->
+                    JvmConventionsPlugin.addApiConstraints(target, "implementation")
 
-                JvmConventionsPlugin.addApiConstraints(this, "implementation")
+                    val jarTask = tasks.named("jar", Jar::class.java)
+                    val runtimeClasspath = configurations.getByName("runtimeClasspath")
 
-                val jarTask = tasks.named("jar", Jar::class.java)
-                val runtimeClasspath = configurations.getByName("runtimeClasspath")
+                    val classesDir = files(tasks.named("compileKotlin", KotlinCompile::class.java).map { it.destinationDirectory })
 
-                val classesDir = files(tasks.named("compileKotlin", KotlinCompile::class.java).map { it.destinationDirectory })
+                    val moduleInfo = extensions.getByType(JvmModuleRegistry::class.java).inspectClassPathsFor(app.module, app, classesDir, null, runtimeClasspath)
+                    val moduleInfoCp = moduleInfo.moduleInfoClasspath
 
-                val moduleInfo = extensions.getByType(JvmModuleRegistry::class.java).inspectClassPathsFor(app.module, app, classesDir, null, runtimeClasspath)
-                val moduleInfoCp = moduleInfo.moduleInfoClasspath
+                    val runtimeModulePath = tasks.register("runtimeModulePath", RuntimeModulePath::class.java) {
+                        it.classpath.from(runtimeClasspath)
+                        it.inferredModulesFile.set(moduleInfo.inferredModulesFile)
+                        it.outputDirectory.set(layout.buildDirectory.dir("jvm/module-path"))
+                    }
 
-                val runtimeModulePath = tasks.register("runtimeModulePath", RuntimeModulePath::class.java) {
-                    it.classpath.from(runtimeClasspath)
-                    it.inferredModulesFile.set(moduleInfo.inferredModulesFile)
-                    it.outputDirectory.set(layout.buildDirectory.dir("jvm/module-path"))
+                    val sourceSet = extensions.getByType(SourceSetContainer::class.java).getByName("main")
+                    sourceSet.output.dir(moduleInfoCp)
+
+                    app.runtimeModulePath.from(jarTask.map { it.archiveFile })
+                    app.runtimeModulePath.from(runtimeModulePath.map { it.outputDirectory.asFileTree.matching { it.include("*.jar") } })
+
+                    JvmConventionsPlugin.parallelTests(target)
                 }
-
-                val sourceSet = extensions.getByType(SourceSetContainer::class.java).getByName("main")
-                sourceSet.output.dir(moduleInfoCp)
-
-                app.runtimeModulePath.from(jarTask.map { it.archiveFile })
-                app.runtimeModulePath.from(runtimeModulePath.map { it.outputDirectory.asFileTree.matching { it.include("*.jar") } })
-
-                JvmConventionsPlugin.parallelTests(this)
             }
         }
     }

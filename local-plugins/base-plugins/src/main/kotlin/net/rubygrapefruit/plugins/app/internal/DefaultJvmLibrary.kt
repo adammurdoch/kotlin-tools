@@ -15,3 +15,8 @@ abstract class DefaultJvmLibrary @Inject constructor(
         main.dependencies.config()
     }
 }
+
+abstract class DefaultTopLevelJvmLibrary @Inject constructor(
+    mainSourceSetName: String,
+    testSourceSetName: String
+) : DefaultJvmLibrary(mainSourceSetName, testSourceSetName), TopLevelJvmComponent

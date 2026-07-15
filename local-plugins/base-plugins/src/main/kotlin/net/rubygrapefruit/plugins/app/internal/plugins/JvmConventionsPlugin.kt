@@ -1,6 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
-import net.rubygrapefruit.plugins.app.internal.JvmModuleRegistry
+import net.rubygrapefruit.plugins.app.Versions
+import net.rubygrapefruit.plugins.app.internal.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
@@ -11,16 +12,7 @@ import kotlin.math.max
 
 class JvmConventionsPlugin : Plugin<Project> {
     companion object {
-        fun javaVersion(project: Project, version: Int) {
-            project.run {
-                plugins.withId("java") {
-                    val java = extensions.getByType(JavaPluginExtension::class.java)
-                    java.toolchain.languageVersion.set(JavaLanguageVersion.of(version))
-                }
-            }
-        }
-
-        fun javaVersion(project: Project, version: Provider<Int>) {
+        private fun javaVersion(project: Project, version: Provider<Int>) {
             project.run {
                 plugins.withId("java") {
                     val java = extensions.getByType(JavaPluginExtension::class.java)
@@ -47,6 +39,18 @@ class JvmConventionsPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             extensions.create("jvmModules", JvmModuleRegistry::class.java)
+
+            componentRegistry.each<DefaultJvmLibrary> {
+                initialize { library ->
+                    library.module.name.convention(toModuleName(project.name))
+                    library.targetJvmVersion.convention(Versions.libs.jvm.version)
+                }
+            }
+            componentRegistry.each<TopLevelJvmComponent> {
+                derive { component ->
+                    javaVersion(project, component.targetJvmVersion)
+                }
+            }
         }
     }
 }

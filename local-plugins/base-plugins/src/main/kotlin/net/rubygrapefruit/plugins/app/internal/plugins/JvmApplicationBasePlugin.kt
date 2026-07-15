@@ -1,12 +1,8 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.Versions
-import net.rubygrapefruit.plugins.app.internal.JvmModuleRegistry
-import net.rubygrapefruit.plugins.app.internal.MutableJvmApplication
-import net.rubygrapefruit.plugins.app.internal.applications
-import net.rubygrapefruit.plugins.app.internal.componentRegistry
+import net.rubygrapefruit.plugins.app.internal.*
 import net.rubygrapefruit.plugins.app.internal.tasks.RuntimeModulePath
-import net.rubygrapefruit.plugins.app.internal.toModuleName
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSetContainer
@@ -30,7 +26,6 @@ class JvmApplicationBasePlugin : Plugin<Project> {
 
             applications.withApp<MutableJvmApplication> { app ->
 
-                JvmConventionsPlugin.javaVersion(this, app.targetJvmVersion)
                 JvmConventionsPlugin.addApiConstraints(this, "implementation")
 
                 val jarTask = tasks.named("jar", Jar::class.java)

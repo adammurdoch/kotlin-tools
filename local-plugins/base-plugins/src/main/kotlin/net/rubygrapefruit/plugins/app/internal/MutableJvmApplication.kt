@@ -6,7 +6,7 @@ import org.gradle.api.file.ConfigurableFileCollection
 /**
  * A JVM based application.
  */
-interface MutableJvmApplication : JvmApplication, MutableApplication {
+interface MutableJvmApplication : JvmApplication, MutableApplication, TopLevelJvmComponent {
     /**
      * The runtime module path for this application. Includes the jar of the application plus those of all its runtime dependencies.
      */

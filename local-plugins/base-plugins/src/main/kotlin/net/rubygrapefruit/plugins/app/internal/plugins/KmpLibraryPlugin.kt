@@ -1,7 +1,6 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.MultiPlatformLibrary
-import net.rubygrapefruit.plugins.app.Versions
 import net.rubygrapefruit.plugins.app.internal.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -24,9 +23,6 @@ class KmpLibraryPlugin : Plugin<Project> {
 
             componentRegistry.each<DefaultJvmLibrary> {
                 initialize { library ->
-                    library.module.name.convention(toModuleName(project.name))
-                    library.targetJvmVersion.convention(Versions.libs.jvm.version)
-
                     val kotlin = target.kotlin
                     kotlin.jvmToolchain {
                         it.languageVersion.convention(library.targetJvmVersion.map { JavaLanguageVersion.of(it) })

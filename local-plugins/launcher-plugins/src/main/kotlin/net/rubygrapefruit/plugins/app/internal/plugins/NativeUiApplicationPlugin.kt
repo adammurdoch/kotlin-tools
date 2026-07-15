@@ -19,6 +19,12 @@ class NativeUiApplicationPlugin : Plugin<Project> {
             plugins.apply(MultiPlatformAppBasePlugin::class.java)
 
             componentRegistry.each<DefaultNativeUiApplication> {
+                initialize { app ->
+                    app.entryPoint.convention("main")
+                    app.macOS()
+                    multiplatformComponents.forOperatingSystem(OperatingSystem.MacOS)
+                }
+
                 each<RealizedNativeTarget> {
                     derive { target, app ->
                         val generatorTask = tasks.register("generate${target.machine.kotlinTarget}Launcher", NativeLauncher::class.java) {
@@ -55,12 +61,6 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                         registerSibling(dist)
                     }
                 }
-            }
-
-            applications.withApp<DefaultNativeUiApplication> { app ->
-                app.entryPoint.convention("main")
-                app.macOS()
-                multiplatformComponents.forOperatingSystem(OperatingSystem.MacOS)
             }
 
             val app = extensions.create("application", DefaultNativeUiApplication::class.java, componentRegistry.factory)

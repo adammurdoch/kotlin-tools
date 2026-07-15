@@ -33,9 +33,8 @@
 - Split app code signing and notarization into separate tasks
 - Fix `.bat` to work from any directory via a link
   - Or replace with binary launcher
-- Figure out why `tasks.registering` is broken for embedded JVM task
 - Add tests for alternate distributions
-- UI app `dist` task should fail on non-mac host machines
+- UI app `dist` task should fail on non-macOS host machines
 - Don't include `.bat` script for non-windows embedded JVM, or replace with binary launcher
 - Improve failure for `dist` task when nothing can be built
   - Or, don't add a dist task in this case.
@@ -47,7 +46,7 @@
 - Libraries in this repo should target Java 11?
 - Add `run` task for apps
 - Add `install` task for UI apps and servers
-- Support KMP app that targets native + jvm + browser + node
+- Support multi-platform app that targets native + jvm + browser + node
 - Use `--launcher` instead of `--add-modules` with `jlink`
 - Convert automatic modules to real modules prior to using with `jlink`
 - Download service: don't keep the install dir when install action fails

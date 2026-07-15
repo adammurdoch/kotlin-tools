@@ -1,7 +1,10 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.BuildType
-import net.rubygrapefruit.plugins.app.internal.*
+import net.rubygrapefruit.plugins.app.internal.DefaultReleaseDistribution
+import net.rubygrapefruit.plugins.app.internal.DefaultUiApplication
+import net.rubygrapefruit.plugins.app.internal.HasUnsignedUiBundle
+import net.rubygrapefruit.plugins.app.internal.componentRegistry
 import net.rubygrapefruit.plugins.app.internal.tasks.AppIcon
 import net.rubygrapefruit.plugins.app.internal.tasks.InfoPlist
 import net.rubygrapefruit.plugins.app.internal.tasks.ReleaseDistribution
@@ -16,6 +19,13 @@ class UiApplicationBasePlugin : Plugin<Project> {
             plugins.apply(ApplicationBasePlugin::class.java)
 
             componentRegistry.each<DefaultUiApplication> {
+                initialize { app ->
+                    app.iconFile.set(layout.projectDirectory.file("src/main/Icon1024.png"))
+
+                    app.notarizationProfileName.set(envVar("APP_NOTARIZATION_PROFILE"))
+                    app.signingIdentity.set(envVar("APP_SIGNING_IDENTITY"))
+                }
+
                 derive { app ->
                     val infoPlistTask = tasks.register("infoPlist", InfoPlist::class.java) {
                         it.plistFile.set(layout.buildDirectory.file("app/Info.plist"))
@@ -33,6 +43,7 @@ class UiApplicationBasePlugin : Plugin<Project> {
 
                     register(ImageAssets(infoPlistTask, iconTask))
                 }
+
                 each<HasUnsignedUiBundle> {
                     prepare { dist, app ->
                         val capitalizedAppName = app.capitalizedAppName
@@ -76,13 +87,6 @@ class UiApplicationBasePlugin : Plugin<Project> {
                         }
                     }
                 }
-            }
-
-            applications.withApp<DefaultUiApplication> { app ->
-                app.iconFile.set(layout.projectDirectory.file("src/main/Icon1024.png"))
-
-                app.notarizationProfileName.set(envVar("APP_NOTARIZATION_PROFILE"))
-                app.signingIdentity.set(envVar("APP_SIGNING_IDENTITY"))
             }
         }
     }

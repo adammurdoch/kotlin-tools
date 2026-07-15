@@ -17,6 +17,10 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
             plugins.apply(MultiPlatformAppBasePlugin::class.java)
 
             componentRegistry.each<DefaultNativeCliApplication> {
+                initialize { app ->
+                    app.entryPoint.convention("main")
+                }
+
                 each<RealizedNativeExecutable> {
                     derive { executable, app ->
                         val buildType = executable.buildType
@@ -38,10 +42,6 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
                         registerSibling(distribution)
                     }
                 }
-            }
-
-            applications.withApp<DefaultNativeCliApplication> { app ->
-                app.entryPoint.convention("main")
             }
 
             val app = extensions.create(NativeApplication::class.java, "application", DefaultNativeCliApplication::class.java, multiplatformComponents, componentRegistry.factory)

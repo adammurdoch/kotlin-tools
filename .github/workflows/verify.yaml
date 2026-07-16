@@ -1,4 +1,4 @@
-name: Verify
+name: verify
 
 on: [ push ]
 
@@ -6,7 +6,7 @@ jobs:
   linux-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: actions/setup-java@v5
@@ -21,7 +21,7 @@ jobs:
   linux-samples:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: actions/setup-java@v5
@@ -36,7 +36,7 @@ jobs:
   windows-check:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: actions/setup-java@v5
@@ -51,7 +51,7 @@ jobs:
   windows-samples:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: actions/setup-java@v5
@@ -66,7 +66,7 @@ jobs:
   macos-check:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: actions/setup-java@v5
@@ -81,7 +81,7 @@ jobs:
   macos-samples:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: actions/setup-java@v5

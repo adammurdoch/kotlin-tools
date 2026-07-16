@@ -13,7 +13,7 @@ sealed class LibBuilder {
         return if (sourceDirs) {
             OriginSourceTree(sampleDir, main, test, additionalPaths.toList())
         } else {
-            NoSourceDirs
+            NoSourceDirs(sampleDir)
         }
     }
 }

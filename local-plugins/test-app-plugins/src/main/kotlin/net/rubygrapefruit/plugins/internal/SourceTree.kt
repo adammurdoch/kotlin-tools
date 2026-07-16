@@ -3,6 +3,8 @@ package net.rubygrapefruit.plugins.internal
 import java.nio.file.Path
 
 sealed interface SourceTree {
+    val sampleDir: Path
+
     fun generatedInto(sampleDir: Path): SourceTree
 
     fun generatedInto(sampleDir: Path, main: String, test: String): SourceTree
@@ -10,32 +12,32 @@ sealed interface SourceTree {
     fun visit(visitor: (SourceDir) -> Unit)
 }
 
-object NoSourceDirs : SourceTree {
+class NoSourceDirs(override val sampleDir: Path) : SourceTree {
     override fun generatedInto(sampleDir: Path): SourceTree {
-        return this
+        return NoSourceDirs(sampleDir)
     }
 
     override fun generatedInto(sampleDir: Path, main: String, test: String): SourceTree {
-        return this
+        return NoSourceDirs(sampleDir)
     }
 
     override fun visit(visitor: (SourceDir) -> Unit) {
     }
 }
 
-sealed class SourceDir {
-    abstract val srcDir: Path
+sealed interface SourceDir {
+    val srcDir: Path
 }
 
-data class OriginSourceDir(val dir: Path, val path: String) : SourceDir() {
+data class OriginSourceDir(val dir: Path, val path: String) : SourceDir {
     override val srcDir: Path get() = dir.resolve(path)
 }
 
-data class GeneratedSourceDir(val dir: Path, val path: String, val origin: OriginSourceDir) : SourceDir() {
+data class GeneratedSourceDir(val dir: Path, val path: String, val origin: OriginSourceDir) : SourceDir {
     override val srcDir: Path get() = dir.resolve(path)
 }
 
-class OriginSourceTree(sampleDir: Path, mainPath: String, testPath: String, additionalPaths: List<String> = emptyList()) : SourceTree {
+class OriginSourceTree(override val sampleDir: Path, mainPath: String, testPath: String, additionalPaths: List<String> = emptyList()) : SourceTree {
     val main = OriginSourceDir(sampleDir, mainPath)
     val test = OriginSourceDir(sampleDir, testPath)
     val additional = additionalPaths.map { OriginSourceDir(sampleDir, it) }
@@ -57,12 +59,12 @@ class OriginSourceTree(sampleDir: Path, mainPath: String, testPath: String, addi
     }
 }
 
-class GeneratedSourceTree(val srcDir: Path, val main: String, val test: String, val origin: OriginSourceTree) : SourceTree {
+class GeneratedSourceTree(override val sampleDir: Path, val main: String, val test: String, val origin: OriginSourceTree) : SourceTree {
     override fun visit(visitor: (SourceDir) -> Unit) {
-        visitor(GeneratedSourceDir(srcDir, main, origin.main))
-        visitor(GeneratedSourceDir(srcDir, test, origin.test))
+        visitor(GeneratedSourceDir(sampleDir, main, origin.main))
+        visitor(GeneratedSourceDir(sampleDir, test, origin.test))
         for (dir in origin.additional) {
-            visitor(GeneratedSourceDir(srcDir, dir.path, dir))
+            visitor(GeneratedSourceDir(sampleDir, dir.path, dir))
         }
     }
 

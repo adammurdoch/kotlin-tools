@@ -20,10 +20,15 @@ class BytecodeReader {
             throw IllegalArgumentException("Unexpected magic number: $header")
         }
         u2() // minor version
-        val major = u2()
-        if (major > 70u) { // Java 26
+        val major = u2().toInt() // major version
+        val jvmVersion = if ((49..70).contains(major)) {
+            // Java version 5 to 26
+            major - 49 + 5
+        } else {
             throw IllegalArgumentException("Unrecognized major version: $major")
         }
+        visitor.version(jvmVersion)
+
         val constantPool = ConstantPool()
         constantPool.run { readFrom() }
 
@@ -35,7 +40,7 @@ class BytecodeReader {
 
         val interfaceCount = u2()
         val interfaces = mutableListOf<String>()
-        for (i in 1..interfaceCount.toInt()) {
+        repeat(interfaceCount.toInt()) {
             val nameIndex = u2()
             interfaces.add(constantPool.classInfo(nameIndex).typeName)
         }
@@ -57,7 +62,7 @@ class BytecodeReader {
         }
 
         val fieldCount = u2()
-        for (i in 1..fieldCount.toInt()) {
+        repeat(fieldCount.toInt()) {
             val fieldFlags = u2()
             val nameIndex = u2()
             val descriptorIndex = u2()
@@ -70,7 +75,7 @@ class BytecodeReader {
         }
 
         val methodCount = u2()
-        for (i in 1..methodCount.toInt()) {
+        repeat(methodCount.toInt()) {
             val methodFlags = u2() // access
             val nameIndex = u2()
             val descriptorIndex = u2()
@@ -101,7 +106,7 @@ class BytecodeReader {
 
     private fun Decoder.skipAttributes() {
         val attributes = u2()
-        for (i in 1..attributes.toInt()) {
+        repeat(attributes.toInt()) {
             u2() // name index
             val length = u4()
             skip(length.toInt())

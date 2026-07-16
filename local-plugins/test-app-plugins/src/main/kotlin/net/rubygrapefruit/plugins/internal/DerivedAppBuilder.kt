@@ -61,7 +61,7 @@ class DerivedJvmCliAppBuilder internal constructor(
                 }
 
                 else -> {
-                    val invocation = ScriptInvocationWithInstalledJvm.of(name, distDir, launcher, cliArgs, mergedExpectedOutput, jvmVersion)
+                    val invocation = ScriptInvocationWithSystemJvm.of(name, distDir, launcher, cliArgs, mergedExpectedOutput, jvmVersion)
                     CliAppDistribution("dist", distDir, null, invocation)
                 }
             }

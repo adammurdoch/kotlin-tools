@@ -41,16 +41,16 @@ class ScriptInvocation(
     }
 }
 
-class ScriptInvocationWithInstalledJvm(
+class ScriptInvocationWithSystemJvm(
     script: Path,
     args: List<String>,
     expectedOutput: List<String>,
     val jvmVersion: Int
 ) : AbstractScriptInvocation(script, args, expectedOutput) {
     companion object {
-        fun of(name: String, distDir: Path, launcher: String?, args: List<String>, expectedOutput: List<String>, jvmVersion: Int?): ScriptInvocationWithInstalledJvm {
+        fun of(name: String, distDir: Path, launcher: String?, args: List<String>, expectedOutput: List<String>, jvmVersion: Int?): ScriptInvocationWithSystemJvm {
             val scriptPath = Machine.thisMachine.scriptName(launcher ?: name)
-            return ScriptInvocationWithInstalledJvm(distDir.resolve(scriptPath), args, expectedOutput, jvmVersion ?: BuildConstants.constants.apps.jvm.version)
+            return ScriptInvocationWithSystemJvm(distDir.resolve(scriptPath), args, expectedOutput, jvmVersion ?: BuildConstants.constants.apps.jvm.version)
         }
     }
 }

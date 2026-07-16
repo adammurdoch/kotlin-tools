@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     implementation(project(":machine-info"))
+    implementation(project(":bytecode"))
 }
 
 pluginBundle {

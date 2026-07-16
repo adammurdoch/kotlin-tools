@@ -2,6 +2,11 @@ package net.rubygrapefruit.bytecode
 
 interface ClassFileVisitor {
     /**
+     * Visits file metadata
+     */
+    fun version(javaVersion: Int) {}
+
+    /**
      * Visits a module.
      */
     fun module(module: ModuleInfo) {}

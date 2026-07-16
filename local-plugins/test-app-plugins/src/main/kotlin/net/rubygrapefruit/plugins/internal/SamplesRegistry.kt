@@ -1,5 +1,7 @@
 package net.rubygrapefruit.plugins.internal
 
+import net.rubygrapefruit.bytecode.BytecodeReader
+import net.rubygrapefruit.bytecode.ClassFileVisitor
 import net.rubygrapefruit.machine.info.Architecture
 import net.rubygrapefruit.machine.info.Architecture.Arm64
 import net.rubygrapefruit.machine.info.Architecture.X64
@@ -15,6 +17,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.nio.file.Path
 import java.security.MessageDigest
+import java.util.zip.ZipInputStream
 import kotlin.io.path.*
 
 abstract class SamplesRegistry(private val settings: Settings) : SampleContainer {
@@ -111,10 +114,37 @@ private fun Lib.verifyLib(project: Project): SampleTasks {
         task.dependsOn("build")
         task.doLast {
             println("Lib: $name")
-            verify(this, sourceTree)
+            verifySourceTree(this)
+            verifyJvmLib()
         }
     }
     return SampleTasks(":$name:verifySample", emptyList())
+}
+
+private fun Lib.verifyJvmLib() {
+    if (this is JvmLib) {
+        val libs = sourceTree.sampleDir.resolve("build/libs")
+        val jar = libs.listDirectoryEntries("$name*.jar").singleOrNull()
+        if (jar == null) {
+            throw IllegalStateException("Could not find library Jar in $libs")
+        }
+        println("Jar: $jar")
+        jar.inputStream().use { stream ->
+            val zip = ZipInputStream(stream)
+            do {
+                val entry = zip.nextEntry ?: break
+//                println(entry.name)
+                if (entry.name == "module-info.class") {
+                    val visitor = object : ClassFileVisitor {
+                        override fun version(javaVersion: Int) {
+                            println("Java version: $javaVersion")
+                        }
+                    }
+                    BytecodeReader().readFrom(zip, visitor)
+                }
+            } while (true)
+        }
+    }
 }
 
 private fun App.verifyApp(project: Project): SampleTasks {
@@ -155,7 +185,7 @@ private fun verify(app: App, distribution: AppDistribution, toolchainService: Ja
         is UiApp -> println("UI app: ${app.name} dist: ${distribution.distTask}")
     }
 
-    verify(app, app.sourceTree)
+    verifySourceTree(app)
 
     println("Dist dir: ${distribution.distDir}")
     if (!distribution.distDir.isDirectory()) {
@@ -185,7 +215,7 @@ private fun verify(app: App, distribution: AppDistribution, toolchainService: Ja
             }
             val commandLine = distribution.invocation.commandLine
             println("Run: ${commandLine.joinToString(" ")}")
-            val javaBinDir = if (distribution.invocation is ScriptInvocationWithInstalledJvm) {
+            val javaBinDir = if (distribution.invocation is ScriptInvocationWithSystemJvm) {
                 val java = toolchainService.launcherFor {
                     it.languageVersion.set(JavaLanguageVersion.of(distribution.invocation.jvmVersion))
                 }.get().executablePath.asFile.parentFile.toPath()
@@ -227,7 +257,8 @@ private fun verify(app: App, distribution: AppDistribution, toolchainService: Ja
     }
 }
 
-private fun verify(sample: Sample, sourceTree: SourceTree) {
+private fun verifySourceTree(sample: Sample) {
+    val sourceTree = sample.sourceTree
     val dirs = mutableListOf<SourceDir>()
     sourceTree.visit { dirs.add(it) }
     if (dirs.isEmpty()) {

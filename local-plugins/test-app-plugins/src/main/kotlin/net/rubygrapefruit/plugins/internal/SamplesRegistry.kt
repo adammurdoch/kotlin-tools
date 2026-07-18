@@ -122,9 +122,10 @@ private fun Lib.verifyLib(project: Project): SampleTasks {
 }
 
 private fun Lib.verifyJvmLib() {
-    if (this is JvmLib) {
+    val jvmTarget = jvm
+    if (jvmTarget != null) {
         val libs = sourceTree.sampleDir.resolve("build/libs")
-        val jar = libs.listDirectoryEntries("$name*.jar").singleOrNull()
+        val jar = libs.listDirectoryEntries("${jvmTarget.jarNamePrefix}*.jar").singleOrNull()
         if (jar == null) {
             throw IllegalStateException("Could not find library Jar in $libs")
         }
@@ -133,7 +134,7 @@ private fun Lib.verifyJvmLib() {
         var classSeen = false
         val visitor = object : ClassFileVisitor {
             override fun version(javaVersion: Int) {
-                if (javaVersion != jvmVersion) {
+                if (javaVersion != jvmTarget.jvmVersion) {
                     throw IllegalStateException("Unexpected Java version $javaVersion found in jar: $jar")
                 }
                 classSeen = true

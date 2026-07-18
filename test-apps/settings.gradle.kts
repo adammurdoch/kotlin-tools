@@ -23,21 +23,23 @@ samples {
     jvmLib("docs-test")
 
     kmpLib("kmp-lib") {
-        derive("kmp-lib-customized")
+        derive("kmp-lib-customized") {
+            requiresJvm(11)
+        }
     }
 
     kmpLib("kmp-lib-render") {
-        derive("kmp-lib-render-customized")
+        derive("kmp-lib-render-customized") {
+            requiresJvm(11)
+        }
     }
 
     kmpLib("kmp-lib-generated-source") {
         noSourceDirs()
     }
 
-    kmpLib("native-lib")
-
-    kmpLib("native-lib-generated-source") {
-        noSourceDirs()
+    kmpLib("native-lib") {
+        noJvm()
     }
 
     kmpLib("parse-kmp-lib")

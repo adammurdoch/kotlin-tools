@@ -17,7 +17,6 @@ application {
     entryPoint = "sample.main"
     nativeDesktop()
     common {
-        implementation(project(":native-lib-generated-source"))
         implementation(project(":kmp-lib-generated-source"))
     }
     generatedSource.add(commonGeneratorTask.flatMap { it.outputDir })

@@ -11,11 +11,19 @@ sealed interface Sample {
     val sourceTree: SourceTree
 }
 
-sealed interface Lib : Sample
+sealed interface Lib : Sample {
+    val jvm: JvmLibTarget?
+}
 
-class JvmLib internal constructor(override val name: String, override val sourceTree: SourceTree, val jvmVersion: Int) : Lib
+class JvmLibTarget(val jvmVersion: Int, val jarNamePrefix: String)
 
-class KmpLib internal constructor(override val name: String, override val sourceTree: SourceTree) : Lib
+class JvmLib internal constructor(override val name: String, override val sourceTree: SourceTree, jvmVersion: Int) : Lib {
+    override val jvm = JvmLibTarget(jvmVersion, name)
+}
+
+class KmpLib internal constructor(override val name: String, override val sourceTree: SourceTree, jvmVersion: Int?) : Lib {
+    override val jvm = if (jvmVersion != null) JvmLibTarget(jvmVersion, "$name-jvm") else null
+}
 
 sealed interface App : Sample {
     /**

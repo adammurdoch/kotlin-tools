@@ -48,10 +48,17 @@ class KmpLibBuilder internal constructor(
     private val name: String,
     private val container: SampleContainer
 ) : LibBuilder() {
-    private val derived = mutableListOf<String>()
+    private var jvm = true
+    private val derived = mutableListOf<DerivedKmpLibBuilder>()
 
-    fun derive(name: String) {
-        derived.add(name)
+    fun noJvm() {
+        jvm = false
+    }
+
+    fun derive(name: String, config: DerivedKmpLibBuilder.() -> Unit = {}) {
+        val builder = DerivedKmpLibBuilder(name)
+        builder.config()
+        derived.add(builder)
     }
 
     internal fun register(): KmpLib {
@@ -66,11 +73,11 @@ class KmpLibBuilder internal constructor(
                 "src/unixMain",
                 "src/jsMain",
             )
-            KmpLib(name, sourceTree)
+            KmpLib(name, sourceTree, if (jvm) 17 else null)
         }
-        for (name in derived) {
-            container.add(name) { name, sampleDir ->
-                KmpLib(name, lib.sourceTree.generatedInto(sampleDir))
+        for (builder in derived) {
+            container.add(builder.name) { name, sampleDir ->
+                KmpLib(name, lib.sourceTree.generatedInto(sampleDir), builder.jvmVersion)
             }
         }
         return lib

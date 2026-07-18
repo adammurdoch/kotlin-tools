@@ -1,6 +1,7 @@
 package net.rubygrapefruit.plugins.internal
 
 import net.rubygrapefruit.machine.info.Machine
+import net.rubygrapefruit.plugins.stage0.BuildConstants
 
 sealed class DerivedCliAppBuilder {
     internal val expectedOutput: List<String>
@@ -18,7 +19,7 @@ class DerivedJvmCliAppBuilder internal constructor(
     private val container: SampleContainer
 ) : DerivedCliAppBuilder() {
     private var launcher: String? = null
-    private var jvmVersion: Int? = null
+    private var jvmVersion: Int = BuildConstants.constants.apps.jvm.version
     private var embedded = false
     private var native = false
 
@@ -31,13 +32,11 @@ class DerivedJvmCliAppBuilder internal constructor(
     }
 
     fun embeddedJvm() {
-        jvmVersion = null
         embedded = true
         native = false
     }
 
     fun nativeBinaries() {
-        jvmVersion = null
         embedded = false
         native = true
     }
@@ -66,7 +65,7 @@ class DerivedJvmCliAppBuilder internal constructor(
                 }
             }
             val sourceDir = derivedFrom.generatedInto(sampleDir, "src/main", "src/test")
-            JvmCliApp(name, distribution, sourceDir)
+            JvmCliApp(name, distribution, sourceDir, jvmVersion)
         }
     }
 }

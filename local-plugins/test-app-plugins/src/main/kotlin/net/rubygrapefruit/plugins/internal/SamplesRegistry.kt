@@ -114,49 +114,49 @@ private fun Lib.verifyLib(project: Project): SampleTasks {
         task.dependsOn("build")
         task.doLast {
             println("Lib: $name")
-            verifySourceTree(this)
-            verifyJvmLib()
+            verifySourceTree()
+            verifyJvmLib(jvm, this)
         }
     }
     return SampleTasks(":$name:verifySample", emptyList())
 }
 
-private fun Lib.verifyJvmLib() {
-    val jvmTarget = jvm
-    if (jvmTarget != null) {
-        val libs = sourceTree.sampleDir.resolve("build/libs")
-        val jar = libs.listDirectoryEntries("${jvmTarget.jarNamePrefix}*.jar").singleOrNull()
-        if (jar == null) {
-            throw IllegalStateException("Could not find library Jar in $libs")
-        }
-        println("Jar: $jar")
-        var moduleInfoSeen = false
-        var classSeen = false
-        val visitor = object : ClassFileVisitor {
-            override fun version(javaVersion: Int) {
-                if (javaVersion != jvmTarget.jvmVersion) {
-                    throw IllegalStateException("Unexpected Java version $javaVersion found in jar: $jar")
-                }
-                classSeen = true
+private fun verifyJvmLib(jvmTarget: JvmTarget?, sample: Sample) {
+    if (jvmTarget == null) {
+        return
+    }
+    val libs = sample.sourceTree.sampleDir.resolve(jvmTarget.libDirPath)
+    val jar = libs.listDirectoryEntries("${jvmTarget.jarNamePrefix}*.jar").singleOrNull()
+    if (jar == null) {
+        throw IllegalStateException("Could not find library Jar in $libs")
+    }
+    println("Jar: $jar")
+    var moduleInfoSeen = false
+    var classSeen = false
+    val visitor = object : ClassFileVisitor {
+        override fun version(javaVersion: Int) {
+            if (javaVersion != jvmTarget.jvmVersion) {
+                throw IllegalStateException("Unexpected Java version $javaVersion found in jar: $jar")
             }
+            classSeen = true
         }
-        jar.inputStream().use { stream ->
-            val zip = ZipInputStream(stream)
-            do {
-                val entry = zip.nextEntry ?: break
-                if (entry.name == "module-info.class") {
-                    moduleInfoSeen = true
-                } else if (entry.name.endsWith(".class")) {
-                    BytecodeReader().readFrom(zip, visitor)
-                }
-            } while (true)
-        }
-        if (!moduleInfoSeen) {
-            throw IllegalStateException("No module-info entry found in $jar")
-        }
-        if (!classSeen) {
-            throw IllegalStateException("No JVM classes found in $jar")
-        }
+    }
+    jar.inputStream().use { stream ->
+        val zip = ZipInputStream(stream)
+        do {
+            val entry = zip.nextEntry ?: break
+            if (entry.name == "module-info.class") {
+                moduleInfoSeen = true
+            } else if (entry.name.endsWith(".class")) {
+                BytecodeReader().readFrom(zip, visitor)
+            }
+        } while (true)
+    }
+    if (!moduleInfoSeen) {
+        throw IllegalStateException("No module-info entry found in $jar")
+    }
+    if (!classSeen) {
+        throw IllegalStateException("No JVM classes found in $jar")
     }
 }
 
@@ -198,7 +198,8 @@ private fun verify(app: App, distribution: AppDistribution, toolchainService: Ja
         is UiApp -> println("UI app: ${app.name} dist: ${distribution.distTask}")
     }
 
-    verifySourceTree(app)
+    app.verifySourceTree()
+    verifyJvmLib(app.jvm, app)
 
     println("Dist dir: ${distribution.distDir}")
     if (!distribution.distDir.isDirectory()) {
@@ -270,8 +271,7 @@ private fun verify(app: App, distribution: AppDistribution, toolchainService: Ja
     }
 }
 
-private fun verifySourceTree(sample: Sample) {
-    val sourceTree = sample.sourceTree
+private fun Sample.verifySourceTree() {
     val dirs = mutableListOf<SourceDir>()
     sourceTree.visit { dirs.add(it) }
     if (dirs.isEmpty()) {
@@ -307,7 +307,7 @@ private fun verifySourceTree(sample: Sample) {
         }
     }
     if (!hasSrcDir) {
-        throw IllegalStateException("Sample ${sample.name} does not contain any source directories.")
+        throw IllegalStateException("Sample ${name} does not contain any source directories.")
     }
 }
 
@@ -325,7 +325,6 @@ private fun Path.architecture(execOperations: ExecOperations): Architecture {
     }
 }
 
-@OptIn(ExperimentalPathApi::class)
 private fun generateSamples(samples: List<Sample>) {
     for (sample in samples) {
         sample.sourceTree.visit { srcDir ->

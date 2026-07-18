@@ -12,17 +12,17 @@ sealed interface Sample {
 }
 
 sealed interface Lib : Sample {
-    val jvm: JvmLibTarget?
+    val jvm: JvmTarget?
 }
 
-class JvmLibTarget(val jvmVersion: Int, val jarNamePrefix: String)
+class JvmTarget(val jvmVersion: Int, val libDirPath: String, val jarNamePrefix: String)
 
 class JvmLib internal constructor(override val name: String, override val sourceTree: SourceTree, jvmVersion: Int) : Lib {
-    override val jvm = JvmLibTarget(jvmVersion, name)
+    override val jvm = JvmTarget(jvmVersion, "build/libs", name)
 }
 
 class KmpLib internal constructor(override val name: String, override val sourceTree: SourceTree, jvmVersion: Int?) : Lib {
-    override val jvm = if (jvmVersion != null) JvmLibTarget(jvmVersion, "$name-jvm") else null
+    override val jvm = if (jvmVersion != null) JvmTarget(jvmVersion, "build/libs", "$name-jvm") else null
 }
 
 sealed interface App : Sample {
@@ -35,6 +35,8 @@ sealed interface App : Sample {
      * Other distributions to test.
      */
     val otherDistributions: List<AppDistribution>
+
+    val jvm: JvmTarget?
 }
 
 sealed interface CliApp : App
@@ -42,10 +44,13 @@ sealed interface CliApp : App
 class JvmCliApp internal constructor(
     override val name: String,
     override val distribution: CliAppDistribution,
-    override val sourceTree: SourceTree
+    override val sourceTree: SourceTree,
+    jvmVersion: Int
 ) : CliApp {
     override val otherDistributions: List<CliAppDistribution>
         get() = emptyList()
+
+    override val jvm = if (distribution.invocation is ScriptInvocationWithSystemJvm) JvmTarget(jvmVersion, "build/dist/lib", name) else null
 }
 
 class NativeCliApp internal constructor(
@@ -61,6 +66,9 @@ class NativeCliApp internal constructor(
     override val otherDistributions: List<CliAppDistribution> = nativeDistributions(sampleDir) { distTask, distDir, architecture ->
         CliAppDistribution.ofBinary(name, distTask, distDir, launcher, args, expectedOutput, architecture)
     }
+
+    override val jvm: JvmTarget?
+        get() = null
 
     init {
         val distDir = sampleDir.resolve("build/dist")
@@ -87,6 +95,9 @@ class JvmUiApp internal constructor(
 
     override val otherDistributions: List<UiAppDistribution>
         get() = emptyList()
+
+    // Uses embedded JVM
+    override val jvm = null
 }
 
 class NativeUiApp internal constructor(
@@ -99,6 +110,9 @@ class NativeUiApp internal constructor(
 
     override val otherDistributions: List<UiAppDistribution>
         get() = emptyList()
+
+    override val jvm: JvmTarget?
+        get() = null
 }
 
 private fun <T : AppDistribution> nativeDistributions(sampleDir: Path, factory: (String, Path, Architecture) -> T): List<T> {

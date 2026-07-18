@@ -55,6 +55,7 @@ samples {
         cliArgs("1", "+", "2")
         expectedOutput("1 + 2 = 3")
         derive("jvm-cli-app-customized") {
+            requiresJvm(21)
             launcher("app")
         }
         derive("jvm-cli-app-embedded") {

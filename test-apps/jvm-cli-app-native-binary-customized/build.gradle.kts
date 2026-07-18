@@ -7,6 +7,7 @@ application {
     appName = "app"
     mainClass = "sample.MainKt"
     module.name = "sample.app"
+    targetJvmVersion = 21
 
     dependencies {
         implementation(project(":kmp-lib"))

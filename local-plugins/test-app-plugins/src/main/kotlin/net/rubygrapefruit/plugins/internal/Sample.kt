@@ -13,7 +13,7 @@ sealed interface Sample {
 
 sealed interface Lib : Sample
 
-class JvmLib internal constructor(override val name: String, override val sourceTree: SourceTree) : Lib
+class JvmLib internal constructor(override val name: String, override val sourceTree: SourceTree, val jvmVersion: Int) : Lib
 
 class KmpLib internal constructor(override val name: String, override val sourceTree: SourceTree) : Lib
 

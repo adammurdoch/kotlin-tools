@@ -129,20 +129,32 @@ private fun Lib.verifyJvmLib() {
             throw IllegalStateException("Could not find library Jar in $libs")
         }
         println("Jar: $jar")
+        var moduleInfoSeen = false
+        var classSeen = false
+        val visitor = object : ClassFileVisitor {
+            override fun version(javaVersion: Int) {
+                if (javaVersion != jvmVersion) {
+                    throw IllegalStateException("Unexpected Java version $javaVersion found in jar: $jar")
+                }
+                classSeen = true
+            }
+        }
         jar.inputStream().use { stream ->
             val zip = ZipInputStream(stream)
             do {
                 val entry = zip.nextEntry ?: break
-//                println(entry.name)
                 if (entry.name == "module-info.class") {
-                    val visitor = object : ClassFileVisitor {
-                        override fun version(javaVersion: Int) {
-                            println("Java version: $javaVersion")
-                        }
-                    }
+                    moduleInfoSeen = true
+                } else if (entry.name.endsWith(".class")) {
                     BytecodeReader().readFrom(zip, visitor)
                 }
             } while (true)
+        }
+        if (!moduleInfoSeen) {
+            throw IllegalStateException("No module-info entry found in $jar")
+        }
+        if (!classSeen) {
+            throw IllegalStateException("No JVM classes found in $jar")
         }
     }
 }

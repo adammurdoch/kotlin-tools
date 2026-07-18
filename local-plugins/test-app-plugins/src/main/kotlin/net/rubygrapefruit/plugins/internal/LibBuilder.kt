@@ -22,20 +22,22 @@ class JvmLibBuilder internal constructor(
     private val name: String,
     private val container: SampleContainer
 ) : LibBuilder() {
-    private val derived = mutableListOf<String>()
+    private val derived = mutableListOf<DerivedJvmLibBuilder>()
 
-    fun derive(name: String) {
-        derived.add(name)
+    fun derive(name: String, config: DerivedJvmLibBuilder.() -> Unit = {}) {
+        val builder = DerivedJvmLibBuilder(name)
+        builder.config()
+        derived.add(builder)
     }
 
     internal fun register(): JvmLib {
         val lib = container.add(name) { name, sampleDir ->
             val sourceTree = sourceTree(sampleDir, main = "src/main", test = "src/test")
-            JvmLib(name, sourceTree)
+            JvmLib(name, sourceTree, 17)
         }
-        for (name in derived) {
-            container.add(name) { name, sampleDir ->
-                JvmLib(name, lib.sourceTree.generatedInto(sampleDir))
+        for (builder in derived) {
+            container.add(builder.name) { name, sampleDir ->
+                JvmLib(name, lib.sourceTree.generatedInto(sampleDir), builder.jvmVersion)
             }
         }
         return lib

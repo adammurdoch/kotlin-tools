@@ -11,7 +11,9 @@ plugins {
 
 samples {
     jvmLib("jvm-lib") {
-        derive("jvm-lib-customized")
+        derive("jvm-lib-customized") {
+            requiresJvm(11)
+        }
     }
 
     jvmLib("jvm-lib-generated-source") {

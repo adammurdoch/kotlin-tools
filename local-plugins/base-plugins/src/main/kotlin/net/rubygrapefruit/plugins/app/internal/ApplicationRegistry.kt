@@ -15,16 +15,6 @@ open class ApplicationRegistry(private val project: Project, private val compone
         main = app
         componentRegistry.register(app)
 
-        app.appName.convention(project.name)
-
-        project.tasks.register("dist", Distributions::class.java) { task ->
-            task.devDistribution.set(app.devDistribution.map { dist -> DefaultDistributionOutputs(dist.outputs.imageDirectory, dist.outputs.launcherFile) })
-            task.releaseDistribution.set(app.releaseDistribution.map { dist -> DefaultDistributionOutputs(dist.outputs.imageDirectory, dist.outputs.launcherFile) })
-            task.allDistributions.set(app.distributions.map { dists ->
-                dists.filterIsInstance<BuildableDistribution>().map { dist -> DefaultDistributionOutputs(dist.outputs.imageDirectory, dist.outputs.launcherFile) }
-            })
-        }
-
         app.distributionContainer.each {
             val imageBaseDirName = app.distributionContainer.dev.map {
                 // This distribution is the development distribution
@@ -52,10 +42,6 @@ open class ApplicationRegistry(private val project: Project, private val compone
 
             imageOutputDirectory.set(distTask.flatMap { t -> t.imageDirectory })
             launcherOutputFile.set(distTask.flatMap { t -> t.imageDirectory.file(effectiveLauncherFilePath) })
-        }
-
-        project.tasks.register("showApplication", ShowApplication::class.java) { task ->
-            task.app.set(project.provider { app.metadata() })
         }
     }
 }

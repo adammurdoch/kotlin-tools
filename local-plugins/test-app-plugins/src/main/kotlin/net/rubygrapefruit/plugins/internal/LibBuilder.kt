@@ -1,12 +1,6 @@
 package net.rubygrapefruit.plugins.internal
 
-sealed class LibBuilder {
-    protected var sourceDirs = true
-
-    fun noSourceDirs() {
-        sourceDirs = false
-    }
-}
+sealed class LibBuilder
 
 class JvmLibBuilder internal constructor(
     name: String,

@@ -16,9 +16,7 @@ samples {
         }
     }
 
-    jvmLib("jvm-lib-generated-source") {
-        noSourceDirs()
-    }
+    jvmLib("jvm-lib-generated-source")
 
     jvmLib("docs-test")
 
@@ -34,9 +32,7 @@ samples {
         }
     }
 
-    kmpLib("kmp-lib-generated-source") {
-        noSourceDirs()
-    }
+    kmpLib("kmp-lib-generated-source")
 
     kmpLib("native-lib") {
         noJvm()

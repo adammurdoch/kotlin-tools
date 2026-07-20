@@ -115,13 +115,13 @@ private fun Lib.verifyLib(project: Project): SampleTasks {
         task.doLast {
             println("Lib: $name")
             verifySourceTree()
-            verifyJvmLib(jvm, this)
+            verifyJvmTarget(jvm, this)
         }
     }
     return SampleTasks(":$name:verifySample", emptyList())
 }
 
-private fun verifyJvmLib(jvmTarget: JvmTarget?, sample: Sample) {
+private fun verifyJvmTarget(jvmTarget: JvmTarget?, sample: Sample) {
     if (jvmTarget == null) {
         return
     }
@@ -199,7 +199,7 @@ private fun verify(app: App, distribution: AppDistribution, toolchainService: Ja
     }
 
     app.verifySourceTree()
-    verifyJvmLib(app.jvm, app)
+    verifyJvmTarget(app.jvm, app)
 
     println("Dist dir: ${distribution.distDir}")
     if (!distribution.distDir.isDirectory()) {

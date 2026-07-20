@@ -13,9 +13,9 @@ import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.TaskContainer
 
 class DistributionContainer(private val tasks: TaskContainer, private val objects: ObjectFactory, providers: ProviderFactory) {
-    private val distContainer = SimpleContainer<MutableDistribution>()
+    private val dists = mutableListOf<MutableDistribution>()
 
-    val distributions: Provider<List<Distribution>> = providers.provider { distContainer.all }
+    val distributions: Provider<List<Distribution>> = providers.provider { dists }
 
     val dev: Property<Distribution> = objects.property(Distribution::class.java)
 
@@ -54,7 +54,7 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
         taskType: Class<out AbstractDistributionImage> = DistributionImage::class.java
     ): T {
         val name = targetMachine.kotlinTarget + if (baseName == null) "" else baseName.capitalized()
-        distContainer.all.forEach { distribution ->
+        dists.forEach { distribution ->
             if (distribution.name == name) {
                 throw IllegalArgumentException("Multiple distributions with name '$name'")
             }
@@ -69,7 +69,7 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
     }
 
     private fun addDist(dist: MutableDistribution, isDev: Boolean, isRelease: Boolean) {
-        distContainer.add(dist)
+        dists.add(dist)
         if (isDev && dist.canBuildOnHostMachine) {
             dev.set(dist)
         }

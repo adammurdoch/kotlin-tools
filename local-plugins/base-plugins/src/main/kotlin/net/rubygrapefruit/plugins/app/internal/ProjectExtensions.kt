@@ -11,9 +11,6 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 val Project.componentRegistry: ComponentRegistry
     get() = extensions.getByType(ComponentRegistry::class.java)
 
-val Project.applications: ApplicationRegistry
-    get() = extensions.getByType(ApplicationRegistry::class.java)
-
 val Project.multiplatformComponents: MultiPlatformComponentRegistry
     get() = extensions.getByType(MultiPlatformComponentRegistry::class.java)
 

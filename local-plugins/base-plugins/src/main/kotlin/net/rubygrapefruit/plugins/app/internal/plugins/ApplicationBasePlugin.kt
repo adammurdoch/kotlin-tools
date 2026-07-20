@@ -15,7 +15,6 @@ class ApplicationBasePlugin : Plugin<Project> {
             repositories.mavenCentral()
 
             val componentRegistry = target.extensions.create("componentRegistry", ComponentRegistry::class.java)
-            target.extensions.create("applicationRegistry", ApplicationRegistry::class.java, componentRegistry)
 
             componentRegistry.each<MutableApplication> {
                 initialize { app ->
@@ -32,6 +31,37 @@ class ApplicationBasePlugin : Plugin<Project> {
                     }
                     project.tasks.register("showApplication", ShowApplication::class.java) { task ->
                         task.app.set(project.provider { app.metadata() })
+                    }
+                }
+
+                each<MutableDistribution> {
+                    prepare { dist, app ->
+                        val imageBaseDirName = app.distributionContainer.dev.map {
+                            // This distribution is the development distribution
+                            if (it == dist) {
+                                "dist"
+                            } else {
+                                "dist-images/$name"
+                            }
+                        }.orElse("dist-images/$name")
+
+                        dist.imageDirectory.convention(project.layout.buildDirectory.dir(imageBaseDirName))
+                        dist.launcherFilePath.convention(app.appName)
+                        dist.rootDirPath.convention(".")
+
+                        dist.distTask.configure { t ->
+                            val canBuild = dist.canBuildOnHostMachine
+                            t.onlyIf {
+                                canBuild
+                            }
+                            t.description = "Builds the distribution image"
+                            t.group = "Distribution"
+                            t.imageDirectory.set(dist.imageDirectory)
+                            t.rootDirPath.set(dist.rootDirPath)
+                        }
+
+                        dist.imageOutputDirectory.set(dist.distTask.flatMap { t -> t.imageDirectory })
+                        dist.launcherOutputFile.set(dist.distTask.flatMap { t -> t.imageDirectory.file(dist.effectiveLauncherFilePath) })
                     }
                 }
 

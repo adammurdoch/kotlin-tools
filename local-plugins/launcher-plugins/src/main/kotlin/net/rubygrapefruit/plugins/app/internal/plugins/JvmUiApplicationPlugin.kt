@@ -2,7 +2,10 @@ package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.NativeMachine
-import net.rubygrapefruit.plugins.app.internal.*
+import net.rubygrapefruit.plugins.app.internal.DefaultJvmUiAppDistribution
+import net.rubygrapefruit.plugins.app.internal.DefaultJvmUiApplication
+import net.rubygrapefruit.plugins.app.internal.HostMachine
+import net.rubygrapefruit.plugins.app.internal.componentRegistry
 import net.rubygrapefruit.plugins.app.internal.tasks.LauncherConf
 import net.rubygrapefruit.plugins.app.internal.tasks.NativeUiLauncher
 import org.gradle.api.Plugin
@@ -69,7 +72,7 @@ class JvmUiApplicationPlugin : Plugin<Project> {
             }
 
             val app = extensions.create("application", DefaultJvmUiApplication::class.java)
-            applications.register(app)
+            componentRegistry.register(app)
         }
     }
 }

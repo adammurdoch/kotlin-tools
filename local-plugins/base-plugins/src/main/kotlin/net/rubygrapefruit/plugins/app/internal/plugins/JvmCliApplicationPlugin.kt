@@ -76,7 +76,7 @@ class JvmCliApplicationPlugin : Plugin<Project> {
             }
 
             val app = extensions.create("application", DefaultJvmCliApplication::class.java)
-            applications.register(app)
+            componentRegistry.register(app)
         }
     }
 }

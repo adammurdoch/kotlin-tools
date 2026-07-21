@@ -164,6 +164,7 @@ private fun App.verifyApp(project: Project): SampleTasks {
     val toolchainService = project.serviceOf<JavaToolchainService>()
     val execOperations = project.serviceOf<ExecOperations>()
     project.tasks.register("verifySample") { task ->
+        task.dependsOn("check")
         applyVerificationToTask(distribution, task, toolchainService, execOperations)
     }
     if (otherDistributions.isNotEmpty()) {
@@ -186,7 +187,6 @@ private fun App.applyVerificationToTask(distribution: AppDistribution, task: Tas
         return
     }
     task.dependsOn(distribution.distTask)
-    task.dependsOn("check")
     task.doLast {
         verify(this, distribution, toolchainService, execOperations)
     }

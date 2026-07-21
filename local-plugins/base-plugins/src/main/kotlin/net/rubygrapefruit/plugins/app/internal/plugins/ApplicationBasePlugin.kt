@@ -41,9 +41,9 @@ class ApplicationBasePlugin : Plugin<Project> {
                             if (it == dist) {
                                 "dist"
                             } else {
-                                "dist-images/$name"
+                                "dist-images/${dist.name}"
                             }
-                        }.orElse("dist-images/$name")
+                        }.orElse("dist-images/${dist.name}")
 
                         dist.imageDirectory.convention(project.layout.buildDirectory.dir(imageBaseDirName))
                         dist.launcherFilePath.convention(app.appName)

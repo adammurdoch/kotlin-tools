@@ -245,6 +245,7 @@ class ChoiceTest : AbstractParseTest() {
             steps {
                 advance(1)
                 advance(1)
+                advance(0)
             }
         }
     }

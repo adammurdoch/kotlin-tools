@@ -1,8 +1,11 @@
 package net.rubygrapefruit.parse
 
-import net.rubygrapefruit.parse.text.literal
 import net.rubygrapefruit.parse.combinators.oneOf
+import net.rubygrapefruit.parse.combinators.repeat
+import net.rubygrapefruit.parse.combinators.replace
 import net.rubygrapefruit.parse.combinators.sequence
+import net.rubygrapefruit.parse.text.literal
+import net.rubygrapefruit.parse.text.oneOf
 import kotlin.test.Test
 
 class SequenceOfChoiceTest : AbstractParseTest() {
@@ -145,7 +148,97 @@ class SequenceOfChoiceTest : AbstractParseTest() {
     }
 
     @Test
-    fun `matches sequence of same choice parser`() {
+    fun `matches sequence of choice then literal when middle option is a prefix of another`() {
+        val parser = sequence(
+            oneOf(
+                literal("abc", 1),
+                literal("ab", 2),
+                replace(repeat(2, oneOf('a', 'b')), 3)
+            ),
+            literal("123", 4)
+        ) { a, b -> listOf(a, b) }
+
+        parser.expecting {
+            expectSequence {
+                expectChoice {
+                    expectLiteral("abc", result = 1)
+                    expectLiteral("ab", result = 2)
+                    expectMap {
+                        expectRepeatSingleInput(2, hasResult = false) {
+                            expectOneOf('a', 'b')
+                        }
+                    }
+                }
+                expectLiteral("123", result = 4)
+            }
+        }
+
+        parser.matches("abc123", expected = listOf(1, 4)) {
+            steps {
+                advance(1)
+                advance(1)
+                advance(1)
+                advance(3)
+            }
+        }
+        parser.matches("ab123", expected = listOf(2, 4)) {
+            steps {
+                advance(1)
+                advance(1)
+                advance(0)
+                advance(3)
+            }
+        }
+        parser.matches("aa123", expected = listOf(3, 4)) {
+            steps {
+                advance(1)
+                advance(1)
+                advance(3)
+            }
+        }
+
+        // missing
+        parser.doesNotMatch("") {
+            expectLiteral("abc")
+            expectLiteral("ab")
+            expectLiteral("a")
+            expectLiteral("b")
+        }
+        parser.doesNotMatch("a") {
+            failAt(1)
+            expectLiteral("a")
+            expectLiteral("b")
+        }
+        parser.doesNotMatch("abc") {
+            failAt(3)
+            expectLiteral("123")
+        }
+        parser.doesNotMatch("ab") {
+            failAt(2)
+            expectLiteral("123")
+        }
+        parser.doesNotMatch("aa") {
+            failAt(2)
+            expectLiteral("123")
+        }
+
+        // unexpected
+        parser.doesNotMatch("X") {
+            expectLiteral("abc")
+            expectLiteral("ab")
+            expectLiteral("a")
+            expectLiteral("b")
+        }
+
+        // extra
+        parser.doesNotMatch("ab123X") {
+            failAt(5)
+            expectEndOfInput()
+        }
+    }
+
+    @Test
+    fun `matches sequence of choice parser`() {
         val choice = oneOf(
             literal("abc", 1),
             literal("ad", 2)

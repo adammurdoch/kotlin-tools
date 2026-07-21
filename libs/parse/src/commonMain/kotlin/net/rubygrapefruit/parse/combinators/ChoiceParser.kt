@@ -77,6 +77,14 @@ internal class ChoiceParser<IN, OUT>(
                 val option = states[index]
                 val optionState = option.state
                 if (optionState is PullParser) {
+                    if (waitingFor == 0 && option.matched) {
+                        option.continuation.disconnect()
+                        return option.continuation.next.selected(
+                            option.advanced - advanced,
+                            optionState,
+                            failedChoices
+                        )
+                    }
                     if (option.advanced > advanced) {
                         waitingFor++
                         continue
@@ -96,6 +104,7 @@ internal class ChoiceParser<IN, OUT>(
                             failedChoices += optionResult.failedChoices
                             option.state = optionResult.parser
                             option.advanced += optionResult.advance
+                            option.matched = true
                             if (optionResult.advance == 0) {
                                 hasZeroAdvance = true
                             }
@@ -138,6 +147,7 @@ internal class ChoiceParser<IN, OUT>(
 
     internal class OptionState<IN> internal constructor(var state: ParseState<IN>, internal val continuation: OptionContinuation<*, *>) {
         var advanced = 0
+        var matched = false
 
         override fun toString(): String {
             return "{$state advances=$advanced}"

@@ -152,7 +152,9 @@ class SequenceOfChoiceTest : AbstractParseTest() {
         val parser = sequence(
             oneOf(
                 literal("abc", 1),
+                // prefix of the first option
                 literal("ab", 2),
+                // may match the same input as second option
                 replace(repeat(2, oneOf('a', 'b')), 3)
             ),
             literal("123", 4)

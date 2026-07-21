@@ -7,12 +7,12 @@ application {
     appName = "app"
     mainClass = "sample.MainKt"
     module.name = "sample.app"
-    targetJvmVersion = 21
+    targetJvmVersion = 17
 
     dependencies {
-        implementation(project(":kmp-lib"))
-        implementation(project(":kmp-lib-render"))
-        implementation(project(":jvm-lib"))
+        implementation(project(":kmp-lib-customized"))
+        implementation(project(":kmp-lib-render-customized"))
+        implementation(project(":jvm-lib-customized"))
     }
     test {
         implementation(versions.test.coordinates)

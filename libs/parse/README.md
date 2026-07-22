@@ -80,10 +80,11 @@ Binary combinators:
 
 Parsers that operate on any kind of input:
 
-- succeed() - matches zero input values, produces nothing
+- succeed() - always succeeds. Matches zero input values and produces nothing
     - succeed(result) - produces result
 - endOfInput() - matches end of input, produces nothing
     - endOfInput(result) - produces result
+- position() - always succeeds. Matches zero input values and produces the current position in the input stream 
 
 ## Combinators
 

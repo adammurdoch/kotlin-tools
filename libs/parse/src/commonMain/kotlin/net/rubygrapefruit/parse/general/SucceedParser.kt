@@ -26,7 +26,7 @@ internal class SucceedParser<OUT>(
         }
     }
 
-    private class SucceedPullParser<IN, OUT>(
+    internal class SucceedPullParser<IN, OUT>(
         val result: ValueProvider<OUT>,
         val next: ParseContinuation<IN, OUT>
     ) : PullParser<IN> {

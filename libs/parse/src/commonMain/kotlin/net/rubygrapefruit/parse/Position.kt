@@ -3,7 +3,7 @@ package net.rubygrapefruit.parse
 import kotlin.jvm.JvmInline
 
 /**
- * An absolute position in the input stream.
+ * An absolute position in an input stream.
  */
 @JvmInline
 value class Position(val value: Int) : Comparable<Position> {

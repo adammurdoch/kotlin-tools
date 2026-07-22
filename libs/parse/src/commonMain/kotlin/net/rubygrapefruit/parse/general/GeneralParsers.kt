@@ -15,3 +15,17 @@ fun succeed(): Parser<Any, Unit> {
 fun <OUT> succeed(result: OUT): Parser<Any, OUT> {
     return SucceedParser(result)
 }
+
+/**
+ * Returns a parser that matches the end of input. Does not consume any input or produce a result
+ */
+fun endOfInput(): Parser<Any, Unit> {
+    return EndOfInputParser(Unit)
+}
+
+/**
+ * Returns a parser that matches the end of input and produces the given result. Does not consume any input.
+ */
+fun <OUT> endOfInput(result: OUT): Parser<Any, OUT> {
+    return EndOfInputParser(result)
+}

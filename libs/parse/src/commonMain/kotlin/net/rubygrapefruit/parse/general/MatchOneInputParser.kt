@@ -66,5 +66,4 @@ internal class MatchOneInputParser<IN, ITEM, OUT, STREAM : BoxingInput<*, ITEM>>
             return next.failed(0, 0, expectation)
         }
     }
-
 }

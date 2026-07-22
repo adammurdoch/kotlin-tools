@@ -8,8 +8,13 @@ class PositionTest : AbstractParseTest() {
     fun `always succeeds`() {
         val parser = position()
 
+        parser.expecting {
+            expectPosition()
+        }
+
         parser.matches("", expected = Position.Zero)
 
+        // extra
         parser.doesNotMatch("X") {
             expectEndOfInput()
         }

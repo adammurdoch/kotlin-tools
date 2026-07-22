@@ -2,10 +2,7 @@ package net.rubygrapefruit.parse
 
 import net.rubygrapefruit.parse.binary.*
 import net.rubygrapefruit.parse.combinators.*
-import net.rubygrapefruit.parse.general.EndOfInputParser
-import net.rubygrapefruit.parse.general.MatchOneInputParser
-import net.rubygrapefruit.parse.general.MatchedInputParser
-import net.rubygrapefruit.parse.general.SucceedParser
+import net.rubygrapefruit.parse.general.*
 import net.rubygrapefruit.parse.stream.Input
 import net.rubygrapefruit.parse.text.*
 import kotlin.test.*
@@ -390,6 +387,8 @@ abstract class AbstractParseTest {
     interface CompiledParserFixture {
         fun expectSucceed(result: Any? = Unit)
 
+        fun expectPosition()
+
         fun expectEndOfInput(result: Any = Unit)
 
         fun expectLiteral(text: String, result: Any = Unit)
@@ -513,6 +512,18 @@ abstract class AbstractParseTest {
             override fun inspect(parser: CompiledParser<*, *>) {
                 assertIs<SucceedParser.SucceedCompiledParser<*, *>>(parser)
                 assertEquals(result, parser.result.get())
+            }
+        }
+
+        data object IsPosition : Inspector {
+            override val expected: List<String>
+                get() = emptyList()
+
+            override val mayBeEmpty: Boolean
+                get() = true
+
+            override fun inspect(parser: CompiledParser<*, *>) {
+                assertIs<PositionParser.PositionCompiledParser>(parser)
             }
         }
 
@@ -909,6 +920,10 @@ abstract class AbstractParseTest {
 
         override fun expectSucceed(result: Any?) {
             inspectors.add(Inspector.IsSucceed(result))
+        }
+
+        override fun expectPosition() {
+            inspectors.add(Inspector.IsPosition)
         }
 
         override fun expectEndOfInput(result: Any) {

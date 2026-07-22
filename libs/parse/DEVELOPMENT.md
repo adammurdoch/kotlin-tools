@@ -8,5 +8,8 @@ To add a new parser:
 - Document the factory functions in `README.md`
 - Add tests in a class that extends `AbstractParseTest`.
   - These tests should use only the factory functions, and literals if the parser is a combinator of some kind.
+  - Use `parser.expecting { }`
+  - Use `parser.matches()`
+  - Use `parser.doesNotMatch()`
 - Add `DiscardOf<parser>` test class.
 - Add additional tests that use the parser with other combinators, as required.

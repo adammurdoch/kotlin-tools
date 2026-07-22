@@ -3,6 +3,7 @@ package sample
 import net.rubygrapefruit.file.RegularFile
 import net.rubygrapefruit.parse.combinators.*
 import net.rubygrapefruit.parse.general.endOfInput
+import net.rubygrapefruit.parse.general.position
 import net.rubygrapefruit.parse.text.*
 
 class Parser {
@@ -37,7 +38,7 @@ class Parser {
         )
         val bareKey = match(oneOrMore(keyChar))
         val bareKeys = oneOrMore(bareKey, separator = literal("."))
-        val key = map(bareKeys) { Path(it) }
+        val key = sequence(position(), bareKeys) { position, path -> Path(position, path) }
 
         val quote = literal('"')
         val escape = literal("\\")
@@ -79,7 +80,7 @@ class Parser {
         value.parser(oneOf(basicString, literalString, number, boolean, array))
 
         val equals = sequence(optionalWhitespace, literal("="), optionalWhitespace)
-        val pair = sequence(key, equals, value) { key, value -> ValueTree(key, value) }
+        val pair = sequence(key, equals, value) { key, value -> KeyValuePairTree(key, value) }
         val pairLine = sequence(optionalWhitespace, pair, blankLine)
         val pairs = sequence(blankLines, zeroOrMore(sequence(pairLine, blankLines)))
 

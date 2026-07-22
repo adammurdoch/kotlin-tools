@@ -1,9 +1,14 @@
 package sample
 
-data class Path(val parts: List<String>)
+import net.rubygrapefruit.parse.Position
 
-data class ValueTree(val path: Path, val value: Any)
+data class Path(val position: Position, val parts: List<String>) {
+    val tail: Path
+        get() = Path(position, parts.drop(1))
+}
 
-class TableTree(val path: Path, val pairs: List<ValueTree>)
+data class KeyValuePairTree(val path: Path, val value: Any)
 
-class FileTree(val pairs: List<ValueTree>, val tables: List<TableTree>)
+class TableTree(val path: Path, val pairs: List<KeyValuePairTree>)
+
+class FileTree(val pairs: List<KeyValuePairTree>, val tables: List<TableTree>)

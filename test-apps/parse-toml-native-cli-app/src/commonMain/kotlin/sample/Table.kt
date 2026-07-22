@@ -1,5 +1,6 @@
 package sample
 
+import net.rubygrapefruit.parse.Position
 import sample.render.Terminal
 
 class Table private constructor(private val values: List<Value>) {
@@ -44,10 +45,13 @@ class Table private constructor(private val values: List<Value>) {
         fun add(path: Path, value: Any) {
             val name = path.parts.first()
             if (path.parts.size == 1) {
+                if (children.containsKey(name)) {
+                    throw IllegalArgumentException("Duplicate key '$name' at position ${path.position}")
+                }
                 children[name] = ValueBuilder(value)
             } else {
-                val builder = table(name)
-                val tail = Path(path.parts.drop(1))
+                val builder = table(name, path.position)
+                val tail = path.tail
                 builder.add(tail, value)
             }
         }
@@ -55,16 +59,24 @@ class Table private constructor(private val values: List<Value>) {
         fun addTable(path: Path): TableBuilder {
             val name = path.parts.first()
             return if (path.parts.size == 1) {
-                table(name)
+                table(name, path.position)
             } else {
-                val builder = table(name)
-                val tail = Path(path.parts.drop(1))
+                val builder = table(name, path.position)
+                val tail = path.tail
                 builder.addTable(tail)
             }
         }
 
-        private fun table(name: String): TableBuilder {
-            return children.getOrPut(name) { TableBuilder() } as TableBuilder
+        private fun table(name: String, position: Position): TableBuilder {
+            val builder = children[name]
+            if (builder is TableBuilder) {
+                return builder
+            } else if (builder != null) {
+                throw IllegalArgumentException("Duplicate key '$name' at position $position")
+            }
+            val newBuilder = TableBuilder()
+            children[name] = newBuilder
+            return newBuilder
         }
 
         private fun nodes(): List<Value> {

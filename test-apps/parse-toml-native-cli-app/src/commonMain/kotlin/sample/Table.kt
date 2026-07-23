@@ -3,7 +3,7 @@ package sample
 import net.rubygrapefruit.parse.Position
 import sample.render.Terminal
 
-class Table private constructor(private val values: List<Value>) {
+class Table private constructor(val values: List<Value>) {
     fun renderTo(terminal: Terminal, indent: String = "") {
         terminal.operator("{")
         println()

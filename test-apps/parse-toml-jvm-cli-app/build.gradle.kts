@@ -9,4 +9,7 @@ application {
         implementation("net.rubygrapefruit:parse:1.0")
         implementation(project(":kmp-lib-render"))
     }
+    test {
+        implementation(versions.test.coordinates)
+    }
 }

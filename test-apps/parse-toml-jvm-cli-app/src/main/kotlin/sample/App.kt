@@ -7,7 +7,7 @@ class App : CliApp("parse-toml-jvm-cli-app") {
     private val file by file(true).option("file").required()
 
     override fun run() {
-        val root = Parser().parse(file)
+        val root = TomlParser().parse(file)
         val terminal = terminal()
         root.renderTo(terminal)
     }

@@ -1,6 +1,7 @@
 
 # TODO
 
+- Install task fails because JVM image contains read-only files
 - Add `versions` as a project extension
 - Fail on duplicate `main()` functions
 - Add `dist --release`

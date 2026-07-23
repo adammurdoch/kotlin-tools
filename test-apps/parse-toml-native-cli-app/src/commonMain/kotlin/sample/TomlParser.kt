@@ -1,13 +1,16 @@
 package sample
 
 import net.rubygrapefruit.file.RegularFile
+import net.rubygrapefruit.parse.Parser
 import net.rubygrapefruit.parse.combinators.*
 import net.rubygrapefruit.parse.general.endOfInput
 import net.rubygrapefruit.parse.general.position
 import net.rubygrapefruit.parse.text.*
 
-class Parser {
-    fun parse(file: RegularFile): Table {
+class TomlParser {
+    private val parser: Parser<TextInput, FileTree>
+
+    init {
         val whitespace = discard(oneOf(' ', '\t'))
         val optionalWhitespace = zeroOrMore(whitespace)
 
@@ -88,10 +91,16 @@ class Parser {
         val tableHeader = sequence(tablePath, blankLine)
         val table = sequence(blankLines, tableHeader, pairs) { header, pairs -> TableTree(header, pairs) }
 
-        val tomlFile = sequence(pairs, zeroOrMore(table)) { a, b -> FileTree(a, b) }
+        parser = sequence(pairs, zeroOrMore(table)) { a, b -> FileTree(a, b) }
+    }
 
-        val leaves = tomlFile.parse(file.readText())
+    fun parse(file: RegularFile): Table {
+        val leaves = parser.parse(file.readText())
+        return Table.of(leaves.get())
+    }
 
+    fun parse(text: String): Table {
+        val leaves = parser.parse(text)
         return Table.of(leaves.get())
     }
 }

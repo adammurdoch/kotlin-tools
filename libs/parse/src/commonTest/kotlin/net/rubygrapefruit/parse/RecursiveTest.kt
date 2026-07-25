@@ -5,19 +5,15 @@ import net.rubygrapefruit.parse.text.TextInput
 import net.rubygrapefruit.parse.text.literal
 import net.rubygrapefruit.parse.text.parse
 import kotlin.test.Test
-import kotlin.test.fail
 
 class RecursiveTest : AbstractParseTest() {
     @Test
     fun `must define parser`() {
         val parser = recursive<TextInput, String>()
 
-        try {
+        failsWith<IllegalStateException> {
             parser.parse("??")
-        } catch (e: IllegalStateException) {
-            return
         }
-        fail()
     }
 
     @Test
@@ -25,11 +21,8 @@ class RecursiveTest : AbstractParseTest() {
         val parser = recursive<TextInput, String>()
 
         parser.parser(literal("abc", "1"))
-        try {
+        failsWith<IllegalStateException> {
             parser.parser(literal("123", "2"))
-        } catch (e: IllegalStateException) {
-            return
         }
-        fail()
     }
 }

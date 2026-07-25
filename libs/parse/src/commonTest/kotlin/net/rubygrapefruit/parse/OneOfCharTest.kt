@@ -2,7 +2,6 @@ package net.rubygrapefruit.parse
 
 import net.rubygrapefruit.parse.text.oneOf
 import kotlin.test.Test
-import kotlin.test.fail
 
 class OneOfCharTest : AbstractParseTest() {
     @Test
@@ -155,21 +154,15 @@ class OneOfCharTest : AbstractParseTest() {
 
     @Test
     fun `cannot provide list with single char`() {
-        try {
+        failsWith<IllegalArgumentException> {
             oneOf(listOf('a'))
-        } catch (e: IllegalArgumentException) {
-            return
         }
-        fail()
     }
 
     @Test
     fun `cannot provide empty list`() {
-        try {
+        failsWith<IllegalArgumentException> {
             oneOf(emptyList<Char>()) // type parameter to force correct overload
-        } catch (e: IllegalArgumentException) {
-            return
         }
-        fail()
     }
 }

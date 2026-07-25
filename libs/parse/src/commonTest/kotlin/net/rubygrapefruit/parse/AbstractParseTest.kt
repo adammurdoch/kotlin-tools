@@ -18,13 +18,17 @@ abstract class AbstractParseTest {
     }
 
     fun failsWith(failure: Exception, block: () -> Unit) {
-        try {
+        val e = assertFails {
             block()
-        } catch (e: RuntimeException) {
-            assertSame(failure, e)
-            return
         }
-        fail()
+        assertSame(failure, e)
+    }
+
+    inline fun <reified T : Throwable> failsWith(block: () -> Unit) {
+        val e = assertFails {
+            block()
+        }
+        assertIs<T>(e)
     }
 
     @JvmName("expectingChars")

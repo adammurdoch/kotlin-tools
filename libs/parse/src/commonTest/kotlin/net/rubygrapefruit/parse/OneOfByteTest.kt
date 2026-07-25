@@ -2,7 +2,6 @@ package net.rubygrapefruit.parse
 
 import net.rubygrapefruit.parse.binary.oneOf
 import kotlin.test.Test
-import kotlin.test.fail
 
 class OneOfByteTest : AbstractParseTest() {
     @Test
@@ -89,22 +88,15 @@ class OneOfByteTest : AbstractParseTest() {
 
     @Test
     fun `cannot provide list with single byte`() {
-        try {
+        failsWith<IllegalArgumentException> {
             oneOf(listOf(0x1))
-        } catch (e: IllegalArgumentException) {
-            return
         }
-        fail()
     }
 
     @Test
     fun `cannot provide empty list`() {
-        try {
+        failsWith<IllegalArgumentException> {
             oneOf(emptyList<Byte>()) // type parameter to force correct overload
-        } catch (e: IllegalArgumentException) {
-            return
         }
-        fail()
     }
-
 }

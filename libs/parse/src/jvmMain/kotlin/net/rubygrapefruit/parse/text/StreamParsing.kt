@@ -10,16 +10,11 @@ import java.io.Reader
  */
 fun <OUT> Parser<TextInput, OUT>.parse(reader: Reader): ParseResult<TextFailureContext, OUT> {
     val parser = pushParser()
-    val buffer = CharArray(16 * 1024)
-    while (true) {
-        val nread = reader.read(buffer)
-        if (nread < 0) {
-            break
-        }
-        val failure = parser.input(buffer, 0, nread)
-        if (failure != null) {
-            return failure
-        }
+    val failure = parser.takeFrom { buffer, offset, max ->
+        reader.read(buffer, offset, max)
+    }
+    if (failure != null) {
+        return failure
     }
     return parser.endOfInput()
 }

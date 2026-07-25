@@ -19,6 +19,24 @@ internal class DefaultTextPushParser<OUT>(
         return inputAvailable(input)
     }
 
+    /**
+     * Parses input provided by the given function. Calls the function when more input is required. The function should return the number of chars read into the array or -1
+     * on end of input.
+     */
+    override fun takeFrom(reader: (buffer: CharArray, offset: Int, max: Int) -> Int): ParseResult.Fail<TextFailureContext>? {
+        val buffer = CharArray(16 * 1024)
+        while (true) {
+            val nread = reader(buffer, 0, buffer.size)
+            if (nread < 0) {
+                return null
+            }
+            val failure = input(buffer, 0, nread)
+            if (failure != null) {
+                return failure
+            }
+        }
+    }
+
     override fun endOfInput(): ParseResult<TextFailureContext, OUT> {
         input.end()
         return endOfInput(input)

@@ -22,4 +22,12 @@ interface TextPushParser<OUT> : PushParser<TextFailureContext, OUT> {
      * If the parsing fails, returns the failure. Returns `null` to signal that more input is required.
      */
     fun input(chars: CharArray, offset: Int, count: Int): ParseResult.Fail<TextFailureContext>?
+
+    /**
+     * Parses input supplied by the given function. Calls the function when more input is required.
+     * The function should return the number of chars read into the array or -1 when the end of its input has been reached.
+     *
+     * This function does not call [endOfInput] when the end of the supplied input is reached, so that this parser can continue to receive more input.
+     */
+    fun takeFrom(reader: (buffer: CharArray, offset: Int, max: Int) -> Int): ParseResult.Fail<TextFailureContext>?
 }

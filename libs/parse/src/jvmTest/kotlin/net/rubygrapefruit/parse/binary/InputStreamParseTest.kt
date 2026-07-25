@@ -15,6 +15,11 @@ class InputStreamParseTest : AbstractParseTest() {
 
         val result = parser.parseStreamContaining(byteArrayOf(0x1, 0x2, 0x3))
         result.assertIsSuccess(3)
+
+        val longString = ByteArray(30000) { 0x2 }
+
+        val result2 = parser.parseStreamContaining(longString)
+        result2.assertIsSuccess(30000)
     }
 
     @Test
@@ -30,8 +35,6 @@ class InputStreamParseTest : AbstractParseTest() {
     }
 
     private fun <OUT> Parser<BinaryInput, OUT>.parseStreamContaining(bytes: ByteArray): ParseResult<BinaryFailureContext, OUT> {
-        val inputStream = ByteArrayInputStream(bytes)
-
-        return parse(inputStream)
+        return parse(ByteArrayInputStream(bytes))
     }
 }

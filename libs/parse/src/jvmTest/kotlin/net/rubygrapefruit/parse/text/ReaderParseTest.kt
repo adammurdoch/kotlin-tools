@@ -15,10 +15,15 @@ class ReaderParseTest : AbstractParseTest() {
 
         val result = parser.parseStreamContaining("abc")
         result.assertIsSuccess(3)
+
+        val longString = CharArray(30000) { 'a' }.concatToString()
+
+        val result2 = parser.parseStreamContaining(longString)
+        result2.assertIsSuccess(30000)
     }
 
     @Test
-    fun `fails when file contains additional text`() {
+    fun `fails when input contains additional text`() {
         val parser = oneInRange('a'..'z')
 
         val result = parser.parseStreamContaining("abc")

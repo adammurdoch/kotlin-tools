@@ -18,6 +18,20 @@ internal class DefaultBinaryPushParser<OUT>(
         return inputAvailable(input)
     }
 
+    override fun takeFrom(reader: (buffer: ByteArray, offset: Int, max: Int) -> Int): ParseResult.Fail<BinaryFailureContext>? {
+        val buffer = ByteArray(16 * 1024)
+        while (true) {
+            val nread = reader(buffer, 0, buffer.size)
+            if (nread < 0) {
+                return null
+            }
+            val failure = input(buffer, 0, nread)
+            if (failure != null) {
+                return failure
+            }
+        }
+    }
+
     override fun endOfInput(): ParseResult<BinaryFailureContext, OUT> {
         input.end()
         return endOfInput(input)

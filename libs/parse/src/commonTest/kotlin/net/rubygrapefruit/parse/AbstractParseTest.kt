@@ -5,6 +5,7 @@ import net.rubygrapefruit.parse.combinators.*
 import net.rubygrapefruit.parse.general.*
 import net.rubygrapefruit.parse.stream.Input
 import net.rubygrapefruit.parse.text.*
+import kotlin.jvm.JvmName
 import kotlin.test.*
 
 abstract class AbstractParseTest {
@@ -1268,3 +1269,5 @@ abstract class AbstractParseTest {
         }
     }
 }
+
+expect fun Throwable.fixStackTrace()

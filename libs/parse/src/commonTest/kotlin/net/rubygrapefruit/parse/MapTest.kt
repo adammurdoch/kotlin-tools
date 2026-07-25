@@ -39,7 +39,7 @@ class MapTest : AbstractParseTest() {
     fun `rethrows mapping failure`() {
         val failure = RuntimeException()
         val parser = map(literal("abc")) {
-            failure.fillInStackTrace()
+            failure.fixStackTrace()
             throw failure
         }
 

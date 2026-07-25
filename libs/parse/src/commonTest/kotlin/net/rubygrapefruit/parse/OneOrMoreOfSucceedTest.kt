@@ -1,7 +1,6 @@
 package net.rubygrapefruit.parse
 
 import net.rubygrapefruit.parse.combinators.oneOrMore
-import net.rubygrapefruit.parse.combinators.zeroOrMore
 import net.rubygrapefruit.parse.general.succeed
 import kotlin.test.Test
 

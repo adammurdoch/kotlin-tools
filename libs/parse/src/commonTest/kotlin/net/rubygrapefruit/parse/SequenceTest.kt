@@ -129,7 +129,7 @@ class SequenceTest : AbstractParseTest() {
     fun `rethrows mapping failure`() {
         val failure = RuntimeException()
         val parser = sequence(literal("a", 1), literal("b", 2)) { _, _ ->
-            failure.fillInStackTrace()
+            failure.fixStackTrace()
             throw failure
         }
 

@@ -79,7 +79,7 @@ class CheckTest : AbstractParseTest() {
     fun `rethrows mapping failure`() {
         val failure = RuntimeException()
         val parser = check<_, _, String>(literal("abc")) {
-            failure.fillInStackTrace()
+            failure.fixStackTrace()
             throw failure
         }
 

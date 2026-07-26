@@ -1159,6 +1159,10 @@ abstract class AbstractParseTest {
     interface ParseFailureFixture : ParseFixture {
         fun expect(text: String)
 
+        fun expectNewLine() {
+            expect("new line")
+        }
+
         fun expectEndOfInput() {
             expect("end of input")
         }

@@ -24,13 +24,12 @@ internal class DefaultTextPushParser<OUT>(
      * on end of input.
      */
     override fun takeFrom(reader: (buffer: CharArray, offset: Int, max: Int) -> Int): ParseResult.Fail<TextFailureContext>? {
-        val buffer = CharArray(16 * 1024)
         while (true) {
-            val nread = reader(buffer, 0, buffer.size)
+            val nread = input.appendFrom(reader)
             if (nread < 0) {
                 return null
             }
-            val failure = input(buffer, 0, nread)
+            val failure = inputAvailable(input)
             if (failure != null) {
                 return failure
             }

@@ -35,6 +35,13 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
         tail = tail.append(chars, offset, offset + count)
     }
 
+    fun appendFrom(reader: (buffer: CharArray, offset: Int, max: Int) -> Int): Int {
+        if (tail.isFull) {
+            tail = tail.appendBuffer()
+        }
+        return tail.appendFrom(reader)
+    }
+
     override fun advance(count: Int) {
         position += count
     }
@@ -58,6 +65,9 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
 
         val endIndex: Int
             get() = startIndex + writeIndex
+
+        val isFull: Boolean
+            get() = writeIndex == content.size
 
         fun get(index: Int): Char {
             return if (index < startIndex && previous != null) {
@@ -230,6 +240,19 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
 
         private fun appendToContent(chars: CharArray, start: Int, end: Int, count: Int) {
             chars.copyInto(content, writeIndex, start, end)
+            advanceWritePosition(count)
+        }
+
+        fun appendFrom(reader: (buffer: CharArray, start: Int, end: Int) -> Int): Int {
+            val available = content.size - writeIndex
+            val nread = reader(content, writeIndex, available)
+            if (nread > 0) {
+                advanceWritePosition(nread)
+            }
+            return nread
+        }
+
+        private fun advanceWritePosition(count: Int) {
             val endContent = writeIndex + count
             for (index in writeIndex until endContent) {
                 if (content[index] == '\n') {
@@ -242,7 +265,7 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
             writeIndex = endContent
         }
 
-        private fun appendBuffer(): Buffer {
+        fun appendBuffer(): Buffer {
             val next = Buffer(this, startIndex + writeIndex, endLine, endCol, content.size)
             this.next = next
             return next

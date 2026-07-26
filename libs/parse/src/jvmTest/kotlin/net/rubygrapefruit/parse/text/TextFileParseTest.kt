@@ -31,14 +31,16 @@ class TextFileParseTest : AbstractFileParseTest() {
 
     @Test
     fun `reports parse failure`() {
-        val parser = map(zeroOrMore(oneInRange('a'..'z'))) { it.size }
+        val parser = map(zeroOrMore(oneOf('a', 'b', '\n'))) { it.size }
 
-        val result = parser.parseFileContaining("abX\nc")
+        val result = parser.parseFileContaining("ab\naXb")
         result.assertIsFail {
-            failAt(2)
-            expectOneInRange('a', 'z')
+            failAt(4, line = 2, col = 2)
+            expectLiteral("a")
+            expectLiteral("b")
+            expectNewLine()
             expectEndOfInput()
-            expectContext("abX", "")
+            expectContext("a", "Xb")
         }
     }
 

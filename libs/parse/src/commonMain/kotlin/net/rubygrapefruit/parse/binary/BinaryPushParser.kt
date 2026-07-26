@@ -25,7 +25,9 @@ interface BinaryPushParser<OUT> : PushParser<BinaryFailureContext, OUT> {
 
     /**
      * Parses input supplied by the given function. Calls the function when more input is required.
+     *
      * The function should return the number of bytes read into the array or -1 when the end of its input has been reached.
+     * The function should only write into the specified segment of the array.
      *
      * This function does not call [endOfInput] when the end of the supplied input is reached, so that this parser can continue to receive more input.
      */

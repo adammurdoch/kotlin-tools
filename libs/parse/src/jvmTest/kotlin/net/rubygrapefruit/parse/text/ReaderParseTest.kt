@@ -34,6 +34,21 @@ class ReaderParseTest : AbstractParseTest() {
         }
     }
 
+    @Test
+    fun `reports parse failure`() {
+        val parser = map(zeroOrMore(oneOf('a', 'b', '\n'))) { it.size }
+
+        val result = parser.parseStreamContaining("ab\naXb")
+        result.assertIsFail {
+            failAt(4, line = 2, col = 2)
+            expectLiteral("a")
+            expectLiteral("b")
+            expectNewLine()
+            expectEndOfInput()
+            expectContext("a", "Xb")
+        }
+    }
+
     private fun <OUT> Parser<TextInput, OUT>.parseStreamContaining(text: String): ParseResult<TextFailureContext, OUT> {
         return parse(StringReader(text))
     }

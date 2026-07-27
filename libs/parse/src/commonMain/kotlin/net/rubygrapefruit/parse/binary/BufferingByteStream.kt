@@ -99,8 +99,12 @@ internal class BufferingByteStream(bufferLen: Int = 64 * 1024) : AdvancingByteSt
                 bytes.copyInto(content, writeIndex, offset, offset + count)
                 writeIndex += count
                 this
+            } else if (available > 0) {
+                bytes.copyInto(content, writeIndex, offset, offset + available)
+                writeIndex += available
+                appendBuffer().append(bytes, offset + available, count - available)
             } else {
-                TODO()
+                appendBuffer().append(bytes, offset, count)
             }
         }
 

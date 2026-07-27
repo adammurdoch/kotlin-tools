@@ -465,7 +465,7 @@ class BufferingCharStreamTest {
         val stream = BufferingCharStream(bufferLen = 4)
 
         stream.append("12")
-        val nread = stream.appendFrom { buffer, offset, max ->
+        val nread = stream.appendFrom { _, offset, max ->
             assertEquals(2, max)
             assertEquals(2, offset)
             0
@@ -481,7 +481,7 @@ class BufferingCharStreamTest {
         val stream = BufferingCharStream(bufferLen = 4)
 
         stream.append("12")
-        val nread = stream.appendFrom { buffer, offset, max ->
+        val nread = stream.appendFrom { _, offset, max ->
             assertEquals(2, max)
             assertEquals(2, offset)
             -1

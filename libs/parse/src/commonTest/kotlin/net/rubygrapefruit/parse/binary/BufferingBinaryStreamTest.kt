@@ -6,6 +6,39 @@ import kotlin.test.assertEquals
 
 class BufferingBinaryStreamTest {
     @Test
+    fun `can append bytes to overflow buffer`() {
+        val stream = BufferingByteStream(bufferLen = 4)
+
+        stream.append(byteArrayOf(0x1, 0x2))
+        stream.append(byteArrayOf(0x3, 0x4, 0x5, 0x6))
+
+        assertEquals(6, stream.available)
+
+        assertEquals(0x2, stream.get(1))
+        assertEquals(0x4, stream.get(3))
+        assertEquals(0x5, stream.get(4))
+        assertEquals(0x6, stream.get(5))
+
+        assertContentEquals(byteArrayOf(0x1, 0x2, 0x3, 0x4, 0x5, 0x6), stream.get(0, 6))
+    }
+
+    @Test
+    fun `can append bytes to full buffer`() {
+        val stream = BufferingByteStream(bufferLen = 4)
+
+        stream.append(byteArrayOf(0x1, 0x2, 0x3, 0x4))
+        stream.append(byteArrayOf(0x5, 0x6))
+
+        assertEquals(0x2, stream.get(1))
+        assertEquals(0x4, stream.get(3))
+        assertEquals(0x5, stream.get(4))
+        assertEquals(0x6, stream.get(5))
+
+        assertEquals(6, stream.available)
+        assertContentEquals(byteArrayOf(0x1, 0x2, 0x3, 0x4, 0x5, 0x6), stream.get(0, 6))
+    }
+
+    @Test
     fun `can append fewer than buffer len bytes using reader function`() {
         val stream = BufferingByteStream(bufferLen = 4)
 
@@ -37,6 +70,9 @@ class BufferingBinaryStreamTest {
         assertEquals(2, nread)
 
         assertEquals(4, stream.available)
+
+        assertEquals(0x2, stream.get(1))
+
         assertContentEquals(byteArrayOf(0x1, 0x2, 0x3, 0x4), stream.get(0, 4))
     }
 
@@ -55,6 +91,41 @@ class BufferingBinaryStreamTest {
         assertEquals(2, nread)
 
         assertEquals(6, stream.available)
+
+        assertEquals(0x2, stream.get(1))
+        assertEquals(0x4, stream.get(3))
+        assertEquals(0x5, stream.get(4))
+        assertEquals(0x6, stream.get(5))
+
         assertContentEquals(byteArrayOf(0x1, 0x2, 0x3, 0x4, 0x5, 0x6), stream.get(0, 6))
+    }
+
+    @Test
+    fun `can query slice from first buffer`() {
+        val stream = BufferingByteStream(bufferLen = 4)
+
+        stream.append(byteArrayOf(0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7))
+
+        assertContentEquals(byteArrayOf(0x2, 0x3), stream.get(1, 3))
+        assertContentEquals(byteArrayOf(0x2), stream.get(1, 2))
+    }
+
+    @Test
+    fun `can query slice from last buffer`() {
+        val stream = BufferingByteStream(bufferLen = 4)
+
+        stream.append(byteArrayOf(0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7))
+
+        assertContentEquals(byteArrayOf(0x5, 0x6), stream.get(4, 6))
+        assertContentEquals(byteArrayOf(0x6), stream.get(5, 6))
+    }
+
+    @Test
+    fun `can query slice from multiple buffers`() {
+        val stream = BufferingByteStream(bufferLen = 4)
+
+        stream.append(byteArrayOf(0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xA))
+
+        assertContentEquals(byteArrayOf(0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9), stream.get(2, 9))
     }
 }

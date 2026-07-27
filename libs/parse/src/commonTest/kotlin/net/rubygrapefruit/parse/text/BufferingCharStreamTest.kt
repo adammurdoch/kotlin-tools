@@ -428,7 +428,7 @@ class BufferingCharStreamTest {
     }
 
     @Test
-    fun `can append fewer than buffer len chars from reader function`() {
+    fun `can append fewer than buffer len chars using reader function`() {
         val stream = BufferingCharStream(bufferLen = 4)
 
         val nread = stream.appendFrom { buffer, offset, max ->
@@ -444,7 +444,7 @@ class BufferingCharStreamTest {
     }
 
     @Test
-    fun `can append from reader function to fill buffer`() {
+    fun `can append using reader function to fill buffer`() {
         val stream = BufferingCharStream(bufferLen = 4)
 
         stream.append("12")
@@ -458,6 +458,38 @@ class BufferingCharStreamTest {
         assertEquals(2, nread)
         assertEquals(4, stream.available)
         assertEquals("1234", stream.get(0, 4))
+    }
+
+    @Test
+    fun `can append zero chars using reader function`() {
+        val stream = BufferingCharStream(bufferLen = 4)
+
+        stream.append("12")
+        val nread = stream.appendFrom { buffer, offset, max ->
+            assertEquals(2, max)
+            assertEquals(2, offset)
+            0
+        }
+
+        assertEquals(0, nread)
+        assertEquals(2, stream.available)
+        assertEquals("12", stream.get(0, 2))
+    }
+
+    @Test
+    fun `reader function can signal end of input`() {
+        val stream = BufferingCharStream(bufferLen = 4)
+
+        stream.append("12")
+        val nread = stream.appendFrom { buffer, offset, max ->
+            assertEquals(2, max)
+            assertEquals(2, offset)
+            -1
+        }
+
+        assertEquals(-1, nread)
+        assertEquals(2, stream.available)
+        assertEquals("12", stream.get(0, 2))
     }
 
     @Test

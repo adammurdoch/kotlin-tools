@@ -7,8 +7,10 @@ import net.rubygrapefruit.parse.plus
 
 internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharStream {
     private var tail = Buffer(null, 0, 1, 1, bufferLen)
+
     override var position = Position.Zero
         private set
+
     override var finished: Boolean = false
         private set
 

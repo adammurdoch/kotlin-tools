@@ -4,8 +4,9 @@ import net.rubygrapefruit.parse.Position
 import net.rubygrapefruit.parse.minus
 import net.rubygrapefruit.parse.plus
 
-internal class BufferingByteStream : AdvancingByteStream {
-    private var tail = Buffer(null, 0)
+internal class BufferingByteStream(bufferLen: Int = 64 * 1024) : AdvancingByteStream {
+    private var tail = Buffer(bufferLen, null, 0)
+
     override var position = Position.Zero
         private set
 
@@ -35,6 +36,13 @@ internal class BufferingByteStream : AdvancingByteStream {
         tail = tail.append(bytes, offset, count)
     }
 
+    fun appendFrom(reader: (buffer: ByteArray, offset: Int, max: Int) -> Int): Int {
+        if (tail.isFull) {
+            tail = tail.appendBuffer()
+        }
+        return tail.appendFrom(reader)
+    }
+
     override fun advance(count: Int) {
         position += count
     }
@@ -43,12 +51,15 @@ internal class BufferingByteStream : AdvancingByteStream {
         finished = true
     }
 
-    private class Buffer(private val previous: Buffer?, private val startIndex: Int) {
+    private class Buffer(private val bufferLen: Int, private val previous: Buffer?, private val startIndex: Int) {
         private var writeIndex = 0
-        private val content = ByteArray(64 * 1024)
+        private val content = ByteArray(bufferLen)
 
         val endIndex: Int
             get() = startIndex + writeIndex
+
+        val isFull: Boolean
+            get() = writeIndex == content.size
 
         fun get(index: Int): Byte {
             return if (index < startIndex && previous != null) {
@@ -91,6 +102,19 @@ internal class BufferingByteStream : AdvancingByteStream {
             } else {
                 TODO()
             }
+        }
+
+        fun appendFrom(reader: (buffer: ByteArray, offset: Int, max: Int) -> Int): Int {
+            val available = content.size - writeIndex
+            val nread = reader(content, writeIndex, available)
+            if (nread > 0) {
+                writeIndex += nread
+            }
+            return nread
+        }
+
+        fun appendBuffer(): Buffer {
+            return Buffer(bufferLen, this, startIndex + writeIndex)
         }
     }
 }

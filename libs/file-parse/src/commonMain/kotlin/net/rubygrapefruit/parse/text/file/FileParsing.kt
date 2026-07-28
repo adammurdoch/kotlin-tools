@@ -1,4 +1,4 @@
-package net.ubygrapefruit.parse.text
+package net.rubygrapefruit.parse.text.file
 
 import net.rubygrapefruit.file.RegularFile
 import net.rubygrapefruit.parse.ParseResult
@@ -13,8 +13,12 @@ import net.rubygrapefruit.parse.text.pushParser
 fun <OUT> Parser<TextInput, OUT>.parse(file: RegularFile): ParseResult<TextFailureContext, OUT> {
     return file.read { source ->
         val parser = pushParser()
-        parser.takeFrom { buffer, offset, _ ->
-            if (source.request(1)) {
+        parser.takeFrom { buffer, offset, max ->
+            var count = 0
+            while (count < max) {
+                if (!source.request(1)) {
+                    break
+                }
                 val byte = source.readByte().toInt()
                 val ch = if (byte.and(0x80) == 0) {
                     Char(byte)
@@ -35,10 +39,13 @@ fun <OUT> Parser<TextInput, OUT>.parse(file: RegularFile): ParseResult<TextFailu
                 } else {
                     TODO()
                 }
-                buffer[offset] = ch
-                1
-            } else {
+                buffer[offset + count] = ch
+                count++
+            }
+            if (count == 0) {
                 -1
+            } else {
+                count
             }
         }
         parser.endOfInput()

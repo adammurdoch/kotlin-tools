@@ -9,11 +9,8 @@ import java.io.InputStream
  */
 fun <OUT> Parser<BinaryInput, OUT>.parse(inputStream: InputStream): ParseResult<BinaryFailureContext, OUT> {
     val parser = pushParser()
-    val failure = parser.takeFrom { buffer, offset, max ->
+    parser.takeFrom { buffer, offset, max ->
         inputStream.read(buffer, offset, max)
-    }
-    if (failure != null) {
-        return failure
     }
     return parser.endOfInput()
 }

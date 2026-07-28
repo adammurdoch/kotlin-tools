@@ -4,7 +4,7 @@ import net.rubygrapefruit.file.fixtures.AbstractFileTest
 import net.rubygrapefruit.parse.ParseResult
 import net.rubygrapefruit.parse.combinators.map
 import net.rubygrapefruit.parse.combinators.oneOrMore
-import net.ubygrapefruit.parse.text.parse
+import net.rubygrapefruit.parse.text.file.parse
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs

@@ -10,11 +10,8 @@ import java.io.Reader
  */
 fun <OUT> Parser<TextInput, OUT>.parse(reader: Reader): ParseResult<TextFailureContext, OUT> {
     val parser = pushParser()
-    val failure = parser.takeFrom { buffer, offset, max ->
+    parser.takeFrom { buffer, offset, max ->
         reader.read(buffer, offset, max)
-    }
-    if (failure != null) {
-        return failure
     }
     return parser.endOfInput()
 }

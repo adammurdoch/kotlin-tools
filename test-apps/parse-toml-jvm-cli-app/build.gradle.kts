@@ -4,9 +4,10 @@ plugins {
 
 application {
     dependencies {
-        implementation("net.rubygrapefruit:cli-app:1.0")
-        implementation("net.rubygrapefruit:file-io:1.0")
-        implementation("net.rubygrapefruit:parse:1.0")
+        implementation(versions.libs.coordinates("cli-app"))
+        implementation(versions.libs.coordinates("file-io"))
+        implementation(versions.libs.coordinates("parse"))
+        implementation(versions.libs.coordinates("file-parse"))
         implementation(project(":kmp-lib-render"))
     }
     test {

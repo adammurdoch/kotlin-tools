@@ -6,6 +6,7 @@ import net.rubygrapefruit.parse.combinators.*
 import net.rubygrapefruit.parse.general.endOfInput
 import net.rubygrapefruit.parse.general.position
 import net.rubygrapefruit.parse.text.*
+import net.rubygrapefruit.parse.text.file.parse
 
 class TomlParser {
     private val parser: Parser<TextInput, FileTree>
@@ -95,7 +96,7 @@ class TomlParser {
     }
 
     fun parse(file: RegularFile): Table {
-        val leaves = parser.parse(file.readText())
+        val leaves = parser.parse(file)
         return Table.of(leaves.get())
     }
 

@@ -48,6 +48,7 @@ Parsers that operate on text input:
 
 - digit() - matches '0'..'9', produces matched input char
 - integer() - matches '1'..'9' ('0'..'9')*, produces an int
+- endOfLine() - matches a line feed character (\n) or a carriage return character followed by a line feed character (\r\n), produces nothing
 
 Text combinators:
 

@@ -353,7 +353,7 @@ abstract class AbstractParseTest {
                 try {
                     get()
                 } catch (e: ParseException) {
-                    val lines = e.message?.lines() ?: emptyList()
+                    val lines = e.message?.split('\n') ?: emptyList()
                     assertEquals(3, lines.size)
                     assertEquals("$line | $failureLine", lines[0])
                     assertEquals(message, lines[2])

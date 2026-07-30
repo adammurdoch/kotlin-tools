@@ -5,6 +5,7 @@ import net.rubygrapefruit.parse.Parser
 import net.rubygrapefruit.parse.combinators.describedAs
 import net.rubygrapefruit.parse.combinators.discard
 import net.rubygrapefruit.parse.combinators.not
+import net.rubygrapefruit.parse.combinators.oneOf
 import net.rubygrapefruit.parse.combinators.sequence
 import net.rubygrapefruit.parse.general.MatchOneInputParser
 import net.rubygrapefruit.parse.general.MatchedInputParser
@@ -71,10 +72,17 @@ fun oneInRange(chars: CharRange): Parser<TextInput, Char> {
 }
 
 /**
- * Returns a parser that matches a digit (0..9)
+ * Returns a parser that matches a digit (`0`..`9`)
  */
 fun digit(): Parser<TextInput, Char> {
     return describedAs(oneInRange('0'..'9'), "a digit")
+}
+
+/**
+ * Returns a parser that matches the end of a line (`\n` or `\r\n`). Does not produce a result.
+ */
+fun endOfLine(): Parser<TextInput, Unit> {
+    return describedAs(oneOf(literal("\r\n"), literal("\n")), "end of line")
 }
 
 /**

@@ -2,7 +2,8 @@ To add a new parser:
 
 - Add factory functions and implementation.
   - Add these in one of `binary`, `text`, `general` or `combinators` package
-  - Implement one of `CombinatorBuilder`, `TypedInputCombinatorBuilder` or `ParserBuilder`
+  - If the parser is a straightforward composition of existing parsers (like `integer()` or `digit()`), wrap it in `describedAs(parser, "description")`.
+  - Otherwise, implement one of `CombinatorBuilder`, `TypedInputCombinatorBuilder` or `ParserBuilder`
   - Implement `DiscardableParser`
   - Alternatively, use `MatchOneInputParser` along with an `InputPredicate` implementation.
 - Document the factory functions in `README.md`

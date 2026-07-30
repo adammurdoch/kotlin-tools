@@ -24,7 +24,7 @@ Parsers
 - `integer(len)` and `integer(range)` - integer with given length
 - `long()`
 - Thousands separator in integers
-- Improve expected message for `not()` or perhaps `oneExcept()`
+- Improve expected message for `not()` or perhaps just `oneExcept()`
 - Line comment convenience
 - Quoted string convenience
 - `not()` discards failed choices of next and matched when it iterates
@@ -33,7 +33,7 @@ Parsers
 
 Performance
 
-- ParseContinuation.failed() chains up and along the grammar to the end continuation
+- `ParseContinuation.failed()` chains up and along the grammar to the end continuation
 - Optimize `oneExcept(oneOf(quote, endOfLine, endOfInput))`
 - Optimized implementation for `not(single-input)`
 - Optimized implementation for `optional(single-input)`
@@ -51,11 +51,11 @@ Performance
 - Discard buffered input once it is not required
 - Choice matches common prefix of options
 - Read from file/stream in parallel with parsing
+- `parse(RegularFile)` methods copies bytes into stream buffer, rather than reads directly into stream buffer
 
 Features
 
 - Parse kotlinx-io Source
-- Parse file-io files
 - Match location/region
 - Semantic errors
 - Android, iOS and wasm targets

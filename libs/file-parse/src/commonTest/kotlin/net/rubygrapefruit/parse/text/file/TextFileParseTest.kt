@@ -1,10 +1,12 @@
-package net.rubygrapefruit.parse.text
+package net.rubygrapefruit.parse.text.file
 
 import net.rubygrapefruit.file.fixtures.AbstractFileTest
 import net.rubygrapefruit.parse.ParseResult
 import net.rubygrapefruit.parse.combinators.map
 import net.rubygrapefruit.parse.combinators.oneOrMore
-import net.rubygrapefruit.parse.text.file.parse
+import net.rubygrapefruit.parse.text.match
+import net.rubygrapefruit.parse.text.one
+import net.rubygrapefruit.parse.text.oneInRange
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs

@@ -1,7 +1,11 @@
 package sample
 
 import net.rubygrapefruit.file.RegularFile
-import net.rubygrapefruit.parse.binary.*
+import net.rubygrapefruit.parse.binary.file.parse
+import net.rubygrapefruit.parse.binary.literal
+import net.rubygrapefruit.parse.binary.one
+import net.rubygrapefruit.parse.binary.uint16BigEndian
+import net.rubygrapefruit.parse.binary.uint16LittleEndian
 import net.rubygrapefruit.parse.combinators.*
 
 class Parser {
@@ -30,7 +34,7 @@ class Parser {
 
         val parser = oneOf(file64le, fileUniversal)
 
-        return parser.parse(file.readBytes()).get()
+        return parser.parse(file).get()
     }
 
     private fun cpu(cpuType: UInt, subType: UInt): CPU {

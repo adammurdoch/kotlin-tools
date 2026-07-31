@@ -70,7 +70,7 @@ internal class StringCharStream(val text: String) : AdvancingCharStream {
     private fun CharSequence.endLine(index: Int): Int {
         for (i in index until length) {
             if (get(i) == '\n') {
-                return i
+                return if (i > 0 && get(i - 1) == '\r') i - 1 else i
             }
         }
         return length

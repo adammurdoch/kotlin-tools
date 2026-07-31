@@ -145,7 +145,11 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
             var endLine = -1
             for (i in contentIndex until writeIndex) {
                 if (content[i] == '\n') {
-                    endLine = i
+                    if (i > 0 && content[i - 1] == '\r') {
+                        endLine = i - 1
+                    } else {
+                        endLine = i
+                    }
                     break
                 }
             }

@@ -38,5 +38,15 @@ class EndOfLineTest : AbstractParseTest() {
             expectContext("", "X")
             expectEndOfInput()
         }
+        parser.doesNotMatch("\n\n") {
+            failAt(1, 2, 1)
+            expectContext("", "")
+            expectEndOfInput()
+        }
+        parser.doesNotMatch("\n\r") {
+            failAt(1, 2, 1)
+            expectContext("", "\r")
+            expectEndOfInput()
+        }
     }
 }

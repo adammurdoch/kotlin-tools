@@ -43,9 +43,26 @@ Expected "a", "b"
             expectEndOfInput()
         }
 
+        // check formatting
         parser.failsWith(
-            "a,b,X,\n,b", """
-1 | a,b,X,
+            "X,a,b", """
+1 | X,a,b
+    ^
+Expected "a", "b", end of input
+""".trimIndent()
+        )
+
+        parser.doesNotMatch("a,b,X,a") {
+            failAt(4, 1, 5)
+            expectContext("a,b,", "X,a")
+            expectLiteral("a")
+            expectLiteral("b")
+        }
+
+        // check formatting
+        parser.failsWith(
+            "a,b,X,a", """
+1 | a,b,X,a
         ^
 Expected "a", "b"
 """.trimIndent()
@@ -61,11 +78,32 @@ Expected "a", "b"
             failAt(4, 1, 5)
             expectLiteral("a")
             expectLiteral("b")
-            expectContext("a,b,X", ",")
+            expectContext("a,b,", "X,")
         }
 
         parser.failsWith(
             "a,b,X,\n,b", """
+1 | a,b,X,
+        ^
+Expected "a", "b"
+""".trimIndent()
+        )
+    }
+
+    @Test
+    fun `reports location of failure on first line with cr-lf separator`() {
+        val item = oneOf('a', 'b')
+        val parser = zeroOrMore(item, separator = literal(","))
+
+        parser.doesNotMatch("a,b,X,\r\n,b") {
+            failAt(4, 1, 5)
+            expectLiteral("a")
+            expectLiteral("b")
+            expectContext("a,b,", "X,")
+        }
+
+        parser.failsWith(
+            "a,b,X,\r\n,b", """
 1 | a,b,X,
         ^
 Expected "a", "b"

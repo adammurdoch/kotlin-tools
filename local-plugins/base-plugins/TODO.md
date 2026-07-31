@@ -1,7 +1,6 @@
 
 # TODO
 
-- Install task fails because JVM image contains read-only files
 - Add `versions` as a project extension
 - Fail on duplicate `main()` functions
 - Add `dist --release`
@@ -20,6 +19,7 @@
   - Configurable installation location
   - Allow app-specific installation actions to be contributed, for example, generating a completion script
   - Add tests
+  - Use XDG base dirs: https://specifications.freedesktop.org/basedir/latest/
 - JVM app option to define JVM args when launching JVM
 - JVM app use Application Class Data Sharing
 - JVM app adds stub that checks current JVM version for no-jvm distribution

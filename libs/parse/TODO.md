@@ -19,7 +19,6 @@ Parsers
 - More convenient way to have a long sequence with the same separator, for example:
     - `sequence(..., separator = x, map)`, eg `sequence(a, b, c, d, separator = literal(",")) { ... }`
     - Or, `sequence()`, `oneOrMore()`, etc return Parser subtype that can have a prefix, separator, etc applied
-- `oneOf(list)`
 - Negative integers
 - `integer(len)` and `integer(range)` - integer with given length
 - `long()`

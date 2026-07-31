@@ -204,7 +204,7 @@ class BufferingCharStreamTest {
 
         stream.contextAt(0).apply {
             assertNotNull(this)
-            assertEquals(Position.Zero, position.position)
+            assertEquals(0, position.position)
             assertEquals(1, position.line)
             assertEquals(1, position.col)
             assertEquals("", lineText)
@@ -219,7 +219,7 @@ class BufferingCharStreamTest {
 
         stream.contextAt(5).apply {
             assertNotNull(this)
-            assertEquals(Position(5), position.position)
+            assertEquals(5, position.position)
             assertEquals(3, position.line)
             assertEquals(1, position.col)
             assertEquals("45", lineText)
@@ -227,7 +227,7 @@ class BufferingCharStreamTest {
 
         stream.contextAt(6).apply {
             assertNotNull(this)
-            assertEquals(Position(6), position.position)
+            assertEquals(6, position.position)
             assertEquals(3, position.line)
             assertEquals(2, position.col)
             assertEquals("45", lineText)
@@ -251,7 +251,7 @@ class BufferingCharStreamTest {
 
         stream.contextAt(5).apply {
             assertNotNull(this)
-            assertEquals(Position(5), position.position)
+            assertEquals(5, position.position)
             assertEquals(4, position.line)
             assertEquals(1, position.col)
             assertEquals("456", lineText)
@@ -259,7 +259,7 @@ class BufferingCharStreamTest {
 
         stream.contextAt(7).apply {
             assertNotNull(this)
-            assertEquals(Position(7), position.position)
+            assertEquals(7, position.position)
             assertEquals(4, position.line)
             assertEquals(3, position.col)
             assertEquals("456", lineText)
@@ -274,14 +274,36 @@ class BufferingCharStreamTest {
 
         stream.contextAt(1).apply {
             assertNotNull(this)
-            assertEquals(Position(1), position.position)
+            assertEquals(1, position.position)
             assertEquals(2, position.line)
             assertEquals(1, position.col)
             assertEquals("12", lineText)
         }
         stream.contextAt(2).apply {
             assertNotNull(this)
-            assertEquals(Position(2), position.position)
+            assertEquals(2, position.position)
+            assertEquals(2, position.line)
+            assertEquals(2, position.col)
+            assertEquals("12", lineText)
+        }
+    }
+
+    @Test
+    fun `can query context from line of previous buffer when cr-lf separator spans buffers`() {
+        val stream = BufferingCharStream(bufferLen = 4)
+
+        stream.append("\n12\r\n123")
+
+        stream.contextAt(1).apply {
+            assertNotNull(this)
+            assertEquals(1, position.position)
+            assertEquals(2, position.line)
+            assertEquals(1, position.col)
+            assertEquals("12", lineText)
+        }
+        stream.contextAt(2).apply {
+            assertNotNull(this)
+            assertEquals(2, position.position)
             assertEquals(2, position.line)
             assertEquals(2, position.col)
             assertEquals("12", lineText)
@@ -305,21 +327,21 @@ class BufferingCharStreamTest {
 
         stream.contextAt(3).apply {
             assertNotNull(this)
-            assertEquals(Position(3), position.position)
+            assertEquals(3, position.position)
             assertEquals(3, position.line)
             assertEquals(1, position.col)
             assertEquals("23456789", lineText)
         }
         stream.contextAt(7).apply {
             assertNotNull(this)
-            assertEquals(Position(7), position.position)
+            assertEquals(7, position.position)
             assertEquals(3, position.line)
             assertEquals(5, position.col)
             assertEquals("23456789", lineText)
         }
         stream.contextAt(10).apply {
             assertNotNull(this)
-            assertEquals(Position(10), position.position)
+            assertEquals(10, position.position)
             assertEquals(3, position.line)
             assertEquals(8, position.col)
             assertEquals("23456789", lineText)
@@ -327,38 +349,82 @@ class BufferingCharStreamTest {
     }
 
     @Test
-    fun `can query context from first line that spans multiple buffer`() {
+    fun `can query context from first line that spans multiple buffers`() {
         val stream = BufferingCharStream(bufferLen = 4)
 
         stream.append("123456789\na")
 
         stream.contextAt(0).apply {
             assertNotNull(this)
-            assertEquals(Position.Zero, position.position)
+            assertEquals(0, position.position)
             assertEquals(1, position.line)
             assertEquals(1, position.col)
             assertEquals("123456789", lineText)
         }
         stream.contextAt(2).apply {
             assertNotNull(this)
-            assertEquals(Position(2), position.position)
+            assertEquals(2, position.position)
             assertEquals(1, position.line)
             assertEquals(3, position.col)
             assertEquals("123456789", lineText)
         }
         stream.contextAt(5).apply {
             assertNotNull(this)
-            assertEquals(Position(5), position.position)
+            assertEquals(5, position.position)
             assertEquals(1, position.line)
             assertEquals(6, position.col)
             assertEquals("123456789", lineText)
         }
         stream.contextAt(8).apply {
             assertNotNull(this)
-            assertEquals(Position(8), position.position)
+            assertEquals(8, position.position)
             assertEquals(1, position.line)
             assertEquals(9, position.col)
             assertEquals("123456789", lineText)
+        }
+    }
+
+    @Test
+    fun `can query context from first line that spans multiple buffers and that has cr-lf separator`() {
+        val stream = BufferingCharStream(bufferLen = 4)
+
+        stream.append("123456789\r\na")
+
+        stream.contextAt(0).apply {
+            assertNotNull(this)
+            assertEquals(0, position.position)
+            assertEquals(1, position.line)
+            assertEquals(1, position.col)
+            assertEquals("123456789", lineText)
+        }
+        stream.contextAt(8).apply {
+            assertNotNull(this)
+            assertEquals(8, position.position)
+            assertEquals(1, position.line)
+            assertEquals(9, position.col)
+            assertEquals("123456789", lineText)
+        }
+    }
+
+    @Test
+    fun `can query context from first line that spans multiple buffers and that has cr-lf separator that spans multiple buffers`() {
+        val stream = BufferingCharStream(bufferLen = 4)
+
+        stream.append("1234567890A\r\na")
+
+        stream.contextAt(0).apply {
+            assertNotNull(this)
+            assertEquals(0, position.position)
+            assertEquals(1, position.line)
+            assertEquals(1, position.col)
+            assertEquals("1234567890A", lineText)
+        }
+        stream.contextAt(6).apply {
+            assertNotNull(this)
+            assertEquals(6, position.position)
+            assertEquals(1, position.line)
+            assertEquals(7, position.col)
+            assertEquals("1234567890A", lineText)
         }
     }
 
@@ -370,7 +436,7 @@ class BufferingCharStreamTest {
 
         stream.contextAt(1).apply {
             assertNotNull(this)
-            assertEquals(Position(1), position.position)
+            assertEquals(1, position.position)
             assertEquals(1, position.line)
             assertEquals(2, position.col)
             assertEquals("1", lineText)
@@ -378,7 +444,44 @@ class BufferingCharStreamTest {
 
         stream.contextAt(4).apply {
             assertNotNull(this)
-            assertEquals(Position(4), position.position)
+            assertEquals(4, position.position)
+            assertEquals(3, position.line)
+            assertEquals(1, position.col)
+            assertEquals("", lineText)
+        }
+    }
+
+    @Test
+    fun `can query context at end of line with cr-lf separator`() {
+        val stream = BufferingCharStream()
+
+        stream.append("1\r\n2\r\n\r\n")
+
+        stream.contextAt(1).apply {
+            assertNotNull(this)
+            assertEquals(1, position.position)
+            assertEquals(1, position.line)
+            assertEquals(2, position.col)
+            assertEquals("1", lineText)
+        }
+        stream.contextAt(2).apply {
+            assertNotNull(this)
+            assertEquals(2, position.position)
+            assertEquals(1, position.line)
+            assertEquals(2, position.col)
+            assertEquals("1", lineText)
+        }
+
+        stream.contextAt(6).apply {
+            assertNotNull(this)
+            assertEquals(6, position.position)
+            assertEquals(3, position.line)
+            assertEquals(1, position.col)
+            assertEquals("", lineText)
+        }
+        stream.contextAt(7).apply {
+            assertNotNull(this)
+            assertEquals(7, position.position)
             assertEquals(3, position.line)
             assertEquals(1, position.col)
             assertEquals("", lineText)
@@ -399,7 +502,7 @@ class BufferingCharStreamTest {
 
         stream.contextAt(0).apply {
             assertNotNull(this)
-            assertEquals(Position(0), position.position)
+            assertEquals(0, position.position)
             assertEquals(1, position.line)
             assertEquals(1, position.col)
             assertEquals("123", lineText)
@@ -420,7 +523,7 @@ class BufferingCharStreamTest {
 
         stream.contextAt(6).apply {
             assertNotNull(this)
-            assertEquals(Position(6), position.position)
+            assertEquals(6, position.position)
             assertEquals(3, position.line)
             assertEquals(3, position.col)
             assertEquals("34", lineText)
@@ -510,12 +613,14 @@ class BufferingCharStreamTest {
 
         stream.contextAt(4).apply {
             assertNotNull(this)
-            assertEquals(Position(4), position.position)
+            assertEquals(4, position.position)
             assertEquals(2, position.line)
             assertEquals(2, position.col)
             assertEquals("34", lineText)
         }
     }
+
+    private fun assertEquals(expected: Int, actual: Position) = assertEquals(Position(expected), actual)
 
     private fun BufferingCharStream.contextAt(position: Int) = contextAt(Position(position))
 

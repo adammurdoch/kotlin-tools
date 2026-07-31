@@ -145,15 +145,12 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
             var endLine = -1
             for (i in contentIndex until writeIndex) {
                 if (content[i] == '\n') {
-                    if (i > 0 && content[i - 1] == '\r') {
-                        endLine = i - 1
-                    } else {
-                        endLine = i
-                    }
+                    endLine = i
                     break
                 }
             }
             if (endLine < 0) {
+                // No end of line in this buffer
                 val next = next
                 if (next == null) {
                     if (!finished) {
@@ -161,6 +158,7 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
                     }
                     builder.endLine = startIndex + writeIndex
                 } else {
+                    // End of line is in a later buffer
                     if (!next.findEndFirstLine(builder, finished)) {
                         return null
                     }
@@ -169,8 +167,30 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
                 builder.endLine = startIndex + endLine
             }
 
+            val buffer = builder.endBuffer.maybeRewindCrLf(builder.endLine)
+            if (buffer != null) {
+                if (builder.endLine == index) {
+                    col--
+                }
+                builder.endBuffer = buffer
+                builder.endLine--
+            }
+
             val pos = CharPosition(Position(index), line, col)
             return AdvancingCharStream.TextStreamContext(pos, builder.endBuffer.get(builder.startLine, builder.endLine))
+        }
+
+        private fun maybeRewindCrLf(index: Int): Buffer? {
+            return if (index == startIndex + writeIndex) {
+                // No trailing \n
+                null
+            } else if (index > startIndex && content[index - startIndex - 1] == '\r') {
+                this
+            } else if (index == startIndex && previous != null && previous.content[previous.writeIndex - 1] == '\r') {
+                previous
+            } else {
+                null
+            }
         }
 
         private fun findStartLastLine(builder: ContextBuilder) {

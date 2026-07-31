@@ -74,6 +74,5 @@ internal class StringCharStream(val text: String) : AdvancingCharStream {
             }
         }
         return length
-
     }
 }

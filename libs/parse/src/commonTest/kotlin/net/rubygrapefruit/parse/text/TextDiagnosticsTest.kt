@@ -150,6 +150,20 @@ Expected ","
     }
 
     @Test
+    fun `reports location of failure at end of line with cr-lf separator`() {
+        val item = sequence(literal("a", 1), literal(","))
+        val line = sequence(item, literal("\r"))
+        val parser = zeroOrMore(line)
+
+        parser.doesNotMatch("a,\ra,\r\na,") {
+            failAt(6, 1, 6)
+            expectContext("a,\ra,", "")
+            expectLiteral("a")
+            expectEndOfInput()
+        }
+    }
+
+    @Test
     fun `reports location of failure at end of input`() {
         val item = sequence(literal("a", 1), literal(","))
         val line = sequence(item, literal("\n"))

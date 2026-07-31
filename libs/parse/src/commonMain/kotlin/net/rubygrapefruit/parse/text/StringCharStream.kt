@@ -28,17 +28,11 @@ internal class StringCharStream(val text: String) : AdvancingCharStream {
 
     override fun contextAt(position: Position): TextFailureContext {
         val offset = position.value
-        val pos = text.posAt(offset)
-        val lineText = text.line(offset)
-        return AdvancingCharStream.TextStreamContext(pos, lineText)
-    }
 
-    private fun CharSequence.posAt(index: Int): CharPosition {
         var line = 1
         var col = 1
-
-        for (i in 0 until index) {
-            if (get(i) == '\n') {
+        for (i in 0 until offset) {
+            if (text[i] == '\n') {
                 line++
                 col = 1
             } else {
@@ -46,16 +40,17 @@ internal class StringCharStream(val text: String) : AdvancingCharStream {
             }
         }
 
-        return CharPosition(Position(index), line, col)
-    }
-
-    private fun CharSequence.line(index: Int): String {
-        if (index == 0 && isEmpty()) {
-            return ""
+        val start = text.startLine(offset)
+        var end = text.endLine(offset)
+        if (end > 0 && end < text.length && text[end - 1] == '\r') {
+            if (end == offset) {
+                col--
+            }
+            end--
         }
-        val start = startLine(index)
-        val end = endLine(index)
-        return text.substring(start, end)
+
+        val pos = CharPosition(Position(offset), line, col)
+        return AdvancingCharStream.TextStreamContext(pos, text.substring(start, end))
     }
 
     private fun CharSequence.startLine(index: Int): Int {
@@ -70,7 +65,7 @@ internal class StringCharStream(val text: String) : AdvancingCharStream {
     private fun CharSequence.endLine(index: Int): Int {
         for (i in index until length) {
             if (get(i) == '\n') {
-                return if (i > 0 && get(i - 1) == '\r') i - 1 else i
+                return i
             }
         }
         return length

@@ -11,7 +11,7 @@ import net.rubygrapefruit.parse.Parser
  * @throws IllegalArgumentException if no parsers are given.
  */
 fun <IN, OUT> oneOf(vararg parsers: Parser<IN, OUT>): Parser<IN, OUT> {
-    return oneOf(parsers.toList())
+    return oneOfWithImmutableList(parsers.toList())
 }
 
 /**
@@ -23,6 +23,10 @@ fun <IN, OUT> oneOf(vararg parsers: Parser<IN, OUT>): Parser<IN, OUT> {
  * @throws IllegalArgumentException if no parsers are given.
  */
 fun <IN, OUT> oneOf(parsers: List<Parser<IN, OUT>>): Parser<IN, OUT> {
+    return oneOfWithImmutableList(parsers.toList())
+}
+
+private fun <IN, OUT> oneOfWithImmutableList(parsers: List<Parser<IN, OUT>>): Parser<IN, OUT> {
     require(parsers.isNotEmpty()) { "At least one parser must be provided." }
     return if (parsers.size == 1) parsers.first() else ChoiceParser(parsers)
 }

@@ -2,11 +2,7 @@ package net.rubygrapefruit.parse.text
 
 import net.rubygrapefruit.parse.Expectation
 import net.rubygrapefruit.parse.Parser
-import net.rubygrapefruit.parse.combinators.describedAs
-import net.rubygrapefruit.parse.combinators.discard
-import net.rubygrapefruit.parse.combinators.not
-import net.rubygrapefruit.parse.combinators.oneOf
-import net.rubygrapefruit.parse.combinators.sequence
+import net.rubygrapefruit.parse.combinators.*
 import net.rubygrapefruit.parse.general.MatchOneInputParser
 import net.rubygrapefruit.parse.general.MatchedInputParser
 
@@ -48,8 +44,8 @@ fun <OUT> literal(text: String, result: OUT): Parser<TextInput, OUT> {
 /**
  * Returns a parser that matches one of the given characters and produces the matched character as a result.
  */
-fun oneOf(first: Char, second: Char, vararg additionalChars: Char): Parser<TextInput, Char> {
-    return oneOf(listOf(first, second) + additionalChars.toList())
+fun oneOf(vararg chars: Char): Parser<TextInput, Char> {
+    return oneOf(chars.toList())
 }
 
 /**
@@ -57,9 +53,7 @@ fun oneOf(first: Char, second: Char, vararg additionalChars: Char): Parser<TextI
  */
 fun oneOf(chars: Collection<Char>): Parser<TextInput, Char> {
     val effective = chars.distinct()
-    if (effective.size < 2) {
-        throw IllegalArgumentException("2 or more characters required.")
-    }
+    require(effective.isNotEmpty()) { "At least one character must be provided." }
     val expectation = Expectation.oneOf(effective.map { Expectation.One(format(it)) })
     return MatchOneInputParser(OneOfCharPredicate(effective.toCharArray()), expectation)
 }

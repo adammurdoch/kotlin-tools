@@ -22,7 +22,7 @@ fun <IN, OUT> oneOf(vararg parsers: Parser<IN, OUT>): Parser<IN, OUT> {
  *
  * @throws IllegalArgumentException if no parsers are given.
  */
-fun <IN, OUT> oneOf(parsers: List<Parser<IN, OUT>>): Parser<IN, OUT> {
+fun <IN, OUT> oneOf(parsers: Collection<Parser<IN, OUT>>): Parser<IN, OUT> {
     return oneOfWithImmutableList(parsers.toList())
 }
 

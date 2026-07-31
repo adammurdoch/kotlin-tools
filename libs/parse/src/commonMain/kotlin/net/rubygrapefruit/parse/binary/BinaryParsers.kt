@@ -46,8 +46,8 @@ fun <OUT> literal(bytes: ByteArray, result: OUT): Parser<BinaryInput, OUT> {
 /**
  * Returns a parser that matches one of the given bytes and produces the matched byte as a result.
  */
-fun oneOf(first: Byte, second: Byte, vararg additional: Byte): Parser<BinaryInput, Byte> {
-    return oneOf(listOf(first, second) + additional.toList())
+fun oneOf(vararg bytes: Byte): Parser<BinaryInput, Byte> {
+    return oneOf(bytes.toList())
 }
 
 /**
@@ -55,9 +55,7 @@ fun oneOf(first: Byte, second: Byte, vararg additional: Byte): Parser<BinaryInpu
  */
 fun oneOf(bytes: Collection<Byte>): Parser<BinaryInput, Byte> {
     val effective = bytes.distinct()
-    if (effective.size < 2) {
-        throw IllegalArgumentException("2 or more bytes required.")
-    }
+    require(effective.isNotEmpty()) { "At least one byte must be provided." }
 
     val expectation = Expectation.oneOf(effective.map { Expectation.One(format(it)) })
     return MatchOneInputParser(OneOfBytePredicate(effective.toByteArray()), expectation)

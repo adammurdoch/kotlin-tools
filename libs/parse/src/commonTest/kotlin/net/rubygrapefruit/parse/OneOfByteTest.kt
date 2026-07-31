@@ -87,9 +87,44 @@ class OneOfByteTest : AbstractParseTest() {
     }
 
     @Test
-    fun `cannot provide list with single byte`() {
-        failsWith<IllegalArgumentException> {
-            oneOf(listOf(0x1))
+    fun `can provide a single byte`() {
+        val parser = oneOf(0x1)
+
+        parser.expecting {
+            expectOneOf(0x1)
+        }
+
+        parser.matches(0x1, expected = 0x1)
+
+        // missing
+        parser.doesNotMatch {
+            expectLiteral(0x1)
+        }
+
+        // unexpected
+        parser.doesNotMatch(0x2) {
+            expectLiteral(0x1)
+        }
+    }
+
+    @Test
+    fun `can provide list with single byte`() {
+        val parser = oneOf(listOf(0x1))
+
+        parser.expecting {
+            expectOneOf(0x1)
+        }
+
+        parser.matches(0x1, expected = 0x1)
+
+        // missing
+        parser.doesNotMatch {
+            expectLiteral(0x1)
+        }
+
+        // unexpected
+        parser.doesNotMatch(0x2) {
+            expectLiteral(0x1)
         }
     }
 

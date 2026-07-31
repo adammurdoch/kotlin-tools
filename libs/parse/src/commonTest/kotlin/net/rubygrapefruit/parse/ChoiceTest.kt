@@ -342,6 +342,13 @@ class ChoiceTest : AbstractParseTest() {
             )
         )
 
+        parser.expecting {
+            expectChoice {
+                expectLiteral("ab", result = 1)
+                expectLiteral("12", result = 2)
+            }
+        }
+
         parser.matches("ab", expected = 1)
         parser.matches("12", expected = 2)
 

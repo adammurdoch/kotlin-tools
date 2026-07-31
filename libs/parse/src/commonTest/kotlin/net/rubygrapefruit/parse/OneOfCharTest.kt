@@ -153,9 +153,44 @@ class OneOfCharTest : AbstractParseTest() {
     }
 
     @Test
-    fun `cannot provide list with single char`() {
-        failsWith<IllegalArgumentException> {
-            oneOf(listOf('a'))
+    fun `can provide a single char`() {
+        val parser = oneOf('a')
+
+        parser.expecting {
+            expectOneOf('a')
+        }
+
+        parser.matches("a", expected = 'a')
+
+        // missing
+        parser.doesNotMatch("") {
+            expectLiteral("a")
+        }
+
+        // unexpected
+        parser.doesNotMatch("X") {
+            expectLiteral("a")
+        }
+    }
+
+    @Test
+    fun `can provide list with single char`() {
+        val parser = oneOf(listOf('a'))
+
+        parser.expecting {
+            expectOneOf('a')
+        }
+
+        parser.matches("a", expected = 'a')
+
+        // missing
+        parser.doesNotMatch("") {
+            expectLiteral("a")
+        }
+
+        // unexpected
+        parser.doesNotMatch("X") {
+            expectLiteral("a")
         }
     }
 

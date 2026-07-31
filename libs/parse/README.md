@@ -93,7 +93,8 @@ Parsers that combine other parsers:
 
 Choice parsers:
 
-- oneOf(parsers) - produces result of first parser that matches
+- oneOf(parsers...) - produces result of first parser that matches
+    - oneOf(list) - overload that takes a list of parsers
 
 Sequence parsers:
 

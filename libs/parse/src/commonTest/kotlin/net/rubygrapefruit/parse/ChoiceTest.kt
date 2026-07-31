@@ -4,6 +4,8 @@ import net.rubygrapefruit.parse.binary.literal
 import net.rubygrapefruit.parse.combinators.oneOf
 import net.rubygrapefruit.parse.text.literal
 import kotlin.test.Test
+import kotlin.test.assertFailsWith
+import kotlin.test.assertSame
 
 class ChoiceTest : AbstractParseTest() {
     @Test
@@ -313,6 +315,54 @@ class ChoiceTest : AbstractParseTest() {
         parser.doesNotMatch("abc") {
             failAt(2)
             expectEndOfInput()
+        }
+    }
+
+    @Test
+    fun `returns the parser unchanged when a single parser is given`() {
+        val single = literal("ab")
+        val parser = oneOf(single)
+
+        assertSame(single, parser)
+    }
+
+    @Test
+    fun `fails when no parsers are given`() {
+        assertFailsWith<IllegalArgumentException> {
+            oneOf<String, Int>()
+        }
+    }
+
+    @Test
+    fun `matches parsers given as a list`() {
+        val parser = oneOf(
+            listOf(
+                literal("ab", 1),
+                literal("12", 2)
+            )
+        )
+
+        parser.matches("ab", expected = 1)
+        parser.matches("12", expected = 2)
+
+        parser.doesNotMatch("") {
+            expectLiteral("12")
+            expectLiteral("ab")
+        }
+    }
+
+    @Test
+    fun `returns the parser unchanged when a single parser is given as a list`() {
+        val single = literal("ab")
+        val parser = oneOf(listOf(single))
+
+        assertSame(single, parser)
+    }
+
+    @Test
+    fun `fails when an empty list is given`() {
+        assertFailsWith<IllegalArgumentException> {
+            oneOf(emptyList<Parser<String, Int>>())
         }
     }
 }

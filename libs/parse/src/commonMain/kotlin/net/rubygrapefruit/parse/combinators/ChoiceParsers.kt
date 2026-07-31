@@ -5,7 +5,24 @@ import net.rubygrapefruit.parse.Parser
 /**
  * Returns a parser that tries to apply one of the given parsers.
  * Parsers are (logically) attempted in the order provided and uses the result from the first parser that succeeds.
+ *
+ * When a single parser is given, returns that parser.
+ *
+ * @throws IllegalArgumentException if no parsers are given.
  */
-fun <IN, OUT> oneOf(first: Parser<IN, OUT>, second: Parser<IN, OUT>, vararg additionalChoices: Parser<IN, OUT>): Parser<IN, OUT> {
-    return ChoiceParser(listOf(first, second) + additionalChoices)
+fun <IN, OUT> oneOf(vararg parsers: Parser<IN, OUT>): Parser<IN, OUT> {
+    return oneOf(parsers.toList())
+}
+
+/**
+ * Returns a parser that tries to apply one of the given parsers.
+ * Parsers are (logically) attempted in the order provided and uses the result from the first parser that succeeds.
+ *
+ * When a single parser is given, returns that parser.
+ *
+ * @throws IllegalArgumentException if no parsers are given.
+ */
+fun <IN, OUT> oneOf(parsers: List<Parser<IN, OUT>>): Parser<IN, OUT> {
+    require(parsers.isNotEmpty()) { "At least one parser must be provided." }
+    return if (parsers.size == 1) parsers.first() else ChoiceParser(parsers)
 }

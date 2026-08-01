@@ -3,7 +3,7 @@ package net.rubygrapefruit.parse.combinators
 import net.rubygrapefruit.parse.ValueProvider
 
 /**
- * Accumulates a sequence of values into a final value.
+ * Accumulates zero or more values into a final value.
  *
  * Implementations are immutable.
  */

@@ -3,7 +3,9 @@ package net.rubygrapefruit.parse.combinators
 import net.rubygrapefruit.parse.stream.BoxingInput
 
 /**
- * Extracts a value from the next input value.
+ * Extracts a value from an input value.
+ *
+ * Implementations are immutable.
  */
 internal interface Extractor<in IN, out OUT> {
     fun extract(input: IN, index: Int): OUT

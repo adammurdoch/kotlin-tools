@@ -3,6 +3,8 @@ package net.rubygrapefruit.parse.combinators
 import net.rubygrapefruit.parse.ValueProvider
 
 /**
+ * Accumulates zero or more ranges of input values into a final value.
+ *
  * Implementations are immutable.
  */
 internal interface RangeAccumulator<in IN, out OUT> : ValueProvider<OUT> {

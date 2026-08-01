@@ -241,6 +241,27 @@ fun <IN, A, B, C, D, E, F, OUT> sequence(
 }
 
 /*
+ * 7 PART SEQUENCES
+ */
+
+/**
+ * Returns a parser that applies the given parsers in order.
+ * Uses the given mapping function to produce the result from the result of the parsers.
+ */
+fun <IN, A, B, C, D, E, F, G, OUT> sequence(
+    a: Parser<IN, A>,
+    b: Parser<IN, B>,
+    c: Parser<IN, C>,
+    d: Parser<IN, D>,
+    e: Parser<IN, E>,
+    f: Parser<IN, F>,
+    g: Parser<IN, G>,
+    map: (A, B, C, D, E, F, G) -> OUT
+): Parser<IN, OUT> {
+    return Sequence2Parser(a, seq6(b, c, d, e, f, g)) { a, tail -> map(a, tail.a, tail.b, tail.c, tail.d, tail.e, tail.f) }
+}
+
+/*
  * Tuple parsers.
  */
 
@@ -258,4 +279,8 @@ private fun <IN, A, B, C, D> seq4(a: Parser<IN, A>, b: Parser<IN, B>, c: Parser<
 
 private fun <IN, A, B, C, D, E> seq5(a: Parser<IN, A>, b: Parser<IN, B>, c: Parser<IN, C>, d: Parser<IN, D>, e: Parser<IN, E>): Parser<IN, Tuple5<A, B, C, D, E>> {
     return Sequence2Parser(a, seq4(b, c, d, e)) { a, tail -> Tuple5(a, tail) }
+}
+
+private fun <IN, A, B, C, D, E, F> seq6(a: Parser<IN, A>, b: Parser<IN, B>, c: Parser<IN, C>, d: Parser<IN, D>, e: Parser<IN, E>, f: Parser<IN, F>): Parser<IN, Tuple6<A, B, C, D, E, F>> {
+    return Sequence2Parser(a, seq5(b, c, d, e, f)) { a, tail -> Tuple6(a, tail) }
 }

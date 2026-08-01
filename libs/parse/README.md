@@ -104,6 +104,7 @@ Sequence parsers:
 - sequence(parser, parser, parser, parser, map) - produces result of map function
 - sequence(parser, parser, parser, parser, parser, map) - produces result of map function
 - sequence(parser, parser, parser, parser, parser, parser, map) - produces result of map function
+- sequence(parser, parser, parser, parser, parser, parser, parser, map) - produces result of map function
 - prefixed(parser, parser) - produces result of the second parser
     - sequence(unitParser, parser) - an alias
     - sequence(unitParser, parser, map) - produces result of map function applied to result of second parser

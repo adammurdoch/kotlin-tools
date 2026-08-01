@@ -13,3 +13,7 @@ internal class Tuple4<A, B, C, D>(val a: A, val b: B, val c: C, val d: D) {
 internal class Tuple5<A, B, C, D, E>(val a: A, val b: B, val c: C, val d: D, val e: E) {
     constructor(a: A, tail: Tuple4<B, C, D, E>) : this(a, tail.a, tail.b, tail.c, tail.d)
 }
+
+internal class Tuple6<A, B, C, D, E, F>(val a: A, val b: B, val c: C, val d: D, val e: E, val f: F) {
+    constructor(a: A, tail: Tuple5<B, C, D, E, F>) : this(a, tail.a, tail.b, tail.c, tail.d, tail.e)
+}

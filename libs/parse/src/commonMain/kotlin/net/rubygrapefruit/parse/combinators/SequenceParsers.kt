@@ -91,8 +91,8 @@ fun <IN> sequence(a: Parser<IN, Unit>, b: Parser<IN, Unit>, vararg additional: P
  * Uses the given mapping function to produce the result from the result of the parsers.
  */
 fun <IN, A, B, C, OUT> sequence(a: Parser<IN, A>, b: Parser<IN, B>, c: Parser<IN, C>, map: (A, B, C) -> OUT): Parser<IN, OUT> {
-    val tail = Sequence2Parser(b, c) { b, c -> Pair(b, c) }
-    return Sequence2Parser(a, tail) { a, tail -> map(a, tail.first, tail.second) }
+    val tail = Sequence2Parser(b, c) { b, c -> Tuple2(b, c) }
+    return Sequence2Parser(a, tail) { a, tail -> map(a, tail.a, tail.b) }
 }
 
 /**
@@ -169,9 +169,9 @@ fun <IN, A, B, C, D, OUT> sequence(
     d: Parser<IN, D>,
     map: (A, B, C, D) -> OUT
 ): Parser<IN, OUT> {
-    val tail1 = Sequence2Parser(c, d) { c, d -> Pair(c, d) }
-    val tail2 = Sequence2Parser(b, tail1) { b, tail -> Pair(b, tail) }
-    return Sequence2Parser(a, tail2) { a, tail -> map(a, tail.first, tail.second.first, tail.second.second) }
+    val tail1 = Sequence2Parser(c, d) { c, d -> Tuple2(c, d) }
+    val tail2 = Sequence2Parser(b, tail1) { b, tail -> Tuple3(b, tail) }
+    return Sequence2Parser(a, tail2) { a, tail -> map(a, tail.a, tail.b, tail.c) }
 }
 
 /*
@@ -190,10 +190,10 @@ fun <IN, A, B, C, D, E, OUT> sequence(
     e: Parser<IN, E>,
     map: (A, B, C, D, E) -> OUT
 ): Parser<IN, OUT> {
-    val tail1 = Sequence2Parser(d, e) { d, e -> Pair(d, e) }
-    val tail2 = Sequence2Parser(c, tail1) { c, tail -> Pair(c, tail) }
-    val tail3 = Sequence2Parser(b, tail2) { b, tail -> Pair(b, tail) }
-    return Sequence2Parser(a, tail3) { a, tail -> map(a, tail.first, tail.second.first, tail.second.second.first, tail.second.second.second) }
+    val tail1 = Sequence2Parser(d, e) { d, e -> Tuple2(d, e) }
+    val tail2 = Sequence2Parser(c, tail1) { c, tail -> Tuple3(c, tail) }
+    val tail3 = Sequence2Parser(b, tail2) { b, tail -> Tuple4(b, tail) }
+    return Sequence2Parser(a, tail3) { a, tail -> map(a, tail.a, tail.b, tail.c, tail.d) }
 }
 
 /**

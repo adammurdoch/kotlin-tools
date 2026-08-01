@@ -3,8 +3,33 @@ package net.rubygrapefruit.parse
 import net.rubygrapefruit.parse.combinators.sequence
 import net.rubygrapefruit.parse.text.literal
 import kotlin.test.Test
+import kotlin.test.assertSame
 
 class DiscardAllSequenceTest : AbstractParseTest() {
+    @Test
+    fun `always succeeds when no parser provided`() {
+        val parser = sequence<Any>()
+
+        parser.expecting {
+            expectSucceed()
+        }
+
+        parser.matches("")
+
+        // extra
+        parser.doesNotMatch("X") {
+            expectEndOfInput()
+        }
+    }
+
+    @Test
+    fun `matches 1 parser`() {
+        val literal = literal("a")
+        val parser = sequence(literal)
+
+        assertSame(parser, literal)
+    }
+
     @Test
     fun `matches 2 literals`() {
         val parser = sequence(literal("a"), literal("b"))
@@ -143,6 +168,26 @@ class DiscardAllSequenceTest : AbstractParseTest() {
         parser.doesNotMatch("abcdefX") {
             failAt(6)
             expectEndOfInput()
+        }
+    }
+
+    @Test
+    fun `can provide a list of parsers`() {
+        val parser = sequence(listOf(literal("a"), literal("b")))
+
+        parser.expecting {
+            expectSequence {
+                expectLiteral("a")
+                expectLiteral("b")
+            }
+        }
+
+        parser.matches("ab")
+
+        // unexpected
+        parser.doesNotMatch("aX") {
+            failAt(1)
+            expectLiteral("b")
         }
     }
 }

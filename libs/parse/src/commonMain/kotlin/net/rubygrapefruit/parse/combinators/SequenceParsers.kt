@@ -1,6 +1,7 @@
 package net.rubygrapefruit.parse.combinators
 
 import net.rubygrapefruit.parse.Parser
+import net.rubygrapefruit.parse.general.SucceedParser
 import kotlin.jvm.JvmName
 
 /*
@@ -69,16 +70,27 @@ fun <IN, INTERMEDIATE, OUT> sequence(parser: Parser<IN, INTERMEDIATE>, suffix: P
 
 /**
  * Returns a parser that applies the given parsers in order. Produces no result.
+ * Always succeeds and consumes no input when no parser provided.
  */
-fun <IN> sequence(a: Parser<IN, Unit>, b: Parser<IN, Unit>, vararg additional: Parser<IN, Unit>): Parser<IN, Unit> {
-    return if (additional.isEmpty()) {
-        sequence(a, b) { _, _ -> }
-    } else {
-        var tail = additional.last()
-        for (parser in additional.reversed().drop(1)) {
-            tail = sequence(parser, tail) { _, _ -> }
+fun <IN> sequence(vararg parsers: Parser<IN, Unit>): Parser<IN, Unit> {
+    return sequence(parsers.toList())
+}
+
+/**
+ * Returns a parser that applies the given parsers in order. Produces no result.
+ * Always succeeds and consumes no input when no parser provided.
+ */
+fun <IN> sequence(parsers: List<Parser<IN, Unit>>): Parser<IN, Unit> {
+    return when (parsers.size) {
+        0 -> SucceedParser(Unit)
+        1 -> parsers.first()
+        else -> {
+            var tail = parsers.last()
+            for (parser in parsers.reversed().drop(1)) {
+                tail = sequence(parser, tail) { _, _ -> }
+            }
+            tail
         }
-        sequence(a, b, tail) { _, _, _ -> }
     }
 }
 

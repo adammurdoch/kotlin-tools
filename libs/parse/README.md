@@ -120,7 +120,9 @@ Sequence parsers:
     - sequence(parser, unitParser, parser, map) - an alias
 - separated(parser, parser, parser, parser, parser, map) - produces result of map function applied to result of first, third and last parser
   - sequence(parser, unitParser, parser, unitParser, parser, map) - an alias
-- sequence(unitParser, unitParser, unitParser...) - produces no result
+- sequence(unitParsers) - produces no result
+  - sequence(unitParser...)
+  - sequence(list)
 - decide(parser, factory) - uses factory to create second parser from the result of the first parser
 
 Repeating parsers:

@@ -3,9 +3,9 @@ package net.rubygrapefruit.parse.general
 import net.rubygrapefruit.parse.*
 import net.rubygrapefruit.parse.stream.Input
 
-internal class SucceedParser<OUT>(
+internal class SucceedParser<IN, OUT>(
     private val result: OUT
-) : Parser<Any, OUT>, CombinatorBuilder<OUT>, DiscardableParser<Any> {
+) : Parser<IN, OUT>, CombinatorBuilder<OUT>, DiscardableParser<Any> {
     override fun withNoResult(): Parser<Any, Unit> {
         return SucceedParser(Unit)
     }
@@ -15,7 +15,7 @@ internal class SucceedParser<OUT>(
     }
 
     companion object {
-        val NoResult = SucceedParser(Unit)
+        val NoResult = SucceedParser<Any, _>(Unit)
     }
 
     internal class SucceedCompiledParser<IN, OUT>(

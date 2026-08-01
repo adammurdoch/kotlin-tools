@@ -6,8 +6,6 @@ import net.rubygrapefruit.parse.Parser
  * Returns a parser that tries to apply one of the given parsers.
  * Parsers are (logically) attempted in the order provided and uses the result from the first parser that succeeds.
  *
- * When a single parser is given, returns that parser.
- *
  * @throws IllegalArgumentException if no parsers are given.
  */
 fun <IN, OUT> oneOf(vararg parsers: Parser<IN, OUT>): Parser<IN, OUT> {
@@ -17,8 +15,6 @@ fun <IN, OUT> oneOf(vararg parsers: Parser<IN, OUT>): Parser<IN, OUT> {
 /**
  * Returns a parser that tries to apply one of the given parsers.
  * Parsers are (logically) attempted in the order provided and uses the result from the first parser that succeeds.
- *
- * When a single parser is given, returns that parser.
  *
  * @throws IllegalArgumentException if no parsers are given.
  */

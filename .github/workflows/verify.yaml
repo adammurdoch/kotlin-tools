@@ -61,7 +61,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
       - name: Execute Gradle build
-        run: ./gradlew test-apps:minTest verifySamples -x :test-apps:store-native-cli-app:verifySample -x :test-apps:native-cli-app-full:verifySample -x :test-apps:jvm-cli-app-native-binary-customized:nativeBinary --continue
+        run: ./gradlew test-apps:minTest verifySamples -x :test-apps:store-native-cli-app:verifySample -x :test-apps:native-cli-app-full:verifySample -x :test-apps:jvm-cli-app-native-binary-customized:verifySample --continue
         timeout-minutes: 30
   macos-check:
     runs-on: macos-latest

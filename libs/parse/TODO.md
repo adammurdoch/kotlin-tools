@@ -13,7 +13,7 @@ Parsers
 - `upTo(parser)`
 - `oneOf(pair<String, OUT>...)` convenience
 - `accept()` should not call function on a failed branch
-- `discard(parser<unit>...)` - alias for `sequence(parser<unit>...)`?
+- `discard(parser<*>...)` - alias for `sequence(parser<unit>...)`?
 - `sequence(prefix, parser, separator, parser, suffix, map)`
 - `blankLine()` ?
 - More convenient way to have a long sequence with the same separator, for example:

@@ -1,8 +1,8 @@
 # AGENTS.md
 
-See `README.md` for the public API and `DEVELOPMENT.md` for the checklist to follow when adding a new parser.
+See `README.md` for the public API and `DEVELOPMENT.md` for the checklist to follow when adding new parser functions.
 
-## Running tests
+## Verifying changes
 
 From the repo root:
 

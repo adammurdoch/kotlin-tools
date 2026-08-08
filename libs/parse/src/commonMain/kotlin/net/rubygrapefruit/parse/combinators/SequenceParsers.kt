@@ -37,6 +37,14 @@ fun <IN, OUT> sequence(prefix: Parser<IN, Unit>, parser: Parser<IN, OUT>): Parse
  * Returns a parser that applies the given parsers in order.
  * Uses the given mapping function to produce the result from the result of the second parser.
  */
+fun <IN, INTERMEDIATE, OUT> prefixed(prefix: Parser<IN, *>, parser: Parser<IN, INTERMEDIATE>, map: (INTERMEDIATE) -> OUT): Parser<IN, OUT> {
+    return sequence(discard(prefix), parser, map)
+}
+
+/**
+ * Returns a parser that applies the given parsers in order.
+ * Uses the given mapping function to produce the result from the result of the second parser.
+ */
 @JvmName("prefixSequence")
 fun <IN, INTERMEDIATE, OUT> sequence(prefix: Parser<IN, Unit>, parser: Parser<IN, INTERMEDIATE>, map: (INTERMEDIATE) -> OUT): Parser<IN, OUT> {
     return sequence(prefix, parser) { _, b -> map(b) }
@@ -57,6 +65,14 @@ fun <IN, OUT> suffixed(parser: Parser<IN, OUT>, suffix: Parser<IN, *>): Parser<I
 @JvmName("suffixSequence")
 fun <IN, OUT> sequence(parser: Parser<IN, OUT>, suffix: Parser<IN, Unit>): Parser<IN, OUT> {
     return sequence(parser, suffix) { a, _ -> a }
+}
+
+/**
+ * Returns a parser that applies the given parsers in order.
+ * Uses the given mapping function to produce the result from the result of the first parser.
+ */
+fun <IN, INTERMEDIATE, OUT> suffixed(parser: Parser<IN, INTERMEDIATE>, suffix: Parser<IN, *>, map: (INTERMEDIATE) -> OUT): Parser<IN, OUT> {
+    return sequence(parser, discard(suffix), map)
 }
 
 /**

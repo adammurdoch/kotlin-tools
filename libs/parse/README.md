@@ -107,12 +107,14 @@ Sequence parsers:
 - sequence(parser, parser, parser, parser, parser, parser, parser, map) - produces result of map function
 - prefixed(parser, parser) - produces result of the second parser
     - sequence(unitParser, parser) - an alias
-    - sequence(unitParser, parser, map) - produces result of map function applied to result of second parser
+- prefixed(parser, parser, map) - produces result of map function applied to result of second parser
+    - sequence(unitParser, parser, map) - an alias
 - prefixed(parser, parser, parser, map) - produces result of the second and third parsers
     - sequence(unitParser, parser, parser, map) - an alias
 - suffixed(parser, parser) - produces result of the first parser
     - sequence(parser, unitParser) - an alias
-    - sequence(parser, unitParser, map) - produces result of map function applied to result of first parser
+- suffixed(parser, parser, map) - produces result of map function applied to result of first parser
+    - sequence(parser, unitParser, map) - an alias
 - quoted(parser, parser, parser) - produces result of the middle parser
     - sequence(unitParser, parser, unitParser) - an alias
     - sequence(unitParser, parser, unitParser, map) - produces result of map function applied to result of middle parser
@@ -123,7 +125,7 @@ Sequence parsers:
 - sequence(unitParsers) - produces no result
   - sequence(unitParser...)
   - sequence(list)
-- decide(parser, factory) - uses factory to create second parser from the result of the first parser
+- decide(parser, factory) - uses factory function to create second parser from the result of the first parser
 
 Repeating parsers:
 

@@ -18,7 +18,7 @@ Parsers
 - `blankLine()` ?
 - More convenient way to have a long sequence with the same separator, for example:
     - `sequence(..., separator = x, map)`, eg `sequence(a, b, c, d, separator = literal(",")) { ... }`
-    - Or, `sequence()`, `oneOrMore()`, etc return Parser subtype that can have a prefix, separator, etc applied
+    - Or, `sequence()`, `oneOrMore()`, etc. return Parser subtype that can have a prefix, separator, etc. applied
 - Negative integers
 - `integer(len)` and `integer(range)` - integer with given length
 - `long()`
@@ -50,7 +50,7 @@ Performance
 - Discard buffered input once it is not required
 - Choice matches common prefix of options
 - Read from file/stream in parallel with parsing
-- `parse(RegularFile)` methods copies bytes into stream buffer, rather than reads directly into stream buffer
+- `parse(RegularFile)` methods currently copies bytes into stream buffer, but should read directly into stream buffer
 
 Features
 

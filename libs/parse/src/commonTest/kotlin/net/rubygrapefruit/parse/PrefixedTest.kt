@@ -71,5 +71,4 @@ class PrefixedTest : AbstractParseTest() {
             expectEndOfInput()
         }
     }
-
 }

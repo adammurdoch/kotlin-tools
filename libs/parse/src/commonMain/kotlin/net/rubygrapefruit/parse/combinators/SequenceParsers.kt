@@ -143,8 +143,16 @@ fun <IN, A, B, OUT> sequence(prefix: Parser<IN, Unit>, a: Parser<IN, A>, b: Pars
  * Returns a parser that applies the given parsers in order.
  * Produces the result of the middle parser.
  */
-fun <IN, OUT> quoted(prefix: Parser<IN, *>, parser: Parser<IN, OUT>, suffix: Parser<IN, *>): Parser<IN, OUT> {
+fun <IN, OUT> surrounded(prefix: Parser<IN, *>, parser: Parser<IN, OUT>, suffix: Parser<IN, *>): Parser<IN, OUT> {
     return sequence(discard(prefix), parser, discard(suffix))
+}
+
+/**
+ * Returns a parser that applies the given parsers in order.
+ * Uses the given mapping function to produce the result from the result of the middle parser.
+ */
+fun <IN, INTERMEDIATE, OUT> surrounded(prefix: Parser<IN, *>, parser: Parser<IN, INTERMEDIATE>, suffix: Parser<IN, *>, map: (INTERMEDIATE) -> OUT): Parser<IN, OUT> {
+    return sequence(discard(prefix), parser, discard(suffix), map)
 }
 
 /**

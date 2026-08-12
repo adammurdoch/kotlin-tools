@@ -4,6 +4,7 @@ import net.rubygrapefruit.parse.Expectation
 import net.rubygrapefruit.parse.Parser
 import net.rubygrapefruit.parse.combinators.discard
 import net.rubygrapefruit.parse.combinators.not
+import net.rubygrapefruit.parse.combinators.prefixed
 import net.rubygrapefruit.parse.combinators.sequence
 import net.rubygrapefruit.parse.general.MatchOneInputParser
 import net.rubygrapefruit.parse.general.MatchedInputParser
@@ -76,7 +77,7 @@ fun oneInRange(from: Byte, to: Byte): Parser<BinaryInput, Byte> {
  * Produces the matched byte as a result.
  */
 fun oneExcept(parser: Parser<BinaryInput, *>): Parser<BinaryInput, Byte> {
-    return sequence(not(parser), one())
+    return prefixed(not(parser), one())
 }
 
 /**

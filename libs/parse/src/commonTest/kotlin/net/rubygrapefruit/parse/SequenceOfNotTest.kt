@@ -14,7 +14,7 @@ class SequenceOfNotTest : AbstractParseTest() {
         val parser = sequence(
             not(literal(byteArrayOf(0x1), 1)),
             zeroOrMore(oneOf(0x1, 0x2))
-        )
+        ) { _, b -> b }
 
         parser.expecting {
             expectSequence {
@@ -80,7 +80,7 @@ class SequenceOfNotTest : AbstractParseTest() {
         val parser = sequence(
             not(literal(byteArrayOf(0x1, 0x2), 1)),
             zeroOrMore(oneOf(0x1, 0x2))
-        )
+        ) { _, b -> b }
 
         parser.expecting {
             expectSequence {
@@ -178,7 +178,7 @@ class SequenceOfNotTest : AbstractParseTest() {
         val parser = sequence(
             not(oneOf(0x1, 0x2)),
             zeroOrMore(oneOf(0x1, 0x2, 0x3, 0x4))
-        )
+        ) { _, b -> b }
 
         parser.expecting {
             expectSequence {
@@ -240,7 +240,7 @@ class SequenceOfNotTest : AbstractParseTest() {
         val parser = sequence(
             not(endOfInput(1)),
             zeroOrMore(oneOf(0x1, 0x2))
-        )
+        ) { _, b -> b }
 
         parser.expecting {
             expectSequence {
@@ -289,7 +289,7 @@ class SequenceOfNotTest : AbstractParseTest() {
                 )
             ),
             oneOrMore(one())
-        )
+        ) { _, b -> b }
 
         parser.expecting {
             expectSequence {
@@ -335,7 +335,7 @@ class SequenceOfNotTest : AbstractParseTest() {
                 }
             ),
             oneOrMore(one())
-        )
+        ) { _, b -> b }
 
         parser.matches("X", expected = listOf('X'))
         parser.matches("a!", expected = listOf('a', '!'))

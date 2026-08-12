@@ -21,16 +21,7 @@ fun <IN, A, B, OUT> sequence(a: Parser<IN, A>, b: Parser<IN, B>, map: (A, B) -> 
  * Produces the result of the second parser.
  */
 fun <IN, OUT> prefixed(prefix: Parser<IN, *>, parser: Parser<IN, OUT>): Parser<IN, OUT> {
-    return sequence(discard(prefix), parser)
-}
-
-/**
- * Returns a parser that applies the given parsers in order.
- * Produces the result of the second parser.
- */
-@JvmName("prefixSequence")
-fun <IN, OUT> sequence(prefix: Parser<IN, Unit>, parser: Parser<IN, OUT>): Parser<IN, OUT> {
-    return sequence(prefix, parser) { _, b -> b }
+    return sequence(discard(prefix), parser) { _, b -> b }
 }
 
 /**
@@ -38,16 +29,7 @@ fun <IN, OUT> sequence(prefix: Parser<IN, Unit>, parser: Parser<IN, OUT>): Parse
  * Uses the given mapping function to produce the result from the result of the second parser.
  */
 fun <IN, INTERMEDIATE, OUT> prefixed(prefix: Parser<IN, *>, parser: Parser<IN, INTERMEDIATE>, map: (INTERMEDIATE) -> OUT): Parser<IN, OUT> {
-    return sequence(discard(prefix), parser, map)
-}
-
-/**
- * Returns a parser that applies the given parsers in order.
- * Uses the given mapping function to produce the result from the result of the second parser.
- */
-@JvmName("prefixSequence")
-fun <IN, INTERMEDIATE, OUT> sequence(prefix: Parser<IN, Unit>, parser: Parser<IN, INTERMEDIATE>, map: (INTERMEDIATE) -> OUT): Parser<IN, OUT> {
-    return sequence(prefix, parser) { _, b -> map(b) }
+    return sequence(discard(prefix), parser) { _, b -> map(b) }
 }
 
 /**
@@ -136,7 +118,7 @@ fun <IN, A, B, OUT> prefixed(prefix: Parser<IN, *>, a: Parser<IN, A>, b: Parser<
  */
 @JvmName("prefixSequence")
 fun <IN, A, B, OUT> sequence(prefix: Parser<IN, Unit>, a: Parser<IN, A>, b: Parser<IN, B>, map: (A, B) -> OUT): Parser<IN, OUT> {
-    return sequence(prefix, sequence(a, b, map))
+    return prefixed(prefix, sequence(a, b, map))
 }
 
 /**
@@ -161,7 +143,7 @@ fun <IN, INTERMEDIATE, OUT> surrounded(prefix: Parser<IN, *>, parser: Parser<IN,
  */
 @JvmName("quotedSequence")
 fun <IN, OUT> sequence(prefix: Parser<IN, Unit>, parser: Parser<IN, OUT>, suffix: Parser<IN, Unit>): Parser<IN, OUT> {
-    return sequence(prefix, sequence(parser, suffix))
+    return prefixed(prefix, sequence(parser, suffix))
 }
 
 /**
@@ -170,7 +152,7 @@ fun <IN, OUT> sequence(prefix: Parser<IN, Unit>, parser: Parser<IN, OUT>, suffix
  */
 @JvmName("quotedSequence")
 fun <IN, INTERMEDIATE, OUT> sequence(prefix: Parser<IN, Unit>, parser: Parser<IN, INTERMEDIATE>, suffix: Parser<IN, Unit>, map: (INTERMEDIATE) -> OUT): Parser<IN, OUT> {
-    return sequence(prefix, sequence(parser, suffix) { b, _ -> map(b) })
+    return prefixed(prefix, sequence(parser, suffix) { b, _ -> map(b) })
 }
 
 /**
@@ -186,7 +168,7 @@ fun <IN, A, B, OUT> separated(a: Parser<IN, A>, separator: Parser<IN, *>, b: Par
  * Produces the result of applying the given mapping function to the result of the first and last parsers.
  */
 fun <IN, A, B, OUT> sequence(a: Parser<IN, A>, separator: Parser<IN, Unit>, b: Parser<IN, B>, map: (A, B) -> OUT): Parser<IN, OUT> {
-    return sequence(a, sequence(separator, b), map)
+    return sequence(a, prefixed(separator, b), map)
 }
 
 /*
@@ -253,7 +235,7 @@ fun <IN, A, B, C, OUT> sequence(
     c: Parser<IN, C>,
     map: (A, B, C) -> OUT
 ): Parser<IN, OUT> {
-    return seq3(a, sequence(separator1, tuple2(b, sequence(separator2, c))), map)
+    return seq3(a, prefixed(separator1, tuple2(b, prefixed(separator2, c))), map)
 }
 
 /*

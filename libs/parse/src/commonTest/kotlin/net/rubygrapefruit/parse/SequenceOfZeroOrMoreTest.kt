@@ -1,9 +1,6 @@
 package net.rubygrapefruit.parse
 
-import net.rubygrapefruit.parse.combinators.not
-import net.rubygrapefruit.parse.combinators.oneOf
-import net.rubygrapefruit.parse.combinators.sequence
-import net.rubygrapefruit.parse.combinators.zeroOrMore
+import net.rubygrapefruit.parse.combinators.*
 import net.rubygrapefruit.parse.text.literal
 import net.rubygrapefruit.parse.text.one
 import net.rubygrapefruit.parse.text.oneOf
@@ -253,7 +250,7 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
     @Test
     fun `matches zero or more of any except literal then literal`() {
         val parser = sequence(
-            zeroOrMore(sequence(not(literal("!")), one())),
+            zeroOrMore(prefixed(not(literal("!")), one())),
             literal("!")
         )
 
@@ -301,7 +298,7 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
     @Test
     fun `matches zero or more of any except multi-char literal then multi-char literal`() {
         val parser = sequence(
-            zeroOrMore(sequence(not(literal("!!")), one())),
+            zeroOrMore(prefixed(not(literal("!!")), one())),
             literal("!!")
         )
 

@@ -84,7 +84,7 @@ fun endOfLine(): Parser<TextInput, Unit> {
  * Produces the matched character as a result.
  */
 fun oneExcept(parser: Parser<TextInput, *>): Parser<TextInput, Char> {
-    return sequence(not(parser), one())
+    return prefixed(not(parser), one())
 }
 
 /**

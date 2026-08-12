@@ -47,7 +47,7 @@ class TomlParser {
         val quote = literal('"')
         val escape = literal("\\")
         // not complete
-        val escapes = sequence(
+        val escapes = prefixed(
             escape,
             oneOf(
                 literal("\"", "\""),
@@ -86,7 +86,7 @@ class TomlParser {
         val equals = sequence(optionalWhitespace, literal("="), optionalWhitespace)
         val pair = sequence(key, equals, value) { key, value -> KeyValuePairTree(key, value) }
         val pairLine = sequence(optionalWhitespace, pair, blankLine)
-        val pairs = sequence(blankLines, zeroOrMore(sequence(pairLine, blankLines)))
+        val pairs = prefixed(blankLines, zeroOrMore(sequence(pairLine, blankLines)))
 
         val tablePath = sequence(literal("["), key, literal("]"))
         val tableHeader = sequence(tablePath, blankLine)

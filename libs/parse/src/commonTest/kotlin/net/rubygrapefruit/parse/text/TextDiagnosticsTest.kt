@@ -4,6 +4,7 @@ import net.rubygrapefruit.parse.AbstractParseTest
 import net.rubygrapefruit.parse.ParseException
 import net.rubygrapefruit.parse.Parser
 import net.rubygrapefruit.parse.combinators.sequence
+import net.rubygrapefruit.parse.combinators.suffixed
 import net.rubygrapefruit.parse.combinators.zeroOrMore
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -113,8 +114,8 @@ Expected "a", "b"
 
     @Test
     fun `reports location of failure on subsequent line`() {
-        val item = sequence(literal("a", 1), literal(","))
-        val line = sequence(item, literal("\n"))
+        val item = suffixed(literal("a", 1), literal(","))
+        val line = suffixed(item, literal("\n"))
         val parser = zeroOrMore(line)
 
         parser.doesNotMatch("a,\na,\naXX") {
@@ -132,8 +133,8 @@ Expected ","
 
     @Test
     fun `reports location of failure at end of line`() {
-        val item = sequence(literal("a", 1), literal(","))
-        val line = sequence(item, literal("\n"))
+        val item = suffixed(literal("a", 1), literal(","))
+        val line = suffixed(item, literal("\n"))
         val parser = zeroOrMore(line)
 
         parser.doesNotMatch("a,\na\na,") {
@@ -151,8 +152,8 @@ Expected ","
 
     @Test
     fun `reports location of failure at end of line with cr-lf separator`() {
-        val item = sequence(literal("a", 1), literal(","))
-        val line = sequence(item, literal("\r"))
+        val item = suffixed(literal("a", 1), literal(","))
+        val line = suffixed(item, literal("\r"))
         val parser = zeroOrMore(line)
 
         parser.doesNotMatch("a,\ra,\r\na,") {
@@ -165,8 +166,8 @@ Expected ","
 
     @Test
     fun `reports location of failure at end of input`() {
-        val item = sequence(literal("a", 1), literal(","))
-        val line = sequence(item, literal("\n"))
+        val item = suffixed(literal("a", 1), literal(","))
+        val line = suffixed(item, literal("\n"))
         val parser = sequence(line, line) { _, _ -> 1 }
 
         parser.doesNotMatch("a,\na") {

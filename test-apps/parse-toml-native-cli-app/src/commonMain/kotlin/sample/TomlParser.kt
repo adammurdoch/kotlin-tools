@@ -74,8 +74,8 @@ class TomlParser {
         val arrayWhitespace = sequence(blankLines, optionalWhitespace)
         val arrayPrefix = sequence(literal("["), arrayWhitespace)
         val arraySeparator = sequence(arrayWhitespace, literal(","), arrayWhitespace)
-        val arrayItem = sequence(value, arraySeparator)
-        val arrayLastItem = sequence(value, arrayWhitespace)
+        val arrayItem = suffixed(value, arraySeparator)
+        val arrayLastItem = suffixed(value, arrayWhitespace)
         // allow optional trailing ','
         val arrayItems = sequence(zeroOrMore(arrayItem), optional(arrayLastItem)) { a, b -> if (b == null) a else a + b }
         val arraySuffix = literal("]")
@@ -86,11 +86,11 @@ class TomlParser {
         val equals = sequence(optionalWhitespace, literal("="), optionalWhitespace)
         val pair = sequence(key, equals, value) { key, value -> KeyValuePairTree(key, value) }
         val pairLine = sequence(optionalWhitespace, pair, blankLine)
-        val pairs = prefixed(blankLines, zeroOrMore(sequence(pairLine, blankLines)))
+        val pairs = prefixed(blankLines, zeroOrMore(suffixed(pairLine, blankLines)))
 
         val tablePath = sequence(literal("["), key, literal("]"))
-        val tableHeader = sequence(tablePath, blankLine)
-        val table = sequence(blankLines, tableHeader, pairs) { header, pairs -> TableTree(header, pairs) }
+        val tableHeader = suffixed(tablePath, blankLine)
+        val table = prefixed(blankLines, tableHeader, pairs) { header, pairs -> TableTree(header, pairs) }
 
         parser = sequence(pairs, zeroOrMore(table)) { a, b -> FileTree(a, b) }
     }

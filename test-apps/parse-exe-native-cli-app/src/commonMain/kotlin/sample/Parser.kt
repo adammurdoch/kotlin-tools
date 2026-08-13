@@ -21,7 +21,8 @@ class Parser {
         val cpule = sequence(u32le, u32le) { cpu, subtype -> cpu(cpu, subtype) }
         val header64le = prefixed(magic64le, cpule)
         val image64le = map(header64le) { cpu -> listOf(MachOImage(cpu)) }
-        val file64le = sequence(image64le, discard(zeroOrMore(one())))
+        val discarded = discard(zeroOrMore(one()))
+        val file64le = suffixed(image64le, discarded)
 
         val magicUniversal = literal(byteArrayOf(0xca.toByte(), 0xfe.toByte(), 0xba.toByte(), 0xbe.toByte()))
 
@@ -30,7 +31,7 @@ class Parser {
 
         val binaryHeaders = decide(u32be) { repeat(it.toInt(), binaryHeader) }
         val executables = prefixed(magicUniversal, binaryHeaders)
-        val fileUniversal = sequence(executables, discard(zeroOrMore(one())))
+        val fileUniversal = suffixed(executables, discarded)
 
         val parser = oneOf(file64le, fileUniversal)
 

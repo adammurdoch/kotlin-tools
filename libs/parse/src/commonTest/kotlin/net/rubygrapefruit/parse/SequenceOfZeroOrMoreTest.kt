@@ -252,7 +252,7 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
         val parser = sequence(
             zeroOrMore(prefixed(not(literal("!")), one())),
             literal("!")
-        )
+        ) { a, _ -> a }
 
         parser.expecting {
             expectSequence {
@@ -300,7 +300,7 @@ class SequenceOfZeroOrMoreTest : AbstractParseTest() {
         val parser = sequence(
             zeroOrMore(prefixed(not(literal("!!")), one())),
             literal("!!")
-        )
+        ) { a, _ -> a }
 
         parser.expecting {
             expectSequence {

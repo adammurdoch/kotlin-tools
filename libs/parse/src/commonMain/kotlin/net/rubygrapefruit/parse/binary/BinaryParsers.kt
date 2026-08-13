@@ -5,7 +5,6 @@ import net.rubygrapefruit.parse.Parser
 import net.rubygrapefruit.parse.combinators.discard
 import net.rubygrapefruit.parse.combinators.not
 import net.rubygrapefruit.parse.combinators.prefixed
-import net.rubygrapefruit.parse.combinators.sequence
 import net.rubygrapefruit.parse.general.MatchOneInputParser
 import net.rubygrapefruit.parse.general.MatchedInputParser
 

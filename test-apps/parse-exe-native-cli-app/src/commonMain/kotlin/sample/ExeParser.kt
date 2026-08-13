@@ -1,15 +1,15 @@
 package sample
 
 import net.rubygrapefruit.file.RegularFile
+import net.rubygrapefruit.parse.Parser
+import net.rubygrapefruit.parse.binary.*
 import net.rubygrapefruit.parse.binary.file.parse
-import net.rubygrapefruit.parse.binary.literal
-import net.rubygrapefruit.parse.binary.one
-import net.rubygrapefruit.parse.binary.uint16BigEndian
-import net.rubygrapefruit.parse.binary.uint16LittleEndian
 import net.rubygrapefruit.parse.combinators.*
 
-class Parser {
-    fun parse(file: RegularFile): List<Image> {
+class ExeParser {
+    private val parser: Parser<BinaryInput, List<Image>>
+
+    init {
         val u16le = uint16LittleEndian()
         val u32le = sequence(u16le, u16le) { w1, w2 -> w2.toUInt().rotateLeft(16).or(w1.toUInt()) }
 
@@ -33,8 +33,10 @@ class Parser {
         val executables = prefixed(magicUniversal, binaryHeaders)
         val fileUniversal = suffixed(executables, discarded)
 
-        val parser = oneOf(file64le, fileUniversal)
+        parser = oneOf(file64le, fileUniversal)
+    }
 
+    fun parse(file: RegularFile): List<Image> {
         return parser.parse(file).get()
     }
 

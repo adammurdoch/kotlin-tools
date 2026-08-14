@@ -1,7 +1,6 @@
 package net.rubygrapefruit.parse
 
-import net.rubygrapefruit.parse.combinators.discard
-import net.rubygrapefruit.parse.combinators.sequence
+import net.rubygrapefruit.parse.combinators.surrounded
 import net.rubygrapefruit.parse.combinators.zeroOrMore
 import net.rubygrapefruit.parse.general.position
 import net.rubygrapefruit.parse.text.digit
@@ -11,8 +10,8 @@ import kotlin.test.Test
 class SequenceOfPositionTest : AbstractParseTest() {
     @Test
     fun `matches zero or more followed by position followed by literal`() {
-        val parser = sequence(
-            discard(zeroOrMore(digit())),
+        val parser = surrounded(
+            zeroOrMore(digit()),
             position(),
             literal("!")
         )

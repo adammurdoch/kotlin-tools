@@ -14,18 +14,18 @@ class Parser {
 
         val openParen = sequence(literal("("), optionalWhitespace)
         val closeParen = sequence(optionalWhitespace, literal(")"))
-        val parenExpression = sequence(openParen, expression, closeParen)
+        val parenExpression = surrounded(openParen, expression, closeParen)
         val operand = oneOf(number, parenExpression)
 
         val plus = sequence(optionalWhitespace, literal("+"), optionalWhitespace)
         val minus = sequence(optionalWhitespace, literal("-"), optionalWhitespace)
 
-        val addition = sequence(operand, plus, operand) { a, b -> Addition(a, b) }
-        val subtraction = sequence(operand, minus, operand) { a, b -> Subtraction(a, b) }
+        val addition = separated(operand, plus, operand) { a, b -> Addition(a, b) }
+        val subtraction = separated(operand, minus, operand) { a, b -> Subtraction(a, b) }
 
         expression.parser(oneOf(addition, subtraction, operand))
 
-        val statement = sequence(optionalWhitespace, expression, optionalWhitespace)
+        val statement = surrounded(optionalWhitespace, expression, optionalWhitespace)
 
         // expression = operand ("+" operand | "-" operand)*
         // operand = number | "(" expression ")"
@@ -39,7 +39,7 @@ class Parser {
         val blankLine = sequence(optionalWhitespace, literal("\n"))
         val blankLines = zeroOrMore(blankLine)
         val statements = oneOrMore(statement, separator = separator)
-        val parser = sequence(blankLines, statements, blankLines)
+        val parser = surrounded(blankLines, statements, blankLines)
 
         return parser.parse(text)
     }

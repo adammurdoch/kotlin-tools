@@ -59,11 +59,11 @@ class TomlParser {
             match(oneOrMore(oneExcept(oneOf(escape, quote, endLine))))
         )
         val basicStringBody = map(zeroOrMore(basicStringSpan)) { it.joinToString("") }
-        val basicString = sequence(quote, basicStringBody, quote)
+        val basicString = surrounded(quote, basicStringBody, quote)
 
         val singleQuote = literal("'")
         val literalStringBody = match(zeroOrMore(oneExcept(oneOf(singleQuote, endLine))))
-        val literalString = sequence(singleQuote, literalStringBody, singleQuote)
+        val literalString = surrounded(singleQuote, literalStringBody, singleQuote)
 
         val number = integer()
 
@@ -79,16 +79,16 @@ class TomlParser {
         // allow optional trailing ','
         val arrayItems = sequence(zeroOrMore(arrayItem), optional(arrayLastItem)) { a, b -> if (b == null) a else a + b }
         val arraySuffix = literal("]")
-        val array = sequence(arrayPrefix, arrayItems, arraySuffix)
+        val array = surrounded(arrayPrefix, arrayItems, arraySuffix)
 
         value.parser(oneOf(basicString, literalString, number, boolean, array))
 
         val equals = sequence(optionalWhitespace, literal("="), optionalWhitespace)
-        val pair = sequence(key, equals, value) { key, value -> KeyValuePairTree(key, value) }
-        val pairLine = sequence(optionalWhitespace, pair, blankLine)
+        val pair = separated(key, equals, value) { key, value -> KeyValuePairTree(key, value) }
+        val pairLine = surrounded(optionalWhitespace, pair, blankLine)
         val pairs = prefixed(blankLines, zeroOrMore(suffixed(pairLine, blankLines)))
 
-        val tablePath = sequence(literal("["), key, literal("]"))
+        val tablePath = surrounded(literal("["), key, literal("]"))
         val tableHeader = suffixed(tablePath, blankLine)
         val table = prefixed(blankLines, tableHeader, pairs) { header, pairs -> TableTree(header, pairs) }
 

@@ -2,7 +2,6 @@ package net.rubygrapefruit.parse.combinators
 
 import net.rubygrapefruit.parse.Parser
 import net.rubygrapefruit.parse.general.SucceedParser
-import kotlin.jvm.JvmName
 
 /*
  * 2 PART SEQUENCES
@@ -99,23 +98,6 @@ fun <IN, A, B, OUT> prefixed(prefix: Parser<IN, *>, a: Parser<IN, A>, b: Parser<
  * Produces the result of the middle parser.
  */
 fun <IN, OUT> surrounded(prefix: Parser<IN, *>, parser: Parser<IN, OUT>, suffix: Parser<IN, *>): Parser<IN, OUT> {
-    return sequence(discard(prefix), parser, discard(suffix))
-}
-
-/**
- * Returns a parser that applies the given parsers in order.
- * Uses the given mapping function to produce the result from the result of the middle parser.
- */
-fun <IN, INTERMEDIATE, OUT> surrounded(prefix: Parser<IN, *>, parser: Parser<IN, INTERMEDIATE>, suffix: Parser<IN, *>, map: (INTERMEDIATE) -> OUT): Parser<IN, OUT> {
-    return sequence(discard(prefix), parser, discard(suffix), map)
-}
-
-/**
- * Returns a parser that applies the given parsers in order.
- * Produces the result of the middle parser.
- */
-@JvmName("quotedSequence")
-fun <IN, OUT> sequence(prefix: Parser<IN, Unit>, parser: Parser<IN, OUT>, suffix: Parser<IN, Unit>): Parser<IN, OUT> {
     return prefixed(prefix, suffixed(parser, suffix))
 }
 
@@ -123,9 +105,8 @@ fun <IN, OUT> sequence(prefix: Parser<IN, Unit>, parser: Parser<IN, OUT>, suffix
  * Returns a parser that applies the given parsers in order.
  * Uses the given mapping function to produce the result from the result of the middle parser.
  */
-@JvmName("quotedSequence")
-fun <IN, INTERMEDIATE, OUT> sequence(prefix: Parser<IN, Unit>, parser: Parser<IN, INTERMEDIATE>, suffix: Parser<IN, Unit>, map: (INTERMEDIATE) -> OUT): Parser<IN, OUT> {
-    return prefixed(prefix, sequence(parser, suffix) { b, _ -> map(b) })
+fun <IN, INTERMEDIATE, OUT> surrounded(prefix: Parser<IN, *>, parser: Parser<IN, INTERMEDIATE>, suffix: Parser<IN, *>, map: (INTERMEDIATE) -> OUT): Parser<IN, OUT> {
+    return prefixed(prefix, suffixed(parser, suffix, map))
 }
 
 /**
@@ -133,14 +114,6 @@ fun <IN, INTERMEDIATE, OUT> sequence(prefix: Parser<IN, Unit>, parser: Parser<IN
  * Produces the result of applying the given mapping function to the result of the first and last parsers.
  */
 fun <IN, A, B, OUT> separated(a: Parser<IN, A>, separator: Parser<IN, *>, b: Parser<IN, B>, map: (A, B) -> OUT): Parser<IN, OUT> {
-    return sequence(a, discard(separator), b, map)
-}
-
-/**
- * Returns a parser that applies the given parsers in order.
- * Produces the result of applying the given mapping function to the result of the first and last parsers.
- */
-fun <IN, A, B, OUT> sequence(a: Parser<IN, A>, separator: Parser<IN, Unit>, b: Parser<IN, B>, map: (A, B) -> OUT): Parser<IN, OUT> {
     return sequence(a, prefixed(separator, b), map)
 }
 
@@ -190,21 +163,6 @@ fun <IN, A, B, C, OUT> separated(
     separator1: Parser<IN, *>,
     b: Parser<IN, B>,
     separator2: Parser<IN, *>,
-    c: Parser<IN, C>,
-    map: (A, B, C) -> OUT
-): Parser<IN, OUT> {
-    return sequence(a, discard(separator1), b, discard(separator2), c, map)
-}
-
-/**
- * Returns a parser that applies the given parsers in order.
- * Produces the result of applying the given mapping function to the result of the first, third and last parsers.
- */
-fun <IN, A, B, C, OUT> sequence(
-    a: Parser<IN, A>,
-    separator1: Parser<IN, Unit>,
-    b: Parser<IN, B>,
-    separator2: Parser<IN, Unit>,
     c: Parser<IN, C>,
     map: (A, B, C) -> OUT
 ): Parser<IN, OUT> {

@@ -114,14 +114,10 @@ Sequence parsers:
 - suffixed(parser, parser, map) - produces result of map function applied to result of first parser
 
 - surrounded(parser, parser, parser) - produces result of the middle parser
-    - sequence(unitParser, parser, unitParser) - an alias
 - surrounded(parser, parser, parser, map) - produces result of map function applied to result of middle parser
-    - sequence(unitParser, parser, unitParser, map) - an alias
 
 - separated(parser, parser, parser, map) - produces result of map function applied to result of first and last parser
-    - sequence(parser, unitParser, parser, map) - an alias
 - separated(parser, parser, parser, parser, parser, map) - produces result of map function applied to result of first, third and last parser
-  - sequence(parser, unitParser, parser, unitParser, parser, map) - an alias
 - sequence(unitParsers) - produces no result
   - sequence(unitParser...)
   - sequence(list)

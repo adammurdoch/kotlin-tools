@@ -118,6 +118,7 @@ Sequence parsers:
 
 - separated(parser, parser, parser, map) - produces result of map function applied to result of first and last parser
 - separated(parser, parser, parser, parser, parser, map) - produces result of map function applied to result of first, third and last parser
+
 - sequence(unitParsers) - produces no result
   - sequence(unitParser...)
   - sequence(list)

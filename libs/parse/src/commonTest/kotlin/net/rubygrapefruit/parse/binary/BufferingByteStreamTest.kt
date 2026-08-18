@@ -4,7 +4,7 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
-class BufferingBinaryStreamTest {
+class BufferingByteStreamTest {
     @Test
     fun `can append bytes to overflow buffer`() {
         val stream = BufferingByteStream(bufferLen = 4)
@@ -121,11 +121,24 @@ class BufferingBinaryStreamTest {
     }
 
     @Test
-    fun `can query slice from multiple buffers`() {
+    fun `can query slice that spans first and last buffers`() {
         val stream = BufferingByteStream(bufferLen = 4)
 
-        stream.append(byteArrayOf(0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xA))
+        stream.append(byteArrayOf(0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8))
 
-        assertContentEquals(byteArrayOf(0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9), stream.get(2, 9))
+        assertContentEquals(byteArrayOf(0x3, 0x4, 0x5, 0x6), stream.get(2, 6))
+        assertContentEquals(byteArrayOf(0x1, 0x2, 0x3, 0x4, 0x5, 0x6), stream.get(0, 6))
+        assertContentEquals(byteArrayOf(0x3, 0x4, 0x5, 0x6, 0x7, 0x8), stream.get(2, 8))
+    }
+
+    @Test
+    fun `can query slice that spans middle buffer`() {
+        val stream = BufferingByteStream(bufferLen = 4)
+
+        stream.append(byteArrayOf(0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xA, 0xB, 0xC))
+
+        assertContentEquals(byteArrayOf(0x7, 0x8, 0x9, 0xA), stream.get(6, 10))
+        assertContentEquals(byteArrayOf(0x3, 0x4, 0x5, 0x6), stream.get(2, 6))
+        assertContentEquals(byteArrayOf(0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xA), stream.get(2, 10))
     }
 }

@@ -182,7 +182,7 @@ class BufferingCharStreamTest {
     }
 
     @Test
-    fun `can query slice from multiple buffers`() {
+    fun `can query slice that spans first and last buffers`() {
         val stream = BufferingCharStream(bufferLen = 4)
 
         stream.append("12345678")
@@ -190,6 +190,17 @@ class BufferingCharStreamTest {
         assertEquals("3456", stream.get(2, 6))
         assertEquals("12345", stream.get(0, 5))
         assertEquals("345678", stream.get(2, 8))
+    }
+
+    @Test
+    fun `can query slice that spans middle buffer`() {
+        val stream = BufferingCharStream(bufferLen = 4)
+
+        stream.append("123456789ABC")
+
+        assertEquals("789A", stream.get(6, 10))
+        assertEquals("3456", stream.get(2, 6))
+        assertEquals("3456789A", stream.get(2, 10))
     }
 
     @Test

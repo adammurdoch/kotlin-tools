@@ -96,7 +96,7 @@ internal class BufferingCharStream(bufferLen: Int = 64 * 1024) : AdvancingCharSt
 
         private fun getInto(start: Int, end: Int, target: CharArray) {
             if (start >= startIndex || previous == null) {
-                content.copyInto(target, 0, start, end)
+                content.copyInto(target, 0, start - startIndex, end - startIndex)
             } else {
                 previous.getInto(start, startIndex, target)
                 content.copyInto(target, startIndex - start, 0, end - startIndex)

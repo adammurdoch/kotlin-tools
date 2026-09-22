@@ -18,7 +18,7 @@ class JvmApplicationBasePlugin : Plugin<Project> {
             plugins.apply("org.jetbrains.kotlin.jvm")
             plugins.apply(ApplicationBasePlugin::class.java)
             plugins.apply(ComponentBasePlugin::class.java)
-            plugins.apply(JvmConventionsPlugin::class.java)
+            plugins.apply(JvmComponentBasePlugin::class.java)
 
             componentRegistry.each<MutableJvmApplication> {
                 initialize { app ->
@@ -27,7 +27,7 @@ class JvmApplicationBasePlugin : Plugin<Project> {
                 }
 
                 derive { app ->
-                    JvmConventionsPlugin.addApiConstraints(target, "implementation")
+                    JvmComponentBasePlugin.addApiConstraints(target, "implementation")
 
                     val jarTask = tasks.named("jar", Jar::class.java)
                     val runtimeClasspath = configurations.getByName("runtimeClasspath")
@@ -49,7 +49,7 @@ class JvmApplicationBasePlugin : Plugin<Project> {
                     app.runtimeModulePath.from(jarTask.map { it.archiveFile })
                     app.runtimeModulePath.from(runtimeModulePath.map { it.outputDirectory.asFileTree.matching { it.include("*.jar") } })
 
-                    JvmConventionsPlugin.parallelTests(target)
+                    JvmComponentBasePlugin.parallelTests(target)
                 }
             }
         }

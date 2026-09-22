@@ -31,4 +31,9 @@ interface JvmComponent<D : Dependencies> {
      * Generated Kotlin source directories for this component.
      */
     val generatedSource: SetProperty<Directory>
+
+    /**
+     * Generated classpath resource directories for this component.
+     */
+    val generatedResources: SetProperty<Directory>
 }

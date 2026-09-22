@@ -17,7 +17,7 @@ class JvmLibraryPlugin : Plugin<Project> {
             plugins.apply("org.jetbrains.kotlin.jvm")
             plugins.apply(LibraryBasePlugin::class.java)
             plugins.apply(ComponentBasePlugin::class.java)
-            plugins.apply(JvmConventionsPlugin::class.java)
+            plugins.apply(JvmComponentBasePlugin::class.java)
 
             val lib = extensions.create(
                 JvmLibrary::class.java,
@@ -28,7 +28,7 @@ class JvmLibraryPlugin : Plugin<Project> {
             ) as DefaultJvmLibrary
             componentRegistry.register(lib)
 
-            JvmConventionsPlugin.addApiConstraints(this, "api")
+            JvmComponentBasePlugin.addApiConstraints(this, "api")
 
             val runtimeClasspath = configurations.getByName("runtimeClasspath")
             val apiConfig = configurations.getByName("api")
@@ -45,7 +45,7 @@ class JvmLibraryPlugin : Plugin<Project> {
             val sourceSet = extensions.getByType(SourceSetContainer::class.java).getByName("main")
             sourceSet.output.dir(moduleInfoCp)
 
-            JvmConventionsPlugin.parallelTests(this)
+            JvmComponentBasePlugin.parallelTests(this)
         }
     }
 }

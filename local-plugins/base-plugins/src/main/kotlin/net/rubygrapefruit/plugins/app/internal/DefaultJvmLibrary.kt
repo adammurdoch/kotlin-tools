@@ -9,7 +9,7 @@ abstract class DefaultJvmLibrary @Inject constructor(
     mainSourceSetName: String,
     testSourceSetName: String
 ) : DefaultJvmComponent<LibraryDependencies>(testSourceSetName), JvmLibrary, MutableComponent {
-    override val main = DefaultLibrarySourceSet(mainSourceSetName, generatedSource)
+    override val main = DefaultJvmLibrarySourceSet(mainSourceSetName, generatedSource, generatedResources)
 
     override fun dependencies(config: LibraryDependencies.() -> Unit) {
         main.dependencies.config()

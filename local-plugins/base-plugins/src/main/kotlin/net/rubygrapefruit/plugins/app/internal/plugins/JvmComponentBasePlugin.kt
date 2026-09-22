@@ -10,7 +10,7 @@ import org.gradle.api.tasks.testing.Test
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import kotlin.math.max
 
-class JvmConventionsPlugin : Plugin<Project> {
+class JvmComponentBasePlugin : Plugin<Project> {
     companion object {
         private fun javaVersion(project: Project, version: Provider<Int>) {
             project.run {
@@ -49,6 +49,13 @@ class JvmConventionsPlugin : Plugin<Project> {
             componentRegistry.each<TopLevelJvmComponent> {
                 derive { component ->
                     javaVersion(project, component.targetJvmVersion)
+                }
+            }
+            componentRegistry.each<HasGeneratedResources> {
+                derive { component ->
+                    deriveFromSourceSet(component.sourceSetName) { sourceSet ->
+                        sourceSet.resources.srcDir(component.generatedResources)
+                    }
                 }
             }
         }

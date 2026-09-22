@@ -17,9 +17,9 @@ class KmpLibraryPlugin : Plugin<Project> {
             plugins.apply(LibraryBasePlugin::class.java)
             plugins.apply(ComponentBasePlugin::class.java)
             plugins.apply(MultiPlatformComponentBasePlugin::class.java)
-            plugins.apply(JvmConventionsPlugin::class.java)
+            plugins.apply(JvmComponentBasePlugin::class.java)
 
-            JvmConventionsPlugin.addApiConstraints(project, "commonMainApi")
+            JvmComponentBasePlugin.addApiConstraints(project, "commonMainApi")
 
             componentRegistry.each<DefaultJvmLibrary> {
                 initialize { library ->

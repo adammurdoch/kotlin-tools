@@ -1,5 +1,6 @@
 package net.rubygrapefruit.plugins.app
 
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.Directory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
@@ -19,4 +20,9 @@ interface NativeUIApplication : Application, UiApplication, MultiPlatformCompone
      * Generated Kotlin source directories for this component.
      */
     val generatedSource: SetProperty<Directory>
+
+    /**
+     * Font files to include in the bundle for this component.
+     */
+    val fontFiles: ConfigurableFileCollection
 }

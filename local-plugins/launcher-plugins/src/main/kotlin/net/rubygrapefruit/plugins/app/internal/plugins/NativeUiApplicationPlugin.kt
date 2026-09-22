@@ -58,6 +58,9 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                             DefaultNativeUiAppDistribution::class.java
                         )
                         dist.launcherFile.set(executable.binaryFile)
+                        dist.withImage {
+                            includeFilesInDir("Fonts", app.fontFiles)
+                        }
                         registerSibling(dist)
                     }
                 }

@@ -17,6 +17,7 @@ class GradlePluginPlugin : Plugin<Project> {
             plugins.apply("java-gradle-plugin")
             plugins.apply("org.jetbrains.kotlin.jvm")
             plugins.apply(LibraryBasePlugin::class.java)
+            plugins.apply(ComponentBasePlugin::class.java)
             plugins.apply(JvmConventionsPlugin::class.java)
 
             repositories.mavenCentral()

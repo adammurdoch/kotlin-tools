@@ -1,7 +1,6 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.internal.*
-import net.rubygrapefruit.plugins.app.internal.component.MutableComponent
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 

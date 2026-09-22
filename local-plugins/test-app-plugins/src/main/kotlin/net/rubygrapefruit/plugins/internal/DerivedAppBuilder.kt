@@ -114,7 +114,7 @@ class DerivedJvmUiAppBuilder internal constructor(
     fun register(derivedFrom: SourceTree?): JvmUiApp {
         return container.add(name) { name, sampleDir ->
             val sourceDir = derivedFrom.generatedInto(sampleDir, "src/main", "src/test")
-            JvmUiApp(name, sampleDir, launcher, sourceDir)
+            JvmUiApp(name, sampleDir, launcher, null, sourceDir)
         }
     }
 }

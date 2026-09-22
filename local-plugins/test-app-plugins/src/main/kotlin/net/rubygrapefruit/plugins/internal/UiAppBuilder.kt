@@ -7,6 +7,7 @@ class JvmUiAppBuilder internal constructor(
     private val container: SampleContainer
 ) : UiAppBuilder() {
     private val derived = mutableListOf<DerivedJvmUiAppBuilder>()
+    private val expectedOutput = mutableListOf<String>()
 
     fun derive(name: String, config: DerivedJvmUiAppBuilder.() -> Unit = {}) {
         val builder = DerivedJvmUiAppBuilder(name, container)
@@ -14,9 +15,14 @@ class JvmUiAppBuilder internal constructor(
         derived.add(builder)
     }
 
+    fun expectedOutput(text: String) {
+        expectedOutput.add(text)
+    }
+
     internal fun register(): JvmUiApp {
         val app = container.add(name) { name, sampleDir ->
-            JvmUiApp(name, sampleDir, null, OriginSourceTree(sampleDir, "src/main", "src/test"))
+            val expectedOutput = if (expectedOutput.isEmpty()) null else expectedOutput
+            JvmUiApp(name, sampleDir, null, expectedOutput, OriginSourceTree(sampleDir, "src/main", "src/test"))
         }
         for (builder in derived) {
             builder.register(app.sourceTree)

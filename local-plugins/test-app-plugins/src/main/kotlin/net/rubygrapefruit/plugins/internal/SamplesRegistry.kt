@@ -238,28 +238,7 @@ private fun verify(app: App, distribution: AppDistribution, toolchainService: Ja
             } else {
                 null
             }
-            val outputStream = ByteArrayOutputStream()
-            val result = execOperations.exec {
-                it.commandLine(commandLine)
-                if (javaBinDir != null) {
-                    it.environment("PATH", javaBinDir.absolutePathString() + File.pathSeparatorChar + System.getenv("PATH"))
-                }
-                it.standardOutput = outputStream
-                it.errorOutput = outputStream
-                it.isIgnoreExitValue = true
-            }
-            val outputText = outputStream.toString(Charsets.UTF_8)
-            println("----")
-            println(outputText)
-            println("----")
-            result.assertNormalExitValue()
-
-            val expectedOutput = distribution.invocation.expectedOutput
-            for (text in expectedOutput) {
-                if (!outputText.contains(text)) {
-                    throw IllegalStateException("Expected text '$text' not found in output.")
-                }
-            }
+            runCommand(execOperations, commandLine, javaBinDir, distribution.invocation.expectedOutput)
         }
 
         is UiAppDistribution -> {
@@ -267,6 +246,40 @@ private fun verify(app: App, distribution: AppDistribution, toolchainService: Ja
             if (!distribution.launcher.isRegularFile()) {
                 throw IllegalStateException("Launcher file ${distribution.launcher} does not exist")
             }
+            if (distribution.invocation != null) {
+                val commandLine = distribution.invocation.commandLine
+                println("Run: ${commandLine.joinToString(" ")}")
+                runCommand(execOperations, commandLine, null, distribution.invocation.expectedOutput)
+            }
+        }
+    }
+}
+
+private fun runCommand(
+    execOperations: ExecOperations,
+    commandLine: List<String>,
+    javaBinDir: Path?,
+    expectedOutput: List<String>
+) {
+    val outputStream = ByteArrayOutputStream()
+    val result = execOperations.exec {
+        it.commandLine(commandLine)
+        if (javaBinDir != null) {
+            it.environment("PATH", javaBinDir.absolutePathString() + File.pathSeparatorChar + System.getenv("PATH"))
+        }
+        it.standardOutput = outputStream
+        it.errorOutput = outputStream
+        it.isIgnoreExitValue = true
+    }
+    val outputText = outputStream.toString(Charsets.UTF_8)
+    println("----")
+    println(outputText)
+    println("----")
+    result.assertNormalExitValue()
+
+    for (text in expectedOutput) {
+        if (!outputText.contains(text)) {
+            throw IllegalStateException("Expected text '$text' not found in output.")
         }
     }
 }

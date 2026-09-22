@@ -45,18 +45,33 @@ class UiAppDistribution(
     override val distDir: Path,
     override val binaries: AppDistribution.Binaries,
     override val canBuild: Boolean,
+    val invocation: CliAppInvocation?,
     val launcher: Path
 ) : AppDistribution {
     companion object {
-        fun of(name: String, distTask: String, distDir: Path, launcher: String?, architecture: Architecture, otherBinaries: List<String> = emptyList()): UiAppDistribution {
+        fun of(
+            name: String,
+            distTask: String,
+            distDir: Path,
+            launcher: String?,
+            architecture: Architecture,
+            expectedOutput: List<String>?,
+            otherBinaries: List<String> = emptyList()
+        ): UiAppDistribution {
             val binName = (launcher ?: name).capitalized()
             val contentsDir = distDir.resolve("${binName}.app/Contents")
             val launcher = contentsDir.resolve("MacOS/$binName")
+            val invocation = if (expectedOutput != null) {
+                BinaryInvocation(launcher, emptyList(), expectedOutput)
+            } else {
+                null
+            }
             return UiAppDistribution(
                 distTask,
                 distDir,
                 AppDistribution.Binaries(architecture, listOf(launcher) + otherBinaries.map { contentsDir.resolve(it) }),
                 Machine.thisMachine.isMacOS,
+                invocation,
                 launcher
             )
         }

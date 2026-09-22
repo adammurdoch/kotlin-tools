@@ -82,6 +82,7 @@ class JvmUiApp internal constructor(
     override val name: String,
     sampleDir: Path,
     launcher: String?,
+    expectedOutput: List<String>?,
     override val sourceTree: SourceTree
 ) : UiApp {
     override val distribution = UiAppDistribution.of(
@@ -90,6 +91,7 @@ class JvmUiApp internal constructor(
         sampleDir.resolve("build/dist"),
         launcher,
         Machine.thisMachine.architecture,
+        expectedOutput,
         listOf("jvm/bin/java")
     )
 
@@ -106,7 +108,7 @@ class NativeUiApp internal constructor(
     launcher: String?,
     override val sourceTree: SourceTree
 ) : UiApp {
-    override val distribution = UiAppDistribution.of(name, "dist", sampleDir.resolve("build/dist"), launcher, Machine.thisMachine.architecture)
+    override val distribution = UiAppDistribution.of(name, "dist", sampleDir.resolve("build/dist"), launcher, Machine.thisMachine.architecture, null)
 
     override val otherDistributions: List<UiAppDistribution>
         get() = emptyList()

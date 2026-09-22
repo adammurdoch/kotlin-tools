@@ -92,7 +92,7 @@ samples {
         deriveNative("store-native-cli-app")
     }
     jvmCliApp("jvm-cli-app-generated-source") {
-        expectedOutput("Generated app class")
+        expectedOutput("Generated JVM app class")
     }
 
     jvmCliApp("parse-jvm-cli-app") {

@@ -2,7 +2,10 @@ plugins {
     id("net.rubygrapefruit.jvm.cli-app")
 }
 
-val generatorTask = tasks.register<SourceGeneratorTask>("generateSource") {
+val resourceGeneratorTask = tasks.register<ResourceGeneratorTask>("generateResource") {
+    outputDir = layout.buildDirectory.dir("generated/resource")
+}
+val sourceGeneratorTask = tasks.register<SourceGeneratorTask>("generateSource") {
     outputDir = layout.buildDirectory.dir("generated/main")
 }
 
@@ -11,7 +14,22 @@ application {
         implementation(project(":jvm-lib-generated-source"))
         implementation(project(":kmp-lib-generated-source"))
     }
-    generatedSource.add(generatorTask.flatMap { it.outputDir })
+    generatedSource.add(sourceGeneratorTask.flatMap { it.outputDir })
+    generatedResources.add(resourceGeneratorTask.flatMap { it.outputDir })
+}
+
+abstract class ResourceGeneratorTask : DefaultTask() {
+    @get:OutputDirectory
+    abstract val outputDir: DirectoryProperty
+
+    @TaskAction
+    fun exec() {
+        val dir = outputDir.get().asFile
+        dir.deleteRecursively()
+        val sourceFile = dir.resolve("jvm-cli-app-message.txt")
+        sourceFile.parentFile.mkdirs()
+        sourceFile.writeText("Generated JVM app resource")
+    }
 }
 
 abstract class SourceGeneratorTask : DefaultTask() {
@@ -31,7 +49,7 @@ abstract class SourceGeneratorTask : DefaultTask() {
                 
                 class Generated {
                     fun log() {
-                        println("Generated app class")
+                        println("Generated JVM app class")
                     }
                 }
             """.trimIndent()

@@ -2,6 +2,9 @@ plugins {
     id("net.rubygrapefruit.kmp.lib")
 }
 
+val resourceGeneratorTask = tasks.register<ResourceGeneratorTask>("generateResource") {
+    outputDir = layout.buildDirectory.dir("generated/resource")
+}
 val commonGeneratorTask = tasks.register<SourceGeneratorTask>("generateCommonSource") {
     outputDir = layout.buildDirectory.dir("generated/common")
     className = "GeneratedCommon"
@@ -21,6 +24,7 @@ val macOSGeneratorTask = tasks.register<SourceGeneratorTask>("generateMacOSSourc
 library {
     jvm {
         generatedSource.add(jvmGeneratorTask.flatMap { it.outputDir })
+        generatedResources.add(resourceGeneratorTask.flatMap { it.outputDir })
     }
     nativeDesktop()
     macOS {
@@ -28,6 +32,20 @@ library {
     }
     browser()
     generatedSource.add(commonGeneratorTask.flatMap { it.outputDir })
+}
+
+abstract class ResourceGeneratorTask : DefaultTask() {
+    @get:OutputDirectory
+    abstract val outputDir: DirectoryProperty
+
+    @TaskAction
+    fun exec() {
+        val dir = outputDir.get().asFile
+        dir.deleteRecursively()
+        val sourceFile = dir.resolve("kmp-lib-message.txt")
+        sourceFile.parentFile.mkdirs()
+        sourceFile.writeText("Generated KMP JVM lib resource")
+    }
 }
 
 abstract class SourceGeneratorTask : DefaultTask() {

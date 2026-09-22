@@ -15,7 +15,7 @@ abstract class DefaultJvmCliApplication @Inject constructor(
     override val distributionContainer = DistributionContainer(project.tasks, objects, providers)
     override val runtimeModulePath: ConfigurableFileCollection = objects.fileCollection()
 
-    override val main: HasDependencies = DefaultSourceSet("main", generatedSource)
+    override val main: HasDependencies = DefaultJvmSourceSet("main", generatedSource, generatedResources)
 
     override fun dependencies(config: Dependencies.() -> Unit) {
         main.dependencies.config()

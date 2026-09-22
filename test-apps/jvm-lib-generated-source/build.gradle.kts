@@ -22,9 +22,9 @@ abstract class ResourceGeneratorTask : DefaultTask() {
     fun exec() {
         val dir = outputDir.get().asFile
         dir.deleteRecursively()
-        val sourceFile = dir.resolve("message.txt")
+        val sourceFile = dir.resolve("jvm-lib-message.txt")
         sourceFile.parentFile.mkdirs()
-        sourceFile.writeText("Generated JVM lib class")
+        sourceFile.writeText("Generated JVM lib resource")
     }
 }
 
@@ -44,8 +44,8 @@ abstract class SourceGeneratorTask : DefaultTask() {
                 package sample.lib.jvm.generated
                 
                 class GeneratedJvm {
-                    fun log(message: String) {
-                        println(message)
+                    fun log() {
+                        println("Generated JVM lib class")
                     }
                 }
             """.trimIndent()

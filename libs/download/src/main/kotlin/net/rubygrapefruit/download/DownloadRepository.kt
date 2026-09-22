@@ -18,10 +18,9 @@ import kotlin.io.path.*
 
 class DownloadRepository(private val silent: Boolean = false) {
     companion object {
-        val locks = ConcurrentHashMap<String, ReentrantLock>()
+        private val locks = ConcurrentHashMap<String, ReentrantLock>()
+        private val downloadsDir = File(System.getProperty("user.home"), "bin/downloads").toPath()
     }
-
-    private val downloadsDir = File(System.getProperty("user.home"), "bin/downloads").toPath()
 
     /**
      * Returns the directory containing the given installation, if present.

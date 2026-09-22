@@ -116,7 +116,6 @@ class DownloadRepository(private val silent: Boolean = false) {
                         Files.copy(instr, tmpFile, StandardCopyOption.REPLACE_EXISTING)
                     }
                     require(tmpFile.isRegularFile())
-                    actions.download(tmpFile)
 
                     tmpDir.createDirectories()
                     format.unpack(tmpFile, tmpDir)
@@ -137,11 +136,6 @@ class DownloadRepository(private val silent: Boolean = false) {
 
     interface Actions {
         /**
-         * Called when the distribution has been downloaded and prior to it being expanded.
-         */
-        fun onDownload(action: (Path) -> Unit)
-
-        /**
          * Called when the distribution has been expanded and prior to it being made visible.
          */
         fun onInstall(action: (Path) -> Unit)
@@ -149,11 +143,6 @@ class DownloadRepository(private val silent: Boolean = false) {
 
     private class DefaultActions : Actions {
         var install: (Path) -> Unit = {}
-        var download: (Path) -> Unit = {}
-
-        override fun onDownload(action: (Path) -> Unit) {
-            download = action
-        }
 
         override fun onInstall(action: (Path) -> Unit) {
             install = action

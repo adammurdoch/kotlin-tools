@@ -59,7 +59,7 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                         )
                         dist.launcherFile.set(executable.binaryFile)
                         dist.withImage {
-                            includeFilesInDir("Fonts", app.fontFiles)
+                            includeFilesInDir("Resources/Fonts", app.fontFiles)
                         }
                         registerSibling(dist)
                     }

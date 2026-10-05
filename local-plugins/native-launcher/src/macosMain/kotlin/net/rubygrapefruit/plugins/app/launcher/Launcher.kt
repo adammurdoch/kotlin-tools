@@ -5,6 +5,7 @@ import kotlinx.cinterop.convert
 import kotlinx.cinterop.pointed
 import kotlinx.cinterop.toKString
 import net.rubygrapefruit.app.launcher.finishMain
+import net.rubygrapefruit.app.launcher.propagateMainFailure
 import platform.Foundation.NSBundle
 import platform.posix.*
 
@@ -14,6 +15,9 @@ import platform.posix.*
 fun runMain(main: () -> Unit): Nothing {
     try {
         setupLogging()
+        // If the exception is reported and exitProcess() called, then macOS's "app crashed" UI is not shown
+        // So, let the exception propagate
+        propagateMainFailure()
         main()
         finishMain(null)
     } catch (e: Throwable) {

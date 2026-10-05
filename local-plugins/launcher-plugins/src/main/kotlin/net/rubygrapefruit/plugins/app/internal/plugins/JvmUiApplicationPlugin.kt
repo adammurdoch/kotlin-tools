@@ -7,10 +7,14 @@ import net.rubygrapefruit.plugins.app.internal.DefaultJvmUiApplication
 import net.rubygrapefruit.plugins.app.internal.HostMachine
 import net.rubygrapefruit.plugins.app.internal.componentRegistry
 import net.rubygrapefruit.plugins.app.internal.tasks.LauncherConf
+import net.rubygrapefruit.plugins.app.internal.tasks.NativeLauncher
 import net.rubygrapefruit.plugins.app.internal.tasks.NativeUiLauncher
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.attributes.Usage
+import org.gradle.api.tasks.SourceSetContainer
+import org.gradle.jvm.tasks.Jar
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 
 @Suppress("unused")
 class JvmUiApplicationPlugin : Plugin<Project> {
@@ -22,6 +26,31 @@ class JvmUiApplicationPlugin : Plugin<Project> {
 
             componentRegistry.each<DefaultJvmUiApplication> {
                 derive { app ->
+                    val generatorTask = tasks.register("generateLauncher", NativeLauncher::class.java) {
+                        it.sourceDirectory.set(layout.buildDirectory.dir("generated/ui-launcher"))
+                        it.packageName.set("ui")
+                        it.delegateMethod.set(app.mainClass.map { mainClass -> "${mainClass.substringBeforeLast('.')}.main" })
+                    }
+
+                    val sourceSets = extensions.getByType(SourceSetContainer::class.java)
+
+                    val sourceSet = sourceSets.create("launcher")
+                    sourceSet.java.setSrcDirs(emptyList<String>())
+                    sourceSet.resources.setSrcDirs(emptyList<String>())
+
+                    val kotlin = extensions.getByType(KotlinJvmProjectExtension::class.java)
+                    val kotlinSourceSet = kotlin.sourceSets.getByName("launcher")
+                    kotlinSourceSet.kotlin.setSrcDirs(emptyList<String>())
+                    kotlinSourceSet.generatedKotlin.srcDir(generatorTask.flatMap { it.sourceDirectory })
+                    kotlinSourceSet.dependencies {
+                        implementation("net.rubygrapefruit.plugins:ui-app-launcher:1.0-dev")
+                        implementation(sourceSets.getByName("main").output)
+                    }
+
+                    tasks.named("jar", Jar::class.java) {
+                        it.from(sourceSet.output)
+                    }
+
                     val machine = NativeMachine.MacOSArm64
                     // TODO - 'can build' flag is incorrect - it depends on the JVM to be embedded
                     val canBuild = HostMachine.current.canBeBuilt && HostMachine.current.machine == machine

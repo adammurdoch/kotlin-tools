@@ -12,19 +12,25 @@ abstract class NativeLauncher : DefaultTask() {
     abstract val sourceDirectory: DirectoryProperty
 
     @get:Input
-    abstract val entryPoint: Property<String>
+    abstract val packageName: Property<String>
 
     @get:Input
     abstract val delegateMethod: Property<String>
 
     @TaskAction
     fun generate() {
-        sourceDirectory.file("${entryPoint.get()}.kt").get().asFile.printWriter().use {
+        val sourceDir = sourceDirectory.get().asFile
+        sourceDir.deleteRecursively()
+        sourceDir.mkdirs()
+        sourceDir.resolve("Main.kt").printWriter().use {
             it.println(
                 """
+                // Generated file - do not edit
+                package ${packageName.get()}
+                   
                 import net.rubygrapefruit.app.ui.launcher.runMain
  
-                fun ${entryPoint.get()}(args: Array<String>) {
+                fun main(args: Array<String>) {
                     runMain {
                         ${delegateMethod.get()}(args)
                     }

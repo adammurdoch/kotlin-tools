@@ -5,9 +5,9 @@ plugins {
 group = versions.plugins.group
 
 library {
-    macOS {
-        dependencies {
-            implementation(project(":app-launcher"))
-        }
+    jvm()
+    macOS()
+    common {
+        implementation(project(":app-launcher"))
     }
 }

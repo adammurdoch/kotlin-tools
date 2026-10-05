@@ -15,13 +15,13 @@ import platform.posix.*
 fun runMain(main: () -> Unit): Nothing {
     try {
         setupLogging()
-        // If the exception is reported and exitProcess() called, then macOS's "app crashed" UI is not shown
-        // So, let the exception propagate
+        // If the exception is logged and exitProcess() called, then macOS's "app crashed" UI is not shown
+        // So, let the exception propagate.
         propagateMainFailure()
         main()
         finishMain(null)
-    } catch (e: Throwable) {
-        finishMain(e)
+    } catch (t: Throwable) {
+        finishMain(t)
     }
 }
 

@@ -6,8 +6,6 @@ import net.rubygrapefruit.plugins.app.internal.tasks.NativeLauncher
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
-private const val generatedEntryPoint = "uiMain"
-
 @Suppress("unused")
 class NativeUiApplicationPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -29,7 +27,7 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                     derive { target, app ->
                         val generatorTask = tasks.register("generate${target.machine.kotlinTarget}Launcher", NativeLauncher::class.java) {
                             it.sourceDirectory.set(layout.buildDirectory.dir("generated/ui-launcher/${target.machine.kotlinTarget}"))
-                            it.entryPoint.set(generatedEntryPoint)
+                            it.packageName.set("ui")
                             it.delegateMethod.set(app.entryPoint)
                         }
                         val sourceSet = target.target.compilations.getByName("main").defaultSourceSet
@@ -46,7 +44,7 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                             BuildType.Debug -> executable.buildType.name
                             BuildType.Release -> "unsignedRelease"
                         }
-                        executable.executable.entryPoint = generatedEntryPoint
+                        executable.executable.entryPoint = "ui.main"
                         val machine = executable.machine
                         val dist = app.distributionContainer.add(
                             name,

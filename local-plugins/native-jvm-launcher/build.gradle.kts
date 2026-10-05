@@ -10,7 +10,7 @@ group = versions.plugins.group
 application {
     macOS {
         dependencies {
-            implementation(project(":native-launcher"))
+            implementation(project(":ui-app-launcher"))
         }
     }
 }

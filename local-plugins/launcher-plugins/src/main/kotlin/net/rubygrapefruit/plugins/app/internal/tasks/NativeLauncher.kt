@@ -22,7 +22,7 @@ abstract class NativeLauncher : DefaultTask() {
         sourceDirectory.file("${entryPoint.get()}.kt").get().asFile.printWriter().use {
             it.println(
                 """
-                import net.rubygrapefruit.plugins.app.launcher.runMain
+                import net.rubygrapefruit.app.ui.launcher.runMain
  
                 fun ${entryPoint.get()}(args: Array<String>) {
                     runMain {

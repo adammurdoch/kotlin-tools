@@ -1,4 +1,4 @@
-package net.rubygrapefruit.plugins.app.launcher
+package net.rubygrapefruit.app.ui.launcher
 
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.convert

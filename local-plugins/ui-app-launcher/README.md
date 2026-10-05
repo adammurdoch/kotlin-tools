@@ -1,0 +1,1 @@
+Types used in UI app processes

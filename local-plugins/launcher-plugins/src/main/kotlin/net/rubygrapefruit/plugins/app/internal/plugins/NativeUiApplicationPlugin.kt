@@ -35,7 +35,7 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                         val sourceSet = target.target.compilations.getByName("main").defaultSourceSet
                         sourceSet.kotlin.srcDir(generatorTask.flatMap { it.sourceDirectory })
                         sourceSet.dependencies {
-                            implementation("net.rubygrapefruit.plugins:native-launcher:1.0-dev")
+                            implementation("net.rubygrapefruit.plugins:ui-app-launcher:1.0-dev")
                         }
                     }
                 }

@@ -1,6 +1,6 @@
 import kotlinx.cinterop.*
-import net.rubygrapefruit.plugins.app.launcher.failed
-import net.rubygrapefruit.plugins.app.launcher.runMain
+import net.rubygrapefruit.app.ui.launcher.failed
+import net.rubygrapefruit.app.ui.launcher.runMain
 import platform.Foundation.NSBundle
 import platform.posix.*
 

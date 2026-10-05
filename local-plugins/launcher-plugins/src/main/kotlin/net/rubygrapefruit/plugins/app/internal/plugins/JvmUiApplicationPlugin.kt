@@ -38,6 +38,9 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                     sourceSet.java.setSrcDirs(emptyList<String>())
                     sourceSet.resources.setSrcDirs(emptyList<String>())
 
+                    val configuration = configurations.create("launcherRuntime")
+                    dependencies.add(configuration.name, "net.rubygrapefruit.plugins:ui-app-launcher:1.0-dev")
+
                     val kotlin = extensions.getByType(KotlinJvmProjectExtension::class.java)
                     val kotlinSourceSet = kotlin.sourceSets.getByName("launcher")
                     kotlinSourceSet.kotlin.setSrcDirs(emptyList<String>())
@@ -50,6 +53,9 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                     tasks.named("jar", Jar::class.java) {
                         it.from(sourceSet.output)
                     }
+
+                    app.module.requires.add("uiAppLauncher")
+                    app.runtimeModulePath.from(configuration)
 
                     val machine = NativeMachine.MacOSArm64
                     // TODO - 'can build' flag is incorrect - it depends on the JVM to be embedded
@@ -89,7 +95,7 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                             it.iconName.set(app.iconName)
                             it.javaCommand.set(dist.javaLauncherPath)
                             it.module.set(app.module.name)
-                            it.mainClass.set(app.mainClass)
+                            it.mainClass.set("ui.MainKt")
                         }
 
                         dist.launcherFile.set(launcherTask.flatMap { it.outputFile })

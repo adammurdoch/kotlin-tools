@@ -13,17 +13,3 @@ fun propagateMainFailure() {
 
 val isPropagateMainFailure: Boolean
     get() = propagateFailure.load()
-
-fun finishMain(failure: Throwable?): Nothing {
-    if (failure != null) {
-        if (propagateFailure.load()) {
-            throw failure
-        }
-        failure.printStackTrace()
-        exit(1)
-    } else {
-        exit(0)
-    }
-}
-
-expect fun exit(status: Int): Nothing

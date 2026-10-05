@@ -29,7 +29,7 @@ class ComponentBasePlugin : Plugin<Project> {
             componentRegistry.each<HasGeneratedSource> {
                 derive { component ->
                     deriveFromSourceSet(component.sourceSetName) { sourceSet ->
-                        sourceSet.kotlin.srcDirs(component.generatedSource)
+                        sourceSet.generatedKotlin.srcDirs(component.generatedSource)
                     }
                 }
             }

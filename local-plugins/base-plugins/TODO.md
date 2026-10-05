@@ -1,6 +1,7 @@
 
 # TODO
 
+- In a UI app with stdout redirected to log file and `main()` throws an exception, log the exception. Currently, it goes missing
 - Add `versions` as a project extension
 - Fail on duplicate `main()` functions
 - Add `dist --release`

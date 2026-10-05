@@ -1,14 +1,12 @@
 import kotlinx.cinterop.*
 import net.rubygrapefruit.plugins.app.launcher.failed
-import net.rubygrapefruit.plugins.app.launcher.setupLogging
+import net.rubygrapefruit.plugins.app.launcher.runMain
 import platform.Foundation.NSBundle
 import platform.posix.*
 
 @OptIn(ExperimentalForeignApi::class)
 fun main(args: Array<String>) {
-    memScoped {
-        setupLogging()
-
+    runMain {
         println("Current dir: ${getCurrentDir()}")
 
         val bundlePath = NSBundle.mainBundle.bundlePath
@@ -35,7 +33,9 @@ fun main(args: Array<String>) {
             "--module",
             mainClass
         ) + args
-        execv(args.first(), (args.map { it.cstr.ptr } + listOf(null)).toCValues())
+        memScoped {
+            execv(args.first(), (args.map { it.cstr.ptr } + listOf(null)).toCValues())
+        }
         failed("Could not launch app using $launcher")
     }
 }

@@ -4,10 +4,24 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.pointed
 import kotlinx.cinterop.toKString
+import net.rubygrapefruit.app.launcher.finishMain
 import platform.Foundation.NSBundle
 import platform.posix.*
 
-fun setupLogging() {
+/**
+ * Runs the main function of a process. Redirects stdout and err to a log file and reports any exception thrown by the main function.
+ */
+fun runMain(main: () -> Unit): Nothing {
+    try {
+        setupLogging()
+        main()
+        finishMain(null)
+    } catch (e: Throwable) {
+        finishMain(e)
+    }
+}
+
+private fun setupLogging() {
     val appId = NSBundle.mainBundle.bundleIdentifier ?: "app"
     println("Starting application '$appId'")
 

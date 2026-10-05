@@ -1,5 +1,6 @@
 package net.rubygrapefruit.cli.app
 
+import net.rubygrapefruit.app.launcher.isPropagateMainFailure
 import net.rubygrapefruit.cli.Action
 import net.rubygrapefruit.cli.ActionUsage
 import net.rubygrapefruit.cli.ArgParseException
@@ -49,7 +50,9 @@ open class CliApp(val name: String) : CliAction() {
             action.run()
             return true
         } catch (t: Throwable) {
-            if (!parsed || main.stackTrace) {
+            if (isPropagateMainFailure) {
+                throw t
+            } else if (!parsed || main.stackTrace) {
                 t.printStackTrace()
             } else {
                 formatter.append(t.message)

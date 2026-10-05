@@ -2,9 +2,12 @@ plugins {
     id("net.rubygrapefruit.kmp.lib")
 }
 
-group = versions.plugins.group
+group = versions.libs.group
 
 library {
-    jvm()
-    macOS()
+    jvm {
+        targetJvmVersion = 11
+        module.name = "net.rubygrapefruit.app_launcher"
+    }
+    nativeDesktop()
 }

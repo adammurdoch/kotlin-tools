@@ -2,6 +2,7 @@ package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.NativeMachine
+import net.rubygrapefruit.plugins.app.Versions
 import net.rubygrapefruit.plugins.app.internal.DefaultJvmUiAppDistribution
 import net.rubygrapefruit.plugins.app.internal.DefaultJvmUiApplication
 import net.rubygrapefruit.plugins.app.internal.HostMachine
@@ -14,8 +15,10 @@ import org.gradle.api.Project
 import org.gradle.api.attributes.Usage
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.jvm.tasks.Jar
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 
+@OptIn(ExperimentalKotlinGradlePluginApi::class)
 @Suppress("unused")
 class JvmUiApplicationPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -39,22 +42,22 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                     sourceSet.resources.setSrcDirs(emptyList<String>())
 
                     val configuration = configurations.create("launcherRuntime")
-                    dependencies.add(configuration.name, "net.rubygrapefruit.plugins:ui-app-launcher:1.0-dev")
+                    dependencies.add(configuration.name, Versions.libs.coordinates("ui-app-launcher"))
 
                     val kotlin = extensions.getByType(KotlinJvmProjectExtension::class.java)
                     val kotlinSourceSet = kotlin.sourceSets.getByName("launcher")
                     kotlinSourceSet.kotlin.setSrcDirs(emptyList<String>())
                     kotlinSourceSet.generatedKotlin.srcDir(generatorTask.flatMap { it.sourceDirectory })
                     kotlinSourceSet.dependencies {
-                        implementation("net.rubygrapefruit.plugins:ui-app-launcher:1.0-dev")
                         implementation(sourceSets.getByName("main").output)
                     }
+                    configurations.getByName(kotlinSourceSet.implementationConfigurationName).extendsFrom(configuration)
 
                     tasks.named("jar", Jar::class.java) {
                         it.from(sourceSet.output)
                     }
 
-                    app.module.requires.add("uiAppLauncher")
+                    app.module.requires.add("net.rubygrapefruit.ui_app_launcher")
                     app.runtimeModulePath.from(configuration)
 
                     val machine = NativeMachine.MacOSArm64

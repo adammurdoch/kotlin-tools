@@ -1,6 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.BuildType
+import net.rubygrapefruit.plugins.app.Versions
 import net.rubygrapefruit.plugins.app.internal.*
 import net.rubygrapefruit.plugins.app.internal.tasks.NativeLauncher
 import org.gradle.api.Plugin
@@ -33,7 +34,7 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                         val sourceSet = target.target.compilations.getByName("main").defaultSourceSet
                         sourceSet.kotlin.srcDir(generatorTask.flatMap { it.sourceDirectory })
                         sourceSet.dependencies {
-                            implementation("net.rubygrapefruit.plugins:ui-app-launcher:1.0-dev")
+                            implementation(Versions.libs.coordinates("ui-app-launcher"))
                         }
                     }
                 }

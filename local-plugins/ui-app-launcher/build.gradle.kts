@@ -2,10 +2,12 @@ plugins {
     id("net.rubygrapefruit.kmp.lib")
 }
 
-group = versions.plugins.group
+group = versions.libs.group
 
 library {
-    jvm()
+    jvm {
+        module.name = "net.rubygrapefruit.ui_app_launcher"
+    }
     macOS()
     common {
         implementation(project(":app-launcher"))

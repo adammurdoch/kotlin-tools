@@ -10,6 +10,7 @@ import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 
 fun main(args: Array<String>) {
+    println("started with args: ${args.toList()}")
     val frame = JFrame("Test App")
     frame.size = Dimension(600, 500)
     frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE

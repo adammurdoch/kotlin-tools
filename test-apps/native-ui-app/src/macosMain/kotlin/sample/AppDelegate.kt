@@ -4,6 +4,7 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import platform.AppKit.*
 import platform.Foundation.NSMakeRect
 import platform.Foundation.NSNotification
+import platform.Foundation.NSSelectorFromString
 import platform.darwin.NSObject
 
 @OptIn(ExperimentalForeignApi::class)
@@ -16,8 +17,7 @@ class AppDelegate : NSObject(), NSApplicationDelegateProtocol {
         NSApp?.mainMenu = menubar
 
         val appMenu = NSMenu()
-        appMenu.addItem(NSMenuItem().also { it.title = "one" })
-        appMenu.addItem(NSMenuItem().also { it.title = "two" })
+        appMenu.addItem(NSMenuItem("Quit $appName", NSSelectorFromString("terminate:"), "q"))
 
         appMenuItem.setSubmenu(appMenu)
 
@@ -31,7 +31,7 @@ class AppDelegate : NSObject(), NSApplicationDelegateProtocol {
         window.setFrame(frame, false)
         window.center()
         window.makeKeyAndOrderFront(null)
-        NSApp?.activateIgnoringOtherApps(true)
+        NSApp?.activate()
     }
 
     override fun applicationShouldTerminateAfterLastWindowClosed(sender: NSApplication): Boolean {

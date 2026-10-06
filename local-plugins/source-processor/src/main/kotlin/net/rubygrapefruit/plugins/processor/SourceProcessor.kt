@@ -5,14 +5,45 @@ import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
+import net.rubygrapefruit.plugins.app.metadata.MainFunction
 
 class SourceProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
+    private val mainFunctions = mutableListOf<MainFunction>()
+
     override fun process(resolver: Resolver): List<KSAnnotated> {
         environment.logger.warn("processing")
         for (file in resolver.getNewFiles()) {
             for (declaration in file.declarations) {
                 if (declaration is KSFunctionDeclaration && declaration.simpleName.getShortName() == "main") {
                     environment.logger.warn("found $declaration in $file")
+                    val isUnit = declaration.returnType?.resolve() == resolver.builtIns.unitType
+                    if (!isUnit) {
+                        environment.logger.warn("not unit return type, found: ${declaration.returnType}")
+                        continue
+                    }
+                    val hasParam = if (declaration.parameters.size == 1) {
+                        val param = declaration.parameters.first()
+                        val paramType = param.type.resolve()
+                        val isArray = paramType.declaration.qualifiedName?.asString() == "kotlin.Array"
+                        if (!isArray) {
+                            environment.logger.warn("not Array parameter, found: $paramType")
+                            continue
+                        }
+                        val typeParam = paramType.arguments.first()
+                        val isString = typeParam.type?.resolve() == resolver.builtIns.stringType
+                        if (!isString) {
+                            environment.logger.warn("not Array<String> parameter, found: $paramType")
+                            continue
+                        }
+                        environment.logger.warn("type param: $isString")
+                        true
+                    } else if (declaration.parameters.size > 1) {
+                        environment.logger.warn("too many parameters")
+                        continue
+                    } else {
+                        false
+                    }
+                    mainFunctions.add(MainFunction(file.filePath, file.packageName.asString(), hasParam))
                 }
             }
         }
@@ -21,5 +52,8 @@ class SourceProcessor(private val environment: SymbolProcessorEnvironment) : Sym
 
     override fun finish() {
         environment.logger.warn("generating")
+        for (function in mainFunctions) {
+            environment.logger.warn("$function")
+        }
     }
 }

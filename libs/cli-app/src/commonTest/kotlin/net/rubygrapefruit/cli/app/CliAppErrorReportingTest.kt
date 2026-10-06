@@ -253,6 +253,30 @@ class CliAppErrorReportingTest {
         )
     }
 
+    @Test
+    fun `reports exception thrown by action`() {
+        class App : CliApp("cmd") {
+            override fun run() {
+                throw RuntimeException("<broken>")
+            }
+        }
+
+        App().run(emptyList(), formatter)
+        assertEquals("<broken>\n", formatter.text)
+    }
+
+    @Test
+    fun `reports exception with no message thrown by action`() {
+        class App : CliApp("cmd") {
+            override fun run() {
+                throw RuntimeException()
+            }
+        }
+
+        App().run(emptyList(), formatter)
+        assertEquals("${RuntimeException::class.qualifiedName} (no message)\n", formatter.text)
+    }
+
     fun hasUsageMessage(message: String) {
         assertEquals(
             message.trimIndent() +

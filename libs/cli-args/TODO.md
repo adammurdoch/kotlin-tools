@@ -1,4 +1,3 @@
-- Handle case where app fails with exception with no message
 - Required option + unknown parameter -> reports missing option
 - Don't run side effects when successful but there are extra inputs
 - Split out recovery logic into a parse state implementation

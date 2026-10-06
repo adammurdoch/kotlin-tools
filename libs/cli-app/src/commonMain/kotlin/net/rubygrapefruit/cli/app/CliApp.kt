@@ -55,7 +55,11 @@ open class CliApp(val name: String) : CliAction() {
             } else if (!parsed || main.stackTrace) {
                 t.printStackTrace()
             } else {
-                formatter.append(t.message)
+                if (t.message.isNullOrEmpty()) {
+                    formatter.append("$t (no message)")
+                } else {
+                    formatter.append(t.message)
+                }
                 formatter.maybeNewLine()
             }
             return false

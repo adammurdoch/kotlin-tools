@@ -7,7 +7,7 @@ group = versions.libs.group
 library {
     jvm {
         targetJvmVersion = 11
-        module.name = "net.rubygrapefruit.app_launcher"
+        module.name = "net.rubygrapefruit.app_bootstrap"
     }
     nativeDesktop()
 }

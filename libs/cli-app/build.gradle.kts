@@ -19,7 +19,7 @@ library {
     common {
         api(project(":file-io"))
         api(project(":cli-args"))
-        implementation(versions.libs.coordinates("app-launcher"))
+        implementation(versions.libs.coordinates("app-bootstrap"))
     }
 }
 

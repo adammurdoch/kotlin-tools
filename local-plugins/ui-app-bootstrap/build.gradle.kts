@@ -6,10 +6,10 @@ group = versions.libs.group
 
 library {
     jvm {
-        module.name = "net.rubygrapefruit.ui_app_launcher"
+        module.name = "net.rubygrapefruit.ui_app_bootstrap"
     }
     macOS()
     common {
-        implementation(project(":app-launcher"))
+        implementation(project(":app-bootstrap"))
     }
 }

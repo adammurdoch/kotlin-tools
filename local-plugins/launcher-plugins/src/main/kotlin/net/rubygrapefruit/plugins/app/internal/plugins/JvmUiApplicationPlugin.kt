@@ -42,7 +42,7 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                     sourceSet.resources.setSrcDirs(emptyList<String>())
 
                     val configuration = configurations.create("launcherRuntime")
-                    dependencies.add(configuration.name, Versions.libs.coordinates("ui-app-launcher"))
+                    dependencies.add(configuration.name, Versions.libs.coordinates("ui-app-bootstrap"))
 
                     val kotlin = extensions.getByType(KotlinJvmProjectExtension::class.java)
                     val kotlinSourceSet = kotlin.sourceSets.getByName("launcher")
@@ -57,7 +57,7 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                         it.from(sourceSet.output)
                     }
 
-                    app.module.requires.add("net.rubygrapefruit.ui_app_launcher")
+                    app.module.requires.add("net.rubygrapefruit.ui_app_bootstrap")
                     app.runtimeModulePath.from(configuration)
 
                     val machine = NativeMachine.MacOSArm64

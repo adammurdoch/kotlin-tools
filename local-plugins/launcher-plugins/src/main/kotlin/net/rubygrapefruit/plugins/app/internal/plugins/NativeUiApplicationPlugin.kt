@@ -34,7 +34,7 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                         val sourceSet = target.target.compilations.getByName("main").defaultSourceSet
                         sourceSet.kotlin.srcDir(generatorTask.flatMap { it.sourceDirectory })
                         sourceSet.dependencies {
-                            implementation(Versions.libs.coordinates("ui-app-launcher"))
+                            implementation(Versions.libs.coordinates("ui-app-bootstrap"))
                         }
                     }
                 }

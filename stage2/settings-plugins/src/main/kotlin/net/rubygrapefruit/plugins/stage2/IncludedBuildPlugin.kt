@@ -6,6 +6,7 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.initialization.Settings
 import org.gradle.api.tasks.TaskContainer
+import java.util.concurrent.Callable
 
 @Suppress("unused")
 class IncludedBuildPlugin : Plugin<Settings> {
@@ -15,8 +16,9 @@ class IncludedBuildPlugin : Plugin<Settings> {
             gradle.rootProject { project ->
                 project.run {
                     tasks.applyLifecycle("clean", target, project)
-                    tasks.applyLifecycle("check", target, project)
                     tasks.applyLifecycle("assemble", target, project)
+                    tasks.applyLifecycle("check", target, project)
+                    tasks.applyLifecycle("build", target, project)
                     tasks.lifecycleTask("dist", target, project)
                     tasks.lifecycleTask("release", target, project)
                     tasks.lifecycleTask("docs", target, project)
@@ -42,6 +44,7 @@ class IncludedBuildPlugin : Plugin<Settings> {
 
     private fun Task.dependsOnChildren(name: String, settings: Settings, rootProject: Project) {
         dependsOn(settings.gradle.includedBuilds.map { it.task(":${name}") })
-        dependsOn(rootProject.subprojects.mapNotNull { it.tasks.findByName(name) })
+        val paths = Callable<Any> { rootProject.subprojects.mapNotNull { it.tasks.findByName(name) } }
+        dependsOn(paths)
     }
 }

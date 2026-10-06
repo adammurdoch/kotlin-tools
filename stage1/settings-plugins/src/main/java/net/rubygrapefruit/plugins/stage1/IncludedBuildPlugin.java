@@ -17,9 +17,10 @@ public class IncludedBuildPlugin implements Plugin<Settings> {
     public void apply(@NotNull Settings target) {
         target.getGradle().rootProject(project -> {
             project.getPlugins().apply("lifecycle-base");
-            addLifecycle(project, "build");
+            addLifecycle(project, "clean");
             addLifecycle(project, "assemble");
             addLifecycle(project, "check");
+            addLifecycle(project, "build");
             addTask(project, "verifySamples");
         });
     }

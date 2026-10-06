@@ -3,7 +3,9 @@ package net.rubygrapefruit.plugins.app.internal.plugins
 import net.rubygrapefruit.plugins.app.internal.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
+@OptIn(ExperimentalKotlinGradlePluginApi::class)
 class ComponentBasePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {

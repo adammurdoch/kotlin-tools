@@ -6,7 +6,9 @@ import net.rubygrapefruit.plugins.app.internal.*
 import net.rubygrapefruit.plugins.app.internal.tasks.NativeLauncher
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
+@OptIn(ExperimentalKotlinGradlePluginApi::class)
 @Suppress("unused")
 class NativeUiApplicationPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -32,7 +34,7 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                             it.delegateMethod.set(app.entryPoint)
                         }
                         val sourceSet = target.target.compilations.getByName("main").defaultSourceSet
-                        sourceSet.kotlin.srcDir(generatorTask.flatMap { it.sourceDirectory })
+                        sourceSet.generatedKotlin.srcDir(generatorTask.flatMap { it.sourceDirectory })
                         sourceSet.dependencies {
                             implementation(Versions.libs.coordinates("ui-app-bootstrap"))
                         }

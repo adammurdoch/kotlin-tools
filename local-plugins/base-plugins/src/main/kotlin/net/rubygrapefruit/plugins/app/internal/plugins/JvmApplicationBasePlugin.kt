@@ -16,9 +16,12 @@ class JvmApplicationBasePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             plugins.apply("org.jetbrains.kotlin.jvm")
+            plugins.apply("com.google.devtools.ksp")
             plugins.apply(ApplicationBasePlugin::class.java)
             plugins.apply(ComponentBasePlugin::class.java)
             plugins.apply(JvmComponentBasePlugin::class.java)
+
+            dependencies.add("ksp", Versions.libs.coordinates("source-processor"))
 
             componentRegistry.each<MutableJvmApplication> {
                 initialize { app ->

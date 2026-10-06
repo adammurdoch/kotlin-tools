@@ -1,4 +1,7 @@
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+
 import net.rubygrapefruit.plugins.stage0.BuildConstants
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import kotlin.io.path.createDirectories
 import kotlin.io.path.writeText
 
@@ -16,7 +19,7 @@ library {
 }
 
 kotlin {
-    sourceSets.getByName("main").kotlin.srcDirs(generateSource.flatMap { it.outputDirectory })
+    sourceSets.getByName("main").generatedKotlin.srcDirs(generateSource.flatMap { it.outputDirectory })
 }
 
 abstract class GenerateSource : DefaultTask() {

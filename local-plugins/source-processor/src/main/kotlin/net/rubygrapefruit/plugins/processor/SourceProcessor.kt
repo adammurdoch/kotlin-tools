@@ -52,6 +52,10 @@ class SourceProcessor(private val environment: SymbolProcessorEnvironment) : Sym
     }
 
     override fun finish() {
+        environment.logger.warn("main functions:")
+        for (function in mainFunctions) {
+            environment.logger.warn(function.toString())
+        }
         environment.codeGenerator.createNewFile(Dependencies.ALL_FILES, "", Names.metadataFileName, "json").use {
             Json { prettyPrint = true }.encodeToStream(mainFunctions, it)
         }

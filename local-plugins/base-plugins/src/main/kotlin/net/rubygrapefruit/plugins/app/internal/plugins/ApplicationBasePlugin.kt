@@ -1,5 +1,6 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
+import net.rubygrapefruit.plugins.app.Versions
 import net.rubygrapefruit.plugins.app.internal.*
 import net.rubygrapefruit.plugins.app.internal.component.ComponentRegistry
 import net.rubygrapefruit.plugins.app.internal.tasks.Distributions
@@ -11,10 +12,18 @@ class ApplicationBasePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             applyBasePlugin()
+            plugins.apply("com.google.devtools.ksp")
 
             repositories.mavenCentral()
 
             val componentRegistry = target.extensions.create("componentRegistry", ComponentRegistry::class.java)
+
+            componentRegistry.each<HasMainFunction> {
+                initialize { function ->
+                    println("-> register source processor")
+                    dependencies.add(function.kspConfigurationName, Versions.libs.coordinates("source-processor"))
+                }
+            }
 
             componentRegistry.each<MutableApplication> {
                 initialize { app ->

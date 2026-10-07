@@ -11,11 +11,14 @@ abstract class DefaultJvmCliApplication @Inject constructor(
     objects: ObjectFactory,
     providers: ProviderFactory,
     project: Project
-) : DefaultJvmComponent<Dependencies>("test"), MutableJvmApplication {
+) : DefaultJvmComponent<Dependencies>("test"), MutableJvmApplication, HasMainFunction {
     override val distributionContainer = DistributionContainer(project.tasks, objects, providers)
     override val runtimeModulePath: ConfigurableFileCollection = objects.fileCollection()
 
     override val main: HasDependencies = DefaultJvmSourceSet("main", generatedSource, generatedResources)
+
+    override val kspConfigurationName: String
+        get() = "ksp"
 
     override fun dependencies(config: Dependencies.() -> Unit) {
         main.dependencies.config()

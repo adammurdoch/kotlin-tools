@@ -37,24 +37,23 @@ abstract class InspectClasses : DefaultTask() {
     private fun visitFiles(exportedPackages: BufferedWriter) {
         val seenPackages = mutableSetOf<String>()
         for (classesDir in classesDirs) {
-            Files.walkFileTree(classesDir.toPath(), object : FileVisitor<Path?> {
-                override fun preVisitDirectory(dir: Path?, attrs: BasicFileAttributes?): FileVisitResult {
+            Files.walkFileTree(classesDir.toPath(), object : FileVisitor<Path> {
+                override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {
                     return FileVisitResult.CONTINUE
                 }
 
-                override fun visitFile(file: Path?, attrs: BasicFileAttributes?): FileVisitResult {
-                    require(file != null)
+                override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
                     if (file.toFile().isFile && file.name.endsWith(".class")) {
                         visitClassFile(file, seenPackages, exportedPackages)
                     }
                     return FileVisitResult.CONTINUE
                 }
 
-                override fun visitFileFailed(file: Path?, exc: IOException?): FileVisitResult {
+                override fun visitFileFailed(file: Path, exc: IOException): FileVisitResult {
                     return FileVisitResult.CONTINUE
                 }
 
-                override fun postVisitDirectory(dir: Path?, exc: IOException?): FileVisitResult {
+                override fun postVisitDirectory(dir: Path, exc: IOException?): FileVisitResult {
                     return FileVisitResult.CONTINUE
                 }
             })

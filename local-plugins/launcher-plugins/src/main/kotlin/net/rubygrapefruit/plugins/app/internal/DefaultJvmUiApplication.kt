@@ -12,10 +12,13 @@ abstract class DefaultJvmUiApplication @Inject constructor(
     objects: ObjectFactory,
     providers: ProviderFactory,
     project: Project
-) : DefaultUiApplication(objects, providers, project), MutableJvmApplication, JvmUiApplication, PlatformContribution, HasTests {
+) : DefaultUiApplication(objects, providers, project), MutableJvmApplication, JvmUiApplication, PlatformContribution, HasTests, HasMainFunction {
     override val main = DefaultJvmSourceSet("main", generatedSource, generatedResources)
     override val test: HasDependencies = DefaultHasDependencies("test")
     override val runtimeModulePath: ConfigurableFileCollection = objects.fileCollection()
+
+    override val kspConfigurationName: String
+        get() = "ksp"
 
     override fun dependencies(config: Dependencies.() -> Unit) {
         main.dependencies.config()

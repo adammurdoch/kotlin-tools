@@ -1,12 +1,19 @@
 package net.rubygrapefruit.plugins.processor
 
+import com.google.devtools.ksp.KspExperimental
+import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToStream
 import net.rubygrapefruit.plugins.app.metadata.MainFunction
+import net.rubygrapefruit.plugins.app.metadata.Names
 
+@OptIn(ExperimentalSerializationApi::class, KspExperimental::class)
 class SourceProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
     private val mainFunctions = mutableListOf<MainFunction>()
 
@@ -43,7 +50,8 @@ class SourceProcessor(private val environment: SymbolProcessorEnvironment) : Sym
                     } else {
                         false
                     }
-                    mainFunctions.add(MainFunction(file.filePath, file.packageName.asString(), hasParam))
+                    val owner = resolver.getOwnerJvmClassName(declaration)!!
+                    mainFunctions.add(MainFunction(file.filePath, owner, file.packageName.asString(), hasParam))
                 }
             }
         }
@@ -54,6 +62,9 @@ class SourceProcessor(private val environment: SymbolProcessorEnvironment) : Sym
         environment.logger.warn("generating")
         for (function in mainFunctions) {
             environment.logger.warn("$function")
+        }
+        environment.codeGenerator.createNewFile(Dependencies.ALL_FILES, "", Names.metadataFileName, "json").use {
+            Json { prettyPrint = true }.encodeToStream(mainFunctions, it)
         }
     }
 }

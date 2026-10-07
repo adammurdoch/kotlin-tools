@@ -47,7 +47,6 @@ abstract class JvmModuleRegistry(
         val exports = project.tasks.register("classInfo", InspectClasses::class.java) {
             it.classesDirs.from(classesDirs)
             it.packagesFile.set(project.layout.buildDirectory.file("jvm/exported-packages.txt"))
-            it.mainClassesFile.set(project.layout.buildDirectory.file("jvm/main-classes.txt"))
         }
         // TODO - should use convention
         module.exports.set(exports.flatMap { it.packagesFile }.map { it.asFile.readLines() })
@@ -57,7 +56,7 @@ abstract class JvmModuleRegistry(
                     val metadataFile = it.file(Names.metadataFileName + ".json").asFile
                     val functions = Json.decodeFromString<List<MainFunction>>(metadataFile.readText())
                     if (functions.size == 1) {
-                        functions.first().ownerJvmClass.also { println("-> loaded main class name: $it") }
+                        functions.first().ownerJvmClass
                     } else {
                         throw IllegalStateException("Did not find exactly one main() function")
                     }

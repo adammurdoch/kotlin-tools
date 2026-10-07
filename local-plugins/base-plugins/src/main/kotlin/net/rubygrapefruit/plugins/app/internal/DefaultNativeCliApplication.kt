@@ -34,7 +34,7 @@ abstract class DefaultNativeCliApplication @Inject constructor(
         }
     }
 
-    private fun register(operatingSystem: OperatingSystem): DefaultNativeOsComponent {
+    private fun register(operatingSystem: OperatingSystem): DefaultOperatingSystemTargetApplication {
         componentRegistry.forOperatingSystem(operatingSystem)
         return appTargets.forOperatingSystem(operatingSystem)
     }

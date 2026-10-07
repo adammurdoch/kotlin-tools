@@ -5,7 +5,7 @@ import net.rubygrapefruit.plugins.app.NativeComponent
 import net.rubygrapefruit.plugins.app.internal.component.MutableComponent
 import javax.inject.Inject
 
-abstract class DefaultNativeOsComponent @Inject constructor(
+abstract class DefaultOperatingSystemTargetApplication @Inject constructor(
     override val target: OperatingSystem
 ) : NativeComponent<Dependencies>, MutableComponent, PlatformContribution, HasOsTarget {
     override val main = DefaultSourceSet(target.mainSourceSetName, generatedSource)

@@ -19,6 +19,7 @@ projects {
     downgrade("local-plugins/cpu-info")
     downgrade("local-plugins/machine-info")
     downgrade("local-plugins/bytecode")
+    downgrade("local-plugins/app-metadata")
     downgrade("local-plugins/base-plugins")
 }
 

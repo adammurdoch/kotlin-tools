@@ -14,6 +14,8 @@ dependencies {
     implementation(project(":basics"))
     implementation(project(":bytecode"))
     implementation(project(":machine-info"))
+    implementation(project(":app-metadata"))
+    implementation(buildConstants.ksp.plugin.coordinates)
     testImplementation(buildConstants.kotlin.test.coordinates)
 }
 

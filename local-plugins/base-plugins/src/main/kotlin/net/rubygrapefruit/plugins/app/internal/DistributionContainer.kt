@@ -25,8 +25,7 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
      */
     fun <T : MutableDistribution> add(name: String, isMainDist: Boolean, type: Class<T>): T {
         val distTask = tasks.register(DefaultMutableDistribution.taskName(name, "dist"), DistributionImage::class.java)
-        val buildable = HostMachine.current.canBeBuilt
-        val dist = objects.newInstance(type, name, buildable, distTask)
+        val dist = objects.newInstance(type, name, true, distTask)
         addDist(dist, isMainDist, isMainDist)
         return dist
     }
@@ -40,7 +39,7 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
      *
      * @param isDevDist Is the distribution a developer distribution?
      * @param isReleaseDist Is the distribution a release distribution?
-     * @param canBuildForHostMachine Can the tooling for this distribution run on this host?
+     * @param canBuildForHostMachine Can the tooling (Kotlin plus whatever packaging tools) for this distribution run on this host?
      */
     fun <T : MutableDistribution> add(
         baseName: String?,
@@ -59,7 +58,7 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
             }
         }
         val distTask = tasks.register(DefaultMutableDistribution.taskName(name, "dist"), taskType)
-        val buildable = HostMachine.current.canBeBuilt && HostMachine.current.canBuild(targetMachine) && canBuildForHostMachine
+        val buildable = HostMachine.current.canBuild(targetMachine) && canBuildForHostMachine
         val isDev = isDevDist && HostMachine.current == targetMachine
         val isRelease = isReleaseDist && HostMachine.current == targetMachine
         val dist = objects.newInstance(type, name, buildable, targetMachine, buildType, distTask)

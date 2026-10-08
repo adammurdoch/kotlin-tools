@@ -58,7 +58,7 @@ class JvmUiApplicationPlugin : Plugin<Project> {
 
                     val machine = MacOsArm64
                     // TODO - 'can build' flag is incorrect - it depends on the JVM to be embedded
-                    val canBuild = HostMachine.current.canBeBuilt && HostMachine.current == machine
+                    val canBuild = HostMachine.current == machine
                     val dist = app.distributionContainer.add(
                         "unsignedRelease",
                         true,

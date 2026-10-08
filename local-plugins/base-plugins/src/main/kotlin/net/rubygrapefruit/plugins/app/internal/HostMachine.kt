@@ -21,9 +21,6 @@ sealed interface HostMachine {
         }
     }
 
-    val canBeBuilt: Boolean
-        get() = true
-
     companion object {
         val current: KotlinTargetMachine by lazy {
             when (Machine.thisMachine) {

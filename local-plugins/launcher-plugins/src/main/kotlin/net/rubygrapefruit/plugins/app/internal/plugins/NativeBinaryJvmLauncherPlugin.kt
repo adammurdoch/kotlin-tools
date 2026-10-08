@@ -20,8 +20,8 @@ class NativeBinaryJvmLauncherPlugin : Plugin<Project> {
                             null,
                             true,
                             true,
-                            HostMachine.current.canBeBuilt,
-                            HostMachine.current as KotlinTargetMachine,
+                            true,
+                            HostMachine.current,
                             BuildType.Release,
                             DefaultHasLauncherExecutableDistribution::class.java
                         )

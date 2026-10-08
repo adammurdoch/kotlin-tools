@@ -32,7 +32,7 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
                             buildType.name,
                             buildType == BuildType.Debug,
                             buildType == BuildType.Release,
-                            executable.canBuildOnHost,
+                            true,
                             machine,
                             buildType,
                             DefaultHasLauncherExecutableDistribution::class.java

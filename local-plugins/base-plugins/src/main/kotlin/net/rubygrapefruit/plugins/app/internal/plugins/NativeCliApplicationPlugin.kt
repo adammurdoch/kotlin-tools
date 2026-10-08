@@ -33,11 +33,11 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
                             buildType == BuildType.Debug,
                             buildType == BuildType.Release,
                             executable.canBuildOnHost,
-                            machine,
+                            machine.machine,
                             buildType,
                             DefaultHasLauncherExecutableDistribution::class.java
                         )
-                        distribution.launcherFilePath.set(app.appName.map { HostMachine.of(machine).exeName(it) })
+                        distribution.launcherFilePath.set(app.appName.map { machine.exeName(it) })
                         distribution.launcherFile.set(executable.binaryFile)
                         registerSibling(distribution)
                     }

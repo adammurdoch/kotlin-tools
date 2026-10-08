@@ -1,12 +1,11 @@
 package net.rubygrapefruit.plugins.app.internal
 
-import net.rubygrapefruit.plugins.app.NativeMachine
 import org.gradle.api.Project
 
 open class MultiPlatformComponentRegistry(private val project: Project) {
     private val unixSourceSets = mutableSetOf<String>()
     private val unixTestSourceSets = mutableSetOf<String>()
-    private val machines = mutableSetOf<NativeMachine>()
+    private val machines = mutableSetOf<KotlinTargetMachine>()
     private var jvm = false
     private var hasSourceSets = false
     val sourceSets = SourceSets(project)
@@ -32,7 +31,7 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
 
     fun forOperatingSystem(operatingSystem: OperatingSystem) {
         for (machine in operatingSystem.machines) {
-            native(machine.machine)
+            native(machine)
         }
     }
 
@@ -56,20 +55,20 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
         }
     }
 
-    private fun native(target: NativeMachine) {
+    private fun native(target: KotlinTargetMachine) {
         if (machines.add(target)) {
             when (target) {
-                NativeMachine.MacOSArm64 -> {
+                MacOsArm64 -> {
                     unixSourceSets.add("macosMain")
                     unixTestSourceSets.add("macosTest")
                 }
 
-                NativeMachine.LinuxX64 -> {
+                LinuxX64 -> {
                     unixSourceSets.add("linuxMain")
                     unixTestSourceSets.add("linuxTest")
                 }
 
-                NativeMachine.WindowsX64 -> {
+                WindowsX64 -> {
                 }
             }
         }

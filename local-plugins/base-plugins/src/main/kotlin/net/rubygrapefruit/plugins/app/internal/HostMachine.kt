@@ -4,6 +4,10 @@ import net.rubygrapefruit.machine.info.Machine
 import net.rubygrapefruit.plugins.app.NativeMachine
 
 sealed interface HostMachine {
+    /**
+     * A human-readable string identifier for this machine.
+     */
+    val alias: String
 
     fun exeName(name: String) = name
 
@@ -54,6 +58,9 @@ sealed class Windows : HostMachine {
 }
 
 data object WindowsX64 : Windows(), KotlinTargetMachine {
+    override val alias: String
+        get() = "windowX64"
+
     override val machine: NativeMachine
         get() = NativeMachine.WindowsX64
 
@@ -62,6 +69,9 @@ data object WindowsX64 : Windows(), KotlinTargetMachine {
 }
 
 data object WindowsArm64 : Windows() {
+    override val alias: String
+        get() = "windowsArm64"
+
     override val machine: NativeMachine
         get() = throw UnsupportedOperationException("Not supported yet")
 
@@ -75,6 +85,9 @@ data object WindowsArm64 : Windows() {
 sealed class Linux : HostMachine
 
 data object LinuxX64 : Linux(), KotlinTargetMachine {
+    override val alias: String
+        get() = "linuxX64"
+
     override val machine: NativeMachine
         get() = NativeMachine.LinuxX64
 
@@ -83,6 +96,9 @@ data object LinuxX64 : Linux(), KotlinTargetMachine {
 }
 
 data object LinuxArm64 : Linux() {
+    override val alias: String
+        get() = "linuxArm64"
+
     override fun canBuild(target: NativeMachine): Boolean {
         return false
     }
@@ -100,11 +116,17 @@ sealed class MacOS : HostMachine {
 }
 
 data object MacOsX64 : MacOS() {
+    override val alias: String
+        get() = "macosX64"
+
     override val machine: NativeMachine
         get() = throw UnsupportedOperationException("Not supported yet")
 }
 
 data object MacOsArm64 : MacOS(), KotlinTargetMachine {
+    override val alias: String
+        get() = "macosArm64"
+
     override val machine: NativeMachine
         get() = NativeMachine.MacOSArm64
 

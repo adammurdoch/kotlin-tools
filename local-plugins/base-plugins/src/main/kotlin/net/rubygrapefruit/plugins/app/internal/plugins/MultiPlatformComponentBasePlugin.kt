@@ -41,7 +41,7 @@ class MultiPlatformComponentBasePlugin : Plugin<Project> {
                     for (machine in component.target.machines) {
                         val kotlinTarget = kotlin.targets.getByName(machine.kotlinTarget) as KotlinNativeTarget
                         val canBuild = HostMachine.current.canBuild(machine.machine)
-                        registerSibling(RealizedNativeTarget(canBuild, machine.machine, kotlinTarget))
+                        registerSibling(RealizedNativeTarget(canBuild, machine, kotlinTarget))
                     }
                 }
             }

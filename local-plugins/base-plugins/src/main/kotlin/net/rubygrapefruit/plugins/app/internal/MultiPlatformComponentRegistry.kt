@@ -58,12 +58,12 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
     private fun native(target: KotlinTargetMachine) {
         if (machines.add(target)) {
             when (target) {
-                MacOsArm64 -> {
+                MacOsArm64, MacOsX64 -> {
                     unixSourceSets.add("macosMain")
                     unixTestSourceSets.add("macosTest")
                 }
 
-                LinuxX64 -> {
+                LinuxX64, LinuxArm64 -> {
                     unixSourceSets.add("linuxMain")
                     unixTestSourceSets.add("linuxTest")
                 }

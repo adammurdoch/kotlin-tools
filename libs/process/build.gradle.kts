@@ -1,5 +1,4 @@
 import net.rubygrapefruit.plugins.app.internal.HostMachine
-import net.rubygrapefruit.plugins.app.internal.KotlinTargetMachine
 
 plugins {
     id("net.rubygrapefruit.kmp.lib")
@@ -20,7 +19,7 @@ library {
 }
 
 val config = configurations.create("testBinary") {
-    val host = HostMachine.current as KotlinTargetMachine
+    val host = HostMachine.current
     attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named("native-binary-${host.kotlinTarget}"))
     isCanBeResolved = true
     isCanBeConsumed = false

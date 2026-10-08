@@ -25,16 +25,15 @@ sealed interface HostMachine {
         get() = true
 
     companion object {
-        val current: HostMachine by lazy {
-            val machine: HostMachine = when (Machine.thisMachine) {
+        val current: KotlinTargetMachine by lazy {
+            when (Machine.thisMachine) {
                 Machine.WindowsX64 -> WindowsX64
-                Machine.WindowsArm64 -> WindowsArm64
                 Machine.LinuxX64 -> LinuxX64
                 Machine.LinuxArm64 -> LinuxArm64
                 Machine.MacOSX64 -> MacOsX64
                 Machine.MacOSArm64 -> MacOsArm64
+                Machine.WindowsArm64 -> throw IllegalStateException()
             }
-            machine
         }
     }
 }
@@ -55,17 +54,6 @@ data object WindowsX64 : Windows(), KotlinTargetMachine {
         get() = "mingwX64"
 }
 
-data object WindowsArm64 : Windows() {
-    override val alias: String
-        get() = "windowsArm64"
-
-    override fun canBuild(target: KotlinTargetMachine): Boolean {
-        return false
-    }
-
-    override val canBeBuilt: Boolean = false
-}
-
 sealed class Linux : HostMachine
 
 data object LinuxX64 : Linux(), KotlinTargetMachine {
@@ -76,15 +64,12 @@ data object LinuxX64 : Linux(), KotlinTargetMachine {
         get() = "linuxX64"
 }
 
-data object LinuxArm64 : Linux() {
+data object LinuxArm64 : Linux(), KotlinTargetMachine {
     override val alias: String
         get() = "linuxArm64"
 
-    override fun canBuild(target: KotlinTargetMachine): Boolean {
-        return false
-    }
-
-    override val canBeBuilt: Boolean = false
+    override val kotlinTarget: String
+        get() = "linuxArm64"
 }
 
 sealed class MacOS : HostMachine {
@@ -94,8 +79,11 @@ sealed class MacOS : HostMachine {
     }
 }
 
-data object MacOsX64 : MacOS() {
+data object MacOsX64 : MacOS(), KotlinTargetMachine {
     override val alias: String
+        get() = "macosX64"
+
+    override val kotlinTarget: String
         get() = "macosX64"
 }
 

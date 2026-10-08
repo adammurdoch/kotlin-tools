@@ -28,7 +28,7 @@ class EmbeddedJvmLauncherPlugin : Plugin<Project> {
                             true,
                             true,
                             HostMachine.current.canBeBuilt,
-                            HostMachine.current as KotlinTargetMachine,
+                            HostMachine.current,
                             BuildType.Release,
                             DefaultHasEmbeddedJvmAndLauncherScriptsDistribution::class.java
                         )

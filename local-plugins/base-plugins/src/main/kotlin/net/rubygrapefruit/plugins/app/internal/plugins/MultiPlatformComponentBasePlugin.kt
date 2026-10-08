@@ -30,9 +30,12 @@ class MultiPlatformComponentBasePlugin : Plugin<Project> {
                     // Declare the Kotlin targets eagerly at configuration time, so that these are in the appropriate state to allow
                     // executables to be declared on the target later
                     for (machine in component.target.machines) {
+                        @Suppress("DEPRECATION")
                         when (machine) {
                             MacOsArm64 -> kotlin.macosArm64()
+                            MacOsX64 -> kotlin.macosX64()
                             LinuxX64 -> kotlin.linuxX64()
+                            LinuxArm64 -> kotlin.linuxArm64()
                             WindowsX64 -> kotlin.mingwX64()
                         }
                     }

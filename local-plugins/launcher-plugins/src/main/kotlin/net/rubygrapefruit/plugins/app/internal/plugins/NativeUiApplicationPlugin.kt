@@ -54,7 +54,7 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                             executable.buildType == BuildType.Debug,
                             false,
                             executable.canBuildOnHost,
-                            machine.machine,
+                            machine,
                             executable.buildType,
                             DefaultNativeUiAppDistribution::class.java
                         )

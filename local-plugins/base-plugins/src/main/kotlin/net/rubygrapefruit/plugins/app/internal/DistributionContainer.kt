@@ -2,7 +2,6 @@ package net.rubygrapefruit.plugins.app.internal
 
 import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.Distribution
-import net.rubygrapefruit.plugins.app.NativeMachine
 import net.rubygrapefruit.plugins.app.internal.tasks.AbstractDistributionImage
 import net.rubygrapefruit.plugins.app.internal.tasks.DistributionImage
 import net.rubygrapefruit.strings.capitalized
@@ -48,7 +47,7 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
         isDevDist: Boolean,
         isReleaseDist: Boolean,
         canBuildForHostMachine: Boolean,
-        targetMachine: NativeMachine,
+        targetMachine: KotlinTargetMachine,
         buildType: BuildType,
         type: Class<T>,
         taskType: Class<out AbstractDistributionImage> = DistributionImage::class.java
@@ -61,8 +60,8 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
         }
         val distTask = tasks.register(DefaultMutableDistribution.taskName(name, "dist"), taskType)
         val buildable = HostMachine.current.canBeBuilt && HostMachine.current.canBuild(targetMachine) && canBuildForHostMachine
-        val isDev = isDevDist && HostMachine.current.machine == targetMachine
-        val isRelease = isReleaseDist && HostMachine.current.machine == targetMachine
+        val isDev = isDevDist && HostMachine.current == targetMachine
+        val isRelease = isReleaseDist && HostMachine.current == targetMachine
         val dist = objects.newInstance(type, name, buildable, targetMachine, buildType, distTask)
         addDist(dist, isDev, isRelease)
         return dist

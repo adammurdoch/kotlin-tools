@@ -1,12 +1,8 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.BuildType
-import net.rubygrapefruit.plugins.app.NativeMachine
 import net.rubygrapefruit.plugins.app.Versions
-import net.rubygrapefruit.plugins.app.internal.DefaultJvmUiAppDistribution
-import net.rubygrapefruit.plugins.app.internal.DefaultJvmUiApplication
-import net.rubygrapefruit.plugins.app.internal.HostMachine
-import net.rubygrapefruit.plugins.app.internal.componentRegistry
+import net.rubygrapefruit.plugins.app.internal.*
 import net.rubygrapefruit.plugins.app.internal.tasks.LauncherConf
 import net.rubygrapefruit.plugins.app.internal.tasks.NativeLauncher
 import net.rubygrapefruit.plugins.app.internal.tasks.NativeUiLauncher
@@ -60,9 +56,9 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                     app.module.requires.add("net.rubygrapefruit.ui_app_bootstrap")
                     app.runtimeModulePath.from(configuration)
 
-                    val machine = NativeMachine.MacOSArm64
+                    val machine = MacOsArm64
                     // TODO - 'can build' flag is incorrect - it depends on the JVM to be embedded
-                    val canBuild = HostMachine.current.canBeBuilt && HostMachine.current.machine == machine
+                    val canBuild = HostMachine.current.canBeBuilt && HostMachine.current == machine
                     val dist = app.distributionContainer.add(
                         "unsignedRelease",
                         true,
@@ -77,7 +73,7 @@ class JvmUiApplicationPlugin : Plugin<Project> {
 
                 each<DefaultJvmUiAppDistribution> {
                     derive { dist, app ->
-                        val nativeBinary = configurations.create("nativeBinaries${dist.targetMachine.name}") {
+                        val nativeBinary = configurations.create("nativeBinaries${dist.targetMachine.alias}") {
                             it.attributes.attribute(
                                 Usage.USAGE_ATTRIBUTE,
                                 objects.named(Usage::class.java, "native-binary-${dist.targetMachine.kotlinTarget}")

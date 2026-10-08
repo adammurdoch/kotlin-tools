@@ -3,7 +3,6 @@ package net.rubygrapefruit.plugins.app.internal
 import net.rubygrapefruit.plugins.app.Application
 import net.rubygrapefruit.plugins.app.BuildType
 import net.rubygrapefruit.plugins.app.Distribution
-import net.rubygrapefruit.plugins.app.NativeMachine
 import java.io.File
 
 internal class ApplicationMetadata(
@@ -17,7 +16,7 @@ internal class ApplicationMetadata(
 internal class DistributionMetadata(
     val name: String,
     val canBuildOnHostMachine: Boolean,
-    val targetMachine: NativeMachine?,
+    val targetMachine: KotlinTargetMachine?,
     val buildType: BuildType?,
     val launcherType: String,
     val hasEmbeddedJvm: Boolean,

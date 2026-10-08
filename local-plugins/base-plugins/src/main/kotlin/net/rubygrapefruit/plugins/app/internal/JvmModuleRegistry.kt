@@ -56,7 +56,7 @@ abstract class JvmModuleRegistry(
                     val metadataFile = it.file(Names.metadataFileName + ".json").asFile
                     val functions = Json.decodeFromString<List<MainFunction>>(metadataFile.readText())
                     if (functions.size == 1) {
-                        functions.first().ownerJvmClass
+                        functions.first().ownerJvmClass!!
                     } else {
                         throw IllegalStateException("Did not find exactly one main() function")
                     }

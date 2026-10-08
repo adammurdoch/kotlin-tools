@@ -6,5 +6,7 @@ package net.rubygrapefruit.plugins.app.internal
 interface HasOsTarget {
     val target: OperatingSystem
 
-    fun visitMachines(visitor: (HasMachineTarget) -> Unit)
+    fun visitMachines(visitor: (KotlinTargetMachine) -> Unit)
+
+    fun createTargets()
 }

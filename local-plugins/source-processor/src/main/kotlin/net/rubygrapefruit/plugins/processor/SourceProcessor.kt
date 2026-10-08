@@ -43,7 +43,7 @@ class SourceProcessor(private val environment: SymbolProcessorEnvironment) : Sym
                     } else {
                         false
                     }
-                    val owner = resolver.getOwnerJvmClassName(declaration)!!
+                    val owner = resolver.getOwnerJvmClassName(declaration)
                     mainFunctions.add(MainFunction(file.filePath, owner, file.packageName.asString(), hasParam))
                 }
             }

@@ -7,9 +7,13 @@ abstract class DefaultOperatingSystemTargetLibrary @Inject constructor(
     override val target: OperatingSystem,
     private val componentFactory: ComponentFactory
 ) : DefaultNativeLibrary(target.mainSourceSetName), HasOsTarget {
-    private val machineTargets = target.machines.map { componentFactory.created(DefaultNativeMachineTargetLibrary(it)) }
+    override fun visitMachines(visitor: (KotlinTargetMachine) -> Unit) {
+        target.machines.forEach(visitor)
+    }
 
-    override fun visitMachines(visitor: (HasMachineTarget) -> Unit) {
-        machineTargets.forEach(visitor)
+    override fun createTargets() {
+        for (machine in target.machines) {
+            componentFactory.created(DefaultNativeMachineTargetLibrary(machine))
+        }
     }
 }

@@ -11,13 +11,18 @@ abstract class DefaultOperatingSystemTargetApplication @Inject constructor(
     private val componentFactory: ComponentFactory
 ) : NativeComponent<Dependencies>, MutableComponent, PlatformContribution, HasOsTarget {
     override val main = DefaultSourceSet(target.mainSourceSetName, generatedSource)
-    private val machineTargets = target.machines.map { componentFactory.created(DefaultNativeMachineTargetApplication(it)) }
 
     override fun dependencies(config: Dependencies.() -> Unit) {
         main.dependencies.config()
     }
 
-    override fun visitMachines(visitor: (HasMachineTarget) -> Unit) {
-        machineTargets.forEach(visitor)
+    override fun visitMachines(visitor: (KotlinTargetMachine) -> Unit) {
+        target.machines.forEach(visitor)
+    }
+
+    override fun createTargets() {
+        for (machine in target.machines) {
+            componentFactory.created(DefaultNativeMachineTargetApplication(machine))
+        }
     }
 }

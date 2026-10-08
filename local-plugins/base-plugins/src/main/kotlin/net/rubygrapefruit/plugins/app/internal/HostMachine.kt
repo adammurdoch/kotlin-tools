@@ -3,7 +3,25 @@ package net.rubygrapefruit.plugins.app.internal
 import net.rubygrapefruit.machine.info.Machine
 import net.rubygrapefruit.plugins.app.NativeMachine
 
-sealed class HostMachine {
+sealed interface HostMachine {
+
+    fun exeName(name: String) = name
+
+    /**
+     * Can this host machine build binaries for the given target machine?
+     */
+    fun canBuild(target: NativeMachine): Boolean {
+        return when (target) {
+            NativeMachine.LinuxX64, NativeMachine.WindowsX64 -> true
+            else -> false
+        }
+    }
+
+    val canBeBuilt: Boolean
+        get() = true
+
+    val machine: NativeMachine
+
     companion object {
         val current: HostMachine by lazy {
             val machine: HostMachine = when (Machine.thisMachine) {
@@ -17,7 +35,7 @@ sealed class HostMachine {
             machine
         }
 
-        fun of(machine: NativeMachine): HostMachine {
+        fun of(machine: NativeMachine): KotlinTargetMachine {
             return when (machine) {
                 NativeMachine.WindowsX64 -> WindowsX64
                 NativeMachine.LinuxX64 -> LinuxX64
@@ -25,31 +43,22 @@ sealed class HostMachine {
             }
         }
     }
-
-    open fun exeName(name: String) = name
-
-    /**
-     * Can this host machine build binaries for the given target machine?
-     */
-    open fun canBuild(target: NativeMachine): Boolean {
-        return when (target) {
-            NativeMachine.LinuxX64, NativeMachine.WindowsX64 -> true
-            else -> false
-        }
-    }
-
-    open val canBeBuilt: Boolean = true
-
-    abstract val machine: NativeMachine
 }
 
-sealed class Windows : HostMachine() {
+sealed interface KotlinTargetMachine : HostMachine {
+    val kotlinTarget: String
+}
+
+sealed class Windows : HostMachine {
     override fun exeName(name: String) = "$name.exe"
 }
 
-data object WindowsX64 : Windows() {
+data object WindowsX64 : Windows(), KotlinTargetMachine {
     override val machine: NativeMachine
         get() = NativeMachine.WindowsX64
+
+    override val kotlinTarget: String
+        get() = "mingwX64"
 }
 
 data object WindowsArm64 : Windows() {
@@ -63,11 +72,14 @@ data object WindowsArm64 : Windows() {
     override val canBeBuilt: Boolean = false
 }
 
-sealed class Linux : HostMachine()
+sealed class Linux : HostMachine
 
-data object LinuxX64 : Linux() {
+data object LinuxX64 : Linux(), KotlinTargetMachine {
     override val machine: NativeMachine
         get() = NativeMachine.LinuxX64
+
+    override val kotlinTarget: String
+        get() = "linuxX64"
 }
 
 data object LinuxArm64 : Linux() {
@@ -81,7 +93,7 @@ data object LinuxArm64 : Linux() {
     override val canBeBuilt: Boolean = false
 }
 
-sealed class MacOS : HostMachine() {
+sealed class MacOS : HostMachine {
     override fun canBuild(target: NativeMachine): Boolean {
         return true
     }
@@ -92,7 +104,10 @@ data object MacOsX64 : MacOS() {
         get() = throw UnsupportedOperationException("Not supported yet")
 }
 
-data object MacOsArm64 : MacOS() {
+data object MacOsArm64 : MacOS(), KotlinTargetMachine {
     override val machine: NativeMachine
         get() = NativeMachine.MacOSArm64
+
+    override val kotlinTarget: String
+        get() = "macosArm64"
 }

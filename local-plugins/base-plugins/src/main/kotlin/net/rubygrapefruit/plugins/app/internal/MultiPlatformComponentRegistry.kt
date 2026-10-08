@@ -32,7 +32,7 @@ open class MultiPlatformComponentRegistry(private val project: Project) {
 
     fun forOperatingSystem(operatingSystem: OperatingSystem) {
         for (machine in operatingSystem.machines) {
-            native(machine)
+            native(machine.machine)
         }
     }
 

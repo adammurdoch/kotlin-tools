@@ -1,6 +1,5 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
-import net.rubygrapefruit.plugins.app.NativeMachine
 import net.rubygrapefruit.plugins.app.internal.*
 import net.rubygrapefruit.plugins.app.internal.component.MutableComponent
 import org.gradle.api.Plugin
@@ -32,17 +31,17 @@ class MultiPlatformComponentBasePlugin : Plugin<Project> {
                     // executables to be declared on the target later
                     for (machine in component.target.machines) {
                         when (machine) {
-                            NativeMachine.MacOSArm64 -> kotlin.macosArm64()
-                            NativeMachine.LinuxX64 -> kotlin.linuxX64()
-                            NativeMachine.WindowsX64 -> kotlin.mingwX64()
+                            MacOsArm64 -> kotlin.macosArm64()
+                            LinuxX64 -> kotlin.linuxX64()
+                            WindowsX64 -> kotlin.mingwX64()
                         }
                     }
                 }
                 derive { component ->
                     for (machine in component.target.machines) {
                         val kotlinTarget = kotlin.targets.getByName(machine.kotlinTarget) as KotlinNativeTarget
-                        val canBuild = HostMachine.current.canBuild(machine)
-                        registerSibling(RealizedNativeTarget(canBuild, machine, kotlinTarget))
+                        val canBuild = HostMachine.current.canBuild(machine.machine)
+                        registerSibling(RealizedNativeTarget(canBuild, machine.machine, kotlinTarget))
                     }
                 }
             }

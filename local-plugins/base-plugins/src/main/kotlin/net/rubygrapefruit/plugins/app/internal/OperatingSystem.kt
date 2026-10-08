@@ -1,34 +1,32 @@
 package net.rubygrapefruit.plugins.app.internal
 
-import net.rubygrapefruit.plugins.app.NativeMachine
-
 sealed interface OperatingSystem {
     val mainSourceSetName: String
 
-    val machines: List<NativeMachine>
+    val machines: List<KotlinTargetMachine>
 
     data object MacOS : OperatingSystem {
         override val mainSourceSetName: String
             get() = "macosMain"
 
-        override val machines: List<NativeMachine>
-            get() = listOf(NativeMachine.MacOSArm64)
+        override val machines: List<KotlinTargetMachine>
+            get() = listOf(MacOsArm64)
     }
 
     data object Linux : OperatingSystem {
         override val mainSourceSetName: String
             get() = "linuxMain"
 
-        override val machines: List<NativeMachine>
-            get() = listOf(NativeMachine.LinuxX64)
+        override val machines: List<KotlinTargetMachine>
+            get() = listOf(LinuxX64)
     }
 
     data object Windows : OperatingSystem {
         override val mainSourceSetName: String
             get() = "mingwMain"
 
-        override val machines: List<NativeMachine>
-            get() = listOf(NativeMachine.WindowsX64)
+        override val machines: List<KotlinTargetMachine>
+            get() = listOf(WindowsX64)
     }
 
     companion object {

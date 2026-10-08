@@ -97,7 +97,7 @@ internal abstract class DefaultMultiPlatformLibrary @Inject constructor(
 
     private fun createForOS(operatingSystem: OperatingSystem): DefaultNativeLibrary {
         return osComponents.getOrPut(operatingSystem) {
-            val library = factory.newInstance(DefaultNativeOsLibrary::class.java, operatingSystem)
+            val library = factory.newInstance(DefaultOperatingSystemTargetLibrary::class.java, operatingSystem)
             componentFactory.created(library)
             componentRegistry.forOperatingSystem(operatingSystem)
             library

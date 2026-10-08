@@ -26,25 +26,27 @@ class MultiPlatformComponentBasePlugin : Plugin<Project> {
             }
 
             componentRegistry.each<HasOsTarget> {
-                initialize { component ->
-                    // Declare the Kotlin targets eagerly at configuration time, so that these are in the appropriate state to allow
-                    // executables to be declared on the target later
-                    for (machine in component.target.machines) {
-                        @Suppress("DEPRECATION")
-                        when (machine) {
-                            MacOsArm64 -> kotlin.macosArm64()
-                            MacOsX64 -> kotlin.macosX64()
-                            LinuxX64 -> kotlin.linuxX64()
-                            LinuxArm64 -> kotlin.linuxArm64()
-                            WindowsX64 -> kotlin.mingwX64()
-                        }
-                    }
-                }
                 derive { component ->
                     for (machine in component.target.machines) {
                         val kotlinTarget = kotlin.targets.getByName(machine.kotlinTarget) as KotlinNativeTarget
                         val canBuild = NativeMachine.current.canBuild(machine)
                         registerSibling(RealizedNativeTarget(canBuild, machine, kotlinTarget))
+                    }
+                }
+            }
+
+            componentRegistry.each<HasMachineTarget> {
+                initialize { component ->
+                    println("-> target ${component.target}")
+                    // Declare the Kotlin targets eagerly at configuration time, so that these are in the appropriate state to allow
+                    // executables to be declared on the target later
+                    @Suppress("DEPRECATION")
+                    when (component.target) {
+                        MacOsArm64 -> kotlin.macosArm64()
+                        MacOsX64 -> kotlin.macosX64()
+                        LinuxX64 -> kotlin.linuxX64()
+                        LinuxArm64 -> kotlin.linuxArm64()
+                        WindowsX64 -> kotlin.mingwX64()
                     }
                 }
             }

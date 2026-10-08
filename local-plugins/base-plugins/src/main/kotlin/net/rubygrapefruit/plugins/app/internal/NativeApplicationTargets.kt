@@ -24,9 +24,8 @@ class NativeApplicationTargets(
 
     fun forOperatingSystem(operatingSystem: OperatingSystem): DefaultOperatingSystemTargetApplication {
         return osComponents.getOrPut(operatingSystem) {
-            val component = objects.newInstance(DefaultOperatingSystemTargetApplication::class.java, operatingSystem)
+            val component = objects.newInstance(DefaultOperatingSystemTargetApplication::class.java, operatingSystem, componentFactory)
             componentFactory.created(component)
-            component
         }
     }
 }

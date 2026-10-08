@@ -22,19 +22,19 @@ internal abstract class DefaultMultiPlatformLibrary @Inject constructor(
     val module: JvmModule
         get() = createJvm().module
 
-    override fun visitPlatforms(consumer: (PlatformContribution) -> Unit) {
-        consumer(common)
+    override fun visitPlatforms(visitor: (PlatformContribution) -> Unit) {
+        visitor(common)
         if (jvm != null) {
-            consumer(jvm!!)
+            visitor(jvm!!)
         }
         if (browser != null) {
-            consumer(browser!!)
+            visitor(browser!!)
         }
         if (desktop != null) {
-            consumer(desktop!!)
+            visitor(desktop!!)
         }
         for (component in osComponents.values) {
-            consumer(component)
+            visitor(component)
         }
     }
 
@@ -97,7 +97,7 @@ internal abstract class DefaultMultiPlatformLibrary @Inject constructor(
 
     private fun createForOS(operatingSystem: OperatingSystem): DefaultNativeLibrary {
         return osComponents.getOrPut(operatingSystem) {
-            val library = factory.newInstance(DefaultOperatingSystemTargetLibrary::class.java, operatingSystem)
+            val library = factory.newInstance(DefaultOperatingSystemTargetLibrary::class.java, operatingSystem, componentFactory)
             componentFactory.created(library)
             componentRegistry.forOperatingSystem(operatingSystem)
             library

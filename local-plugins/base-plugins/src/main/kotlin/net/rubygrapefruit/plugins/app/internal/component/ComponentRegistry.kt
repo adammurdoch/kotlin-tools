@@ -263,8 +263,9 @@ open class ComponentRegistry(private val project: Project) {
     }
 
     private class DefaultComponentFactory(private val consumer: (Any) -> Unit) : ComponentFactory {
-        override fun created(component: Any) {
+        override fun <T : Any> created(component: T): T {
             consumer(component)
+            return component
         }
     }
 

@@ -20,8 +20,13 @@ class ApplicationBasePlugin : Plugin<Project> {
 
             componentRegistry.each<HasMainFunction> {
                 initialize { function ->
-                    println("-> register source processor")
-                    dependencies.add(function.kspConfigurationName, Versions.libs.coordinates("source-processor"))
+                    // This has to be done eagerly
+                    if (configurations.findByName(function.kspConfigurationName) != null) {
+                        println("-> register source processor")
+                        dependencies.add(function.kspConfigurationName, Versions.libs.coordinates("source-processor"))
+                    } else {
+                        println("-> cannot register source processor")
+                    }
                 }
             }
 

@@ -20,8 +20,8 @@ abstract class DefaultNativeCliApplication @Inject constructor(
 
     override val distributionContainer = DistributionContainer(project.tasks, objects, providers)
 
-    override fun visitPlatforms(consumer: (PlatformContribution) -> Unit) {
-        appTargets.visitPlatforms(consumer)
+    override fun visitPlatforms(visitor: (PlatformContribution) -> Unit) {
+        appTargets.visitPlatforms(visitor)
     }
 
     override fun macOS(config: NativeComponent<Dependencies>.() -> Unit) {

@@ -28,7 +28,7 @@ class EmbeddedJvmLauncherPlugin : Plugin<Project> {
                             true,
                             true,
                             true,
-                            HostMachine.current,
+                            NativeMachine.current,
                             BuildType.Release,
                             DefaultHasEmbeddedJvmAndLauncherScriptsDistribution::class.java
                         )

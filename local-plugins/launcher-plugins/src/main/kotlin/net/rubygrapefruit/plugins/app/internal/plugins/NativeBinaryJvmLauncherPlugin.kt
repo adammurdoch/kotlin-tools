@@ -21,7 +21,7 @@ class NativeBinaryJvmLauncherPlugin : Plugin<Project> {
                             true,
                             true,
                             true,
-                            HostMachine.current,
+                            NativeMachine.current,
                             BuildType.Release,
                             DefaultHasLauncherExecutableDistribution::class.java
                         )
@@ -44,9 +44,9 @@ class NativeBinaryJvmLauncherPlugin : Plugin<Project> {
                 each<HasLauncherExecutable> {
                     require<LauncherExecutable> {
                         derive { dist, app, exe ->
-                            dist.launcherFilePath.set(app.appName.map { appName -> HostMachine.current.exeName(appName) })
+                            dist.launcherFilePath.set(app.appName.map { appName -> NativeMachine.current.exeName(appName) })
                             val projectDirectory = layout.projectDirectory
-                            dist.launcherFile.set(exe.binaryTask.flatMap { task -> task.launcherFile.map { projectDirectory.file(HostMachine.current.exeName(it.asFile.absolutePath)) } })
+                            dist.launcherFile.set(exe.binaryTask.flatMap { task -> task.launcherFile.map { projectDirectory.file(NativeMachine.current.exeName(it.asFile.absolutePath)) } })
                         }
                     }
                 }

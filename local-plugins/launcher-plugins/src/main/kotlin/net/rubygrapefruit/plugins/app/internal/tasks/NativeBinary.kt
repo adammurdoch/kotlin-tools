@@ -50,7 +50,7 @@ abstract class NativeBinary : DefaultTask() {
         } else {
             jdkVersion.toString()
         }
-        val args = when (HostMachine.current) {
+        val args = when (NativeMachine.current) {
             LinuxX64 -> {
                 val baseName = "graalvm-jdk-${binVersion}_linux-x64"
                 Args(baseURI.resolve("${baseName}_bin.tar.gz"), baseName, "bin")

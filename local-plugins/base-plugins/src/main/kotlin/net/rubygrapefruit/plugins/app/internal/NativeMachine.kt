@@ -2,11 +2,13 @@ package net.rubygrapefruit.plugins.app.internal
 
 import net.rubygrapefruit.machine.info.Machine
 
-sealed interface HostMachine {
+sealed interface NativeMachine {
     /**
      * A human-readable string identifier for this machine.
      */
     val alias: String
+
+    val operatingSystem: OperatingSystem
 
     fun exeName(name: String) = name
 
@@ -35,11 +37,14 @@ sealed interface HostMachine {
     }
 }
 
-sealed interface KotlinTargetMachine : HostMachine {
+sealed interface KotlinTargetMachine : NativeMachine {
     val kotlinTarget: String
 }
 
-sealed class Windows : HostMachine {
+sealed class Windows : NativeMachine {
+    override val operatingSystem: OperatingSystem
+        get() = OperatingSystem.Windows
+
     override fun exeName(name: String) = "$name.exe"
 }
 
@@ -51,7 +56,10 @@ data object WindowsX64 : Windows(), KotlinTargetMachine {
         get() = "mingwX64"
 }
 
-sealed class Linux : HostMachine
+sealed class Linux : NativeMachine {
+    override val operatingSystem: OperatingSystem
+        get() = OperatingSystem.Linux
+}
 
 data object LinuxX64 : Linux(), KotlinTargetMachine {
     override val alias: String
@@ -69,7 +77,10 @@ data object LinuxArm64 : Linux(), KotlinTargetMachine {
         get() = "linuxArm64"
 }
 
-sealed class MacOS : HostMachine {
+sealed class MacOS : NativeMachine {
+    override val operatingSystem: OperatingSystem
+        get() = OperatingSystem.MacOS
+
     override fun canBuild(target: KotlinTargetMachine): Boolean {
         // macOS hosts can build all targets
         return true

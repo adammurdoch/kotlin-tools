@@ -3,6 +3,9 @@ package net.rubygrapefruit.plugins.app.internal
 sealed interface OperatingSystem {
     val mainSourceSetName: String
 
+    /**
+     * Supported machines for this OS.
+     */
     val machines: List<KotlinTargetMachine>
 
     data object MacOS : OperatingSystem {

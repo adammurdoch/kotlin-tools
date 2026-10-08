@@ -1,6 +1,6 @@
 package net.rubygrapefruit.plugins.app.internal.tasks
 
-import net.rubygrapefruit.plugins.app.internal.HostMachine
+import net.rubygrapefruit.plugins.app.internal.NativeMachine
 import net.rubygrapefruit.plugins.app.internal.Windows
 import org.gradle.api.tasks.TaskAction
 import java.nio.file.Files
@@ -38,7 +38,7 @@ JAVA_ARGS=""
 $$javaCommand$$modulePathArg $JAVA_ARGS --module $${module.get()}/$${mainClass.get()} "$@"
 """
         )
-        if (HostMachine.current !is Windows) {
+        if (NativeMachine.current !is Windows) {
             Files.setPosixFilePermissions(
                 scriptFile,
                 setOf(

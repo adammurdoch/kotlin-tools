@@ -58,9 +58,9 @@ class DistributionContainer(private val tasks: TaskContainer, private val object
             }
         }
         val distTask = tasks.register(DefaultMutableDistribution.taskName(name, "dist"), taskType)
-        val buildable = HostMachine.current.canBuild(targetMachine) && canBuildForHostMachine
-        val isDev = isDevDist && HostMachine.current == targetMachine
-        val isRelease = isReleaseDist && HostMachine.current == targetMachine
+        val buildable = NativeMachine.current.canBuild(targetMachine) && canBuildForHostMachine
+        val isDev = isDevDist && NativeMachine.current == targetMachine
+        val isRelease = isReleaseDist && NativeMachine.current == targetMachine
         val dist = objects.newInstance(type, name, buildable, targetMachine, buildType, distTask)
         addDist(dist, isDev, isRelease)
         return dist

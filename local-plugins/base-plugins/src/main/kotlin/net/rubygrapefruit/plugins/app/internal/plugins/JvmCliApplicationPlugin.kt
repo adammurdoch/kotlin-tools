@@ -59,7 +59,7 @@ class JvmCliApplicationPlugin : Plugin<Project> {
                             includeFilesInDir(LIB_DIR_PATH, app.runtimeModulePath)
                         }
 
-                        if (HostMachine.current is Windows) {
+                        if (NativeMachine.current is Windows) {
                             dist.launcherFile.set(batScript.flatMap { it.scriptFile })
                             dist.launcherFilePath.set(app.appName.map { "$it.bat" })
                             dist.withImage {

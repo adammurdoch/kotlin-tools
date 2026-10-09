@@ -1,11 +1,8 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.Versions
-import net.rubygrapefruit.plugins.app.internal.JvmModuleRegistry
-import net.rubygrapefruit.plugins.app.internal.MutableJvmApplication
-import net.rubygrapefruit.plugins.app.internal.componentRegistry
+import net.rubygrapefruit.plugins.app.internal.*
 import net.rubygrapefruit.plugins.app.internal.tasks.RuntimeModulePath
-import net.rubygrapefruit.plugins.app.internal.toModuleName
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSetContainer
@@ -34,7 +31,7 @@ class JvmApplicationBasePlugin : Plugin<Project> {
 
                     val classesDir = files(tasks.named("compileKotlin", KotlinCompile::class.java).map { it.destinationDirectory })
 
-                    val moduleInfo = extensions.getByType(JvmModuleRegistry::class.java).inspectClassPathsFor(app.module, app, classesDir, null, runtimeClasspath)
+                    val moduleInfo = extensions.getByType(JvmModuleRegistry::class.java).inspectClassPathsFor(app.module, classesDir, null, runtimeClasspath)
                     val moduleInfoCp = moduleInfo.moduleInfoClasspath
 
                     val runtimeModulePath = tasks.register("runtimeModulePath", RuntimeModulePath::class.java) {
@@ -50,6 +47,13 @@ class JvmApplicationBasePlugin : Plugin<Project> {
                     app.runtimeModulePath.from(runtimeModulePath.map { it.outputDirectory.asFileTree.matching { it.include("*.jar") } })
 
                     JvmComponentBasePlugin.parallelTests(target)
+                }
+
+                each<ApplicationMainFunction> {
+                    prepare { function, application ->
+                        println("-> set app main class")
+                        application.mainClass.set(function.mainFunction.map { it.ownerJvmClass!! })
+                    }
                 }
             }
         }

@@ -2,15 +2,11 @@
 
 package net.rubygrapefruit.plugins.app.internal
 
-import com.google.devtools.ksp.gradle.KspAATask
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
-import net.rubygrapefruit.plugins.app.JvmApplication
 import net.rubygrapefruit.plugins.app.JvmModule
 import net.rubygrapefruit.plugins.app.internal.tasks.*
-import net.rubygrapefruit.plugins.app.metadata.MainFunction
-import net.rubygrapefruit.plugins.app.metadata.Names
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
@@ -21,7 +17,6 @@ abstract class JvmModuleRegistry(
 ) {
     fun inspectClassPathsFor(
         module: JvmModule,
-        jvmApplication: JvmApplication?,
         classesDirs: FileCollection,
         apiClassPath: Configuration?,
         runtimeClasspath: Configuration
@@ -50,20 +45,6 @@ abstract class JvmModuleRegistry(
         }
         // TODO - should use convention
         module.exports.set(exports.flatMap { it.packagesFile }.map { it.asFile.readLines() })
-        if (jvmApplication != null) {
-            val mainClassName = project.tasks.named("kspKotlin", KspAATask::class.java).flatMap {
-                it.kspConfig.resourceOutputDir.map {
-                    val metadataFile = it.file(Names.metadataFileName + ".json").asFile
-                    val functions = Json.decodeFromString<List<MainFunction>>(metadataFile.readText())
-                    if (functions.size == 1) {
-                        functions.first().ownerJvmClass!!
-                    } else {
-                        throw IllegalStateException("Did not find exactly one main() function")
-                    }
-                }
-            }
-            jvmApplication.mainClass.convention(mainClassName)
-        }
 
         val moduleTask = project.tasks.register("moduleInfo", JvmModuleInfo::class.java) {
             it.outputDirectory.set(project.layout.buildDirectory.dir("jvm/jvm-module"))

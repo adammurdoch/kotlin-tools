@@ -40,7 +40,7 @@ class ApplicationBasePlugin : Plugin<Project> {
                             }
                         }
                     }
-                    registerSibling(ApplicationMainFunction(mainFunction))
+                    register(ApplicationMainFunction(mainFunction))
                 }
             }
 

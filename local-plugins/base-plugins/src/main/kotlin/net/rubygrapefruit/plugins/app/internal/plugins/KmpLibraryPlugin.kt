@@ -44,7 +44,7 @@ class KmpLibraryPlugin : Plugin<Project> {
                     val classesDir = files(compilation.compileTaskProvider.flatMap { (it as KotlinJvmCompile).destinationDirectory })
 
                     val moduleInfoCp = extensions.getByType(JvmModuleRegistry::class.java)
-                        .inspectClassPathsFor(component.module, null, classesDir, apiClasspath, runtimeClasspath)
+                        .inspectClassPathsFor(component.module, classesDir, apiClasspath, runtimeClasspath)
                         .moduleInfoClasspath
 
                     tasks.named(jvmTarget.artifactsTaskName, Jar::class.java) { task ->

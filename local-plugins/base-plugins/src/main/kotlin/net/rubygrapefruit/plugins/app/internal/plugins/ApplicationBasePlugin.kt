@@ -21,7 +21,12 @@ class ApplicationBasePlugin : Plugin<Project> {
             componentRegistry.each<HasMainFunction> {
                 initialize { function ->
                     // This has to be done eagerly
+                    println("-> add processor for ${function.kspConfigurationName}")
                     dependencies.add(function.kspConfigurationName, Versions.libs.coordinates("source-processor"))
+                }
+                derive { function ->
+                    println("-> register realised app target for ${function.kspConfigurationName}")
+                    register(RealizedApplication())
                 }
             }
 

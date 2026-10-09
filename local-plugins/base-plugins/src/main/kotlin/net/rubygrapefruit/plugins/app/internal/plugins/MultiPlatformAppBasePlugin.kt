@@ -17,23 +17,23 @@ class MultiPlatformAppBasePlugin : Plugin<Project> {
                         for (machine in component.target.machines) {
                             val kotlinTarget = kotlin.targets.getByName(machine.kotlinTarget) as KotlinNativeTarget
                             val canBuild = NativeMachine.current.canBuild(machine)
-                            registerSibling(RealizedNativeTarget(canBuild, machine, app.entryPoint, kotlinTarget))
+                            registerSibling(RealizedNativeMachineApplication(canBuild, machine, app.entryPoint, kotlinTarget))
                         }
                     }
                 }
-                each<RealizedNativeTarget> {
-                    derive { target, _ ->
-                        val binaries = target.target.binaries
-                        binaries.executable()
-                        for (executable in binaries.withType(Executable::class.java)) {
-                            val binaryFile = project.layout.file(executable.linkTaskProvider.map { it.binary.outputFile })
-                            val buildType = when (executable.buildType) {
-                                NativeBuildType.DEBUG -> BuildType.Debug
-                                NativeBuildType.RELEASE -> BuildType.Release
-                            }
-                            val machine = target.machine
-                            registerSibling(RealizedNativeExecutable(target.canBuildOnHost, machine, buildType, executable, target.entryPoint, binaryFile))
+            }
+            componentRegistry.each<RealizedNativeMachineApplication> {
+                derive { target ->
+                    val binaries = target.target.binaries
+                    binaries.executable()
+                    for (executable in binaries.withType(Executable::class.java)) {
+                        val binaryFile = project.layout.file(executable.linkTaskProvider.map { it.binary.outputFile })
+                        val buildType = when (executable.buildType) {
+                            NativeBuildType.DEBUG -> BuildType.Debug
+                            NativeBuildType.RELEASE -> BuildType.Release
                         }
+                        val machine = target.machine
+                        registerSibling(RealizedNativeExecutable(target.canBuildOnHost, machine, buildType, executable, target.entryPoint, binaryFile))
                     }
                 }
             }

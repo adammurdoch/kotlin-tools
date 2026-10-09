@@ -26,7 +26,7 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                     multiplatformComponents.forOperatingSystem(OperatingSystem.MacOS)
                 }
 
-                each<RealizedNativeTarget> {
+                each<RealizedNativeMachineApplication> {
                     derive { target, app ->
                         val generatorTask = tasks.register("generate${target.machine.kotlinTarget}Launcher", NativeLauncher::class.java) {
                             it.sourceDirectory.set(layout.buildDirectory.dir("generated/ui-launcher/${target.machine.kotlinTarget}"))

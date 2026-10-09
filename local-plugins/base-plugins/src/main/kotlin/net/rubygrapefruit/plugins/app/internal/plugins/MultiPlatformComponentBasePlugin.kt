@@ -4,7 +4,6 @@ import net.rubygrapefruit.plugins.app.internal.*
 import net.rubygrapefruit.plugins.app.internal.component.MutableComponent
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 class MultiPlatformComponentBasePlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -40,14 +39,6 @@ class MultiPlatformComponentBasePlugin : Plugin<Project> {
                         }
                     }
                     component.createTargets()
-                }
-
-                derive { component ->
-                    for (machine in component.target.machines) {
-                        val kotlinTarget = kotlin.targets.getByName(machine.kotlinTarget) as KotlinNativeTarget
-                        val canBuild = NativeMachine.current.canBuild(machine)
-                        registerSibling(RealizedNativeTarget(canBuild, machine, kotlinTarget))
-                    }
                 }
             }
         }

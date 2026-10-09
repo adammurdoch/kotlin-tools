@@ -1,4 +1,7 @@
 package net.rubygrapefruit.plugins.app.internal
 
-interface MutableMultiPlatformApplication: MutableApplication {
+import org.gradle.api.provider.Provider
+
+interface MutableMultiPlatformApplication : MutableApplication {
+    val entryPoint: Provider<String>
 }

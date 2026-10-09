@@ -1,19 +1,26 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
 import net.rubygrapefruit.plugins.app.BuildType
-import net.rubygrapefruit.plugins.app.internal.MutableMultiPlatformApplication
-import net.rubygrapefruit.plugins.app.internal.RealizedNativeExecutable
-import net.rubygrapefruit.plugins.app.internal.RealizedNativeTarget
-import net.rubygrapefruit.plugins.app.internal.componentRegistry
+import net.rubygrapefruit.plugins.app.internal.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.plugin.mpp.Executable
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 
 class MultiPlatformAppBasePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             componentRegistry.each<MutableMultiPlatformApplication> {
+                each<HasOsTarget> {
+                    derive { component, app ->
+                        for (machine in component.target.machines) {
+                            val kotlinTarget = kotlin.targets.getByName(machine.kotlinTarget) as KotlinNativeTarget
+                            val canBuild = NativeMachine.current.canBuild(machine)
+                            registerSibling(RealizedNativeTarget(canBuild, machine, app.entryPoint, kotlinTarget))
+                        }
+                    }
+                }
                 each<RealizedNativeTarget> {
                     derive { target, _ ->
                         val binaries = target.target.binaries
@@ -25,7 +32,7 @@ class MultiPlatformAppBasePlugin : Plugin<Project> {
                                 NativeBuildType.RELEASE -> BuildType.Release
                             }
                             val machine = target.machine
-                            registerSibling(RealizedNativeExecutable(target.canBuildOnHost, machine, buildType, executable, binaryFile))
+                            registerSibling(RealizedNativeExecutable(target.canBuildOnHost, machine, buildType, executable, target.entryPoint, binaryFile))
                         }
                     }
                 }

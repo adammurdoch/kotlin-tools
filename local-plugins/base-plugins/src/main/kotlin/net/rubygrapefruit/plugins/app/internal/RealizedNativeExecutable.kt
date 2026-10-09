@@ -10,5 +10,6 @@ class RealizedNativeExecutable(
     val machine: KotlinTargetMachine,
     val buildType: BuildType,
     val executable: Executable,
+    val entryPoint: Provider<String>,
     val binaryFile: Provider<RegularFile>
 )

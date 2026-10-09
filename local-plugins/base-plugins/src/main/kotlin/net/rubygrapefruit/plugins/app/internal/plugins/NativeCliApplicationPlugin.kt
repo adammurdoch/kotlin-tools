@@ -26,7 +26,7 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
                         val buildType = executable.buildType
                         val machine = executable.machine
 
-                        executable.executable.entryPoint = app.entryPoint.get()
+                        executable.executable.entryPoint = executable.entryPoint.get()
 
                         val distribution = app.distributionContainer.add(
                             buildType.name,

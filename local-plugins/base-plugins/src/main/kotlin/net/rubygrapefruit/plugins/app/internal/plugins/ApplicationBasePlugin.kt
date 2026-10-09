@@ -1,10 +1,14 @@
 package net.rubygrapefruit.plugins.app.internal.plugins
 
+import com.google.devtools.ksp.gradle.KspAATask
+import kotlinx.serialization.json.Json
 import net.rubygrapefruit.plugins.app.Versions
 import net.rubygrapefruit.plugins.app.internal.*
 import net.rubygrapefruit.plugins.app.internal.component.ComponentRegistry
 import net.rubygrapefruit.plugins.app.internal.tasks.Distributions
 import net.rubygrapefruit.plugins.app.internal.tasks.ShowApplication
+import net.rubygrapefruit.plugins.app.metadata.MainFunction
+import net.rubygrapefruit.plugins.app.metadata.Names
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -21,12 +25,22 @@ class ApplicationBasePlugin : Plugin<Project> {
             componentRegistry.each<HasMainFunction> {
                 initialize { function ->
                     // This has to be done eagerly
-                    println("-> add processor for ${function.kspConfigurationName}")
                     dependencies.add(function.kspConfigurationName, Versions.libs.coordinates("source-processor"))
                 }
                 derive { function ->
-                    println("-> register realised app target for ${function.kspConfigurationName}")
-                    register(RealizedApplication())
+                    val kspTask = tasks.named(function.kspTaskName, KspAATask::class.java)
+                    val mainFunction = kspTask.flatMap {
+                        it.kspConfig.resourceOutputDir.map {
+                            val metadataFile = it.file(Names.metadataFileName + ".json").asFile
+                            val functions = Json.decodeFromString<List<MainFunction>>(metadataFile.readText())
+                            if (functions.size == 1) {
+                                functions.first()
+                            } else {
+                                throw IllegalStateException("Did not find exactly one main() function")
+                            }
+                        }
+                    }
+                    registerSibling(ApplicationMainFunction(mainFunction))
                 }
             }
 

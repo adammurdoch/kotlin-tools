@@ -20,6 +20,9 @@ abstract class DefaultJvmUiApplication @Inject constructor(
     override val kspConfigurationName: String
         get() = "ksp"
 
+    override val kspTaskName: String
+        get() = "kspKotlin"
+
     override fun dependencies(config: Dependencies.() -> Unit) {
         main.dependencies.config()
     }

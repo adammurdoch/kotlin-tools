@@ -15,7 +15,7 @@ class NativeApplicationTargets(
     val common = DefaultPlatformContribution(commonMain, commonTest)
     private val osComponents = mutableMapOf<OperatingSystem, DefaultOperatingSystemTargetApplication>()
 
-    fun visitPlatforms(visitor: (PlatformContribution) -> Unit) {
+    fun visitOtherPlatforms(visitor: (PlatformContribution) -> Unit) {
         visitor(common)
         // The others are registered via ComponentFactory
     }

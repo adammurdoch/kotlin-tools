@@ -22,7 +22,7 @@ internal abstract class DefaultMultiPlatformLibrary @Inject constructor(
     val module: JvmModule
         get() = createJvm().module
 
-    override fun visitPlatforms(visitor: (PlatformContribution) -> Unit) {
+    override fun visitOtherPlatforms(visitor: (PlatformContribution) -> Unit) {
         visitor(common)
         // The others are registered via ComponentFactory
     }

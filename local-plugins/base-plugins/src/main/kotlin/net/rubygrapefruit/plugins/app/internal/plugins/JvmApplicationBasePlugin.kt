@@ -51,7 +51,6 @@ class JvmApplicationBasePlugin : Plugin<Project> {
 
                 each<ApplicationMainFunction> {
                     prepare { function, application ->
-                        println("-> set app main class")
                         application.mainClass.set(function.mainFunction.map { it.ownerJvmClass!! })
                     }
                 }

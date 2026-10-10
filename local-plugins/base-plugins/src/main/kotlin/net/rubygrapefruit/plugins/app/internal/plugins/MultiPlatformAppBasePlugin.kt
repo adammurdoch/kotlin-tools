@@ -12,13 +12,12 @@ class MultiPlatformAppBasePlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             componentRegistry.each<MutableMultiPlatformApplication> {
-                each<HasOsTarget> {
+                each<HasMachineTarget> {
                     derive { component, app ->
-                        for (machine in component.target.machines) {
-                            val kotlinTarget = kotlin.targets.getByName(machine.kotlinTarget) as KotlinNativeTarget
-                            val canBuild = NativeMachine.current.canBuild(machine)
-                            registerSibling(RealizedNativeMachineApplication(canBuild, machine, app.entryPoint, kotlinTarget))
-                        }
+                        val machine = component.target
+                        val kotlinTarget = kotlin.targets.getByName(machine.kotlinTarget) as KotlinNativeTarget
+                        val canBuild = NativeMachine.current.canBuild(machine)
+                        register(RealizedNativeMachineApplication(canBuild, machine, app.entryPoint, kotlinTarget))
                     }
                 }
             }

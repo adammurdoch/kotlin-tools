@@ -18,7 +18,7 @@ class MultiPlatformComponentBasePlugin : Plugin<Project> {
 
             componentRegistry.each<HasTargets> {
                 derive { component ->
-                    component.visitPlatforms { contribution ->
+                    component.visitOtherPlatforms { contribution ->
                         register(contribution)
                     }
                 }

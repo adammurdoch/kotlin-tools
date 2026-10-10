@@ -17,8 +17,8 @@ abstract class DefaultNativeUiApplication @Inject constructor(
 ) : DefaultUiApplication(objects, providers, project), NativeUIApplication, MutableMultiPlatformApplication, HasTargets {
     private val appTargets = NativeApplicationTargets(objects, componentFactory, generatedSource)
 
-    override fun visitPlatforms(visitor: (PlatformContribution) -> Unit) {
-        appTargets.visitPlatforms(visitor)
+    override fun visitOtherPlatforms(visitor: (PlatformContribution) -> Unit) {
+        appTargets.visitOtherPlatforms(visitor)
     }
 
     override fun macOS(config: NativeComponent<Dependencies>.() -> Unit) {

@@ -30,7 +30,7 @@ open class ComponentRegistry(private val project: Project) {
     }
 
     fun <T : Any> each(type: KClass<T>, action: Rules<T>.() -> Unit) {
-        Rules(type, rules).action()
+        AllWithTypeRules(type, rules).action()
     }
 
     inline fun <reified T : Any> each(noinline action: Rules<T>.() -> Unit) {
@@ -39,7 +39,7 @@ open class ComponentRegistry(private val project: Project) {
 
     private fun applyRules(phase: Phase, registration: Registration, context: Context) {
         for (rule in rules.rules) {
-            rule.maybeApply(phase, registration.value, registration.parent?.value, context)
+            rule.maybeApply(phase, registration, context)
         }
     }
 
@@ -60,8 +60,8 @@ open class ComponentRegistry(private val project: Project) {
         Derive
     }
 
-    internal sealed class Rule {
-        abstract fun maybeApply(phase: Phase, component: Any, parent: Any?, context: Context)
+    private sealed class Rule {
+        abstract fun maybeApply(phase: Phase, registration: Registration, context: Context)
     }
 
     private class ApplyToType<T : Any>(
@@ -69,22 +69,25 @@ open class ComponentRegistry(private val project: Project) {
         val type: KClass<T>,
         val action: Context.(T) -> Unit
     ) : Rule() {
-        override fun maybeApply(phase: Phase, component: Any, parent: Any?, context: Context) {
+        override fun maybeApply(phase: Phase, registration: Registration, context: Context) {
+            val component = registration.value
             if (phase == this.phase && type.isInstance(component)) {
                 context.action(type.cast(component))
             }
         }
     }
 
-    private class ApplyToTypeWithParent<T : Any, P : Any>(
+    private class ApplyToTypeWithAncestor<T : Any, P : Any>(
         val phase: Phase,
         val type: KClass<T>,
         val parentType: KClass<P>,
         val action: Context.(T, P) -> Unit
     ) : Rule() {
-        override fun maybeApply(phase: Phase, component: Any, parent: Any?, context: Context) {
-            if (phase == this.phase && parentType.isInstance(parent) && type.isInstance(component)) {
-                context.action(type.cast(component), parentType.cast(parent))
+        override fun maybeApply(phase: Phase, registration: Registration, context: Context) {
+            val component = registration.value
+            val parent = registration.findAncestor(parentType)
+            if (phase == this.phase && parent != null && type.isInstance(component)) {
+                context.action(type.cast(component), parent)
             }
         }
     }
@@ -98,10 +101,12 @@ open class ComponentRegistry(private val project: Project) {
         private val deps = mutableMapOf<P, D>()
         private val waiting = mutableMapOf<P, MutableList<T>>()
 
-        override fun maybeApply(phase: Phase, component: Any, parent: Any?, context: Context) {
+        override fun maybeApply(phase: Phase, registration: Registration, context: Context) {
             if (phase != Phase.Derive) {
                 return
             }
+            val component = registration.value
+            val parent = registration.parent?.value
             if (parentType.isInstance(parent)) {
                 val typedParent = parentType.cast(parent)
                 if (type.isInstance(component)) {
@@ -125,7 +130,7 @@ open class ComponentRegistry(private val project: Project) {
         }
     }
 
-    internal class RuleSet {
+    private class RuleSet {
         val rules = mutableListOf<Rule>()
 
         fun add(rule: Rule) {
@@ -133,78 +138,110 @@ open class ComponentRegistry(private val project: Project) {
         }
     }
 
-    class Rules<T : Any> internal constructor(
-        private val type: KClass<T>,
-        private val rules: RuleSet
-    ) {
+    abstract class Rules<T : Any> {
         /**
-         * Initializes the target when it is created. Applied to objects create via [ComponentFactory].
+         * Initializes the target during project configuration. Applied to objects create via [ComponentFactory] or registered explicitly.
+         * This is intended to be used when some plugin requires configuration to happen before project's afterEvaluate.
+         *
+         * Should prefer using [prepare].
          */
-        fun initialize(action: Context.(T) -> Unit) {
-            rules.add(ApplyToType(Phase.Initialize, type) { action(it) })
-        }
+        abstract fun initialize(action: Context.(T) -> Unit)
 
         /**
          * Mutates the target. All prepare rules are run before any derive rules.
          */
-        fun prepare(action: (T) -> Unit) {
-            rules.add(ApplyToType(Phase.Prepare, type) { action(it) })
-        }
+        abstract fun prepare(action: (T) -> Unit)
 
         /**
          * Called after each value of T has been realized.
          */
-        fun derive(action: Context.(T) -> Unit) {
-            rules.add(ApplyToType(Phase.Derive, type, action))
-        }
+        abstract fun derive(action: Context.(T) -> Unit)
 
-        fun <S : Any> each(childType: KClass<S>, action: Rules2<S, T>.() -> Unit) {
-            Rules2(childType, type, rules).action()
-        }
+        /**
+         * Applies rules to each descendent of the given type.
+         */
+        abstract fun <S : Any> each(descendentType: KClass<S>, action: Rules2<S, T>.() -> Unit)
 
+        /**
+         * Applies rules to each descendent of the given type.
+         */
         inline fun <reified S : Any> each(noinline action: Rules2<S, T>.() -> Unit) {
             each(S::class, action)
         }
     }
 
-    class Rules2<S : Any, T : Any> internal constructor(
-        private val type: KClass<S>,
-        private val parentType: KClass<T>,
+    private class AllWithTypeRules<T : Any>(
+        private val type: KClass<T>,
         private val rules: RuleSet
-    ) {
-        fun prepare(action: (S, T) -> Unit) {
-            rules.add(ApplyToTypeWithParent(Phase.Prepare, type, parentType) { value, parent -> action(value, parent) })
+    ) : Rules<T>() {
+        override fun initialize(action: Context.(T) -> Unit) {
+            rules.add(ApplyToType(Phase.Initialize, type) { action(it) })
         }
+
+        override fun prepare(action: (T) -> Unit) {
+            rules.add(ApplyToType(Phase.Prepare, type) { action(it) })
+        }
+
+        override fun derive(action: Context.(T) -> Unit) {
+            rules.add(ApplyToType(Phase.Derive, type, action))
+        }
+
+        override fun <S : Any> each(descendentType: KClass<S>, action: Rules2<S, T>.() -> Unit) {
+            AllWithTypeAndAncestor(descendentType, type, rules).action()
+        }
+    }
+
+    abstract class Rules2<S : Any, T : Any> {
+        abstract fun prepare(action: (S, T) -> Unit)
 
         /**
          * Called after each value has been realized.
          */
-        fun derive(action: Context.(S, T) -> Unit) {
-            rules.add(ApplyToTypeWithParent(Phase.Derive, type, parentType, action))
-        }
+        abstract fun derive(action: Context.(S, T) -> Unit)
 
         /**
          * Requires a sibling with the given type.
          */
-        fun <U : Any> require(depType: KClass<U>, action: Rules3<S, T, U>.() -> Unit) {
-            Rules3(type, parentType, depType, rules).action()
-        }
+        abstract fun <U : Any> require(depType: KClass<U>, action: Rules3<S, T, U>.() -> Unit)
 
         inline fun <reified U : Any> require(noinline action: Rules3<S, T, U>.() -> Unit) {
             require(U::class, action)
         }
     }
 
-    class Rules3<S : Any, T : Any, U : Any> internal constructor(
+    private class AllWithTypeAndAncestor<S : Any, T : Any>(
+        private val type: KClass<S>,
+        private val parentType: KClass<T>,
+        private val rules: RuleSet
+    ) : Rules2<S, T>() {
+        override fun prepare(action: (S, T) -> Unit) {
+            rules.add(ApplyToTypeWithAncestor(Phase.Prepare, type, parentType) { value, parent -> action(value, parent) })
+        }
+
+        override fun derive(action: Context.(S, T) -> Unit) {
+            rules.add(ApplyToTypeWithAncestor(Phase.Derive, type, parentType, action))
+        }
+
+        override fun <U : Any> require(depType: KClass<U>, action: Rules3<S, T, U>.() -> Unit) {
+            DefaultRules3(type, parentType, depType, rules).action()
+        }
+
+    }
+
+    abstract class Rules3<S : Any, T : Any, U : Any> {
+        /**
+         * Called after each value has been realized.
+         */
+        abstract fun derive(action: Context.(S, T, U) -> Unit)
+    }
+
+    private class DefaultRules3<S : Any, T : Any, U : Any>(
         private val type: KClass<S>,
         private val parentType: KClass<T>,
         private val depType: KClass<U>,
         private val rules: RuleSet
-    ) {
-        /**
-         * Called after each value has been realized.
-         */
-        fun derive(action: Context.(S, T, U) -> Unit) {
+    ) : Rules3<S, T, U>() {
+        override fun derive(action: Context.(S, T, U) -> Unit) {
             rules.add(DeriveFromTypeWithParentAndDep(type, parentType, depType, action))
         }
     }
@@ -301,6 +338,18 @@ open class ComponentRegistry(private val project: Project) {
                 "$parent > $value"
             } else {
                 value.toString()
+            }
+        }
+
+        fun <T : Any> findAncestor(parentType: KClass<T>): T? {
+            return parent?.find(parentType)
+        }
+
+        private fun <T : Any> find(type: KClass<T>): T? {
+            return if (type.isInstance(value)) {
+                type.cast(value)
+            } else {
+                parent?.find(type)
             }
         }
     }

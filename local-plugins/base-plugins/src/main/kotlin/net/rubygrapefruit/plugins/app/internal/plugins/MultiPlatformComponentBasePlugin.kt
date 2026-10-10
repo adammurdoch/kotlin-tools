@@ -26,10 +26,10 @@ class MultiPlatformComponentBasePlugin : Plugin<Project> {
 
             componentRegistry.each<HasOsTarget> {
                 initialize { component ->
-                    component.visitMachines { machine ->
+                    component.visitTargets { target ->
                         // Declare the Kotlin targets eagerly at configuration time, so that these are in the appropriate state to allow
                         // executables to be declared on the target later
-                        when (machine) {
+                        when (target.target) {
                             MacOsArm64 -> kotlin.macosArm64()
                             MacOsX64 -> {
                                 @Suppress("DEPRECATION")
@@ -40,12 +40,6 @@ class MultiPlatformComponentBasePlugin : Plugin<Project> {
                             LinuxArm64 -> kotlin.linuxArm64()
                             WindowsX64 -> kotlin.mingwX64()
                         }
-                    }
-                    // This has to be done eagerly, for example to set up KSP dependencies
-                    component.createTargets()
-                }
-                derive { component ->
-                    component.visitTargets { target ->
                         register(target)
                     }
                 }

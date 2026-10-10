@@ -17,14 +17,12 @@ class NativeApplicationTargets(
 
     fun visitPlatforms(visitor: (PlatformContribution) -> Unit) {
         visitor(common)
-        for (component in osComponents.values) {
-            visitor(component)
-        }
+        // The others are registered via ComponentFactory
     }
 
     fun forOperatingSystem(operatingSystem: OperatingSystem): DefaultOperatingSystemTargetApplication {
         return osComponents.getOrPut(operatingSystem) {
-            val component = objects.newInstance(DefaultOperatingSystemTargetApplication::class.java, operatingSystem, componentFactory)
+            val component = objects.newInstance(DefaultOperatingSystemTargetApplication::class.java, operatingSystem)
             componentFactory.created(component)
         }
     }

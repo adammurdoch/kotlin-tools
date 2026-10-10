@@ -8,24 +8,22 @@ import kotlin.reflect.cast
 
 open class ComponentRegistry(private val project: Project) {
     private val rules = RuleSet()
-    private val context = DefaultContext(SourceSets(project)) { value, context ->
-        applyRules(Phase.Prepare, value, context)
-        applyRules(Phase.Derive, value, context)
-    }
+    private val context = DefaultContext(SourceSets(project), ::applyRules)
+    private var main: Registration? = null
     val factory: ComponentFactory = DefaultComponentFactory { value ->
-        applyRules(Phase.Initialize, Registration(null, value), context)
+        require(main != null)
+        context.start(Registration(main, value))
     }
-    private var main: MutableComponent? = null
 
     fun register(component: MutableComponent) {
         if (main != null) {
             throw UnsupportedOperationException("Support for multiple root components in the same project is not implemented.")
         }
-        main = component
         val registration = Registration(null, component)
-        applyRules(Phase.Initialize, registration, context)
+        main = registration
+        context.start(registration)
         project.afterEvaluate {
-            context.start(registration)
+            context.realizeAll()
 //            applyActions.clear()
 //            deriveActions.clear()
         }
@@ -140,9 +138,9 @@ open class ComponentRegistry(private val project: Project) {
         private val rules: RuleSet
     ) {
         /**
-         * Initializes the target when it is created. Only applied to objects create via [ComponentFactory].
+         * Initializes the target when it is created. Applied to objects create via [ComponentFactory].
          */
-        fun initialize(action: (T) -> Unit) {
+        fun initialize(action: Context.(T) -> Unit) {
             rules.add(ApplyToType(Phase.Initialize, type) { action(it) })
         }
 
@@ -185,6 +183,9 @@ open class ComponentRegistry(private val project: Project) {
             rules.add(ApplyToTypeWithParent(Phase.Derive, type, parentType, action))
         }
 
+        /**
+         * Requires a sibling with the given type.
+         */
         fun <U : Any> require(depType: KClass<U>, action: Rules3<S, T, U>.() -> Unit) {
             Rules3(type, parentType, depType, rules).action()
         }
@@ -223,41 +224,66 @@ open class ComponentRegistry(private val project: Project) {
         fun deriveFromSourceSet(name: String, action: Context.(KotlinSourceSet) -> Unit)
     }
 
-    private class DefaultContext(val sourceSets: SourceSets, val realizeAction: (Registration, Context) -> Unit) : Context {
+    private class DefaultContext(val sourceSets: SourceSets, val applyRules: (Phase, Registration, Context) -> Unit) : Context {
+        private val all = mutableSetOf<Any>()
+        private val initialized = mutableListOf<Registration>()
         private val queue = mutableListOf<Registration>()
-        private var realizing: Registration? = null
+        private var initializing = true
+        private var visiting: Registration? = null
 
         fun start(registration: Registration) {
-            queue.add(registration)
-            realize()
+            register(registration)
+            applyRulesToQueued()
         }
 
-        fun realize() {
-            if (realizing != null) {
+        fun realizeAll() {
+            require(queue.isEmpty() && visiting == null)
+            initializing = false
+            queue.addAll(initialized)
+            initialized.clear()
+            applyRulesToQueued()
+        }
+
+        private fun applyRulesToQueued() {
+            if (visiting != null) {
+                // Already working on the queue
                 return
             }
             while (queue.isNotEmpty()) {
                 val registration = queue.removeFirst()
-                realizing = registration
-                realizeAction(registration, this)
+                visiting = registration
+                if (initializing) {
+                    applyRules(Phase.Initialize, registration, this)
+                    initialized.add(registration)
+                } else {
+                    applyRules(Phase.Prepare, registration, this)
+                    applyRules(Phase.Derive, registration, this)
+                }
             }
-            realizing = null
+            visiting = null
         }
 
         override fun register(value: Any) {
-            require(realizing != null)
-            queue.add(Registration(realizing, value))
+            require(visiting != null)
+            register(Registration(visiting, value))
         }
 
         override fun registerSibling(value: Any) {
-            require(realizing != null)
-            queue.add(Registration(realizing?.parent, value))
+            require(visiting != null)
+            register(Registration(visiting?.parent, value))
+        }
+
+        private fun register(registration: Registration) {
+            if (!all.add(registration.value)) {
+                throw IllegalStateException("Object ${registration.value} already registered")
+            }
+            queue.add(registration)
         }
 
         override fun deriveFromSourceSet(name: String, action: Context.(KotlinSourceSet) -> Unit) {
             sourceSets.withSourceSet(name) { sourceSet, _ ->
                 action(sourceSet)
-                realize()
+                applyRulesToQueued()
             }
         }
     }
@@ -269,5 +295,13 @@ open class ComponentRegistry(private val project: Project) {
         }
     }
 
-    private class Registration(val parent: Registration?, val value: Any)
+    private class Registration(val parent: Registration?, val value: Any) {
+        override fun toString(): String {
+            return if (parent != null) {
+                "$parent > $value"
+            } else {
+                value.toString()
+            }
+        }
+    }
 }

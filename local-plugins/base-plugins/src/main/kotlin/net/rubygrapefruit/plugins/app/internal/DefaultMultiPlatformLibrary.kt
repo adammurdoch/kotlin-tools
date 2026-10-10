@@ -24,18 +24,7 @@ internal abstract class DefaultMultiPlatformLibrary @Inject constructor(
 
     override fun visitPlatforms(visitor: (PlatformContribution) -> Unit) {
         visitor(common)
-        if (jvm != null) {
-            visitor(jvm!!)
-        }
-        if (browser != null) {
-            visitor(browser!!)
-        }
-        if (desktop != null) {
-            visitor(desktop!!)
-        }
-        for (component in osComponents.values) {
-            visitor(component)
-        }
+        // The others are registered via ComponentFactory
     }
 
     override fun jvm(config: JvmLibrary.() -> Unit) {
@@ -97,7 +86,7 @@ internal abstract class DefaultMultiPlatformLibrary @Inject constructor(
 
     private fun createForOS(operatingSystem: OperatingSystem): DefaultNativeLibrary {
         return osComponents.getOrPut(operatingSystem) {
-            val library = factory.newInstance(DefaultOperatingSystemTargetLibrary::class.java, operatingSystem, componentFactory)
+            val library = factory.newInstance(DefaultOperatingSystemTargetLibrary::class.java, operatingSystem)
             componentFactory.created(library)
             componentRegistry.forOperatingSystem(operatingSystem)
             library

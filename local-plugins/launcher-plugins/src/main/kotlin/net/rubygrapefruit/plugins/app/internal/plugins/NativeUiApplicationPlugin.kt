@@ -27,11 +27,12 @@ class NativeUiApplicationPlugin : Plugin<Project> {
                 }
 
                 each<RealizedNativeMachineApplication> {
-                    derive { target, app ->
+                    derive { target, _ ->
+                        println("-> add launcher generator for ${target.machine}")
                         val generatorTask = tasks.register("generate${target.machine.kotlinTarget}Launcher", NativeLauncher::class.java) {
                             it.sourceDirectory.set(layout.buildDirectory.dir("generated/ui-launcher/${target.machine.kotlinTarget}"))
                             it.packageName.set("ui")
-                            it.delegateMethod.set(app.entryPoint)
+                            it.delegateMethod.set(target.entryPoint)
                         }
                         val sourceSet = target.target.compilations.getByName("main").defaultSourceSet
                         sourceSet.generatedKotlin.srcDir(generatorTask.flatMap { it.sourceDirectory })

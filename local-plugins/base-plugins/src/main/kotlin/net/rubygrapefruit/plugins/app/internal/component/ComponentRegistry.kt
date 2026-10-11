@@ -92,7 +92,7 @@ open class ComponentRegistry(private val project: Project) {
         }
     }
 
-    private class DeriveFromTypeWithParentAndDep<T : Any, P : Any, D : Any>(
+    private class DeriveFromTypeWithAncestorAndDep<T : Any, P : Any, D : Any>(
         val type: KClass<T>,
         val parentType: KClass<P>,
         val depType: KClass<D>,
@@ -106,24 +106,27 @@ open class ComponentRegistry(private val project: Project) {
                 return
             }
             val component = registration.value
-            val parent = registration.parent?.value
-            if (parentType.isInstance(parent)) {
-                val typedParent = parentType.cast(parent)
+            val ancestor = registration.findAncestor(parentType)
+            if (ancestor != null) {
                 if (type.isInstance(component)) {
-                    val dep = deps[parent]
+                    val dep = deps[ancestor]
                     val typedComponent = type.cast(component)
                     if (dep != null) {
-                        context.action(typedComponent, typedParent, dep)
+                        context.action(typedComponent, ancestor, dep)
                     } else {
-                        waiting.getOrPut(typedParent) { mutableListOf() }.add(typedComponent)
+                        waiting.getOrPut(ancestor) { mutableListOf() }.add(typedComponent)
                     }
-                }
-                if (depType.isInstance(component)) {
-                    val dep = depType.cast(component)
-                    deps[typedParent] = dep
+                } else {
+                    val parent = registration.parent?.value
+                    if (depType.isInstance(component) && parentType.isInstance(parent)) {
+                        val typedParent = parentType.cast(parent)
 
-                    waiting.remove(typedParent)?.forEach {
-                        context.action(it, typedParent, dep)
+                        val dep = depType.cast(component)
+                        deps[typedParent] = dep
+
+                        waiting.remove(typedParent)?.forEach {
+                            context.action(it, typedParent, dep)
+                        }
                     }
                 }
             }
@@ -223,9 +226,8 @@ open class ComponentRegistry(private val project: Project) {
         }
 
         override fun <U : Any> require(depType: KClass<U>, action: Rules3<S, T, U>.() -> Unit) {
-            DefaultRules3(type, parentType, depType, rules).action()
+            AllWithTypeAndAncestorAndDep(type, parentType, depType, rules).action()
         }
-
     }
 
     abstract class Rules3<S : Any, T : Any, U : Any> {
@@ -235,14 +237,14 @@ open class ComponentRegistry(private val project: Project) {
         abstract fun derive(action: Context.(S, T, U) -> Unit)
     }
 
-    private class DefaultRules3<S : Any, T : Any, U : Any>(
+    private class AllWithTypeAndAncestorAndDep<S : Any, T : Any, U : Any>(
         private val type: KClass<S>,
         private val parentType: KClass<T>,
         private val depType: KClass<U>,
         private val rules: RuleSet
     ) : Rules3<S, T, U>() {
         override fun derive(action: Context.(S, T, U) -> Unit) {
-            rules.add(DeriveFromTypeWithParentAndDep(type, parentType, depType, action))
+            rules.add(DeriveFromTypeWithAncestorAndDep(type, parentType, depType, action))
         }
     }
 

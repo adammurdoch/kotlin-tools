@@ -4,7 +4,6 @@ plugins {
 }
 
 application {
-    entryPoint = "sample.main"
     nativeDesktop()
     common {
         implementation("net.rubygrapefruit:cli-app:1.0")

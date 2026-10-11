@@ -3,7 +3,6 @@ plugins {
 }
 
 application {
-    entryPoint = "sample.main"
     nativeDesktop()
     common {
         implementation(versions.libs.coordinates("cli-app"))

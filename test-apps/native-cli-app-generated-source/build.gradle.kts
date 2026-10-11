@@ -14,7 +14,6 @@ val macosGeneratorTask = tasks.register<SourceGeneratorTask>("generateMacOSSourc
 }
 
 application {
-    entryPoint = "sample.main"
     nativeDesktop()
     common {
         implementation(project(":kmp-lib-generated-source"))

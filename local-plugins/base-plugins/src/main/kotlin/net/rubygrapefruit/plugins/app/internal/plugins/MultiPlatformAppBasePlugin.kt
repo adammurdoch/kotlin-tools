@@ -17,10 +17,21 @@ class MultiPlatformAppBasePlugin : Plugin<Project> {
                         val machine = component.target
                         val kotlinTarget = kotlin.targets.getByName(machine.kotlinTarget) as KotlinNativeTarget
                         val canBuild = NativeMachine.current.canBuild(machine)
-                        register(RealizedNativeMachineApplication(canBuild, machine, app.entryPoint, kotlinTarget))
+                        register(RealizedNativeMachineApplication(canBuild, machine, objects.property(String::class.java), app.entryPoint, kotlinTarget))
                     }
                 }
             }
+
+            componentRegistry.each<HasMachineTarget> {
+                each<RealizedNativeMachineApplication> {
+                    require<ApplicationMainFunction> {
+                        derive { machine, _, function ->
+                            machine.entryPoint.convention(machine.declaredAppEntryPoint.orElse(function.mainFunction.map { "${it.packageName}.main" }))
+                        }
+                    }
+                }
+            }
+
             componentRegistry.each<RealizedNativeMachineApplication> {
                 derive { target ->
                     val binaries = target.target.binaries

@@ -17,16 +17,20 @@ open class NativeCliApplicationPlugin : Plugin<Project> {
             plugins.apply(MultiPlatformAppBasePlugin::class.java)
 
             componentRegistry.each<DefaultNativeCliApplication> {
-                initialize { app ->
-                    app.entryPoint.convention("main")
-                }
-
                 each<RealizedNativeExecutable> {
                     derive { executable, app ->
                         val buildType = executable.buildType
                         val machine = executable.machine
 
-                        executable.executable.entryPoint = executable.entryPoint.get()
+                        executable.executable.linkTaskProvider.configure { task ->
+                            // Need to use reflection as entry point is not exposed as a lazy property
+                            task.inputs.property("actualEntryPoint", executable.entryPoint)
+                            task.doFirst {
+                                val field = task.javaClass.superclass!!.declaredFields.find { it.name == "_entryPoint\$delegate" }
+                                field!!.isAccessible = true
+                                field.set(task, executable.entryPoint)
+                            }
+                        }
 
                         val distribution = app.distributionContainer.add(
                             buildType.name,

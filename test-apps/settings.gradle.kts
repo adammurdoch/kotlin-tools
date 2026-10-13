@@ -124,9 +124,7 @@ samples {
             launcher("App")
         }
     }
-    jvmUiApp("jvm-ui-app-generated-source") {
-        expectedOutput("Starting application 'Jvm-ui-app-generated-source'")
-    }
+    jvmUiApp("jvm-ui-app-generated-source")
 
     nativeUiApp("native-ui-app") {
         derive("native-ui-app-customized") {

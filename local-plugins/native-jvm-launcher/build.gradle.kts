@@ -15,6 +15,17 @@ application {
     }
 }
 
+kotlin {
+    macosArm64 {
+        compilations.getByName("main") {
+            cinterops.create("jni") {
+                includeDirs("${System.getProperty("java.home")}/include")
+                includeDirs("${System.getProperty("java.home")}/include/darwin")
+            }
+        }
+    }
+}
+
 componentRegistry.each<RealizedNativeExecutable> {
     derive { executable ->
         if (executable.canBuildOnHost && executable.buildType == Release) {

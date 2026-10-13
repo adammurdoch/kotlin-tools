@@ -1,8 +1,15 @@
+import jni.*
 import kotlinx.cinterop.*
 import net.rubygrapefruit.app.ui.launcher.failed
 import net.rubygrapefruit.app.ui.launcher.runMain
+import platform.AppKit.NSApplication
+import platform.AppKit.NSApplicationActivationPolicy
 import platform.Foundation.NSBundle
+import platform.Foundation.NSThread
 import platform.posix.*
+
+@OptIn(ExperimentalForeignApi::class)
+private typealias CreateJavaVM = CFunction<(CPointer<CPointerVar<JavaVMVar>>?, CPointer<COpaquePointerVar>?, COpaquePointer?) -> jint>
 
 @OptIn(ExperimentalForeignApi::class)
 fun main(args: Array<String>) {
@@ -25,18 +32,66 @@ fun main(args: Array<String>) {
         println("App display name: $appDisplayName")
         println("Main class: $mainClass")
 
-        val args = listOf(
-            launcher,
-            "-Xdock:name=$appDisplayName",
-            "-Xdock:icon=$bundlePath/Contents/Resources/$icon",
-            "-Dapple.laf.useScreenMenuBar=true",
-            "--module",
-            mainClass
-        ) + args
-        memScoped {
-            execv(args.first(), (args.map { it.cstr.ptr } + listOf(null)).toCValues())
+        val app = NSApplication.sharedApplication
+
+        val jvmThread = NSThread {
+            memScoped {
+                val jvmLibraryPath = "$bundlePath/Contents/jvm/lib/server/libjvm.dylib"
+                val libHandle = dlopen(jvmLibraryPath, RTLD_LAZY) ?: failed("Could not open JVM library")
+                val address = dlsym(libHandle, "JNI_CreateJavaVM") ?: failed("Could not locate JVM create function")
+                val createJavaVM = address.reinterpret<CreateJavaVM>()
+
+                val jvm = alloc<CPointerVar<JavaVMVar>>()
+                val jniEnv = alloc<CPointerVar<JNIEnvVar>>()
+                val jvmArgs = alloc<JavaVMInitArgs>()
+
+                jvmArgs.version = JNI_VERSION_21
+                jvmArgs.nOptions = 0
+                jvmArgs.options = null
+                jvmArgs.ignoreUnrecognized = 0.convert()
+
+                val result = createJavaVM(jvm.ptr, jniEnv.ptr.reinterpret(), jvmArgs.ptr)
+                if (result != JNI_OK) {
+                    throw RuntimeException("Could not create JVM: $result")
+                }
+
+                val env = jniEnv.value
+                val functions = jniEnv.pointed!!.pointed!!
+                val mainClassHandle = functions.FindClass!!(env, mainClass.substringAfterLast("/").replace('.', '/').cstr.ptr)
+                if (mainClassHandle == null) {
+                    throw RuntimeException("Could not load main class $mainClass")
+                }
+                val mainMethodHandle = functions.GetStaticMethodID!!(env, mainClassHandle, "main".cstr.ptr, "([Ljava/lang/String;)V".cstr.ptr)
+                if (mainMethodHandle == null) {
+                    throw RuntimeException("Could not locate ${mainClass}.main() method")
+                }
+                val stringHandle = functions.FindClass!!(env, "java/lang/String".cstr.ptr)
+                if (stringHandle == null) {
+                    throw RuntimeException("Could not locate Java String class")
+                }
+                val mainMethodArgs = functions.NewObjectArray!!(env, args.size, stringHandle, null)
+                args.forEachIndexed { index, arg ->
+                    functions.SetObjectArrayElement!!(env, mainMethodArgs, index, functions.NewStringUTF!!(env, arg.cstr.ptr))
+                }
+                val callArgs = allocArray<jvalue>(1)
+                callArgs[0].l = mainMethodArgs
+                functions.CallStaticVoidMethodA!!(env, mainClassHandle, mainMethodHandle, callArgs)
+
+                if (functions.ExceptionCheck!!(env) != 0.toUByte()) {
+                    functions.ExceptionDescribe!!(env)
+                }
+
+                println("-> main() completed")
+
+                val vm = jvm.value!!
+                vm.pointed.pointed!!.DestroyJavaVM!!(vm)
+
+                println("-> JVM finished")
+            }
         }
-        failed("Could not launch app using $launcher")
+
+        jvmThread.start()
+        app.run()
     }
 }
 

@@ -15,16 +15,13 @@ abstract class LauncherConf : DefaultTask() {
     abstract val applicationDisplayName: Property<String>
 
     @get:Input
-    abstract val module: Property<String>
-
-    @get:Input
     abstract val mainClass: Property<String>
 
     @get:Input
-    abstract val javaCommand: Property<String>
+    abstract val jvmDirPath: Property<String>
 
     @get:Input
-    abstract val iconName: Property<String>
+    abstract val startOnMainThread: Property<Boolean>
 
     @TaskAction
     fun generate() {
@@ -32,9 +29,9 @@ abstract class LauncherConf : DefaultTask() {
         configFile.writeText(
             """
             ${applicationDisplayName.get()}
-            ${iconName.get()}
-            ${javaCommand.get()}
-            ${module.get()}/${mainClass.get()}
+            ${jvmDirPath.get()}
+            ${mainClass.get()}
+            ${startOnMainThread.get()}
         """.trimIndent()
         )
     }

@@ -53,6 +53,7 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                         it.from(sourceSet.output)
                     }
 
+                    app.startOnMainThread.convention(false)
                     app.module.requires.add("net.rubygrapefruit.ui_app_bootstrap")
                     app.runtimeModulePath.from(configuration)
 
@@ -91,10 +92,9 @@ class JvmUiApplicationPlugin : Plugin<Project> {
                         val configTask = tasks.register(dist.taskName("launcherConf"), LauncherConf::class.java) {
                             it.configFile.set(layout.buildDirectory.file(dist.buildDirName("launcher-config") + "/launcher.conf"))
                             it.applicationDisplayName.set(app.capitalizedAppName)
-                            it.iconName.set(app.iconName)
-                            it.javaCommand.set(dist.javaLauncherPath)
-                            it.module.set(app.module.name)
+                            it.jvmDirPath.set("jvm")
                             it.mainClass.set("ui.MainKt")
+                            it.startOnMainThread.set(app.startOnMainThread)
                         }
 
                         dist.launcherFile.set(launcherTask.flatMap { it.outputFile })

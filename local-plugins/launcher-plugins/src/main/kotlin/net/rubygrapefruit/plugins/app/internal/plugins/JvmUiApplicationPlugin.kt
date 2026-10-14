@@ -9,10 +9,7 @@ import net.rubygrapefruit.plugins.app.internal.tasks.NativeUiLauncher
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.attributes.Usage
-import org.gradle.api.tasks.SourceSetContainer
-import org.gradle.jvm.tasks.Jar
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 
 @OptIn(ExperimentalKotlinGradlePluginApi::class)
 @Suppress("unused")
@@ -25,33 +22,20 @@ class JvmUiApplicationPlugin : Plugin<Project> {
 
             componentRegistry.each<DefaultJvmUiApplication> {
                 derive { app ->
-                    val generatorTask = tasks.register("generateLauncher", NativeLauncher::class.java) {
-                        it.sourceDirectory.set(layout.buildDirectory.dir("generated/ui-launcher"))
+                    val generatorTask = tasks.register("jvmUiLauncher", NativeLauncher::class.java) {
+                        it.sourceDirectory.set(layout.buildDirectory.dir("generated/jvm-ui-launcher"))
                         it.packageName.set("ui")
                         it.delegateMethod.set(app.mainClass.map { mainClass -> "${mainClass.substringBeforeLast('.')}.main" })
                     }
 
-                    val sourceSets = extensions.getByType(SourceSetContainer::class.java)
+                    val sourceSet = addGeneratedProductionSourceSet("jvmUiLauncher")
 
-                    val sourceSet = sourceSets.create("launcher")
-                    sourceSet.java.setSrcDirs(emptyList<String>())
-                    sourceSet.resources.setSrcDirs(emptyList<String>())
-
-                    val configuration = configurations.create("launcherRuntime")
+                    val configuration = configurations.create("jvmUiLauncherRuntime")
                     dependencies.add(configuration.name, Versions.libs.coordinates("ui-app-bootstrap"))
 
-                    val kotlin = extensions.getByType(KotlinJvmProjectExtension::class.java)
-                    val kotlinSourceSet = kotlin.sourceSets.getByName("launcher")
-                    kotlinSourceSet.kotlin.setSrcDirs(emptyList<String>())
+                    val kotlinSourceSet = sourceSet.kotlinSourceSet
                     kotlinSourceSet.generatedKotlin.srcDir(generatorTask.flatMap { it.sourceDirectory })
-                    kotlinSourceSet.dependencies {
-                        implementation(sourceSets.getByName("main").output)
-                    }
                     configurations.getByName(kotlinSourceSet.implementationConfigurationName).extendsFrom(configuration)
-
-                    tasks.named("jar", Jar::class.java) {
-                        it.from(sourceSet.output)
-                    }
 
                     app.startOnMainThread.convention(false)
                     app.module.requires.add("net.rubygrapefruit.ui_app_bootstrap")

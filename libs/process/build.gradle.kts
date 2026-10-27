@@ -7,6 +7,11 @@ plugins {
 group = versions.libs.group
 
 library {
+    jvm {
+        test {
+            implementation(versions.libs.coordinates("machine-info"))
+        }
+    }
     nativeDesktop()
     common {
         api(project(":file-io"))

@@ -30,6 +30,8 @@ interface ProcessBuilder : ProcessStarter<Unit> {
 
     /**
      * Uses the given action to read from and write to the child process to produce a result.
+     *
+     * The action is called by [Process.waitFor].
      */
     fun <T> withInputAndOutput(action: (Source, Sink) -> T): ProcessStarter<T>
 }

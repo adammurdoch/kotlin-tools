@@ -10,9 +10,23 @@ import kotlin.test.assertEquals
 import kotlin.test.fail
 
 
-expect fun pwd(): List<String>
+fun pwd(): List<String> {
+    return if (isWindows()) {
+        listOf("powershell", "/c", "pwd")
+    } else {
+        listOf("pwd")
+    }
+}
 
-expect fun ls(): List<String>
+fun ls(): List<String> {
+    return if (isWindows()) {
+        listOf("powershell", "/c", "ls")
+    } else {
+        listOf("ls")
+    }
+}
+
+expect fun isWindows(): Boolean
 
 class ProcessBuilderTest {
     private val fixture = FilesFixture()
@@ -78,10 +92,13 @@ class ProcessBuilderTest {
         val result = Process.command(TestApp.path, "head", "1").withInputAndOutput { read, write ->
             write.writeString("greetings\nignore this\n")
             write.emit()
-            read.readString()
-        }.start().waitFor()
+            println("-> READING FROM PROCESS OUTPUT")
+            read.readString().also { println("-> READ '$it'") }
+        }.start().also { println("-> PROCESS STARTED") }.waitFor().also { println("-> PROCESS FINISHED") }
 
         assertEquals("greetings\n", result)
+
+        println("-> TEST ENDED")
     }
 
     @Test

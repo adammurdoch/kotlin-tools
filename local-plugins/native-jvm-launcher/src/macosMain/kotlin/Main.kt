@@ -43,6 +43,7 @@ private fun runJvmOnOtherThread(bundlePath: String, jvmDirPath: String, mainClas
     }
     jvmThread.start()
 
+    // Timer prevents run loop from finishing immediately, while waiting for the JVM to create the UI
     NSTimer.scheduledTimerWithTimeInterval(1.0e10, repeats = true) { }
     while (true) {
         CFRunLoopRunInMode(kCFRunLoopDefaultMode, 1.0e20, false)

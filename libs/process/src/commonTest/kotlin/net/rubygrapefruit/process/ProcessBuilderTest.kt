@@ -91,14 +91,11 @@ class ProcessBuilderTest {
     fun `can run command and act on input and output`() {
         val result = Process.command(TestApp.path, "head", "1").withInputAndOutput { read, write ->
             write.writeString("greetings\nignore this\n")
-            write.emit()
-            println("-> READING FROM PROCESS OUTPUT")
-            read.readString().also { println("-> READ '$it'") }
-        }.start().also { println("-> PROCESS STARTED") }.waitFor().also { println("-> PROCESS FINISHED") }
+            write.flush()
+            read.readString()
+        }.start().waitFor()
 
         assertEquals("greetings\n", result)
-
-        println("-> TEST ENDED")
     }
 
     @Test

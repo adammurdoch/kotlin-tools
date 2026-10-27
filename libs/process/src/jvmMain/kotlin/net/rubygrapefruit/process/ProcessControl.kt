@@ -29,8 +29,7 @@ private class JvmProcessControl(val process: Process, val spec: ProcessStartSpec
         get() = InputStreamBackedRawSource(ProcessSource, process.inputStream)
 
     override val stdin: RawSink
-//        get() = OutputStreamBackedRawSink(process.outputStream)
-        get() = TODO()
+        get() = OutputStreamBackedRawSink(process.outputStream)
 
     override fun waitFor(): Int {
         val exitCode = process.waitFor()

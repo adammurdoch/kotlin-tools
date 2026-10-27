@@ -18,6 +18,7 @@ class OutputStreamBackedRawSink(
     }
 
     override fun flush() {
+        outputStream.flush()
     }
 
     override fun close() {

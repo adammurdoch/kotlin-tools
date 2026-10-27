@@ -36,6 +36,8 @@
     - Help should indicate parameter is optional
     - Help for nested actions with nested actions
     - Show required options in synopsis
+    - Show examples
+    - Show link to documentation
 - Completion
     - Fix global flags for nested actions 
     - Include help message for each choice completion option
@@ -70,6 +72,7 @@
 - Disallow any positional parameters after string list parameter
 - File locations: dir, file, must exist
 - Color output on terminal
+- Declare input environment variables
 - Fuzzy matching and/or suggestions
   - Unknown action
   - Unknown option or value

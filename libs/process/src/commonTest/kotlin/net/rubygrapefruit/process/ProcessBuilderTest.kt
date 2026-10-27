@@ -9,25 +9,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
 
-
-fun pwd(): List<String> {
-    return if (isWindows()) {
-        listOf("powershell", "/c", "pwd")
-    } else {
-        listOf("pwd")
-    }
-}
-
-fun ls(): List<String> {
-    return if (isWindows()) {
-        listOf("powershell", "/c", "ls")
-    } else {
-        listOf("ls")
-    }
-}
-
-expect fun isWindows(): Boolean
-
 class ProcessBuilderTest {
     private val fixture = FilesFixture()
 

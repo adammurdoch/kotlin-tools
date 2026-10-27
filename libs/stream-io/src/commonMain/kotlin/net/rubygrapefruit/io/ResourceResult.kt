@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalStdlibApi::class, ExperimentalStdlibApi::class)
-
 package net.rubygrapefruit.io
 
 class Resource<out T>(

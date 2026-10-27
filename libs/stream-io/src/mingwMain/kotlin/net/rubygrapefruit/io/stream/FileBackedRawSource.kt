@@ -26,7 +26,7 @@ class FileBackedRawSource(private val streamSource: StreamSource, private val ha
                 }
                 nbytes.value.convert()
             }
-            return if (ncopied == 0) -1 else ncopied.toLong()
+            if (ncopied == 0) -1 else ncopied.toLong()
         }
     }
 

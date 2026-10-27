@@ -28,6 +28,7 @@ kotlin {
 
 componentRegistry.each<RealizedNativeExecutable> {
     derive { executable ->
+        println("-> EXECUTABLE: ${executable.machine} ${executable.buildType} ${executable.canBuildOnHost}")
         if (executable.canBuildOnHost && executable.buildType == Release) {
             configurations.create("outgoingNativeBinary${executable.machine.alias}") {
                 attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named("native-binary-${executable.machine.kotlinTarget}"))

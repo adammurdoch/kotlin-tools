@@ -42,8 +42,9 @@ class DownloadRepository(private val silent: Boolean = false) {
         configure(actions)
 
         val format = when {
-            uri.path.endsWith(Zip.extension, true) -> Zip
-            uri.path.endsWith(TarGz.extension, true) -> TarGz
+            uri.path.endsWith(".zip", true) -> Zip
+            uri.path.endsWith(".tar.gz", true) -> Tar
+            uri.path.endsWith(".tar.xz", true) -> Tar
             else -> throw RuntimeException("Don't know how to install $uri")
         }
 
@@ -86,7 +87,7 @@ class DownloadRepository(private val silent: Boolean = false) {
         actions: DefaultActions
     ): Path {
         val lockFile = workDir.resolve("${name}.lock")
-        val tmpFile = workDir.resolve("${name}.download.${format.extension}")
+        val tmpFile = workDir.resolve("${name}.download.bin")
         val tmpDir = workDir.resolve("${name}.expanded-archive")
 
         FileChannel.open(lockFile, StandardOpenOption.CREATE, StandardOpenOption.WRITE).use { channel ->
@@ -149,15 +150,10 @@ class DownloadRepository(private val silent: Boolean = false) {
     }
 
     private sealed interface Format {
-        val extension: String
-
         fun unpack(file: Path, dir: Path)
     }
 
     private object Zip : Format {
-        override val extension: String
-            get() = "zip"
-
         override fun unpack(file: Path, dir: Path) {
             if (Machine.thisMachine.isWindows) {
                 file.inputStream().use { stream ->
@@ -185,10 +181,7 @@ class DownloadRepository(private val silent: Boolean = false) {
         }
     }
 
-    private object TarGz : Format {
-        override val extension: String
-            get() = "tar.gz"
-
+    private object Tar : Format {
         override fun unpack(file: Path, dir: Path) {
             if (!exec("tar", "--extract", "-f", file.toString(), "--directory", dir.toString())) {
                 throw RuntimeException("Could not untar $file")

@@ -14,6 +14,10 @@ application {
             implementation(project(":ui-app-bootstrap"))
         }
     }
+    // This is a hack: the Kotlin plugin was attempting to download the native distributions on Linux and Windows, even though they are not targets.
+    // Seems to be related to the c-interop for macOS causing some parts of the Kotlin build to be disabled, but not all of them.
+    // Adding a dummy target seems to resolve this
+    nativeDesktop()
 }
 
 kotlin {
@@ -26,9 +30,7 @@ kotlin {
                     listOf(
                         launcher.metadata.installationPath.file("include"),
                         launcher.metadata.installationPath.file("include/darwin")
-                    ).also {
-                        println("-> INCLUDE DIRS: $it")
-                    }
+                    )
                 }
                 includeDirs(includeDirs)
             }

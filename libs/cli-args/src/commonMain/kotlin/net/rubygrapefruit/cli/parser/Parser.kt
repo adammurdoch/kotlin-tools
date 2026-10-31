@@ -1,5 +1,7 @@
 package net.rubygrapefruit.cli.parser
 
+import net.rubygrapefruit.cli.ArgParseException
+
 /**
  * Parses a list of arguments to produce a result of type [T].
  */
@@ -23,9 +25,11 @@ sealed interface Parser<out T> {
         fun get(): T
     }
 
-    object Failure : Result<Nothing> {
+    class Problem(val index: Int, val message: String)
+
+    class Failure(val problems: List<Problem>) : Result<Nothing> {
         override fun get(): Nothing {
-            throw IllegalStateException()
+            throw ArgParseException("failed")
         }
     }
 

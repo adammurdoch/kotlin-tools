@@ -1,7 +1,9 @@
 package net.rubygrapefruit.cli.parser
 
+import net.rubygrapefruit.cli.ArgParseException
 import kotlin.test.ExperimentalKotlinTestApi
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 
 abstract class AbstractParseTest {
@@ -9,6 +11,10 @@ abstract class AbstractParseTest {
         val result = parse(*args)
         assertIs<Parser.Failure>(result)
         DefaultFailures(result).check(config)
+
+        assertFailsWith<ArgParseException> {
+            result.get()
+        }
     }
 
     protected interface Failures {

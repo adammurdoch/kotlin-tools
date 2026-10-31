@@ -2,7 +2,6 @@ package net.rubygrapefruit.cli.parser
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertIs
 import kotlin.test.assertNull
 
 class StringOptionTest : AbstractParseTest() {
@@ -37,14 +36,20 @@ class StringOptionTest : AbstractParseTest() {
         parser.fails("-x") {
             failure(1, "No value provided for option -x")
         }
-        parser.fails("-x", "-y") {
-            failure(1, "No value provided for option -x")
-        }
 
         parser.fails("-x", "value", "-x", "value") {
             failure(2, "Option -x can only appear once")
         }
         parser.fails("-x", "value", "-x") {
+            failure(2, "Option -x can only appear once")
+        }
+
+        parser.fails("-x", "-y") {
+            failure(1, "No value provided for option -x")
+            failure(2, "Unexpected option '-y'")
+        }
+        parser.fails("-x", "-x", "value") {
+            failure(1, "No value provided for option -x")
             failure(2, "Option -x can only appear once")
         }
 

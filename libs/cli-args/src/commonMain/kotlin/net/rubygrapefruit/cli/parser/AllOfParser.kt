@@ -5,7 +5,7 @@ internal class AllOfParser<A, B, OUT>(
     private val b: ParserInternal<B>,
     private val map: (A, B) -> OUT
 ) : AbstractParser<OUT>() {
-    override fun maybeParse(args: List<String>): ParserInternal.Result<OUT> {
+    override fun maybeParse(args: InputArgs): ParserInternal.Result<OUT> {
         val aResult = a.maybeParse(args)
         if (aResult is ParserInternal.Success) {
             val bResult = b.maybeParse(args.drop(aResult.count))

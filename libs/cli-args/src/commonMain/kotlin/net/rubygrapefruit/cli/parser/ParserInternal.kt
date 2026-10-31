@@ -3,7 +3,7 @@ package net.rubygrapefruit.cli.parser
 import net.rubygrapefruit.cli.ArgParseException
 
 internal interface ParserInternal<out T> {
-    fun maybeParse(args: List<String>): Result<T>
+    fun maybeParse(args: InputArgs): Result<T>
 
     sealed interface Result<out T>
 

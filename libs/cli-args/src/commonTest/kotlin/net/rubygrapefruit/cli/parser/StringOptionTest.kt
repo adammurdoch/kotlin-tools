@@ -37,20 +37,9 @@ class StringOptionTest : AbstractParseTest() {
             failure(1, "No value provided for option -x")
         }
 
-        parser.fails("-x", "value", "-x", "value") {
-            failure(2, "Option -x can only appear once")
-        }
-        parser.fails("-x", "value", "-x") {
-            failure(2, "Option -x can only appear once")
-        }
-
         parser.fails("-x", "-y") {
             failure(1, "No value provided for option -x")
             failure(2, "Unexpected option '-y'")
-        }
-        parser.fails("-x", "-x", "value") {
-            failure(1, "No value provided for option -x")
-            failure(2, "Option -x can only appear once")
         }
 
         parser.fails("-x", "value", "-y") {
@@ -58,6 +47,22 @@ class StringOptionTest : AbstractParseTest() {
         }
         parser.fails("-x", "value", "value") {
             failure(2, "Unexpected parameter 'value'")
+        }
+    }
+
+    @Test
+    fun `option cannot appear twice`() {
+        val parser = option("x")
+
+        parser.fails("-x", "value", "-x", "value") {
+            failure(2, "Option -x can only appear once")
+        }
+        parser.fails("-x", "value", "-x") {
+            failure(2, "Option -x can only appear once")
+        }
+        parser.fails("-x", "-x", "value") {
+            failure(1, "No value provided for option -x")
+            failure(2, "Option -x can only appear once")
         }
     }
 }

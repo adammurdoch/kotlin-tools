@@ -77,3 +77,6 @@
   - Unknown action
   - Unknown option or value
   - Unknown file/directory
+
+- Long name for `option()`
+- Error reporting for `allOf()`

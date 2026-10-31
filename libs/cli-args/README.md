@@ -4,7 +4,7 @@ A lightweight CLI argument parser for Kotlin multiplatform.
 
 Targets:
 - JVM 11+
-- MacOS x64 and arm64
+- MacOS arm64
 - Windows x64
 - Linux x64
 

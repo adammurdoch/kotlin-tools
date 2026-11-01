@@ -20,10 +20,11 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
                     current = current.drop(1)
                 }
 
-                is ParseState.Success -> {
+                is ParseState.Continue -> {
                     require(result.count > 0)
                     current = current.drop(result.count)
                 }
+
                 is ParseState.Failure -> {
                     require(result.count > 0)
                     failure = failure.plus(current.index + result.index, result.message)
@@ -35,15 +36,15 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
 
         val result = state.finish()
         return when (result) {
-            is Parser.Failure -> {
-                failure.plus(result)
+            is ParseState.FinalFailure -> {
+                failure.plus(current.index, result.messages)
             }
 
-            is Parser.Success -> {
+            is ParseState.Success -> {
                 if (failure != null) {
                     failure
                 } else {
-                    result
+                    ParserInternal.Success(result.result)
                 }
             }
         }

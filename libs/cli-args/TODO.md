@@ -81,6 +81,7 @@
 Combinators
 
 `option(name): Option<String?>`
+`parameter(name): Parameter<String>`
 `allOf(a, b, map): Parser<T>`
 
 - Long name for `option()`

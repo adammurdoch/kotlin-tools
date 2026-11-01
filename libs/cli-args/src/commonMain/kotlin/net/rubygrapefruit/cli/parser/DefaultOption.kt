@@ -12,9 +12,6 @@ internal class DefaultOption(name: String) : AbstractParser<String?>(), Option<S
         private var seen = false
 
         override fun maybeParse(args: InputArgs): ParseState.Result {
-            if (args.isEmpty) {
-                return ParseState.NotRecognized
-            }
             val first = args.first()
             if (first != flag) {
                 return ParseState.NotRecognized
@@ -28,12 +25,12 @@ internal class DefaultOption(name: String) : AbstractParser<String?>(), Option<S
                 ParseState.Failure(1, 1, "No value provided for option $first")
             } else {
                 value = args.second()
-                ParseState.Success(2)
+                ParseState.Continue(2)
             }
         }
 
-        override fun finish(): Parser.Result<String?> {
-            return ParserInternal.Success(value)
+        override fun finish(): ParseState.FinalResult<String?> {
+            return ParseState.Success(value)
         }
     }
 }

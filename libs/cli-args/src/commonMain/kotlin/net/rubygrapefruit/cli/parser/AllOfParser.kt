@@ -18,7 +18,7 @@ internal class AllOfParser<A, B, OUT>(
             return b.maybeParse(args)
         }
 
-        override fun finish(): Parser.Result<OUT> {
+        override fun finish(): ParseState.FinalResult<OUT> {
             val aResult = a.finish()
             val bResult = b.finish()
             return zipping(aResult, bResult, map)

@@ -12,6 +12,8 @@ internal interface ParserInternal<out T> {
     }
 
     class Failure(override val problems: List<Parser.Problem>) : Parser.Failure {
+        constructor(index: Int, message: String) : this(listOf(Parser.Problem(index, message)))
+
         override fun get(): Nothing {
             throw ArgParseException("Argument parsing failed.")
         }
@@ -20,7 +22,7 @@ internal interface ParserInternal<out T> {
 
 internal interface ParseState<out T> {
     /**
-     * Attempt to parse the first arguments of the provided arguments.
+     * Attempt to parse the first argument(s) of the provided arguments.
      *
      * May be called zero or more times.
      */
@@ -29,13 +31,19 @@ internal interface ParseState<out T> {
     /**
      * Produces the result of this parser.
      */
-    fun finish(): Parser.Result<T>
+    fun finish(): FinalResult<T>
 
     sealed interface Result
+
+    sealed interface FinalResult<out T>
 
     object NotRecognized : Result
 
     class Failure(val count: Int, val index: Int, val message: String) : Result
 
-    class Success(val count: Int) : Result
+    class Continue(val count: Int) : Result
+
+    class FinalFailure(val messages: List<String>) : FinalResult<Nothing>
+
+    class Success<T>(val result: T) : FinalResult<T>
 }

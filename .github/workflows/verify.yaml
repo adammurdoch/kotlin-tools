@@ -54,7 +54,7 @@ jobs:
         with:
           name: test-reports
           path: |
-            */build/reports/**
+            libs/*/build/reports/**
   windows-samples:
     runs-on: windows-latest
     steps:

@@ -18,7 +18,8 @@ internal interface ParserInternal<out T> {
 
         override fun writeTo(output: Output) {
             for (problem in problems) {
-                output.appendLine(problem.message)
+                problem.message.writeTo(output)
+                output.maybeNewLine()
             }
         }
     }
@@ -43,11 +44,11 @@ internal interface ParseState<out T> {
 
     object NotRecognized : PartialResult
 
-    class Failure(val count: Int, val index: Int, val message: String) : PartialResult
+    class Failure(val count: Int, val index: Int, val message: Message) : PartialResult
 
     class Continue(val count: Int) : PartialResult
 
-    class FinalFailure(val messages: List<String>) : Result<Nothing>
+    class FinalFailure(val messages: List<Message>) : Result<Nothing>
 
     sealed interface Success<out T> : Result<T> {
         val result: T

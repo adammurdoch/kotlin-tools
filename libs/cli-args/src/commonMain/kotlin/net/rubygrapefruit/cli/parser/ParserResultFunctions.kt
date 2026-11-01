@@ -1,6 +1,6 @@
 package net.rubygrapefruit.cli.parser
 
-internal fun List<Parser.Problem>?.plus(index: Int, message: String): List<Parser.Problem> {
+internal fun List<Parser.Problem>?.plus(index: Int, message: Message): List<Parser.Problem> {
     return if (this == null) {
         listOf(Parser.Problem(index, message))
     } else {
@@ -8,7 +8,7 @@ internal fun List<Parser.Problem>?.plus(index: Int, message: String): List<Parse
     }
 }
 
-internal fun List<Parser.Problem>?.plus(index: Int, messages: List<String>): List<Parser.Problem> {
+internal fun List<Parser.Problem>?.plus(index: Int, messages: List<Message>): List<Parser.Problem> {
     val newProblems = messages.map { Parser.Problem(index, it) }
     return if (this == null) {
         newProblems

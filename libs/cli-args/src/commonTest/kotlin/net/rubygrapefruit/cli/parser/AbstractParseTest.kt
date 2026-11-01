@@ -1,5 +1,6 @@
 package net.rubygrapefruit.cli.parser
 
+import net.rubygrapefruit.cli.terminal.BufferingOutput
 import kotlin.test.*
 
 abstract class AbstractParseTest {
@@ -31,7 +32,9 @@ abstract class AbstractParseTest {
             assertTrue(current < failure.problems.size) { "expected at least ${current + 1} problems, found: ${failure.problems}" }
             val problem = failure.problems[current]
             assertEquals(index, problem.index) { "unexpected index for problem, expected $index, found $problem in ${failure.problems}" }
-            assertEquals(message, problem.message)
+            val buffer = BufferingOutput()
+            problem.message.writeTo(buffer)
+            assertEquals(message, buffer.text)
             current++
         }
     }

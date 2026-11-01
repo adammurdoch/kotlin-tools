@@ -1,10 +1,26 @@
 package net.rubygrapefruit.cli.terminal
 
 sealed interface Output {
-    fun append(text: String)
+    /**
+     * Writes the given text to the output
+     */
+    fun write(text: String)
 
-    fun appendLine(text: String)
+    /**
+     * Writes the given text that was provided by the user to the output.
+     *
+     * May be quoted or rendered with a color.
+     */
+    fun userInput(text: String)
 
+    /**
+     * Writes the given text to the output, followed by line separator.
+     */
+    fun writeLine(text: String)
+
+    /**
+     * Terminates the current line, if not already.
+     */
     fun maybeNewLine()
 }
 

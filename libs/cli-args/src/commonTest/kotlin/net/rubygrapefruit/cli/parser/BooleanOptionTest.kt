@@ -28,4 +28,13 @@ class BooleanOptionTest : AbstractParseTest() {
             failure(1, "Unexpected argument 'value'")
         }
     }
+
+    @Test
+    fun `option cannot appear twice`() {
+        val parser = option("x").boolean()
+
+        parser.fails("-x", "-x") {
+            failure(1, "Option -x can only appear once")
+        }
+    }
 }

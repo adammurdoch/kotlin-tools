@@ -38,9 +38,9 @@ internal fun runApp(parser: Parser<Runnable>, arguments: List<String>, output: O
         } else {
             val message = t.message
             if (message.isNullOrEmpty()) {
-                output.append("$t (no message)")
+                output.write("$t (no message)")
             } else {
-                output.append(message)
+                output.write(message)
             }
             output.maybeNewLine()
         }

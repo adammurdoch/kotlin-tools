@@ -10,9 +10,9 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
             when (result) {
                 is ParseState.NotRecognized -> {
                     val message = if (current.firstIsOption()) {
-                        "Unexpected option '${current.first()}'"
+                        Message.Text("Unexpected option ") + Message.UserInput(current.first())
                     } else {
-                        "Unexpected argument '${current.first()}'"
+                        Message.Text("Unexpected argument ") + Message.UserInput(current.first())
                     }
                     problems = problems.plus(current.index, message)
                     // Attempt to recover and continue

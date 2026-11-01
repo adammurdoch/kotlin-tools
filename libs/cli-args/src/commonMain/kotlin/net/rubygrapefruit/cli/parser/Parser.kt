@@ -25,7 +25,7 @@ sealed interface Parser<out T> {
         fun get(): T
     }
 
-    data class Problem(val index: Int, val message: String)
+    data class Problem(val index: Int, val message: Message)
 
     /**
      * Provides information about argument parsing failure.

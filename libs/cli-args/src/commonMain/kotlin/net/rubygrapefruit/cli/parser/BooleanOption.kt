@@ -9,11 +9,15 @@ internal class BooleanOption(val flag: String) : AbstractParser<Boolean>(), Opti
         private var value = false
 
         override fun maybeParse(args: InputArgs): ParseState.PartialResult {
-            return if (args.first() == flag) {
+            val first = args.first()
+            if (first != flag) {
+                return ParseState.NotRecognized
+            }
+            return if (value) {
+                ParseState.Failure(1, 0, Message.Text("Option $flag can only appear once"))
+            } else {
                 value = true
                 ParseState.Continue(1)
-            } else {
-                ParseState.NotRecognized
             }
         }
 

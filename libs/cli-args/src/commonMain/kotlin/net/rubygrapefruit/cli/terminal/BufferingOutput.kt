@@ -1,6 +1,6 @@
 package net.rubygrapefruit.cli.terminal
 
-class BufferingOutput : AbstractOutput() {
+class BufferingOutput : AbstractPlainOutput() {
     private val builder = StringBuilder()
 
     val text: String

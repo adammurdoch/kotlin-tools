@@ -1,6 +1,6 @@
 package net.rubygrapefruit.cli.terminal
 
-private object DefaultOutput : AbstractOutput() {
+private object DefaultOutput : AbstractPlainOutput() {
     override fun put(text: CharSequence) {
         System.err.print(text)
     }

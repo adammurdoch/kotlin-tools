@@ -3,7 +3,7 @@
 - Split out recovery logic into a parse state implementation
 - Distinguish between failure due to missing value vs semantic issue (currently uses `expectedMore`)
 - List option:
-  - Require 1 or more
+    - Require 1 or more
 - `Action.run()` runs nested actions, if present? Downside: IDEA marks the action field as unused
 - Report multiple problems
 - Error message shows where on the command-line the problem occurred.
@@ -39,7 +39,7 @@
     - Show examples
     - Show link to documentation
 - Completion
-    - Fix global flags for nested actions 
+    - Fix global flags for nested actions
     - Include help message for each choice completion option
     - Include help message for each action completion option
     - Merge choice options for optional parameter with choice options for next parameter
@@ -55,7 +55,7 @@
     - Unknown option - show available options
     - Unknown option for sub-command - show available options
     - Unknown action provided to `help`
-    - Unknown option - if expecting an action, check if option belongs to action and give hint to use action 
+    - Unknown option - if expecting an action, check if option belongs to action and give hint to use action
     - Argument not provided
     - Too many arguments
     - Option value badly formed
@@ -63,7 +63,7 @@
     - Option value missing
     - `-x` used instead of `--x`
 - Allow actions to calculate the set of options dynamically
-  - For example, action is constructed with a list of enum _types_
+    - For example, action is constructed with a list of enum _types_
 - Validate names do not contain spaces
 - Validate at least one action or choice is defined, if no default
 - Validate choices do not contain spaces
@@ -74,21 +74,22 @@
 - Color output on terminal
 - Declare input environment variables
 - Fuzzy matching and/or suggestions
-  - Unknown action
-  - Unknown option or value
-  - Unknown file/directory
+    - Unknown action
+    - Unknown option or value
+    - Unknown file/directory
 
 Combinators
 
 `option(name): Option<String?>`
+`option(name).boolean(): Option<Boolean>`
 `parameter(name): Parameter<String>`
 `allOf(a, b, map): Parser<T>`
 
 CLI app
 
 `parser.runApp(args)`
+- Color output
 
-- Cannot repeat boolean option
 - Show usage on parse error
 - Multiple names for `option()`
 - Error reporting for `allOf()`
@@ -107,3 +108,4 @@ CLI app
 - `-Dx=y` style
 - Compose value parsers (e.g. value is ip address or host name)
 - Deprecated, hidden options + commands
+- Terminal for JVM

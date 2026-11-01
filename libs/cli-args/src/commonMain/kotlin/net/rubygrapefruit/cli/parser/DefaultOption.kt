@@ -11,7 +11,7 @@ internal class DefaultOption(name: String) : AbstractParser<String?>(), Option<S
         private var value: String? = null
         private var seen = false
 
-        override fun maybeParse(args: InputArgs): ParseState.Result {
+        override fun maybeParse(args: InputArgs): ParseState.PartialResult {
             val first = args.first()
             if (first != flag) {
                 return ParseState.NotRecognized
@@ -29,8 +29,8 @@ internal class DefaultOption(name: String) : AbstractParser<String?>(), Option<S
             }
         }
 
-        override fun finish(): ParseState.FinalResult<String?> {
-            return ParseState.Success(value)
+        override fun finish(): ParseState.Result<String?> {
+            return ParseState.FixedResult(value)
         }
     }
 }

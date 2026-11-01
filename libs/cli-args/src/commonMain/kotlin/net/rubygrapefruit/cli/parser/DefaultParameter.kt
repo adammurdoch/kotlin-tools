@@ -8,7 +8,7 @@ internal class DefaultParameter(private val name: String) : AbstractParser<Strin
     private class State(val name: String) : ParseState<String> {
         private var value: String? = null
 
-        override fun maybeParse(args: InputArgs): ParseState.Result {
+        override fun maybeParse(args: InputArgs): ParseState.PartialResult {
             val first = args.first()
             if (first.startsWith("-") || value != null) {
                 return ParseState.NotRecognized
@@ -17,12 +17,12 @@ internal class DefaultParameter(private val name: String) : AbstractParser<Strin
             return ParseState.Continue(1)
         }
 
-        override fun finish(): ParseState.FinalResult<String> {
+        override fun finish(): ParseState.Result<String> {
             val value = value
             return if (value == null) {
-                ParseState.FinalFailure(listOf("Parameter <$name> not provided."))
+                ParseState.FinalFailure(listOf("Parameter <$name> not provided"))
             } else {
-                ParseState.Success(value)
+                ParseState.FixedResult(value)
             }
         }
     }

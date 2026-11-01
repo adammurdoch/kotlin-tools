@@ -25,7 +25,7 @@ internal fun Parser.Failure?.plus(other: Parser.Failure): Parser.Failure {
     }
 }
 
-internal fun <A, B, OUT> zipping(a: ParseState.FinalResult<A>, b: ParseState.FinalResult<B>, map: (A, B) -> OUT): ParseState.FinalResult<OUT> {
+internal fun <A, B, OUT> zipping(a: ParseState.Result<A>, b: ParseState.Result<B>, map: (A, B) -> OUT): ParseState.Result<OUT> {
     return when (a) {
         is ParseState.FinalFailure -> {
             when (b) {
@@ -37,7 +37,7 @@ internal fun <A, B, OUT> zipping(a: ParseState.FinalResult<A>, b: ParseState.Fin
         is ParseState.Success -> {
             when (b) {
                 is ParseState.FinalFailure -> b
-                is ParseState.Success -> ParseState.Success(map(a.result, b.result))
+                is ParseState.Success -> ParseState.LazyResult { map(a.result, b.result) }
             }
         }
     }

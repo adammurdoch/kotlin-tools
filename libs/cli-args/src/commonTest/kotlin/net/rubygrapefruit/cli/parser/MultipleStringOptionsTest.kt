@@ -37,7 +37,7 @@ class MultipleStringOptionsTest : AbstractParseTest() {
     }
 
     @Test
-    fun `option must have a value`() {
+    fun `each option must have a value`() {
         val parser = allOf(option("a"), option("b")) { a, b -> Pair(a, b) }
 
         parser.fails("-a", "-b") {

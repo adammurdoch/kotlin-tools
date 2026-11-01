@@ -26,24 +26,33 @@ internal interface ParseState<out T> {
      *
      * May be called zero or more times.
      */
-    fun maybeParse(args: InputArgs): Result
+    fun maybeParse(args: InputArgs): PartialResult
 
     /**
      * Produces the result of this parser.
      */
-    fun finish(): FinalResult<T>
+    fun finish(): Result<T>
 
-    sealed interface Result
+    sealed interface PartialResult
 
-    sealed interface FinalResult<out T>
+    sealed interface Result<out T>
 
-    object NotRecognized : Result
+    object NotRecognized : PartialResult
 
-    class Failure(val count: Int, val index: Int, val message: String) : Result
+    class Failure(val count: Int, val index: Int, val message: String) : PartialResult
 
-    class Continue(val count: Int) : Result
+    class Continue(val count: Int) : PartialResult
 
-    class FinalFailure(val messages: List<String>) : FinalResult<Nothing>
+    class FinalFailure(val messages: List<String>) : Result<Nothing>
 
-    class Success<T>(val result: T) : FinalResult<T>
+    sealed interface Success<out T> : Result<T> {
+        val result: T
+    }
+
+    class FixedResult<T>(override val result: T) : Success<T>
+
+    class LazyResult<T>(val provider: () -> T) : Success<T> {
+        override val result: T
+            get() = provider()
+    }
 }

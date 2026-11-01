@@ -17,11 +17,11 @@ class StringParameterTest : AbstractParseTest() {
         val parser = parameter("param")
 
         parser.fails {
-            failure(0, "Parameter <param> not provided.")
+            failure(0, "Parameter <param> not provided")
         }
         parser.fails("-unknown") {
             failure(0, "Unexpected option '-unknown'")
-            failure(1, "Parameter <param> not provided.")
+            failure(1, "Parameter <param> not provided")
         }
     }
 

@@ -10,7 +10,7 @@ internal class AllOfParser<A, B, OUT>(
     }
 
     private class State<A, B, OUT>(val a: ParseState<A>, val b: ParseState<B>, val map: (A, B) -> OUT) : ParseState<OUT> {
-        override fun maybeParse(args: InputArgs): ParseState.Result {
+        override fun maybeParse(args: InputArgs): ParseState.PartialResult {
             val aResult = a.maybeParse(args)
             if (aResult !is ParseState.NotRecognized) {
                 return aResult
@@ -18,7 +18,7 @@ internal class AllOfParser<A, B, OUT>(
             return b.maybeParse(args)
         }
 
-        override fun finish(): ParseState.FinalResult<OUT> {
+        override fun finish(): ParseState.Result<OUT> {
             val aResult = a.finish()
             val bResult = b.finish()
             return zipping(aResult, bResult, map)

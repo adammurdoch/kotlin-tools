@@ -5,25 +5,23 @@ internal class AllOfParser<A, B, OUT>(
     private val b: ParserInternal<B>,
     private val map: (A, B) -> OUT
 ) : AbstractParser<OUT>() {
-    override fun maybeParse(args: InputArgs): ParserInternal.Result<OUT> {
-        val aResult = a.maybeParse(args)
-        if (aResult is ParserInternal.Success) {
-            val bResult = b.maybeParse(args.drop(aResult.count))
-            if (bResult is ParserInternal.Success) {
-                return ParserInternal.Success(aResult.count + bResult.count, map(aResult.result, bResult.result))
-            } else {
-                ParserInternal.Failure(listOf(Parser.Problem(0, "??")))
+    override fun start(): ParseState<OUT> {
+        return State(a.start(), b.start(), map)
+    }
+
+    private class State<A, B, OUT>(val a: ParseState<A>, val b: ParseState<B>, val map: (A, B) -> OUT) : ParseState<OUT> {
+        override fun maybeParse(args: InputArgs): ParseState.Result {
+            val aResult = a.maybeParse(args)
+            if (aResult is ParseState.NotRecognized) {
+                return aResult
             }
+            return b.maybeParse(args)
         }
-        val bResult = b.maybeParse(args)
-        if (bResult is ParserInternal.Success) {
-            val aResult = a.maybeParse(args.drop(bResult.count))
-            if (aResult is ParserInternal.Success) {
-                return ParserInternal.Success(aResult.count + bResult.count, map(aResult.result, bResult.result))
-            } else {
-                return ParserInternal.Failure(listOf(Parser.Problem(0, "??")))
-            }
+
+        override fun finish(): Parser.Result<OUT> {
+            val aResult = a.finish()
+            val bResult = b.finish()
+            return zipping(aResult, bResult, map)
         }
-        return ParserInternal.Failure(listOf(Parser.Problem(0, "??")))
     }
 }

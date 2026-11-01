@@ -79,4 +79,14 @@
   - Unknown file/directory
 
 - Long name for `option()`
+- `option()` is boolean by default?
 - Error reporting for `allOf()`
+- Unrecognized or remainder
+- Merge short options
+- `--` as end of options
+- `-option=value` (allows value that starts with `-`)
+- `[..]` - optional, `<..>` - required
+- convenience for `--version`
+- `-Dx=y` style
+- compose value parsers
+- deprecated, hidden options + commands

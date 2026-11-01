@@ -3,18 +3,36 @@ package net.rubygrapefruit.cli.parser
 internal class DefaultOption(name: String) : AbstractParser<String?>(), Option<String?> {
     private val flag = "-$name"
 
-    override fun maybeParse(args: InputArgs): ParserInternal.Result<String?> {
-        return if (args.isEmpty) {
-            ParserInternal.Success(0, null)
-        } else {
+    override fun start(): ParseState<String?> {
+        return State(flag)
+    }
+
+    private class State(private val flag: String) : ParseState<String?> {
+        private var value: String? = null
+        private var seen = false
+
+        override fun maybeParse(args: InputArgs): ParseState.Result {
+            if (args.isEmpty) {
+                return ParseState.NotRecognized
+            }
             val first = args.first()
             if (first != flag) {
-                ParserInternal.NotRecognized
-            } else if (args.length == 1 || args.length >= 2 && args.second().startsWith("-")) {
-                ParserInternal.Failure(listOf(Parser.Problem(args.index + 1, "No value provided for option $first")))
-            } else {
-                ParserInternal.Success(2, args.second())
+                return ParseState.NotRecognized
             }
+            if (seen) {
+                return ParseState.Failure(args.index, "Option $first can only appear once")
+            }
+            return if (args.length == 1 || args.length >= 2 && args.second().startsWith("-")) {
+                ParseState.Failure(args.index + 1, "No value provided for option $first")
+            } else {
+                seen = true
+                value = args.second()
+                ParseState.Success(2)
+            }
+        }
+
+        override fun finish(): Parser.Result<String?> {
+            return ParserInternal.Success(value)
         }
     }
 }

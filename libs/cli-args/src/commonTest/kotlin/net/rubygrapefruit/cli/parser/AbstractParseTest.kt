@@ -1,10 +1,7 @@
 package net.rubygrapefruit.cli.parser
 
 import net.rubygrapefruit.cli.ArgParseException
-import kotlin.test.ExperimentalKotlinTestApi
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertIs
+import kotlin.test.*
 
 abstract class AbstractParseTest {
     protected fun Parser<*>.fails(vararg args: String, config: Failures.() -> Unit) {
@@ -31,6 +28,7 @@ abstract class AbstractParseTest {
         }
 
         override fun failure(index: Int, message: String) {
+            assertTrue(current < failure.problems.size) { "too few problems, expected at least ${current + 1}, found: ${failure.problems.size}" }
             val problem = failure.problems[current]
             assertEquals(index, problem.index) { "unexpected index for problem - $message" }
             assertEquals(message, problem.message)

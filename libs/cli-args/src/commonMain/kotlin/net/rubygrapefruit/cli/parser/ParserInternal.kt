@@ -3,23 +3,39 @@ package net.rubygrapefruit.cli.parser
 import net.rubygrapefruit.cli.ArgParseException
 
 internal interface ParserInternal<out T> {
-    fun maybeParse(args: InputArgs): Result<T>
+    fun start(): ParseState<T>
 
-    sealed interface Result<out T>
-
-    data class Success<T>(val count: Int, override val result: T) : Result<T>, Parser.Success<T> {
+    class Success<out T>(override val result: T) : Parser.Success<T> {
         override fun get(): T {
             return result
         }
     }
+}
 
-    object NotRecognized : Result<Nothing>
+internal interface ParseState<out T> {
+    /**
+     * Attempt to parse the first arguments of the provided arguments.
+     *
+     * May be called zero or more times.
+     */
+    fun maybeParse(args: InputArgs): Result
 
-    data class Failure(override val problems: List<Parser.Problem>) : Result<Nothing>, Parser.Failure {
+    /**
+     * Produces the result of this parser.
+     */
+    fun finish(): Parser.Result<T>
+
+    sealed interface Result
+
+    object NotRecognized : Result
+
+    class Failure(override val problems: List<Parser.Problem>) : Result, Parser.Failure {
         constructor(index: Int, message: String) : this(listOf(Parser.Problem(index, message)))
 
         override fun get(): Nothing {
-            throw ArgParseException("Argument parsing failed")
+            throw ArgParseException("Argument parsing failed.")
         }
     }
+
+    class Success(val count: Int) : Result
 }

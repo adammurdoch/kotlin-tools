@@ -29,7 +29,7 @@ sealed interface Parser<out T> {
         val problems: List<Problem>
     }
 
-    sealed interface Success<T> : Result<T> {
+    sealed interface Success<out T> : Result<T> {
         val result: T
     }
 }

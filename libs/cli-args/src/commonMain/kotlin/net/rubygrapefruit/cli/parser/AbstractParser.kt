@@ -14,7 +14,6 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
                     problems.add(Parser.Problem(current.index + result.index, result.message))
                     // Attempt to recover and continue
                     current = current.drop(result.count)
-                    break
                 }
             }
         }

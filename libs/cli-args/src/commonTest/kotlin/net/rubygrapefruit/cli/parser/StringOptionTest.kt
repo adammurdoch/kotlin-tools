@@ -39,7 +39,7 @@ class StringOptionTest : AbstractParseTest() {
 
         parser.fails("-x", "-y") {
             failure(1, "No value provided for option -x")
-            failure(2, "Unexpected option '-y'")
+            failure(1, "Unexpected option '-y'")
         }
 
         parser.fails("-x", "value", "-y") {
@@ -62,7 +62,7 @@ class StringOptionTest : AbstractParseTest() {
         }
         parser.fails("-x", "-x", "value") {
             failure(1, "No value provided for option -x")
-            failure(2, "Option -x can only appear once")
+            failure(1, "Option -x can only appear once")
         }
     }
 }

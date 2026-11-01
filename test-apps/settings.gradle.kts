@@ -115,7 +115,10 @@ samples {
     jvmCliApp("cli-args-options") { cliArgs("--help") }
     jvmCliApp("cli-args-actions") { cliArgs("--help") }
 
-    jvmCliApp("cli-args-parse") { cliArgs("--help", "x", "y") }
+    jvmCliApp("cli-args-jvm-app") {
+        cliArgs("--help", "x", "y")
+        deriveNative("cli-args-native-app")
+    }
 
     nativeCliApp("native-cli-app-generated-source") {
         expectedOutput("Generated common app class")

@@ -11,4 +11,4 @@ sealed interface Output {
 /**
  * Returns the default [Output] for this process, connected to the process' stdout and stderr.
  */
-fun output(): Output = DefaultOutput
+expect fun output(): Output

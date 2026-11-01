@@ -20,10 +20,11 @@ internal class DefaultOption(name: String) : AbstractParser<String?>(), Option<S
                 return ParseState.NotRecognized
             }
             if (seen) {
-                return ParseState.Failure(args.index, "Option $first can only appear once")
+                val count = if (args.length >= 2 && !args.second().startsWith("-")) 2 else 1
+                return ParseState.Failure(count, 0, "Option $first can only appear once")
             }
             return if (args.length == 1 || args.length >= 2 && args.second().startsWith("-")) {
-                ParseState.Failure(args.index + 1, "No value provided for option $first")
+                ParseState.Failure(1, 1, "No value provided for option $first")
             } else {
                 seen = true
                 value = args.second()

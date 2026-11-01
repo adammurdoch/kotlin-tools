@@ -23,7 +23,7 @@ sealed interface Parser<out T> {
         fun get(): T
     }
 
-    class Problem(val index: Int, val message: String)
+    data class Problem(val index: Int, val message: String)
 
     sealed interface Failure : Result<Nothing> {
         val problems: List<Problem>

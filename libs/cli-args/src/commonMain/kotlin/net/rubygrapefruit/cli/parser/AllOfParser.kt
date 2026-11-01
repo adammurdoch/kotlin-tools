@@ -12,7 +12,7 @@ internal class AllOfParser<A, B, OUT>(
     private class State<A, B, OUT>(val a: ParseState<A>, val b: ParseState<B>, val map: (A, B) -> OUT) : ParseState<OUT> {
         override fun maybeParse(args: InputArgs): ParseState.Result {
             val aResult = a.maybeParse(args)
-            if (aResult is ParseState.NotRecognized) {
+            if (aResult !is ParseState.NotRecognized) {
                 return aResult
             }
             return b.maybeParse(args)

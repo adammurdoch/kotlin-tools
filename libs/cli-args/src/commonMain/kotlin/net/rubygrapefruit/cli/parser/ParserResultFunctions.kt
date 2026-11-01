@@ -4,7 +4,7 @@ internal fun <A, B, OUT> zipping(a: Parser.Result<A>, b: Parser.Result<B>, map: 
     return when (a) {
         is Parser.Failure -> {
             when (b) {
-                is Parser.Failure -> ParseState.Failure(a.problems + b.problems)
+                is Parser.Failure -> ParserInternal.Failure(a.problems + b.problems)
                 is Parser.Success -> a
             }
         }

@@ -24,13 +24,13 @@ abstract class AbstractParseTest {
 
         fun check(config: Failures.() -> Unit) {
             config()
-            assertEquals(failure.problems.size, current)
+            assertEquals(current, failure.problems.size) { "expected $current problems, found: ${failure.problems}"}
         }
 
         override fun failure(index: Int, message: String) {
-            assertTrue(current < failure.problems.size) { "too few problems, expected at least ${current + 1}, found: ${failure.problems.size}" }
+            assertTrue(current < failure.problems.size) { "expected at least ${current + 1} problems, found: ${failure.problems}" }
             val problem = failure.problems[current]
-            assertEquals(index, problem.index) { "unexpected index for problem - $message" }
+            assertEquals(index, problem.index) { "unexpected index for problem, expected $index, found $problem in ${failure.problems}" }
             assertEquals(message, problem.message)
             current++
         }

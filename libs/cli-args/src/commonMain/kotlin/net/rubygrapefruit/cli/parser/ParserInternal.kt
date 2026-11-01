@@ -10,6 +10,12 @@ internal interface ParserInternal<out T> {
             return result
         }
     }
+
+    class Failure(override val problems: List<Parser.Problem>) : Parser.Failure {
+        override fun get(): Nothing {
+            throw ArgParseException("Argument parsing failed.")
+        }
+    }
 }
 
 internal interface ParseState<out T> {
@@ -29,13 +35,7 @@ internal interface ParseState<out T> {
 
     object NotRecognized : Result
 
-    class Failure(override val problems: List<Parser.Problem>) : Result, Parser.Failure {
-        constructor(index: Int, message: String) : this(listOf(Parser.Problem(index, message)))
-
-        override fun get(): Nothing {
-            throw ArgParseException("Argument parsing failed.")
-        }
-    }
+    class Failure(val count: Int, val index: Int, val message: String) : Result
 
     class Success(val count: Int) : Result
 }

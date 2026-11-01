@@ -3,7 +3,7 @@ package net.rubygrapefruit.cli.app
 import net.rubygrapefruit.cli.Action
 import net.rubygrapefruit.cli.ArgParseException
 import kotlin.test.assertEquals
-import kotlin.test.fail
+import kotlin.test.assertFailsWith
 
 abstract class AbstractActionTest {
     fun <T : Action> parse(action: T, args: List<String>, verification: (T) -> Unit) {
@@ -16,11 +16,9 @@ abstract class AbstractActionTest {
     }
 
     fun parseFails(action: Action, args: List<String>, verification: (ArgParseException) -> Unit) {
-        try {
+        val e = assertFailsWith<ArgParseException> {
             action.parse(args)
-            fail()
-        } catch (e: ArgParseException) {
-            verification(e)
         }
+        verification(e)
     }
 }

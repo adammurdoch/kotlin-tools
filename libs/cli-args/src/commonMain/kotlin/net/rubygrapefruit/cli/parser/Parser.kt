@@ -25,10 +25,16 @@ sealed interface Parser<out T> {
 
     data class Problem(val index: Int, val message: String)
 
+    /**
+     * Provides information about argument parsing failure.
+     */
     sealed interface Failure : Result<Nothing> {
         val problems: List<Problem>
     }
 
+    /**
+     * Provides the result of argument parsing.
+     */
     sealed interface Success<out T> : Result<T> {
         val result: T
     }

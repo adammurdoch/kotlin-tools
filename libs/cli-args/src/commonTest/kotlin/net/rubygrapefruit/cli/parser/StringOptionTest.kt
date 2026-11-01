@@ -13,12 +13,28 @@ class StringOptionTest : AbstractParseTest() {
         assertEquals("", parser.parse("-x", "").get())
         assertNull(parser.parse().get())
 
+        parser.fails("--x", "value") {
+            failure(0, "Option -x should be used instead of '--x'")
+        }
         parser.fails("-X", "value") {
             failure(0, "Unexpected option '-X'")
             failure(1, "Unexpected argument 'value'")
         }
-        parser.fails("--x", "value") {
-            failure(0, "Unexpected option '--x'")
+    }
+
+    @Test
+    fun `parses option with long name`() {
+        val parser = option("an-option")
+
+        assertEquals("value", parser.parse("--an-option", "value").get())
+        assertEquals("", parser.parse("--an-option", "").get())
+        assertNull(parser.parse().get())
+
+        parser.fails("-an-option", "value") {
+            failure(0, "Option --an-option should be used instead of '-an-option'")
+        }
+        parser.fails("--An-Option", "value") {
+            failure(0, "Unexpected option '--An-Option'")
             failure(1, "Unexpected argument 'value'")
         }
     }

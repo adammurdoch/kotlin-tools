@@ -11,8 +11,16 @@ internal class InputArgs(val index: Int, private val args: List<String>) {
         return args[index]
     }
 
+    fun firstIsOption(): Boolean {
+        return args[index].startsWith("-")
+    }
+
     fun second(): String {
         return args[index + 1]
+    }
+
+    fun secondIsOption(): Boolean {
+        return args[index + 1].startsWith("-")
     }
 
     fun drop(count: Int): InputArgs {

@@ -9,11 +9,10 @@ internal class DefaultParameter(private val name: String) : AbstractParser<Strin
         private var value: String? = null
 
         override fun maybeParse(args: InputArgs): ParseState.PartialResult {
-            val first = args.first()
-            if (first.startsWith("-") || value != null) {
+            if (args.firstIsOption() || value != null) {
                 return ParseState.NotRecognized
             }
-            value = first
+            value = args.first()
             return ParseState.Continue(1)
         }
 

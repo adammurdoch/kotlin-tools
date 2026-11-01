@@ -85,14 +85,18 @@ Combinators
 `allOf(a, b, map): Parser<T>`
 
 - Long name for `option()`
+- Aliases for `option()`
 - `option()` is boolean by default?
 - Error reporting for `allOf()`
-- Unrecognized or remainder
+- `allOf()` with nested `allOf()`
+- Parser that collects unrecognized or remainder
 - Merge short options
 - `--` as end of options
 - `--option=<value>` (allows value that starts with `-`)
-- `[..]` - optional, `<..>` - required
-- convenience for `--version`
+- Report `[..]` - optional, `<..>` - required
+- `oneOf()`
+- `command()`
+- Convenience for `--version`
 - `-Dx=y` style
-- compose value parsers
-- deprecated, hidden options + commands
+- Compose value parsers (e.g. value is ip address or host name)
+- Deprecated, hidden options + commands

@@ -9,11 +9,10 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
             val result = state.maybeParse(current)
             when (result) {
                 is ParseState.NotRecognized -> {
-                    val first = current.first()
-                    val message = if (first.startsWith("-")) {
-                        "Unexpected option '$first'"
+                    val message = if (current.firstIsOption()) {
+                        "Unexpected option '${current.first()}'"
                     } else {
-                        "Unexpected argument '$first'"
+                        "Unexpected argument '${current.first()}'"
                     }
                     failure = failure.plus(current.index, message)
                     // Attempt to recover and continue

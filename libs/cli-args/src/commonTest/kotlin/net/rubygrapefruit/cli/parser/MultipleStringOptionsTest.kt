@@ -5,7 +5,7 @@ import kotlin.test.assertEquals
 
 class MultipleStringOptionsTest : AbstractParseTest() {
     @Test
-    fun `parses two options in any order`() {
+    fun `parses two options with short name in any order`() {
         val parser = allOf(option("a"), option("b")) { a, b -> Pair(a, b) }
 
         assertEquals(Pair("one", "two"), parser.parse("-a", "one", "-b", "two").get())
@@ -13,6 +13,19 @@ class MultipleStringOptionsTest : AbstractParseTest() {
 
         assertEquals(Pair("one", null), parser.parse("-a", "one").get())
         assertEquals(Pair(null, "two"), parser.parse("-b", "two").get())
+
+        assertEquals(Pair(null, null), parser.parse().get())
+    }
+
+    @Test
+    fun `parses two options with long name in any order`() {
+        val parser = allOf(option("option-a"), option("option-b")) { a, b -> Pair(a, b) }
+
+        assertEquals(Pair("one", "two"), parser.parse("--option-a", "one", "--option-b", "two").get())
+        assertEquals(Pair("one", "two"), parser.parse("--option-b", "two", "--option-a", "one").get())
+
+        assertEquals(Pair("one", null), parser.parse("--option-a", "one").get())
+        assertEquals(Pair(null, "two"), parser.parse("--option-b", "two").get())
 
         assertEquals(Pair(null, null), parser.parse().get())
     }

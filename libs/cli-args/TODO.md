@@ -78,13 +78,18 @@
   - Unknown option or value
   - Unknown file/directory
 
+Combinators
+
+`option(name): Option<String?>`
+`allOf(a, b, map): Parser<T>`
+
 - Long name for `option()`
 - `option()` is boolean by default?
 - Error reporting for `allOf()`
 - Unrecognized or remainder
 - Merge short options
 - `--` as end of options
-- `-option=value` (allows value that starts with `-`)
+- `--option=<value>` (allows value that starts with `-`)
 - `[..]` - optional, `<..>` - required
 - convenience for `--version`
 - `-Dx=y` style

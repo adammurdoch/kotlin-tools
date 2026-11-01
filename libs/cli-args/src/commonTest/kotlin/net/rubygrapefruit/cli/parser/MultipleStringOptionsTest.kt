@@ -16,4 +16,40 @@ class MultipleStringOptionsTest : AbstractParseTest() {
 
         assertEquals(Pair(null, null), parser.parse().get())
     }
+
+    @Test
+    fun `cannot include other input values`() {
+        val parser = allOf(option("a"), option("b")) { a, b -> Pair(a, b) }
+
+        parser.fails("-unknown") {
+            failure(0, "Unexpected option '-unknown'")
+        }
+        parser.fails("value") {
+            failure(0, "Unexpected argument 'value'")
+        }
+
+        parser.fails("-a", "one", "-unknown") {
+            failure(2, "Unexpected option '-unknown'")
+        }
+        parser.fails("-b", "two", "-unknown") {
+            failure(2, "Unexpected option '-unknown'")
+        }
+    }
+
+    @Test
+    fun `option must have a value`() {
+        val parser = allOf(option("a"), option("b")) { a, b -> Pair(a, b) }
+
+        parser.fails("-a", "-b") {
+            failure(1, "No value provided for option -a")
+            failure(2, "No value provided for option -b")
+        }
+
+        parser.fails("-a", "-unknown", "-b", "--unknown") {
+            failure(1, "No value provided for option -a")
+            failure(1, "Unexpected option '-unknown'")
+            failure(3, "No value provided for option -b")
+            failure(3, "Unexpected option '--unknown'")
+        }
+    }
 }

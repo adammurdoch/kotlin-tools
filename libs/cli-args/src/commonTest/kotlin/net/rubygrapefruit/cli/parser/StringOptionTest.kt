@@ -13,6 +13,20 @@ class StringOptionTest : AbstractParseTest() {
         assertEquals("", parser.parse("-x", "").get())
         assertNull(parser.parse().get())
 
+        parser.fails("-X", "value") {
+            failure(0, "Unexpected option '-X'")
+            failure(1, "Unexpected argument 'value'")
+        }
+        parser.fails("--x", "value") {
+            failure(0, "Unexpected option '--x'")
+            failure(1, "Unexpected argument 'value'")
+        }
+    }
+
+    @Test
+    fun `cannot include other input values`() {
+        val parser = option("x")
+
         parser.fails("-unknown") {
             failure(0, "Unexpected option '-unknown'")
         }
@@ -24,29 +38,37 @@ class StringOptionTest : AbstractParseTest() {
         }
         parser.fails("-unknown", "value") {
             failure(0, "Unexpected option '-unknown'")
+            failure(1, "Unexpected argument 'value'")
+        }
+        parser.fails("value", "--unknown") {
+            failure(0, "Unexpected argument 'value'")
+            failure(1, "Unexpected option '--unknown'")
         }
 
-        parser.fails("-X", "value") {
-            failure(0, "Unexpected option '-X'")
+        parser.fails("-x", "value", "-unknown") {
+            failure(2, "Unexpected option '-unknown'")
         }
-        parser.fails("--x", "value") {
-            failure(0, "Unexpected option '--x'")
+        parser.fails("-x", "value", "value") {
+            failure(2, "Unexpected argument 'value'")
         }
+    }
+
+    @Test
+    fun `option must have value`() {
+        val parser = option("x")
 
         parser.fails("-x") {
             failure(1, "No value provided for option -x")
         }
 
-        parser.fails("-x", "-y") {
+        parser.fails("-x", "-unknown") {
             failure(1, "No value provided for option -x")
-            failure(1, "Unexpected option '-y'")
+            failure(1, "Unexpected option '-unknown'")
         }
 
-        parser.fails("-x", "value", "-y") {
-            failure(2, "Unexpected option '-y'")
-        }
-        parser.fails("-x", "value", "value") {
-            failure(2, "Unexpected argument 'value'")
+        parser.fails("-unknown", "-x") {
+            failure(0, "Unexpected option '-unknown'")
+            failure(2, "No value provided for option -x")
         }
     }
 

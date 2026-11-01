@@ -4,7 +4,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
     override fun parse(args: List<String>): Parser.Result<T> {
         var current = InputArgs(0, args)
         val state = start()
-        var failure: Parser.Failure? = null
+        var problems: List<Parser.Problem>? = null
         while (!current.isEmpty) {
             val result = state.maybeParse(current)
             when (result) {
@@ -14,7 +14,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
                     } else {
                         "Unexpected argument '${current.first()}'"
                     }
-                    failure = failure.plus(current.index, message)
+                    problems = problems.plus(current.index, message)
                     // Attempt to recover and continue
                     current = current.drop(1)
                 }
@@ -26,7 +26,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
 
                 is ParseState.Failure -> {
                     require(result.count > 0)
-                    failure = failure.plus(current.index + result.index, result.message)
+                    problems = problems.plus(current.index + result.index, result.message)
                     // Attempt to recover and continue
                     current = current.drop(result.count)
                 }
@@ -36,12 +36,12 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
         val result = state.finish()
         return when (result) {
             is ParseState.FinalFailure -> {
-                failure.plus(current.index, result.messages)
+                ParserInternal.Failure(problems.plus(current.index, result.messages))
             }
 
             is ParseState.Success -> {
-                if (failure != null) {
-                    failure
+                if (problems != null) {
+                    ParserInternal.Failure(problems)
                 } else {
                     ParserInternal.Success(result.result)
                 }

@@ -84,8 +84,8 @@ Combinators
 `parameter(name): Parameter<String>`
 `allOf(a, b, map): Parser<T>`
 
-- Long name for `option()`
-- Aliases for `option()`
+- Report errors to stderr
+- Multiple names for `option()`
 - `option()` is boolean by default?
 - Error reporting for `allOf()`
 - `allOf()` with nested `allOf()`

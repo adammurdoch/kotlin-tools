@@ -1,6 +1,5 @@
 package net.rubygrapefruit.cli.parser
 
-import net.rubygrapefruit.cli.ArgParseException
 import kotlin.test.*
 
 abstract class AbstractParseTest {
@@ -9,9 +8,10 @@ abstract class AbstractParseTest {
         assertIs<Parser.Failure>(result)
         DefaultFailures(result).check(config)
 
-        assertFailsWith<ArgParseException> {
+        val e = assertFailsWith<ArgumentParseException> {
             result.get()
         }
+        assertEquals("Argument parsing failed", e.message)
     }
 
     protected interface Failures {
@@ -24,7 +24,7 @@ abstract class AbstractParseTest {
 
         fun check(config: Failures.() -> Unit) {
             config()
-            assertEquals(current, failure.problems.size) { "expected $current problems, found: ${failure.problems}"}
+            assertEquals(current, failure.problems.size) { "expected $current problems, found: ${failure.problems}" }
         }
 
         override fun failure(index: Int, message: String) {

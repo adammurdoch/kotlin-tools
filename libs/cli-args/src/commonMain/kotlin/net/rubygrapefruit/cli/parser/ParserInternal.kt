@@ -1,6 +1,6 @@
 package net.rubygrapefruit.cli.parser
 
-import net.rubygrapefruit.cli.ArgParseException
+import net.rubygrapefruit.cli.terminal.Output
 
 internal interface ParserInternal<out T> {
     fun start(): ParseState<T>
@@ -12,10 +12,14 @@ internal interface ParserInternal<out T> {
     }
 
     class Failure(override val problems: List<Parser.Problem>) : Parser.Failure {
-        constructor(index: Int, message: String) : this(listOf(Parser.Problem(index, message)))
-
         override fun get(): Nothing {
-            throw ArgParseException("Argument parsing failed.")
+            throw ArgumentParseException()
+        }
+
+        override fun writeTo(output: Output) {
+            for (problem in problems) {
+                output.appendLine(problem.message)
+            }
         }
     }
 }

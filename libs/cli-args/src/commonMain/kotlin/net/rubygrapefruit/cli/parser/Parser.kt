@@ -1,5 +1,7 @@
 package net.rubygrapefruit.cli.parser
 
+import net.rubygrapefruit.cli.terminal.Output
+
 /**
  * Parses a list of arguments to produce a result of type [T].
  */
@@ -30,6 +32,8 @@ sealed interface Parser<out T> {
      */
     sealed interface Failure : Result<Nothing> {
         val problems: List<Problem>
+
+        fun writeTo(output: Output)
     }
 
     /**

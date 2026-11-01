@@ -1,27 +1,19 @@
 package net.rubygrapefruit.cli.parser
 
-internal fun Parser.Failure?.plus(index: Int, message: String): Parser.Failure {
+internal fun List<Parser.Problem>?.plus(index: Int, message: String): List<Parser.Problem> {
     return if (this == null) {
-        ParserInternal.Failure(listOf(Parser.Problem(index, message)))
+        listOf(Parser.Problem(index, message))
     } else {
-        ParserInternal.Failure(problems + Parser.Problem(index, message))
+        this + Parser.Problem(index, message)
     }
 }
 
-internal fun Parser.Failure?.plus(index: Int, messages: List<String>): Parser.Failure {
+internal fun List<Parser.Problem>?.plus(index: Int, messages: List<String>): List<Parser.Problem> {
     val newProblems = messages.map { Parser.Problem(index, it) }
     return if (this == null) {
-        ParserInternal.Failure(newProblems)
+        newProblems
     } else {
-        ParserInternal.Failure(problems + newProblems)
-    }
-}
-
-internal fun Parser.Failure?.plus(other: Parser.Failure): Parser.Failure {
-    return if (this == null) {
-        other
-    } else {
-        ParserInternal.Failure(problems + other.problems)
+        this + newProblems
     }
 }
 

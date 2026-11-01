@@ -18,7 +18,7 @@ class App(val help: Boolean, val greeting: String) : Runnable {
 }
 
 fun parser(): Parser<App> {
-    return allOf(option("help"), parameter("greeting")) { help, greeting -> App(help != null, greeting) }
+    return allOf(option("help").boolean(), parameter("greeting")) { help, greeting -> App(help, greeting) }
 }
 
 fun main(args: Array<String>) = parser().runApp(args)

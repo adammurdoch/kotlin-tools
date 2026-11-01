@@ -84,9 +84,13 @@ Combinators
 `parameter(name): Parameter<String>`
 `allOf(a, b, map): Parser<T>`
 
+CLI app
+
+`parser.runApp(args)`
+
+- Cannot repeat boolean option
 - Show usage on parse error
 - Multiple names for `option()`
-- `option()` is boolean by default?
 - Error reporting for `allOf()`
 - `allOf()` with nested `allOf()`
 - Parser that collects unrecognized or remainder
@@ -96,7 +100,10 @@ Combinators
 - Report `[..]` - optional, `<..>` - required
 - `oneOf()`
 - `command()`
+- Convenience for help command or option
 - Convenience for `--version`
+- Convenience for `--stack`
+- Convenience for completion command or option
 - `-Dx=y` style
 - Compose value parsers (e.g. value is ip address or host name)
 - Deprecated, hidden options + commands

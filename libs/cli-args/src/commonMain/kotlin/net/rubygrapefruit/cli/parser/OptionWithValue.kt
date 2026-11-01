@@ -1,8 +1,12 @@
 package net.rubygrapefruit.cli.parser
 
-internal class DefaultOption(name: String) : AbstractParser<String?>(), Option<String?> {
+internal class OptionWithValue(name: String) : AbstractParser<String?>(), StringOption {
     private val flag = if (name.length == 1) "-$name" else "--$name"
     private val lenient = if (name.length == 1) "--$name" else "-$name"
+
+    override fun boolean(): Option<Boolean> {
+        return BooleanOption(flag)
+    }
 
     override fun start(): ParseState<String?> {
         return State(flag, lenient)

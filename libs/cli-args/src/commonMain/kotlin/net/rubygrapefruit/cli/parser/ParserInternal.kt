@@ -11,14 +11,14 @@ internal interface ParserInternal<out T> {
         }
     }
 
-    class Failure(override val problems: List<Parser.Problem>) : Parser.Failure {
+    class Failure(override val problems: List<ProblemAtIndex>) : Parser.Failure {
         override fun get(): Nothing {
             throw ArgumentParseException()
         }
 
         override fun writeTo(output: Output) {
             for (problem in problems) {
-                problem.message.writeTo(output)
+                problem.problem.writeTo(output)
                 output.maybeNewLine()
             }
         }
@@ -44,11 +44,11 @@ internal interface ParseState<out T> {
 
     object NotRecognized : PartialResult
 
-    class Failure(val count: Int, val index: Int, val message: Message) : PartialResult
+    class Failure(val count: Int, val index: Int, val problem: Problem) : PartialResult
 
     class Continue(val count: Int) : PartialResult
 
-    class FinalFailure(val messages: List<Message>) : Result<Nothing>
+    class FinalFailure(val problems: List<Problem>) : Result<Nothing>
 
     sealed interface Success<out T> : Result<T> {
         val result: T

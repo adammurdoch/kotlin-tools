@@ -1,15 +1,15 @@
 package net.rubygrapefruit.cli.parser
 
-internal fun List<Parser.Problem>?.plus(index: Int, message: Message): List<Parser.Problem> {
+internal fun List<ProblemAtIndex>?.plus(index: Int, problem: Problem): List<ProblemAtIndex> {
     return if (this == null) {
-        listOf(Parser.Problem(index, message))
+        listOf(ProblemAtIndex(index, problem))
     } else {
-        this + Parser.Problem(index, message)
+        this + ProblemAtIndex(index, problem)
     }
 }
 
-internal fun List<Parser.Problem>?.plus(index: Int, messages: List<Message>): List<Parser.Problem> {
-    val newProblems = messages.map { Parser.Problem(index, it) }
+internal fun List<ProblemAtIndex>?.plus(index: Int, problems: List<Problem>): List<ProblemAtIndex> {
+    val newProblems = problems.map { ProblemAtIndex(index, it) }
     return if (this == null) {
         newProblems
     } else {
@@ -21,7 +21,7 @@ internal fun <A, B, OUT> zipping(a: ParseState.Result<A>, b: ParseState.Result<B
     return when (a) {
         is ParseState.FinalFailure -> {
             when (b) {
-                is ParseState.FinalFailure -> ParseState.FinalFailure(a.messages + b.messages)
+                is ParseState.FinalFailure -> ParseState.FinalFailure(a.problems + b.problems)
                 is ParseState.Success -> a
             }
         }

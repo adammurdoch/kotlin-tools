@@ -15,6 +15,13 @@ class MultipleStringOptionsTest : AbstractParseTest() {
         assertEquals(Pair(null, "two"), parser.parse("-b", "two").get())
 
         assertEquals(Pair(null, null), parser.parse().get())
+
+        parser.fails("--a", "value", "-b", "value") {
+            failure(0, "Unexpected option '--a'. Use '-a' instead")
+        }
+        parser.fails("-a", "value", "--b", "value") {
+            failure(2, "Unexpected option '--b'. Use '-b' instead")
+        }
     }
 
     @Test
@@ -28,6 +35,13 @@ class MultipleStringOptionsTest : AbstractParseTest() {
         assertEquals(Pair(null, "two"), parser.parse("--option-b", "two").get())
 
         assertEquals(Pair(null, null), parser.parse().get())
+
+        parser.fails("-option-a", "value", "--option-b", "value") {
+            failure(0, "Unexpected option '-option-a'. Use '--option-a' instead")
+        }
+        parser.fails("--option-a", "value", "-option-b", "value") {
+            failure(2, "Unexpected option '-option-b'. Use '--option-b' instead")
+        }
     }
 
     @Test

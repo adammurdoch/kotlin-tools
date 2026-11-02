@@ -33,7 +33,7 @@ abstract class AbstractParseTest {
             val problem = failure.problems[current]
             assertEquals(index, problem.index) { "unexpected index for problem, expected $index, found $problem in ${failure.problems}" }
             val buffer = BufferingOutput()
-            problem.message.writeTo(buffer)
+            problem.problem.writeTo(buffer)
             assertEquals(message, buffer.text)
             current++
         }

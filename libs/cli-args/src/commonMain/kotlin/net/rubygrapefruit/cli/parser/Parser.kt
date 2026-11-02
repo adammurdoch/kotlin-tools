@@ -25,13 +25,11 @@ sealed interface Parser<out T> {
         fun get(): T
     }
 
-    data class Problem(val index: Int, val message: Message)
-
     /**
      * Provides information about argument parsing failure.
      */
     sealed interface Failure : Result<Nothing> {
-        val problems: List<Problem>
+        val problems: List<ProblemAtIndex>
 
         fun writeTo(output: Output)
     }

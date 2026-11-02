@@ -14,7 +14,7 @@ class StringOptionTest : AbstractParseTest() {
         assertNull(parser.parse().get())
 
         parser.fails("--x", "value") {
-            failure(0, "Option -x should be used instead of '--x'")
+            failure(0, "Unexpected option '--x'. Use '-x' instead")
         }
         parser.fails("-X", "value") {
             failure(0, "Unexpected option '-X'")
@@ -31,7 +31,7 @@ class StringOptionTest : AbstractParseTest() {
         assertNull(parser.parse().get())
 
         parser.fails("-an-option", "value") {
-            failure(0, "Option --an-option should be used instead of '-an-option'")
+            failure(0, "Unexpected option '-an-option'. Use '--an-option' instead")
         }
         parser.fails("--An-Option", "value") {
             failure(0, "Unexpected option '--An-Option'")

@@ -1,20 +1,24 @@
 package net.rubygrapefruit.cli.parser
 
-internal class BooleanOption(val flag: String) : AbstractParser<Boolean>(), Option<Boolean> {
+internal class BooleanOption(private val flag: String, private val lenient: String) : AbstractParser<Boolean>(), Option<Boolean> {
     override fun start(): ParseState<Boolean> {
-        return State(flag)
+        return State(flag, lenient)
     }
 
-    private class State(val flag: String) : ParseState<Boolean> {
+    private class State(val flag: String, val lenient: String) : ParseState<Boolean> {
         private var value = false
 
         override fun maybeParse(args: InputArgs): ParseState.PartialResult {
             val first = args.first()
             if (first != flag) {
-                return ParseState.NotRecognized
+                return if (first == lenient) {
+                    ParseState.Failure(1, 0, UnexpectedOption(first, flag))
+                } else {
+                    ParseState.NotRecognized
+                }
             }
             return if (value) {
-                ParseState.Failure(1, 0, Message.Text("Option $flag can only appear once"))
+                ParseState.Failure(1, 0, RepeatedOption(flag))
             } else {
                 value = true
                 ParseState.Continue(1)

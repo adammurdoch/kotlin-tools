@@ -18,7 +18,7 @@ private object TerminalOutput : AbstractOutput() {
     override fun put(text: CharSequence, appearance: Appearance) {
         if (appearance == Appearance.UserInput) {
             // Bold green foreground
-            fputs("\u001B[1m\u001B[32m", stderr)
+            fputs("\u001B[1;32m", stderr)
         }
         fputs(text.toString(), stderr)
         if (appearance == Appearance.UserInput) {

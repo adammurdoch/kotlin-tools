@@ -19,7 +19,7 @@ internal class DefaultParameter(private val name: String) : AbstractParser<Strin
         override fun finish(): ParseState.Result<String> {
             val value = value
             return if (value == null) {
-                ParseState.FinalFailure(listOf(Message.Text("Parameter <$name> not provided")))
+                ParseState.FinalFailure(listOf(MissingParameter(name)))
             } else {
                 ParseState.FixedResult(value)
             }

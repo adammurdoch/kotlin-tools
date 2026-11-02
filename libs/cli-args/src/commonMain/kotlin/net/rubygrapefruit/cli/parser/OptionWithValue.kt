@@ -5,7 +5,7 @@ internal class OptionWithValue(name: String) : AbstractParser<String?>(), String
     private val lenient = if (name.length == 1) "--$name" else "-$name"
 
     override fun boolean(): Option<Boolean> {
-        return BooleanOption(flag)
+        return BooleanOption(flag, lenient)
     }
 
     override fun start(): ParseState<String?> {
@@ -21,18 +21,18 @@ internal class OptionWithValue(name: String) : AbstractParser<String?>(), String
             if (first != flag) {
                 return if (first == lenient) {
                     val count = if (args.length >= 2 && !args.secondIsOption()) 2 else 1
-                    ParseState.Failure(count, 0, Message.Text("Option $flag should be used instead of ") + Message.UserInput(first))
+                    ParseState.Failure(count, 0, UnexpectedOption(first, flag))
                 } else {
                     ParseState.NotRecognized
                 }
             }
             if (seen) {
                 val count = if (args.length >= 2 && !args.secondIsOption()) 2 else 1
-                return ParseState.Failure(count, 0, Message.Text("Option $flag can only appear once"))
+                return ParseState.Failure(count, 0, RepeatedOption(flag))
             }
             seen = true
             return if (args.length == 1 || args.length >= 2 && args.secondIsOption()) {
-                ParseState.Failure(1, 1, Message.Text("No value provided for option $flag"))
+                ParseState.Failure(1, 1, MissingOptionValue(flag))
             } else {
                 value = args.second()
                 ParseState.Continue(2)

@@ -10,6 +10,13 @@ class BooleanOptionTest : AbstractParseTest() {
 
         assertEquals(true, parser.parse("-x").get())
         assertEquals(false, parser.parse().get())
+
+        parser.fails("--x") {
+            failure(0, "Unexpected option '--x'. Use '-x' instead")
+        }
+        parser.fails("-X") {
+            failure(0, "Unexpected option '-X'")
+        }
     }
 
     @Test
@@ -18,6 +25,10 @@ class BooleanOptionTest : AbstractParseTest() {
 
         assertEquals(true, parser.parse("--some-flag").get())
         assertEquals(false, parser.parse().get())
+
+        parser.fails("-some-flag") {
+            failure(0, "Unexpected option '-some-flag'. Use '--some-flag' instead")
+        }
     }
 
     @Test

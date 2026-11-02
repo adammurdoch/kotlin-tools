@@ -2,24 +2,24 @@ package net.rubygrapefruit.cli.parser
 
 internal class OptionWithValue(name: String) : AbstractParser<String?>(), StringOption {
     private val flag = if (name.length == 1) "-$name" else "--$name"
-    private val lenient = if (name.length == 1) "--$name" else "-$name"
+    private val incorrectPrefix = if (name.length == 1) "--$name" else "-$name"
 
     override fun boolean(): Option<Boolean> {
-        return BooleanOption(flag, lenient)
+        return BooleanOption(flag, incorrectPrefix)
     }
 
     override fun start(): ParseState<String?> {
-        return State(flag, lenient)
+        return State(flag, incorrectPrefix)
     }
 
-    private class State(private val flag: String, private val lenient: String) : ParseState<String?> {
+    private class State(private val flag: String, private val incorrectPrefix: String) : ParseState<String?> {
         private var value: String? = null
         private var seen = false
 
         override fun maybeParse(args: InputArgs): ParseState.PartialResult {
             val first = args.first()
             if (first != flag) {
-                return if (first == lenient) {
+                return if (first == incorrectPrefix) {
                     val count = if (args.length >= 2 && !args.secondIsOption()) 2 else 1
                     ParseState.Failure(count, 0, UnexpectedOption(first, flag))
                 } else {

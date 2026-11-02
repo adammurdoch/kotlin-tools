@@ -13,7 +13,7 @@ internal class UnexpectedOption(val option: String, val suggestion: String? = nu
         output.write("Unexpected option ")
         output.userInput(option)
         if (suggestion != null) {
-            output.write(". Use ")
+            output.write(". Try ")
             output.userInput(suggestion)
             output.write(" instead")
         }

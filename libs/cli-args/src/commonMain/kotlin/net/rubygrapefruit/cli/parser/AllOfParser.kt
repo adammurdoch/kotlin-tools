@@ -1,27 +1,46 @@
 package net.rubygrapefruit.cli.parser
 
-internal class AllOfParser<A, B, OUT>(
-    private val a: ParserInternal<A>,
-    private val b: ParserInternal<B>,
-    private val map: (A, B) -> OUT
+internal class AllOfParser<OUT>(
+    private val parsers: List<Parser<*>>,
+    private val map: (List<ParseState.Success<*>>) -> OUT
 ) : AbstractParser<OUT>() {
     override fun start(): ParseState<OUT> {
-        return State(a.start(), b.start(), map)
+        return State(parsers.map { (it as ParserInternal<*>).start() }, map)
     }
 
-    private class State<A, B, OUT>(val a: ParseState<A>, val b: ParseState<B>, val map: (A, B) -> OUT) : ParseState<OUT> {
+    private class State<OUT>(val states: List<ParseState<*>>, val map: (List<ParseState.Success<*>>) -> OUT) : ParseState<OUT> {
         override fun maybeParse(args: InputArgs): ParseState.PartialResult {
-            val aResult = a.maybeParse(args)
-            if (aResult !is ParseState.NotRecognized) {
-                return aResult
+            for (state in states) {
+                val result = state.maybeParse(args)
+                if (result != ParseState.NotRecognized) {
+                    return result
+                }
             }
-            return b.maybeParse(args)
+            return ParseState.NotRecognized
         }
 
         override fun finish(): ParseState.Result<OUT> {
-            val aResult = a.finish()
-            val bResult = b.finish()
-            return zipping(aResult, bResult, map)
+            var problems: List<Problem>? = null
+            val results = mutableListOf<ParseState.Success<*>>()
+            for (state in states) {
+                val result = state.finish()
+                when (result) {
+                    is ParseState.FinalFailure -> {
+                        if (problems == null) {
+                            problems = result.problems
+                        } else {
+                            problems = problems + result.problems
+                        }
+                    }
+
+                    is ParseState.Success<*> -> results.add(result)
+                }
+            }
+            return if (problems != null) {
+                ParseState.FinalFailure(problems)
+            } else {
+                ParseState.LazyResult { map(results) }
+            }
         }
     }
 }

@@ -7,9 +7,16 @@ import kotlin.test.fail
 class MultipleStringParametersTest : AbstractParseTest() {
     @Test
     fun `parses two parameters in order`() {
-        val parser = allOf(parameter("a"), parameter("b")) { a, b -> Pair(a, b) }
+        val parser = allOf(parameter("a"), parameter("b")) { a, b -> listOf(a, b) }
 
-        assertEquals(Pair("one", "two"), parser.parse("one", "two").get())
+        assertEquals(listOf("one", "two"), parser.parse("one", "two").get())
+    }
+
+    @Test
+    fun `parses three parameters in order`() {
+        val parser = allOf(parameter("a"), parameter("b"), parameter("c")) { a, b, c -> listOf(a, b, c) }
+
+        assertEquals(listOf("one", "two", "three"), parser.parse("one", "two", "three").get())
     }
 
     @Test

@@ -1,17 +1,17 @@
 package net.rubygrapefruit.cli.parser
 
-internal class BooleanOption(private val flag: String, private val lenient: String) : AbstractParser<Boolean>(), Option<Boolean> {
+internal class BooleanOption(private val flag: String, private val incorrectPrefix: String) : AbstractParser<Boolean>(), Option<Boolean> {
     override fun start(): ParseState<Boolean> {
-        return State(flag, lenient)
+        return State(flag, incorrectPrefix)
     }
 
-    private class State(val flag: String, val lenient: String) : ParseState<Boolean> {
+    private class State(val flag: String, val incorrectPrefix: String) : ParseState<Boolean> {
         private var value = false
 
         override fun maybeParse(args: InputArgs): ParseState.PartialResult {
             val first = args.first()
             if (first != flag) {
-                return if (first == lenient) {
+                return if (first == incorrectPrefix) {
                     ParseState.Failure(1, 0, UnexpectedOption(first, flag))
                 } else {
                     ParseState.NotRecognized

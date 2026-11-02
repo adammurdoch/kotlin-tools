@@ -84,6 +84,7 @@ Combinators
 `option(name).boolean(): Option<Boolean>`
 `parameter(name): Parameter<String>`
 `allOf(a, b, map): Parser<T>`
+`allOf(a, b, c, map): Parser<T>`
 
 CLI app
 

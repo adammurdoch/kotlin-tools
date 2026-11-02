@@ -25,17 +25,25 @@ abstract class AbstractParseTest {
 
         fun check(config: Failures.() -> Unit) {
             config()
-            assertEquals(current, failure.problems.size) { "expected $current problems, found: ${failure.problems}" }
+            assertEquals(current, failure.problems.size) { "expected $current problems, found: ${failure.problems.text()}" }
         }
 
         override fun failure(index: Int, message: String) {
-            assertTrue(current < failure.problems.size) { "expected at least ${current + 1} problems, found: ${failure.problems}" }
+            assertTrue(current < failure.problems.size) { "expected at least ${current + 1} problems, found: ${failure.problems.text()}" }
             val problem = failure.problems[current]
-            assertEquals(index, problem.index) { "unexpected index for problem, expected $index, found $problem in ${failure.problems}" }
-            val buffer = BufferingOutput()
-            problem.problem.writeTo(buffer)
-            assertEquals(message, buffer.text)
+            assertEquals(index, problem.index) { "unexpected index for problem, expected $index, found $problem in ${failure.problems.text()}" }
+            assertEquals(message, problem.problem.text())
             current++
+        }
+
+        private fun List<ProblemAtIndex>.text(): String {
+            return joinToString { it.problem.text() }
+        }
+
+        private fun Problem.text(): String {
+            val buffer = BufferingOutput()
+            writeTo(buffer)
+            return buffer.text
         }
     }
 }

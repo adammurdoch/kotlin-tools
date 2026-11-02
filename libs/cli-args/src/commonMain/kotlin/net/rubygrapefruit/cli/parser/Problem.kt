@@ -44,3 +44,9 @@ internal class MissingParameter(val name: String) : Problem {
         output.write("Parameter <$name> not provided")
     }
 }
+
+internal class MissingLiteral(val text: String) : Problem {
+    override fun writeTo(output: Output) {
+        output.write("Expected '$text'")
+    }
+}

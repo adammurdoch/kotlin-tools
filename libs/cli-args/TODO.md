@@ -83,6 +83,7 @@ Combinators
 `option(name): Option<String?>`
 `option(name).boolean(): Option<Boolean>`
 `parameter(name): Parameter<String>`
+`literal(text): Parameter<Unit>`
 `allOf(a, b, map): Parser<T>`
 `allOf(a, b, c, map): Parser<T>`
 
@@ -91,9 +92,9 @@ CLI app
 `parser.runApp(args)`
 - Color output
 
+- literal() parse failure generates 2 problems
 - Show usage on parse error
 - Multiple names for `option()`
-- Error reporting for `allOf()`
 - `allOf()` with nested `allOf()`
 - Parser that collects unrecognized or remainder
 - Merge short options

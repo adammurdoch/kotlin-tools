@@ -2,23 +2,30 @@ package sample
 
 import net.rubygrapefruit.cli.app.Runnable
 import net.rubygrapefruit.cli.app.runApp
-import net.rubygrapefruit.cli.parser.Parser
-import net.rubygrapefruit.cli.parser.allOf
-import net.rubygrapefruit.cli.parser.option
-import net.rubygrapefruit.cli.parser.parameter
+import net.rubygrapefruit.cli.parser.*
 
-class App(val help: Boolean, val greeting: String) : Runnable {
+class App(val verbose: Boolean, val greeting: String) : Runnable {
     override fun run() {
-        if (help) {
-            println("help")
-        } else {
-            println(greeting)
+        if (verbose) {
+            print("> ")
         }
+        println(greeting)
     }
 }
 
-fun parser(): Parser<App> {
-    return allOf(option("help").boolean(), parameter("greeting")) { help, greeting -> App(help, greeting) }
+class Help(val verbose: Boolean) : Runnable {
+    override fun run() {
+        if (verbose) {
+            print("> ")
+        }
+        println("help")
+    }
+}
+
+fun parser(): Parser<Runnable> {
+    val help = allOf(literal("help"), option("verbose").boolean()) { _, verbose -> Help(verbose) }
+    val app = allOf(literal("run"), option("verbose").boolean(), parameter("greeting")) { _, verbose, greeting -> App(verbose, greeting) }
+    return oneOf(help, app)
 }
 
 fun main(args: Array<String>) = parser().runApp(args)

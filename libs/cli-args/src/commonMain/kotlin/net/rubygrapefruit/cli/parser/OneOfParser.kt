@@ -1,5 +1,7 @@
 package net.rubygrapefruit.cli.parser
 
+import kotlin.math.min
+
 internal class OneOfParser<OUT>(private val choices: List<ParserInternal<OUT>>) : AbstractParser<OUT>(), Parser<OUT> {
     override fun start(): ParseState<OUT> {
         return State(choices.map { ChoiceState(it.start()) })
@@ -7,30 +9,51 @@ internal class OneOfParser<OUT>(private val choices: List<ParserInternal<OUT>>) 
 
     private class State<OUT>(val choices: List<ChoiceState<OUT>>) : ParseState<OUT> {
         override fun maybeParse(args: InputArgs): ParseState.PartialResult {
+            var recognized = Int.MAX_VALUE
             for (choice in choices) {
                 val result = choice.state.maybeParse(args)
-                if (result !is ParseState.Continue) {
-                    choice.failed = true
+                when (result) {
+                    is ParseState.NotRecognized -> continue
+                    is ParseState.Continue -> {
+                        choice.recognized = true
+                        recognized = min(recognized, result.count)
+                    }
+
+                    is ParseState.Failure -> {
+                        choice.recognized = true
+                        choice.problems = choice.problems.plus(result.index, result.problem)
+                        recognized = min(recognized, result.count)
+                    }
                 }
             }
-            return ParseState.Continue(2)
+            return if (recognized != Int.MAX_VALUE) {
+                ParseState.Continue(recognized)
+            } else {
+                ParseState.NotRecognized
+            }
         }
 
         override fun finish(): ParseState.Result<OUT> {
-            for (choice in choices) {
-                if (choice.failed) {
-                    continue
-                }
+            val candidates = choices.filter { it.recognized } + choices.filter { !it.recognized }
+            var problems: List<ProblemAtIndex> = emptyList()
+            for (choice in candidates) {
+                problems = problems.plus(choice.problems)
                 val result = choice.state.finish()
-                if (result is ParseState.Success) {
-                    return result
+                when (result) {
+                    is ParseState.FinalFailure -> problems.plus(0, result.problems)
+                    is ParseState.Success -> {
+                        if (choice.problems == null) {
+                            return result
+                        }
+                    }
                 }
             }
-            TODO("Not yet implemented")
+            return ParseState.FinalFailure(problems.map { it.problem })
         }
     }
 
     private class ChoiceState<OUT>(val state: ParseState<OUT>) {
-        var failed = false
+        var problems: List<ProblemAtIndex>? = null
+        var recognized = false
     }
 }

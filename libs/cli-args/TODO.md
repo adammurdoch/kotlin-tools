@@ -93,6 +93,9 @@ CLI app
 `parser.runApp(args)`
 - Color output
 
+- `oneOf()` with overlapping options, some with values and some without
+- `oneOf()` reports conflicting options or literals
+- `oneOf()` reports problems for option (e.g. repeated option, missing value)
 - Show usage on parse error
 - Multiple names for `option()`
 - `allOf()` with nested `allOf()`
@@ -111,4 +114,4 @@ CLI app
 - `-Dx=y` style
 - Compose value parsers (e.g. value is ip address or host name)
 - Deprecated, hidden options + commands
-- Terminal for JVM
+- Terminal integration for JVM

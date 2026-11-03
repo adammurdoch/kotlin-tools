@@ -16,3 +16,11 @@ internal fun List<ProblemAtIndex>?.plus(index: Int, problems: List<Problem>): Li
         this + newProblems
     }
 }
+
+internal fun List<ProblemAtIndex>.plus(problems: List<ProblemAtIndex>?): List<ProblemAtIndex> {
+    return if (problems == null) {
+        this
+    } else {
+        this + problems
+    }
+}

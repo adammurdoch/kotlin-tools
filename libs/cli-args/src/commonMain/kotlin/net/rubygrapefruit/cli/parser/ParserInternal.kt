@@ -29,7 +29,7 @@ internal interface ParseState<out T> {
     /**
      * Attempt to parse the first argument(s) of the provided arguments.
      *
-     * May be called zero or more times.
+     * May be called zero or more times, followed by [finish].
      */
     fun maybeParse(args: InputArgs): PartialResult
 
@@ -42,10 +42,22 @@ internal interface ParseState<out T> {
 
     sealed interface Result<out T>
 
+    /**
+     * The parser did not recognize any arguments.
+     * The parser's [maybeParse] function may be called again after skipping some arguments.
+     */
     object NotRecognized : PartialResult
 
+    /**
+     * The parser has recognized one or more arguments but has encountered some problem.
+     * The parser's [maybeParse] function may be called again after skipping the recognized arguments.
+     */
     class Failure(val count: Int, val index: Int, val problem: Problem) : PartialResult
 
+    /**
+     * The parser has recognized one or more arguments without any problems.
+     * The parser's [maybeParse] function may be called again after skipping the recognized arguments.
+     */
     class Continue(val count: Int) : PartialResult
 
     class FinalFailure(val problems: List<Problem>) : Result<Nothing>

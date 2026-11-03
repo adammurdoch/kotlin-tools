@@ -86,6 +86,7 @@ Combinators
 `literal(text): Parameter<Unit>`
 `allOf(a, b, map): Parser<T>`
 `allOf(a, b, c, map): Parser<T>`
+`oneOf(choices...): Parser<T>`
 
 CLI app
 
@@ -100,6 +101,7 @@ CLI app
 - Merge short options
 - `--` as end of options
 - `--option=<value>` (allows value that starts with `-`)
+- `--no-x` flag for boolean options
 - Report `[..]` - optional, `<..>` - required
 - `oneOf()`
 - `command()`

@@ -1,11 +1,11 @@
 package net.rubygrapefruit.cli.parser
 
 internal class AllOfParser<OUT>(
-    private val parsers: List<Parser<*>>,
+    private val parsers: List<ParserInternal<*>>,
     private val map: (List<ParseState.Success<*>>) -> OUT
 ) : AbstractParser<OUT>() {
     override fun start(): ParseState<OUT> {
-        return State(parsers.map { (it as ParserInternal<*>).start() }, map)
+        return State(parsers.map { it.start() }, map)
     }
 
     private class State<OUT>(val states: List<ParseState<*>>, val map: (List<ParseState.Success<*>>) -> OUT) : ParseState<OUT> {

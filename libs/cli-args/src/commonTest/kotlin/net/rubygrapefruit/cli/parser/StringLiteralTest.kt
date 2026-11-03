@@ -11,8 +11,7 @@ class StringLiteralTest : AbstractParseTest() {
         assertEquals(Unit, parser.parse("help").get())
 
         parser.fails("HELP") {
-            failure(0, "Unexpected argument 'HELP'")
-            failure(1, "Expected 'help'")
+            failure(0, "Unexpected argument 'HELP'. Expected 'help' instead")
         }
         parser.fails("--help") {
             failure(0, "Unexpected option '--help'")
@@ -28,8 +27,7 @@ class StringLiteralTest : AbstractParseTest() {
             failure(0, "Expected 'help'")
         }
         parser.fails("other") {
-            failure(0, "Unexpected argument 'other'")
-            failure(1, "Expected 'help'")
+            failure(0, "Unexpected argument 'other'. Expected 'help' instead")
         }
         parser.fails("-unknown") {
             failure(0, "Unexpected option '-unknown'")

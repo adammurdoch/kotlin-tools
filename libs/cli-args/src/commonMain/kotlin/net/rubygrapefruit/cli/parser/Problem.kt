@@ -20,10 +20,15 @@ internal class UnexpectedOption(val option: String, val suggestion: String? = nu
     }
 }
 
-internal class UnexpectedArgument(val argument: String) : Problem {
+internal class UnexpectedArgument(val argument: String, val expected: String? = null) : Problem {
     override fun writeTo(output: Output) {
         output.write("Unexpected argument ")
         output.userInput(argument)
+        if (expected != null) {
+            output.write(". Expected ")
+            output.userInput(expected)
+            output.write(" instead")
+        }
     }
 }
 

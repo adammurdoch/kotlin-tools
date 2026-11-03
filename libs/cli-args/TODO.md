@@ -93,7 +93,6 @@ CLI app
 `parser.runApp(args)`
 - Color output
 
-- literal() parse failure generates 2 problems
 - Show usage on parse error
 - Multiple names for `option()`
 - `allOf()` with nested `allOf()`

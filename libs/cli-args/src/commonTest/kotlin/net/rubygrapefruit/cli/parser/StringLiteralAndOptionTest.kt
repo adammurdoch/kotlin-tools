@@ -16,4 +16,29 @@ class StringLiteralAndOptionTest : AbstractParseTest() {
 
         assertEquals(false, parser.parse("run").get())
     }
+
+    @Test
+    fun `must provide literal`() {
+        val parser = allOf(
+            literal("run"),
+            option("a").boolean()
+        ) { _, a -> a }
+
+        parser.fails {
+            failure(0, "Expected 'run'")
+        }
+        parser.fails("-a") {
+            failure(1, "Expected 'run'")
+        }
+        parser.fails("-a", "unknown") {
+            failure(1, "Unexpected argument 'unknown'. Expected 'run' instead")
+        }
+        parser.fails("unknown", "-a") {
+            failure(0, "Unexpected argument 'unknown'. Expected 'run' instead")
+        }
+        parser.fails("-a", "-unknown") {
+            failure(1, "Unexpected option '-unknown'")
+            failure(2, "Expected 'run'")
+        }
+    }
 }

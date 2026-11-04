@@ -1,7 +1,26 @@
 package net.rubygrapefruit.cli.parser
 
 /**
- * Applies the given parsers to produce a value of type [OUT].
+ * Returns a parser that does not accept any inputs.
+ *
+ * The parser produces the result of the given function.
+ */
+fun <OUT> allOf(producer: () -> OUT): Parser<OUT> {
+    return AllOfParser(emptyList()) { producer() }
+}
+
+/**
+ * Applies the given parser and maps it result to produce a value of type [OUT].
+ */
+fun <A, OUT> allOf(a: Parser<A>, map: (A) -> OUT): Parser<OUT> {
+    @Suppress("UNCHECKED_CAST")
+    return AllOfParser(listOf(a).cast()) { results ->
+        map(results[0].result as A)
+    }
+}
+
+/**
+ * Applies the given parsers and maps their results to produce a value of type [OUT].
  *
  * Parameters must appear in the order specified, and options can appear in any order.
  */
@@ -13,7 +32,7 @@ fun <A, B, OUT> allOf(a: Parser<A>, b: Parser<B>, map: (A, B) -> OUT): Parser<OU
 }
 
 /**
- * Applies the given parsers to produce a value of type [OUT].
+ * Applies the given parsers and maps their results to produce a value of type [OUT].
  *
  * Parameters must appear in the order specified, and options can appear in any order.
  */
@@ -24,6 +43,9 @@ fun <A, B, C, OUT> allOf(a: Parser<A>, b: Parser<B>, c: Parser<C>, map: (A, B, C
     }
 }
 
+/**
+ * Attempts to match the inputs using the given parsers. Returns the result of the first parser to match.
+ */
 fun <OUT> oneOf(vararg choices: Parser<OUT>): Parser<OUT> {
     return OneOfParser(choices.toList().cast())
 }

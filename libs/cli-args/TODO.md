@@ -83,7 +83,9 @@ Combinators
 `option(name): Option<String?>`
 `option(name).boolean(): Option<Boolean>`
 `parameter(name): Parameter<String>`
-`literal(text): Parameter<Unit>`
+`literal(text): Parser<Unit>`
+`allOf(producer): Parser<T>`
+`allOf(a, map): Parser<T>`
 `allOf(a, b, map): Parser<T>`
 `allOf(a, b, c, map): Parser<T>`
 `oneOf(choices...): Parser<T>`
@@ -91,6 +93,7 @@ Combinators
 CLI app
 
 `parser.runApp(args)`
+
 - Color output
 
 - `oneOf()` with overlapping options, some with values and some without

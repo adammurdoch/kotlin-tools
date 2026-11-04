@@ -2,6 +2,7 @@ package net.rubygrapefruit.cli.parser
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.fail
 
 class MultipleStringOptionsTest : AbstractParseTest() {
     @Test
@@ -60,7 +61,7 @@ class MultipleStringOptionsTest : AbstractParseTest() {
 
     @Test
     fun `cannot include other input values`() {
-        val parser = allOf(option("a"), option("b")) { a, b -> Pair(a, b) }
+        val parser = allOf(option("a"), option("b")) { a, b -> fail() }
 
         parser.fails("-unknown") {
             failure(0, "Unexpected option '-unknown'")
@@ -79,7 +80,7 @@ class MultipleStringOptionsTest : AbstractParseTest() {
 
     @Test
     fun `each option must have a value`() {
-        val parser = allOf(option("a"), option("b")) { a, b -> Pair(a, b) }
+        val parser = allOf(option("a"), option("b")) { a, b -> fail() }
 
         parser.fails("-a", "-b") {
             failure(1, "No value provided for option -a")

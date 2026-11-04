@@ -2,8 +2,9 @@ package net.rubygrapefruit.cli.parser
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.fail
 
-class StringLiteralAndOptionTest : AbstractParseTest() {
+class StringLiteralAndBooleanOptionTest : AbstractParseTest() {
     @Test
     fun `parses literal and option in any order`() {
         val parser = allOf(
@@ -22,7 +23,7 @@ class StringLiteralAndOptionTest : AbstractParseTest() {
         val parser = allOf(
             literal("run"),
             option("a").boolean()
-        ) { _, a -> a }
+        ) { _, _ -> fail() }
 
         parser.fails {
             failure(0, "Expected 'run'")
@@ -39,6 +40,21 @@ class StringLiteralAndOptionTest : AbstractParseTest() {
         parser.fails("-a", "-unknown") {
             failure(1, "Unexpected option '-unknown'")
             failure(2, "Expected 'run'")
+        }
+    }
+
+    @Test
+    fun `option must not have a value`() {
+        val parser = allOf(
+            literal("run"),
+            option("a").boolean()
+        ) { _, _ -> fail() }
+
+        parser.fails("run", "-a", "value") {
+            failure(2, "Unexpected argument 'value'")
+        }
+        parser.fails("-a", "value", "run") {
+            failure(1, "Unexpected argument 'value'")
         }
     }
 }

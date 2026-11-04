@@ -27,11 +27,13 @@ private object TerminalOutput : AbstractOutput() {
     }
 }
 
-actual fun output(): Output {
+private val defaultOutput by lazy {
     val ttyResult = isatty(STDERR_FILENO)
-    return if (ttyResult == 1) {
+    if (ttyResult == 1) {
         TerminalOutput
     } else {
         PlainOutput
     }
 }
+
+actual fun output(): Output = defaultOutput

@@ -1,5 +1,8 @@
 package net.rubygrapefruit.cli.terminal
 
+/**
+ * Writes diagnostic output to some source.
+ */
 sealed interface Output {
     /**
      * Writes the given text to the output
@@ -25,6 +28,6 @@ sealed interface Output {
 }
 
 /**
- * Returns the default [Output] for this process, connected to the process' stdout and stderr.
+ * Returns the default [Output] for this process, which writes to the process' stderr.
  */
 expect fun output(): Output

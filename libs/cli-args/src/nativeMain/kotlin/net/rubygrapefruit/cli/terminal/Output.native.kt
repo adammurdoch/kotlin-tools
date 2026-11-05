@@ -17,12 +17,16 @@ private object PlainOutput : AbstractPlainOutput() {
 private object TerminalOutput : AbstractOutput() {
     override fun put(text: CharSequence, appearance: Appearance) {
         if (appearance == Appearance.UserInput) {
-            // Bold green foreground
-            fputs("\u001B[1;32m", stderr)
-        }
-        fputs(text.toString(), stderr)
-        if (appearance == Appearance.UserInput) {
-            fputs("\u001B[0m", stderr)
+            if (text.isEmpty()) {
+                fputs("''", stderr)
+            } else {
+                // Bold green foreground
+                fputs("\u001B[1;32m", stderr)
+                fputs(text.toString(), stderr)
+                fputs("\u001B[0m", stderr)
+            }
+        } else {
+            fputs(text.toString(), stderr)
         }
     }
 }

@@ -19,7 +19,7 @@ class OneStringOptionTest : AbstractParseTest() {
 
     @Test
     fun `cannot include other input values`() {
-        val parser = allOf(option("a")) { a -> fail() }
+        val parser = allOf(option("a")) { _ -> fail() }
 
         parser.fails("-unknown") {
             failure(0, "Unexpected option '-unknown'")

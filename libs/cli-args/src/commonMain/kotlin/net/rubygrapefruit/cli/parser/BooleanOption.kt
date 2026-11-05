@@ -21,7 +21,7 @@ internal class BooleanOption(private val flag: String, private val incorrectPref
                 ParseState.Failure(1, 0, RepeatedOption(flag))
             } else {
                 value = true
-                ParseState.Continue(1)
+                ParseState.Matched(1)
             }
         }
 

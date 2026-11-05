@@ -11,7 +11,9 @@ internal interface ParserInternal<out T> {
         }
     }
 
-    class Failure(override val problems: List<ProblemAtIndex>) : Parser.Failure {
+    class Failure(problems: List<ProblemAtIndex>) : Parser.Failure {
+        override val problems: List<ProblemAtIndex> = problems.sortedBy { it.index }
+
         override fun get(): Nothing {
             throw ArgumentParseException()
         }
@@ -38,9 +40,11 @@ internal interface ParseState<out T> {
      */
     fun finish(): Result<T>
 
-    sealed interface PartialResult
+    fun claimUnrecognized(args: InputArgs): Problem? {
+        return null
+    }
 
-    sealed interface Result<out T>
+    sealed interface PartialResult
 
     /**
      * The parser did not recognize any arguments.
@@ -50,15 +54,17 @@ internal interface ParseState<out T> {
 
     /**
      * The parser has recognized one or more arguments but has encountered some problem.
-     * The parser's [maybeParse] function may be called again after skipping the recognized arguments.
+     * The parser's [maybeParse] function may be called again after skipping at least recognized arguments (and possibly more).
      */
     class Failure(val count: Int, val index: Int, val problem: Problem) : PartialResult
 
     /**
      * The parser has recognized one or more arguments without any problems.
-     * The parser's [maybeParse] function may be called again after skipping the recognized arguments.
+     * The parser's [maybeParse] function may be called again after skipping at least recognized arguments (and possibly more).
      */
-    class Continue(val count: Int) : PartialResult
+    class Matched(val count: Int) : PartialResult
+
+    sealed interface Result<out T>
 
     class FinalFailure(val problems: List<Problem>) : Result<Nothing>
 

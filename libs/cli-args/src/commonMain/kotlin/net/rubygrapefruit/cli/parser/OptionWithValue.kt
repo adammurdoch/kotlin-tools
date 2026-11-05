@@ -35,7 +35,7 @@ internal class OptionWithValue(name: String) : AbstractParser<String?>(), String
                 ParseState.Failure(1, 1, MissingOptionValue(flag))
             } else {
                 value = args.second()
-                ParseState.Continue(2)
+                ParseState.Matched(2)
             }
         }
 

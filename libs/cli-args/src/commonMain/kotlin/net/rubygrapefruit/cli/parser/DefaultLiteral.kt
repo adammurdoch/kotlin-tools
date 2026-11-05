@@ -6,26 +6,34 @@ internal class DefaultLiteral(private val text: String) : AbstractParser<Unit>()
     }
 
     private class State(val text: String) : ParseState<Unit> {
-        private var seen = false
-        private var failed = false
+        private var claimed = false
+        private var matched = false
 
         override fun maybeParse(args: InputArgs): ParseState.PartialResult {
-            if (seen || args.firstIsOption()) {
+            if (matched || args.firstIsOption()) {
                 return ParseState.NotRecognized
             }
-            seen = true
             return if (args.first() == text) {
-                ParseState.Continue(1)
+                matched = true
+                ParseState.Matched(1)
             } else {
-                failed = true
-                ParseState.Failure(1, 0, UnexpectedArgument(args.first(), text))
+                ParseState.NotRecognized
+            }
+        }
+
+        override fun claimUnrecognized(args: InputArgs): Problem? {
+            return if (!matched && !claimed && !args.firstIsOption()) {
+                claimed = true
+                UnexpectedArgument(args.first(), text)
+            } else {
+                null
             }
         }
 
         override fun finish(): ParseState.Result<Unit> {
-            return if (seen) {
+            return if (matched) {
                 ParseState.FixedResult(Unit)
-            } else if (failed) {
+            } else if (claimed) {
                 ParseState.FinalFailure(emptyList())
             } else {
                 ParseState.FinalFailure(listOf(MissingLiteral(text)))

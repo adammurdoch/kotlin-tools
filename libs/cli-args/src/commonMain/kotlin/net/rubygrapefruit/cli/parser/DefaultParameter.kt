@@ -13,7 +13,7 @@ internal class DefaultParameter(private val name: String) : AbstractParser<Strin
                 return ParseState.NotRecognized
             }
             value = args.first()
-            return ParseState.Continue(1)
+            return ParseState.Matched(1)
         }
 
         override fun finish(): ParseState.Result<String> {

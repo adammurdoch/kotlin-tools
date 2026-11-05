@@ -14,7 +14,7 @@ internal class OneOfParser<OUT>(private val choices: List<ParserInternal<OUT>>) 
                 val result = choice.state.maybeParse(args)
                 when (result) {
                     is ParseState.NotRecognized -> continue
-                    is ParseState.Continue -> {
+                    is ParseState.Matched -> {
                         choice.recognized = true
                         recognized = min(recognized, result.count)
                     }
@@ -27,7 +27,7 @@ internal class OneOfParser<OUT>(private val choices: List<ParserInternal<OUT>>) 
                 }
             }
             return if (recognized != Int.MAX_VALUE) {
-                ParseState.Continue(recognized)
+                ParseState.Matched(recognized)
             } else {
                 ParseState.NotRecognized
             }

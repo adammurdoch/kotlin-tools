@@ -52,6 +52,9 @@ class StringOptionTest : AbstractParseTest() {
         parser.fails("value") {
             failure(0, "Unexpected argument 'value'")
         }
+        parser.fails("") {
+            failure(0, "Unexpected argument ''")
+        }
         parser.fails("-unknown", "value") {
             failure(0, "Unexpected option '-unknown'")
             failure(1, "Unexpected argument 'value'")

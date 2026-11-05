@@ -6,6 +6,7 @@ internal class DefaultLiteral(private val text: String) : AbstractParser<Unit>()
     }
 
     private class State(val text: String) : ParseState<Unit> {
+        private var minIndex = -1
         private var claimed = false
         private var matched = false
 
@@ -17,12 +18,15 @@ internal class DefaultLiteral(private val text: String) : AbstractParser<Unit>()
                 matched = true
                 ParseState.Matched(1)
             } else {
+                if (minIndex < 0) {
+                    minIndex = args.index
+                }
                 ParseState.NotRecognized
             }
         }
 
         override fun claimUnrecognized(args: InputArgs): Problem? {
-            return if (!matched && !claimed && !args.firstIsOption()) {
+            return if (!matched && !claimed && args.index >= minIndex && !args.firstIsOption()) {
                 claimed = true
                 UnexpectedArgument(args.first(), text)
             } else {

@@ -47,5 +47,13 @@ class BooleanOptionTest : AbstractParseTest() {
         parser.fails("-x", "-x") {
             failure(1, "Option -x can only appear once")
         }
+        parser.fails("-x", "value", "-x") {
+            failure(1, "Unexpected argument 'value'")
+            failure(2, "Option -x can only appear once")
+        }
+        parser.fails("-x", "-x", "value") {
+            failure(1, "Option -x can only appear once")
+            failure(2, "Unexpected argument 'value'")
+        }
     }
 }

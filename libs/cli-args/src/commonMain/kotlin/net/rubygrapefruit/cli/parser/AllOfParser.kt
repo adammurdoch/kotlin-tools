@@ -19,6 +19,16 @@ internal class AllOfParser<OUT>(
             return ParseState.NotRecognized
         }
 
+        override fun claimUnrecognized(args: InputArgs): Problem? {
+            for (state in states) {
+                val problem = state.claimUnrecognized(args)
+                if (problem != null) {
+                    return problem
+                }
+            }
+            return null
+        }
+
         override fun finish(): ParseState.Result<OUT> {
             var problems: List<Problem>? = null
             val results = mutableListOf<ParseState.Success<*>>()

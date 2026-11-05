@@ -54,7 +54,7 @@ class StringLiteralAndBooleanOptionTest : AbstractParseTest() {
             failure(2, "Unexpected argument 'value'")
         }
         parser.fails("-a", "value", "run") {
-            failure(1, "Unexpected argument 'value'. Expected 'run' instead")
+            failure(1, "Unexpected argument 'value'")
         }
     }
 }

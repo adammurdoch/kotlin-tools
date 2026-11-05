@@ -4,7 +4,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
 
-class NoOptionsOrParametersTest : AbstractParseTest() {
+class NoParametersTest : AbstractParseTest() {
     @Test
     fun `parses no parameters`() {
         val parser = allOf { "result" }

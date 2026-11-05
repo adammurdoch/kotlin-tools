@@ -100,6 +100,7 @@ CLI app
 - `oneOf()` reports conflicting options or literals
 - `oneOf()` reports problems for option (e.g. repeated option, missing value)
 - Show usage on parse error
+    - Bold text
     - Include app name
     - Include app summary
     - Include 'run with --help', etc

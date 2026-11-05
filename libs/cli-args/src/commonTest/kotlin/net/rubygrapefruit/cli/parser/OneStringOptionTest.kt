@@ -7,10 +7,10 @@ import kotlin.test.fail
 class OneStringOptionTest : AbstractParseTest() {
     @Test
     fun `parses option with short name`() {
-        val parser = allOf(option("a")) { a -> "'$a'" }
+        val parser = allOf(option("a")) { a -> a?.length }
 
-        assertEquals("'one'", parser.parse("-a", "one").get())
-        assertEquals("'null'", parser.parse().get())
+        assertEquals(3, parser.parse("-a", "one").get())
+        assertEquals(null, parser.parse().get())
 
         parser.fails("--a", "value") {
             failure(0, "Unexpected option '--a'. Try '-a' instead")

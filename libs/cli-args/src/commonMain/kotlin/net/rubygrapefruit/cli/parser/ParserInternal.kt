@@ -40,7 +40,7 @@ internal interface ParseState<out T> {
      */
     fun finish(): Result<T>
 
-    fun claimUnrecognized(args: InputArgs): Problem? {
+    fun claimUnrecognized(args: InputArgs): Failure? {
         return null
     }
 

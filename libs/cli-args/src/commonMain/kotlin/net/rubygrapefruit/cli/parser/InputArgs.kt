@@ -39,12 +39,4 @@ internal class DefaultInputArgs(override val index: Int, private val args: List<
     override fun secondIsRecognized(): Boolean {
         return recognized[index + 1]
     }
-
-    fun drop(count: Int): DefaultInputArgs {
-        return if (count == 0) {
-            this
-        } else {
-            DefaultInputArgs(index + count, args, recognized)
-        }
-    }
 }

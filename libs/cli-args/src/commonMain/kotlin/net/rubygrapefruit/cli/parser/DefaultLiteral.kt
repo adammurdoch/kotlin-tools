@@ -6,29 +6,24 @@ internal class DefaultLiteral(private val text: String) : AbstractParser<Unit>()
     }
 
     private class State(val text: String) : ParseState<Unit> {
-        private var minIndex = -1
         private var claimed = false
         private var matched = false
 
         override fun maybeParse(args: InputArgs): ParseState.PartialResult {
-            if (matched || args.firstIsOption()) {
-                return ParseState.NotRecognized
-            }
-            return if (args.first() == text) {
+            return if (matched || args.firstIsOption()) {
+                ParseState.NotRecognized
+            } else if (args.first() == text) {
                 matched = true
                 ParseState.Matched(1)
             } else {
-                if (minIndex < 0) {
-                    minIndex = args.index
-                }
                 ParseState.NotRecognized
             }
         }
 
-        override fun claimUnrecognized(args: InputArgs): Problem? {
-            return if (!matched && !claimed && args.index >= minIndex && !args.firstIsOption()) {
+        override fun claimUnrecognized(args: InputArgs): ParseState.Failure? {
+            return if (!matched && !claimed && !args.firstIsOption()) {
                 claimed = true
-                UnexpectedArgument(args.first(), text)
+                ParseState.Failure(1, 0, UnexpectedArgument(args.first(), text))
             } else {
                 null
             }

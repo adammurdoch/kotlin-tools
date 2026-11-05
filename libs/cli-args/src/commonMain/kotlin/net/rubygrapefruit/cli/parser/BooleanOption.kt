@@ -6,30 +6,30 @@ internal class BooleanOption(private val flag: String, private val incorrectPref
     }
 
     private class State(val flag: String, val incorrectPrefix: String) : ParseState<Boolean> {
-        private var matchedIndex = -1
+        private var matched = false
 
         override fun maybeParse(args: InputArgs): ParseState.PartialResult {
             val first = args.first()
-            return if (first != flag || matchedIndex >= 0) {
+            return if (first != flag || matched) {
                 ParseState.NotRecognized
             } else {
-                matchedIndex = args.index
+                matched = true
                 ParseState.Matched(1)
             }
         }
 
-        override fun claimUnrecognized(args: InputArgs): Problem? {
+        override fun claimUnrecognized(args: InputArgs): ParseState.Failure? {
             return if (args.first() == incorrectPrefix) {
-                UnexpectedOption(args.first(), flag)
-            } else if (args.index > matchedIndex && args.first() == flag) {
-                RepeatedOption(flag)
+                ParseState.Failure(1, 0, UnexpectedOption(args.first(), flag))
+            } else if (args.first() == flag) {
+                ParseState.Failure(1, 0, RepeatedOption(flag))
             } else {
                 null
             }
         }
 
         override fun finish(): ParseState.Result<Boolean> {
-            return ParseState.FixedResult(matchedIndex >= 0)
+            return ParseState.FixedResult(matched)
         }
     }
 }

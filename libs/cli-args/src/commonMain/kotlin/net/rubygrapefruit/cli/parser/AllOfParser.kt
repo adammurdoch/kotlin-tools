@@ -19,7 +19,7 @@ internal class AllOfParser<OUT>(
             return ParseState.NotRecognized
         }
 
-        override fun claimUnrecognized(args: InputArgs): Problem? {
+        override fun claimUnrecognized(args: InputArgs): ParseState.Failure? {
             for (state in states) {
                 val problem = state.claimUnrecognized(args)
                 if (problem != null) {

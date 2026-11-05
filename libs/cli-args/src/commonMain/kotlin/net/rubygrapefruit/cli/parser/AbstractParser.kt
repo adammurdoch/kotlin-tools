@@ -37,16 +37,26 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
 
         index = 0
         while (index < args.size) {
-            if (!recognized[index]) {
-                val current = DefaultInputArgs(index, args, recognized)
-                val problem = state.claimUnrecognized(current) ?: if (current.firstIsOption()) {
+            if (recognized[index]) {
+                index++
+                continue
+            }
+
+            val current = DefaultInputArgs(index, args, recognized)
+            val failure = state.claimUnrecognized(current)
+            if (failure != null) {
+                require(failure.index == 0 && failure.count > 0)
+                problems = problems.plus(index, failure.problem)
+                index += failure.count
+            } else {
+                val problem = if (current.firstIsOption()) {
                     UnexpectedOption(current.first())
                 } else {
                     UnexpectedArgument(current.first())
                 }
                 problems = problems.plus(index, problem)
+                index++
             }
-            index++
         }
 
         val result = state.finish()

@@ -19,12 +19,7 @@ internal class OptionWithValue(name: String) : AbstractParser<String?>(), String
         override fun maybeParse(args: InputArgs): ParseState.PartialResult {
             val first = args.first()
             if (first != flag) {
-                return if (first == incorrectPrefix) {
-                    val count = if (args.hasSecond() && !args.secondIsOption()) 2 else 1
-                    ParseState.Failure(count, 0, UnexpectedOption(first, flag))
-                } else {
-                    ParseState.NotRecognized
-                }
+                return ParseState.NotRecognized
             }
             if (seen) {
                 val count = if (args.hasSecond() && !args.secondIsOption()) 2 else 1
@@ -36,6 +31,16 @@ internal class OptionWithValue(name: String) : AbstractParser<String?>(), String
             } else {
                 value = args.second()
                 ParseState.Matched(2)
+            }
+        }
+
+        override fun claimUnrecognized(args: InputArgs): ParseState.Failure? {
+            val first = args.first()
+            return if (first == incorrectPrefix) {
+                val count = if (args.hasSecond() && !args.secondIsOption() && !args.secondIsRecognized()) 2 else 1
+                ParseState.Failure(count, 0, UnexpectedOption(first, flag))
+            } else {
+                null
             }
         }
 

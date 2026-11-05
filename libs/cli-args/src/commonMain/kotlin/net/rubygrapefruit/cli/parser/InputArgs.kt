@@ -9,9 +9,10 @@ internal interface InputArgs {
     fun hasSecond(): Boolean
     fun second(): String
     fun secondIsOption(): Boolean
+    fun secondIsRecognized(): Boolean
 }
 
-internal class DefaultInputArgs(override val index: Int, private val args: List<String>) : InputArgs {
+internal class DefaultInputArgs(override val index: Int, private val args: List<String>, private val recognized: BooleanArray) : InputArgs {
     val isEmpty: Boolean
         get() = index == args.size
 
@@ -35,11 +36,15 @@ internal class DefaultInputArgs(override val index: Int, private val args: List<
         return args[index + 1].startsWith("-")
     }
 
+    override fun secondIsRecognized(): Boolean {
+        return recognized[index + 1]
+    }
+
     fun drop(count: Int): DefaultInputArgs {
         return if (count == 0) {
             this
         } else {
-            DefaultInputArgs(index + count, args)
+            DefaultInputArgs(index + count, args, recognized)
         }
     }
 }

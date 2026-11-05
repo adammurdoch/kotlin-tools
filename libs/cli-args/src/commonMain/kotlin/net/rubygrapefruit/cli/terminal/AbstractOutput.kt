@@ -15,14 +15,17 @@ abstract class AbstractOutput : Output {
 
     override fun writeLine(text: String) {
         put(text, Appearance.None)
+        writeLine()
+    }
+
+    override fun writeLine() {
         putEndLine()
         emptyLine = true
     }
 
     override fun maybeNewLine() {
         if (!emptyLine) {
-            putEndLine()
-            emptyLine = true
+            writeLine()
         }
     }
 

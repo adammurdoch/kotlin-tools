@@ -1,5 +1,7 @@
 package net.rubygrapefruit.cli.parser
 
+import net.rubygrapefruit.cli.terminal.Output
+
 internal class OptionWithValue(name: String) : AbstractParser<String?>(), StringOption {
     private val flag = if (name.length == 1) "-$name" else "--$name"
     private val incorrectPrefix = if (name.length == 1) "--$name" else "-$name"
@@ -10,6 +12,16 @@ internal class OptionWithValue(name: String) : AbstractParser<String?>(), String
 
     override fun start(): ParseState<String?> {
         return State(flag, incorrectPrefix)
+    }
+
+    override fun usage(): UsageInternal {
+        return OptionUsage()
+    }
+
+    private inner class OptionUsage: UsageInternal {
+        override fun writeTo(output: Output) {
+            output.write("$flag VALUE")
+        }
     }
 
     private class State(private val flag: String, private val incorrectPrefix: String) : ParseState<String?> {

@@ -5,13 +5,15 @@ import net.rubygrapefruit.cli.terminal.Output
 internal interface ParserInternal<out T> {
     fun start(): ParseState<T>
 
+    fun usage(): UsageInternal
+
     class Success<out T>(override val result: T) : Parser.Success<T> {
         override fun get(): T {
             return result
         }
     }
 
-    class Failure(problems: List<ProblemAtIndex>) : Parser.Failure {
+    class Failure(problems: List<ProblemAtIndex>, private val parser: ParserInternal<*>) : Parser.Failure {
         override val problems: List<ProblemAtIndex> = problems.sortedBy { it.index }
 
         override fun get(): Nothing {
@@ -23,6 +25,10 @@ internal interface ParserInternal<out T> {
                 problem.problem.writeTo(output)
                 output.maybeNewLine()
             }
+            output.writeLine()
+            output.write("USAGE: ")
+            parser.usage().writeTo(output)
+            output.writeLine()
         }
     }
 }

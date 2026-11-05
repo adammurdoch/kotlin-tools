@@ -5,15 +5,20 @@ internal class DefaultParameter(private val name: String) : AbstractParser<Strin
         return State(name)
     }
 
+    override fun usage(): UsageInternal {
+        return DeleteMe
+    }
+
     private class State(val name: String) : ParseState<String> {
         private var value: String? = null
 
         override fun maybeParse(args: InputArgs): ParseState.PartialResult {
-            if (args.firstIsOption() || value != null) {
-                return ParseState.NotRecognized
+            return if (args.firstIsOption() || value != null) {
+                ParseState.NotRecognized
+            } else {
+                value = args.first()
+                ParseState.Matched(1)
             }
-            value = args.first()
-            return ParseState.Matched(1)
         }
 
         override fun finish(): ParseState.Result<String> {

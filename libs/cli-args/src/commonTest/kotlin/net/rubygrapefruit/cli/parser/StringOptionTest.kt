@@ -1,5 +1,6 @@
 package net.rubygrapefruit.cli.parser
 
+import net.rubygrapefruit.cli.terminal.BufferingOutput
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -20,6 +21,15 @@ class StringOptionTest : AbstractParseTest() {
             failure(0, "Unexpected option '-X'")
             failure(1, "Unexpected argument 'value'")
         }
+    }
+
+    @Test
+    fun `reports usage of option with short name`() {
+        val parser = option("x")
+
+        val output = BufferingOutput()
+        parser.usage().writeTo(output)
+        assertEquals("-x VALUE", output.text)
     }
 
     @Test

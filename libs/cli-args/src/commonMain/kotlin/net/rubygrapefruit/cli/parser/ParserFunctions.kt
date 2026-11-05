@@ -1,7 +1,7 @@
 package net.rubygrapefruit.cli.parser
 
 /**
- * Returns a parser that does not accept any inputs.
+ * Returns a parser that does not match any inputs.
  *
  * The parser produces the result of the given function.
  */

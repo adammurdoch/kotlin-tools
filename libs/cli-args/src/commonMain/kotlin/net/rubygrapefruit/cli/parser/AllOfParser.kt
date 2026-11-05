@@ -8,6 +8,10 @@ internal class AllOfParser<OUT>(
         return State(parsers.map { it.start() }, map)
     }
 
+    override fun usage(): UsageInternal {
+        return DeleteMe
+    }
+
     private class State<OUT>(val states: List<ParseState<*>>, val map: (List<ParseState.Success<*>>) -> OUT) : ParseState<OUT> {
         override fun maybeParse(args: InputArgs): ParseState.PartialResult {
             for (state in states) {

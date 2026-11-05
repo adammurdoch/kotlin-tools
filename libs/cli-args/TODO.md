@@ -100,6 +100,8 @@ CLI app
 - `oneOf()` reports conflicting options or literals
 - `oneOf()` reports problems for option (e.g. repeated option, missing value)
 - Show usage on parse error
+  - Include app name
+  - Allow value name to be provided for `option()`
 - Multiple names for `option()`
 - `allOf()` with nested `allOf()`
 - Parser that collects unrecognized or remainder

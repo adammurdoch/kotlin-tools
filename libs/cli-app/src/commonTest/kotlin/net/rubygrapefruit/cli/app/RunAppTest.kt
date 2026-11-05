@@ -30,6 +30,8 @@ class RunAppTest {
 
         assertEquals(1, runApp(parser, listOf("one"), output))
         assertEquals("""Parameter <b> not provided
+
+USAGE: 
 """, output.text)
     }
 

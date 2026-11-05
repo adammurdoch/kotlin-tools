@@ -62,12 +62,12 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
         val result = state.finish()
         return when (result) {
             is ParseState.FinalFailure -> {
-                ParserInternal.Failure(problems.plus(args.size, result.problems))
+                ParserInternal.Failure(problems.plus(args.size, result.problems), this)
             }
 
             is ParseState.Success -> {
                 if (problems != null) {
-                    ParserInternal.Failure(problems)
+                    ParserInternal.Failure(problems, this)
                 } else {
                     ParserInternal.Success(result.result)
                 }

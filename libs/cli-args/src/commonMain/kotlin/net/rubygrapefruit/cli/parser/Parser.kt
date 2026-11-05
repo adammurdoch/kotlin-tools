@@ -7,20 +7,22 @@ import net.rubygrapefruit.cli.terminal.Output
  */
 sealed interface Parser<out T> {
     /**
-     * Parse the given arguments.
+     * Parses the given arguments.
      */
     fun parse(args: List<String>): Result<T>
 
     /**
-     * Parse the given arguments.
+     * Parses the given arguments.
      */
     fun parse(vararg args: String): Result<T> {
         return parse(args.toList())
     }
 
+    fun usage(): Usage
+
     sealed interface Result<out T> {
         /**
-         * Return the result or throw an exception.
+         * Returns the result or throw an exception.
          */
         fun get(): T
     }

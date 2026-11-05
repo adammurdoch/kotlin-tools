@@ -22,6 +22,11 @@ sealed interface Output {
     fun writeLine(text: String)
 
     /**
+     * Writes the line separator.
+     */
+    fun writeLine()
+
+    /**
      * Terminates the current line, if not already.
      */
     fun maybeNewLine()

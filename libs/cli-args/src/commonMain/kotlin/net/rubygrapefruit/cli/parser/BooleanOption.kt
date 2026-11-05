@@ -5,6 +5,10 @@ internal class BooleanOption(private val flag: String, private val incorrectPref
         return State(flag, incorrectPrefix)
     }
 
+    override fun usage(): UsageInternal {
+        return DeleteMe
+    }
+
     private class State(val flag: String, val incorrectPrefix: String) : ParseState<Boolean> {
         private var matched = false
 

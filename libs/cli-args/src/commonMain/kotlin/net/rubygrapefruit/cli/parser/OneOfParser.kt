@@ -7,6 +7,10 @@ internal class OneOfParser<OUT>(private val choices: List<ParserInternal<OUT>>) 
         return State(choices.map { ChoiceState(it.start()) })
     }
 
+    override fun usage(): UsageInternal {
+        return DeleteMe
+    }
+
     private class State<OUT>(val choices: List<ChoiceState<OUT>>) : ParseState<OUT> {
         override fun maybeParse(args: InputArgs): ParseState.PartialResult {
             var recognized = Int.MAX_VALUE

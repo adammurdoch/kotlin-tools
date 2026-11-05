@@ -5,6 +5,10 @@ internal class DefaultLiteral(private val text: String) : AbstractParser<Unit>()
         return State(text)
     }
 
+    override fun usage(): UsageInternal {
+        return DeleteMe
+    }
+
     private class State(val text: String) : ParseState<Unit> {
         private var claimed = false
         private var matched = false

@@ -3,7 +3,7 @@ package net.rubygrapefruit.cli.parser
 /**
  * Creates a parameter with the given name.
  *
- * The returned parser will match any input value that isn't an option.
+ * The returned parser will match a single argument that isn't an option.
  */
 fun parameter(name: String): Parameter<String> {
     return DefaultParameter(name)

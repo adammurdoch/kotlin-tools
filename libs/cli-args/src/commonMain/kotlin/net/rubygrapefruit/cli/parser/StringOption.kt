@@ -1,11 +1,12 @@
 package net.rubygrapefruit.cli.parser
 
 /**
- * An option that produces a string value or null when the option is not provided.
+ * A parser that matches an option with a string value.
+ * Produces the value as its result or produces `null` when the option is not present in the provided arguments.
  */
 interface StringOption : Option<String?> {
     /**
-     * Creates a copy of this option that produces `true` when the option is provided or `false` when the option is not provided.
+     * Creates a copy of this option that produces `true` when the option is present or `false` when the option is not present.
      */
     fun boolean(): Option<Boolean>
 }

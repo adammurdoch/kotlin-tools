@@ -108,7 +108,6 @@ CLI app
 - `--option=<value>` (allows value that starts with `-`)
 - `--no-x` flag for boolean options
 - Report `[..]` - optional, `<..>` - required
-- `oneOf()`
 - `command()`
 - Convenience for help command or option
 - Convenience for `--version`

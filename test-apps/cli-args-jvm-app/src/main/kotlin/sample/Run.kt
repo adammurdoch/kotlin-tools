@@ -4,7 +4,7 @@ import net.rubygrapefruit.cli.app.Runnable
 import net.rubygrapefruit.cli.app.runApp
 import net.rubygrapefruit.cli.parser.*
 
-class App(val verbose: Boolean, val greeting: String) : Runnable {
+class Run(val verbose: Boolean, val greeting: String) : Runnable {
     override fun run() {
         if (verbose) {
             print("> ")
@@ -24,8 +24,8 @@ class Help(val verbose: Boolean) : Runnable {
 
 fun parser(): Parser<Runnable> {
     val help = allOf(literal("help"), option("verbose").boolean()) { _, verbose -> Help(verbose) }
-    val app = allOf(literal("run"), option("verbose").boolean(), parameter("greeting")) { _, verbose, greeting -> App(verbose, greeting) }
-    return oneOf(help, app)
+    val run = allOf(literal("run"), option("verbose").boolean(), parameter("greeting")) { _, verbose, greeting -> Run(verbose, greeting) }
+    return oneOf(help, run)
 }
 
 fun main(args: Array<String>) = parser().runApp(args)

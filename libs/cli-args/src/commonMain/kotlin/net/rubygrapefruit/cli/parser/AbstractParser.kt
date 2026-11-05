@@ -2,22 +2,22 @@ package net.rubygrapefruit.cli.parser
 
 internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
     override fun parse(args: List<String>): Parser.Result<T> {
-        var current = InputArgs(0, args)
+        var current = DefaultInputArgs(0, args)
         val state = start()
         val unrecognized = mutableListOf<Int>()
         var problems: List<ProblemAtIndex>? = null
         while (!current.isEmpty) {
             val result = state.maybeParse(current)
             when (result) {
+                is ParseState.Matched -> {
+                    require(result.count > 0)
+                    current = current.drop(result.count)
+                }
+
                 is ParseState.NotRecognized -> {
                     unrecognized.add(current.index)
                     // Attempt to recover and continue
                     current = current.drop(1)
-                }
-
-                is ParseState.Matched -> {
-                    require(result.count > 0)
-                    current = current.drop(result.count)
                 }
 
                 is ParseState.Failure -> {
@@ -31,7 +31,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
 
         while (unrecognized.isNotEmpty()) {
             val index = unrecognized.removeFirst()
-            val current = InputArgs(index, args)
+            val current = DefaultInputArgs(index, args)
             val problem = state.claimUnrecognized(current) ?: if (current.firstIsOption()) {
                 UnexpectedOption(current.first())
             } else {

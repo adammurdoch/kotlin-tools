@@ -1,33 +1,45 @@
 package net.rubygrapefruit.cli.parser
 
-internal class InputArgs(val index: Int, private val args: List<String>) {
-    val length: Int
-        get() = args.size - index
+internal interface InputArgs {
+    val index: Int
 
+    fun first(): String
+    fun firstIsOption(): Boolean
+
+    fun hasSecond(): Boolean
+    fun second(): String
+    fun secondIsOption(): Boolean
+}
+
+internal class DefaultInputArgs(override val index: Int, private val args: List<String>) : InputArgs {
     val isEmpty: Boolean
         get() = index == args.size
 
-    fun first(): String {
+    override fun first(): String {
         return args[index]
     }
 
-    fun firstIsOption(): Boolean {
+    override fun firstIsOption(): Boolean {
         return args[index].startsWith("-")
     }
 
-    fun second(): String {
+    override fun second(): String {
         return args[index + 1]
     }
 
-    fun secondIsOption(): Boolean {
+    override fun hasSecond(): Boolean {
+        return index + 1 < args.size
+    }
+
+    override fun secondIsOption(): Boolean {
         return args[index + 1].startsWith("-")
     }
 
-    fun drop(count: Int): InputArgs {
+    fun drop(count: Int): DefaultInputArgs {
         return if (count == 0) {
             this
         } else {
-            InputArgs(index + count, args)
+            DefaultInputArgs(index + count, args)
         }
     }
 }

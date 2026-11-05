@@ -40,8 +40,6 @@ abstract class AbstractParseTest {
             return joinToString { it.problem.text() }
         }
 
-        private fun ProblemAtIndex.text() = problem.text()
-
         private fun Problem.text(): String {
             val buffer = BufferingOutput()
             writeTo(buffer)

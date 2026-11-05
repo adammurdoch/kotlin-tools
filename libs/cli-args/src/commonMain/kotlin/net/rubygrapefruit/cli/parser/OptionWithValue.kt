@@ -20,18 +20,18 @@ internal class OptionWithValue(name: String) : AbstractParser<String?>(), String
             val first = args.first()
             if (first != flag) {
                 return if (first == incorrectPrefix) {
-                    val count = if (args.length >= 2 && !args.secondIsOption()) 2 else 1
+                    val count = if (args.hasSecond() && !args.secondIsOption()) 2 else 1
                     ParseState.Failure(count, 0, UnexpectedOption(first, flag))
                 } else {
                     ParseState.NotRecognized
                 }
             }
             if (seen) {
-                val count = if (args.length >= 2 && !args.secondIsOption()) 2 else 1
+                val count = if (args.hasSecond() && !args.secondIsOption()) 2 else 1
                 return ParseState.Failure(count, 0, RepeatedOption(flag))
             }
             seen = true
-            return if (args.length == 1 || args.length >= 2 && args.secondIsOption()) {
+            return if (!args.hasSecond() || args.secondIsOption()) {
                 ParseState.Failure(1, 1, MissingOptionValue(flag))
             } else {
                 value = args.second()

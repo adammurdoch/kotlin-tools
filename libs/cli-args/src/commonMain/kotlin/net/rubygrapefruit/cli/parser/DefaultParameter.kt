@@ -1,12 +1,20 @@
 package net.rubygrapefruit.cli.parser
 
+import net.rubygrapefruit.cli.terminal.Output
+
 internal class DefaultParameter(private val name: String) : AbstractParser<String>(), Parameter<String> {
     override fun start(): ParseState<String> {
         return State(name)
     }
 
     override fun usage(): UsageInternal {
-        return DeleteMe
+        return ParameterUsage()
+    }
+
+    private inner class ParameterUsage : UsageInternal {
+        override fun writeTo(output: Output) {
+            output.write("<$name>")
+        }
     }
 
     private class State(val name: String) : ParseState<String> {

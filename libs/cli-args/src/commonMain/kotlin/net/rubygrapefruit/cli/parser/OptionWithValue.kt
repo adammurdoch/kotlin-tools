@@ -20,7 +20,7 @@ internal class OptionWithValue(name: String) : AbstractParser<String?>(), String
 
     private inner class OptionUsage: UsageInternal {
         override fun writeTo(output: Output) {
-            output.write("$flag VALUE")
+            output.write("[$flag <value>]")
         }
     }
 

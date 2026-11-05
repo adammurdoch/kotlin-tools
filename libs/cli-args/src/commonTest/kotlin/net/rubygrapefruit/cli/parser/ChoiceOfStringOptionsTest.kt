@@ -38,6 +38,20 @@ class ChoiceOfStringOptionsTest : AbstractParseTest() {
     }
 
     @Test
+    fun `reports usage`() {
+        val parser = oneOf(
+            option("a"),
+            option("b"),
+            option("c")
+        )
+
+        assertEquals(
+            """[-a <value>]
+[-b <value>]
+[-c <value>]""", parser.usage)
+    }
+
+    @Test
     fun `cannot include other input values`() {
         val parser = oneOf(
             option("a"),

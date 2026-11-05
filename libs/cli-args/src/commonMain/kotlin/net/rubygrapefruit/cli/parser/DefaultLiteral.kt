@@ -1,12 +1,20 @@
 package net.rubygrapefruit.cli.parser
 
+import net.rubygrapefruit.cli.terminal.Output
+
 internal class DefaultLiteral(private val text: String) : AbstractParser<Unit>(), Parser<Unit> {
     override fun start(): ParseState<Unit> {
         return State(text)
     }
 
     override fun usage(): UsageInternal {
-        return DeleteMe
+        return LiteralUsage()
+    }
+
+    private inner class LiteralUsage : UsageInternal {
+        override fun writeTo(output: Output) {
+            output.write(text)
+        }
     }
 
     private class State(val text: String) : ParseState<Unit> {

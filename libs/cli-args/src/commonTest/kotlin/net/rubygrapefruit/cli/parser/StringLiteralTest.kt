@@ -20,6 +20,13 @@ class StringLiteralTest : AbstractParseTest() {
     }
 
     @Test
+    fun `reports usage`() {
+        val parser = literal("help")
+
+        assertEquals("help", parser.usage)
+    }
+
+    @Test
     fun `literal must be provided`() {
         val parser = literal("help")
 

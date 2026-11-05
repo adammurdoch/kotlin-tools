@@ -13,6 +13,13 @@ class StringParameterTest : AbstractParseTest() {
     }
 
     @Test
+    fun `reports usage`() {
+        val parser = parameter("param")
+
+        assertEquals("<param>", parser.usage)
+    }
+
+    @Test
     fun `parameter must be provided`() {
         val parser = parameter("param")
 

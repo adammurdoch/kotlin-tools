@@ -100,8 +100,15 @@ CLI app
 - `oneOf()` reports conflicting options or literals
 - `oneOf()` reports problems for option (e.g. repeated option, missing value)
 - Show usage on parse error
-  - Include app name
-  - Allow value name to be provided for `option()`
+    - Include app name
+    - Include app summary
+    - Include 'run with --help', etc
+    - Indent choices
+    - Show usage of recognized choice(s) only
+    - Use a separate option list when there are many options
+    - Use a separate command list when there are many commands
+    - Allow value name to be provided for `option()`
+    - Highlight problematic part of usage?
 - Multiple names for `option()`
 - `allOf()` with nested `allOf()`
 - Parser that collects unrecognized or remainder
@@ -119,3 +126,4 @@ CLI app
 - Compose value parsers (e.g. value is ip address or host name)
 - Deprecated, hidden options + commands
 - Terminal integration for JVM
+- Terminal integration is thread-safe, e.g. does not interleave partial outputs

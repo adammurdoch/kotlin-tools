@@ -1,5 +1,6 @@
 package net.rubygrapefruit.cli.parser
 
+import net.rubygrapefruit.cli.terminal.Output
 import kotlin.math.min
 
 internal class OneOfParser<OUT>(private val choices: List<ParserInternal<OUT>>) : AbstractParser<OUT>(), Parser<OUT> {
@@ -8,7 +9,18 @@ internal class OneOfParser<OUT>(private val choices: List<ParserInternal<OUT>>) 
     }
 
     override fun usage(): UsageInternal {
-        return DeleteMe
+        return ParserUsage()
+    }
+
+    private inner class ParserUsage : UsageInternal {
+        override fun writeTo(output: Output) {
+            choices.forEachIndexed { index, choice ->
+                if (index > 0) {
+                    output.writeLine()
+                }
+                choice.usage().writeTo(output)
+            }
+        }
     }
 
     private class State<OUT>(val choices: List<ChoiceState<OUT>>) : ParseState<OUT> {

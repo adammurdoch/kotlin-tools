@@ -20,6 +20,13 @@ class BooleanOptionTest : AbstractParseTest() {
     }
 
     @Test
+    fun `reports usage of option with short name`() {
+        val parser = option("x").boolean()
+
+        assertEquals("[-x]", parser.usage)
+    }
+
+    @Test
     fun `parses option with long name`() {
         val parser = option("some-flag").boolean()
 
@@ -29,6 +36,13 @@ class BooleanOptionTest : AbstractParseTest() {
         parser.fails("-some-flag") {
             failure(0, "Unexpected option '-some-flag'. Try '--some-flag' instead")
         }
+    }
+
+    @Test
+    fun `reports usage of option with long name`() {
+        val parser = option("some-flag").boolean()
+
+        assertEquals("[--some-flag]", parser.usage)
     }
 
     @Test

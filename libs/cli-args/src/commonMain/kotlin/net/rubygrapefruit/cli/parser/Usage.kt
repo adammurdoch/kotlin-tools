@@ -13,8 +13,3 @@ sealed interface Usage {
 }
 
 internal sealed interface UsageInternal : Usage
-
-object DeleteMe: UsageInternal {
-    override fun writeTo(output: Output) {
-    }
-}

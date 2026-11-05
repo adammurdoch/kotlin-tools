@@ -1,12 +1,20 @@
 package net.rubygrapefruit.cli.parser
 
+import net.rubygrapefruit.cli.terminal.Output
+
 internal class BooleanOption(private val flag: String, private val incorrectPrefix: String) : AbstractParser<Boolean>(), Option<Boolean> {
     override fun start(): ParseState<Boolean> {
         return State(flag, incorrectPrefix)
     }
 
     override fun usage(): UsageInternal {
-        return DeleteMe
+        return OptionUsage()
+    }
+
+    private inner class OptionUsage: UsageInternal {
+        override fun writeTo(output: Output) {
+            output.write("[$flag]")
+        }
     }
 
     private class State(val flag: String, val incorrectPrefix: String) : ParseState<Boolean> {

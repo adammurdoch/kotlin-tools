@@ -1,5 +1,7 @@
 package net.rubygrapefruit.cli.parser
 
+import net.rubygrapefruit.cli.terminal.Output
+
 internal class AllOfParser<OUT>(
     private val parsers: List<ParserInternal<*>>,
     private val map: (List<ParseState.Success<*>>) -> OUT
@@ -9,7 +11,18 @@ internal class AllOfParser<OUT>(
     }
 
     override fun usage(): UsageInternal {
-        return DeleteMe
+        return ParserUsage()
+    }
+
+    private inner class ParserUsage : UsageInternal {
+        override fun writeTo(output: Output) {
+            parsers.forEachIndexed { index, parser ->
+                if (index > 0) {
+                    output.write(" ")
+                }
+                parser.usage().writeTo(output)
+            }
+        }
     }
 
     private class State<OUT>(val states: List<ParseState<*>>, val map: (List<ParseState.Success<*>>) -> OUT) : ParseState<OUT> {

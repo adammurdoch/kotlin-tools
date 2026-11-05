@@ -60,6 +60,20 @@ class MultipleStringOptionsTest : AbstractParseTest() {
     }
 
     @Test
+    fun `reports usage for two options with short name`() {
+        val parser = allOf(option("a"), option("b")) { a, b -> listOf(a, b) }
+
+        assertEquals("[-a <value>] [-b <value>]", parser.usage)
+    }
+
+    @Test
+    fun `reports usage for three options`() {
+        val parser = allOf(option("a"), option("b"), option("long")) { a, b, c -> listOf(a, b, c) }
+
+        assertEquals("[-a <value>] [-b <value>] [--long <value>]", parser.usage)
+    }
+
+    @Test
     fun `cannot include other input values`() {
         val parser = allOf(option("a"), option("b")) { _, _ -> fail() }
 

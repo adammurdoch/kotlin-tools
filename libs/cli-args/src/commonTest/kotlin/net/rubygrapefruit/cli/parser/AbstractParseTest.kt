@@ -4,6 +4,13 @@ import net.rubygrapefruit.cli.terminal.BufferingOutput
 import kotlin.test.*
 
 abstract class AbstractParseTest {
+    protected val Parser<*>.usage: String
+        get() {
+            val output = BufferingOutput()
+            usage().writeTo(output)
+            return output.text
+        }
+
     protected fun Parser<*>.fails(vararg args: String, config: Failures.() -> Unit) {
         val result = parse(*args)
         assertIs<Parser.Failure>(result)

@@ -27,11 +27,15 @@ internal class OneOfParser<OUT>(private val choices: List<ParserInternal<OUT>>) 
         override fun maybeParse(args: InputArgs): ParseState.PartialResult {
             var recognized = Int.MAX_VALUE
             for (choice in choices) {
+                if (choice.finished) {
+                    continue
+                }
                 val result = choice.state.maybeParse(args)
                 when (result) {
                     is ParseState.NotRecognized -> continue
                     is ParseState.Matched -> {
                         choice.recognized = true
+                        choice.finished = result.finished
                         recognized = min(recognized, result.count)
                     }
 
@@ -80,5 +84,6 @@ internal class OneOfParser<OUT>(private val choices: List<ParserInternal<OUT>>) 
     private class ChoiceState<OUT>(val state: ParseState<OUT>) {
         var problems: List<ProblemAtIndex>? = null
         var recognized = false
+        var finished = false
     }
 }

@@ -26,14 +26,21 @@ internal class AllOfParser<OUT>(
     }
 
     private class State<OUT>(val states: List<ParseState<*>>, val map: (List<ParseState.Success<*>>) -> OUT) : ParseState<OUT> {
+        private val remaining = states.toMutableList()
+
         override fun maybeParse(args: InputArgs): ParseState.PartialResult {
-            for (state in states) {
+            var index = 0
+            while (index < remaining.size) {
+                val state = remaining[index]
                 val result = state.maybeParse(args)
                 when (result) {
-                    is ParseState.Matched -> return ParseState.Matched(result.count, false)
+                    is ParseState.Matched -> {
+                        remaining.removeAt(index)
+                        return ParseState.Matched(result.count, false)
+                    }
                     is ParseState.Failure -> return result
                     is ParseState.NotRecognized -> {
-                        // ignore
+                        index++
                     }
                 }
             }

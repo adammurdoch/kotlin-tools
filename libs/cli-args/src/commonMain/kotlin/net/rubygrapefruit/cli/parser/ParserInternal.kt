@@ -35,20 +35,25 @@ internal interface ParserInternal<out T> {
 
 internal interface ParseState<out T> {
     /**
-     * Attempt to parse the first argument(s) of the provided arguments.
+     * Attempts to parse the first argument(s) of the provided arguments.
      *
-     * May be called zero or more times, followed by [finish].
+     * May be called zero or more times. Is not called again if this method returns [ParseState.Finished]
      */
     fun maybeParse(args: InputArgs): PartialResult<T>
 
     /**
-     * Produces the result of this parser.
+     * Attempts to produce a [Failure] for the first unrecognized argument.
      */
-    fun finish(index: Int): Result<T>
-
     fun claimUnrecognized(args: InputArgs): Failure? {
         return null
     }
+
+    /**
+     * Produces the result of this parser at the end of the inputs.
+     *
+     * Is not called if [maybeParse] returns [ParseState.Finished].
+     */
+    fun finish(index: Int): Result<T>
 
     sealed interface PartialResult<out T>
 
@@ -70,6 +75,9 @@ internal interface ParseState<out T> {
      */
     class Matched(val count: Int) : PartialResult<Nothing>
 
+    /**
+     * The parser has recognized one or more arguments without any problems and produced a result.
+     */
     class Finished<T>(val count: Int, val result: Result<T>) : PartialResult<T>
 
     sealed interface Result<out T>

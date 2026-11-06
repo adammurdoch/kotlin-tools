@@ -26,7 +26,7 @@ internal class BooleanOption(private val flag: String, private val incorrectPref
                 ParseState.NotRecognized
             } else {
                 matched = true
-                ParseState.Matched(1)
+                ParseState.Matched(1, true)
             }
         }
 

@@ -29,8 +29,12 @@ internal class AllOfParser<OUT>(
         override fun maybeParse(args: InputArgs): ParseState.PartialResult {
             for (state in states) {
                 val result = state.maybeParse(args)
-                if (result != ParseState.NotRecognized) {
-                    return result
+                when (result) {
+                    is ParseState.Matched -> return ParseState.Matched(result.count, false)
+                    is ParseState.Failure -> return result
+                    is ParseState.NotRecognized -> {
+                        // ignore
+                    }
                 }
             }
             return ParseState.NotRecognized

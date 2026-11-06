@@ -25,7 +25,7 @@ internal class DefaultParameter(private val name: String) : AbstractParser<Strin
                 ParseState.NotRecognized
             } else {
                 value = args.first()
-                ParseState.Matched(1)
+                ParseState.Matched(1, true)
             }
         }
 

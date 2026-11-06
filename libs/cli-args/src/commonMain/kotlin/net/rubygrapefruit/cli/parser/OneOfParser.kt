@@ -43,7 +43,7 @@ internal class OneOfParser<OUT>(private val choices: List<ParserInternal<OUT>>) 
                 }
             }
             return if (recognized != Int.MAX_VALUE) {
-                ParseState.Matched(recognized)
+                ParseState.Matched(recognized, false)
             } else {
                 ParseState.NotRecognized
             }

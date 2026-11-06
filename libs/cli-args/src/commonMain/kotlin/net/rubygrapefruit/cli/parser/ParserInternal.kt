@@ -68,7 +68,7 @@ internal interface ParseState<out T> {
      * The parser has recognized one or more arguments without any problems.
      * The parser's [maybeParse] function may be called again after skipping at least recognized arguments (and possibly more).
      */
-    class Matched(val count: Int) : PartialResult
+    class Matched(val count: Int, val finished: Boolean) : PartialResult
 
     sealed interface Result<out T>
 

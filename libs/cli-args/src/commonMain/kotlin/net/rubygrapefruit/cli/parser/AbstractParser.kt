@@ -16,6 +16,9 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
                         recognized[index] = true
                         index++
                     }
+                    if (result.finished) {
+                        break
+                    }
                 }
 
                 is ParseState.NotRecognized -> {

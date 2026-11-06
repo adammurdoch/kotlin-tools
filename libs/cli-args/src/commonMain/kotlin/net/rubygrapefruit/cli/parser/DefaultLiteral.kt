@@ -26,7 +26,7 @@ internal class DefaultLiteral(private val text: String) : AbstractParser<Unit>()
                 ParseState.NotRecognized
             } else if (args.first() == text) {
                 matched = true
-                ParseState.Matched(1)
+                ParseState.Matched(1, true)
             } else {
                 ParseState.NotRecognized
             }

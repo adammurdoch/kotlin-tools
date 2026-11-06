@@ -18,7 +18,7 @@ internal class OptionWithValue(name: String) : AbstractParser<String?>(), String
         return OptionUsage()
     }
 
-    private inner class OptionUsage: UsageInternal {
+    private inner class OptionUsage : UsageInternal {
         override fun writeTo(output: Output) {
             output.write("[$flag <value>]")
         }
@@ -38,7 +38,7 @@ internal class OptionWithValue(name: String) : AbstractParser<String?>(), String
                 ParseState.Failure(1, 1, MissingOptionValue(flag))
             } else {
                 value = args.second()
-                ParseState.Matched(2)
+                ParseState.Matched(2, true)
             }
         }
 

@@ -5,7 +5,7 @@ import kotlin.test.assertEquals
 
 class StringPositionalTest : AbstractParseTest() {
     @Test
-    fun `parses string`() {
+    fun `parses positional`() {
         val parser = positional("param")
 
         assertEquals("value", parser.parse("value").get())
@@ -20,7 +20,7 @@ class StringPositionalTest : AbstractParseTest() {
     }
 
     @Test
-    fun `parameter must be provided`() {
+    fun `positional must be provided`() {
         val parser = positional("param")
 
         parser.fails {

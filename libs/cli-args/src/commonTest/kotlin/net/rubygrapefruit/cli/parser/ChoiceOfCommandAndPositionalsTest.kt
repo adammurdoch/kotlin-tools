@@ -3,9 +3,9 @@ package net.rubygrapefruit.cli.parser
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class ChoiceOfCommandAndParametersTest : AbstractParseTest() {
+class ChoiceOfCommandAndPositionalsTest : AbstractParseTest() {
     @Test
-    fun `parses one of literal and parameter`() {
+    fun `parses one of literal and positional`() {
         val parser = oneOf(
             params(command("one"), positional("a")) { _, a -> "1:$a" },
             params(command("two")) { "2" },
@@ -53,7 +53,7 @@ two""", parser.usage
     }
 
     @Test
-    fun `parameter must be provided`() {
+    fun `positional must be provided`() {
         val parser = oneOf(
             params(command("one"), positional("a")) { _, a -> "1:$a" },
             params(command("two")) { "2" },

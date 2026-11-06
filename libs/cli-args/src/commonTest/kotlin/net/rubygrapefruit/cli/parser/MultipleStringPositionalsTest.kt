@@ -6,21 +6,21 @@ import kotlin.test.fail
 
 class MultipleStringPositionalsTest : AbstractParseTest() {
     @Test
-    fun `parses two parameters in order`() {
+    fun `parses two positionals in order`() {
         val parser = params(positional("a"), positional("b")) { a, b -> listOf(a, b) }
 
         assertEquals(listOf("one", "two"), parser.parse("one", "two").get())
     }
 
     @Test
-    fun `parses three parameters in order`() {
+    fun `parses three positionals in order`() {
         val parser = params(positional("a"), positional("b"), positional("c")) { a, b, c -> listOf(a, b, c) }
 
         assertEquals(listOf("one", "two", "three"), parser.parse("one", "two", "three").get())
     }
 
     @Test
-    fun `parameters must be provided`() {
+    fun `positionals must be provided`() {
         val parser = params(positional("a"), positional("b")) { _, _ -> fail() }
 
         parser.fails {

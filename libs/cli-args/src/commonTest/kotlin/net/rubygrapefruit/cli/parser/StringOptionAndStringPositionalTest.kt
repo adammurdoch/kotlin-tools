@@ -6,7 +6,7 @@ import kotlin.test.fail
 
 class StringOptionAndStringPositionalTest : AbstractParseTest() {
     @Test
-    fun `parses parameter and option in any order`() {
+    fun `parses positional and option in any order`() {
         val parser = params(option("x"), positional("a")) { a, b -> Pair(a, b) }
 
         assertEquals(Pair("one", "two"), parser.parse("-x", "one", "two").get())
@@ -15,7 +15,7 @@ class StringOptionAndStringPositionalTest : AbstractParseTest() {
     }
 
     @Test
-    fun `must provide parameter`() {
+    fun `must provide positional`() {
         val parser = params(option("x"), positional("a")) { _, _ -> fail() }
 
         parser.fails {

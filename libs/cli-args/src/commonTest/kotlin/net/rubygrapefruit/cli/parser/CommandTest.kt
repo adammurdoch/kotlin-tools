@@ -3,9 +3,9 @@ package net.rubygrapefruit.cli.parser
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class StringLiteralTest : AbstractParseTest() {
+class CommandTest : AbstractParseTest() {
     @Test
-    fun `parses literal`() {
+    fun `parses command`() {
         val parser = command("help")
 
         assertEquals(Unit, parser.parse("help").get())
@@ -34,7 +34,7 @@ class StringLiteralTest : AbstractParseTest() {
     }
 
     @Test
-    fun `literal must be provided`() {
+    fun `command must be provided`() {
         val parser = command("help")
 
         parser.fails {
@@ -50,7 +50,7 @@ class StringLiteralTest : AbstractParseTest() {
     }
 
     @Test
-    fun `literal cannot appear more than once`() {
+    fun `command cannot appear more than once`() {
         val parser = command("help")
 
         parser.fails("help", "help") {

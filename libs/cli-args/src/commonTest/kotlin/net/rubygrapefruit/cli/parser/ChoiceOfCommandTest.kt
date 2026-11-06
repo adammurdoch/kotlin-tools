@@ -5,7 +5,7 @@ import kotlin.test.assertEquals
 
 class ChoiceOfCommandTest : AbstractParseTest() {
     @Test
-    fun `parses one of literal`() {
+    fun `parses one of command`() {
         val parser = oneOf(
             params(command("one")) { 1 },
             params(command("two")) { 2 },
@@ -29,7 +29,7 @@ two""", parser.usage
     }
 
     @Test
-    fun `literal must be provided`() {
+    fun `command must be provided`() {
         val parser = oneOf(
             params(command("one")) { 1 },
             params(command("two")) { 2 },

@@ -4,9 +4,9 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
 
-class StringLiteralAndBooleanOptionTest : AbstractParseTest() {
+class CommandAndBooleanOptionTest : AbstractParseTest() {
     @Test
-    fun `parses literal and option in any order`() {
+    fun `parses command and option in any order`() {
         val parser = params(
             command("run"),
             option("a").boolean()
@@ -19,7 +19,7 @@ class StringLiteralAndBooleanOptionTest : AbstractParseTest() {
     }
 
     @Test
-    fun `must provide literal`() {
+    fun `must provide command`() {
         val parser = params(
             command("run"),
             option("a").boolean()

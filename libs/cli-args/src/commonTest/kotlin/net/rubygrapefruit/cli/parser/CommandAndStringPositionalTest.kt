@@ -3,9 +3,9 @@ package net.rubygrapefruit.cli.parser
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class StringLiteralAndStringPositionalTest : AbstractParseTest() {
+class CommandAndStringPositionalTest : AbstractParseTest() {
     @Test
-    fun `parses literal then parameter`() {
+    fun `parses command then parameter`() {
         val parser = params(command("run"), positional("a")) { _, a -> a }
 
         assertEquals("one", parser.parse("run", "one").get())
@@ -13,7 +13,7 @@ class StringLiteralAndStringPositionalTest : AbstractParseTest() {
     }
 
     @Test
-    fun `parses parameter then literal`() {
+    fun `parses parameter then command`() {
         val parser = params(positional("a"), command("run")) { a, _ -> a }
 
         assertEquals("one", parser.parse("one", "run").get())
@@ -21,7 +21,7 @@ class StringLiteralAndStringPositionalTest : AbstractParseTest() {
     }
 
     @Test
-    fun `literal must be provided`() {
+    fun `command must be provided`() {
         val parser = params(command("run"), positional("a")) { _, a -> a }
 
         parser.fails {

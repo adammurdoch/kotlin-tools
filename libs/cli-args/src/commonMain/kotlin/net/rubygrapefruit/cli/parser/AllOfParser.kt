@@ -26,7 +26,7 @@ internal class AllOfParser<OUT>(
     }
 
     private class Element<T>(val state: ParseState<T>) {
-        var result: ParseState.Success<T>? = null
+        var result: ParseState.Result<T>? = null
 
         fun maybeParse(args: InputArgs): ParseState.PartialResult<Nothing> {
             val parseResult = state.maybeParse(args)

@@ -5,7 +5,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
         val recognized = BooleanArray(args.size)
         val state = start()
         var problems: List<ProblemAtIndex>? = null
-        var result: ParseState.Success<T>? = null
+        var result: ParseState.Result<T>? = null
         var index = 0
         while (index < args.size) {
             val current = DefaultInputArgs(index, args, recognized)

@@ -89,6 +89,6 @@ internal class OneOfParser<OUT>(private val choices: List<ParserInternal<OUT>>) 
     private class ChoiceState<OUT>(val state: ParseState<OUT>) {
         var problems: List<ProblemAtIndex>? = null
         var recognized = false
-        var result: ParseState.Success<OUT>? = null
+        var result: ParseState.Result<OUT>? = null
     }
 }

@@ -70,7 +70,7 @@ internal interface ParseState<out T> {
      */
     class Matched(val count: Int) : PartialResult<Nothing>
 
-    class Finished<T>(val count: Int, val result: Success<T>) : PartialResult<T>
+    class Finished<T>(val count: Int, val result: Result<T>) : PartialResult<T>
 
     sealed interface Result<out T>
 

@@ -83,45 +83,53 @@ Combinator API
 
 - *Command-line arguments* - the values provided on the command-line
 - *Parameter* - any value provided to the app from some external source (currently only from command-line arguments)
-- *Option* - a parameter that may be provided anywhere in the command-line arguments. 
-  - A fixed string that starts with `-`, possibly also followed by zero or more values
+- *Option* - a parameter that may be provided anywhere in the command-line arguments.
+    - A fixed string that starts with `-`, possibly also followed by zero or more values
 - *Positional* - a parameter that may must appear at a certain position in the command-line arguments
 - *Parser* - takes command-line arguments and produces some value of type T
-- *Literal* - a literal string that must appear at a certain position in the command-line arguments
+- *Command* - a literal string that must appear at a certain position in the command-line arguments
 
 Combinators
 -----------
 
-`option(name): Option<String?>`
-`option(name).boolean(): Option<Boolean>`
-`positional(name): Positional<String>`
-`literal(text): Parser<Unit>`
-`params(producer): Parser<T>`
-`params(a, map): Parser<T>`
-`params(a, b, map): Parser<T>`
-`params(a, b, c, map): Parser<T>`
-`oneOf(choices...): Parser<T>`
+- `option(name): Option<String?>`
+    - matches `-n value' or '--name value', null when not present
+- `option(name).boolean(): Option<Boolean>`
+    - matches `-n` or `--name`, false when not present
+- `option(name).boolean().required(): Parser<Unit>`
+    - matches `-n` or `--name`, must be present
+- `positional(name): Positional<String>`
+    - matches 1 positional, must be present
+- `command(text): Parser<Unit>`
+    - matches the given text, must be present
+- `params(producer): Parser<T>`
+- `params(a, map): Parser<T>`
+- `params(a, b, map): Parser<T>`
+- `params(a, b, c, map): Parser<T>`
+    - matches the parsers and maps the result. Options can appear in any order, positionals in fixed order
+- `oneOf(choices...): Parser<T>`
+    - matches the parses and returns the first matching
 
 CLI app
 -------
 
-`parser.runApp(args)`
-- Color output
-- Usage summary
+- `parser.runApp(args)`
+    - Color output
+    - Usage summary
 
 - `allOf()` currently skips over a positional that does not match to the next positional
-  - See ChoiceOfStringLiteralAndParametersTest, e.g. <literal> <parameter>
+    - See ChoiceOfStringLiteralAndParametersTest, e.g. <literal> <parameter>
 - `oneOf()` currently reports each expected literal as a separate problem
-  - See ChoiceOfStringLiteralTest
+    - See ChoiceOfStringLiteralTest
 - `oneOf()` with overlapping options, some with values and some without
 - `oneOf()` currently does not fail on conflicting options or literals
-  - See ChoiceOfStringOptionsTest
+    - See ChoiceOfStringOptionsTest
 - `oneOf()` reports problems for option (e.g. repeated option, missing value)
 - Literal currently fails inconsistently when unexpected argument or option is found
-  - For unexpected argument, a single "unexpected argument x, expected y" problem is reported
-  - For unexpected option, both "expected x" and "unexpected option -x" are reported
+    - For unexpected argument, a single "unexpected argument x, expected y" problem is reported
+    - For unexpected option, both "expected x" and "unexpected option -x" are reported
 - Combine all remaining unexpected arguments into a single failure
-  - e.g. instead of "unexpected arg 'a'" + "unexpected arg 'b'" instead produce "unexpected args 'a b'"
+    - e.g. instead of "unexpected arg 'a'" + "unexpected arg 'b'" instead produce "unexpected args 'a b'"
 - Show usage on parse error
     - Bold text
     - Include app name

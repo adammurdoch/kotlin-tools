@@ -12,6 +12,6 @@ fun positional(name: String): Positional<String> {
 /**
  * Creates a parser that matches the given text.
  */
-fun literal(value: String): Parser<Unit> {
-    return DefaultLiteral(value)
+fun command(value: String): Parser<Unit> {
+    return DefaultCommand(value)
 }

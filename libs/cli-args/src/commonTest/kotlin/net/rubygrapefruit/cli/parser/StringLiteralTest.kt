@@ -6,7 +6,7 @@ import kotlin.test.assertEquals
 class StringLiteralTest : AbstractParseTest() {
     @Test
     fun `parses literal`() {
-        val parser = literal("help")
+        val parser = command("help")
 
         assertEquals(Unit, parser.parse("help").get())
 
@@ -21,14 +21,14 @@ class StringLiteralTest : AbstractParseTest() {
 
     @Test
     fun `reports usage`() {
-        val parser = literal("help")
+        val parser = command("help")
 
         assertEquals("help", parser.usage)
     }
 
     @Test
     fun `literal must be provided`() {
-        val parser = literal("help")
+        val parser = command("help")
 
         parser.fails {
             failure(0, "Expected 'help'")
@@ -44,7 +44,7 @@ class StringLiteralTest : AbstractParseTest() {
 
     @Test
     fun `literal cannot appear more than once`() {
-        val parser = literal("help")
+        val parser = command("help")
 
         parser.fails("help", "help") {
             failure(1, "Unexpected argument 'help'")

@@ -8,7 +8,7 @@ class StringLiteralAndBooleanOptionTest : AbstractParseTest() {
     @Test
     fun `parses literal and option in any order`() {
         val parser = params(
-            literal("run"),
+            command("run"),
             option("a").boolean()
         ) { _, a -> a }
 
@@ -21,7 +21,7 @@ class StringLiteralAndBooleanOptionTest : AbstractParseTest() {
     @Test
     fun `must provide literal`() {
         val parser = params(
-            literal("run"),
+            command("run"),
             option("a").boolean()
         ) { _, _ -> fail() }
 
@@ -46,7 +46,7 @@ class StringLiteralAndBooleanOptionTest : AbstractParseTest() {
     @Test
     fun `option must not have a value`() {
         val parser = params(
-            literal("run"),
+            command("run"),
             option("a").boolean()
         ) { _, _ -> fail() }
 

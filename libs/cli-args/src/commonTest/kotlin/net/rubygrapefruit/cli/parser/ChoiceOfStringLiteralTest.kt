@@ -7,8 +7,8 @@ class ChoiceOfStringLiteralTest : AbstractParseTest() {
     @Test
     fun `parses one of literal`() {
         val parser = oneOf(
-            params(literal("one")) { 1 },
-            params(literal("two")) { 2 },
+            params(command("one")) { 1 },
+            params(command("two")) { 2 },
         )
 
         assertEquals(1, parser.parse("one").get())
@@ -18,8 +18,8 @@ class ChoiceOfStringLiteralTest : AbstractParseTest() {
     @Test
     fun `reports usage`() {
         val parser = oneOf(
-            params(literal("one")) { 1 },
-            params(literal("two")) { 2 },
+            params(command("one")) { 1 },
+            params(command("two")) { 2 },
         )
 
         assertEquals(
@@ -31,8 +31,8 @@ two""", parser.usage
     @Test
     fun `literal must be provided`() {
         val parser = oneOf(
-            params(literal("one")) { 1 },
-            params(literal("two")) { 2 },
+            params(command("one")) { 1 },
+            params(command("two")) { 2 },
         )
 
         // Capturing current behavior

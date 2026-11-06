@@ -38,7 +38,7 @@ class MultipleBooleanOptionsTest : AbstractParseTest() {
 
     @Test
     fun `parses three options in any order`() {
-        val parser = allOf(
+        val parser = params(
             option("a").boolean(),
             option("b").boolean(),
             option("long").boolean()

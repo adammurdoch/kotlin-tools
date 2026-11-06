@@ -14,7 +14,7 @@ class MultipleStringPositionalsTest : AbstractParseTest() {
 
     @Test
     fun `parses three parameters in order`() {
-        val parser = allOf(positional("a"), positional("b"), positional("c")) { a, b, c -> listOf(a, b, c) }
+        val parser = params(positional("a"), positional("b"), positional("c")) { a, b, c -> listOf(a, b, c) }
 
         assertEquals(listOf("one", "two", "three"), parser.parse("one", "two", "three").get())
     }

@@ -15,15 +15,11 @@ class BooleanOptionTest : AbstractParseTest() {
             failure(0, "Unexpected option '--x'. Try '-x' instead")
         }
         parser.fails("-X") {
-            failure(0, "Unexpected option '-X'")
+            failure(0, "Unexpected option '-X'. Try '-x' instead")
         }
-    }
-
-    @Test
-    fun `reports usage of option with short name`() {
-        val parser = option("x").boolean()
-
-        assertEquals("[-x]", parser.usage)
+        parser.fails("--X") {
+            failure(0, "Unexpected option '--X'. Try '-x' instead")
+        }
     }
 
     @Test
@@ -36,6 +32,16 @@ class BooleanOptionTest : AbstractParseTest() {
         parser.fails("-some-flag") {
             failure(0, "Unexpected option '-some-flag'. Try '--some-flag' instead")
         }
+        parser.fails("--Some-Flag") {
+            failure(0, "Unexpected option '--Some-Flag'. Try '--some-flag' instead")
+        }
+    }
+
+    @Test
+    fun `reports usage of option with short name`() {
+        val parser = option("x").boolean()
+
+        assertEquals("[-x]", parser.usage)
     }
 
     @Test

@@ -13,19 +13,27 @@ class Run(val verbose: Boolean, val greeting: String) : Runnable {
     }
 }
 
-class Help(val verbose: Boolean) : Runnable {
+class Generate(val verbose: Boolean) : Runnable {
     override fun run() {
         if (verbose) {
             print("> ")
         }
+        println("generate")
+    }
+}
+
+class Help : Runnable {
+    override fun run() {
         println("help")
     }
 }
 
 fun parser(): Parser<Runnable> {
-    val help = params(literal("help"), option("verbose").boolean()) { _, verbose -> Help(verbose) }
-    val run = allOf(literal("run"), option("verbose").boolean(), positional("greeting")) { _, verbose, greeting -> Run(verbose, greeting) }
-    return oneOf(help, run)
+    val help = params(option("help").boolean().required()) { _ -> Help() }
+    val verbose = option("verbose").boolean()
+    val run = params(command("run"), verbose, positional("greeting")) { _, verbose, greeting -> Run(verbose, greeting) }
+    val generate = params(command("generate"), verbose) { _, verbose -> Generate(verbose) }
+    return oneOf(help, run, generate)
 }
 
 fun main(args: Array<String>) = parser().runApp(args)

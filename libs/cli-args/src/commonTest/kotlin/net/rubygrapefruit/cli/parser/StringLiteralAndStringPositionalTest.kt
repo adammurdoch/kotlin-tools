@@ -6,7 +6,7 @@ import kotlin.test.assertEquals
 class StringLiteralAndStringPositionalTest : AbstractParseTest() {
     @Test
     fun `parses literal then parameter`() {
-        val parser = params(literal("run"), positional("a")) { _, a -> a }
+        val parser = params(command("run"), positional("a")) { _, a -> a }
 
         assertEquals("one", parser.parse("run", "one").get())
         assertEquals("run", parser.parse("run", "run").get())
@@ -14,7 +14,7 @@ class StringLiteralAndStringPositionalTest : AbstractParseTest() {
 
     @Test
     fun `parses parameter then literal`() {
-        val parser = params(positional("a"), literal("run")) { a, _ -> a }
+        val parser = params(positional("a"), command("run")) { a, _ -> a }
 
         assertEquals("one", parser.parse("one", "run").get())
         assertEquals("run", parser.parse("run", "run").get())
@@ -22,7 +22,7 @@ class StringLiteralAndStringPositionalTest : AbstractParseTest() {
 
     @Test
     fun `literal must be provided`() {
-        val parser = params(literal("run"), positional("a")) { _, a -> a }
+        val parser = params(command("run"), positional("a")) { _, a -> a }
 
         parser.fails {
             failure(0, "Expected 'run'")
@@ -41,7 +41,7 @@ class StringLiteralAndStringPositionalTest : AbstractParseTest() {
 
     @Test
     fun `parameter must be provided`() {
-        val parser = params(literal("run"), positional("a")) { _, a -> a }
+        val parser = params(command("run"), positional("a")) { _, a -> a }
 
         parser.fails("run") {
             failure(1, "Parameter <a> not provided")

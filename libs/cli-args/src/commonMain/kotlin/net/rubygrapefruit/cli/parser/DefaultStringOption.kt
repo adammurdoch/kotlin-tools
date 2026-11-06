@@ -2,16 +2,15 @@ package net.rubygrapefruit.cli.parser
 
 import net.rubygrapefruit.cli.terminal.Output
 
-internal class OptionWithValue(name: String) : AbstractParser<String?>(), StringOption {
+internal class DefaultStringOption(private val name: String) : AbstractParser<String?>(), StringOption {
     private val flag = if (name.length == 1) "-$name" else "--$name"
-    private val incorrectPrefix = if (name.length == 1) "--$name" else "-$name"
 
-    override fun boolean(): Option<Boolean> {
-        return BooleanOption(flag, incorrectPrefix)
+    override fun boolean(): BooleanOption {
+        return DefaultBooleanOption(flag, name)
     }
 
     override fun start(): ParseState<String?> {
-        return State(flag, incorrectPrefix)
+        return State(flag, name)
     }
 
     override fun usage(): UsageInternal {
@@ -24,7 +23,7 @@ internal class OptionWithValue(name: String) : AbstractParser<String?>(), String
         }
     }
 
-    private class State(private val flag: String, private val incorrectPrefix: String) : ParseState<String?> {
+    private class State(private val flag: String, private val name: String) : ParseState<String?> {
         private var seen = false
 
         override fun maybeParse(args: InputArgs): ParseState.PartialResult<String?> {
@@ -43,12 +42,12 @@ internal class OptionWithValue(name: String) : AbstractParser<String?>(), String
 
         override fun claimUnrecognized(args: InputArgs): ParseState.Failure? {
             val first = args.first()
-            return if (first == incorrectPrefix) {
-                val count = if (args.hasSecond() && !args.secondIsOption() && !args.secondIsRecognized()) 2 else 1
-                ParseState.Failure(count, ProblemAtIndex(args.index, UnexpectedOption(first, flag)))
-            } else if (first == flag) {
+            return if (first == flag) {
                 val count = if (args.hasSecond() && !args.secondIsOption() && !args.secondIsRecognized()) 2 else 1
                 ParseState.Failure(count, ProblemAtIndex(args.index, RepeatedOption(flag)))
+            } else if (first.equals("-$name", true) || first.equals("--$name", true)) {
+                val count = if (args.hasSecond() && !args.secondIsOption() && !args.secondIsRecognized()) 2 else 1
+                ParseState.Failure(count, ProblemAtIndex(args.index, UnexpectedOption(first, flag)))
             } else {
                 null
             }

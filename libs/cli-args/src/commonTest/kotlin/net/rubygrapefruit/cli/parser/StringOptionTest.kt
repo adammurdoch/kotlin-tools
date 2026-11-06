@@ -17,8 +17,10 @@ class StringOptionTest : AbstractParseTest() {
             failure(0, "Unexpected option '--x'. Try '-x' instead")
         }
         parser.fails("-X", "value") {
-            failure(0, "Unexpected option '-X'")
-            failure(1, "Unexpected argument 'value'")
+            failure(0, "Unexpected option '-X'. Try '-x' instead")
+        }
+        parser.fails("--X", "value") {
+            failure(0, "Unexpected option '--X'. Try '-x' instead")
         }
     }
 
@@ -41,8 +43,10 @@ class StringOptionTest : AbstractParseTest() {
             failure(0, "Unexpected option '-an-option'. Try '--an-option' instead")
         }
         parser.fails("--An-Option", "value") {
-            failure(0, "Unexpected option '--An-Option'")
-            failure(1, "Unexpected argument 'value'")
+            failure(0, "Unexpected option '--An-Option'. Try '--an-option' instead")
+        }
+        parser.fails("-An-Option", "value") {
+            failure(0, "Unexpected option '-An-Option'. Try '--an-option' instead")
         }
     }
 

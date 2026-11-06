@@ -44,6 +44,12 @@ internal class MissingOptionValue(val option: String) : Problem {
     }
 }
 
+internal class MissingOption(val option: String) : Problem {
+    override fun writeTo(output: Output) {
+        output.write("Option $option not provided")
+    }
+}
+
 internal class MissingParameter(val name: String) : Problem {
     override fun writeTo(output: Output) {
         output.write("Parameter <$name> not provided")

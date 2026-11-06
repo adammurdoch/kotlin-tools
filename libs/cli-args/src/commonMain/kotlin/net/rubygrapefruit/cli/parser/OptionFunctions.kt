@@ -6,5 +6,5 @@ package net.rubygrapefruit.cli.parser
  * The returned parser will match `-<name> <string>` or empty input.
  */
 fun option(name: String): StringOption {
-    return OptionWithValue(name)
+    return DefaultStringOption(name)
 }

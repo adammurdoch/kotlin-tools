@@ -47,7 +47,7 @@ class MultipleStringOptionsTest : AbstractParseTest() {
 
     @Test
     fun `parses three options in any order`() {
-        val parser = allOf(option("a"), option("b"), option("long")) { a, b, c -> listOf(a, b, c) }
+        val parser = params(option("a"), option("b"), option("long")) { a, b, c -> listOf(a, b, c) }
 
         assertEquals(listOf("1", "2", "3"), parser.parse("-a", "1", "-b", "2", "--long", "3").get())
         assertEquals(listOf("1", "2", "3"), parser.parse("--long", "3", "-a", "1", "-b", "2").get())
@@ -68,7 +68,7 @@ class MultipleStringOptionsTest : AbstractParseTest() {
 
     @Test
     fun `reports usage for three options`() {
-        val parser = allOf(option("a"), option("b"), option("long")) { a, b, c -> listOf(a, b, c) }
+        val parser = params(option("a"), option("b"), option("long")) { a, b, c -> listOf(a, b, c) }
 
         assertEquals("[-a <value>] [-b <value>] [--long <value>]", parser.usage)
     }

@@ -1,25 +1,18 @@
 package net.rubygrapefruit.cli.parser
 
-internal fun List<ProblemAtIndex>?.plus(index: Int, problem: Problem): List<ProblemAtIndex> {
+internal fun List<ProblemAtIndex>?.plus(problem: ProblemAtIndex): List<ProblemAtIndex> {
     return if (this == null) {
-        listOf(ProblemAtIndex(index, problem))
+        listOf(problem)
     } else {
-        this + ProblemAtIndex(index, problem)
+        this + problem
     }
 }
 
-internal fun List<ProblemAtIndex>?.plus(index: Int, problems: List<Problem>): List<ProblemAtIndex> {
-    val newProblems = problems.map { ProblemAtIndex(index, it) }
-    return if (this == null) {
-        newProblems
-    } else {
-        this + newProblems
-    }
-}
-
-internal fun List<ProblemAtIndex>.plus(problems: List<ProblemAtIndex>?): List<ProblemAtIndex> {
+internal fun List<ProblemAtIndex>?.plus(problems: List<ProblemAtIndex>?): List<ProblemAtIndex> {
     return if (problems == null) {
-        this
+        this ?: emptyList()
+    } else if (this == null) {
+        problems
     } else {
         this + problems
     }

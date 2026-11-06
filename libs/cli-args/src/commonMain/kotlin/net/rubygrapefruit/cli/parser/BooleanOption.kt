@@ -29,15 +29,15 @@ internal class BooleanOption(private val flag: String, private val incorrectPref
 
         override fun claimUnrecognized(args: InputArgs): ParseState.Failure? {
             return if (args.first() == incorrectPrefix) {
-                ParseState.Failure(1, 0, UnexpectedOption(args.first(), flag))
+                ParseState.Failure(1, ProblemAtIndex(args.index, UnexpectedOption(args.first(), flag)))
             } else if (args.first() == flag) {
-                ParseState.Failure(1, 0, RepeatedOption(flag))
+                ParseState.Failure(1, ProblemAtIndex(args.index, RepeatedOption(flag)))
             } else {
                 null
             }
         }
 
-        override fun finish(): ParseState.Result<Boolean> {
+        override fun finish(index: Int): ParseState.Result<Boolean> {
             return ParseState.FixedResult(false)
         }
     }

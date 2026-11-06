@@ -46,7 +46,7 @@ internal class OneOfParser<OUT>(private val choices: List<ParserInternal<OUT>>) 
 
                     is ParseState.Failure -> {
                         choice.recognized = true
-                        choice.problems = choice.problems.plus(result.index, result.problem)
+                        choice.problems = choice.problems.plus(result.problem)
                         recognized = min(recognized, result.count)
                     }
                 }
@@ -58,14 +58,14 @@ internal class OneOfParser<OUT>(private val choices: List<ParserInternal<OUT>>) 
             }
         }
 
-        override fun finish(): ParseState.Result<OUT> {
+        override fun finish(index: Int): ParseState.Result<OUT> {
             val recognized = choices.filter { it.recognized }
             var problems: List<ProblemAtIndex> = emptyList()
             for (choice in recognized) {
                 problems = problems.plus(choice.problems)
-                val result = choice.result ?: choice.state.finish()
+                val result = choice.result ?: choice.state.finish(index)
                 when (result) {
-                    is ParseState.FinalFailure -> problems.plus(0, result.problems)
+                    is ParseState.FinalFailure -> problems.plus(result.problems)
                     is ParseState.Success -> {
                         if (choice.problems == null) {
                             return result
@@ -75,14 +75,14 @@ internal class OneOfParser<OUT>(private val choices: List<ParserInternal<OUT>>) 
             }
             if (recognized.isEmpty() && problems.isEmpty()) {
                 for (choice in choices) {
-                    val result = choice.state.finish()
+                    val result = choice.state.finish(index)
                     when (result) {
-                        is ParseState.FinalFailure -> problems.plus(0, result.problems)
+                        is ParseState.FinalFailure -> problems.plus(result.problems)
                         is ParseState.Success -> return result
                     }
                 }
             }
-            return ParseState.FinalFailure(problems.map { it.problem })
+            return ParseState.FinalFailure(problems)
         }
     }
 

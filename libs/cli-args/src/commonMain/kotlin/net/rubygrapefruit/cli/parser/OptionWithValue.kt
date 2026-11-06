@@ -34,7 +34,7 @@ internal class OptionWithValue(name: String) : AbstractParser<String?>(), String
             }
             seen = true
             return if (!args.hasSecond() || args.secondIsOption()) {
-                ParseState.Failure(1, 1, MissingOptionValue(flag))
+                ParseState.Failure(1, ProblemAtIndex(args.index + 1, MissingOptionValue(flag)))
             } else {
                 val value = args.second()
                 ParseState.Finished(2, ParseState.FixedResult(value))
@@ -45,16 +45,16 @@ internal class OptionWithValue(name: String) : AbstractParser<String?>(), String
             val first = args.first()
             return if (first == incorrectPrefix) {
                 val count = if (args.hasSecond() && !args.secondIsOption() && !args.secondIsRecognized()) 2 else 1
-                ParseState.Failure(count, 0, UnexpectedOption(first, flag))
+                ParseState.Failure(count, ProblemAtIndex(args.index, UnexpectedOption(first, flag)))
             } else if (first == flag) {
                 val count = if (args.hasSecond() && !args.secondIsOption() && !args.secondIsRecognized()) 2 else 1
-                ParseState.Failure(count, 0, RepeatedOption(flag))
+                ParseState.Failure(count, ProblemAtIndex(args.index, RepeatedOption(flag)))
             } else {
                 null
             }
         }
 
-        override fun finish(): ParseState.Result<String?> {
+        override fun finish(index: Int): ParseState.Result<String?> {
             return ParseState.FixedResult(null)
         }
     }

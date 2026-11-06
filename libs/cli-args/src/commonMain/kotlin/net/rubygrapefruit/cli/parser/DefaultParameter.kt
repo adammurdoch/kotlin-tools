@@ -27,8 +27,8 @@ internal class DefaultParameter(private val name: String) : AbstractParser<Strin
             }
         }
 
-        override fun finish(): ParseState.Result<String> {
-            return ParseState.FinalFailure(listOf(MissingParameter(name)))
+        override fun finish(index: Int): ParseState.Result<String> {
+            return ParseState.FinalFailure(listOf(ProblemAtIndex(index, MissingParameter(name))))
         }
     }
 }

@@ -33,17 +33,17 @@ internal class DefaultLiteral(private val text: String) : AbstractParser<Unit>()
         override fun claimUnrecognized(args: InputArgs): ParseState.Failure? {
             return if (!matched && !claimed && !args.firstIsOption()) {
                 claimed = true
-                ParseState.Failure(1, 0, UnexpectedArgument(args.first(), text))
+                ParseState.Failure(1, ProblemAtIndex(args.index, UnexpectedArgument(args.first(), text)))
             } else {
                 null
             }
         }
 
-        override fun finish(): ParseState.Result<Unit> {
+        override fun finish(index: Int): ParseState.Result<Unit> {
             return if (claimed) {
                 ParseState.FinalFailure(emptyList())
             } else {
-                ParseState.FinalFailure(listOf(MissingLiteral(text)))
+                ParseState.FinalFailure(listOf(ProblemAtIndex(index, MissingLiteral(text))))
             }
         }
     }

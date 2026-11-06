@@ -43,11 +43,11 @@ internal class AllOfParser<OUT>(
             }
         }
 
-        fun finish(): ParseState.Result<T> {
+        fun finish(index: Int): ParseState.Result<T> {
             if (result != null) {
                 return result!!
             }
-            return state.finish()
+            return state.finish(index)
         }
     }
 
@@ -75,11 +75,11 @@ internal class AllOfParser<OUT>(
             return null
         }
 
-        override fun finish(): ParseState.Result<OUT> {
-            var problems: List<Problem>? = null
+        override fun finish(index: Int): ParseState.Result<OUT> {
+            var problems: List<ProblemAtIndex>? = null
             val results = mutableListOf<ParseState.Success<*>>()
             for (element in elements) {
-                val result = element.finish()
+                val result = element.finish(index)
                 when (result) {
                     is ParseState.FinalFailure -> {
                         if (problems == null) {

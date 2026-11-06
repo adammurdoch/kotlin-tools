@@ -44,7 +44,7 @@ internal interface ParseState<out T> {
     /**
      * Produces the result of this parser.
      */
-    fun finish(): Result<T>
+    fun finish(index: Int): Result<T>
 
     fun claimUnrecognized(args: InputArgs): Failure? {
         return null
@@ -62,7 +62,7 @@ internal interface ParseState<out T> {
      * The parser has recognized one or more arguments but has encountered some problem.
      * The parser's [maybeParse] function may be called again after skipping at least recognized arguments (and possibly more).
      */
-    class Failure(val count: Int, val index: Int, val problem: Problem) : PartialResult<Nothing>
+    class Failure(val count: Int, val problem: ProblemAtIndex) : PartialResult<Nothing>
 
     /**
      * The parser has recognized one or more arguments without any problems.
@@ -74,7 +74,7 @@ internal interface ParseState<out T> {
 
     sealed interface Result<out T>
 
-    class FinalFailure(val problems: List<Problem>) : Result<Nothing>
+    class FinalFailure(val problems: List<ProblemAtIndex>) : Result<Nothing>
 
     sealed interface Success<out T> : Result<T> {
         val result: T

@@ -36,7 +36,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
 
                 is ParseState.Failure -> {
                     require(parseResult.count > 0)
-                    problems = problems.plus(current.index + parseResult.index, parseResult.problem)
+                    problems = problems.plus(parseResult.problem)
                     // Attempt to recover and continue
                     repeat(parseResult.count) {
                         recognized[index] = true
@@ -56,8 +56,8 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
             val current = DefaultInputArgs(index, args, recognized)
             val failure = state.claimUnrecognized(current)
             if (failure != null) {
-                require(failure.index == 0 && failure.count > 0)
-                problems = problems.plus(index, failure.problem)
+                require(failure.count > 0)
+                problems = problems.plus(failure.problem)
                 index += failure.count
             } else {
                 val problem = if (current.firstIsOption()) {
@@ -65,15 +65,15 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
                 } else {
                     UnexpectedArgument(current.first())
                 }
-                problems = problems.plus(index, problem)
+                problems = problems.plus(ProblemAtIndex(index, problem))
                 index++
             }
         }
 
-        val finalResult = result ?: state.finish()
+        val finalResult = result ?: state.finish(args.size)
         return when (finalResult) {
             is ParseState.FinalFailure -> {
-                ParserInternal.Failure(problems.plus(args.size, finalResult.problems), this)
+                ParserInternal.Failure(problems.plus(finalResult.problems), this)
             }
 
             is ParseState.Success -> {

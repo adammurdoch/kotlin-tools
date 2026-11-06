@@ -7,7 +7,7 @@ internal class AllOfParser<OUT>(
     private val map: (List<ParseState.Success<*>>) -> OUT
 ) : AbstractParser<OUT>() {
     override fun start(): ParseState<OUT> {
-        return State(parsers.map { it.start() }, map)
+        return State(parsers.map { Element(it.start()) }, map)
     }
 
     override fun usage(): UsageInternal {
@@ -25,31 +25,49 @@ internal class AllOfParser<OUT>(
         }
     }
 
-    private class State<OUT>(val states: List<ParseState<*>>, val map: (List<ParseState.Success<*>>) -> OUT) : ParseState<OUT> {
-        private val remaining = states.toMutableList()
+    private class Element<T>(val state: ParseState<T>) {
+        var result: ParseState.Success<T>? = null
 
-        override fun maybeParse(args: InputArgs): ParseState.PartialResult {
-            var index = 0
-            while (index < remaining.size) {
-                val state = remaining[index]
-                val result = state.maybeParse(args)
-                when (result) {
-                    is ParseState.Matched -> {
-                        remaining.removeAt(index)
-                        return ParseState.Matched(result.count, false)
-                    }
-                    is ParseState.Failure -> return result
-                    is ParseState.NotRecognized -> {
-                        index++
-                    }
+        fun maybeParse(args: InputArgs): ParseState.PartialResult<Nothing> {
+            val parseResult = state.maybeParse(args)
+            return when (parseResult) {
+                is ParseState.Matched -> parseResult
+
+                is ParseState.Finished -> {
+                    result = parseResult.result
+                    ParseState.Matched(parseResult.count)
+                }
+
+                is ParseState.Failure -> parseResult
+                is ParseState.NotRecognized -> parseResult
+            }
+        }
+
+        fun finish(): ParseState.Result<T> {
+            if (result != null) {
+                return result!!
+            }
+            return state.finish()
+        }
+    }
+
+    private class State<OUT>(val elements: List<Element<*>>, val map: (List<ParseState.Success<*>>) -> OUT) : ParseState<OUT> {
+        override fun maybeParse(args: InputArgs): ParseState.PartialResult<OUT> {
+            for (element in elements) {
+                if (element.result != null) {
+                    continue
+                }
+                val result = element.maybeParse(args)
+                if (result !is ParseState.NotRecognized) {
+                    return result
                 }
             }
             return ParseState.NotRecognized
         }
 
         override fun claimUnrecognized(args: InputArgs): ParseState.Failure? {
-            for (state in states) {
-                val problem = state.claimUnrecognized(args)
+            for (element in elements) {
+                val problem = element.state.claimUnrecognized(args)
                 if (problem != null) {
                     return problem
                 }
@@ -60,8 +78,8 @@ internal class AllOfParser<OUT>(
         override fun finish(): ParseState.Result<OUT> {
             var problems: List<Problem>? = null
             val results = mutableListOf<ParseState.Success<*>>()
-            for (state in states) {
-                val result = state.finish()
+            for (element in elements) {
+                val result = element.finish()
                 when (result) {
                     is ParseState.FinalFailure -> {
                         if (problems == null) {

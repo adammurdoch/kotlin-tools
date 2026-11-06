@@ -21,12 +21,12 @@ internal class DefaultLiteral(private val text: String) : AbstractParser<Unit>()
         private var claimed = false
         private var matched = false
 
-        override fun maybeParse(args: InputArgs): ParseState.PartialResult {
+        override fun maybeParse(args: InputArgs): ParseState.PartialResult<Unit> {
             return if (matched || args.firstIsOption()) {
                 ParseState.NotRecognized
             } else if (args.first() == text) {
                 matched = true
-                ParseState.Matched(1, true)
+                ParseState.Finished(1, ParseState.FixedResult(Unit))
             } else {
                 ParseState.NotRecognized
             }

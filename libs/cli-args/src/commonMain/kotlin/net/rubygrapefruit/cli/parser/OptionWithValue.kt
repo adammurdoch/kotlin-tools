@@ -25,10 +25,9 @@ internal class OptionWithValue(name: String) : AbstractParser<String?>(), String
     }
 
     private class State(private val flag: String, private val incorrectPrefix: String) : ParseState<String?> {
-        private var value: String? = null
         private var seen = false
 
-        override fun maybeParse(args: InputArgs): ParseState.PartialResult {
+        override fun maybeParse(args: InputArgs): ParseState.PartialResult<String?> {
             val first = args.first()
             if (seen || first != flag) {
                 return ParseState.NotRecognized
@@ -37,8 +36,8 @@ internal class OptionWithValue(name: String) : AbstractParser<String?>(), String
             return if (!args.hasSecond() || args.secondIsOption()) {
                 ParseState.Failure(1, 1, MissingOptionValue(flag))
             } else {
-                value = args.second()
-                ParseState.Matched(2, true)
+                val value = args.second()
+                ParseState.Finished(2, ParseState.FixedResult(value))
             }
         }
 
@@ -56,7 +55,7 @@ internal class OptionWithValue(name: String) : AbstractParser<String?>(), String
         }
 
         override fun finish(): ParseState.Result<String?> {
-            return ParseState.FixedResult(value)
+            return ParseState.FixedResult(null)
         }
     }
 }

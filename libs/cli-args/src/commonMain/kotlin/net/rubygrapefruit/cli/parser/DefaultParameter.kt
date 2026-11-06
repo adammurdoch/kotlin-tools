@@ -18,24 +18,20 @@ internal class DefaultParameter(private val name: String) : AbstractParser<Strin
     }
 
     private class State(val name: String) : ParseState<String> {
-        private var value: String? = null
+        private var matched = false
 
-        override fun maybeParse(args: InputArgs): ParseState.PartialResult {
-            return if (args.firstIsOption() || value != null) {
+        override fun maybeParse(args: InputArgs): ParseState.PartialResult<String> {
+            return if (args.firstIsOption() || matched) {
                 ParseState.NotRecognized
             } else {
-                value = args.first()
-                ParseState.Matched(1, true)
+                matched = true
+                val value = args.first()
+                ParseState.Finished(1, ParseState.FixedResult(value))
             }
         }
 
         override fun finish(): ParseState.Result<String> {
-            val value = value
-            return if (value == null) {
-                ParseState.FinalFailure(listOf(MissingParameter(name)))
-            } else {
-                ParseState.FixedResult(value)
-            }
+            return ParseState.FinalFailure(listOf(MissingParameter(name)))
         }
     }
 }

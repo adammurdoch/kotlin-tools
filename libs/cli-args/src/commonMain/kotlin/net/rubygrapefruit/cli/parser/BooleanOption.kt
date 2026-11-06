@@ -11,7 +11,7 @@ internal class BooleanOption(private val flag: String, private val incorrectPref
         return OptionUsage()
     }
 
-    private inner class OptionUsage: UsageInternal {
+    private inner class OptionUsage : UsageInternal {
         override fun writeTo(output: Output) {
             output.write("[$flag]")
         }
@@ -20,13 +20,13 @@ internal class BooleanOption(private val flag: String, private val incorrectPref
     private class State(val flag: String, val incorrectPrefix: String) : ParseState<Boolean> {
         private var matched = false
 
-        override fun maybeParse(args: InputArgs): ParseState.PartialResult {
+        override fun maybeParse(args: InputArgs): ParseState.PartialResult<Boolean> {
             val first = args.first()
             return if (first != flag || matched) {
                 ParseState.NotRecognized
             } else {
                 matched = true
-                ParseState.Matched(1, true)
+                ParseState.Finished(1, ParseState.FixedResult(true))
             }
         }
 
@@ -41,7 +41,7 @@ internal class BooleanOption(private val flag: String, private val incorrectPref
         }
 
         override fun finish(): ParseState.Result<Boolean> {
-            return ParseState.FixedResult(matched)
+            return ParseState.FixedResult(false)
         }
     }
 }

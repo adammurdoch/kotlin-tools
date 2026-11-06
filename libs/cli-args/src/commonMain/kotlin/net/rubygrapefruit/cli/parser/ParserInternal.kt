@@ -39,7 +39,7 @@ internal interface ParseState<out T> {
      *
      * May be called zero or more times, followed by [finish].
      */
-    fun maybeParse(args: InputArgs): PartialResult
+    fun maybeParse(args: InputArgs): PartialResult<T>
 
     /**
      * Produces the result of this parser.
@@ -50,25 +50,27 @@ internal interface ParseState<out T> {
         return null
     }
 
-    sealed interface PartialResult
+    sealed interface PartialResult<out T>
 
     /**
      * The parser did not recognize any arguments.
      * The parser's [maybeParse] function may be called again after skipping some arguments.
      */
-    object NotRecognized : PartialResult
+    object NotRecognized : PartialResult<Nothing>
 
     /**
      * The parser has recognized one or more arguments but has encountered some problem.
      * The parser's [maybeParse] function may be called again after skipping at least recognized arguments (and possibly more).
      */
-    class Failure(val count: Int, val index: Int, val problem: Problem) : PartialResult
+    class Failure(val count: Int, val index: Int, val problem: Problem) : PartialResult<Nothing>
 
     /**
      * The parser has recognized one or more arguments without any problems.
      * The parser's [maybeParse] function may be called again after skipping at least recognized arguments (and possibly more).
      */
-    class Matched(val count: Int, val finished: Boolean) : PartialResult
+    class Matched(val count: Int) : PartialResult<Nothing>
+
+    class Finished<T>(val count: Int, val result: Success<T>) : PartialResult<T>
 
     sealed interface Result<out T>
 

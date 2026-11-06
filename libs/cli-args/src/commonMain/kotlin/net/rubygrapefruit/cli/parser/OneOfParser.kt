@@ -24,10 +24,10 @@ internal class OneOfParser<OUT>(private val choices: List<ParserInternal<OUT>>) 
     }
 
     private class State<OUT>(val choices: List<ChoiceState<OUT>>) : ParseState<OUT> {
-        override fun maybeParse(args: InputArgs): ParseState.PartialResult {
+        override fun maybeParse(args: InputArgs): ParseState.PartialResult<OUT> {
             var recognized = Int.MAX_VALUE
             for (choice in choices) {
-                if (choice.finished) {
+                if (choice.result != null) {
                     continue
                 }
                 val result = choice.state.maybeParse(args)
@@ -35,7 +35,12 @@ internal class OneOfParser<OUT>(private val choices: List<ParserInternal<OUT>>) 
                     is ParseState.NotRecognized -> continue
                     is ParseState.Matched -> {
                         choice.recognized = true
-                        choice.finished = result.finished
+                        recognized = min(recognized, result.count)
+                    }
+
+                    is ParseState.Finished -> {
+                        choice.recognized = true
+                        choice.result = result.result
                         recognized = min(recognized, result.count)
                     }
 
@@ -47,7 +52,7 @@ internal class OneOfParser<OUT>(private val choices: List<ParserInternal<OUT>>) 
                 }
             }
             return if (recognized != Int.MAX_VALUE) {
-                ParseState.Matched(recognized, false)
+                ParseState.Matched(recognized)
             } else {
                 ParseState.NotRecognized
             }
@@ -58,7 +63,7 @@ internal class OneOfParser<OUT>(private val choices: List<ParserInternal<OUT>>) 
             var problems: List<ProblemAtIndex> = emptyList()
             for (choice in recognized) {
                 problems = problems.plus(choice.problems)
-                val result = choice.state.finish()
+                val result = choice.result ?: choice.state.finish()
                 when (result) {
                     is ParseState.FinalFailure -> problems.plus(0, result.problems)
                     is ParseState.Success -> {
@@ -84,6 +89,6 @@ internal class OneOfParser<OUT>(private val choices: List<ParserInternal<OUT>>) 
     private class ChoiceState<OUT>(val state: ParseState<OUT>) {
         var problems: List<ProblemAtIndex>? = null
         var recognized = false
-        var finished = false
+        var result: ParseState.Success<OUT>? = null
     }
 }

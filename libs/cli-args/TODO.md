@@ -99,6 +99,8 @@ CLI app
 - `oneOf()` with overlapping options, some with values and some without
 - `oneOf()` reports conflicting options or literals
 - `oneOf()` reports problems for option (e.g. repeated option, missing value)
+- Combine all remaining unexpected arguments into a single failure
+  - e.g. instead of "unexpected arg 'a'" + "unexpected arg 'b'" instead produce "unexpected args 'a b'"
 - Show usage on parse error
     - Bold text
     - Include app name

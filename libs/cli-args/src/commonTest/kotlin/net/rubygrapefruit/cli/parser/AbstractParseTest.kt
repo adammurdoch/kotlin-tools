@@ -44,7 +44,7 @@ abstract class AbstractParseTest {
         }
 
         private fun List<ProblemAtIndex>.text(): String {
-            return map { it.problem.text() }.toString()
+            return map { "(${it.index} - ${it.problem.text()})" }.toString()
         }
 
         private fun Problem.text(): String {

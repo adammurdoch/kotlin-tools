@@ -65,7 +65,7 @@ internal class OneOfParser<OUT>(private val choices: List<ParserInternal<OUT>>) 
                 problems = problems.plus(choice.problems)
                 val result = choice.result ?: choice.state.finish(index)
                 when (result) {
-                    is ParseState.FinalFailure -> problems.plus(result.problems)
+                    is ParseState.FinalFailure -> problems = problems.plus(result.problems)
                     is ParseState.Success -> {
                         if (choice.problems == null) {
                             return result
@@ -77,7 +77,7 @@ internal class OneOfParser<OUT>(private val choices: List<ParserInternal<OUT>>) 
                 for (choice in choices) {
                     val result = choice.state.finish(index)
                     when (result) {
-                        is ParseState.FinalFailure -> problems.plus(result.problems)
+                        is ParseState.FinalFailure -> problems = problems.plus(result.problems)
                         is ParseState.Success -> return result
                     }
                 }

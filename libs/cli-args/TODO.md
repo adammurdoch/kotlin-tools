@@ -78,7 +78,11 @@
     - Unknown option or value
     - Unknown file/directory
 
+Combinator API
+--------------
+
 Combinators
+-----------
 
 `option(name): Option<String?>`
 `option(name).boolean(): Option<Boolean>`
@@ -91,13 +95,19 @@ Combinators
 `oneOf(choices...): Parser<T>`
 
 CLI app
+-------
 
 `parser.runApp(args)`
-
 - Color output
+- Usage summary
 
+- `allOf()` currently skips over a positional that does not match to the next positional
+  - See ChoiceOfStringLiteralAndParametersTest, e.g. <literal> <parameter>
+- `oneOf()` currently reports each expected literal as a separate problem
+  - See ChoiceOfStringLiteralTest
 - `oneOf()` with overlapping options, some with values and some without
-- `oneOf()` reports conflicting options or literals
+- `oneOf()` currently does not fail on conflicting options or literals
+  - See ChoiceOfStringOptionsTest
 - `oneOf()` reports problems for option (e.g. repeated option, missing value)
 - Combine all remaining unexpected arguments into a single failure
   - e.g. instead of "unexpected arg 'a'" + "unexpected arg 'b'" instead produce "unexpected args 'a b'"

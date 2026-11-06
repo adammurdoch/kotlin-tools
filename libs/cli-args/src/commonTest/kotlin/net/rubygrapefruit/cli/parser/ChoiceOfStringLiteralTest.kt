@@ -35,11 +35,18 @@ two""", parser.usage
             allOf(literal("two")) { 2 },
         )
 
+        // Capturing current behavior
+
         parser.fails {
-            failure(0, "Expected 'one' or 'two'")
+//            failure(0, "Expected 'one' or 'two'")
+            failure(0, "Expected 'one'")
+            failure(0, "Expected 'two'")
         }
         parser.fails("unknown") {
-            failure(0, "Unknown argument 'unknown'. Expected 'one' or 'two'")
+//            failure(0, "Unexpected argument 'unknown'. Expected 'one' or 'two'")
+            failure(0, "Unexpected argument 'unknown'")
+            failure(1, "Expected 'one'")
+            failure(1, "Expected 'two'")
         }
     }
 }

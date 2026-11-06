@@ -18,14 +18,11 @@ internal class BooleanOption(private val flag: String, private val incorrectPref
     }
 
     private class State(val flag: String, val incorrectPrefix: String) : ParseState<Boolean> {
-        private var matched = false
-
         override fun maybeParse(args: InputArgs): ParseState.PartialResult<Boolean> {
             val first = args.first()
-            return if (first != flag || matched) {
+            return if (first != flag) {
                 ParseState.NotRecognized
             } else {
-                matched = true
                 ParseState.Finished(1, ParseState.FixedResult(true))
             }
         }

@@ -22,13 +22,11 @@ internal class DefaultLiteral(private val text: String) : AbstractParser<Unit>()
         private var matched = false
 
         override fun maybeParse(args: InputArgs): ParseState.PartialResult<Unit> {
-            return if (matched || args.firstIsOption()) {
+            return if (args.firstIsOption() || args.first() != text) {
                 ParseState.NotRecognized
-            } else if (args.first() == text) {
+            } else {
                 matched = true
                 ParseState.Finished(1, ParseState.FixedResult(Unit))
-            } else {
-                ParseState.NotRecognized
             }
         }
 
@@ -42,9 +40,7 @@ internal class DefaultLiteral(private val text: String) : AbstractParser<Unit>()
         }
 
         override fun finish(): ParseState.Result<Unit> {
-            return if (matched) {
-                ParseState.FixedResult(Unit)
-            } else if (claimed) {
+            return if (claimed) {
                 ParseState.FinalFailure(emptyList())
             } else {
                 ParseState.FinalFailure(listOf(MissingLiteral(text)))

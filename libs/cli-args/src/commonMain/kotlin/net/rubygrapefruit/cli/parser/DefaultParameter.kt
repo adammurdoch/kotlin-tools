@@ -17,7 +17,7 @@ internal class DefaultParameter(private val name: String) : AbstractParser<Strin
         }
     }
 
-    private class State(val name: String) : ParseState<String> {
+    private class State(val name: String) : ParseState.Positional<String> {
         override fun maybeParse(args: InputArgs): ParseState.PartialResult<String> {
             return if (args.firstIsOption()) {
                 ParseState.NotRecognized

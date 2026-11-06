@@ -45,7 +45,10 @@ two""", parser.usage
         }
         parser.fails("unknown") {
 //            failure(0, "Unknown argument 'unknown'. Expected 'one' or 'two'")
+            failure(0, "Unexpected argument 'unknown'")
             failure(1, "Expected 'one'")
+            failure(1, "Parameter <a> not provided")
+            failure(1, "Expected 'two'")
         }
     }
 

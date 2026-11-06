@@ -55,6 +55,8 @@ internal interface ParseState<out T> {
      */
     fun finish(index: Int): Result<T>
 
+    sealed interface Positional<out T> : ParseState<T>
+
     sealed interface PartialResult<out T>
 
     /**

@@ -52,8 +52,11 @@ internal class AllOfParser<OUT>(
     }
 
     private class State<OUT>(val elements: List<Element<*>>, val map: (List<ParseState.Success<*>>) -> OUT) : ParseState<OUT> {
+        private val nonPositional = elements.filter { it.state !is ParseState.Positional }
+        private val positional = elements.filter { it.state is ParseState.Positional }
+
         override fun maybeParse(args: InputArgs): ParseState.PartialResult<OUT> {
-            for (element in elements) {
+            for (element in nonPositional) {
                 if (element.result != null) {
                     continue
                 }
@@ -62,6 +65,15 @@ internal class AllOfParser<OUT>(
                     return result
                 }
             }
+
+            for (element in positional) {
+                if (element.result != null) {
+                    continue
+                }
+                val result = element.maybeParse(args)
+                return result
+            }
+
             return ParseState.NotRecognized
         }
 

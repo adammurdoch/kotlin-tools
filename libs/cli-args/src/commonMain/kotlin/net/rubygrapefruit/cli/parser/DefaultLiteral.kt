@@ -17,7 +17,7 @@ internal class DefaultLiteral(private val text: String) : AbstractParser<Unit>()
         }
     }
 
-    private class State(val text: String) : ParseState<Unit> {
+    private class State(val text: String) : ParseState.Positional<Unit> {
         private var claimed = false
         private var matched = false
 

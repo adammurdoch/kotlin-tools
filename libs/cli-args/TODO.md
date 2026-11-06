@@ -109,6 +109,9 @@ CLI app
 - `oneOf()` currently does not fail on conflicting options or literals
   - See ChoiceOfStringOptionsTest
 - `oneOf()` reports problems for option (e.g. repeated option, missing value)
+- Literal currently fails inconsistently when unexpected argument or option is found
+  - For unexpected argument, a single "unexpected argument x, expected y" problem is reported
+  - For unexpected option, both "expected x" and "unexpected option -x" are reported
 - Combine all remaining unexpected arguments into a single failure
   - e.g. instead of "unexpected arg 'a'" + "unexpected arg 'b'" instead produce "unexpected args 'a b'"
 - Show usage on parse error

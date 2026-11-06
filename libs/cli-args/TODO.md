@@ -81,17 +81,25 @@
 Combinator API
 --------------
 
+- *Command-line arguments* - the values provided on the command-line
+- *Parameter* - any value provided to the app from some external source (currently only from command-line arguments)
+- *Option* - a parameter that may be provided anywhere in the command-line arguments. 
+  - A fixed string that starts with `-`, possibly also followed by zero or more values
+- *Positional* - a parameter that may must appear at a certain position in the command-line arguments
+- *Parser* - takes command-line arguments and produces some value of type T
+- *Literal* - a literal string that must appear at a certain position in the command-line arguments
+
 Combinators
 -----------
 
 `option(name): Option<String?>`
 `option(name).boolean(): Option<Boolean>`
-`parameter(name): Parameter<String>`
+`positional(name): Positional<String>`
 `literal(text): Parser<Unit>`
-`allOf(producer): Parser<T>`
-`allOf(a, map): Parser<T>`
-`allOf(a, b, map): Parser<T>`
-`allOf(a, b, c, map): Parser<T>`
+`params(producer): Parser<T>`
+`params(a, map): Parser<T>`
+`params(a, b, map): Parser<T>`
+`params(a, b, c, map): Parser<T>`
 `oneOf(choices...): Parser<T>`
 
 CLI app

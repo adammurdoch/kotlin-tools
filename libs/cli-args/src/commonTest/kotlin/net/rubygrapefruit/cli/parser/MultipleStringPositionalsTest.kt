@@ -4,24 +4,24 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
 
-class MultipleStringParametersTest : AbstractParseTest() {
+class MultipleStringPositionalsTest : AbstractParseTest() {
     @Test
     fun `parses two parameters in order`() {
-        val parser = allOf(parameter("a"), parameter("b")) { a, b -> listOf(a, b) }
+        val parser = params(positional("a"), positional("b")) { a, b -> listOf(a, b) }
 
         assertEquals(listOf("one", "two"), parser.parse("one", "two").get())
     }
 
     @Test
     fun `parses three parameters in order`() {
-        val parser = allOf(parameter("a"), parameter("b"), parameter("c")) { a, b, c -> listOf(a, b, c) }
+        val parser = allOf(positional("a"), positional("b"), positional("c")) { a, b, c -> listOf(a, b, c) }
 
         assertEquals(listOf("one", "two", "three"), parser.parse("one", "two", "three").get())
     }
 
     @Test
     fun `parameters must be provided`() {
-        val parser = allOf(parameter("a"), parameter("b")) { _, _ -> fail() }
+        val parser = params(positional("a"), positional("b")) { _, _ -> fail() }
 
         parser.fails {
             failure(0, "Parameter <a> not provided")
@@ -44,7 +44,7 @@ class MultipleStringParametersTest : AbstractParseTest() {
 
     @Test
     fun `cannot include other input values`() {
-        val parser = allOf(parameter("a"), parameter("b")) { _, _ -> fail() }
+        val parser = params(positional("a"), positional("b")) { _, _ -> fail() }
 
         parser.fails("one", "two", "other") {
             failure(2, "Unexpected argument 'other'")

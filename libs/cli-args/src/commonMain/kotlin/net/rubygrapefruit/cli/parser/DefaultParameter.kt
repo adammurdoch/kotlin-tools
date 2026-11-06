@@ -2,7 +2,7 @@ package net.rubygrapefruit.cli.parser
 
 import net.rubygrapefruit.cli.terminal.Output
 
-internal class DefaultParameter(private val name: String) : AbstractParser<String>(), Parameter<String> {
+internal class DefaultParameter(private val name: String) : AbstractParser<String>(), Positional<String> {
     override fun start(): ParseState<String> {
         return State(name)
     }

@@ -3,10 +3,10 @@ package net.rubygrapefruit.cli.parser
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class StringParameterTest : AbstractParseTest() {
+class StringPositionalTest : AbstractParseTest() {
     @Test
     fun `parses string`() {
-        val parser = parameter("param")
+        val parser = positional("param")
 
         assertEquals("value", parser.parse("value").get())
         assertEquals("", parser.parse("").get())
@@ -14,14 +14,14 @@ class StringParameterTest : AbstractParseTest() {
 
     @Test
     fun `reports usage`() {
-        val parser = parameter("param")
+        val parser = positional("param")
 
         assertEquals("<param>", parser.usage)
     }
 
     @Test
     fun `parameter must be provided`() {
-        val parser = parameter("param")
+        val parser = positional("param")
 
         parser.fails {
             failure(0, "Parameter <param> not provided")
@@ -34,7 +34,7 @@ class StringParameterTest : AbstractParseTest() {
 
     @Test
     fun `cannot include other input values`() {
-        val parser = parameter("param")
+        val parser = positional("param")
 
         parser.fails("value", "other") {
             failure(1, "Unexpected argument 'other'")

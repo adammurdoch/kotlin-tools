@@ -7,7 +7,7 @@ import kotlin.test.fail
 class MultipleStringOptionsTest : AbstractParseTest() {
     @Test
     fun `parses two options with short name in any order`() {
-        val parser = allOf(option("a"), option("b")) { a, b -> listOf(a, b) }
+        val parser = params(option("a"), option("b")) { a, b -> listOf(a, b) }
 
         assertEquals(listOf("one", "two"), parser.parse("-a", "one", "-b", "two").get())
         assertEquals(listOf("one", "two"), parser.parse("-b", "two", "-a", "one").get())
@@ -27,7 +27,7 @@ class MultipleStringOptionsTest : AbstractParseTest() {
 
     @Test
     fun `parses two options with long name in any order`() {
-        val parser = allOf(option("option-a"), option("option-b")) { a, b -> listOf(a, b) }
+        val parser = params(option("option-a"), option("option-b")) { a, b -> listOf(a, b) }
 
         assertEquals(listOf("one", "two"), parser.parse("--option-a", "one", "--option-b", "two").get())
         assertEquals(listOf("one", "two"), parser.parse("--option-b", "two", "--option-a", "one").get())
@@ -61,7 +61,7 @@ class MultipleStringOptionsTest : AbstractParseTest() {
 
     @Test
     fun `reports usage for two options with short name`() {
-        val parser = allOf(option("a"), option("b")) { a, b -> listOf(a, b) }
+        val parser = params(option("a"), option("b")) { a, b -> listOf(a, b) }
 
         assertEquals("[-a <value>] [-b <value>]", parser.usage)
     }
@@ -75,7 +75,7 @@ class MultipleStringOptionsTest : AbstractParseTest() {
 
     @Test
     fun `cannot include other input values`() {
-        val parser = allOf(option("a"), option("b")) { _, _ -> fail() }
+        val parser = params(option("a"), option("b")) { _, _ -> fail() }
 
         parser.fails("-unknown") {
             failure(0, "Unexpected option '-unknown'")
@@ -94,7 +94,7 @@ class MultipleStringOptionsTest : AbstractParseTest() {
 
     @Test
     fun `each option must have a value`() {
-        val parser = allOf(option("a"), option("b")) { _, _ -> fail() }
+        val parser = params(option("a"), option("b")) { _, _ -> fail() }
 
         parser.fails("-a", "-b") {
             failure(1, "No value provided for option -a")

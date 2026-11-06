@@ -1,11 +1,11 @@
 package net.rubygrapefruit.cli.parser
 
 /**
- * Creates a parameter with the given name.
+ * Creates a positional parameter with the given name.
  *
  * The returned parser will match a single argument that isn't an option.
  */
-fun parameter(name: String): Parameter<String> {
+fun positional(name: String): Positional<String> {
     return DefaultParameter(name)
 }
 

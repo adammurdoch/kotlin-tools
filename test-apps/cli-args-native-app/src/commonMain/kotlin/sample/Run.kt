@@ -23,8 +23,8 @@ class Help(val verbose: Boolean) : Runnable {
 }
 
 fun parser(): Parser<Runnable> {
-    val help = allOf(literal("help"), option("verbose").boolean()) { _, verbose -> Help(verbose) }
-    val run = allOf(literal("run"), option("verbose").boolean(), parameter("greeting")) { _, verbose, greeting -> Run(verbose, greeting) }
+    val help = params(literal("help"), option("verbose").boolean()) { _, verbose -> Help(verbose) }
+    val run = allOf(literal("run"), option("verbose").boolean(), positional("greeting")) { _, verbose, greeting -> Run(verbose, greeting) }
     return oneOf(help, run)
 }
 

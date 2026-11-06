@@ -7,14 +7,14 @@ import kotlin.test.fail
 class NoParametersTest : AbstractParseTest() {
     @Test
     fun `parses no parameters`() {
-        val parser = allOf { "result" }
+        val parser = params { "result" }
 
         assertEquals("result", parser.parse().get())
     }
 
     @Test
     fun `cannot include any input values`() {
-        val parser = allOf { fail() }
+        val parser = params { fail() }
 
         parser.fails("--unknown") {
             failure(0, "Unexpected option '--unknown'")

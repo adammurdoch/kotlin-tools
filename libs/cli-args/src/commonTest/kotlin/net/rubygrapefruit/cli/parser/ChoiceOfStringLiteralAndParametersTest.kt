@@ -7,8 +7,8 @@ class ChoiceOfStringLiteralAndParametersTest : AbstractParseTest() {
     @Test
     fun `parses one of literal and parameter`() {
         val parser = oneOf(
-            allOf(literal("one"), parameter("a")) { _, a -> "1:$a" },
-            allOf(literal("two")) { "2" },
+            params(literal("one"), positional("a")) { _, a -> "1:$a" },
+            params(literal("two")) { "2" },
         )
 
         assertEquals("1:value", parser.parse("one", "value").get())
@@ -18,8 +18,8 @@ class ChoiceOfStringLiteralAndParametersTest : AbstractParseTest() {
     @Test
     fun `reports usage`() {
         val parser = oneOf(
-            allOf(literal("one"), parameter("a")) { _, a -> "1:$a" },
-            allOf(literal("two")) { "2" },
+            params(literal("one"), positional("a")) { _, a -> "1:$a" },
+            params(literal("two")) { "2" },
         )
 
         assertEquals(
@@ -31,8 +31,8 @@ two""", parser.usage
     @Test
     fun `literal must be provided`() {
         val parser = oneOf(
-            allOf(literal("one"), parameter("a")) { _, a -> "1:$a" },
-            allOf(literal("two")) { "2" },
+            params(literal("one"), positional("a")) { _, a -> "1:$a" },
+            params(literal("two")) { "2" },
         )
 
         // Capturing current behavior
@@ -55,8 +55,8 @@ two""", parser.usage
     @Test
     fun `parameter must be provided`() {
         val parser = oneOf(
-            allOf(literal("one"), parameter("a")) { _, a -> "1:$a" },
-            allOf(literal("two")) { "2" },
+            params(literal("one"), positional("a")) { _, a -> "1:$a" },
+            params(literal("two")) { "2" },
         )
 
         parser.fails("one") {

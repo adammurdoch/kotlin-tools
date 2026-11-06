@@ -6,7 +6,7 @@ import kotlin.test.assertEquals
 class MultipleBooleanOptionsTest : AbstractParseTest() {
     @Test
     fun `parses two options with short name in any order`() {
-        val parser = allOf(
+        val parser = params(
             option("a").boolean(),
             option("b").boolean()
         ) { a, b -> listOf(a, b) }
@@ -22,7 +22,7 @@ class MultipleBooleanOptionsTest : AbstractParseTest() {
 
     @Test
     fun `parses two options with long name in any order`() {
-        val parser = allOf(
+        val parser = params(
             option("option-a").boolean(),
             option("option-b").boolean()
         ) { a, b -> listOf(a, b) }

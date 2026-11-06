@@ -7,7 +7,7 @@ import kotlin.test.fail
 class StringLiteralAndBooleanOptionTest : AbstractParseTest() {
     @Test
     fun `parses literal and option in any order`() {
-        val parser = allOf(
+        val parser = params(
             literal("run"),
             option("a").boolean()
         ) { _, a -> a }
@@ -20,7 +20,7 @@ class StringLiteralAndBooleanOptionTest : AbstractParseTest() {
 
     @Test
     fun `must provide literal`() {
-        val parser = allOf(
+        val parser = params(
             literal("run"),
             option("a").boolean()
         ) { _, _ -> fail() }
@@ -45,7 +45,7 @@ class StringLiteralAndBooleanOptionTest : AbstractParseTest() {
 
     @Test
     fun `option must not have a value`() {
-        val parser = allOf(
+        val parser = params(
             literal("run"),
             option("a").boolean()
         ) { _, _ -> fail() }

@@ -1,18 +1,18 @@
 package net.rubygrapefruit.cli.parser
 
 /**
- * Returns a parser that does not match any inputs.
+ * Returns a parser that does not take any parameters.
  *
  * The parser produces the result of the given function.
  */
-fun <OUT> allOf(producer: () -> OUT): Parser<OUT> {
+fun <OUT> params(producer: () -> OUT): Parser<OUT> {
     return AllOfParser(emptyList()) { producer() }
 }
 
 /**
  * Applies the given parser and maps it result to produce a value of type [OUT].
  */
-fun <A, OUT> allOf(a: Parser<A>, map: (A) -> OUT): Parser<OUT> {
+fun <A, OUT> params(a: Parser<A>, map: (A) -> OUT): Parser<OUT> {
     @Suppress("UNCHECKED_CAST")
     return AllOfParser(listOf(a).cast()) { results ->
         map(results[0].result as A)
@@ -22,9 +22,9 @@ fun <A, OUT> allOf(a: Parser<A>, map: (A) -> OUT): Parser<OUT> {
 /**
  * Applies the given parsers and maps their results to produce a value of type [OUT].
  *
- * Parameters must appear in the order specified, and options can appear in any order.
+ * Positional parameters must appear in the order specified, and options can appear in any order.
  */
-fun <A, B, OUT> allOf(a: Parser<A>, b: Parser<B>, map: (A, B) -> OUT): Parser<OUT> {
+fun <A, B, OUT> params(a: Parser<A>, b: Parser<B>, map: (A, B) -> OUT): Parser<OUT> {
     @Suppress("UNCHECKED_CAST")
     return AllOfParser(listOf(a, b).cast()) { results ->
         map(results[0].result as A, results[1].result as B)
@@ -34,7 +34,7 @@ fun <A, B, OUT> allOf(a: Parser<A>, b: Parser<B>, map: (A, B) -> OUT): Parser<OU
 /**
  * Applies the given parsers and maps their results to produce a value of type [OUT].
  *
- * Parameters must appear in the order specified, and options can appear in any order.
+ * Positional parameters must appear in the order specified, and options can appear in any order.
  */
 fun <A, B, C, OUT> allOf(a: Parser<A>, b: Parser<B>, c: Parser<C>, map: (A, B, C) -> OUT): Parser<OUT> {
     @Suppress("UNCHECKED_CAST")

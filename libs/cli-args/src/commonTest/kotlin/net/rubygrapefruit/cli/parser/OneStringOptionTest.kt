@@ -7,7 +7,7 @@ import kotlin.test.fail
 class OneStringOptionTest : AbstractParseTest() {
     @Test
     fun `parses option with short name`() {
-        val parser = allOf(option("a")) { a -> a?.length }
+        val parser = params(option("a")) { a -> a?.length }
 
         assertEquals(3, parser.parse("-a", "one").get())
         assertEquals(null, parser.parse().get())
@@ -19,7 +19,7 @@ class OneStringOptionTest : AbstractParseTest() {
 
     @Test
     fun `cannot include other input values`() {
-        val parser = allOf(option("a")) { _ -> fail() }
+        val parser = params(option("a")) { _ -> fail() }
 
         parser.fails("-unknown") {
             failure(0, "Unexpected option '-unknown'")

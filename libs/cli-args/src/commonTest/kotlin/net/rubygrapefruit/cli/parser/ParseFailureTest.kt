@@ -12,7 +12,7 @@ import kotlin.test.fail
 class ParseFailureTest : AbstractParseTest() {
     @Test
     fun `reports problem and shows usage summary on parse failure`() {
-        val parser = allOf(option("a"), option("b")) { _, _ -> fail() }
+        val parser = params(option("a"), option("b")) { _, _ -> fail() }
 
         val result = parser.parse("-a", "--unknown")
         assertIs<Parser.Failure>(result)

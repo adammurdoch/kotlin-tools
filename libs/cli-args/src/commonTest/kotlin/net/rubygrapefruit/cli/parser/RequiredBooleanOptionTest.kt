@@ -9,13 +9,6 @@ class RequiredBooleanOptionTest : AbstractParseTest() {
         val parser = option("x").boolean().required()
 
         assertEquals(Unit, parser.parse("-x").get())
-
-        parser.fails("--x") {
-            failure(0, "Unexpected option '--x'. Try '-x' instead")
-        }
-        parser.fails("-X") {
-            failure(0, "Unexpected option '-X'. Try '-x' instead")
-        }
     }
 
     @Test
@@ -23,13 +16,6 @@ class RequiredBooleanOptionTest : AbstractParseTest() {
         val parser = option("some-flag").boolean().required()
 
         assertEquals(Unit, parser.parse("--some-flag").get())
-
-        parser.fails("-some-flag") {
-            failure(0, "Unexpected option '-some-flag'. Try '--some-flag' instead")
-        }
-        parser.fails("--Some-Flag") {
-            failure(0, "Unexpected option '--Some-Flag'. Try '--some-flag' instead")
-        }
     }
 
     @Test
@@ -44,6 +30,39 @@ class RequiredBooleanOptionTest : AbstractParseTest() {
         val parser = option("some-flag").boolean().required()
 
         assertEquals("--some-flag", parser.usage)
+    }
+
+    @Test
+    fun `option with short name must be well formed`() {
+        val parser = option("x").boolean().required()
+
+        parser.fails("--x") {
+            failure(0, "Unexpected option '--x'. Try '-x' instead")
+        }
+        parser.fails("-X") {
+            failure(0, "Unexpected option '-X'. Try '-x' instead")
+        }
+        parser.fails("-x", "--x") {
+            failure(1, "Unexpected option '--x'. Try '-x' instead")
+        }
+        parser.fails("--x", "-x") {
+            failure(0, "Unexpected option '--x'. Try '-x' instead")
+        }
+    }
+
+    @Test
+    fun `option with long name must be well formed`() {
+        val parser = option("some-flag").boolean().required()
+
+        parser.fails("-some-flag") {
+            failure(0, "Unexpected option '-some-flag'. Try '--some-flag' instead")
+        }
+        parser.fails("--Some-Flag") {
+            failure(0, "Unexpected option '--Some-Flag'. Try '--some-flag' instead")
+        }
+        parser.fails("--some-flag", "-some-flag") {
+            failure(1, "Unexpected option '-some-flag'. Try '--some-flag' instead")
+        }
     }
 
     @Test

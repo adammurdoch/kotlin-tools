@@ -12,23 +12,6 @@ class StringOptionTest : AbstractParseTest() {
         assertEquals("value", parser.parse("-x", "value").get())
         assertEquals("", parser.parse("-x", "").get())
         assertNull(parser.parse().get())
-
-        parser.fails("--x", "value") {
-            failure(0, "Unexpected option '--x'. Try '-x' instead")
-        }
-        parser.fails("-X", "value") {
-            failure(0, "Unexpected option '-X'. Try '-x' instead")
-        }
-        parser.fails("--X", "value") {
-            failure(0, "Unexpected option '--X'. Try '-x' instead")
-        }
-    }
-
-    @Test
-    fun `reports usage of option with short name`() {
-        val parser = option("x")
-
-        assertEquals("[-x <value>]", parser.usage)
     }
 
     @Test
@@ -38,16 +21,13 @@ class StringOptionTest : AbstractParseTest() {
         assertEquals("value", parser.parse("--an-option", "value").get())
         assertEquals("", parser.parse("--an-option", "").get())
         assertNull(parser.parse().get())
+    }
 
-        parser.fails("-an-option", "value") {
-            failure(0, "Unexpected option '-an-option'. Try '--an-option' instead")
-        }
-        parser.fails("--An-Option", "value") {
-            failure(0, "Unexpected option '--An-Option'. Try '--an-option' instead")
-        }
-        parser.fails("-An-Option", "value") {
-            failure(0, "Unexpected option '-An-Option'. Try '--an-option' instead")
-        }
+    @Test
+    fun `reports usage of option with short name`() {
+        val parser = option("x")
+
+        assertEquals("[-x <value>]", parser.usage)
     }
 
     @Test
@@ -91,6 +71,53 @@ class StringOptionTest : AbstractParseTest() {
     }
 
     @Test
+    fun `option with short name must be well formed`() {
+        val parser = option("x")
+
+        parser.fails("--x", "value") {
+            failure(0, "Unexpected option '--x'. Try '-x' instead")
+        }
+        parser.fails("-X", "value") {
+            failure(0, "Unexpected option '-X'. Try '-x' instead")
+        }
+        parser.fails("--X", "value") {
+            failure(0, "Unexpected option '--X'. Try '-x' instead")
+        }
+
+        parser.fails("--x") {
+            failure(0, "Unexpected option '--x'. Try '-x' instead")
+        }
+        parser.fails("-x", "value", "--x") {
+            failure(2, "Unexpected option '--x'. Try '-x' instead")
+        }
+        parser.fails("--x", "-x", "value") {
+            failure(0, "Unexpected option '--x'. Try '-x' instead")
+        }
+    }
+
+    @Test
+    fun `option with long name must be well formed`() {
+        val parser = option("an-option")
+
+        parser.fails("-an-option", "value") {
+            failure(0, "Unexpected option '-an-option'. Try '--an-option' instead")
+        }
+        parser.fails("--An-Option", "value") {
+            failure(0, "Unexpected option '--An-Option'. Try '--an-option' instead")
+        }
+        parser.fails("-An-Option", "value") {
+            failure(0, "Unexpected option '-An-Option'. Try '--an-option' instead")
+        }
+
+        parser.fails("-an-option") {
+            failure(0, "Unexpected option '-an-option'. Try '--an-option' instead")
+        }
+        parser.fails("--an-option", "value", "-an-option") {
+            failure(2, "Unexpected option '-an-option'. Try '--an-option' instead")
+        }
+    }
+
+    @Test
     fun `option must have value`() {
         val parser = option("x")
 
@@ -120,6 +147,10 @@ class StringOptionTest : AbstractParseTest() {
             failure(2, "Option -x can only appear once")
         }
         parser.fails("-x", "-x", "value") {
+            failure(1, "No value provided for option -x")
+            failure(1, "Option -x can only appear once")
+        }
+        parser.fails("-x", "-x") {
             failure(1, "No value provided for option -x")
             failure(1, "Option -x can only appear once")
         }

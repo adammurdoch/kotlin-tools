@@ -9,14 +9,6 @@ class StringLiteralTest : AbstractParseTest() {
         val parser = command("help")
 
         assertEquals(Unit, parser.parse("help").get())
-
-        parser.fails("HELP") {
-            failure(0, "Unexpected argument 'HELP'. Expected 'help' instead")
-        }
-        parser.fails("--help") {
-            failure(0, "Unexpected option '--help'")
-            failure(1, "Expected 'help'")
-        }
     }
 
     @Test
@@ -24,6 +16,21 @@ class StringLiteralTest : AbstractParseTest() {
         val parser = command("help")
 
         assertEquals("help", parser.usage)
+    }
+
+    @Test
+    fun `cannot include other input values`() {
+        val parser = command("help")
+
+       parser.fails("HELP") {
+            failure(0, "Unexpected argument 'HELP'. Expected 'help' instead")
+        }
+        parser.fails("help", "HELP") {
+            failure(1, "Unexpected argument 'HELP'")
+        }
+        parser.fails("HELP", "help") {
+            failure(0, "Unexpected argument 'HELP'")
+        }
     }
 
     @Test

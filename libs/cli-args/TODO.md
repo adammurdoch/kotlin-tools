@@ -106,7 +106,9 @@ Combinators
 - `params(a, map): Parser<T>`
 - `params(a, b, map): Parser<T>`
 - `params(a, b, c, map): Parser<T>`
-    - matches the parsers and maps the result. Options can appear in any order, positionals in fixed order
+- `params(a, b, c, d, map): Parser<T>`
+- `params(a, b, c, d, e, map): Parser<T>`
+    - matches the parsers and maps the result. Options can appear in any order, positionals must appear in the order specified
 - `oneOf(choices...): Parser<T>`
     - matches the parses and returns the first matching
 

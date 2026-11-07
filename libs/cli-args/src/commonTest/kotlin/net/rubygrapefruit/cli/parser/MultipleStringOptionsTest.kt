@@ -60,6 +60,48 @@ class MultipleStringOptionsTest : AbstractParseTest() {
     }
 
     @Test
+    fun `parses four options in any order`() {
+        val parser = params(
+            option("a"),
+            option("b"),
+            option("long"),
+            option("last")
+        ) { a, b, c, d -> listOf(a, b, c, d) }
+
+        assertEquals(listOf("1", "2", "3", "4"), parser.parse("-a", "1", "-b", "2", "--long", "3", "--last", "4").get())
+        assertEquals(listOf("1", "2", "3", "4"), parser.parse("--long", "3", "--last", "4", "-a", "1", "-b", "2").get())
+
+        assertEquals(listOf("1", null, null, null), parser.parse("-a", "1").get())
+        assertEquals(listOf(null, "2", null, null), parser.parse("-b", "2").get())
+        assertEquals(listOf(null, null, "3", null), parser.parse("--long", "3").get())
+        assertEquals(listOf(null, null, null, "4"), parser.parse("--last", "4").get())
+
+        assertEquals(listOf(null, null, null, null), parser.parse().get())
+    }
+
+    @Test
+    fun `parses five options in any order`() {
+        val parser = params(
+            option("a"),
+            option("b"),
+            option("long"),
+            option("d"),
+            option("last")
+        ) { a, b, c, d, e -> listOf(a, b, c, d, e) }
+
+        assertEquals(listOf("1", "2", "3", "4", "5"), parser.parse("-a", "1", "-b", "2", "--long", "3", "-d", "4", "--last", "5").get())
+        assertEquals(listOf("1", "2", "3", "4", "5"), parser.parse("--long", "3", "--last", "5", "-a", "1", "-d", "4", "-b", "2").get())
+
+        assertEquals(listOf("1", null, null, null, null), parser.parse("-a", "1").get())
+        assertEquals(listOf(null, "2", null, null, null), parser.parse("-b", "2").get())
+        assertEquals(listOf(null, null, "3", null, null), parser.parse("--long", "3").get())
+        assertEquals(listOf(null, null, null, "4", null), parser.parse("-d", "4").get())
+        assertEquals(listOf(null, null, null, null, "5"), parser.parse("--last", "5").get())
+
+        assertEquals(listOf(null, null, null, null, null), parser.parse().get())
+    }
+
+    @Test
     fun `reports usage for two options with short name`() {
         val parser = params(option("a"), option("b")) { a, b -> listOf(a, b) }
 

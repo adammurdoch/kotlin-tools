@@ -25,10 +25,27 @@ internal interface ParserInternal<out T> {
                 problem.problem.writeTo(output)
                 output.maybeNewLine()
             }
+
+            val usage = parser.usage()
             output.writeLine()
-            output.write("USAGE: ")
-            parser.usage().writeTo(output)
-            output.writeLine()
+            when (usage) {
+                is UsageInternal.OneOf -> {
+                    output.heading("USAGE:")
+                    output.writeLine()
+                    for (choice in usage.choices()) {
+                        output.write("  ")
+                        choice.writeTo(output)
+                        output.writeLine()
+                    }
+                }
+
+                else -> {
+                    output.heading("USAGE:")
+                    output.write(" ")
+                    usage.writeTo(output)
+                    output.writeLine()
+                }
+            }
         }
     }
 }

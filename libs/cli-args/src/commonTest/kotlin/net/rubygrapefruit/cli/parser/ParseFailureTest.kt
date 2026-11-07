@@ -29,4 +29,25 @@ USAGE: [-a <value>] [-b <value>]
 """, output.text
         )
     }
+
+    @Test
+    fun `reports problem and shows usage summary for choice`() {
+        val parser = oneOf(option("help").boolean().required(), command("run"))
+
+        val result = parser.parse("--help", "--unknown")
+        assertIs<Parser.Failure>(result)
+
+        assertEquals(1, result.problems.size)
+
+        val output = BufferingOutput()
+        result.writeTo(output)
+        assertEquals(
+            """Unexpected option '--unknown'
+
+USAGE:
+  --help
+  run
+""", output.text
+        )
+    }
 }

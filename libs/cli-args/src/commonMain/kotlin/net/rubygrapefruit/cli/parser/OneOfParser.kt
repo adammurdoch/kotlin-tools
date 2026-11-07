@@ -12,7 +12,11 @@ internal class OneOfParser<OUT>(private val choices: List<ParserInternal<OUT>>) 
         return ParserUsage()
     }
 
-    private inner class ParserUsage : UsageInternal {
+    private inner class ParserUsage : UsageInternal.OneOf {
+        override fun choices(): List<Usage> {
+            return choices.map { it.usage() }
+        }
+
         override fun writeTo(output: Output) {
             choices.forEachIndexed { index, choice ->
                 if (index > 0) {

@@ -12,4 +12,8 @@ sealed interface Usage {
     fun writeTo(output: Output)
 }
 
-internal sealed interface UsageInternal : Usage
+internal sealed interface UsageInternal : Usage {
+    sealed interface OneOf : UsageInternal {
+        fun choices(): List<Usage>
+    }
+}

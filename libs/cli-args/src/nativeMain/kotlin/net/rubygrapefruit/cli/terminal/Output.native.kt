@@ -16,18 +16,36 @@ private object PlainOutput : AbstractPlainOutput() {
 @OptIn(ExperimentalForeignApi::class)
 private object TerminalOutput : AbstractOutput() {
     override fun put(text: CharSequence, appearance: Appearance) {
-        if (appearance == Appearance.UserInput) {
-            if (text.isEmpty()) {
-                fputs("''", stderr)
-            } else {
-                // Bold green foreground
-                fputs("\u001B[1;32m", stderr)
-                fputs(text.toString(), stderr)
-                fputs("\u001B[0m", stderr)
+        when (appearance) {
+            Appearance.UserInput -> {
+                if (text.isEmpty()) {
+                    fputs("''", stderr)
+                } else {
+                    // Bold green foreground
+                    withAttributes("\u001B[1;32m", text)
+                }
             }
-        } else {
-            fputs(text.toString(), stderr)
+
+            Appearance.Heading -> {
+                // Bold foreground
+                withAttributes("\u001B[1m", text)
+            }
+
+            else -> {
+                if (text.isNotEmpty()) {
+                    fputs(text.toString(), stderr)
+                }
+            }
         }
+    }
+
+    private fun withAttributes(escape: String, text: CharSequence) {
+        if (text.isEmpty()) {
+            return
+        }
+        fputs(escape, stderr)
+        fputs(text.toString(), stderr)
+        fputs("\u001B[0m", stderr)
     }
 }
 

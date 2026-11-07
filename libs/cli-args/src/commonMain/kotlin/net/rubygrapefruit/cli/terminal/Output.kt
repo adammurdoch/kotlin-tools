@@ -17,6 +17,11 @@ sealed interface Output {
     fun userInput(text: String)
 
     /**
+     * Writes some text that is part of the heading for some grouped output.
+     */
+    fun heading(text: String)
+
+    /**
      * Writes the given text to the output, followed by line separator.
      */
     fun writeLine(text: String)

@@ -4,17 +4,19 @@ abstract class AbstractOutput : Output {
     private var emptyLine = true
 
     override fun write(text: String) {
-        put(text, Appearance.None)
-        emptyLine = text.endsWith("\n")
+        write(text, Appearance.Normal)
     }
 
     override fun userInput(text: String) {
-        put(text, Appearance.UserInput)
-        emptyLine = text.endsWith("\n")
+        write(text, Appearance.UserInput)
+    }
+
+    override fun heading(text: String) {
+        write(text, Appearance.Heading)
     }
 
     override fun writeLine(text: String) {
-        put(text, Appearance.None)
+        put(text, Appearance.Normal)
         writeLine()
     }
 
@@ -29,13 +31,18 @@ abstract class AbstractOutput : Output {
         }
     }
 
+    private fun write(text: String, appearance: Appearance) {
+        put(text, appearance)
+        emptyLine = text.endsWith("\n")
+    }
+
     protected abstract fun put(text: CharSequence, appearance: Appearance)
 
     protected open fun putEndLine() {
-        put("\n", Appearance.None)
+        put("\n", Appearance.Normal)
     }
 
     protected enum class Appearance {
-        None, UserInput
+        Normal, UserInput, Heading
     }
 }

@@ -117,6 +117,9 @@ CLI app
     - Color output
     - Usage summary
 
+TODO 
+----
+
 - `allOf()` currently skips over a positional that does not match to the next positional
     - See ChoiceOfStringLiteralAndParametersTest, e.g. <literal> <parameter>
 - `oneOf()` currently reports each expected literal as a separate problem
@@ -141,6 +144,7 @@ CLI app
     - Use a separate command list when there are many commands
     - Allow value name to be provided for `option()`
     - Highlight problematic part of usage?
+    - Sort choices by command name
 - Multiple names for `option()`
 - `allOf()` with nested `allOf()`
 - Parser that collects unrecognized or remainder

@@ -117,7 +117,7 @@ CLI app
     - Color output
     - Usage summary
 
-TODO 
+TODO
 ----
 
 - `allOf()` currently skips over a positional that does not match to the next positional
@@ -133,12 +133,14 @@ TODO
     - For unexpected option, both "expected x" and "unexpected option -x" are reported
 - Combine all remaining unexpected arguments into a single failure
     - e.g. instead of "unexpected arg 'a'" + "unexpected arg 'b'" instead produce "unexpected args 'a b'"
+- Multiple names for option
+    - Test with boolean options
+    - Repeated option handling, badly formed flag handling
 - Show usage on parse error
-    - Bold text
     - Include app name
     - Include app summary
     - Include 'run with --help', etc
-    - Indent choices
+    - Include description of each choice, if specified
     - Show usage of recognized choice(s) only
     - Use a separate option list when there are many options
     - Use a separate command list when there are many commands
@@ -158,6 +160,7 @@ TODO
 - Convenience for `--version`
 - Convenience for `--stack`
 - Convenience for completion command or option
+- Convenience for @arg file.
 - `-Dx=y` style
 - Compose value parsers (e.g. value is ip address or host name)
 - Deprecated, hidden options + commands

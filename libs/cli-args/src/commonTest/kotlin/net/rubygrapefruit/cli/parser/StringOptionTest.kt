@@ -139,11 +139,29 @@ class StringOptionTest : AbstractParseTest() {
     }
 
     @Test
+    fun `option with multiple names must be well formed`() {
+        val parser = option("long", "x", "an-option")
+
+        parser.fails("--x", "value") {
+            failure(0, "Unexpected option '--x'. Try '-x' instead")
+        }
+        parser.fails("-LONG", "value") {
+            failure(0, "Unexpected option '-LONG'. Try '--long' instead")
+        }
+        parser.fails("-an-option", "value") {
+            failure(0, "Unexpected option '-an-option'. Try '--an-option' instead")
+        }
+    }
+
+    @Test
     fun `option must have value`() {
-        val parser = option("x")
+        val parser = option("x", "long")
 
         parser.fails("-x") {
             failure(1, "No value provided for option -x")
+        }
+        parser.fails("--long") {
+            failure(1, "No value provided for option --long")
         }
 
         parser.fails("-x", "-unknown") {
@@ -174,6 +192,31 @@ class StringOptionTest : AbstractParseTest() {
         parser.fails("-x", "-x") {
             failure(1, "No value provided for option -x")
             failure(1, "Option -x can only appear once")
+        }
+    }
+
+    @Test
+    fun `option with multiple names cannot appear twice`() {
+        val parser = option("long", "x", "an-option")
+
+        parser.fails("-x", "value", "-x", "value") {
+            failure(2, "Option -x can only appear once")
+        }
+        parser.fails("-x", "value", "--long", "value") {
+            failure(2, "Option --long cannot be used with -x")
+        }
+        parser.fails("--an-option", "value", "--long", "value") {
+            failure(2, "Option --long cannot be used with --an-option")
+        }
+        parser.fails("-x", "value", "-x") {
+            failure(2, "Option -x can only appear once")
+        }
+        parser.fails("--long", "value", "-x") {
+            failure(2, "Option -x cannot be used with --long")
+        }
+        parser.fails("--an-option", "value", "-x", "--long") {
+            failure(2, "Option -x cannot be used with --an-option")
+            failure(3, "Option --long cannot be used with --an-option")
         }
     }
 }

@@ -2,8 +2,8 @@ package net.rubygrapefruit.cli.parser
 
 import net.rubygrapefruit.cli.terminal.Output
 
-internal class DefaultStringOption(private val names: List<String>) : AbstractParser<String?>(), StringOption {
-    private val flags = names.map { name -> if (name.length == 1) "-$name" else "--$name" }.sortedWith { a, b ->
+internal class DefaultStringOption(unsortedNames: List<String>) : AbstractParser<String?>(), StringOption {
+    private val names = unsortedNames.sortedWith { a, b ->
         val diff = a.length.compareTo(b.length)
         if (diff != 0) {
             diff
@@ -11,9 +11,10 @@ internal class DefaultStringOption(private val names: List<String>) : AbstractPa
             a.compareTo(b)
         }
     }
+    private val flags = names.map { name -> if (name.length == 1) "-$name" else "--$name" }
 
     override fun boolean(): BooleanOption {
-        return DefaultBooleanOption(flags.first(), names.first())
+        return DefaultBooleanOption(flags, names)
     }
 
     override fun start(): ParseState<String?> {
@@ -39,18 +40,17 @@ internal class DefaultStringOption(private val names: List<String>) : AbstractPa
 
     private class State(private val flags: List<String>, private val names: List<String>) : ParseState<String?> {
         val flag = flags.first()
-        val name = names.first()
 
-        private var seen = false
+        private var seen: String? = null
 
         override fun maybeParse(args: InputArgs): ParseState.PartialResult<String?> {
             val first = args.first()
-            if (seen || !flags.contains(first)) {
+            if (seen != null || !flags.contains(first)) {
                 return ParseState.NotRecognized
             }
-            seen = true
+            seen = first
             return if (!args.hasSecond() || args.secondIsOption()) {
-                ParseState.Failure(1, ProblemAtIndex(args.index + 1, MissingOptionValue(flag)))
+                ParseState.Failure(1, ProblemAtIndex(args.index + 1, MissingOptionValue(first)))
             } else {
                 val value = args.second()
                 ParseState.Finished(2, ParseState.FixedResult(value))
@@ -59,15 +59,23 @@ internal class DefaultStringOption(private val names: List<String>) : AbstractPa
 
         override fun claimUnrecognized(args: InputArgs): ParseState.Failure? {
             val first = args.first()
-            return if (first == flag) {
+            if (flags.contains(first)) {
                 val count = if (args.hasSecond() && !args.secondIsOption() && !args.secondIsRecognized()) 2 else 1
-                ParseState.Failure(count, ProblemAtIndex(args.index, RepeatedOption(flag)))
-            } else if (first.equals("-$name", true) || first.equals("--$name", true)) {
-                val count = if (args.hasSecond() && !args.secondIsOption() && !args.secondIsRecognized()) 2 else 1
-                ParseState.Failure(count, ProblemAtIndex(args.index, UnexpectedOption(first, flag)))
-            } else {
-                null
+                val problem = if (first == seen) {
+                    RepeatedOption(first)
+                } else {
+                    RepeatedOption(first, seen!!)
+                }
+                return ParseState.Failure(count, ProblemAtIndex(args.index, problem))
+            } else if (args.firstIsOption()) {
+                names.forEachIndexed { index, name ->
+                    if (first.equals("-$name", true) || first.equals("--$name", true)) {
+                        val count = if (args.hasSecond() && !args.secondIsOption() && !args.secondIsRecognized()) 2 else 1
+                        return ParseState.Failure(count, ProblemAtIndex(args.index, UnexpectedOption(first, flags[index])))
+                    }
+                }
             }
+            return null
         }
 
         override fun finish(index: Int): ParseState.Result<String?> {

@@ -32,9 +32,13 @@ internal class UnexpectedArgument(val argument: String, val expected: String? = 
     }
 }
 
-internal class RepeatedOption(val option: String) : Problem {
+internal class RepeatedOption(val option: String, val previousOption: String? = null) : Problem {
     override fun writeTo(output: Output) {
-        output.write("Option $option can only appear once")
+        if (previousOption == null) {
+            output.write("Option $option can only appear once")
+        } else {
+            output.write("Option $option cannot be used with $previousOption")
+        }
     }
 }
 

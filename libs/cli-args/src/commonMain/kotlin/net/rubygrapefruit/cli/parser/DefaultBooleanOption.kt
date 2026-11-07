@@ -2,13 +2,13 @@ package net.rubygrapefruit.cli.parser
 
 import net.rubygrapefruit.cli.terminal.Output
 
-internal class DefaultBooleanOption(private val flag: String, private val name: String) : AbstractParser<Boolean>(), BooleanOption {
+internal class DefaultBooleanOption(private val flags: List<String>, private val names: List<String>) : AbstractParser<Boolean>(), BooleanOption {
     override fun required(): Parser<Unit> {
-        return RequiredBooleanOption(flag, name)
+        return RequiredBooleanOption(flags.first(), names.first())
     }
 
     override fun start(): ParseState<Boolean> {
-        return State(flag, name)
+        return State(flags, names)
     }
 
     override fun usage(): UsageInternal {
@@ -17,14 +17,24 @@ internal class DefaultBooleanOption(private val flag: String, private val name: 
 
     private inner class OptionUsage : UsageInternal {
         override fun writeTo(output: Output) {
-            output.write("[$flag]")
+            output.write("[")
+            flags.forEachIndexed { index, flag ->
+                if (index > 0) {
+                    output.write(" | ")
+                }
+                output.write(flag)
+            }
+            output.write("]")
         }
     }
 
-    private class State(val flag: String, val name: String) : ParseState<Boolean> {
+    private class State(val flags: List<String>, val names: List<String>) : ParseState<Boolean> {
+        val flag = flags.first()
+        val name = names.first()
+
         override fun maybeParse(args: InputArgs): ParseState.PartialResult<Boolean> {
             val first = args.first()
-            return if (first != flag) {
+            return if (!flags.contains(first)) {
                 ParseState.NotRecognized
             } else {
                 ParseState.Finished(1, ParseState.FixedResult(true))

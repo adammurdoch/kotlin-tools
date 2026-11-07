@@ -60,6 +60,8 @@ internal interface ParseState<out T> {
 
     /**
      * Attempts to produce a [Failure] for the first unrecognized argument.
+     *
+     * Called after all arguments have been parsed, but before [finish] is called.
      */
     fun claimUnrecognized(args: InputArgs): Failure? {
         return null
@@ -95,9 +97,11 @@ internal interface ParseState<out T> {
     class Matched(val count: Int) : PartialResult<Nothing>
 
     /**
-     * The parser has recognized one or more arguments without any problems and produced a result.
+     * The parser has recognized one or more arguments and produced a result (possibly a failure).
      */
-    class Finished<T>(val count: Int, val result: Result<T>) : PartialResult<T>
+    class Finished<T>(val count: Int, val result: Result<T>) : PartialResult<T> {
+        constructor(count: Int, problem: ProblemAtIndex) : this(count, FinalFailure(listOf(problem)))
+    }
 
     sealed interface Result<out T>
 

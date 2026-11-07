@@ -164,6 +164,7 @@ class StringOptionTest : AbstractParseTest() {
             failure(1, "No value provided for option --long")
         }
 
+        println("-> START")
         parser.fails("-x", "-unknown") {
             failure(1, "No value provided for option -x")
             failure(1, "Unexpected option '-unknown'")

@@ -46,6 +46,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
             }
         }
 
+        var unrecognizedProblems: List<ProblemAtIndex>? = null
         index = 0
         while (index < args.size) {
             if (recognized[index]) {
@@ -57,7 +58,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
             val failure = state.claimUnrecognized(current)
             if (failure != null) {
                 require(failure.count > 0)
-                problems = problems.plus(failure.problem)
+                unrecognizedProblems = unrecognizedProblems.plus(failure.problem)
                 index += failure.count
             } else {
                 val problem = if (current.firstIsOption()) {
@@ -65,7 +66,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
                 } else {
                     UnexpectedArgument(current.first())
                 }
-                problems = problems.plus(ProblemAtIndex(index, problem))
+                unrecognizedProblems = unrecognizedProblems.plus(ProblemAtIndex(index, problem))
                 index++
             }
         }
@@ -73,12 +74,13 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
         val finalResult = result ?: state.finish(args.size)
         return when (finalResult) {
             is ParseState.FinalFailure -> {
-                ParserInternal.Failure(problems.plus(finalResult.problems), this)
+                ParserInternal.Failure(problems.plus(finalResult.problems).plus(unrecognizedProblems), this)
             }
 
             is ParseState.Success -> {
-                if (problems != null) {
-                    ParserInternal.Failure(problems, this)
+                val finalProblems = problems.plus(unrecognizedProblems)
+                if (finalProblems.isNotEmpty()) {
+                    ParserInternal.Failure(finalProblems, this)
                 } else {
                     ParserInternal.Success(finalResult.result)
                 }

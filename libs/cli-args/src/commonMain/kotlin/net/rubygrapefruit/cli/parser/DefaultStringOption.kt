@@ -39,18 +39,16 @@ internal class DefaultStringOption(unsortedNames: List<String>) : AbstractParser
     }
 
     private class State(private val flags: List<String>, private val names: List<String>) : ParseState<String?> {
-        val flag = flags.first()
-
         private var seen: String? = null
 
         override fun maybeParse(args: InputArgs): ParseState.PartialResult<String?> {
             val first = args.first()
-            if (seen != null || !flags.contains(first)) {
+            if (!flags.contains(first)) {
                 return ParseState.NotRecognized
             }
             seen = first
             return if (!args.hasSecond() || args.secondIsOption()) {
-                ParseState.Failure(1, ProblemAtIndex(args.index + 1, MissingOptionValue(first)))
+                ParseState.Finished(1, ProblemAtIndex(args.index + 1, MissingOptionValue(first)))
             } else {
                 val value = args.second()
                 ParseState.Finished(2, ParseState.FixedResult(value))

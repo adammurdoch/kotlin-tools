@@ -16,7 +16,7 @@ import java.util.zip.ZipInputStream
 import kotlin.concurrent.withLock
 import kotlin.io.path.*
 
-class DownloadRepository(private val silent: Boolean = false) {
+class DownloadRepository(private val diagnostics: Diagnostics = Diagnostics.Logging) {
     companion object {
         private val locks = ConcurrentHashMap<String, ReentrantLock>()
         private val downloadsDir = File(System.getProperty("user.home"), "bin/downloads").toPath()
@@ -107,9 +107,7 @@ class DownloadRepository(private val silent: Boolean = false) {
                     tmpDir.deleteRecursively()
                 }
 
-                if (!silent) {
-                    println("Downloading $uri")
-                }
+                diagnostics.downloading(uri)
                 try {
                     tmpFile.parent.createDirectories()
                     uri.toURL().openConnection().getInputStream().use { instr ->

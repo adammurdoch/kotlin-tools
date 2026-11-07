@@ -7,7 +7,7 @@ class ChoiceOfCommandAndPositionalsTest : AbstractParseTest() {
     @Test
     fun `parses one of literal and positional`() {
         val parser = oneOf(
-            params(command("one"), positional("a")) { _, a -> "1:$a" },
+            params(command("one"), positional("a")) { a -> "1:$a" },
             params(command("two")) { "2" },
         )
 
@@ -18,7 +18,7 @@ class ChoiceOfCommandAndPositionalsTest : AbstractParseTest() {
     @Test
     fun `reports usage`() {
         val parser = oneOf(
-            params(command("one"), positional("a")) { _, a -> "1:$a" },
+            params(command("one"), positional("a")) { a -> "1:$a" },
             params(command("two")) { "2" },
         )
 
@@ -31,7 +31,7 @@ two""", parser.usage
     @Test
     fun `literal must be provided`() {
         val parser = oneOf(
-            params(command("one"), positional("a")) { _, a -> "1:$a" },
+            params(command("one"), positional("a")) { a -> "1:$a" },
             params(command("two")) { "2" },
         )
 
@@ -55,7 +55,7 @@ two""", parser.usage
     @Test
     fun `positional must be provided`() {
         val parser = oneOf(
-            params(command("one"), positional("a")) { _, a -> "1:$a" },
+            params(command("one"), positional("a")) { a -> "1:$a" },
             params(command("two")) { "2" },
         )
 

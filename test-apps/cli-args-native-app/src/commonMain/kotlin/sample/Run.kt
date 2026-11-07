@@ -29,10 +29,10 @@ class Help : Runnable {
 }
 
 fun parser(): Parser<Runnable> {
-    val help = params(option("help").boolean().required()) { _ -> Help() }
+    val help = params(option("help").boolean().required()) { Help() }
     val verbose = option("verbose").boolean()
-    val run = params(command("run"), verbose, positional("greeting")) { _, verbose, greeting -> Run(verbose, greeting) }
-    val generate = params(command("generate"), verbose) { _, verbose -> Generate(verbose) }
+    val run = params(command("run"), verbose, positional("greeting")) { verbose, greeting -> Run(verbose, greeting) }
+    val generate = params(command("generate"), verbose) { verbose -> Generate(verbose) }
     return oneOf(help, run, generate)
 }
 

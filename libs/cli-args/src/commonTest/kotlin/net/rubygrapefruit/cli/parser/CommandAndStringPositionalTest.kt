@@ -6,7 +6,7 @@ import kotlin.test.assertEquals
 class CommandAndStringPositionalTest : AbstractParseTest() {
     @Test
     fun `parses command then parameter`() {
-        val parser = params(command("run"), positional("a")) { _, a -> a }
+        val parser = params(command("run"), positional("a")) { a -> a }
 
         assertEquals("one", parser.parse("run", "one").get())
         assertEquals("run", parser.parse("run", "run").get())
@@ -22,7 +22,7 @@ class CommandAndStringPositionalTest : AbstractParseTest() {
 
     @Test
     fun `command must be provided`() {
-        val parser = params(command("run"), positional("a")) { _, a -> a }
+        val parser = params(command("run"), positional("a")) { a -> a }
 
         parser.fails {
             failure(0, "Expected 'run'")
@@ -41,7 +41,7 @@ class CommandAndStringPositionalTest : AbstractParseTest() {
 
     @Test
     fun `parameter must be provided`() {
-        val parser = params(command("run"), positional("a")) { _, a -> a }
+        val parser = params(command("run"), positional("a")) { a -> a }
 
         parser.fails("run") {
             failure(1, "Parameter <a> not provided")

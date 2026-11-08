@@ -2,6 +2,8 @@ package net.rubygrapefruit.cli.parser
 
 internal abstract class OptionParseState<T>(protected val flags: List<String>, protected val names: List<String>) : ParseState<T> {
     private var seen: String? = null
+    protected var suggested = false
+        private set
 
     override fun maybeParse(args: InputArgs): ParseState.PartialResult<T> {
         val first = args.first()
@@ -26,6 +28,7 @@ internal abstract class OptionParseState<T>(protected val flags: List<String>, p
             names.forEachIndexed { index, name ->
                 if (first.equals("-$name", true) || first.equals("--$name", true)) {
                     val count = consumeBadlyFormed(args)
+                    suggested = true
                     return ParseState.Failure(count, ProblemAtIndex(args.index, UnexpectedOption(first, flags[index])))
                 }
             }
@@ -33,7 +36,10 @@ internal abstract class OptionParseState<T>(protected val flags: List<String>, p
         return null
     }
 
-    protected abstract fun consumeBadlyFormed(args: InputArgs): Int
-
     protected abstract fun matched(args: InputArgs): ParseState.Finished<T>
+
+    /**
+     * Calculate how many inputs to consume for badly formed option.
+     */
+    protected abstract fun consumeBadlyFormed(args: InputArgs): Int
 }

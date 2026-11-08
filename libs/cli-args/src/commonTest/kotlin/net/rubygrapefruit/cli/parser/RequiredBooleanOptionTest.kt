@@ -83,8 +83,20 @@ class RequiredBooleanOptionTest : AbstractParseTest() {
     }
 
     @Test
+    fun `option with multiple names must be well formed`() {
+        val parser = option("some-flag", "x").boolean().required()
+
+        parser.fails("-some-flag") {
+            failure(0, "Unexpected option '-some-flag'. Try '--some-flag' instead")
+        }
+        parser.fails("--x") {
+            failure(0, "Unexpected option '--x'. Try '-x' instead")
+        }
+    }
+
+    @Test
     fun `option must be present`() {
-        val parser = option("some-flag").boolean().required()
+        val parser = option("some-flag", "x").boolean().required()
 
         parser.fails {
             failure(0, "Option --some-flag not provided")

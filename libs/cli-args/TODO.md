@@ -135,14 +135,12 @@ TODO
     - For unexpected option, both "expected x" and "unexpected option -x" are reported
 - Combine all remaining unexpected arguments into a single failure
     - e.g. instead of "unexpected arg 'a'" + "unexpected arg 'b'" instead produce "unexpected args 'a b'"
-- Multiple names for option
-    - Repeated option handling, badly formed flag handling
 - Show usage on parse error
     - Include app name
     - Include app summary
     - Include 'run with --help', etc
     - Include description of each choice, if specified
-    - Show usage of recognized choice(s) only
+    - Show usage of recognized choice(s) only, e.g. for app with multiple commands, show usage of command that was invoked
     - Use a separate option list when there are many options
     - Use a separate command list when there are many commands
     - Allow value name to be provided for `option()`

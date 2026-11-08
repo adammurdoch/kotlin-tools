@@ -19,38 +19,22 @@ internal class RequiredBooleanOption(private val flags: List<String>, private va
         }
     }
 
-    private class State(val flags: List<String>, val names: List<String>) : ParseState<Unit> {
-        private var claimed = false
+    private class State(flags: List<String>, names: List<String>) : OptionParseState<Unit>(flags, names) {
 
-        val flag = flags.first()
-        val name = names.first()
-
-        override fun maybeParse(args: InputArgs): ParseState.PartialResult<Unit> {
-            val first = args.first()
-            return if (!flags.contains(first)) {
-                ParseState.NotRecognized
-            } else {
-                ParseState.Finished(1, ParseState.FixedResult(Unit))
-            }
+        override fun matched(args: InputArgs): ParseState.Finished<Unit> {
+            return ParseState.Finished(1, ParseState.FixedResult(Unit))
         }
 
-        override fun claimUnrecognized(args: InputArgs): ParseState.Failure? {
-            val first = args.first()
-            return if (first == flag) {
-                ParseState.Failure(1, ProblemAtIndex(args.index, RepeatedOption(flag)))
-            } else if (first.equals("-$name", true) || first.equals("--$name", true)) {
-                claimed = true
-                ParseState.Failure(1, ProblemAtIndex(args.index, UnexpectedOption(first, flag)))
-            } else {
-                null
-            }
+        override fun consumeBadlyFormed(args: InputArgs): Int {
+            return 1
         }
 
         override fun finish(index: Int): ParseState.Result<Unit> {
-            return if (claimed) {
+            return if (suggested) {
                 ParseState.FinalFailure(emptyList())
             } else {
-                ParseState.FinalFailure(listOf(ProblemAtIndex(index, MissingOption(flag))))
+                val longest = flags.maxBy { it.length }
+                ParseState.FinalFailure(listOf(ProblemAtIndex(index, MissingOption(longest))))
             }
         }
     }

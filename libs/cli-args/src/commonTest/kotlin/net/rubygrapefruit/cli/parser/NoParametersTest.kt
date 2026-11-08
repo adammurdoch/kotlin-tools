@@ -13,6 +13,13 @@ class NoParametersTest : AbstractParseTest() {
     }
 
     @Test
+    fun `reports usage`() {
+        val parser = params { "result" }
+
+        assertEquals("", parser.usage)
+    }
+
+    @Test
     fun `cannot include any input values`() {
         val parser = params { fail() }
 

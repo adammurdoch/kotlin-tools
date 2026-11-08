@@ -33,7 +33,8 @@ fun parser(): Parser<Runnable> {
     val verbose = option("verbose").boolean()
     val run = params(command("run"), verbose, positional("greeting")) { verbose, greeting -> Run(verbose, greeting) }
     val generate = params(command("generate"), verbose) { verbose -> Generate(verbose) }
-    return oneOf(help, run, generate)
+    val commands = oneOf(help, run, generate)
+    return app("cli-args-app", commands)
 }
 
 fun main(args: Array<String>) = parser().runApp(args)

@@ -13,18 +13,31 @@ sealed interface Usage {
 }
 
 internal sealed interface UsageInternal : Usage {
+    val isEmpty: Boolean
+        get() = false
+
+    /**
+     * Unpacks this usage into its choices, if any.
+     *
+     * Returns a list with a single element if this usage has no choices
+     */
+    fun choices(): List<UsageInternal> {
+        return listOf(this)
+    }
+
     override fun writeTo(output: Output) {
-        writeTo(false, output)
+        choices().forEachIndexed { index, choice ->
+            if (index > 0) {
+                output.writeLine()
+            }
+            choice.writeTo(false, output)
+        }
     }
 
     /**
      * Write usage as part of a single line summary.
      */
     fun writeTo(quoted: Boolean, output: Output)
-
-    sealed interface OneOf : UsageInternal {
-        fun choices(): List<UsageInternal>
-    }
 }
 
 internal inline fun <T> writeChoices(quoted: Boolean, output: Output, choices: List<T>, writer: (T) -> Unit) {

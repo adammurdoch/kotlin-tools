@@ -89,8 +89,8 @@ Combinator API
 - *Parser* - takes command-line arguments and produces some value of type T
 - *Command* - a literal string that must appear at a certain position in the command-line arguments
 
-Combinators
------------
+Parsers
+-------
 
 - `option(name): Option<String?>`
     - matches `-n value' or '--name value', null when not present
@@ -111,6 +111,8 @@ Combinators
     - matches the parsers and maps the result. Options can appear in any order, positionals must appear in the order specified
 - `oneOf(choices...): Parser<T>`
     - matches the parses and returns the first matching
+- `app(name, parser): Parser<T>`
+    - adds application details to a parser.
 
 CLI app
 -------

@@ -15,6 +15,9 @@ internal class AllOfParser<OUT>(
     }
 
     private inner class AllOfUsage : UsageInternal {
+        override val isEmpty: Boolean
+            get() = parsers.isEmpty()
+
         override fun writeTo(quoted: Boolean, output: Output) {
             if (parsers.size == 1) {
                 parsers.first().usage().writeTo(quoted, output)

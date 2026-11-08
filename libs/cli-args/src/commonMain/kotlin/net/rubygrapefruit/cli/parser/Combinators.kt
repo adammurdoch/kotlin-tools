@@ -98,5 +98,12 @@ fun <OUT> oneOf(vararg choices: Parser<OUT>): Parser<OUT> {
     return OneOfParser(choices.toList().cast())
 }
 
+fun <OUT> app(name: String, parser: Parser<OUT>): Parser<OUT> {
+    return AppParser(name, parser.cast())
+}
+
 @Suppress("UNCHECKED_CAST")
 private fun <OUT> List<Parser<OUT>>.cast() = this as List<ParserInternal<OUT>>
+
+@Suppress("UNCHECKED_CAST")
+private fun <OUT> Parser<OUT>.cast() = this as ParserInternal<OUT>

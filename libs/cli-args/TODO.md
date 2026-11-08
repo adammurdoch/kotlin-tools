@@ -136,7 +136,6 @@ TODO
 - Combine all remaining unexpected arguments into a single failure
     - e.g. instead of "unexpected arg 'a'" + "unexpected arg 'b'" instead produce "unexpected args 'a b'"
 - Multiple names for option
-    - Test with boolean options
     - Repeated option handling, badly formed flag handling
 - Show usage on parse error
     - Include app name

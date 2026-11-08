@@ -38,42 +38,18 @@ internal class DefaultStringOption(unsortedNames: List<String>) : AbstractParser
         }
     }
 
-    private class State(private val flags: List<String>, private val names: List<String>) : ParseState<String?> {
-        private var seen: String? = null
-
-        override fun maybeParse(args: InputArgs): ParseState.PartialResult<String?> {
-            val first = args.first()
-            if (!flags.contains(first)) {
-                return ParseState.NotRecognized
-            }
-            seen = first
+    private class State(flags: List<String>, names: List<String>) : OptionParseState<String?>(flags, names) {
+        override fun matched(args: InputArgs): ParseState.Finished<String?> {
             return if (!args.hasSecond() || args.secondIsOption()) {
-                ParseState.Finished(1, ProblemAtIndex(args.index + 1, MissingOptionValue(first)))
+                ParseState.Finished(1, ProblemAtIndex(args.index + 1, MissingOptionValue(args.first())))
             } else {
                 val value = args.second()
                 ParseState.Finished(2, ParseState.FixedResult(value))
             }
         }
 
-        override fun claimUnrecognized(args: InputArgs): ParseState.Failure? {
-            val first = args.first()
-            if (flags.contains(first)) {
-                val count = if (args.hasSecond() && !args.secondIsOption() && !args.secondIsRecognized()) 2 else 1
-                val problem = if (first == seen) {
-                    RepeatedOption(first)
-                } else {
-                    RepeatedOption(first, seen!!)
-                }
-                return ParseState.Failure(count, ProblemAtIndex(args.index, problem))
-            } else if (args.firstIsOption()) {
-                names.forEachIndexed { index, name ->
-                    if (first.equals("-$name", true) || first.equals("--$name", true)) {
-                        val count = if (args.hasSecond() && !args.secondIsOption() && !args.secondIsRecognized()) 2 else 1
-                        return ParseState.Failure(count, ProblemAtIndex(args.index, UnexpectedOption(first, flags[index])))
-                    }
-                }
-            }
-            return null
+        override fun consumeBadlyFormed(args: InputArgs): Int {
+            return if (args.hasSecond() && !args.secondIsOption() && !args.secondIsRecognized()) 2 else 1
         }
 
         override fun finish(index: Int): ParseState.Result<String?> {

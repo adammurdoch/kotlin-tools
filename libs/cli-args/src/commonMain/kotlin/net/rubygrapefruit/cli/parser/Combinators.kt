@@ -1,7 +1,9 @@
 package net.rubygrapefruit.cli.parser
 
+import net.rubygrapefruit.cli.Runnable
+
 /**
- * Returns a parser that does not take any parameters.
+ * Creates a parser that does not take any parameters.
  *
  * The parser produces the result of the given function.
  */
@@ -10,7 +12,7 @@ fun <OUT> params(producer: () -> OUT): Parser<OUT> {
 }
 
 /**
- * Applies the given parser and maps it result to produce a value of type [OUT].
+ * Creates a parser that applies the given parser and maps its result to produce a value of type [OUT].
  */
 fun <A, OUT> params(a: Parser<A>, map: (A) -> OUT): Parser<OUT> {
     @Suppress("UNCHECKED_CAST")
@@ -20,7 +22,7 @@ fun <A, OUT> params(a: Parser<A>, map: (A) -> OUT): Parser<OUT> {
 }
 
 /**
- * Applies the given parsers and maps their results to produce a value of type [OUT].
+ * Creates a parser that applies the given parsers and maps their results to produce a value of type [OUT].
  *
  * Positional parameters must appear in the order specified, and options can appear in any order.
  */
@@ -32,7 +34,7 @@ fun <A, B, OUT> params(a: Parser<A>, b: Parser<B>, map: (A, B) -> OUT): Parser<O
 }
 
 /**
- * Applies the given parsers and maps their results to produce a value of type [OUT].
+ * Creates a parser that applies the given parsers and maps their results to produce a value of type [OUT].
  *
  * Positional parameters must appear in the order specified, and options can appear in any order.
  */
@@ -44,7 +46,7 @@ fun <A, OUT> params(prefix: Parser<Unit>, a: Parser<A>, map: (A) -> OUT): Parser
 }
 
 /**
- * Applies the given parsers and maps their results to produce a value of type [OUT].
+ * Creates a parser that applies the given parsers and maps their results to produce a value of type [OUT].
  *
  * Positional parameters must appear in the order specified, and options can appear in any order.
  */
@@ -56,7 +58,7 @@ fun <A, B, C, OUT> params(a: Parser<A>, b: Parser<B>, c: Parser<C>, map: (A, B, 
 }
 
 /**
- * Applies the given parsers and maps their results to produce a value of type [OUT].
+ * Creates a parser that applies the given parsers and maps their results to produce a value of type [OUT].
  *
  * Positional parameters must appear in the order specified, and options can appear in any order.
  */
@@ -68,7 +70,7 @@ fun <A, B, OUT> params(prefix: Parser<Unit>, a: Parser<A>, b: Parser<B>, map: (A
 }
 
 /**
- * Applies the given parsers and maps their results to produce a value of type [OUT].
+ * Creates a parser that applies the given parsers and maps their results to produce a value of type [OUT].
  *
  * Positional parameters must appear in the order specified, and options can appear in any order.
  */
@@ -80,7 +82,7 @@ fun <A, B, C, D, OUT> params(a: Parser<A>, b: Parser<B>, c: Parser<C>, d: Parser
 }
 
 /**
- * Applies the given parsers and maps their results to produce a value of type [OUT].
+ * Creates a parser that applies the given parsers and maps their results to produce a value of type [OUT].
  *
  * Positional parameters must appear in the order specified, and options can appear in any order.
  */
@@ -92,14 +94,27 @@ fun <A, B, C, D, E, OUT> params(a: Parser<A>, b: Parser<B>, c: Parser<C>, d: Par
 }
 
 /**
- * Attempts to match the inputs using the given parsers. Returns the result of the first parser to match.
+ * Creates a parser that attempts to match the inputs using each of the given parsers. Returns the result of the first parser to match.
  */
 fun <OUT> oneOf(vararg choices: Parser<OUT>): Parser<OUT> {
     return OneOfParser(choices.toList().cast())
 }
 
+/**
+ * Creates an application command-line argument parser from the given parser.
+ */
 fun <OUT> app(name: String, parser: Parser<OUT>): Parser<OUT> {
     return AppParser(name, parser.cast())
+}
+
+/**
+ * Creates a parser that includes a help action.
+ */
+fun withHelp(parser: Parser<Runnable>): Parser<Runnable> {
+    return oneOf(
+        params(option("h", "help").boolean().required()) { HelpAction() },
+        parser
+    )
 }
 
 @Suppress("UNCHECKED_CAST")

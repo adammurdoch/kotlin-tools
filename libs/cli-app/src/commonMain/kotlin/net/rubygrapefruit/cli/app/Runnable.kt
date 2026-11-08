@@ -1,13 +1,10 @@
 package net.rubygrapefruit.cli.app
 
 import net.rubygrapefruit.app.launcher.isPropagateMainFailure
+import net.rubygrapefruit.cli.Runnable
 import net.rubygrapefruit.cli.parser.Parser
 import net.rubygrapefruit.cli.terminal.Output
 import net.rubygrapefruit.cli.terminal.output
-
-interface Runnable {
-    fun run()
-}
 
 /**
  * Runs the [Runnable] produced by parsing the given arguments, and then exits the process.

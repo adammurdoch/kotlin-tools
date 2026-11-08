@@ -113,6 +113,7 @@ Parsers
     - matches the parses and returns the first matching
 - `app(name, parser): Parser<T>`
     - adds application details to a parser.
+- `withHelp(parser): Parser<Runnable>`
 
 CLI app
 -------
@@ -138,7 +139,6 @@ TODO
 - Combine all remaining unexpected arguments into a single failure
     - e.g. instead of "unexpected arg 'a'" + "unexpected arg 'b'" instead produce "unexpected args 'a b'"
 - Show usage on parse error
-    - Include app name
     - Include app summary
     - Include 'run with --help', etc
     - Include description of each choice, if specified
@@ -147,8 +147,11 @@ TODO
     - Use a separate command list when there are many commands
     - Allow value name to be provided for `option()`
     - Highlight problematic part of usage?
-    - Sort choices by command name
-- Multiple names for `option()`
+    - Sort choices by command name or option
+- Convenience for help command or option
+    - Add 'help' command when app uses commands
+    - Merge nested `allOf()`
+    - Help option has the highest priority 
 - `allOf()` with nested `allOf()`
 - Parser that collects unrecognized or remainder
 - Merge short options
@@ -157,7 +160,6 @@ TODO
 - `--no-x` flag for boolean options
 - Report `[..]` - optional, `<..>` - required
 - `command()`
-- Convenience for help command or option
 - Convenience for `--version`
 - Convenience for `--stack`
 - Convenience for completion command or option

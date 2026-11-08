@@ -1,5 +1,6 @@
 package net.rubygrapefruit.cli.app
 
+import net.rubygrapefruit.cli.Runnable
 import net.rubygrapefruit.cli.parser.params
 import net.rubygrapefruit.cli.parser.positional
 import net.rubygrapefruit.cli.terminal.BufferingOutput

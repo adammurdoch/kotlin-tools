@@ -13,21 +13,8 @@ internal class RequiredBooleanOption(private val flags: List<String>, private va
 
     private inner class OptionUsage : UsageInternal {
         override fun writeTo(quoted: Boolean, output: Output) {
-            if (flags.size == 1) {
-                output.write(flags.first())
-            } else {
-                if (quoted) {
-                    output.write("(")
-                }
-                flags.forEachIndexed { index, flag ->
-                    if (index > 0) {
-                        output.write(" | ")
-                    }
-                    output.write(flag)
-                }
-                if (quoted) {
-                    output.write(")")
-                }
+            writeChoices(quoted, output, flags) { flag ->
+                output.write(flag)
             }
         }
     }

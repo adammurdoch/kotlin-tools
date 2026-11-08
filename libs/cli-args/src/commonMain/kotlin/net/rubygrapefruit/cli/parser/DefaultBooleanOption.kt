@@ -18,10 +18,7 @@ internal class DefaultBooleanOption(private val flags: List<String>, private val
     private inner class OptionUsage : UsageInternal {
         override fun writeTo(quoted: Boolean, output: Output) {
             output.write("[")
-            flags.forEachIndexed { index, flag ->
-                if (index > 0) {
-                    output.write(" | ")
-                }
+            writeChoices(false, output, flags) { flag ->
                 output.write(flag)
             }
             output.write("]")

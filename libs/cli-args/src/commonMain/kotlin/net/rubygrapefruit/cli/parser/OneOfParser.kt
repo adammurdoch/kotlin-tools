@@ -27,17 +27,8 @@ internal class OneOfParser<OUT>(private val choices: List<ParserInternal<OUT>>) 
         }
 
         override fun writeTo(quoted: Boolean, output: Output) {
-            if (quoted) {
-                output.write("(")
-            }
-            choices.forEachIndexed { index, choice ->
-                if (index > 0) {
-                    output.write(" | ")
-                }
-                choice.usage().writeTo(output)
-            }
-            if (quoted) {
-                output.write(")")
+            writeChoices(quoted, output, choices) { choice ->
+                choice.usage().writeTo(true, output)
             }
         }
     }

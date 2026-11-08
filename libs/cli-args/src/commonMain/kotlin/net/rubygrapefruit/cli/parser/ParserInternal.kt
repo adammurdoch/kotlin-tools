@@ -34,7 +34,7 @@ internal interface ParserInternal<out T> {
                     output.writeLine()
                     for (choice in usage.choices()) {
                         output.write("  ")
-                        choice.writeTo(output)
+                        choice.writeTo(false, output)
                         output.writeLine()
                     }
                 }
@@ -42,7 +42,7 @@ internal interface ParserInternal<out T> {
                 else -> {
                     output.heading("USAGE:")
                     output.write(" ")
-                    usage.writeTo(output)
+                    usage.writeTo(false, output)
                     output.writeLine()
                 }
             }

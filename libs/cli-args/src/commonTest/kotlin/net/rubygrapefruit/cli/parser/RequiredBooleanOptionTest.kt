@@ -46,7 +46,7 @@ class RequiredBooleanOptionTest : AbstractParseTest() {
     fun `reports usage of option with multiple names`() {
         val parser = option("some-flag", "x", "a", "long").boolean().required()
 
-        assertEquals("(-a | -x | --long | --some-flag)", parser.usage)
+        assertEquals("-a | -x | --long | --some-flag", parser.usage)
     }
 
     @Test

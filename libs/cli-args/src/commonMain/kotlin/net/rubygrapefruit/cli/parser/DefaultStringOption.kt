@@ -26,7 +26,7 @@ internal class DefaultStringOption(unsortedNames: List<String>) : AbstractParser
     }
 
     private inner class OptionUsage : UsageInternal {
-        override fun writeTo(output: Output) {
+        override fun writeTo(quoted: Boolean, output: Output) {
             output.write("[")
             flags.forEachIndexed { index, flag ->
                 if (index > 0) {

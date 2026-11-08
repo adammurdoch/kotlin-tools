@@ -11,16 +11,20 @@ internal class AllOfParser<OUT>(
     }
 
     override fun usage(): UsageInternal {
-        return ParserUsage()
+        return AllOfUsage()
     }
 
-    private inner class ParserUsage : UsageInternal {
-        override fun writeTo(output: Output) {
-            parsers.forEachIndexed { index, parser ->
-                if (index > 0) {
-                    output.write(" ")
+    private inner class AllOfUsage : UsageInternal {
+        override fun writeTo(quoted: Boolean, output: Output) {
+            if (parsers.size == 1) {
+                parsers.first().usage().writeTo(quoted, output)
+            } else {
+                parsers.forEachIndexed { index, parser ->
+                    if (index > 0) {
+                        output.write(" ")
+                    }
+                    parser.usage().writeTo(true, output)
                 }
-                parser.usage().writeTo(output)
             }
         }
     }

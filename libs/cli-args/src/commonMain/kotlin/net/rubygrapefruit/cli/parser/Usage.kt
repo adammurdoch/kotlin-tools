@@ -13,7 +13,16 @@ sealed interface Usage {
 }
 
 internal sealed interface UsageInternal : Usage {
+    override fun writeTo(output: Output) {
+        writeTo(false, output)
+    }
+
+    /**
+     * Write usage as part of a single line summary.
+     */
+    fun writeTo(quoted: Boolean, output: Output)
+
     sealed interface OneOf : UsageInternal {
-        fun choices(): List<Usage>
+        fun choices(): List<UsageInternal>
     }
 }

@@ -12,7 +12,7 @@ internal class DefaultCommand(private val text: String) : AbstractParser<Unit>()
     }
 
     private inner class LiteralUsage : UsageInternal {
-        override fun writeTo(output: Output) {
+        override fun writeTo(quoted: Boolean, output: Output) {
             output.write(text)
         }
     }

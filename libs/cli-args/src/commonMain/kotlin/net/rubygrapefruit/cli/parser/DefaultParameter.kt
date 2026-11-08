@@ -12,7 +12,7 @@ internal class DefaultParameter(private val name: String) : AbstractParser<Strin
     }
 
     private inner class ParameterUsage : UsageInternal {
-        override fun writeTo(output: Output) {
+        override fun writeTo(quoted: Boolean, output: Output) {
             output.write("<$name>")
         }
     }

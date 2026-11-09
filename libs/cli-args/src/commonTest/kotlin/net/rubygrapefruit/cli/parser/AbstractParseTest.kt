@@ -5,7 +5,12 @@ import net.rubygrapefruit.cli.terminal.BufferingOutput
 import kotlin.test.*
 
 abstract class AbstractParseTest {
-    protected object DoNothing : Runnable {
+    protected class NoParams : Runnable {
+        override fun run() {
+        }
+    }
+
+    protected class OneParam(val value: String?) : Runnable {
         override fun run() {
         }
     }

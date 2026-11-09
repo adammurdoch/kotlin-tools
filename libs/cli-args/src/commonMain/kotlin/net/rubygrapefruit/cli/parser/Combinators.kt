@@ -1,5 +1,7 @@
 package net.rubygrapefruit.cli.parser
 
+import kotlin.jvm.JvmName
+
 /**
  * Creates a parser that does not take any parameters.
  *
@@ -95,11 +97,25 @@ fun <A, B, C, D, E, OUT> params(a: Parser<A>, b: Parser<B>, c: Parser<C>, d: Par
  * Creates a parser that attempts to match the inputs using each of the given parsers. Returns the result of the first parser to match.
  */
 fun <OUT> oneOf(vararg choices: Parser<OUT>): Parser<OUT> {
-    return OneOfParser(choices.toList().cast())
+    val unpacked = mutableListOf<ParserInternal<OUT>>()
+    val queue = choices.toMutableList().cast()
+    while (queue.isNotEmpty()) {
+        val parser = queue.removeFirst()
+        if (parser is OneOfParser) {
+            queue.addAll(0, parser.choices)
+        } else {
+            unpacked.add(parser)
+        }
+    }
+    return OneOfParser(unpacked)
 }
 
 @Suppress("UNCHECKED_CAST")
 internal fun <OUT> List<Parser<OUT>>.cast() = this as List<ParserInternal<OUT>>
+
+@Suppress("UNCHECKED_CAST")
+@JvmName("castMutableList")
+internal fun <OUT> MutableList<Parser<OUT>>.cast() = this as MutableList<ParserInternal<OUT>>
 
 @Suppress("UNCHECKED_CAST")
 internal fun <OUT> Parser<OUT>.cast() = this as ParserInternal<OUT>

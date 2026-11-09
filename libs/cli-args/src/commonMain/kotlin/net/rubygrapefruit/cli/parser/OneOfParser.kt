@@ -3,7 +3,7 @@ package net.rubygrapefruit.cli.parser
 import net.rubygrapefruit.cli.terminal.Output
 import kotlin.math.min
 
-internal class OneOfParser<OUT>(private val choices: List<ParserInternal<OUT>>) : AbstractParser<OUT>(), Parser<OUT> {
+internal class OneOfParser<OUT>(val choices: List<ParserInternal<OUT>>) : AbstractParser<OUT>(), Parser<OUT> {
     override fun start(): ParseState<OUT> {
         return State(choices.map { ChoiceState(it.start()) })
     }

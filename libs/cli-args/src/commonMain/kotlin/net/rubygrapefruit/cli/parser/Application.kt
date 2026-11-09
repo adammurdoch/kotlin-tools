@@ -2,6 +2,6 @@ package net.rubygrapefruit.cli.parser
 
 import net.rubygrapefruit.cli.Runnable
 
-interface Application : Parser<Runnable> {
-    fun withHelp(): Application
+interface Application<out T : Runnable> : Parser<T> {
+    fun withHelp(): Application<Runnable>
 }

@@ -1,20 +1,14 @@
 package net.rubygrapefruit.cli.parser
 
-import net.rubygrapefruit.cli.Runnable
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertSame
 
 class HelpActionTest : AbstractParseTest() {
-    private object DoNothing : Runnable {
-        override fun run() {
-        }
-    }
-
     @Test
     fun `parses choice of help or command`() {
-        val parser = withHelp(params(command("run")) { DoNothing })
+        val parser = app("some_app", params(command("run")) { DoNothing }).withHelp()
 
         assertSame(DoNothing, parser.parse("run").get())
         assertIs<HelpAction>(parser.parse("--help").get())
@@ -23,10 +17,11 @@ class HelpActionTest : AbstractParseTest() {
 
     @Test
     fun `reports usage of choice of help or command`() {
-        val parser = withHelp(params(command("run")) { DoNothing })
+        val parser = app("some_app", params(command("run")) { DoNothing }).withHelp()
 
         assertEquals(
-            """-h | --help
-run""", parser.usage)
+            """some_app -h | --help
+some_app run""", parser.usage
+        )
     }
 }

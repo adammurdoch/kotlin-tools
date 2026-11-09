@@ -1,10 +1,19 @@
 package net.rubygrapefruit.cli.parser
 
+import net.rubygrapefruit.cli.Runnable
 import net.rubygrapefruit.cli.terminal.Output
 
-internal class AppParser<T>(private val name: String, private val parser: ParserInternal<T>) : AbstractParser<T>(), Parser<T> {
+internal class AppParser(private val name: String, private val parser: Parser<Runnable>) : AbstractParser<Runnable>(), Application {
+    override fun withHelp(): Application {
+        val parser = oneOf(
+            params(option("h", "help").boolean().required()) { HelpAction() },
+            parser
+        )
+        return AppParser(name, parser)
+    }
+
     override fun usage(): UsageInternal {
-        return AppUsage(parser.usage())
+        return AppUsage(parser.cast().usage())
     }
 
     private inner class AppUsage(val usage: UsageInternal) : UsageInternal {
@@ -21,7 +30,7 @@ internal class AppParser<T>(private val name: String, private val parser: Parser
         }
     }
 
-    override fun start(): ParseState<T> {
-        return parser.start()
+    override fun start(): ParseState<Runnable> {
+        return parser.cast().start()
     }
 }

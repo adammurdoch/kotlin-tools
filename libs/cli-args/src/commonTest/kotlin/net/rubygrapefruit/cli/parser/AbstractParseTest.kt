@@ -1,9 +1,15 @@
 package net.rubygrapefruit.cli.parser
 
+import net.rubygrapefruit.cli.Runnable
 import net.rubygrapefruit.cli.terminal.BufferingOutput
 import kotlin.test.*
 
 abstract class AbstractParseTest {
+    protected object DoNothing : Runnable {
+        override fun run() {
+        }
+    }
+
     protected val Parser<*>.usage: String
         get() {
             val output = BufferingOutput()

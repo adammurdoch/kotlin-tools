@@ -1,27 +1,39 @@
 package net.rubygrapefruit.cli.parser
 
+import net.rubygrapefruit.cli.Runnable
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
+import kotlin.test.assertNull
 
 class AppParserTest : AbstractParseTest() {
+    class Action(val value: String?) : Runnable {
+        override fun run() {
+        }
+    }
+
     @Test
     fun `parses arguments`() {
-        val parser = app("some_app", option("x"))
+        val parser = app("some_app", params(option("x")) { Action(it) })
 
-        assertEquals("value", parser.parse("-x", "value").get())
-        assertEquals(null, parser.parse().get())
+        assertIs<Action>(parser.parse("-x", "value").get()).apply {
+            assertEquals("value", value)
+        }
+        assertIs<Action>(parser.parse().get()).apply {
+            assertNull(value)
+        }
     }
 
     @Test
     fun `reports app usage when app takes no parameters`() {
-        val parser = app("some_app", params { "run" })
+        val parser = app("some_app", params { DoNothing })
 
         assertEquals("some_app", parser.usage)
     }
 
     @Test
     fun `reports app usage when app takes option`() {
-        val parser = app("some_app", option("x"))
+        val parser = app("some_app", params(option("x")) { Action(it) })
 
         assertEquals("some_app [-x <value>]", parser.usage)
     }
@@ -29,8 +41,8 @@ class AppParserTest : AbstractParseTest() {
     @Test
     fun `reports app usage when app takes choice of option or command`() {
         val choices = oneOf(
-            option("help").boolean().required(),
-            command("run")
+            params(option("help").boolean().required()) { DoNothing },
+            params(command("run")) { DoNothing }
         )
         val parser = app("some_app", choices)
 

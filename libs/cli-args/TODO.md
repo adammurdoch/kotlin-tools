@@ -111,9 +111,10 @@ Parsers
     - matches the parsers and maps the result. Options can appear in any order, positionals must appear in the order specified
 - `oneOf(choices...): Parser<T>`
     - matches the parses and returns the first matching
-- `app(name, parser): Parser<T>`
-    - adds application details to a parser.
-- `withHelp(parser): Parser<Runnable>`
+- `app(name, parser): Application`
+    - adds application details to a parser
+- `app(name, p).withHelp(): Application`
+    - add help action
 
 CLI app
 -------
@@ -148,18 +149,17 @@ TODO
     - Allow value name to be provided for `option()`
     - Highlight problematic part of usage?
     - Sort choices by command name or option
+- Move runApp() into `cli-args` project
 - Convenience for help command or option
     - Add 'help' command when app uses commands
     - Merge nested `allOf()`
-    - Help option has the highest priority 
+    - Help option has the highest priority
 - `allOf()` with nested `allOf()`
 - Parser that collects unrecognized or remainder
 - Merge short options
 - `--` as end of options
 - `--option=<value>` (allows value that starts with `-`)
 - `--no-x` flag for boolean options
-- Report `[..]` - optional, `<..>` - required
-- `command()`
 - Convenience for `--version`
 - Convenience for `--stack`
 - Convenience for completion command or option
@@ -168,4 +168,8 @@ TODO
 - Compose value parsers (e.g. value is ip address or host name)
 - Deprecated, hidden options + commands
 - Terminal integration for JVM
-- Terminal integration is thread-safe, e.g. does not interleave partial outputs
+- Terminal integration is thread-safe
+    - Does not interleave partial outputs
+    - Can be used by app code
+- Terminal integration API distinguishes between diagnostic output and app output
+- Convenience for `--no-color`, etc

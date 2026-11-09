@@ -1,7 +1,5 @@
 package net.rubygrapefruit.cli.parser
 
-import net.rubygrapefruit.cli.Runnable
-
 /**
  * Creates a parser that does not take any parameters.
  *
@@ -100,25 +98,8 @@ fun <OUT> oneOf(vararg choices: Parser<OUT>): Parser<OUT> {
     return OneOfParser(choices.toList().cast())
 }
 
-/**
- * Creates an application command-line argument parser from the given parser.
- */
-fun <OUT> app(name: String, parser: Parser<OUT>): Parser<OUT> {
-    return AppParser(name, parser.cast())
-}
-
-/**
- * Creates a parser that includes a help action.
- */
-fun withHelp(parser: Parser<Runnable>): Parser<Runnable> {
-    return oneOf(
-        params(option("h", "help").boolean().required()) { HelpAction() },
-        parser
-    )
-}
+@Suppress("UNCHECKED_CAST")
+internal fun <OUT> List<Parser<OUT>>.cast() = this as List<ParserInternal<OUT>>
 
 @Suppress("UNCHECKED_CAST")
-private fun <OUT> List<Parser<OUT>>.cast() = this as List<ParserInternal<OUT>>
-
-@Suppress("UNCHECKED_CAST")
-private fun <OUT> Parser<OUT>.cast() = this as ParserInternal<OUT>
+internal fun <OUT> Parser<OUT>.cast() = this as ParserInternal<OUT>

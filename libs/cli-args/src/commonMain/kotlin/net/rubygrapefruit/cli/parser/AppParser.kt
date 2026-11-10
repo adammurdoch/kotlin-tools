@@ -22,10 +22,8 @@ internal class AppParser<OUT : Runnable>(
 
     private fun parser(): ParserInternal<OUT> {
         return if (help) {
-            lateinit var fullParser: ParserInternal<OUT>
-            val helpOption = params(option("h", "help").boolean().required()) { HelpAction(fullParser) }
-            fullParser = oneOf(helpOption, parser) as ParserInternal<OUT>
-            fullParser
+            val helpOption = params(option("h", "help").boolean().required()) { HelpAction(this) }
+            oneOf(helpOption, parser) as ParserInternal<OUT>
         } else {
             parser.cast()
         }

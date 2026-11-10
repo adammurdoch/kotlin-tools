@@ -154,6 +154,7 @@ TODO
     - Add 'help' command when app uses commands
     - Merge nested `allOf()`
     - Help option has the highest priority
+    - Help writes to stdout
 - `allOf()` with nested `allOf()`
 - Parser that collects unrecognized or remainder
 - Merge short options

@@ -55,8 +55,9 @@ some_app stop""", parser.usage
 
         assertEquals(
             """
--h | --help
-[-x <value>]
+USAGE:
+  some_app -h | --help
+  some_app [-x <value>]
 """, output.text
         )
     }

@@ -11,7 +11,7 @@ internal class HelpAction(private val parser: ParserInternal<*>) : Runnable {
 
     fun run(output: Output) {
         output.writeLine()
-        parser.usage().writeTo(output)
+        parser.usage().writeSummaryTo(output)
         output.maybeNewLine()
     }
 }

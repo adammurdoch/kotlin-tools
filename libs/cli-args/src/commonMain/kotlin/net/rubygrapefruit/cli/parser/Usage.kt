@@ -25,6 +25,24 @@ internal sealed interface UsageInternal : Usage {
         return listOf(this)
     }
 
+    fun writeSummaryTo(output: Output) {
+        val choices = choices()
+        if (choices.size > 1) {
+            output.heading("USAGE:")
+            output.writeLine()
+            for (choice in choices) {
+                output.write("  ")
+                choice.writeTo(false, output)
+                output.writeLine()
+            }
+        } else {
+            output.heading("USAGE:")
+            output.write(" ")
+            writeTo(false, output)
+            output.writeLine()
+        }
+    }
+
     override fun writeTo(output: Output) {
         choices().forEachIndexed { index, choice ->
             if (index > 0) {

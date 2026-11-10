@@ -155,16 +155,19 @@ TODO
 - Convenience for help command or option
     - Add 'help' command when app uses commands
     - Help option has the highest priority
-    - Help writes to stdout
+    - Show options
+    - Show option descriptions
+    - Sort options
+    - Show commands, sorted
 - Convenience for completion command or option
     - Add 'completion' command when app uses commands
-    - Completion writes to stdout
 - Parser that collects unrecognized or remainder
 - Merge short options
 - `--` as end of options
 - `--option=<value>` (allows value that starts with `-`)
 - `--no-x` flag for boolean options
 - Convenience for `--version`
+  - Include in help output
 - Convenience for `--stack`
 - Convenience for @arg file.
 - `-Dx=y` style

@@ -25,6 +25,10 @@ internal sealed interface UsageInternal : Usage {
         return listOf(this)
     }
 
+    fun options(): List<OptionUsage> {
+        return emptyList()
+    }
+
     fun writeSummaryTo(output: Output) {
         val choices = choices()
         if (choices.size > 1) {
@@ -56,6 +60,14 @@ internal sealed interface UsageInternal : Usage {
      * Write usage as part of a single line summary.
      */
     fun writeTo(quoted: Boolean, output: Output)
+
+    sealed interface OptionUsage : UsageInternal {
+        override fun options(): List<OptionUsage> {
+            return listOf(this)
+        }
+
+        fun writeOptionUsageTo(output: Output)
+    }
 }
 
 internal inline fun <T> writeChoices(quoted: Boolean, output: Output, choices: List<T>, writer: (T) -> Unit) {
@@ -80,5 +92,14 @@ internal inline fun <T> writeChoices(quoted: Boolean, output: Output, choices: L
                 output.write(")")
             }
         }
+    }
+}
+
+internal inline fun <T> writeList(output: Output, items: List<T>, writer: (T) -> Unit) {
+    items.forEachIndexed { index, item ->
+        if (index > 0) {
+            output.write(", ")
+        }
+        writer(item)
     }
 }

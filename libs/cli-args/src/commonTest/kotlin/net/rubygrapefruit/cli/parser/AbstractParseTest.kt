@@ -22,6 +22,15 @@ abstract class AbstractParseTest {
             return output.text
         }
 
+    protected val Parser<*>.optionUsage: String
+        get() {
+            val options = (usage() as UsageInternal).options()
+            assertEquals(1, options.size)
+            val output = BufferingOutput()
+            options.first().writeOptionUsageTo(output)
+            return output.text
+        }
+
     protected fun Parser<*>.fails(vararg args: String, config: Failures.() -> Unit) {
         val result = parse(*args)
         assertIs<Parser.Failure>(result)

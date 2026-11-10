@@ -42,6 +42,7 @@ class StringOptionTest : AbstractParseTest() {
         val parser = option("x")
 
         assertEquals("[-x <value>]", parser.usage)
+        assertEquals("-x <value>", parser.optionUsage)
     }
 
     @Test
@@ -49,6 +50,7 @@ class StringOptionTest : AbstractParseTest() {
         val parser = option("an-option")
 
         assertEquals("[--an-option <value>]", parser.usage)
+        assertEquals("--an-option <value>", parser.optionUsage)
     }
 
     @Test
@@ -56,6 +58,7 @@ class StringOptionTest : AbstractParseTest() {
         val parser = option("option-x", "x", "aka", "a")
 
         assertEquals("[-a <value> | -x <value> | --aka <value> | --option-x <value>]", parser.usage)
+        assertEquals("-a <value>, -x <value>, --aka <value>, --option-x <value>", parser.optionUsage)
     }
 
     @Test

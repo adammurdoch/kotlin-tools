@@ -11,9 +11,15 @@ internal class RequiredBooleanOption(private val flags: List<String>, private va
         return OptionUsage()
     }
 
-    private inner class OptionUsage : UsageInternal {
+    private inner class OptionUsage : UsageInternal.OptionUsage {
         override fun writeTo(quoted: Boolean, output: Output) {
             writeChoices(quoted, output, flags) { flag ->
+                output.write(flag)
+            }
+        }
+
+        override fun writeOptionUsageTo(output: Output) {
+            writeList(output, flags) { flag ->
                 output.write(flag)
             }
         }

@@ -2,6 +2,7 @@ package net.rubygrapefruit.cli.parser
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlin.test.assertNull
 
 class AppParserTest : AbstractParseTest() {
@@ -10,9 +11,11 @@ class AppParserTest : AbstractParseTest() {
         val parser = app("some_app", params(option("x")) { OneParam(it) })
 
         parser.parse("-x", "value").get().apply {
+            assertIs<OneParam>(this)
             assertEquals("value", value)
         }
         parser.parse().get().apply {
+            assertIs<OneParam>(this)
             assertNull(value)
         }
     }

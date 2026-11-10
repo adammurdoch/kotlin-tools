@@ -122,6 +122,8 @@ CLI app
 - `parser.runApp(args)`
     - Color output
     - Usage summary
+    - `-h`, `--help` options
+    - `--completion` option
 
 TODO
 ----
@@ -152,10 +154,11 @@ TODO
 - Move runApp() into `cli-args` project
 - Convenience for help command or option
     - Add 'help' command when app uses commands
-    - Merge nested `allOf()`
     - Help option has the highest priority
     - Help writes to stdout
-- `allOf()` with nested `allOf()`
+- Convenience for completion command or option
+    - Add 'completion' command when app uses commands
+    - Completion writes to stdout
 - Parser that collects unrecognized or remainder
 - Merge short options
 - `--` as end of options
@@ -163,7 +166,6 @@ TODO
 - `--no-x` flag for boolean options
 - Convenience for `--version`
 - Convenience for `--stack`
-- Convenience for completion command or option
 - Convenience for @arg file.
 - `-Dx=y` style
 - Compose value parsers (e.g. value is ip address or host name)

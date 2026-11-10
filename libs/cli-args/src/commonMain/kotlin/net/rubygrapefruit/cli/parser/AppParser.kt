@@ -46,7 +46,7 @@ internal class AppParser(
     }
 
     private fun completionAction(): Parser<Runnable> {
-        return params(option("completion").boolean().required()) { CompletionAction() }
+        return params(option("completion").boolean().required()) { CompletionAction(name) }
     }
 
     private inner class AppUsage(val usage: UsageInternal) : UsageInternal {

@@ -38,6 +38,11 @@ sealed interface Output {
 }
 
 /**
- * Returns the default [Output] for this process, which writes to the process' stderr.
+ * Returns the default [Output] for this process, which writes to the process' stdout.
  */
 expect fun output(): Output
+
+/**
+ * Returns the default diagnostic [Output] for this process, which writes to the process' stderr.
+ */
+expect fun diagnostics(): Output

@@ -1,25 +1,23 @@
 package net.rubygrapefruit.cli.terminal
 
+import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.ExperimentalForeignApi
-import platform.posix.STDERR_FILENO
-import platform.posix.fputs
-import platform.posix.isatty
-import platform.posix.stderr
+import platform.posix.*
 
 @OptIn(ExperimentalForeignApi::class)
-private object PlainOutput : AbstractPlainOutput() {
+private class PlainOutput(val output: CPointer<FILE>?) : AbstractPlainOutput() {
     override fun put(text: CharSequence) {
-        fputs(text.toString(), stderr)
+        fputs(text.toString(), output)
     }
 }
 
 @OptIn(ExperimentalForeignApi::class)
-private object TerminalOutput : AbstractOutput() {
+private class TerminalOutput(val output: CPointer<FILE>?) : AbstractOutput() {
     override fun put(text: CharSequence, appearance: Appearance) {
         when (appearance) {
             Appearance.UserInput -> {
                 if (text.isEmpty()) {
-                    fputs("''", stderr)
+                    fputs("''", output)
                 } else {
                     // Bold green foreground
                     withAttributes("\u001B[1;32m", text)
@@ -33,7 +31,7 @@ private object TerminalOutput : AbstractOutput() {
 
             else -> {
                 if (text.isNotEmpty()) {
-                    fputs(text.toString(), stderr)
+                    fputs(text.toString(), output)
                 }
             }
         }
@@ -43,19 +41,28 @@ private object TerminalOutput : AbstractOutput() {
         if (text.isEmpty()) {
             return
         }
-        fputs(escape, stderr)
-        fputs(text.toString(), stderr)
-        fputs("\u001B[0m", stderr)
+        fputs(escape, output)
+        fputs(text.toString(), output)
+        fputs("\u001B[0m", output)
     }
 }
 
-private val defaultOutput by lazy {
-    val ttyResult = isatty(STDERR_FILENO)
-    if (ttyResult == 1) {
-        TerminalOutput
+@OptIn(ExperimentalForeignApi::class)
+private val defaultOutput by lazy { outputFor(STDOUT_FILENO, stdout) }
+
+@OptIn(ExperimentalForeignApi::class)
+private val defaultDiagnostics by lazy { outputFor(STDERR_FILENO, stderr) }
+
+@OptIn(ExperimentalForeignApi::class)
+private fun outputFor(fd: Int, file: CPointer<FILE>?): AbstractOutput {
+    val ttyResult = isatty(fd)
+    return if (ttyResult == 1) {
+        TerminalOutput(file)
     } else {
-        PlainOutput
+        PlainOutput(file)
     }
 }
 
 actual fun output(): Output = defaultOutput
+
+actual fun diagnostics(): Output = defaultDiagnostics

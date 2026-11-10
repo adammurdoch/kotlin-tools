@@ -10,8 +10,10 @@ internal class HelpAction(private val parser: ParserInternal<*>) : Runnable {
     }
 
     fun run(output: Output) {
-        output.writeLine()
-        parser.usage().writeSummaryTo(output)
-        output.maybeNewLine()
+        output.apply {
+            writeLine()
+            parser.usage().writeSummaryTo(this)
+            maybeNewLine()
+        }
     }
 }

@@ -19,8 +19,13 @@ class JvmCliAppBuilder internal constructor(
     name: String,
     private val container: SampleContainer
 ) : CliAppBuilder() {
+    private var launcher: String? = null
     private val derived = mutableListOf<DerivedCliAppBuilder>()
     private val builder = DerivedJvmCliAppBuilder(name, container)
+
+    fun launcher(name: String) {
+        builder.launcher(name)
+    }
 
     fun derive(name: String, config: DerivedJvmCliAppBuilder.() -> Unit) {
         val builder = DerivedJvmCliAppBuilder(name, container)

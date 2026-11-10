@@ -116,8 +116,11 @@ samples {
     jvmCliApp("cli-args-actions") { cliArgs("--help") }
 
     jvmCliApp("cli-args-jvm-app") {
+        launcher("cli-args-app")
         cliArgs("--help")
-        deriveNative("cli-args-native-app")
+        deriveNative("cli-args-native-app") {
+            launcher("cli-args-app")
+        }
     }
 
     nativeCliApp("native-cli-app-generated-source") {

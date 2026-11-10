@@ -4,13 +4,13 @@ import net.rubygrapefruit.app.launcher.isPropagateMainFailure
 import net.rubygrapefruit.cli.Runnable
 import net.rubygrapefruit.cli.parser.Parser
 import net.rubygrapefruit.cli.terminal.Output
-import net.rubygrapefruit.cli.terminal.output
+import net.rubygrapefruit.cli.terminal.diagnostics
 
 /**
  * Runs the [Runnable] produced by parsing the given arguments, and then exits the process.
  */
 fun Parser<Runnable>.runApp(arguments: Array<String>) {
-    val exitCode = runApp(this, arguments.toList(), output())
+    val exitCode = runApp(this, arguments.toList(), diagnostics())
     exit(exitCode)
 }
 

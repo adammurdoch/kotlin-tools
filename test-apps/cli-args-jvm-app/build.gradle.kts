@@ -3,6 +3,7 @@ plugins {
 }
 
 application {
+    appName = "cli-args-app"
     dependencies {
         implementation(versions.libs.coordinates("cli-app"))
     }

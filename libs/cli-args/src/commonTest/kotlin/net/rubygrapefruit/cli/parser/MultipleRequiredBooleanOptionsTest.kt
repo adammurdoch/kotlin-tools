@@ -21,6 +21,11 @@ class MultipleRequiredBooleanOptionsTest : AbstractParseTest() {
         val parser = params(option("a").boolean().required(), option("b").boolean().required(), option("long").boolean().required()) { a, b, c -> listOf(a, b, c) }
 
         assertEquals("-a -b --long", parser.usage)
+        parser.options {
+            option("-a")
+            option("-b")
+            option("--long")
+        }
     }
 
     @Test

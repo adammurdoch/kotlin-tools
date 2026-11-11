@@ -15,6 +15,16 @@ class StringOptionAndStringPositionalTest : AbstractParseTest() {
     }
 
     @Test
+    fun `reports usage`() {
+        val parser = params(option("x"), positional("a")) { _, _ -> fail() }
+
+        assertEquals("[-x <value>] <a>", parser.usage)
+        parser.options {
+            option("-x <value>")
+        }
+    }
+
+    @Test
     fun `must provide positional`() {
         val parser = params(option("x"), positional("a")) { _, _ -> fail() }
 

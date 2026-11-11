@@ -27,6 +27,8 @@ class ChoiceOfOptionOrCommandTest : AbstractParseTest() {
             """-h | --help
 run""", parser.usage
         )
-        assertEquals("-h, --help", parser.optionUsage)
+        parser.options {
+            option("-h, --help")
+        }
     }
 }

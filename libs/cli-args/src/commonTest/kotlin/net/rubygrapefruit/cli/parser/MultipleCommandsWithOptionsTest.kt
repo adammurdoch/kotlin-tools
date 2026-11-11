@@ -4,7 +4,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
 
-class MultipleCommandAndOptionsTest : AbstractParseTest() {
+class MultipleCommandsWithOptionsTest : AbstractParseTest() {
     @Test
     fun `parses command and options then command and options`() {
         val command1 = params(command("one"), option("a")) { it }

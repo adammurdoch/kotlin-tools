@@ -17,6 +17,7 @@ class StringPositionalTest : AbstractParseTest() {
         val parser = positional("param")
 
         assertEquals("<param>", parser.usage)
+        parser.noOptions()
     }
 
     @Test

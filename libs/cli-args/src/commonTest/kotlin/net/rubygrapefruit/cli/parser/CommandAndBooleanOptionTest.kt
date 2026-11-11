@@ -26,7 +26,9 @@ class CommandAndBooleanOptionTest : AbstractParseTest() {
         ) { _, _ -> fail() }
 
         assertEquals("run [-a]", parser.usage)
-        assertEquals("-a", parser.optionUsage)
+        parser.options {
+            option("-a")
+        }
     }
 
     @Test

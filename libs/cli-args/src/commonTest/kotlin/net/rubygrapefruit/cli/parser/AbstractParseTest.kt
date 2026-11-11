@@ -22,19 +22,21 @@ abstract class AbstractParseTest {
             return output.text
         }
 
-    protected val Parser<*>.optionUsage: String
-        get() {
-            val options = (usage() as UsageInternal).options()
-            assertEquals(1, options.size)
-            return options.first().optionUsage
-        }
-
     internal val UsageInternal.OptionUsage.optionUsage: String
         get() {
             val output = BufferingOutput()
             writeOptionUsageTo(output)
             return output.text
         }
+
+    protected fun Parser<*>.noOptions() {
+        options {}
+    }
+
+    protected fun Parser<*>.options(config: Options.() -> Unit) {
+        val options = (usage() as UsageInternal).options()
+        DefaultOptions(options).check(config)
+    }
 
     internal val Parser<*>.options: List<UsageInternal.OptionUsage>
         get() {
@@ -61,6 +63,7 @@ abstract class AbstractParseTest {
         private var current = 0
 
         fun check(config: Failures.() -> Unit) {
+            current = 0
             config()
             assertEquals(current, failure.problems.size) { "expected $current problems, found: ${failure.problems.text()}" }
         }
@@ -81,6 +84,29 @@ abstract class AbstractParseTest {
             val buffer = BufferingOutput()
             writeTo(buffer)
             return buffer.text
+        }
+    }
+
+    protected interface Options {
+        fun option(usage: String)
+    }
+
+    private class DefaultOptions(val options: List<UsageInternal.OptionUsage>) : Options {
+        private var current = 0
+
+        fun check(config: Options.() -> Unit) {
+            current = 0
+            config()
+            assertEquals(current, options.size)
+        }
+
+        override fun option(usage: String) {
+            val option = options[current]
+            val output = BufferingOutput()
+            option.writeOptionUsageTo(output)
+
+            assertEquals(usage, output.text)
+            current++
         }
     }
 }

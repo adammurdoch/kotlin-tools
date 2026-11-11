@@ -2,7 +2,6 @@ package net.rubygrapefruit.cli.parser
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertIs
 
 class ChoiceOfStringOptionsTest : AbstractParseTest() {
     @Test
@@ -52,6 +51,11 @@ class ChoiceOfStringOptionsTest : AbstractParseTest() {
             """[-a <value>]
 [-b <value>]
 [-c <value>]""", parser.usage)
+        val options = parser.options
+        assertEquals(3, options.size)
+        assertEquals("-a <value>", options[0].optionUsage)
+        assertEquals("-b <value>", options[1].optionUsage)
+        assertEquals("-c <value>", options[2].optionUsage)
     }
 
     @Test

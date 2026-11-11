@@ -9,5 +9,5 @@ interface BooleanOption : Option<Boolean> {
     /**
      * Creates a copy of this option that must be present in the provided arguments.
      */
-    fun required(): Parser<Unit>
+    fun required(): Option<Unit>
 }

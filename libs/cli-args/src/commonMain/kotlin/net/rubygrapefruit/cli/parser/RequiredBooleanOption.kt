@@ -2,7 +2,7 @@ package net.rubygrapefruit.cli.parser
 
 import net.rubygrapefruit.cli.terminal.Output
 
-internal class RequiredBooleanOption(private val flags: List<String>, private val names: List<String>) : AbstractParser<Unit>() {
+internal class RequiredBooleanOption(private val flags: List<String>, private val names: List<String>) : AbstractParser<Unit>(), Option<Unit> {
     override fun start(): ParseState<Unit> {
         return State(flags, names)
     }

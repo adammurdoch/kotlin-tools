@@ -9,7 +9,7 @@ import kotlin.test.fail
 /**
  * Some cross-cutting tests, most error handling is covered by the parser specific tests.
  */
-class ParseFailureTest : AbstractParseTest() {
+class ParseFailureReportingTest : AbstractParseTest() {
     @Test
     fun `reports problem and shows usage summary on parse failure`() {
         val parser = params(option("a"), option("b")) { _, _ -> fail() }

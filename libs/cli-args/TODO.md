@@ -94,6 +94,8 @@ Parsers
 
 - `option(name): Option<String?>`
     - matches `-n value' or '--name value', null when not present
+- `option(name).required(): Option<String>`
+    - matches `-n value' or '--name value', must be present
 - `option(name).boolean(): Option<Boolean>`
     - matches `-n` or `--name`, false when not present
 - `option(name).boolean().required(): Parser<Unit>`
@@ -161,6 +163,8 @@ TODO
     - Sort options
     - Show commands, sorted
     - Merge duplicate options
+- Required string option
+    - Repeated option, badly formed option
 - Convenience for completion command or option
     - Add 'completion' command when app uses commands
 - Parser that collects unrecognized or remainder

@@ -13,6 +13,10 @@ internal class DefaultStringOption(unsortedNames: List<String>) : AbstractParser
     }
     private val flags = names.map { name -> if (name.length == 1) "-$name" else "--$name" }
 
+    override fun required(): Option<String> {
+        return RequiredStringOption(flags, names)
+    }
+
     override fun boolean(): BooleanOption {
         return DefaultBooleanOption(flags, names)
     }

@@ -7,6 +7,11 @@ package net.rubygrapefruit.cli.parser
  */
 interface StringOption : Option<String?> {
     /**
+     * Creates a copy of this option that must be present in the provided arguments.
+     */
+    fun required(): Option<String>
+
+    /**
      * Creates a copy of this option that produces `true` when the option is present in the arguments or `false` when the option is not present.
      */
     fun boolean(): BooleanOption

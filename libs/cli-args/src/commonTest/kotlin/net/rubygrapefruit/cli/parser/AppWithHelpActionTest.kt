@@ -20,6 +20,11 @@ class AppWithHelpActionTest : AbstractParseTest() {
 USAGE:
   some_app -h | --help
   some_app [-x <value>]
+
+OPTIONS:
+  -h, --help
+  -x <value>
+
 """, output.text
         )
     }

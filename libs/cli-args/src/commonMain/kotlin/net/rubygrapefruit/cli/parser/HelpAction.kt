@@ -17,7 +17,8 @@ internal class HelpAction(private val parser: ParserInternal<*>) : Runnable {
             maybeNewLine()
             val options = usage.options()
             if (options.isNotEmpty()) {
-                heading("OPTIONS")
+                writeLine()
+                heading("OPTIONS:")
                 writeLine()
 
                 for (option in options) {
@@ -26,6 +27,7 @@ internal class HelpAction(private val parser: ParserInternal<*>) : Runnable {
                     writeLine()
                 }
             }
+            writeLine()
         }
     }
 }

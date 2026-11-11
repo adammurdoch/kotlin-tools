@@ -157,10 +157,10 @@ TODO
 - Convenience for help command or option
     - Add 'help' command when app uses commands
     - Help option has the highest priority
-    - Show options
     - Show option descriptions
     - Sort options
     - Show commands, sorted
+    - Merge duplicate options
 - Convenience for completion command or option
     - Add 'completion' command when app uses commands
 - Parser that collects unrecognized or remainder

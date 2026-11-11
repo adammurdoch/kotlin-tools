@@ -54,6 +54,10 @@ internal class AppParser(
             return usage.choices().map { AppUsage(it) }
         }
 
+        override fun options(): List<UsageInternal.OptionUsage> {
+            return usage.options()
+        }
+
         override fun writeTo(quoted: Boolean, output: Output) {
             output.write(name)
             if (!usage.isEmpty) {

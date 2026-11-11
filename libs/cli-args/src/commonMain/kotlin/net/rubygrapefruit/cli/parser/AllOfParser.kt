@@ -20,6 +20,10 @@ internal class AllOfParser<OUT>(
         override val isEmpty: Boolean
             get() = usages.isEmpty()
 
+        override fun options(): List<UsageInternal.OptionUsage> {
+            return usages.flatMap { it.options() }
+        }
+
         override fun writeTo(quoted: Boolean, output: Output) {
             if (usages.size == 1) {
                 usages.first().writeTo(quoted, output)
@@ -31,10 +35,6 @@ internal class AllOfParser<OUT>(
                     parser.writeTo(true, output)
                 }
             }
-        }
-
-        override fun options(): List<UsageInternal.OptionUsage> {
-            return usages.flatMap { it.options() }
         }
     }
 

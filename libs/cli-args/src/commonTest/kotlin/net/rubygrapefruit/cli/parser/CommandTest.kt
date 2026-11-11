@@ -15,7 +15,7 @@ class CommandTest : AbstractParseTest() {
     fun `reports usage`() {
         val parser = command("help")
 
-        assertEquals("help", parser.usage)
+        parser.usage("help")
         parser.noOptions()
     }
 

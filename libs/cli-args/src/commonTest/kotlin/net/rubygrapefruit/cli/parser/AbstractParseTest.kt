@@ -15,13 +15,6 @@ abstract class AbstractParseTest {
         }
     }
 
-    protected val Parser<*>.usage: String
-        get() {
-            val output = BufferingOutput()
-            usage().writeTo(output)
-            return output.text
-        }
-
     protected fun Parser<*>.usage(usage: String) {
         usage { choice(usage) }
     }
@@ -102,14 +95,24 @@ abstract class AbstractParseTest {
             current = 0
             config()
             assertEquals(current, choices.size)
+
+            if (current == 1) {
+                assertEquals(usage.usage(), choices.first().usage())
+            } else {
+                assertEquals(choices.map { it.usage() }, usage.usage().lines())
+            }
         }
 
         override fun choice(usage: String) {
             val choice = choices[current]
-            val output = BufferingOutput()
-            choice.writeTo(output)
-            assertEquals(usage, output.text)
+            assertEquals(usage, choice.usage())
             current++
+        }
+
+        private fun UsageInternal.usage(): String {
+            val output = BufferingOutput()
+            writeTo(output)
+            return output.text
         }
     }
 

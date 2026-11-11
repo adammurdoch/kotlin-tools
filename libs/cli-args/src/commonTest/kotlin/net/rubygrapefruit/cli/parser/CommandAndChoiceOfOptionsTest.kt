@@ -29,7 +29,7 @@ class CommandAndChoiceOfOptionsTest : AbstractParseTest() {
             option("root", "r").boolean().required(),
         ) { a, b -> listOf(a, b) }
 
-        assertEquals("run ([-h <value> | --hostname <value>] | [--ip <value>]) (-r | --root)", parser.usage)
+        parser.usage("run ([-h <value> | --hostname <value>] | [--ip <value>]) (-r | --root)")
 
         parser.options {
             option("-h <value>, --hostname <value>")

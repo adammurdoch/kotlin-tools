@@ -23,7 +23,7 @@ class MultipleCommandsWithOptionsTest : AbstractParseTest() {
         val command2 = params(command("two"), option("b")) { it }
         val parser = params(command1, command2) { _, _ -> fail() }
 
-        assertEquals("one [-a <value>] two [-b <value>]", parser.usage)
+        parser.usage("one [-a <value>] two [-b <value>]")
 
         parser.options {
             option("-a <value>")

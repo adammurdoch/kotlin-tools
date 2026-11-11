@@ -36,12 +36,12 @@ class ChoiceOfChoiceTest : AbstractParseTest() {
             params(option("4").boolean().required()) { 4 }
         )
 
-        assertEquals(
-            """one
-two
--3
--4""", parser.usage
-        )
+        parser.usage {
+            choice("one")
+            choice("two")
+            choice("-3")
+            choice("-4")
+        }
         parser.options {
             option("-3")
             option("-4")

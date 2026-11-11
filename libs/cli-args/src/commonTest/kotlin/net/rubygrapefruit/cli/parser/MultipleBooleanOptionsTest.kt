@@ -58,7 +58,7 @@ class MultipleBooleanOptionsTest : AbstractParseTest() {
     fun `reports usage for three options`() {
         val parser = params(option("a").boolean(), option("b").boolean(), option("long").boolean()) { a, b, c -> listOf(a, b, c) }
 
-        assertEquals("[-a] [-b] [--long]", parser.usage)
+        parser.usage("[-a] [-b] [--long]")
 
         parser.options {
             option("-a")

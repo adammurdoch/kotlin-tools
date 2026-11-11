@@ -105,7 +105,7 @@ class MultipleStringOptionsTest : AbstractParseTest() {
     fun `reports usage for two options with short name`() {
         val parser = params(option("a"), option("b")) { a, b -> listOf(a, b) }
 
-        assertEquals("[-a <value>] [-b <value>]", parser.usage)
+        parser.usage("[-a <value>] [-b <value>]")
         parser.options {
             option("-a <value>")
             option("-b <value>")
@@ -116,7 +116,7 @@ class MultipleStringOptionsTest : AbstractParseTest() {
     fun `reports usage for three options`() {
         val parser = params(option("a"), option("b"), option("long")) { a, b, c -> listOf(a, b, c) }
 
-        assertEquals("[-a <value>] [-b <value>] [--long <value>]", parser.usage)
+        parser.usage("[-a <value>] [-b <value>] [--long <value>]")
         parser.options {
             option("-a <value>")
             option("-b <value>")

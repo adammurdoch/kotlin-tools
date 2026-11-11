@@ -24,7 +24,7 @@ class AppParserTest : AbstractParseTest() {
     fun `reports app usage when app takes no parameters`() {
         val parser = app("some_app", params { NoParams() })
 
-        assertEquals("some_app", parser.usage)
+        parser.usage("some_app")
         parser.noOptions()
     }
 
@@ -32,10 +32,8 @@ class AppParserTest : AbstractParseTest() {
     fun `reports app usage when app takes option`() {
         val parser = app("some_app", params(option("x")) { OneParam(it) })
 
-        assertEquals("some_app [-x <value>]", parser.usage)
-        parser.options {
-            option("-x <value>")
-        }
+        parser.usage("some_app [-x <value>]")
+        parser.option("-x <value>")
     }
 
     @Test
@@ -46,11 +44,10 @@ class AppParserTest : AbstractParseTest() {
         )
         val parser = app("some_app", choices)
 
-        assertEquals(
-            """some_app --help
-some_app run""", parser.usage
-        )
-
+        parser.usage {
+            choice("some_app --help")
+            choice("some_app run")
+        }
         parser.options {
             option("--help")
         }

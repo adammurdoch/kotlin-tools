@@ -1,7 +1,6 @@
 package net.rubygrapefruit.cli.parser
 
 import kotlin.test.Test
-import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertSame
 
@@ -36,11 +35,14 @@ class AppWithStandardActions : AbstractParseTest() {
             )
         ).withHelp()
 
-        assertEquals(
-            """some_app -h | --help
-some_app start
-some_app stop""", parser.usage
-        )
+        parser.usage {
+            choice("some_app -h | --help")
+            choice("some_app start")
+            choice("some_app stop")
+        }
+        parser.options {
+            option("-h, --help")
+        }
     }
 
     @Test

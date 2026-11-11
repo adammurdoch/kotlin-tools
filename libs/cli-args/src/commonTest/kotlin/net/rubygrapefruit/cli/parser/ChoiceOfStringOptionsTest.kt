@@ -47,11 +47,11 @@ class ChoiceOfStringOptionsTest : AbstractParseTest() {
             option("c")
         )
 
-        assertEquals(
-            """[-a <value>]
-[-b <value>]
-[-c <value>]""", parser.usage
-        )
+        parser.usage {
+            choice("[-a <value>]")
+            choice("[-b <value>]")
+            choice("[-c <value>]")
+        }
 
         parser.options {
             option("-a <value>")

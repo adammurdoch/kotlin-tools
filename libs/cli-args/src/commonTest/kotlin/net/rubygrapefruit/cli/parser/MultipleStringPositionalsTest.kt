@@ -23,7 +23,7 @@ class MultipleStringPositionalsTest : AbstractParseTest() {
     fun `reports usage of three positionals`() {
         val parser = params(positional("a"), positional("b"), positional("c")) { _, _, _ -> fail() }
 
-        assertEquals("<a> <b> <c>", parser.usage)
+        parser.usage("<a> <b> <c>")
         parser.noOptions()
     }
 

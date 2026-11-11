@@ -35,30 +35,24 @@ class BooleanOptionTest : AbstractParseTest() {
     fun `reports usage of option with short name`() {
         val parser = option("x").boolean()
 
-        assertEquals("[-x]", parser.usage)
-        parser.options {
-            option("-x")
-        }
+        parser.usage("[-x]")
+        parser.option("-x")
     }
 
     @Test
     fun `reports usage of option with long name`() {
         val parser = option("some-flag").boolean()
 
-        assertEquals("[--some-flag]", parser.usage)
-        parser.options {
-            option("--some-flag")
-        }
+        parser.usage("[--some-flag]")
+        parser.option("--some-flag")
     }
 
     @Test
     fun `reports usage of option with multiple names`() {
         val parser = option("some-flag", "x", "a", "long").boolean()
 
-        assertEquals("[-a | -x | --long | --some-flag]", parser.usage)
-        parser.options {
-            option("-a, -x, --long, --some-flag")
-        }
+        parser.usage("[-a | -x | --long | --some-flag]")
+        parser.option("-a, -x, --long, --some-flag")
     }
 
     @Test

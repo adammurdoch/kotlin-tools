@@ -22,10 +22,10 @@ class ChoiceOfCommandTest : AbstractParseTest() {
             params(command("two")) { 2 },
         )
 
-        assertEquals(
-            """one
-two""", parser.usage
-        )
+        parser.usage {
+            choice("one")
+            choice("two")
+        }
         parser.noOptions()
     }
 

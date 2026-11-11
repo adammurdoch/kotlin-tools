@@ -11,24 +11,30 @@ internal class AllOfParser<OUT>(
     }
 
     override fun usage(): UsageInternal {
-        return AllOfUsage()
+        return AllOfUsage(parsers)
     }
 
-    private inner class AllOfUsage : UsageInternal {
+    private class AllOfUsage(parsers: List<ParserInternal<*>>) : UsageInternal {
+        private val usages = parsers.map { it.usage() }
+
         override val isEmpty: Boolean
-            get() = parsers.isEmpty()
+            get() = usages.isEmpty()
 
         override fun writeTo(quoted: Boolean, output: Output) {
-            if (parsers.size == 1) {
-                parsers.first().usage().writeTo(quoted, output)
+            if (usages.size == 1) {
+                usages.first().writeTo(quoted, output)
             } else {
-                parsers.forEachIndexed { index, parser ->
+                usages.forEachIndexed { index, parser ->
                     if (index > 0) {
                         output.write(" ")
                     }
-                    parser.usage().writeTo(true, output)
+                    parser.writeTo(true, output)
                 }
             }
+        }
+
+        override fun options(): List<UsageInternal.OptionUsage> {
+            return usages.flatMap { it.options() }
         }
     }
 

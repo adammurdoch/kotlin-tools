@@ -16,6 +16,7 @@ class CommandTest : AbstractParseTest() {
         val parser = command("help")
 
         assertEquals("help", parser.usage)
+        assertEquals(0, parser.options.size)
     }
 
     @Test

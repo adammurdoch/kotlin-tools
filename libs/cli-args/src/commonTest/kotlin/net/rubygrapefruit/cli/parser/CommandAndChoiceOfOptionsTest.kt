@@ -3,7 +3,7 @@ package net.rubygrapefruit.cli.parser
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class CommandAndMultipleChoiceOfOptionsTest : AbstractParseTest() {
+class CommandAndChoiceOfOptionsTest : AbstractParseTest() {
     @Test
     fun `parses command with multiple choices of options`() {
         val parser = params(

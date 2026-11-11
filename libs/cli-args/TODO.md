@@ -136,6 +136,8 @@ TODO
 - `oneOf()` currently does not fail on conflicting options or literals
     - See ChoiceOfStringOptionsTest
 - `oneOf()` reports problems for option (e.g. repeated option, missing value)
+- `params()` does not parse positionals in order if the parsers also allow options
+    - See MultipleCommandAndOptionsTest
 - Literal currently fails inconsistently when unexpected argument or option is found
     - For unexpected argument, a single "unexpected argument x, expected y" problem is reported
     - For unexpected option, both "expected x" and "unexpected option -x" are reported
@@ -167,7 +169,7 @@ TODO
 - `--option=<value>` (allows value that starts with `-`)
 - `--no-x` flag for boolean options
 - Convenience for `--version`
-  - Include in help output
+    - Include in help output
 - Convenience for `--stack`
 - Convenience for @arg file.
 - `-Dx=y` style

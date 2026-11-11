@@ -19,12 +19,15 @@ internal sealed interface UsageInternal : Usage {
     /**
      * Unpacks this usage into its choices, if any.
      *
-     * Returns a list with a single element if this usage has no choices
+     * Returns a list with a single element if this usage is not a choice.
      */
     fun choices(): List<UsageInternal> {
         return listOf(this)
     }
 
+    /**
+     * Returns the options of this usage, if any.
+     */
     fun options(): List<OptionUsage> {
         return emptyList()
     }

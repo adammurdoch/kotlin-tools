@@ -2,6 +2,7 @@ package net.rubygrapefruit.cli.parser
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.fail
 
 class CommandAndStringPositionalTest : AbstractParseTest() {
     @Test
@@ -18,6 +19,22 @@ class CommandAndStringPositionalTest : AbstractParseTest() {
 
         assertEquals("one", parser.parse("one", "run").get())
         assertEquals("run", parser.parse("run", "run").get())
+    }
+
+    @Test
+    fun `reports usage of command then parameter`() {
+        val parser = params(command("run"), positional("a")) { fail() }
+
+        assertEquals("run <a>", parser.usage)
+        assertEquals(0, parser.options.size)
+    }
+
+    @Test
+    fun `reports usage of parameter then command`() {
+        val parser = params(positional("a"), command("run")) { a, _ -> a }
+
+        assertEquals("<a> run", parser.usage)
+        assertEquals(0, parser.options.size)
     }
 
     @Test

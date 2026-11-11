@@ -19,6 +19,17 @@ class CommandAndBooleanOptionTest : AbstractParseTest() {
     }
 
     @Test
+    fun `reports usage`() {
+        val parser = params(
+            command("run"),
+            option("a").boolean()
+        ) { _, _ -> fail() }
+
+        assertEquals("run [-a]", parser.usage)
+        assertEquals("-a", parser.optionUsage)
+    }
+
+    @Test
     fun `must provide command`() {
         val parser = params(
             command("run"),

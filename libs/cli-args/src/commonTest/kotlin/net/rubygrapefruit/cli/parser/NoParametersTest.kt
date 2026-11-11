@@ -29,5 +29,8 @@ class NoParametersTest : AbstractParseTest() {
         parser.fails("unknown") {
             failure(0, "Unexpected argument 'unknown'")
         }
+        parser.fails("") {
+            failure(0, "Unexpected argument ''")
+        }
     }
 }

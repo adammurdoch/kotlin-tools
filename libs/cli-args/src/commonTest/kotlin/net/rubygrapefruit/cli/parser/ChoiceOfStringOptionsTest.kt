@@ -51,6 +51,7 @@ class ChoiceOfStringOptionsTest : AbstractParseTest() {
             """[-a <value>]
 [-b <value>]
 [-c <value>]""", parser.usage)
+
         val options = parser.options
         assertEquals(3, options.size)
         assertEquals("-a <value>", options[0].optionUsage)

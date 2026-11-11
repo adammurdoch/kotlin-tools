@@ -42,5 +42,9 @@ two
 -3
 -4""", parser.usage
         )
+        val options = parser.options
+        assertEquals(2, options.size)
+        assertEquals("-3", options[0].optionUsage)
+        assertEquals("-4", options[1].optionUsage)
     }
 }

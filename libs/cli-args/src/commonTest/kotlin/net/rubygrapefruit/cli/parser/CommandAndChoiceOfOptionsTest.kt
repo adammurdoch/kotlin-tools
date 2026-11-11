@@ -31,10 +31,10 @@ class CommandAndChoiceOfOptionsTest : AbstractParseTest() {
 
         assertEquals("run ([-h <value> | --hostname <value>] | [--ip <value>]) (-r | --root)", parser.usage)
 
-        val options = parser.options
-        assertEquals(3, options.size)
-        assertEquals("-h <value>, --hostname <value>", options[0].optionUsage)
-        assertEquals("--ip <value>", options[1].optionUsage)
-        assertEquals("-r, --root", options[2].optionUsage)
+        parser.options {
+            option("-h <value>, --hostname <value>")
+            option("--ip <value>")
+            option("-r, --root")
+        }
     }
 }

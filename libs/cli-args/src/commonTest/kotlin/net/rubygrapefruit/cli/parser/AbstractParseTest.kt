@@ -22,13 +22,6 @@ abstract class AbstractParseTest {
             return output.text
         }
 
-    internal val UsageInternal.OptionUsage.optionUsage: String
-        get() {
-            val output = BufferingOutput()
-            writeOptionUsageTo(output)
-            return output.text
-        }
-
     protected fun Parser<*>.noOptions() {
         options {}
     }
@@ -37,11 +30,6 @@ abstract class AbstractParseTest {
         val options = (usage() as UsageInternal).options()
         DefaultOptions(options).check(config)
     }
-
-    internal val Parser<*>.options: List<UsageInternal.OptionUsage>
-        get() {
-            return (usage() as UsageInternal).options()
-        }
 
     protected fun Parser<*>.fails(vararg args: String, config: Failures.() -> Unit) {
         val result = parse(*args)

@@ -26,7 +26,7 @@ class ChoiceOfCommandTest : AbstractParseTest() {
             """one
 two""", parser.usage
         )
-        assertEquals(0, parser.options.size)
+        parser.noOptions()
     }
 
     @Test

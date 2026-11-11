@@ -50,13 +50,14 @@ class ChoiceOfStringOptionsTest : AbstractParseTest() {
         assertEquals(
             """[-a <value>]
 [-b <value>]
-[-c <value>]""", parser.usage)
+[-c <value>]""", parser.usage
+        )
 
-        val options = parser.options
-        assertEquals(3, options.size)
-        assertEquals("-a <value>", options[0].optionUsage)
-        assertEquals("-b <value>", options[1].optionUsage)
-        assertEquals("-c <value>", options[2].optionUsage)
+        parser.options {
+            option("-a <value>")
+            option("-b <value>")
+            option("-c <value>")
+        }
     }
 
     @Test

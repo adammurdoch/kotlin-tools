@@ -25,10 +25,10 @@ class MultipleCommandsWithOptionsTest : AbstractParseTest() {
 
         assertEquals("one [-a <value>] two [-b <value>]", parser.usage)
 
-        val options = parser.options
-        assertEquals(2, options.size)
-        assertEquals("-a <value>", options[0].optionUsage)
-        assertEquals("-b <value>", options[1].optionUsage)
+        parser.options {
+            option("-a <value>")
+            option("-b <value>")
+        }
     }
 
     @Test

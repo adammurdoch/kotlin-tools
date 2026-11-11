@@ -25,7 +25,7 @@ class AppParserTest : AbstractParseTest() {
         val parser = app("some_app", params { NoParams() })
 
         assertEquals("some_app", parser.usage)
-        assertEquals(0, parser.options.size)
+        parser.noOptions()
     }
 
     @Test

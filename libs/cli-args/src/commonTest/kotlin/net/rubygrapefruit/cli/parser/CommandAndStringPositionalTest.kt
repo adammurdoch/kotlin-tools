@@ -26,7 +26,7 @@ class CommandAndStringPositionalTest : AbstractParseTest() {
         val parser = params(command("run"), positional("a")) { fail() }
 
         assertEquals("run <a>", parser.usage)
-        assertEquals(0, parser.options.size)
+        parser.noOptions()
     }
 
     @Test
@@ -34,7 +34,7 @@ class CommandAndStringPositionalTest : AbstractParseTest() {
         val parser = params(positional("a"), command("run")) { a, _ -> a }
 
         assertEquals("<a> run", parser.usage)
-        assertEquals(0, parser.options.size)
+        parser.noOptions()
     }
 
     @Test

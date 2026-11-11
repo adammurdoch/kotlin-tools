@@ -26,7 +26,7 @@ class ChoiceOfCommandWithPositionalsTest : AbstractParseTest() {
             """one <a>
 two""", parser.usage
         )
-        assertEquals(0, parser.options.size)
+        parser.noOptions()
     }
 
     @Test

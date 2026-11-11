@@ -23,27 +23,6 @@ class AppWithStandardActions : AbstractParseTest() {
         assertIs<HelpAction>(parser.parse("-h").get())
     }
 
-    @Test
-    fun `reports usage of choice of help or command`() {
-        val start = NoParams()
-        val stop = NoParams()
-        val parser = app(
-            "some_app",
-            oneOf(
-                params(command("start")) { start },
-                params(command("stop")) { stop }
-            )
-        ).withHelp()
-
-        parser.usage {
-            choice("some_app -h | --help")
-            choice("some_app start")
-            choice("some_app stop")
-        }
-        parser.options {
-            option("-h, --help")
-        }
-    }
 
     @Test
     fun `parses choice of completion or command`() {

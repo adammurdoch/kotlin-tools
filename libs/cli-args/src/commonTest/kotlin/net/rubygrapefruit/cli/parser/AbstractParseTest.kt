@@ -39,6 +39,13 @@ abstract class AbstractParseTest {
         DefaultOptions(options).check(config)
     }
 
+    protected fun Parser<*>.help(help: String) {
+        val action = assertIs<HelpAction>(parse("--help").get())
+        val output = BufferingOutput()
+        action.run(output)
+        assertEquals(help, output.text)
+    }
+
     protected fun Parser<*>.fails(vararg args: String, config: Failures.() -> Unit) {
         val result = parse(*args)
         assertIs<Parser.Failure>(result)

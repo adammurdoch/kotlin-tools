@@ -16,7 +16,7 @@ class NoParametersTest : AbstractParseTest() {
     fun `reports usage`() {
         val parser = params { "result" }
 
-        assertEquals("", parser.usage)
+        parser.usage("")
         parser.noOptions()
     }
 

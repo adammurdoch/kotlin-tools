@@ -41,30 +41,24 @@ class StringOptionTest : AbstractParseTest() {
     fun `reports usage of option with short name`() {
         val parser = option("x")
 
-        assertEquals("[-x <value>]", parser.usage)
-        parser.options {
-            option("-x <value>")
-        }
+        parser.usage("[-x <value>]")
+        parser.option("-x <value>")
     }
 
     @Test
     fun `reports usage of option with long name`() {
         val parser = option("an-option")
 
-        assertEquals("[--an-option <value>]", parser.usage)
-        parser.options {
-            option("--an-option <value>")
-        }
+        parser.usage("[--an-option <value>]")
+        parser.option("--an-option <value>")
     }
 
     @Test
     fun `reports usage of option with multiple names`() {
         val parser = option("option-x", "x", "aka", "a")
 
-        assertEquals("[-a <value> | -x <value> | --aka <value> | --option-x <value>]", parser.usage)
-        parser.options {
-            option("-a <value>, -x <value>, --aka <value>, --option-x <value>")
-        }
+        parser.usage("[-a <value> | -x <value> | --aka <value> | --option-x <value>]")
+        parser.option("-a <value>, -x <value>, --aka <value>, --option-x <value>")
     }
 
     @Test

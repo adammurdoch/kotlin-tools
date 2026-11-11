@@ -22,8 +22,23 @@ abstract class AbstractParseTest {
             return output.text
         }
 
+    protected fun Parser<*>.usage(usage: String) {
+        usage { choice(usage) }
+    }
+
+    protected fun Parser<*>.usage(config: UsageSummary.() -> Unit) {
+        val usage = usage() as UsageInternal
+        DefaultUsageSummary(usage).check(config)
+    }
+
     protected fun Parser<*>.noOptions() {
         options {}
+    }
+
+    protected fun Parser<*>.option(usage: String) {
+        options {
+            option(usage)
+        }
     }
 
     protected fun Parser<*>.options(config: Options.() -> Unit) {
@@ -72,6 +87,29 @@ abstract class AbstractParseTest {
             val buffer = BufferingOutput()
             writeTo(buffer)
             return buffer.text
+        }
+    }
+
+    protected interface UsageSummary {
+        fun choice(usage: String)
+    }
+
+    private class DefaultUsageSummary(val usage: UsageInternal) : UsageSummary {
+        private val choices = usage.choices()
+        private var current = 0
+
+        fun check(config: UsageSummary.() -> Unit) {
+            current = 0
+            config()
+            assertEquals(current, choices.size)
+        }
+
+        override fun choice(usage: String) {
+            val choice = choices[current]
+            val output = BufferingOutput()
+            choice.writeTo(output)
+            assertEquals(usage, output.text)
+            current++
         }
     }
 

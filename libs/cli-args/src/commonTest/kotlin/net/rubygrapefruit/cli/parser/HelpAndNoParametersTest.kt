@@ -10,7 +10,7 @@ class HelpAndNoParametersTest : AbstractParseTest() {
         val parser = params { NoParams() }
         val app = app("some_app", parser).withHelp()
 
-        assertIs<NoParams>(app.parse("").get())
+        assertIs<NoParams>(app.parse().get())
         assertIs<HelpAction>(app.parse("--help").get())
     }
 

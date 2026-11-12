@@ -1,4 +1,3 @@
 package net.rubygrapefruit.cli.parser
 
-class ArgumentParseException: RuntimeException("Argument parsing failed") {
-}
+class ArgumentParseException(message: String) : RuntimeException(message)

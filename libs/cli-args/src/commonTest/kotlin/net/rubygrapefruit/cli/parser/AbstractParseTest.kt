@@ -54,7 +54,7 @@ abstract class AbstractParseTest {
         val e = assertFailsWith<ArgumentParseException> {
             result.get()
         }
-        assertEquals("Argument parsing failed", e.message)
+        assertTrue(e.message!!.startsWith("Argument parsing failed"))
     }
 
     protected interface Failures {

@@ -66,9 +66,8 @@ internal class OneOfParser<OUT>(val choices: List<ParserInternal<OUT>>) : Abstra
         }
 
         override fun finish(index: Int): ParseState.Result<OUT> {
-            val recognized = choices.filter { it.recognized }
             var problems: List<ProblemAtIndex> = emptyList()
-            for (choice in recognized) {
+            for (choice in choices) {
                 problems = problems.plus(choice.problems)
                 val result = choice.result ?: choice.state.finish(index)
                 when (result) {
@@ -77,15 +76,6 @@ internal class OneOfParser<OUT>(val choices: List<ParserInternal<OUT>>) : Abstra
                         if (choice.problems == null) {
                             return result
                         }
-                    }
-                }
-            }
-            if (recognized.isEmpty() && problems.isEmpty()) {
-                for (choice in choices) {
-                    val result = choice.state.finish(index)
-                    when (result) {
-                        is ParseState.FinalFailure -> problems = problems.plus(result.problems)
-                        is ParseState.Success -> return result
                     }
                 }
             }

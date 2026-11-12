@@ -1,5 +1,6 @@
 package net.rubygrapefruit.cli.parser
 
+import net.rubygrapefruit.cli.terminal.BufferingOutput
 import net.rubygrapefruit.cli.terminal.Output
 
 internal interface ParserInternal<out T> {
@@ -17,7 +18,14 @@ internal interface ParserInternal<out T> {
         override val problems: List<ProblemAtIndex> = problems.sortedBy { it.index }
 
         override fun get(): Nothing {
-            throw ArgumentParseException()
+            val output = BufferingOutput()
+            output.write("Argument parsing failed")
+            for (problem in problems) {
+                output.maybeNewLine()
+                output.write("- ")
+                problem.problem.writeTo(output)
+            }
+            throw ArgumentParseException(output.text)
         }
 
         override fun writeTo(output: Output) {

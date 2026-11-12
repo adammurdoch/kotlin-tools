@@ -8,7 +8,7 @@ class HelpAndStringOptionTest : AbstractParseTest() {
         val parser = option("x")
         val app = app("some_app", params(parser) { OneParam(it) }).withHelp()
 
-        assertIs<OneParam>(app.parse("-x value").get()).apply {
+        assertIs<OneParam>(app.parse("-x", "value").get()).apply {
             assertEquals("value", value)
         }
         assertIs<OneParam>(app.parse().get()).apply {

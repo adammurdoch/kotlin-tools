@@ -20,19 +20,20 @@ class ChoiceOfStringOptionsTest : AbstractParseTest() {
 
         // Capturing current behavior
 
-//        parser.fails("-a", "one", "-c", "three") {
+        parser.fails("-a", "one", "-c", "three") {
 //            failure(2, "Option -c cannot be used with option -a")
-//        }
-        assertEquals("one", parser.parse("-a", "one", "-c", "three").get())
+            failure(2, "Unexpected argument '-c'")
+        }
 //        parser.fails("-a", "one", "-b", "two", "-c", "three") {
 //            failure(2, "Option -b cannot be used with option -a")
 //            failure(4, "Option -c cannot be used with option -a")
 //        }
-//        parser.fails("-c", "three", "-b", "two", "-a", "one") {
+        parser.fails("-c", "three", "-b", "two", "-a", "one") {
 //            failure(2, "Option -b cannot be used with option -c")
 //            failure(4, "Option -a cannot be used with option -c")
-//        }
-        assertEquals("one", parser.parse("-c", "three", "-b", "two", "-a", "one").get())
+            failure(0, "Unexpected argument '-c'")
+            failure(2, "Unexpected argument '-b'")
+        }
 //        parser.fails("-a", "-c", "three") {
 //            failure(1, "No value provided for option -a")
 //            failure(1, "Option -c cannot be used with option -a")

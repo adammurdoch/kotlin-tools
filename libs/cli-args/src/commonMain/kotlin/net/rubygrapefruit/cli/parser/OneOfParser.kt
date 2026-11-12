@@ -35,11 +35,15 @@ internal class OneOfParser<OUT>(val choices: List<ParserInternal<OUT>>) : Abstra
             var recognized = Int.MAX_VALUE
             for (choice in choices) {
                 if (choice.result != null) {
+                    choice.problems = choice.problems.plus(ProblemAtIndex(args.index, UnexpectedArgument(args.first())))
                     continue
                 }
                 val result = choice.state.maybeParse(args)
                 when (result) {
-                    is ParseState.NotRecognized -> continue
+                    is ParseState.NotRecognized -> {
+                        choice.problems = choice.problems.plus(ProblemAtIndex(args.index, UnexpectedArgument(args.first())))
+                    }
+
                     is ParseState.Matched -> {
                         choice.recognized = true
                         recognized = min(recognized, result.count)
@@ -66,12 +70,10 @@ internal class OneOfParser<OUT>(val choices: List<ParserInternal<OUT>>) : Abstra
         }
 
         override fun finish(index: Int): ParseState.Result<OUT> {
-            var problems: List<ProblemAtIndex> = emptyList()
             for (choice in choices) {
-                problems = problems.plus(choice.problems)
                 val result = choice.result ?: choice.state.finish(index)
                 when (result) {
-                    is ParseState.FinalFailure -> problems = problems.plus(result.problems)
+                    is ParseState.FinalFailure -> choice.problems = choice.problems.plus(result.problems)
                     is ParseState.Success -> {
                         if (choice.problems == null) {
                             return result
@@ -79,6 +81,16 @@ internal class OneOfParser<OUT>(val choices: List<ParserInternal<OUT>>) : Abstra
                     }
                 }
             }
+            val best = choices.find { it.recognized }
+            if (best != null) {
+                return ParseState.FinalFailure(best.problems!!)
+            }
+
+            var problems: List<ProblemAtIndex> = emptyList()
+            for (choice in choices) {
+                problems += choice.problems!!
+            }
+
             return ParseState.FinalFailure(problems)
         }
     }

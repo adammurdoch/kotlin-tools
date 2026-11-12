@@ -2,28 +2,27 @@ package net.rubygrapefruit.cli.parser
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.fail
 
 class ChoiceOfCommandOrNoParametersTest : AbstractParseTest() {
     @Test
-    fun `parses one of literal and positional`() {
+    fun `parses one of command or no parameters`() {
         val parser = oneOf(
-            params(command("one")) { 1 },
-            params { 2 }
+            params(command("one")) { "command" },
+            params { "none" }
         )
 
-        assertEquals(1, parser.parse("one").get())
-        assertEquals(2, parser.parse().get())
+        assertEquals("command", parser.parse("one").get())
+        assertEquals("none", parser.parse().get())
     }
 
     @Test
-    fun `only last choice can match no arguments`() {
-        val empty = params { fail() }
-        val nonEmpty = params(command("one")) { fail() }
+    fun `parses one of no parameters or command`() {
+        val parser = oneOf(
+            params { "none" },
+            params(command("one")) { "command" }
+        )
 
-        assertFailsWith<IllegalArgumentException> {
-            oneOf(empty, nonEmpty)
-        }
+        assertEquals("command", parser.parse("one").get())
+        assertEquals("none", parser.parse().get())
     }
 }

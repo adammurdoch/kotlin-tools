@@ -138,6 +138,7 @@ TODO
 - `oneOf()` currently does not fail on conflicting options or literals
     - See ChoiceOfStringOptionsTest
 - `oneOf()` reports problems for option (e.g. repeated option, missing value)
+- `oneOf()` should fails when created with choice that can match no arguments when the choice is not the last
 - `params()` does not parse positionals in order if the parsers also allow options
     - See MultipleCommandAndOptionsTest
 - Literal currently fails inconsistently when unexpected argument or option is found

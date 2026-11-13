@@ -10,4 +10,13 @@ class OneCommandTest : AbstractParseTest() {
 
         assertEquals("result", parser.parse("run").get())
     }
+
+    @Test
+    fun `reports usage`() {
+        val parser = params(command("run")) { "result" }
+
+        parser.usage("run")
+        parser.noOptions()
+    }
+
 }

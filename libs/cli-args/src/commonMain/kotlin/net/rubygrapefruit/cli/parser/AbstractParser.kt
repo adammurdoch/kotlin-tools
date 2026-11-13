@@ -8,12 +8,49 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
     override fun parse(args: List<String>): Parser.Result<T> {
         val results = startAll().map { parseAlternative(args, it) }
         for (alternative in results) {
-            if (alternative.result is Parser.Success) {
-                return alternative.result
+            if (alternative.result is ParsedArguments.Success && alternative.recognizedCount == args.size) {
+                return ParserInternal.Success(alternative.result.value())
             }
         }
-        val best = results.maxBy { it.recognized }
-        return best.result
+
+        val best = results.maxBy { it.recognizedCount }
+        val recognized = best.recognized
+        val result = best.result
+
+        var unrecognizedProblems: List<ProblemAtIndex> = emptyList()
+        var index = 0
+        while (index < args.size) {
+            if (recognized[index]) {
+                index++
+                continue
+            }
+
+            val current = DefaultInputArgs(index, args, recognized)
+            val failure = result.claimUnrecognized(current)
+            if (failure != null) {
+                require(failure.count > 0)
+                unrecognizedProblems = unrecognizedProblems.plus(failure.problem)
+                index += failure.count
+            } else {
+                val problem = if (current.firstIsOption()) {
+                    UnexpectedOption(current.first())
+                } else {
+                    UnexpectedArgument(current.first())
+                }
+                unrecognizedProblems = unrecognizedProblems.plus(ProblemAtIndex(index, problem))
+                index++
+            }
+        }
+
+        return when (result) {
+            is ParsedArguments.Failure -> {
+                ParserInternal.Failure(result.problems().plus(unrecognizedProblems), this)
+            }
+
+            is ParsedArguments.Success -> {
+                ParserInternal.Failure(unrecognizedProblems, this)
+            }
+        }
     }
 
     private fun parseAlternative(args: List<String>, state: ParseState<T>): Alternative<T> {
@@ -40,47 +77,10 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
 
         val result = state.finish(args.size)
 
-        var unrecognizedProblems: List<ProblemAtIndex>? = null
-        index = 0
-        while (index < args.size) {
-            if (recognized[index]) {
-                index++
-                continue
-            }
-
-            val current = DefaultInputArgs(index, args, recognized)
-            val failure = result.claimUnrecognized(current)
-            if (failure != null) {
-                require(failure.count > 0)
-                unrecognizedProblems = unrecognizedProblems.plus(failure.problem)
-                index += failure.count
-            } else {
-                val problem = if (current.firstIsOption()) {
-                    UnexpectedOption(current.first())
-                } else {
-                    UnexpectedArgument(current.first())
-                }
-                unrecognizedProblems = unrecognizedProblems.plus(ProblemAtIndex(index, problem))
-                index++
-            }
-        }
-
-        val finalResult = when (result) {
-            is ParsedArguments.Failure -> {
-                ParserInternal.Failure(result.problems().plus(unrecognizedProblems), this)
-            }
-
-            is ParsedArguments.Success -> {
-                if (unrecognizedProblems != null) {
-                    ParserInternal.Failure(unrecognizedProblems, this)
-                } else {
-                    ParserInternal.Success(result.value())
-                }
-            }
-        }
-
-        return Alternative(finalResult, recognized.count { it })
+        return Alternative(result, recognized)
     }
 
-    private class Alternative<T>(val result: Parser.Result<T>, val recognized: Int)
+    private class Alternative<T>(val result: ParsedArguments<T>, val recognized: BooleanArray) {
+        val recognizedCount = recognized.count { it }
+    }
 }

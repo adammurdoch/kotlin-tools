@@ -3,7 +3,7 @@ package net.rubygrapefruit.cli.parser
 import kotlin.test.Test
 import kotlin.test.fail
 
-class HelpWithChoiceOfCommands : AbstractParseTest() {
+class HelpAndChoiceOfCommands : AbstractParseTest() {
     @Test
     fun `reports usage`() {
         val parser = app(

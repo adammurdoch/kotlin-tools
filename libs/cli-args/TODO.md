@@ -133,7 +133,8 @@ TODO
 - `allOf()` currently skips over a positional that does not match to the next positional
     - See ChoiceOfStringLiteralAndParametersTest, e.g. <literal> <parameter>
 - `oneOf()` currently reports each expected literal as a separate problem
-    - See ChoiceOfStringLiteralTest
+    - See ChoiceOfCommandTest
+- `oneOf()` should report problems from choice that recognized something first
 - `oneOf()` with overlapping options, some with values and some without
 - `oneOf()` currently does not fail on conflicting options or literals
     - See ChoiceOfStringOptionsTest

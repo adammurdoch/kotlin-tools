@@ -110,12 +110,12 @@ internal class AllOfParser<OUT>(
     }
 
     private class Failure(elements: List<ParsedArguments<*>>) : Result<ParsedArguments<*>>(elements), ParsedArguments.Failure {
+        private val failures = elements.filterIsInstance<ParsedArguments.Failure>()
+
         override fun problems(): List<ProblemAtIndex> {
             val problems = mutableListOf<ProblemAtIndex>()
-            for (element in elements) {
-                if (element is ParsedArguments.Failure) {
-                    problems.addAll(element.problems())
-                }
+            for (element in failures) {
+                problems.addAll(element.problems())
             }
             return problems
         }

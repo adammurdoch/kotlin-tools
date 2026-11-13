@@ -31,10 +31,16 @@ internal class OneOfParser<OUT>(val choices: List<ParserInternal<OUT>>) : Abstra
     }
 
     private class State<OUT>(val choices: List<ChoiceState<OUT>>) : ParseState<OUT> {
-        override fun maybeParse(args: InputArgs): ParseState.PartialResult<OUT> {
+        override val expectingOption: Boolean
+            get() = choices.any { it.state.expectingOption }
+
+        override val finished: Boolean
+            get() = choices.all { it.state.finished }
+
+        override fun maybeParse(args: InputArgs): ParseState.PartialResult {
             var recognized = Int.MAX_VALUE
             for (choice in choices) {
-                if (choice.result != null) {
+                if (choice.state.finished) {
                     choice.problems = choice.problems.plus(ProblemAtIndex(args.index, UnexpectedArgument(args.first())))
                     continue
                 }
@@ -44,37 +50,25 @@ internal class OneOfParser<OUT>(val choices: List<ParserInternal<OUT>>) : Abstra
                         choice.problems = choice.problems.plus(ProblemAtIndex(args.index, UnexpectedArgument(args.first())))
                     }
 
-                    is ParseState.Matched -> {
+                    is ParseState.Recognized -> {
                         choice.recognized = true
-                        recognized = min(recognized, result.count)
-                    }
-
-                    is ParseState.Finished -> {
-                        choice.recognized = true
-                        choice.result = result.result
-                        recognized = min(recognized, result.count)
-                    }
-
-                    is ParseState.Failure -> {
-                        choice.recognized = true
-                        choice.problems = choice.problems.plus(result.problem)
                         recognized = min(recognized, result.count)
                     }
                 }
             }
             return if (recognized != Int.MAX_VALUE) {
-                ParseState.Matched(recognized)
+                ParseState.Recognized(recognized)
             } else {
                 ParseState.NotRecognized
             }
         }
 
-        override fun finish(index: Int): ParseState.Result<OUT> {
+        override fun finish(index: Int): ParsedArguments<OUT> {
             for (choice in choices) {
-                val result = choice.result ?: choice.state.finish(index)
+                val result = choice.state.finish(index)
                 when (result) {
-                    is ParseState.FinalFailure -> choice.problems = choice.problems.plus(result.problems)
-                    is ParseState.Success -> {
+                    is ParsedArguments.Failure -> choice.problems = choice.problems.plus(result.problems())
+                    is ParsedArguments.Success -> {
                         if (choice.problems == null) {
                             return result
                         }
@@ -83,7 +77,7 @@ internal class OneOfParser<OUT>(val choices: List<ParserInternal<OUT>>) : Abstra
             }
             val best = choices.find { it.recognized }
             if (best != null) {
-                return ParseState.FinalFailure(best.problems!!)
+                return Failure(best.problems!!)
             }
 
             var problems: List<ProblemAtIndex> = emptyList()
@@ -91,13 +85,18 @@ internal class OneOfParser<OUT>(val choices: List<ParserInternal<OUT>>) : Abstra
                 problems += choice.problems!!
             }
 
-            return ParseState.FinalFailure(problems)
+            return Failure(problems)
         }
     }
 
     private class ChoiceState<OUT>(val state: ParseState<OUT>) {
         var problems: List<ProblemAtIndex>? = null
         var recognized = false
-        var result: ParseState.Result<OUT>? = null
+    }
+
+    private class Failure(val problems: List<ProblemAtIndex>) : ParsedArguments.Failure {
+        override fun problems(): List<ProblemAtIndex> {
+            return problems
+        }
     }
 }

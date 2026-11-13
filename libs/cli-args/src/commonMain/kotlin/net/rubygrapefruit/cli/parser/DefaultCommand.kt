@@ -17,33 +17,48 @@ internal class DefaultCommand(private val text: String) : AbstractParser<Unit>()
         }
     }
 
-    private class State(val text: String) : ParseState.Positional<Unit> {
-        private var claimed = false
+    private class State(val text: String) : ParseState<Unit> {
         private var matched = false
 
-        override fun maybeParse(args: InputArgs): ParseState.PartialResult<Unit> {
+        override val finished: Boolean
+            get() = matched
+
+        override val expectingOption: Boolean
+            get() = false
+
+        override fun maybeParse(args: InputArgs): ParseState.PartialResult {
             return if (args.firstIsOption() || args.first() != text) {
                 ParseState.NotRecognized
             } else {
                 matched = true
-                ParseState.Finished(1, ParseState.FixedResult(Unit))
+                ParseState.Recognized(1)
             }
         }
 
-        override fun claimUnrecognized(args: InputArgs): ParseState.Failure? {
-            return if (!matched && !claimed && !args.firstIsOption()) {
-                claimed = true
-                ParseState.Failure(1, ProblemAtIndex(args.index, UnexpectedArgument(args.first(), text)))
+        override fun finish(index: Int): ParsedArguments<Unit> {
+            return if (matched) {
+                Success
+            } else {
+                Failure(listOf(ProblemAtIndex(index, MissingLiteral(text))), text)
+            }
+        }
+    }
+
+    private object Success : ParsedArguments.Success<Unit> {
+        override fun value() {
+        }
+    }
+
+    private class Failure(val problems: List<ProblemAtIndex>, val text: String) : ParsedArguments.Failure {
+        override fun problems(): List<ProblemAtIndex> {
+            return problems
+        }
+
+        override fun claimUnrecognized(args: InputArgs): ParsedArguments.Unrecognized? {
+            return if (!args.firstIsOption()) {
+                ParsedArguments.Unrecognized(1, ProblemAtIndex(args.index, UnexpectedArgument(args.first(), text)))
             } else {
                 null
-            }
-        }
-
-        override fun finish(index: Int): ParseState.Result<Unit> {
-            return if (claimed) {
-                ParseState.FinalFailure(emptyList())
-            } else {
-                ParseState.FinalFailure(listOf(ProblemAtIndex(index, MissingLiteral(text))))
             }
         }
     }

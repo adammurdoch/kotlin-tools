@@ -17,7 +17,7 @@ fun <OUT> params(producer: () -> OUT): Parser<OUT> {
 fun <A, OUT> params(a: Parser<A>, map: (A) -> OUT): Parser<OUT> {
     @Suppress("UNCHECKED_CAST")
     return AllOfParser(listOf(a).cast()) { results ->
-        map(results[0].result as A)
+        map(results[0].value() as A)
     }
 }
 
@@ -29,7 +29,7 @@ fun <A, OUT> params(a: Parser<A>, map: (A) -> OUT): Parser<OUT> {
 fun <A, B, OUT> params(a: Parser<A>, b: Parser<B>, map: (A, B) -> OUT): Parser<OUT> {
     @Suppress("UNCHECKED_CAST")
     return AllOfParser(listOf(a, b).cast()) { results ->
-        map(results[0].result as A, results[1].result as B)
+        map(results[0].value() as A, results[1].value() as B)
     }
 }
 
@@ -41,7 +41,7 @@ fun <A, B, OUT> params(a: Parser<A>, b: Parser<B>, map: (A, B) -> OUT): Parser<O
 fun <A, OUT> params(prefix: Parser<Unit>, a: Parser<A>, map: (A) -> OUT): Parser<OUT> {
     @Suppress("UNCHECKED_CAST")
     return AllOfParser(listOf(prefix, a).cast()) { results ->
-        map(results[1].result as A)
+        map(results[1].value() as A)
     }
 }
 
@@ -53,7 +53,7 @@ fun <A, OUT> params(prefix: Parser<Unit>, a: Parser<A>, map: (A) -> OUT): Parser
 fun <A, B, C, OUT> params(a: Parser<A>, b: Parser<B>, c: Parser<C>, map: (A, B, C) -> OUT): Parser<OUT> {
     @Suppress("UNCHECKED_CAST")
     return AllOfParser(listOf(a, b, c).cast()) { results ->
-        map(results[0].result as A, results[1].result as B, results[2].result as C)
+        map(results[0].value() as A, results[1].value() as B, results[2].value() as C)
     }
 }
 
@@ -65,7 +65,7 @@ fun <A, B, C, OUT> params(a: Parser<A>, b: Parser<B>, c: Parser<C>, map: (A, B, 
 fun <A, B, OUT> params(prefix: Parser<Unit>, a: Parser<A>, b: Parser<B>, map: (A, B) -> OUT): Parser<OUT> {
     @Suppress("UNCHECKED_CAST")
     return AllOfParser(listOf(prefix, a, b).cast()) { results ->
-        map(results[1].result as A, results[2].result as B)
+        map(results[1].value() as A, results[2].value() as B)
     }
 }
 
@@ -77,7 +77,7 @@ fun <A, B, OUT> params(prefix: Parser<Unit>, a: Parser<A>, b: Parser<B>, map: (A
 fun <A, B, C, D, OUT> params(a: Parser<A>, b: Parser<B>, c: Parser<C>, d: Parser<D>, map: (A, B, C, D) -> OUT): Parser<OUT> {
     @Suppress("UNCHECKED_CAST")
     return AllOfParser(listOf(a, b, c, d).cast()) { results ->
-        map(results[0].result as A, results[1].result as B, results[2].result as C, results[3].result as D)
+        map(results[0].value() as A, results[1].value() as B, results[2].value() as C, results[3].value() as D)
     }
 }
 
@@ -89,7 +89,7 @@ fun <A, B, C, D, OUT> params(a: Parser<A>, b: Parser<B>, c: Parser<C>, d: Parser
 fun <A, B, C, D, E, OUT> params(a: Parser<A>, b: Parser<B>, c: Parser<C>, d: Parser<D>, e: Parser<E>, map: (A, B, C, D, E) -> OUT): Parser<OUT> {
     @Suppress("UNCHECKED_CAST")
     return AllOfParser(listOf(a, b, c, d, e).cast()) { results ->
-        map(results[0].result as A, results[1].result as B, results[2].result as C, results[3].result as D, results[4].result as E)
+        map(results[0].value() as A, results[1].value() as B, results[2].value() as C, results[3].value() as D, results[4].value() as E)
     }
 }
 

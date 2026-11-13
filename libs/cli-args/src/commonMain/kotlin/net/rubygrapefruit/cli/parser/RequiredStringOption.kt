@@ -26,22 +26,22 @@ internal class RequiredStringOption(private val flags: List<String>, private val
     }
 
     private class State(flags: List<String>, names: List<String>) : OptionParseState<String>(flags, names) {
-        override fun matched(args: InputArgs): ParseState.Finished<String> {
+        override fun matched(args: InputArgs): Finished<String> {
             return if (!args.hasSecond() || args.secondIsOption()) {
-                ParseState.Finished(1, ProblemAtIndex(args.index + 1, MissingOptionValue(args.first())))
+                Finished.Failure(1, listOf(ProblemAtIndex(args.index + 1, MissingOptionValue(args.first()))))
             } else {
                 val value = args.second()
-                ParseState.Finished(2, ParseState.FixedResult(value))
+                Finished.Success(2, value)
             }
+        }
+
+        override fun endOfArguments(index: Int): Finished<String> {
+            val longest = flags.maxBy { it.length }
+            return Finished.Failure(0, listOf(ProblemAtIndex(index, MissingOption(longest))))
         }
 
         override fun consumeBadlyFormed(args: InputArgs): Int {
             return if (args.hasSecond() && !args.secondIsOption() && !args.secondIsRecognized()) 2 else 1
-        }
-
-        override fun finish(index: Int): ParseState.Result<String> {
-            val longest = flags.maxBy { it.length }
-            return ParseState.FinalFailure(listOf(ProblemAtIndex(index, MissingOption(longest))))
         }
     }
 }

@@ -32,16 +32,16 @@ internal class DefaultBooleanOption(private val flags: List<String>, private val
     }
 
     private class State(flags: List<String>, names: List<String>) : OptionParseState<Boolean>(flags, names) {
-        override fun matched(args: InputArgs): ParseState.Finished<Boolean> {
-            return ParseState.Finished(1, ParseState.FixedResult(true))
+        override fun matched(args: InputArgs): Finished<Boolean> {
+            return Finished.Success(1, true)
+        }
+
+        override fun endOfArguments(index: Int): Finished<Boolean> {
+            return Finished.Success(0, false)
         }
 
         override fun consumeBadlyFormed(args: InputArgs): Int {
             return 1
-        }
-
-        override fun finish(index: Int): ParseState.Result<Boolean> {
-            return ParseState.FixedResult(false)
         }
     }
 }

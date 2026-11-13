@@ -46,21 +46,21 @@ internal class DefaultStringOption(unsortedNames: List<String>) : AbstractParser
     }
 
     private class State(flags: List<String>, names: List<String>) : OptionParseState<String?>(flags, names) {
-        override fun matched(args: InputArgs): ParseState.Finished<String?> {
+        override fun matched(args: InputArgs): Finished<String?> {
             return if (!args.hasSecond() || args.secondIsOption()) {
-                ParseState.Finished(1, ProblemAtIndex(args.index + 1, MissingOptionValue(args.first())))
+                Finished.Failure(1, listOf(ProblemAtIndex(args.index + 1, MissingOptionValue(args.first()))))
             } else {
                 val value = args.second()
-                ParseState.Finished(2, ParseState.FixedResult(value))
+                Finished.Success(2, value)
             }
+        }
+
+        override fun endOfArguments(index: Int): Finished<String?> {
+            return Finished.Success(0, null)
         }
 
         override fun consumeBadlyFormed(args: InputArgs): Int {
             return if (args.hasSecond() && !args.secondIsOption() && !args.secondIsRecognized()) 2 else 1
-        }
-
-        override fun finish(index: Int): ParseState.Result<String?> {
-            return ParseState.FixedResult(null)
         }
     }
 }

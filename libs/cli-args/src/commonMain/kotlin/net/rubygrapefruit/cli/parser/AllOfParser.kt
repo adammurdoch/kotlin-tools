@@ -4,7 +4,7 @@ import net.rubygrapefruit.cli.terminal.Output
 
 internal class AllOfParser<OUT>(
     private val parsers: List<ParserInternal<*>>,
-    private val map: (List<ParseState.Success<*>>) -> OUT
+    private val map: (List<ParsedArguments.Success<*>>) -> OUT
 ) : AbstractParser<OUT>() {
     override fun start(): ParseState<OUT> {
         return State(parsers.map { Element(it.start()) }, map)
@@ -38,90 +38,90 @@ internal class AllOfParser<OUT>(
         }
     }
 
-    private class Element<T>(val state: ParseState<T>) {
-        var result: ParseState.Result<T>? = null
+    private class Element<T>(val state: ParseState<T>)
 
-        fun maybeParse(args: InputArgs): ParseState.PartialResult<Nothing> {
-            val parseResult = state.maybeParse(args)
-            return when (parseResult) {
-                is ParseState.Matched -> parseResult
+    private class State<OUT>(val elements: List<Element<*>>, val map: (List<ParsedArguments.Success<*>>) -> OUT) : ParseState<OUT> {
+        override val finished: Boolean
+            get() = elements.all { it.state.finished }
+        override val expectingOption: Boolean
+            get() = elements.any { it.state.expectingOption }
 
-                is ParseState.Finished -> {
-                    result = parseResult.result
-                    ParseState.Matched(parseResult.count)
-                }
-
-                is ParseState.Failure -> parseResult
-                is ParseState.NotRecognized -> parseResult
-            }
-        }
-
-        fun finish(index: Int): ParseState.Result<T> {
-            if (result != null) {
-                return result!!
-            }
-            return state.finish(index)
-        }
-    }
-
-    private class State<OUT>(val elements: List<Element<*>>, val map: (List<ParseState.Success<*>>) -> OUT) : ParseState<OUT> {
-        private val nonPositional = elements.filter { it.state !is ParseState.Positional }
-        private val positional = elements.filter { it.state is ParseState.Positional }
-
-        override fun maybeParse(args: InputArgs): ParseState.PartialResult<OUT> {
-            for (element in nonPositional) {
-                if (element.result != null) {
-                    continue
-                }
-                val result = element.maybeParse(args)
-                if (result !is ParseState.NotRecognized) {
-                    return result
+        override fun maybeParse(args: InputArgs): ParseState.PartialResult {
+            for (element in elements) {
+                if (!element.state.finished && element.state.expectingOption) {
+                    val result = element.state.maybeParse(args)
+                    if (result !is ParseState.NotRecognized) {
+                        return result
+                    }
                 }
             }
-
-            for (element in positional) {
-                if (element.result != null) {
-                    continue
+            for (element in elements) {
+                if (!element.state.finished && !element.state.expectingOption) {
+                    val result = element.state.maybeParse(args)
+                    if (result !is ParseState.NotRecognized) {
+                        return result
+                    }
                 }
-                val result = element.maybeParse(args)
-                return result
             }
 
             return ParseState.NotRecognized
         }
 
-        override fun claimUnrecognized(args: InputArgs): ParseState.Failure? {
+        override fun finish(index: Int): ParsedArguments<OUT> {
+            val results = mutableListOf<ParsedArguments<*>>()
+            var failed = false
             for (element in elements) {
-                val problem = element.state.claimUnrecognized(args)
+                val result = element.state.finish(index)
+                results.add(result)
+                if (result is ParsedArguments.Failure) {
+                    failed = true
+                }
+            }
+            return if (failed) {
+                Failure(results)
+            } else {
+                @Suppress("UNCHECKED_CAST")
+                Success(results as List<ParsedArguments.Success<*>>, map)
+            }
+        }
+    }
+
+    private abstract class Result<R : ParsedArguments<*>>(val elements: List<R>) {
+        fun maybeClaimUnrecognized(args: InputArgs): ParsedArguments.Unrecognized? {
+            for (element in elements) {
+                val problem = element.claimUnrecognized(args)
                 if (problem != null) {
                     return problem
                 }
             }
             return null
         }
+    }
 
-        override fun finish(index: Int): ParseState.Result<OUT> {
-            var problems: List<ProblemAtIndex>? = null
-            val results = mutableListOf<ParseState.Success<*>>()
+    private class Success<T>(elements: List<ParsedArguments.Success<*>>, val map: (List<ParsedArguments.Success<*>>) -> T) : Result<ParsedArguments.Success<*>>(elements),
+        ParsedArguments.Success<T> {
+        override fun value(): T {
+            return map(elements)
+        }
+
+        override fun claimUnrecognized(args: InputArgs): ParsedArguments.Unrecognized? {
+            return maybeClaimUnrecognized(args)
+        }
+    }
+
+    private class Failure(elements: List<ParsedArguments<*>>) : Result<ParsedArguments<*>>(elements), ParsedArguments.Failure {
+        override fun problems(): List<ProblemAtIndex> {
+            val problems = mutableListOf<ProblemAtIndex>()
             for (element in elements) {
-                val result = element.finish(index)
-                when (result) {
-                    is ParseState.FinalFailure -> {
-                        if (problems == null) {
-                            problems = result.problems
-                        } else {
-                            problems = problems + result.problems
-                        }
-                    }
-
-                    is ParseState.Success<*> -> results.add(result)
+                if (element is ParsedArguments.Failure) {
+                    problems.addAll(element.problems())
                 }
             }
-            return if (problems != null) {
-                ParseState.FinalFailure(problems)
-            } else {
-                ParseState.LazyResult { map(results) }
-            }
+            return problems
+        }
+
+        override fun claimUnrecognized(args: InputArgs): ParsedArguments.Unrecognized? {
+            return maybeClaimUnrecognized(args)
         }
     }
 }

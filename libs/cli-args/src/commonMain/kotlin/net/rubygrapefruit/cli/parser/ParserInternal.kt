@@ -42,70 +42,36 @@ internal interface ParserInternal<out T> {
 }
 
 internal interface ParseState<out T> {
+    val finished: Boolean
+
+    /**
+     * Not called if [finished] is true
+     */
+    val expectingOption: Boolean
+
     /**
      * Attempts to parse the first argument(s) of the provided arguments.
      *
-     * May be called zero or more times. Is not called again if this method returns [ParseState.Finished]
+     * May be called zero or more times.
      */
-    fun maybeParse(args: InputArgs): PartialResult<T>
-
-    /**
-     * Attempts to produce a [Failure] for the first unrecognized argument.
-     *
-     * Called after all arguments have been parsed, but before [finish] is called.
-     */
-    fun claimUnrecognized(args: InputArgs): Failure? {
-        return null
-    }
+    fun maybeParse(args: InputArgs): PartialResult
 
     /**
      * Produces the result of this parser at the end of the inputs.
-     *
-     * Is not called if [maybeParse] returns [ParseState.Finished].
      */
-    fun finish(index: Int): Result<T>
+    fun finish(index: Int): ParsedArguments<T>
 
-    sealed interface Positional<out T> : ParseState<T>
-
-    sealed interface PartialResult<out T>
+    sealed interface PartialResult
 
     /**
      * The parser did not recognize any arguments.
      * The parser's [maybeParse] function may be called again after skipping some arguments.
      */
-    object NotRecognized : PartialResult<Nothing>
-
-    /**
-     * The parser has recognized one or more arguments but has encountered some problem.
-     * The parser's [maybeParse] function may be called again after skipping at least recognized arguments (and possibly more).
-     */
-    class Failure(val count: Int, val problem: ProblemAtIndex) : PartialResult<Nothing>
+    object NotRecognized : PartialResult
 
     /**
      * The parser has recognized one or more arguments without any problems.
      * The parser's [maybeParse] function may be called again after skipping at least recognized arguments (and possibly more).
      */
-    class Matched(val count: Int) : PartialResult<Nothing>
-
-    /**
-     * The parser has recognized one or more arguments and produced a result (possibly a failure).
-     */
-    class Finished<T>(val count: Int, val result: Result<T>) : PartialResult<T> {
-        constructor(count: Int, problem: ProblemAtIndex) : this(count, FinalFailure(listOf(problem)))
-    }
-
-    sealed interface Result<out T>
-
-    class FinalFailure(val problems: List<ProblemAtIndex>) : Result<Nothing>
-
-    sealed interface Success<out T> : Result<T> {
-        val result: T
-    }
-
-    class FixedResult<T>(override val result: T) : Success<T>
-
-    class LazyResult<T>(val provider: () -> T) : Success<T> {
-        override val result: T
-            get() = provider()
-    }
+    class Recognized(val count: Int) : PartialResult
 }

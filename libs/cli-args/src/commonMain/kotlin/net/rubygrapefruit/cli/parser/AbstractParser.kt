@@ -4,47 +4,27 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
     override fun parse(args: List<String>): Parser.Result<T> {
         val recognized = BooleanArray(args.size)
         val state = start()
-        var problems: List<ProblemAtIndex>? = null
-        var result: ParseState.Result<T>? = null
         var index = 0
         while (index < args.size) {
             val current = DefaultInputArgs(index, args, recognized)
             val parseResult = state.maybeParse(current)
             when (parseResult) {
-                is ParseState.Matched -> {
+                is ParseState.Recognized -> {
                     require(parseResult.count > 0)
                     repeat(parseResult.count) {
                         recognized[index] = true
                         index++
                     }
-                }
-
-                is ParseState.Finished -> {
-                    require(parseResult.count > 0)
-                    repeat(parseResult.count) {
-                        recognized[index] = true
-                        index++
-                    }
-                    result = parseResult.result
-                    break
                 }
 
                 is ParseState.NotRecognized -> {
                     // Attempt to recover and continue
                     index++
                 }
-
-                is ParseState.Failure -> {
-                    require(parseResult.count > 0)
-                    problems = problems.plus(parseResult.problem)
-                    // Attempt to recover and continue
-                    repeat(parseResult.count) {
-                        recognized[index] = true
-                        index++
-                    }
-                }
             }
         }
+
+        val result = state.finish(args.size)
 
         var unrecognizedProblems: List<ProblemAtIndex>? = null
         index = 0
@@ -55,7 +35,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
             }
 
             val current = DefaultInputArgs(index, args, recognized)
-            val failure = state.claimUnrecognized(current)
+            val failure = result.claimUnrecognized(current)
             if (failure != null) {
                 require(failure.count > 0)
                 unrecognizedProblems = unrecognizedProblems.plus(failure.problem)
@@ -71,18 +51,16 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
             }
         }
 
-        val finalResult = result ?: state.finish(args.size)
-        return when (finalResult) {
-            is ParseState.FinalFailure -> {
-                ParserInternal.Failure(problems.plus(finalResult.problems).plus(unrecognizedProblems), this)
+        return when (result) {
+            is ParsedArguments.Failure -> {
+                ParserInternal.Failure(result.problems().plus(unrecognizedProblems), this)
             }
 
-            is ParseState.Success -> {
-                val finalProblems = problems.plus(unrecognizedProblems)
-                if (finalProblems.isNotEmpty()) {
-                    ParserInternal.Failure(finalProblems, this)
+            is ParsedArguments.Success -> {
+                if (unrecognizedProblems != null) {
+                    ParserInternal.Failure(unrecognizedProblems, this)
                 } else {
-                    ParserInternal.Success(finalResult.result)
+                    ParserInternal.Success(result.value())
                 }
             }
         }

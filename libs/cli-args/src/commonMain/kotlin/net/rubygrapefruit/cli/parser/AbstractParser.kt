@@ -23,6 +23,12 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
             }
             if (problems.isNotEmpty()) {
                 val names = problems.map { it.name }
+                for (index in args.indices) {
+                    val arg = args[index]
+                    if (!arg.startsWith("-")) {
+                        return ParserInternal.Failure(listOf(ProblemAtIndex(index, UnexpectedArgument(arg, names))), this)
+                    }
+                }
                 return ParserInternal.Failure(listOf(ProblemAtIndex(args.size, MissingCommands(names))), this)
             }
         }

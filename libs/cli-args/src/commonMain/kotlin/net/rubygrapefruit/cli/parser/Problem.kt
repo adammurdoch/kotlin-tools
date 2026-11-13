@@ -20,13 +20,22 @@ internal class UnexpectedOption(val option: String, val suggestion: String? = nu
     }
 }
 
-internal class UnexpectedArgument(val argument: String, val expected: String? = null) : Problem {
+internal class UnexpectedArgument(val argument: String, val expected: List<String> = emptyList()) : Problem {
     override fun writeTo(output: Output) {
         output.write("Unexpected argument ")
         output.userInput(argument)
-        if (expected != null) {
+        if (expected.isNotEmpty()) {
             output.write(". Expected ")
-            output.userInput(expected)
+            expected.forEachIndexed { index, name ->
+                if (index > 0) {
+                    if (index == expected.lastIndex) {
+                        output.write(" or ")
+                    } else {
+                        output.write(", ")
+                    }
+                }
+                output.write("'$name'")
+            }
             output.write(" instead")
         }
     }

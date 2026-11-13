@@ -63,7 +63,7 @@ internal class DefaultCommand(private val text: String) : AbstractParser<Unit>()
         override fun claimUnrecognized(args: InputArgs): ParsedArguments.Unrecognized? {
             return if (!args.firstIsOption()) {
                 suggested = true
-                ParsedArguments.Unrecognized(1, ProblemAtIndex(args.index, UnexpectedArgument(args.first(), text)))
+                ParsedArguments.Unrecognized(1, ProblemAtIndex(args.index, UnexpectedArgument(args.first(), listOf(text))))
             } else {
                 null
             }

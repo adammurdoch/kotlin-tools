@@ -40,7 +40,7 @@ class ChoiceOfCommandTest : AbstractParseTest() {
             failure(0, "Expected 'one' or 'two'")
         }
         parser.fails("unknown") {
-            failure(0, "Unexpected argument 'unknown'. Expected 'one' or 'two'")
+            failure(0, "Unexpected argument 'unknown'. Expected 'one' or 'two' instead")
         }
         parser.fails("-unknown") {
             failure(0, "Unexpected option '-unknown'")

@@ -10,7 +10,7 @@ internal abstract class OptionParseState<T>(protected val flags: List<String>, p
     override val finished: Boolean
         get() = result != null
 
-    override fun maybeParse(args: InputArgs): ParseState.PartialResult {
+    override fun maybeParse(args: InputArgs): ParseState.Result {
         val first = args.first()
         if (!flags.contains(first)) {
             return ParseState.NotRecognized

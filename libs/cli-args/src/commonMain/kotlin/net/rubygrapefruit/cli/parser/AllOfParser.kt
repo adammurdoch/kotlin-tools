@@ -46,7 +46,7 @@ internal class AllOfParser<OUT>(
         override val expectingOption: Boolean
             get() = elements.any { it.state.expectingOption }
 
-        override fun maybeParse(args: InputArgs): ParseState.PartialResult {
+        override fun maybeParse(args: InputArgs): ParseState.Result {
             for (element in elements) {
                 if (!element.state.finished && element.state.expectingOption) {
                     val result = element.state.maybeParse(args)

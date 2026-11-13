@@ -26,7 +26,7 @@ internal class DefaultPositional(private val name: String) : AbstractParser<Stri
         override val finished: Boolean
             get() = result != null
 
-        override fun maybeParse(args: InputArgs): ParseState.PartialResult {
+        override fun maybeParse(args: InputArgs): ParseState.Result {
             return if (args.firstIsOption()) {
                 ParseState.NotRecognized
             } else {

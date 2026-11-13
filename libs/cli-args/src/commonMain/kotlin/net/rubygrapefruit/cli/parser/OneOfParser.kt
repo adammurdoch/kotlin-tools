@@ -41,7 +41,7 @@ internal class OneOfParser<OUT>(val choices: List<ParserInternal<OUT>>) : Abstra
         override val finished: Boolean
             get() = choices.all { it.state.finished }
 
-        override fun maybeParse(args: InputArgs): ParseState.PartialResult {
+        override fun maybeParse(args: InputArgs): ParseState.Result {
             var recognized = Int.MAX_VALUE
             for (choice in choices) {
                 if (choice.state.finished) {

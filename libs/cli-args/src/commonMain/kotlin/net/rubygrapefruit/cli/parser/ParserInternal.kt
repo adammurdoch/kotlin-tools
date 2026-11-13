@@ -54,24 +54,24 @@ internal interface ParseState<out T> {
      *
      * May be called zero or more times.
      */
-    fun maybeParse(args: InputArgs): PartialResult
+    fun maybeParse(args: InputArgs): Result
 
     /**
      * Produces the result of this parser at the end of the inputs.
      */
     fun finish(index: Int): ParsedArguments<T>
 
-    sealed interface PartialResult
+    sealed interface Result
 
     /**
      * The parser did not recognize any arguments.
      * The parser's [maybeParse] function may be called again after skipping some arguments.
      */
-    object NotRecognized : PartialResult
+    object NotRecognized : Result
 
     /**
      * The parser has recognized one or more arguments without any problems.
      * The parser's [maybeParse] function may be called again after skipping at least recognized arguments (and possibly more).
      */
-    class Recognized(val count: Int) : PartialResult
+    class Recognized(val count: Int) : Result
 }

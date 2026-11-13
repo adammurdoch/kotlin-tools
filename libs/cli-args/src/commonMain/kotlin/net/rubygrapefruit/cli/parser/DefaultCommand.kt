@@ -26,7 +26,7 @@ internal class DefaultCommand(private val text: String) : AbstractParser<Unit>()
         override val expectingOption: Boolean
             get() = false
 
-        override fun maybeParse(args: InputArgs): ParseState.PartialResult {
+        override fun maybeParse(args: InputArgs): ParseState.Result {
             return if (args.firstIsOption() || args.first() != text) {
                 ParseState.NotRecognized
             } else {

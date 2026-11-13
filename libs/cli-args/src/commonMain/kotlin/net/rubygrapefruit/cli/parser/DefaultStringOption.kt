@@ -48,7 +48,7 @@ internal class DefaultStringOption(unsortedNames: List<String>) : AbstractParser
     private class State(flags: List<String>, names: List<String>) : OptionParseState<String?>(flags, names) {
         override fun matched(args: InputArgs): Finished<String?> {
             return if (!args.hasSecond() || args.secondIsOption()) {
-                Finished.Failure(1, listOf(ProblemAtIndex(args.index + 1, MissingOptionValue(args.first()))))
+                Finished.Failure(1, ProblemAtIndex(args.index + 1, MissingOptionValue(args.first())))
             } else {
                 val value = args.second()
                 Finished.Success(2, value)

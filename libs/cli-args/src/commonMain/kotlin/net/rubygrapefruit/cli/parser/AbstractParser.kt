@@ -5,7 +5,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
         val recognized = BooleanArray(args.size)
         val state = start()
         var index = 0
-        while (index < args.size) {
+        while (index < args.size && !state.finished) {
             val current = DefaultInputArgs(index, args, recognized)
             val parseResult = state.maybeParse(current)
             when (parseResult) {

@@ -31,8 +31,7 @@ internal class RequiredBooleanOption(private val flags: List<String>, private va
         }
 
         override fun endOfArguments(index: Int): Finished<Unit> {
-            val longest = flags.maxBy { it.length }
-            return Finished.Failure(0, listOf(ProblemAtIndex(index, MissingOption(longest))))
+            return Finished.MissingOption
         }
 
         override fun consumeBadlyFormed(args: InputArgs): Int {

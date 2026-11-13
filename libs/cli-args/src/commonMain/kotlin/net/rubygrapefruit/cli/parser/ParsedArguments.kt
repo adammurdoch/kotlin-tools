@@ -15,6 +15,9 @@ internal sealed interface ParsedArguments<out T> {
     }
 
     sealed interface Failure : ParsedArguments<Nothing> {
+        /**
+         * Called after [claimUnrecognized]
+         */
         fun problems(): List<ProblemAtIndex>
     }
 }

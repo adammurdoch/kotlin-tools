@@ -3,8 +3,6 @@ package net.rubygrapefruit.cli.parser
 internal abstract class OptionParseState<T>(protected val flags: List<String>, protected val names: List<String>) : ParseState<T> {
     private var result: Finished<T>? = null
     private var seen: String? = null
-    protected var suggested = false
-        private set
 
     override val expectingOption: Boolean
         get() = true
@@ -28,29 +26,8 @@ internal abstract class OptionParseState<T>(protected val flags: List<String>, p
         return when (result) {
             is Finished.Success -> Success(result)
             is Finished.Failure -> Failure(result)
+            is Finished.MissingOption -> MissingOption(index)
         }
-    }
-
-    private fun claimUnrecognized(args: InputArgs): ParsedArguments.Unrecognized? {
-        val first = args.first()
-        if (seen != null && flags.contains(first)) {
-            val count = consumeBadlyFormed(args)
-            val problem = if (first == seen) {
-                RepeatedOption(first)
-            } else {
-                RepeatedOption(first, seen!!)
-            }
-            return ParsedArguments.Unrecognized(count, ProblemAtIndex(args.index, problem))
-        } else if (args.firstIsOption()) {
-            names.forEachIndexed { index, name ->
-                if (first.equals("-$name", true) || first.equals("--$name", true)) {
-                    val count = consumeBadlyFormed(args)
-                    suggested = true
-                    return ParsedArguments.Unrecognized(count, ProblemAtIndex(args.index, UnexpectedOption(first, flags[index])))
-                }
-            }
-        }
-        return null
     }
 
     protected abstract fun matched(args: InputArgs): Finished<T>
@@ -65,27 +42,74 @@ internal abstract class OptionParseState<T>(protected val flags: List<String>, p
     protected sealed interface Finished<out T> {
         val count: Int
 
-        class Failure(override val count: Int, val problems: List<ProblemAtIndex>) : Finished<Nothing>
+        class Failure(override val count: Int, val problem: ProblemAtIndex) : Finished<Nothing>
         class Success<T>(override val count: Int, val value: T) : Finished<T>
+
+        object MissingOption : Finished<Nothing> {
+            override val count: Int
+                get() = 0
+        }
     }
 
-    private inner class Success<T>(val result: Finished.Success<T>) : ParsedArguments.Success<T> {
+    private abstract inner class Result {
+        protected var suggested = false
+            private set
+
+        protected fun maybeClaimUnrecognized(args: InputArgs): ParsedArguments.Unrecognized? {
+            val first = args.first()
+            if (seen != null && flags.contains(first)) {
+                val count = consumeBadlyFormed(args)
+                val problem = if (first == seen) {
+                    RepeatedOption(first)
+                } else {
+                    RepeatedOption(first, seen!!)
+                }
+                return ParsedArguments.Unrecognized(count, ProblemAtIndex(args.index, problem))
+            } else if (args.firstIsOption()) {
+                names.forEachIndexed { index, name ->
+                    if (first.equals("-$name", true) || first.equals("--$name", true)) {
+                        val count = consumeBadlyFormed(args)
+                        suggested = true
+                        return ParsedArguments.Unrecognized(count, ProblemAtIndex(args.index, UnexpectedOption(first, flags[index])))
+                    }
+                }
+            }
+            return null
+        }
+    }
+
+    private inner class Success<T>(val result: Finished.Success<T>) : Result(), ParsedArguments.Success<T> {
         override fun value(): T {
             return result.value
         }
 
         override fun claimUnrecognized(args: InputArgs): ParsedArguments.Unrecognized? {
-            return this@OptionParseState.claimUnrecognized(args)
+            return maybeClaimUnrecognized(args)
         }
     }
 
-    private inner class Failure(val result: Finished.Failure) : ParsedArguments.Failure {
+    private inner class Failure(val result: Finished.Failure) : Result(), ParsedArguments.Failure {
         override fun problems(): List<ProblemAtIndex> {
-            return result.problems
+            return listOf(result.problem)
         }
 
         override fun claimUnrecognized(args: InputArgs): ParsedArguments.Unrecognized? {
-            return this@OptionParseState.claimUnrecognized(args)
+            return maybeClaimUnrecognized(args)
+        }
+    }
+
+    private inner class MissingOption(val index: Int) : Result(), ParsedArguments.Failure {
+        override fun problems(): List<ProblemAtIndex> {
+            return if (suggested) {
+                emptyList()
+            } else {
+                val longest = flags.maxBy { it.length }
+                listOf(ProblemAtIndex(index, MissingOption(longest)))
+            }
+        }
+
+        override fun claimUnrecognized(args: InputArgs): ParsedArguments.Unrecognized? {
+            return maybeClaimUnrecognized(args)
         }
     }
 }

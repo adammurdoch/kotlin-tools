@@ -39,7 +39,7 @@ internal class DefaultCommand(private val text: String) : AbstractParser<Unit>()
             return if (matched) {
                 Success
             } else {
-                Failure(listOf(ProblemAtIndex(index, MissingLiteral(text))), text)
+                Failure(index, text)
             }
         }
     }
@@ -49,13 +49,20 @@ internal class DefaultCommand(private val text: String) : AbstractParser<Unit>()
         }
     }
 
-    private class Failure(val problems: List<ProblemAtIndex>, val text: String) : ParsedArguments.Failure {
+    private class Failure(val index: Int, val text: String) : ParsedArguments.Failure {
+        private var suggested = false
+
         override fun problems(): List<ProblemAtIndex> {
-            return problems
+            return if (suggested) {
+                emptyList()
+            } else {
+                listOf(ProblemAtIndex(index, MissingLiteral(text)))
+            }
         }
 
         override fun claimUnrecognized(args: InputArgs): ParsedArguments.Unrecognized? {
             return if (!args.firstIsOption()) {
+                suggested = true
                 ParsedArguments.Unrecognized(1, ProblemAtIndex(args.index, UnexpectedArgument(args.first(), text)))
             } else {
                 null

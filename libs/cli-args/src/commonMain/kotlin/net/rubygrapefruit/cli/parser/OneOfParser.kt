@@ -8,6 +8,10 @@ internal class OneOfParser<OUT>(val choices: List<ParserInternal<OUT>>) : Abstra
         return State(choices.map { ChoiceState(it.start()) })
     }
 
+    override fun startAll(): List<ParseState<OUT>> {
+        return choices.map { it.start() }
+    }
+
     override fun usage(): UsageInternal {
         return OneOfUsage(choices)
     }
@@ -41,14 +45,11 @@ internal class OneOfParser<OUT>(val choices: List<ParserInternal<OUT>>) : Abstra
             var recognized = Int.MAX_VALUE
             for (choice in choices) {
                 if (choice.state.finished) {
-                    choice.problems = choice.problems.plus(ProblemAtIndex(args.index, UnexpectedArgument(args.first())))
                     continue
                 }
                 val result = choice.state.maybeParse(args)
                 when (result) {
-                    is ParseState.NotRecognized -> {
-                        choice.problems = choice.problems.plus(ProblemAtIndex(args.index, UnexpectedArgument(args.first())))
-                    }
+                    is ParseState.NotRecognized -> continue
 
                     is ParseState.Recognized -> {
                         choice.recognized = true

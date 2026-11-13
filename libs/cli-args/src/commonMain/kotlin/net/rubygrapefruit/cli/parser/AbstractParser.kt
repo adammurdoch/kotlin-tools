@@ -1,9 +1,23 @@
 package net.rubygrapefruit.cli.parser
 
 internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
+    protected open fun startAll(): List<ParseState<T>> {
+        return listOf(start())
+    }
+
     override fun parse(args: List<String>): Parser.Result<T> {
+        val results = startAll().map { parseAlternative(args, it) }
+        for (alternative in results) {
+            if (alternative.result is Parser.Success) {
+                return alternative.result
+            }
+        }
+        val best = results.maxBy { it.recognized }
+        return best.result
+    }
+
+    private fun parseAlternative(args: List<String>, state: ParseState<T>): Alternative<T> {
         val recognized = BooleanArray(args.size)
-        val state = start()
         var index = 0
         while (index < args.size && !state.finished) {
             val current = DefaultInputArgs(index, args, recognized)
@@ -51,7 +65,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
             }
         }
 
-        return when (result) {
+        val finalResult = when (result) {
             is ParsedArguments.Failure -> {
                 ParserInternal.Failure(result.problems().plus(unrecognizedProblems), this)
             }
@@ -64,5 +78,9 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
                 }
             }
         }
+
+        return Alternative(finalResult, recognized.count { it })
     }
+
+    private class Alternative<T>(val result: Parser.Result<T>, val recognized: Int)
 }

@@ -79,10 +79,12 @@ internal class MissingCommands(val names: List<String>) : Problem {
     override fun writeTo(output: Output) {
         output.write("Expected ")
         names.forEachIndexed { index, name ->
-            if (index == names.lastIndex) {
-                output.write(" or ")
-            } else if (index > 0) {
-                output.write(", ")
+            if (index > 0) {
+                if (index == names.lastIndex) {
+                    output.write(" or ")
+                } else {
+                    output.write(", ")
+                }
             }
             output.write("'$name'")
         }

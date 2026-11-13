@@ -20,11 +20,11 @@ internal class DefaultCommand(private val text: String) : AbstractParser<Unit>()
     private class State(val text: String) : ParseState<Unit> {
         private var matched = false
 
-        override val finished: Boolean
-            get() = matched
-
         override val expectingOption: Boolean
             get() = false
+
+        override val expectingPositional: Boolean
+            get() = !matched
 
         override fun maybeParse(args: InputArgs): ParseState.Result {
             return if (args.firstIsOption() || args.first() != text) {

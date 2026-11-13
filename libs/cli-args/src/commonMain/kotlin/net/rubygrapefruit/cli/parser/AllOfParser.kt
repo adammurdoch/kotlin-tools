@@ -41,14 +41,15 @@ internal class AllOfParser<OUT>(
     private class Element<T>(val state: ParseState<T>)
 
     private class State<OUT>(val elements: List<Element<*>>, val map: (List<ParsedArguments.Success<*>>) -> OUT) : ParseState<OUT> {
-        override val finished: Boolean
-            get() = elements.all { it.state.finished }
         override val expectingOption: Boolean
             get() = elements.any { it.state.expectingOption }
 
+        override val expectingPositional: Boolean
+            get() = elements.any { it.state.expectingPositional }
+
         override fun maybeParse(args: InputArgs): ParseState.Result {
             for (element in elements) {
-                if (!element.state.finished && element.state.expectingOption) {
+                if (element.state.expectingOption) {
                     val result = element.state.maybeParse(args)
                     if (result !is ParseState.NotRecognized) {
                         return result
@@ -56,11 +57,8 @@ internal class AllOfParser<OUT>(
                 }
             }
             for (element in elements) {
-                if (!element.state.finished && !element.state.expectingOption) {
-                    val result = element.state.maybeParse(args)
-                    if (result !is ParseState.NotRecognized) {
-                        return result
-                    }
+                if (element.state.expectingPositional) {
+                    return element.state.maybeParse(args)
                 }
             }
 

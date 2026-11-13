@@ -38,22 +38,21 @@ internal class OneOfParser<OUT>(val choices: List<ParserInternal<OUT>>) : Abstra
         override val expectingOption: Boolean
             get() = choices.any { it.state.expectingOption }
 
-        override val finished: Boolean
-            get() = choices.all { it.state.finished }
+        override val expectingPositional: Boolean
+            get() = choices.any { it.state.expectingPositional }
 
         override fun maybeParse(args: InputArgs): ParseState.Result {
             var recognized = Int.MAX_VALUE
             for (choice in choices) {
-                if (choice.state.finished) {
-                    continue
-                }
-                val result = choice.state.maybeParse(args)
-                when (result) {
-                    is ParseState.NotRecognized -> continue
+                if (choice.state.expectingOption || choice.state.expectingPositional) {
+                    val result = choice.state.maybeParse(args)
+                    when (result) {
+                        is ParseState.NotRecognized -> continue
 
-                    is ParseState.Recognized -> {
-                        choice.recognized = true
-                        recognized = min(recognized, result.count)
+                        is ParseState.Recognized -> {
+                            choice.recognized = true
+                            recognized = min(recognized, result.count)
+                        }
                     }
                 }
             }

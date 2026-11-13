@@ -23,8 +23,8 @@ internal class DefaultPositional(private val name: String) : AbstractParser<Stri
         override val expectingOption: Boolean
             get() = false
 
-        override val finished: Boolean
-            get() = result != null
+        override val expectingPositional: Boolean
+            get() = result == null
 
         override fun maybeParse(args: InputArgs): ParseState.Result {
             return if (args.firstIsOption()) {

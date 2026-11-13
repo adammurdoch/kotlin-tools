@@ -86,7 +86,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
     private fun parseAlternative(args: List<String>, state: ParseState<T>): Alternative<T> {
         val recognized = BooleanArray(args.size)
         var index = 0
-        while (index < args.size && !state.finished) {
+        while (index < args.size && (state.expectingOption || state.expectingPositional)) {
             val current = DefaultInputArgs(index, args, recognized)
             val parseResult = state.maybeParse(current)
             when (parseResult) {

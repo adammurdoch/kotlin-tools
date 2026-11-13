@@ -42,12 +42,9 @@ internal interface ParserInternal<out T> {
 }
 
 internal interface ParseState<out T> {
-    val finished: Boolean
-
-    /**
-     * Not called if [finished] is true
-     */
     val expectingOption: Boolean
+
+    val expectingPositional: Boolean
 
     /**
      * Attempts to parse the first argument(s) of the provided arguments.

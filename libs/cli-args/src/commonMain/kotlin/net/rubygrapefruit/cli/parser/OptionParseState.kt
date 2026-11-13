@@ -5,10 +5,10 @@ internal abstract class OptionParseState<T>(protected val flags: List<String>, p
     private var seen: String? = null
 
     override val expectingOption: Boolean
-        get() = true
+        get() = result == null
 
-    override val finished: Boolean
-        get() = result != null
+    override val expectingPositional: Boolean
+        get() = false
 
     override fun maybeParse(args: InputArgs): ParseState.Result {
         val first = args.first()

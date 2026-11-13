@@ -13,11 +13,25 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
             }
         }
 
+        if (results.size > 1 && results.all { it.recognizedCount == 0 }) {
+            val problems = results.flatMap {
+                if (it.result is ParsedArguments.Failure) {
+                    it.result.problems().mapNotNull { it.problem as? MissingCommand }
+                } else {
+                    emptyList()
+                }
+            }
+            if (problems.isNotEmpty()) {
+                val names = problems.map { it.name }
+                return ParserInternal.Failure(listOf(ProblemAtIndex(args.size, MissingCommands(names))), this)
+            }
+        }
+
         val best = results.maxBy { it.recognizedCount }
         val recognized = best.recognized
         val result = best.result
 
-        var unrecognizedProblems: List<ProblemAtIndex> = emptyList()
+        val unrecognizedProblems = mutableListOf<ProblemAtIndex>()
         var index = 0
         while (index < args.size) {
             if (recognized[index]) {
@@ -29,7 +43,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
             val failure = result.claimUnrecognized(current)
             if (failure != null) {
                 require(failure.count > 0)
-                unrecognizedProblems = unrecognizedProblems.plus(failure.problem)
+                unrecognizedProblems.add(failure.problem)
                 index += failure.count
             } else {
                 val problem = if (current.firstIsOption()) {
@@ -37,7 +51,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
                 } else {
                     UnexpectedArgument(current.first())
                 }
-                unrecognizedProblems = unrecognizedProblems.plus(ProblemAtIndex(index, problem))
+                unrecognizedProblems.add(ProblemAtIndex(index, problem))
                 index++
             }
         }

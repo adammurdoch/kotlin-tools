@@ -56,7 +56,7 @@ internal class DefaultCommand(private val text: String) : AbstractParser<Unit>()
             return if (suggested) {
                 emptyList()
             } else {
-                listOf(ProblemAtIndex(index, MissingLiteral(text)))
+                listOf(ProblemAtIndex(index, MissingCommand(text)))
             }
         }
 

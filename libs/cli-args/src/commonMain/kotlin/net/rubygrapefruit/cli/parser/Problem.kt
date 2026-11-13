@@ -60,8 +60,22 @@ internal class MissingParameter(val name: String) : Problem {
     }
 }
 
-internal class MissingLiteral(val text: String) : Problem {
+internal class MissingCommand(val name: String) : Problem {
     override fun writeTo(output: Output) {
-        output.write("Expected '$text'")
+        output.write("Expected '$name'")
+    }
+}
+
+internal class MissingCommands(val names: List<String>) : Problem {
+    override fun writeTo(output: Output) {
+        output.write("Expected ")
+        names.forEachIndexed { index, name ->
+            if (index == names.lastIndex) {
+                output.write(" or ")
+            } else if (index > 0) {
+                output.write(", ")
+            }
+            output.write("'$name'")
+        }
     }
 }

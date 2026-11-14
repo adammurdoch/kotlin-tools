@@ -1,7 +1,7 @@
 package net.rubygrapefruit.cli.parser
 
 internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
-    protected open fun startAll(): List<ParseState<T>> {
+    override fun startAll(): List<ParseState<T>> {
         return listOf(start())
     }
 

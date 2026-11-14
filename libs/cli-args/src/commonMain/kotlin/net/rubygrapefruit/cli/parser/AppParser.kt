@@ -21,6 +21,10 @@ internal class AppParser(
         return parser().start()
     }
 
+    override fun startAll(): List<ParseState<Runnable>> {
+        return parser().startAll()
+    }
+
     override fun usage(): UsageInternal {
         return AppUsage(parser().usage())
     }

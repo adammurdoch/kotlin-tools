@@ -6,6 +6,8 @@ import net.rubygrapefruit.cli.terminal.Output
 internal interface ParserInternal<out T> {
     fun start(): ParseState<T>
 
+    fun startAll(): List<ParseState<T>>
+
     fun usage(): UsageInternal
 
     class Success<out T>(override val result: T) : Parser.Success<T> {

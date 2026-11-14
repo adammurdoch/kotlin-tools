@@ -26,6 +26,7 @@ class ParseFailureReportingTest : AbstractParseTest() {
 Unexpected option '--unknown'
 
 USAGE: [-a <value>] [-b <value>]
+
 """, output.text
         )
     }
@@ -47,6 +48,7 @@ USAGE: [-a <value>] [-b <value>]
 USAGE:
   -h | --help
   run
+
 """, output.text
         )
     }

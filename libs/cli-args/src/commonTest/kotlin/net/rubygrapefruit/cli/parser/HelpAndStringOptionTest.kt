@@ -55,7 +55,7 @@ class HelpAndStringOptionTest : AbstractParseTest() {
         app.help(
             """
 USAGE:
-  some_app -h | --help
+  some_app -h | --help  Shows this help message
   some_app [-x <value>]
 
 OPTIONS:

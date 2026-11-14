@@ -37,7 +37,25 @@ internal interface ParserInternal<out T> {
             }
 
             val usage = parser.usage()
-            usage.writeSummaryTo(output)
+
+            val choices = usage.choices()
+            if (choices.size > 1) {
+                output.writeLine()
+                output.heading("USAGE:")
+                output.writeLine()
+                for (choice in choices) {
+                    output.write("  ")
+                    choice.writeTo(false, output)
+                    output.writeLine()
+                }
+            } else {
+                output.writeLine()
+                output.heading("USAGE:")
+                output.write(" ")
+                usage.writeTo(false, output)
+                output.writeLine()
+            }
+            output.writeLine()
         }
     }
 }

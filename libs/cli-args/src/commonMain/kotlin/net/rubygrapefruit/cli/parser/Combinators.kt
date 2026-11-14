@@ -7,16 +7,16 @@ import kotlin.jvm.JvmName
  *
  * The parser produces the result of the given function.
  */
-fun <OUT> params(producer: () -> OUT): Parser<OUT> {
-    return AllOfParser(emptyList()) { producer() }
+fun <OUT> params(summary: String? = null, producer: () -> OUT): Parser<OUT> {
+    return AllOfParser(emptyList(), summary) { producer() }
 }
 
 /**
  * Creates a parser that applies the given parser and maps its result to produce a value of type [OUT].
  */
-fun <A, OUT> params(a: Parser<A>, map: (A) -> OUT): Parser<OUT> {
+fun <A, OUT> params(a: Parser<A>, summary: String? = null, map: (A) -> OUT): Parser<OUT> {
     @Suppress("UNCHECKED_CAST")
-    return AllOfParser(listOf(a).cast()) { results ->
+    return AllOfParser(listOf(a).cast(), summary) { results ->
         map(results[0].value() as A)
     }
 }
@@ -26,9 +26,9 @@ fun <A, OUT> params(a: Parser<A>, map: (A) -> OUT): Parser<OUT> {
  *
  * Positional parameters must appear in the order specified, and options can appear in any order.
  */
-fun <A, B, OUT> params(a: Parser<A>, b: Parser<B>, map: (A, B) -> OUT): Parser<OUT> {
+fun <A, B, OUT> params(a: Parser<A>, b: Parser<B>, summary: String? = null, map: (A, B) -> OUT): Parser<OUT> {
     @Suppress("UNCHECKED_CAST")
-    return AllOfParser(listOf(a, b).cast()) { results ->
+    return AllOfParser(listOf(a, b).cast(), summary) { results ->
         map(results[0].value() as A, results[1].value() as B)
     }
 }
@@ -38,9 +38,9 @@ fun <A, B, OUT> params(a: Parser<A>, b: Parser<B>, map: (A, B) -> OUT): Parser<O
  *
  * Positional parameters must appear in the order specified, and options can appear in any order.
  */
-fun <A, OUT> params(prefix: Parser<Unit>, a: Parser<A>, map: (A) -> OUT): Parser<OUT> {
+fun <A, OUT> params(prefix: Parser<Unit>, a: Parser<A>, summary: String? = null, map: (A) -> OUT): Parser<OUT> {
     @Suppress("UNCHECKED_CAST")
-    return AllOfParser(listOf(prefix, a).cast()) { results ->
+    return AllOfParser(listOf(prefix, a).cast(), summary) { results ->
         map(results[1].value() as A)
     }
 }
@@ -50,9 +50,9 @@ fun <A, OUT> params(prefix: Parser<Unit>, a: Parser<A>, map: (A) -> OUT): Parser
  *
  * Positional parameters must appear in the order specified, and options can appear in any order.
  */
-fun <A, B, C, OUT> params(a: Parser<A>, b: Parser<B>, c: Parser<C>, map: (A, B, C) -> OUT): Parser<OUT> {
+fun <A, B, C, OUT> params(a: Parser<A>, b: Parser<B>, c: Parser<C>, summary: String? = null, map: (A, B, C) -> OUT): Parser<OUT> {
     @Suppress("UNCHECKED_CAST")
-    return AllOfParser(listOf(a, b, c).cast()) { results ->
+    return AllOfParser(listOf(a, b, c).cast(), summary) { results ->
         map(results[0].value() as A, results[1].value() as B, results[2].value() as C)
     }
 }
@@ -62,9 +62,9 @@ fun <A, B, C, OUT> params(a: Parser<A>, b: Parser<B>, c: Parser<C>, map: (A, B, 
  *
  * Positional parameters must appear in the order specified, and options can appear in any order.
  */
-fun <A, B, OUT> params(prefix: Parser<Unit>, a: Parser<A>, b: Parser<B>, map: (A, B) -> OUT): Parser<OUT> {
+fun <A, B, OUT> params(prefix: Parser<Unit>, a: Parser<A>, b: Parser<B>, summary: String? = null, map: (A, B) -> OUT): Parser<OUT> {
     @Suppress("UNCHECKED_CAST")
-    return AllOfParser(listOf(prefix, a, b).cast()) { results ->
+    return AllOfParser(listOf(prefix, a, b).cast(), summary) { results ->
         map(results[1].value() as A, results[2].value() as B)
     }
 }
@@ -74,9 +74,9 @@ fun <A, B, OUT> params(prefix: Parser<Unit>, a: Parser<A>, b: Parser<B>, map: (A
  *
  * Positional parameters must appear in the order specified, and options can appear in any order.
  */
-fun <A, B, C, D, OUT> params(a: Parser<A>, b: Parser<B>, c: Parser<C>, d: Parser<D>, map: (A, B, C, D) -> OUT): Parser<OUT> {
+fun <A, B, C, D, OUT> params(a: Parser<A>, b: Parser<B>, c: Parser<C>, d: Parser<D>, summary: String? = null, map: (A, B, C, D) -> OUT): Parser<OUT> {
     @Suppress("UNCHECKED_CAST")
-    return AllOfParser(listOf(a, b, c, d).cast()) { results ->
+    return AllOfParser(listOf(a, b, c, d).cast(), summary) { results ->
         map(results[0].value() as A, results[1].value() as B, results[2].value() as C, results[3].value() as D)
     }
 }
@@ -86,9 +86,9 @@ fun <A, B, C, D, OUT> params(a: Parser<A>, b: Parser<B>, c: Parser<C>, d: Parser
  *
  * Positional parameters must appear in the order specified, and options can appear in any order.
  */
-fun <A, B, C, D, E, OUT> params(a: Parser<A>, b: Parser<B>, c: Parser<C>, d: Parser<D>, e: Parser<E>, map: (A, B, C, D, E) -> OUT): Parser<OUT> {
+fun <A, B, C, D, E, OUT> params(a: Parser<A>, b: Parser<B>, c: Parser<C>, d: Parser<D>, e: Parser<E>, summary: String? = null, map: (A, B, C, D, E) -> OUT): Parser<OUT> {
     @Suppress("UNCHECKED_CAST")
-    return AllOfParser(listOf(a, b, c, d, e).cast()) { results ->
+    return AllOfParser(listOf(a, b, c, d, e).cast(), summary) { results ->
         map(results[0].value() as A, results[1].value() as B, results[2].value() as C, results[3].value() as D, results[4].value() as E)
     }
 }

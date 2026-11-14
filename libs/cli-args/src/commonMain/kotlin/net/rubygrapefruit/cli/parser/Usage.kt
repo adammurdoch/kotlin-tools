@@ -32,27 +32,7 @@ internal sealed interface UsageInternal : Usage {
         return emptyList()
     }
 
-    fun writeAppSummaryTo(output: Output) {
-    }
-
-    fun writeSummaryTo(output: Output) {
-        output.writeLine()
-
-        val choices = choices()
-        if (choices.size > 1) {
-            output.heading("USAGE:")
-            output.writeLine()
-            for (choice in choices) {
-                output.write("  ")
-                choice.writeTo(false, output)
-                output.writeLine()
-            }
-        } else {
-            output.heading("USAGE:")
-            output.write(" ")
-            writeTo(false, output)
-            output.writeLine()
-        }
+    fun writeHelpHeaderTo(output: Output) {
     }
 
     override fun writeTo(output: Output) {
@@ -68,6 +48,9 @@ internal sealed interface UsageInternal : Usage {
      * Write usage as part of a single line summary.
      */
     fun writeTo(quoted: Boolean, output: Output)
+
+    fun writeSummaryTo(output: Output) {
+    }
 
     sealed interface OptionUsage : UsageInternal {
         override fun options(): List<OptionUsage> {

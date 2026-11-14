@@ -41,7 +41,7 @@ class HelpAndChoiceOfCommands : AbstractParseTest() {
         parser.help(
             """
 USAGE:
-  some_app -h | --help
+  some_app -h | --help  Shows this help message
   some_app start
   some_app stop
 

@@ -39,11 +39,17 @@ internal class AppParser(
     }
 
     private fun helpAction(): Parser<Runnable> {
-        return params(option("h", "help").boolean().required()) { HelpAction(this) }
+        return params(
+            option("h", "help").boolean().required(),
+            summary = "Shows this help message"
+        ) { HelpAction(this) }
     }
 
     private fun completionAction(): Parser<Runnable> {
-        return params(option("completion").boolean().required()) { CompletionAction(name) }
+        return params(
+            option("completion").boolean().required(),
+            summary = "Generates a ZSH completion script"
+        ) { CompletionAction(name) }
     }
 
     private inner class AppUsage(val usage: UsageInternal) : UsageInternal {
@@ -55,7 +61,7 @@ internal class AppParser(
             return usage.options()
         }
 
-        override fun writeAppSummaryTo(output: Output) {
+        override fun writeHelpHeaderTo(output: Output) {
             if (summary != null) {
                 output.writeLine()
                 output.write(name)
@@ -71,6 +77,10 @@ internal class AppParser(
                 output.write(" ")
                 usage.writeTo(quoted, output)
             }
+        }
+
+        override fun writeSummaryTo(output: Output) {
+            usage.writeSummaryTo(output)
         }
     }
 }

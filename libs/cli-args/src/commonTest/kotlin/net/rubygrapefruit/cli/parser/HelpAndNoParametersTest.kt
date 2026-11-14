@@ -49,7 +49,7 @@ class HelpAndNoParametersTest : AbstractParseTest() {
         app.help(
             """
 USAGE:
-  some_app -h | --help
+  some_app -h | --help  Shows this help message
   some_app
 
 OPTIONS:
@@ -60,8 +60,8 @@ OPTIONS:
     }
 
     @Test
-    fun `shows help when app has a summary`() {
-        val parser = params { fail() }
+    fun `shows help when app and action have a summary`() {
+        val parser = params(summary = "Does the thing") { fail() }
         val app = app(
             "some_app",
             parser,
@@ -75,8 +75,8 @@ OPTIONS:
 some_app - Does something useful
 
 USAGE:
-  some_app -h | --help
-  some_app
+  some_app -h | --help  Shows this help message
+  some_app  Does the thing
 
 OPTIONS:
   -h, --help

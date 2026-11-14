@@ -34,6 +34,7 @@ class RunAppTest {
             """Parameter <b> not provided
 
 USAGE: <a> <b>
+
 """, output.text
         )
     }

@@ -4,6 +4,7 @@ import net.rubygrapefruit.cli.terminal.Output
 
 internal class AllOfParser<OUT>(
     private val parsers: List<ParserInternal<*>>,
+    private val summary: String?,
     private val map: (List<ParsedArguments.Success<*>>) -> OUT
 ) : AbstractParser<OUT>() {
     override fun start(): ParseState<OUT> {
@@ -11,10 +12,10 @@ internal class AllOfParser<OUT>(
     }
 
     override fun usage(): UsageInternal {
-        return AllOfUsage(parsers)
+        return AllOfUsage()
     }
 
-    private class AllOfUsage(parsers: List<ParserInternal<*>>) : UsageInternal {
+    private inner class AllOfUsage : UsageInternal {
         private val usages = parsers.map { it.usage() }
 
         override val isEmpty: Boolean
@@ -34,6 +35,13 @@ internal class AllOfParser<OUT>(
                     }
                     parser.writeTo(true, output)
                 }
+            }
+        }
+
+        override fun writeSummaryTo(output: Output) {
+            if (summary != null) {
+                output.write("  ")
+                output.write(summary)
             }
         }
     }

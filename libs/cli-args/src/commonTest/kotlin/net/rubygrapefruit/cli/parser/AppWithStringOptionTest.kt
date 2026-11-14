@@ -8,7 +8,12 @@ import kotlin.test.assertNull
 class AppWithStringOptionTest: AbstractParseTest() {
     @Test
     fun `parses app with string option`() {
-        val parser = app("some_app", params(option("x")) { OneParam(it) })
+        val parser = app(
+            "some_app",
+            params(option("x")) { OneParam(it) },
+            helpAction = false,
+            completionAction = false
+        )
 
         parser.parse("-x", "value").get().apply {
             assertIs<OneParam>(this)
@@ -22,7 +27,12 @@ class AppWithStringOptionTest: AbstractParseTest() {
 
     @Test
     fun `reports app usage`() {
-        val parser = app("some_app", params(option("x")) { OneParam(it) })
+        val parser = app(
+            "some_app",
+            params(option("x")) { OneParam(it) },
+            helpAction = false,
+            completionAction = false
+        )
 
         parser.usage("some_app [-x <value>]")
         parser.option("-x <value>")

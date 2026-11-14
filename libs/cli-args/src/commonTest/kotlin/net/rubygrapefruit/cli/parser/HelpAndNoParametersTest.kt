@@ -8,7 +8,12 @@ class HelpAndNoParametersTest : AbstractParseTest() {
     @Test
     fun `parses help and no parameters`() {
         val parser = params { NoParams() }
-        val app = app("some_app", parser).withHelp()
+        val app = app(
+            "some_app",
+            parser,
+            helpAction = true,
+            completionAction = false
+        )
 
         assertIs<NoParams>(app.parse().get())
         assertIs<HelpAction>(app.parse("--help").get())
@@ -17,7 +22,12 @@ class HelpAndNoParametersTest : AbstractParseTest() {
     @Test
     fun `reports usage`() {
         val parser = params { fail() }
-        val app = app("some_app", parser).withHelp()
+        val app = app(
+            "some_app",
+            parser,
+            helpAction = true,
+            completionAction = false
+        )
 
         app.usage {
             choice("some_app -h | --help")
@@ -29,9 +39,15 @@ class HelpAndNoParametersTest : AbstractParseTest() {
     @Test
     fun `shows help`() {
         val parser = params { fail() }
-        val app = app("some_app", parser).withHelp()
+        val app = app(
+            "some_app",
+            parser,
+            helpAction = true,
+            completionAction = false
+        )
 
-        app.help("""
+        app.help(
+            """
 USAGE:
   some_app -h | --help
   some_app
@@ -39,6 +55,7 @@ USAGE:
 OPTIONS:
   -h, --help
 
-""")
+"""
+        )
     }
 }

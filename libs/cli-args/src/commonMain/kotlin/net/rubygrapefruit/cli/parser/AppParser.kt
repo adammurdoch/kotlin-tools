@@ -6,17 +6,9 @@ import net.rubygrapefruit.cli.terminal.Output
 internal class AppParser(
     private val name: String,
     private val parser: Parser<Runnable>,
-    private val help: Boolean = false,
-    private val completion: Boolean = false,
-) : AbstractParser<Runnable>(), Application {
-    override fun withHelp(): Application {
-        return AppParser(name, parser, true, completion)
-    }
-
-    override fun withCompletion(): Application {
-        return AppParser(name, parser, help, true)
-    }
-
+    private val help: Boolean,
+    private val completion: Boolean,
+) : AbstractParser<Runnable>(), Parser<Runnable> {
     override fun start(): ParseState<Runnable> {
         return parser().start()
     }

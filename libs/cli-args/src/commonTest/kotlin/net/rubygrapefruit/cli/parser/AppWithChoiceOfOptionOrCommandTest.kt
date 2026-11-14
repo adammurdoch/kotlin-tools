@@ -12,7 +12,7 @@ class AppWithChoiceOfOptionOrCommandTest : AbstractParseTest() {
             params(option("help").boolean().required()) { OneParam("help") },
             params(command("run")) { OneParam("run") }
         )
-        val parser = app("some_app", choices)
+        val parser = app("some_app", choices, helpAction = false, completionAction = false)
 
         parser.parse("--help").get().apply {
             assertIs<OneParam>(this)
@@ -30,7 +30,7 @@ class AppWithChoiceOfOptionOrCommandTest : AbstractParseTest() {
             params(option("help").boolean().required()) { NoParams() },
             params(command("run")) { NoParams() }
         )
-        val parser = app("some_app", choices)
+        val parser = app("some_app", choices, helpAction = false, completionAction = false)
 
         parser.usage {
             choice("some_app --help")
@@ -47,7 +47,7 @@ class AppWithChoiceOfOptionOrCommandTest : AbstractParseTest() {
             params(option("help").boolean().required()) { fail() },
             params(command("run")) { fail() }
         )
-        val parser = app("some_app", choices)
+        val parser = app("some_app", choices, helpAction = false, completionAction = false)
 
         parser.fails {
             failure(0, "Expected 'run'")

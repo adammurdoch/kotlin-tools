@@ -4,7 +4,7 @@ import kotlin.test.Test
 import kotlin.test.assertIs
 import kotlin.test.assertSame
 
-class AppWithStandardActions : AbstractParseTest() {
+class AppWithStandardActionsTest : AbstractParseTest() {
     @Test
     fun `parses choice of help or command`() {
         val start = NoParams()
@@ -14,15 +14,16 @@ class AppWithStandardActions : AbstractParseTest() {
             oneOf(
                 params(command("start")) { start },
                 params(command("stop")) { stop }
-            )
-        ).withHelp()
+            ),
+            helpAction = true,
+            completionAction = false
+        )
 
         assertSame(start, parser.parse("start").get())
         assertSame(stop, parser.parse("stop").get())
         assertIs<HelpAction>(parser.parse("--help").get())
         assertIs<HelpAction>(parser.parse("-h").get())
     }
-
 
     @Test
     fun `parses choice of completion or command`() {
@@ -33,8 +34,10 @@ class AppWithStandardActions : AbstractParseTest() {
             oneOf(
                 params(command("start")) { start },
                 params(command("stop")) { stop }
-            )
-        ).withCompletion()
+            ),
+            helpAction = false,
+            completionAction = true
+        )
 
         assertSame(start, parser.parse("start").get())
         assertSame(stop, parser.parse("stop").get())
@@ -50,8 +53,10 @@ class AppWithStandardActions : AbstractParseTest() {
             oneOf(
                 params(command("start")) { start },
                 params(command("stop")) { stop }
-            )
-        ).withHelp().withCompletion()
+            ),
+            helpAction = true,
+            completionAction = true
+        )
 
         assertSame(start, parser.parse("start").get())
         assertSame(stop, parser.parse("stop").get())

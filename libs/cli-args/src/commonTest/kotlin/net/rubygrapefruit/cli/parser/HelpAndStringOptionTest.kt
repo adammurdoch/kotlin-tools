@@ -6,7 +6,12 @@ class HelpAndStringOptionTest : AbstractParseTest() {
     @Test
     fun `parses help with option with short name`() {
         val parser = option("x")
-        val app = app("some_app", params(parser) { OneParam(it) }).withHelp()
+        val app = app(
+            "some_app",
+            params(parser) { OneParam(it) },
+            helpAction = true,
+            completionAction = false
+        )
 
         assertIs<OneParam>(app.parse("-x", "value").get()).apply {
             assertEquals("value", value)
@@ -20,7 +25,12 @@ class HelpAndStringOptionTest : AbstractParseTest() {
     @Test
     fun `reports usage for option with short name`() {
         val parser = option("x")
-        val app = app("some_app", params(parser) { fail() }).withHelp()
+        val app = app(
+            "some_app",
+            params(parser) { fail() },
+            helpAction = true,
+            completionAction = false
+        )
 
         app.usage {
             choice("some_app -h | --help")
@@ -35,7 +45,12 @@ class HelpAndStringOptionTest : AbstractParseTest() {
     @Test
     fun `shows help for option with short name`() {
         val parser = option("x")
-        val app = app("some_app", params(parser) { fail() }).withHelp()
+        val app = app(
+            "some_app",
+            params(parser) { fail() },
+            helpAction = true,
+            completionAction = false
+        )
 
         app.help(
             """

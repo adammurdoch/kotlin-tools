@@ -11,8 +11,10 @@ class HelpAndChoiceOfCommands : AbstractParseTest() {
             oneOf(
                 params(command("start")) { fail() },
                 params(command("stop")) { fail() }
-            )
-        ).withHelp()
+            ),
+            helpAction = true,
+            completionAction = false
+        )
 
         parser.usage {
             choice("some_app -h | --help")
@@ -31,10 +33,13 @@ class HelpAndChoiceOfCommands : AbstractParseTest() {
             oneOf(
                 params(command("start")) { fail() },
                 params(command("stop")) { fail() }
-            )
-        ).withHelp()
+            ),
+            helpAction = true,
+            completionAction = false
+        )
 
-        parser.help("""
+        parser.help(
+            """
 USAGE:
   some_app -h | --help
   some_app start
@@ -43,6 +48,7 @@ USAGE:
 OPTIONS:
   -h, --help
 
-""")
+"""
+        )
     }
 }

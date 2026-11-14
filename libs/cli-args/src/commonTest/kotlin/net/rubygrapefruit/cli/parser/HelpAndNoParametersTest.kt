@@ -58,4 +58,30 @@ OPTIONS:
 """
         )
     }
+
+    @Test
+    fun `shows help when app has a summary`() {
+        val parser = params { fail() }
+        val app = app(
+            "some_app",
+            parser,
+            helpAction = true,
+            completionAction = false,
+            summary = "Does something useful"
+        )
+
+        app.help(
+            """
+some_app - Does something useful
+
+USAGE:
+  some_app -h | --help
+  some_app
+
+OPTIONS:
+  -h, --help
+
+"""
+        )
+    }
 }

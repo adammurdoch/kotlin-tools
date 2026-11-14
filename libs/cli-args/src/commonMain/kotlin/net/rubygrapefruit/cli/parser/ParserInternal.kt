@@ -37,7 +37,6 @@ internal interface ParserInternal<out T> {
             }
 
             val usage = parser.usage()
-            output.writeLine()
             usage.writeSummaryTo(output)
         }
     }

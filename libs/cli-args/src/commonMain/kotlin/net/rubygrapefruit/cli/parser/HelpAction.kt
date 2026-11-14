@@ -11,9 +11,8 @@ internal class HelpAction(private val parser: ParserInternal<*>) : Runnable {
     fun run(output: Output) {
         val usage = parser.usage()
         output.apply {
-            writeLine()
+            usage.writeAppSummaryTo(this)
             usage.writeSummaryTo(this)
-            maybeNewLine()
             val options = usage.options()
             if (options.isNotEmpty()) {
                 writeLine()

@@ -6,6 +6,7 @@ import net.rubygrapefruit.cli.terminal.Output
 internal class AppParser(
     private val name: String,
     private val parser: Parser<Runnable>,
+    private val summary: String?,
     private val help: Boolean,
     private val completion: Boolean,
 ) : AbstractParser<Runnable>(), Parser<Runnable> {
@@ -52,6 +53,16 @@ internal class AppParser(
 
         override fun options(): List<UsageInternal.OptionUsage> {
             return usage.options()
+        }
+
+        override fun writeAppSummaryTo(output: Output) {
+            if (summary != null) {
+                output.writeLine()
+                output.write(name)
+                output.write(" - ")
+                output.write(summary)
+                output.maybeNewLine()
+            }
         }
 
         override fun writeTo(quoted: Boolean, output: Output) {

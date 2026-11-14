@@ -32,7 +32,12 @@ internal sealed interface UsageInternal : Usage {
         return emptyList()
     }
 
+    fun writeAppSummaryTo(output: Output) {
+    }
+
     fun writeSummaryTo(output: Output) {
+        output.writeLine()
+
         val choices = choices()
         if (choices.size > 1) {
             output.heading("USAGE:")

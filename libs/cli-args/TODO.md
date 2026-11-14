@@ -136,7 +136,7 @@ TODO
     - See ChoiceOfCommandTest
 - `oneOf()` should report problems from choice that recognized something first
 - `oneOf()` with overlapping options, some with values and some without
-- `oneOf()` currently does not fail on conflicting options or literals
+- `oneOf()` currently does not report conflicting options or literals
     - See ChoiceOfStringOptionsTest
 - `oneOf()` currently uses generic 'unexpected' problem instead of specific problems for option (e.g. repeated option, missing value)
 - `oneOf()` should fails when created with choice that can match no arguments when the choice is not the last

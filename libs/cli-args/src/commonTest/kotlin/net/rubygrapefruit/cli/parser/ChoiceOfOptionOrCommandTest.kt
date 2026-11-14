@@ -59,13 +59,13 @@ class ChoiceOfOptionOrCommandTest : AbstractParseTest() {
         }
         parser.fails("run", "--help") {
 //            failure(1, "Cannot use '--help' with 'run'")
-            failure(0, "Unexpected argument 'run'")
+            failure(1, "Unexpected option '--help'")
         }
 
         parser.fails("unknown", "run", "--help") {
             failure(0, "Unexpected argument 'unknown'")
 //            failure(2, "Cannot use '--help' with 'run'")
-            failure(1, "Unexpected argument 'run'")
+            failure(2, "Unexpected option '--help'")
         }
     }
 

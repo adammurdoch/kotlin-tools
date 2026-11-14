@@ -6,7 +6,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
     }
 
     override fun parse(args: List<String>): Parser.Result<T> {
-        val results = startAll().map { parseAlternative(args, it) }
+        val results = parseAlternatives(args, startAll().map { Alternative(it, BooleanArray(args.size)) })
         for (alternative in results) {
             if (alternative.result is ParsedArguments.Success && alternative.recognizedCount == args.size) {
                 return ParserInternal.Success(alternative.result.value())
@@ -83,34 +83,58 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
         }
     }
 
-    private fun parseAlternative(args: List<String>, state: ParseState<T>): Alternative<T> {
-        val recognized = BooleanArray(args.size)
+    private fun parseAlternatives(args: List<String>, alteratives: List<Alternative<T>>): List<Result<T>> {
         var index = 0
-        while (index < args.size && (state.expectingOption || state.expectingPositional)) {
-            val current = DefaultInputArgs(index, args, recognized)
-            val parseResult = state.maybeParse(current)
-            when (parseResult) {
-                is ParseState.Recognized -> {
-                    require(parseResult.count > 0)
-                    repeat(parseResult.count) {
-                        recognized[index] = true
-                        index++
+        var remaining = alteratives.toMutableList()
+        while (index < args.size) {
+            val nextAlternatives = mutableListOf<Alternative<T>>()
+            for (alternative in remaining) {
+                val state = alternative.state
+                if (alternative.advance > 0) {
+                    nextAlternatives.add(alternative)
+                } else if (state.expectingOption || state.expectingPositional) {
+                    val recognized = alternative.recognized
+                    val current = DefaultInputArgs(index, args, recognized)
+                    val parseResult = state.maybeParse(current)
+                    when (parseResult) {
+                        is ParseState.Recognized -> {
+                            require(parseResult.count > 0)
+                            repeat(parseResult.count) {
+                                recognized[index + it] = true
+                            }
+                            alternative.advance = parseResult.count
+                            nextAlternatives.add(alternative)
+                        }
+
+                        is ParseState.NotRecognized -> {
+                            // Attempt to recover and continue
+                            alternative.advance = 1
+                        }
                     }
                 }
-
-                is ParseState.NotRecognized -> {
-                    // Attempt to recover and continue
-                    index++
-                }
             }
+            if (nextAlternatives.isNotEmpty()) {
+                remaining = nextAlternatives
+            }
+            val advance = remaining.minOf { it.advance }
+            for (alternative in remaining) {
+                alternative.advance -= advance
+            }
+            if (advance == 0) {
+                // All alternatives are finished
+                break
+            }
+            index += advance
         }
 
-        val result = state.finish(args.size)
-
-        return Alternative(result, recognized)
+        return remaining.map { Result(it.state.finish(args.size), it.recognized) }
     }
 
-    private class Alternative<T>(val result: ParsedArguments<T>, val recognized: BooleanArray) {
+    private class Alternative<T>(val state: ParseState<T>, val recognized: BooleanArray) {
+        var advance = 0
+    }
+
+    private class Result<T>(val result: ParsedArguments<T>, val recognized: BooleanArray) {
         val recognizedCount = recognized.count { it }
     }
 }

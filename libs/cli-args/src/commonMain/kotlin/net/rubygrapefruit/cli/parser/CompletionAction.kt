@@ -5,8 +5,8 @@ import net.rubygrapefruit.cli.terminal.Output
 import net.rubygrapefruit.cli.terminal.output
 
 internal class CompletionAction(private val appName: String) : Runnable {
-    override fun run() {
-        run(output())
+    override fun Runnable.Context.run() {
+        run(output)
     }
 
     fun run(output: Output) {

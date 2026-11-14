@@ -5,6 +5,7 @@ import net.rubygrapefruit.cli.Runnable
 import net.rubygrapefruit.cli.parser.Parser
 import net.rubygrapefruit.cli.terminal.Output
 import net.rubygrapefruit.cli.terminal.diagnostics
+import net.rubygrapefruit.cli.terminal.output
 
 /**
  * Runs the [Runnable] produced by parsing the given arguments, and then exits the process.
@@ -27,7 +28,9 @@ internal fun runApp(parser: Parser<Runnable>, arguments: List<String>, output: O
             }
             return 1
         }
-        result.get().run()
+        result.get().run {
+            DefaultContext().run()
+        }
         return 0
     } catch (t: Throwable) {
         if (isPropagateMainFailure) {
@@ -43,4 +46,12 @@ internal fun runApp(parser: Parser<Runnable>, arguments: List<String>, output: O
         }
         return 1
     }
+}
+
+private class DefaultContext : Runnable.Context {
+    override val output: Output
+        get() = output()
+
+    override val diagnostics: Output
+        get() = diagnostics()
 }

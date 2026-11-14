@@ -5,16 +5,16 @@ import net.rubygrapefruit.cli.app.runApp
 import net.rubygrapefruit.cli.parser.*
 
 class Run(val verbose: Boolean, val greeting: String) : Runnable {
-    override fun run() {
+    override fun Runnable.Context.run() {
         if (verbose) {
             print("> ")
         }
-        println(greeting)
+        println("hello $greeting")
     }
 }
 
 class Generate(val verbose: Boolean) : Runnable {
-    override fun run() {
+    override fun Runnable.Context.run() {
         if (verbose) {
             print("> ")
         }

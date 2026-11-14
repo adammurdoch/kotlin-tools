@@ -9,7 +9,7 @@ import kotlin.test.assertEquals
 
 class RunAppTest {
     val app = object : Runnable {
-        override fun run() {
+        override fun Runnable.Context.run() {
         }
     }
 
@@ -39,7 +39,7 @@ USAGE: <a> <b>
     @Test
     fun `reports error and exits with 1 when app throws exception`() {
         val app = object : Runnable {
-            override fun run() {
+            override fun Runnable.Context.run() {
                 throw RuntimeException("<broken>")
             }
         }
@@ -56,7 +56,7 @@ USAGE: <a> <b>
     fun `reports exception with no message`() {
         val exception = RuntimeException()
         val app = object : Runnable {
-            override fun run() {
+            override fun Runnable.Context.run() {
                 throw exception
             }
         }

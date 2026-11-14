@@ -6,12 +6,12 @@ import kotlin.test.*
 
 abstract class AbstractParseTest {
     protected class NoParams : Runnable {
-        override fun run() {
+        override fun Runnable.Context.run() {
         }
     }
 
     protected class OneParam(val value: String?) : Runnable {
-        override fun run() {
+        override fun Runnable.Context.run() {
         }
     }
 

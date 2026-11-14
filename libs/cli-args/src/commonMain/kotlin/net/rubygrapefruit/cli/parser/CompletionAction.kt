@@ -2,7 +2,6 @@ package net.rubygrapefruit.cli.parser
 
 import net.rubygrapefruit.cli.Runnable
 import net.rubygrapefruit.cli.terminal.Output
-import net.rubygrapefruit.cli.terminal.output
 
 internal class CompletionAction(private val appName: String) : Runnable {
     override fun Runnable.Context.run() {

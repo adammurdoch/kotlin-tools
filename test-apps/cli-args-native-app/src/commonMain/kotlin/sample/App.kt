@@ -1,7 +1,7 @@
 package sample
 
 import net.rubygrapefruit.cli.Runnable
-import net.rubygrapefruit.cli.app.runApp
+import net.rubygrapefruit.cli.app.appMain
 import net.rubygrapefruit.cli.parser.*
 
 class Run(val verbose: Boolean, val greeting: String) : Runnable {
@@ -22,12 +22,10 @@ class Generate(val verbose: Boolean) : Runnable {
     }
 }
 
-fun parser(): Parser<Runnable> {
+fun main(args: Array<String>) = appMain(args) {
     val verbose = option("verbose").boolean()
     val run = params(command("run"), verbose, positional("greeting")) { verbose, greeting -> Run(verbose, greeting) }
     val generate = params(command("generate"), verbose) { verbose -> Generate(verbose) }
     val commands = oneOf(run, generate)
-    return app("cli-args-app", commands).withHelp().withCompletion()
+    app("cli-args-app", commands).withHelp().withCompletion()
 }
-
-fun main(args: Array<String>) = parser().runApp(args)

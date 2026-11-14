@@ -19,7 +19,7 @@ class RunAppTest {
 
         val parser = params(positional("a"), positional("b")) { _, _ -> app }
 
-        assertEquals(0, runApp(parser, listOf("one", "two"), output))
+        assertEquals(0, runApp(listOf("one", "two"), output, { parser }))
         assertEquals("", output.text)
     }
 
@@ -29,11 +29,13 @@ class RunAppTest {
 
         val parser = params(positional("a"), positional("b")) { _, _ -> app }
 
-        assertEquals(1, runApp(parser, listOf("one"), output))
-        assertEquals("""Parameter <b> not provided
+        assertEquals(1, runApp(listOf("one"), output, { parser }))
+        assertEquals(
+            """Parameter <b> not provided
 
 USAGE: <a> <b>
-""", output.text)
+""", output.text
+        )
     }
 
     @Test
@@ -47,9 +49,11 @@ USAGE: <a> <b>
 
         val parser = params(positional("a"), positional("b")) { _, _ -> app }
 
-        assertEquals(1, runApp(parser, listOf("one", "two"), output))
-        assertEquals("""<broken>
-""", output.text)
+        assertEquals(1, runApp(listOf("one", "two"), output, { parser }))
+        assertEquals(
+            """<broken>
+""", output.text
+        )
     }
 
     @Test
@@ -64,8 +68,10 @@ USAGE: <a> <b>
 
         val parser = params(positional("a"), positional("b")) { _, _ -> app }
 
-        assertEquals(1, runApp(parser, listOf("one", "two"), output))
-        assertEquals("""$exception (no message)
-""", output.text)
+        assertEquals(1, runApp(listOf("one", "two"), output, { parser }))
+        assertEquals(
+            """$exception (no message)
+""", output.text
+        )
     }
 }

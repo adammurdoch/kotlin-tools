@@ -10,19 +10,19 @@ import net.rubygrapefruit.cli.terminal.output
 /**
  * Runs the [Runnable] produced by parsing the given arguments, and then exits the process.
  */
-fun Parser<Runnable>.runApp(arguments: Array<String>) {
-    val exitCode = runApp(this, arguments.toList(), diagnostics())
+fun appMain(arguments: Array<String>, factory: () -> Parser<Runnable>) {
+    val exitCode = runApp(arguments.toList(), diagnostics(), factory)
     exit(exitCode)
 }
 
 /**
  * Parses args and runs app. Returns the exit code.
  */
-internal fun runApp(parser: Parser<Runnable>, arguments: List<String>, output: Output): Int {
+internal fun runApp(arguments: List<String>, diagnostics: Output, factory: () -> Parser<Runnable>): Int {
     try {
-        val result = parser.parse(arguments.toList())
+        val result = parseArgs(factory, arguments)
         if (result is Parser.Failure) {
-            result.writeTo(output)
+            result.writeTo(diagnostics)
             if (isPropagateMainFailure) {
                 result.get()
             }
@@ -38,14 +38,20 @@ internal fun runApp(parser: Parser<Runnable>, arguments: List<String>, output: O
         } else {
             val message = t.message
             if (message.isNullOrEmpty()) {
-                output.write("$t (no message)")
+                diagnostics.write("$t (no message)")
             } else {
-                output.write(message)
+                diagnostics.write(message)
             }
-            output.maybeNewLine()
+            diagnostics.maybeNewLine()
         }
         return 1
     }
+}
+
+private fun parseArgs(factory: () -> Parser<Runnable>, arguments: List<String>): Parser.Result<Runnable> {
+    val parser = factory()
+    val result = parser.parse(arguments.toList())
+    return result
 }
 
 private class DefaultContext : Runnable.Context {

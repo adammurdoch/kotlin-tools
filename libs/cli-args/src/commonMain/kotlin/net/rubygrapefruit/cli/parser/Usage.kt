@@ -58,6 +58,9 @@ internal sealed interface UsageInternal : Usage {
         }
 
         fun writeOptionUsageTo(output: Output)
+
+        fun writeOptionSummaryTo(output: Output) {
+        }
     }
 }
 

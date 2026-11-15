@@ -55,12 +55,36 @@ class HelpAndStringOptionTest : AbstractParseTest() {
         app.help(
             """
 USAGE:
-  some_app -h | --help  Shows this help message
+  some_app -h | --help  Show some_app usage information
   some_app [-x <value>]
 
 OPTIONS:
   -h, --help
   -x <value>
+
+"""
+        )
+    }
+
+    @Test
+    fun `shows help for option with short name and summary`() {
+        val parser = option("x", summary = "The value to thing")
+        val app = app(
+            "some_app",
+            params(parser, summary = "Do the thing") { fail() },
+            helpAction = true,
+            completionAction = false
+        )
+
+        app.help(
+            """
+USAGE:
+  some_app -h | --help  Show some_app usage information
+  some_app [-x <value>]  Do the thing
+
+OPTIONS:
+  -h, --help
+  -x <value>  The value to thing
 
 """
         )

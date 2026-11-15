@@ -33,6 +33,7 @@ internal class HelpAction(private val parser: ParserInternal<*>) : Runnable {
                 for (option in options) {
                     write("  ")
                     option.writeOptionUsageTo(this)
+                    option.writeOptionSummaryTo(this)
                     writeLine()
                 }
             }

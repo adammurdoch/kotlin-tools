@@ -40,15 +40,15 @@ internal class AppParser(
 
     private fun helpAction(): Parser<Runnable> {
         return params(
-            option("h", "help").boolean().required(),
-            summary = "Shows this help message"
+            option("h", "help", summary = "Show usage information").boolean().required(),
+            summary = "Show $name usage information"
         ) { HelpAction(this) }
     }
 
     private fun completionAction(): Parser<Runnable> {
         return params(
-            option("completion").boolean().required(),
-            summary = "Generates a ZSH completion script"
+            option("completion", summary = "Generate completion script").boolean().required(),
+            summary = "Generate a ZSH completion script for $name"
         ) { CompletionAction(name) }
     }
 

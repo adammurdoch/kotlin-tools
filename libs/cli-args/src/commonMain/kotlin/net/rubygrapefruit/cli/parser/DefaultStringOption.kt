@@ -2,7 +2,7 @@ package net.rubygrapefruit.cli.parser
 
 import net.rubygrapefruit.cli.terminal.Output
 
-internal class DefaultStringOption(unsortedNames: List<String>) : AbstractParser<String?>(), StringOption {
+internal class DefaultStringOption(unsortedNames: List<String>, private val summary: String?) : AbstractParser<String?>(), StringOption {
     private val names = unsortedNames.sortedWith { a, b ->
         val diff = a.length.compareTo(b.length)
         if (diff != 0) {
@@ -41,6 +41,13 @@ internal class DefaultStringOption(unsortedNames: List<String>) : AbstractParser
         override fun writeOptionUsageTo(output: Output) {
             writeList(output, flags) { flag ->
                 output.write("$flag <value>")
+            }
+        }
+
+        override fun writeOptionSummaryTo(output: Output) {
+            if (summary != null) {
+                output.write("  ")
+                output.write(summary)
             }
         }
     }

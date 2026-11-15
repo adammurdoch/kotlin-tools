@@ -158,7 +158,7 @@ TODO
     - Allow value name to be provided for `option()`
     - Highlight problematic part of usage?
     - Sort choices by command name or option
-- Move runApp() into `cli-args` project
+- Move `appMain()` into `cli-args` project
 - Convenience for help command or option
     - Add 'help' command when app uses commands
     - Help option has the highest priority
@@ -166,10 +166,13 @@ TODO
     - Sort options
     - Show commands, sorted
     - Merge duplicate options
+    - Display app usage + summary or options + summary in a table
+    - Layout takes terminal width into account, handles long option names or long summaries
 - Required string option
     - Repeated option, badly formed option
 - Convenience for completion command or option
     - Add 'completion' command when app uses commands
+    - Complete options
 - Parser that collects unrecognized or remainder
 - Merge short options
 - `--` as end of options

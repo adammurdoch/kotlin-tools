@@ -51,4 +51,30 @@ OPTIONS:
 """
         )
     }
+
+    @Test
+    fun `shows help when commands have summary`() {
+        val parser = app(
+            "some_app",
+            oneOf(
+                params(command("start"), summary = "Start the app") { fail() },
+                params(command("stop"), summary = "Stop the app") { fail() }
+            ),
+            helpAction = true,
+            completionAction = false
+        )
+
+        parser.help(
+            """
+USAGE:
+  some_app -h | --help  Show some_app usage information
+  some_app start  Start the app
+  some_app stop  Stop the app
+
+OPTIONS:
+  -h, --help  Show usage information
+
+"""
+        )
+    }
 }

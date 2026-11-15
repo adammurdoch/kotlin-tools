@@ -8,9 +8,9 @@ import net.rubygrapefruit.cli.Runnable
  * @param name The name of the CLI app
  * @param summary A short description of what the app does
  */
-fun <OUT : Runnable> app(
+fun app(
     name: String,
-    parser: Parser<OUT>,
+    parser: Parser<Runnable>,
     summary: String? = null,
     helpAction: Boolean = true,
     completionAction: Boolean = true,

@@ -61,6 +61,10 @@ internal class AppParser(
             return usage.options()
         }
 
+        override fun positionals(): List<UsageInternal.PositionalUsage> {
+            return usage.positionals()
+        }
+
         override fun writeHelpHeaderTo(output: Output) {
             if (summary != null) {
                 output.writeLine()

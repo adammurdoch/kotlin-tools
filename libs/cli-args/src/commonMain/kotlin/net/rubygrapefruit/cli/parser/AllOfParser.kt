@@ -25,6 +25,10 @@ internal class AllOfParser<OUT>(
             return usages.flatMap { it.options() }
         }
 
+        override fun positionals(): List<UsageInternal.PositionalUsage> {
+            return usages.flatMap { it.positionals() }
+        }
+
         override fun writeTo(quoted: Boolean, output: Output) {
             if (usages.size == 1) {
                 usages.first().writeTo(quoted, output)

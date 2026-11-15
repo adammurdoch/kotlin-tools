@@ -32,6 +32,13 @@ internal sealed interface UsageInternal : Usage {
         return emptyList()
     }
 
+    /**
+     * Returns the positionals of this usage, if any.
+     */
+    fun positionals(): List<PositionalUsage> {
+        return emptyList()
+    }
+
     fun writeHelpHeaderTo(output: Output) {
     }
 
@@ -61,6 +68,14 @@ internal sealed interface UsageInternal : Usage {
 
         fun writeOptionSummaryTo(output: Output) {
         }
+    }
+
+    sealed interface PositionalUsage : UsageInternal {
+        override fun positionals(): List<PositionalUsage> {
+            return listOf(this)
+        }
+
+        fun writePositionalSummaryTo(output: Output)
     }
 }
 

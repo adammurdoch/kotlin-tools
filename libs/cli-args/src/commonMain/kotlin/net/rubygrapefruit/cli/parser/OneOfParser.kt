@@ -27,6 +27,10 @@ internal class OneOfParser<OUT>(val choices: List<ParserInternal<OUT>>) : Abstra
             return usages.flatMap { it.options() }
         }
 
+        override fun positionals(): List<UsageInternal.PositionalUsage> {
+            return usages.flatMap { it.positionals() }
+        }
+
         override fun writeTo(quoted: Boolean, output: Output) {
             writeChoices(quoted, output, usages) { choice ->
                 choice.writeTo(true, output)

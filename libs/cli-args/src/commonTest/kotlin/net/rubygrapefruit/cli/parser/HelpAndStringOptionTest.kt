@@ -5,10 +5,9 @@ import kotlin.test.*
 class HelpAndStringOptionTest : AbstractParseTest() {
     @Test
     fun `parses help with option with short name`() {
-        val parser = option("x")
         val app = app(
             "some_app",
-            params(parser) { OneParam(it) },
+            params(option("x")) { OneParam(it) },
             helpAction = true,
             completionAction = false
         )
@@ -24,10 +23,9 @@ class HelpAndStringOptionTest : AbstractParseTest() {
 
     @Test
     fun `reports usage for option with short name`() {
-        val parser = option("x")
         val app = app(
             "some_app",
-            params(parser) { fail() },
+            params(option("x")) { fail() },
             helpAction = true,
             completionAction = false
         )
@@ -44,10 +42,9 @@ class HelpAndStringOptionTest : AbstractParseTest() {
 
     @Test
     fun `shows help for option with short name`() {
-        val parser = option("x")
         val app = app(
             "some_app",
-            params(parser) { fail() },
+            params(option("x")) { fail() },
             helpAction = true,
             completionAction = false
         )
@@ -68,10 +65,9 @@ OPTIONS:
 
     @Test
     fun `shows help for option with short name and summary`() {
-        val parser = option("x", summary = "The value to thing")
         val app = app(
             "some_app",
-            params(parser, summary = "Do the thing") { fail() },
+            params(option("x", summary = "The value to thing"), summary = "Do the thing") { fail() },
             helpAction = true,
             completionAction = false
         )

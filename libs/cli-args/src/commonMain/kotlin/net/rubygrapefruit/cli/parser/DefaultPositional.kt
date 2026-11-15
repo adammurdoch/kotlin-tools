@@ -2,7 +2,7 @@ package net.rubygrapefruit.cli.parser
 
 import net.rubygrapefruit.cli.terminal.Output
 
-internal class DefaultPositional(private val name: String) : AbstractParser<String>(), Positional<String> {
+internal class DefaultPositional(private val name: String, private val summary: String?) : AbstractParser<String>(), Positional<String> {
     override fun start(): ParseState<String> {
         return State(name)
     }
@@ -11,9 +11,16 @@ internal class DefaultPositional(private val name: String) : AbstractParser<Stri
         return ParameterUsage()
     }
 
-    private inner class ParameterUsage : UsageInternal {
+    private inner class ParameterUsage : UsageInternal.PositionalUsage {
         override fun writeTo(quoted: Boolean, output: Output) {
             output.write("<$name>")
+        }
+
+        override fun writePositionalSummaryTo(output: Output) {
+            if (summary != null) {
+                output.write("  ")
+                output.write(summary)
+            }
         }
     }
 

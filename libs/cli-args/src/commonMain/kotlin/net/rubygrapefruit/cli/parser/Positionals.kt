@@ -5,8 +5,8 @@ package net.rubygrapefruit.cli.parser
  *
  * The returned parser will match a single argument that isn't an option.
  */
-fun positional(name: String): Positional<String> {
-    return DefaultPositional(name)
+fun positional(name: String, summary: String? = null): Positional<String> {
+    return DefaultPositional(name, summary)
 }
 
 /**

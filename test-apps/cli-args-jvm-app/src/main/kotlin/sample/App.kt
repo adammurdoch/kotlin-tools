@@ -24,7 +24,7 @@ class Generate(val verbose: Boolean) : Runnable {
 
 fun main(args: Array<String>) = appMain(args) {
     val verbose = option("verbose", summary = "Use verbose output").boolean()
-    val run = params(command("run"), verbose, positional("greeting"), summary = "Show a greeting") { verbose, greeting -> Run(verbose, greeting) }
+    val run = params(command("run"), verbose, positional("greeting", summary = "Greeting to show"), summary = "Show a greeting") { verbose, greeting -> Run(verbose, greeting) }
     val generate = params(command("generate"), verbose, summary ="Generate something") { verbose -> Generate(verbose) }
     val commands = oneOf(run, generate)
     app("cli-args-app", commands, summary = "A sample app")

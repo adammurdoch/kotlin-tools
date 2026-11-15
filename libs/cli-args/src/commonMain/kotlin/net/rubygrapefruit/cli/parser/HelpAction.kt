@@ -14,14 +14,28 @@ internal class HelpAction(private val parser: ParserInternal<*>) : Runnable {
             usage.writeHelpHeaderTo(this)
 
             val choices = usage.choices()
-            output.writeLine()
-            output.heading("USAGE:")
-            output.writeLine()
+            writeLine()
+            heading("USAGE:")
+            writeLine()
             for (choice in choices) {
-                output.write("  ")
-                choice.writeTo(false, output)
-                choice.writeSummaryTo(output)
-                output.writeLine()
+                write("  ")
+                choice.writeTo(false, this)
+                choice.writeSummaryTo(this)
+                writeLine()
+            }
+
+            val positionals = usage.positionals()
+            if (positionals.isNotEmpty()) {
+                writeLine()
+                heading("PARAMETERS:")
+                writeLine()
+
+                for (positional in positionals) {
+                    write("  ")
+                    positional.writeTo(false, this)
+                    positional.writePositionalSummaryTo(this)
+                    writeLine()
+                }
             }
 
             val options = usage.options()

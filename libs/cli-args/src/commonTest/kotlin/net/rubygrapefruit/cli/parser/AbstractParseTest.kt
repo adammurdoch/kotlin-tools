@@ -15,8 +15,8 @@ abstract class AbstractParseTest {
         }
     }
 
-    protected fun Parser<*>.usage(usage: String) {
-        usage { choice(usage) }
+    protected fun Parser<*>.usage(usage: String, summary: String? = null) {
+        usage { choice(usage, summary) }
     }
 
     protected fun Parser<*>.usage(config: UsageSummary.() -> Unit) {
@@ -28,9 +28,9 @@ abstract class AbstractParseTest {
         options {}
     }
 
-    protected fun Parser<*>.option(usage: String) {
+    protected fun Parser<*>.option(usage: String, summary: String? = null) {
         options {
-            option(usage)
+            option(usage, summary)
         }
     }
 
@@ -91,7 +91,7 @@ abstract class AbstractParseTest {
     }
 
     protected interface UsageSummary {
-        fun choice(usage: String)
+        fun choice(usage: String, summary: String? = null)
     }
 
     private class DefaultUsageSummary(val usage: UsageInternal) : UsageSummary {
@@ -110,9 +110,10 @@ abstract class AbstractParseTest {
             }
         }
 
-        override fun choice(usage: String) {
+        override fun choice(usage: String, summary: String?) {
             val choice = choices[current]
             assertEquals(usage, choice.usage())
+            assertEquals(summary, choice.summary())
             current++
         }
 
@@ -121,10 +122,21 @@ abstract class AbstractParseTest {
             writeTo(output)
             return output.text
         }
+
+        private fun UsageInternal.summary(): String? {
+            val output = BufferingOutput()
+            writeSummaryTo(output)
+            val text = output.text
+            return if (text.isEmpty()) {
+                null
+            } else {
+                text.removePrefix("  ")
+            }
+        }
     }
 
     protected interface Options {
-        fun option(usage: String)
+        fun option(usage: String, summary: String? = null)
     }
 
     private class DefaultOptions(val options: List<UsageInternal.OptionUsage>) : Options {
@@ -136,13 +148,26 @@ abstract class AbstractParseTest {
             assertEquals(current, options.size)
         }
 
-        override fun option(usage: String) {
+        override fun option(usage: String, summary: String?) {
             val option = options[current]
-            val output = BufferingOutput()
-            option.writeOptionUsageTo(output)
 
-            assertEquals(usage, output.text)
+            assertEquals(usage, option.usage())
+            assertEquals(summary, option.summary())
+
             current++
+        }
+
+        private fun UsageInternal.OptionUsage.usage(): String {
+            val output = BufferingOutput()
+            writeOptionUsageTo(output)
+            return output.text
+        }
+
+        private fun UsageInternal.OptionUsage.summary(): String? {
+            val output = BufferingOutput()
+            writeOptionSummaryTo(output)
+            val text = output.text
+            return if (text.isEmpty()) null else text.removePrefix("  ")
         }
     }
 }

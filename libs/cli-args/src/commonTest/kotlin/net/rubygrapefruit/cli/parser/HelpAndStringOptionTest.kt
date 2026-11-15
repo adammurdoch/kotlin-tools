@@ -33,11 +33,11 @@ class HelpAndStringOptionTest : AbstractParseTest() {
         )
 
         app.usage {
-            choice("some_app -h | --help")
+            choice("some_app -h | --help", "Show some_app usage information")
             choice("some_app [-x <value>]")
         }
         app.options {
-            option("-h, --help")
+            option("-h, --help", "Show usage information")
             option("-x <value>")
         }
     }
@@ -59,7 +59,7 @@ USAGE:
   some_app [-x <value>]
 
 OPTIONS:
-  -h, --help
+  -h, --help  Show usage information
   -x <value>
 
 """
@@ -83,7 +83,7 @@ USAGE:
   some_app [-x <value>]  Do the thing
 
 OPTIONS:
-  -h, --help
+  -h, --help  Show usage information
   -x <value>  The value to thing
 
 """

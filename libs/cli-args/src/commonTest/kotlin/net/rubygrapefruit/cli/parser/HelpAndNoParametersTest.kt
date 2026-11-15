@@ -30,10 +30,10 @@ class HelpAndNoParametersTest : AbstractParseTest() {
         )
 
         app.usage {
-            choice("some_app -h | --help")
+            choice("some_app -h | --help", "Show some_app usage information")
             choice("some_app")
         }
-        app.option("-h, --help")
+        app.option("-h, --help", "Show usage information")
     }
 
     @Test
@@ -53,7 +53,7 @@ USAGE:
   some_app
 
 OPTIONS:
-  -h, --help
+  -h, --help  Show usage information
 
 """
         )
@@ -79,7 +79,7 @@ USAGE:
   some_app  Do the thing
 
 OPTIONS:
-  -h, --help
+  -h, --help  Show usage information
 
 """
         )

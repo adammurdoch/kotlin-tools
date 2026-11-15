@@ -2,7 +2,7 @@ package net.rubygrapefruit.cli.parser
 
 import net.rubygrapefruit.cli.terminal.Output
 
-internal class RequiredStringOption(private val flags: List<String>, private val names: List<String>) : AbstractParser<String>(), Option<String> {
+internal class RequiredStringOption(private val flags: List<String>, private val names: List<String>, private val summary: String?) : AbstractParser<String>(), Option<String> {
     override fun start(): ParseState<String> {
         return State(flags, names)
     }
@@ -21,6 +21,13 @@ internal class RequiredStringOption(private val flags: List<String>, private val
         override fun writeOptionUsageTo(output: Output) {
             writeList(output, flags) { flag ->
                 output.write("$flag <value>")
+            }
+        }
+
+        override fun writeOptionSummaryTo(output: Output) {
+            if (summary != null) {
+                output.write("  ")
+                output.write(summary)
             }
         }
     }

@@ -20,6 +20,14 @@ class RequiredStringOptionTest : AbstractParseTest() {
     }
 
     @Test
+    fun `can provide summary`() {
+        val parser = option("x", summary = "Something useful").required()
+
+        parser.usage("-x <value>")
+        parser.option("-x <value>", "Something useful")
+    }
+
+    @Test
     fun `option must be present`() {
         val parser = option("some-flag", "x").required()
 

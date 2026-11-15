@@ -14,11 +14,11 @@ internal class DefaultStringOption(unsortedNames: List<String>, private val summ
     private val flags = names.map { name -> if (name.length == 1) "-$name" else "--$name" }
 
     override fun required(): Option<String> {
-        return RequiredStringOption(flags, names)
+        return RequiredStringOption(flags, names, summary)
     }
 
     override fun boolean(): BooleanOption {
-        return DefaultBooleanOption(flags, names)
+        return DefaultBooleanOption(flags, names, summary)
     }
 
     override fun start(): ParseState<String?> {

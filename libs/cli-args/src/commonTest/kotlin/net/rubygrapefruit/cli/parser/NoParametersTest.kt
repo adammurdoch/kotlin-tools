@@ -14,9 +14,17 @@ class NoParametersTest : AbstractParseTest() {
 
     @Test
     fun `reports usage`() {
-        val parser = params { "result" }
+        val parser = params { fail() }
 
         parser.usage("")
+        parser.noOptions()
+    }
+
+    @Test
+    fun `can provide summary`() {
+        val parser = params("Something useful") { fail() }
+
+        parser.usage("", "Something useful")
         parser.noOptions()
     }
 

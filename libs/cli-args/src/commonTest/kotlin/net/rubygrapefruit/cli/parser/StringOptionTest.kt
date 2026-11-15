@@ -62,6 +62,14 @@ class StringOptionTest : AbstractParseTest() {
     }
 
     @Test
+    fun `can provide summary`() {
+        val parser = option("x", summary = "Something useful")
+
+        parser.usage("[-x <value>]")
+        parser.option("-x <value>", "Something useful")
+    }
+
+    @Test
     fun `cannot include other input values`() {
         val parser = option("x")
 

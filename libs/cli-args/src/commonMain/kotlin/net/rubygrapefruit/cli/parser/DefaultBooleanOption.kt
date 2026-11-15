@@ -2,9 +2,9 @@ package net.rubygrapefruit.cli.parser
 
 import net.rubygrapefruit.cli.terminal.Output
 
-internal class DefaultBooleanOption(private val flags: List<String>, private val names: List<String>) : AbstractParser<Boolean>(), BooleanOption {
+internal class DefaultBooleanOption(private val flags: List<String>, private val names: List<String>, private val summary: String?) : AbstractParser<Boolean>(), BooleanOption {
     override fun required(): Option<Unit> {
-        return RequiredBooleanOption(flags, names)
+        return RequiredBooleanOption(flags, names, summary)
     }
 
     override fun start(): ParseState<Boolean> {
@@ -27,6 +27,13 @@ internal class DefaultBooleanOption(private val flags: List<String>, private val
         override fun writeOptionUsageTo(output: Output) {
             writeList(output, flags) { flag ->
                 output.write(flag)
+            }
+        }
+
+        override fun writeOptionSummaryTo(output: Output) {
+            if (summary != null) {
+                output.write("  ")
+                output.write(summary)
             }
         }
     }

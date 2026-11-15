@@ -3,7 +3,7 @@ package net.rubygrapefruit.cli.parser
 import kotlin.test.Test
 import kotlin.test.fail
 
-class HelpAndChoiceOfCommands : AbstractParseTest() {
+class HelpAndChoiceOfCommandsTest : AbstractParseTest() {
     @Test
     fun `reports usage`() {
         val parser = app(
@@ -17,12 +17,12 @@ class HelpAndChoiceOfCommands : AbstractParseTest() {
         )
 
         parser.usage {
-            choice("some_app -h | --help")
+            choice("some_app -h | --help", "Show some_app usage information")
             choice("some_app start")
             choice("some_app stop")
         }
         parser.options {
-            option("-h, --help")
+            option("-h, --help", "Show usage information")
         }
     }
 
@@ -46,7 +46,7 @@ USAGE:
   some_app stop
 
 OPTIONS:
-  -h, --help
+  -h, --help  Show usage information
 
 """
         )

@@ -56,6 +56,14 @@ class BooleanOptionTest : AbstractParseTest() {
     }
 
     @Test
+    fun `can provide summary`() {
+        val parser = option("x", summary = "Something useful").boolean()
+
+        parser.usage("[-x]")
+        parser.option("-x", "Something useful")
+    }
+
+    @Test
     fun `option with short name must be well formed`() {
         val parser = option("x").boolean()
 

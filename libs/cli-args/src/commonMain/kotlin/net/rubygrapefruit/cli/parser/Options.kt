@@ -10,5 +10,26 @@ fun option(
     vararg otherNames: String,
     summary: String? = null
 ): StringOption {
-    return DefaultStringOption(listOf(name) + otherNames.toList(), summary)
+    val unsortedNames = listOf(name) + otherNames.toList()
+    for (name in unsortedNames) {
+        if (name.isEmpty()) {
+            throw IllegalArgumentException("Option name cannot be empty")
+        }
+        if (name.startsWith("-")) {
+            throw IllegalArgumentException("Option name '$name' cannot start with '-'")
+        }
+        if (name.contains(" ")) {
+            throw IllegalArgumentException("Option name '$name' cannot contain whitespace")
+        }
+    }
+    val names = unsortedNames.sortedWith { a, b ->
+        val diff = a.length.compareTo(b.length)
+        if (diff != 0) {
+            diff
+        } else {
+            a.compareTo(b)
+        }
+    }
+
+    return DefaultStringOption(names, summary)
 }

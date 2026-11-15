@@ -17,4 +17,3 @@ fun app(
 ): Parser<Runnable> {
     return AppParser(name, parser, summary, helpAction, completionAction)
 }
-

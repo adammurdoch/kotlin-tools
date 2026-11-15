@@ -143,6 +143,7 @@ TODO
 - `oneOf()` reports unexpected argument instead of unexpected option
 - `params()` does not parse positionals in order if the parsers also allow options
     - See MultipleCommandAndOptionsTest
+- When app has single action with required positional plus standard actions, reports "--help not provided" instead of "<positional> not provided" 
 - Literal currently fails inconsistently when unexpected argument or option is found
     - For unexpected argument, a single "unexpected argument x, expected y" problem is reported
     - For unexpected option, both "expected x" and "unexpected option -x" are reported

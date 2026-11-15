@@ -2,6 +2,7 @@ package net.rubygrapefruit.cli.parser
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class CommandTest : AbstractParseTest() {
     @Test
@@ -9,6 +10,24 @@ class CommandTest : AbstractParseTest() {
         val parser = command("help")
 
         assertEquals(Unit, parser.parse("help").get())
+    }
+
+    @Test
+    fun `name must be well formed`() {
+        val candidates = listOf(
+            "" to "Command name cannot be empty",
+            "-"  to "Command name '-' cannot start with '-'",
+            "-x" to "Command name '-x' cannot start with '-'",
+            "two words" to "Command name 'two words' cannot contain whitespace"
+        )
+
+        for ((name, expected) in candidates) {
+            assertFailsWith<IllegalArgumentException> {
+                command(name)
+            }.apply {
+                assertEquals(expected, message)
+            }
+        }
     }
 
     @Test

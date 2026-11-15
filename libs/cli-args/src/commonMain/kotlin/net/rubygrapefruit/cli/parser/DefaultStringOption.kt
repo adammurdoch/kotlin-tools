@@ -2,15 +2,7 @@ package net.rubygrapefruit.cli.parser
 
 import net.rubygrapefruit.cli.terminal.Output
 
-internal class DefaultStringOption(unsortedNames: List<String>, private val summary: String?) : AbstractParser<String?>(), StringOption {
-    private val names = unsortedNames.sortedWith { a, b ->
-        val diff = a.length.compareTo(b.length)
-        if (diff != 0) {
-            diff
-        } else {
-            a.compareTo(b)
-        }
-    }
+internal class DefaultStringOption(private val names: List<String>, private val summary: String?) : AbstractParser<String?>(), StringOption {
     private val flags = names.map { name -> if (name.length == 1) "-$name" else "--$name" }
 
     override fun required(): Option<String> {

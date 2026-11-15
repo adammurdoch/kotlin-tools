@@ -12,6 +12,15 @@ fun positional(name: String, summary: String? = null): Positional<String> {
 /**
  * Creates a parser that matches the given text.
  */
-fun command(value: String): Parser<Unit> {
-    return DefaultCommand(value)
+fun command(name: String): Parser<Unit> {
+    if (name.isEmpty()) {
+        throw IllegalArgumentException("Command name cannot be empty")
+    }
+    if (name.startsWith("-")) {
+        throw IllegalArgumentException("Command name '$name' cannot start with '-'")
+    }
+    if (name.contains(" ")) {
+        throw IllegalArgumentException("Command name '$name' cannot contain whitespace")
+    }
+    return DefaultCommand(name)
 }

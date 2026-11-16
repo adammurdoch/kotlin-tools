@@ -5,32 +5,50 @@ import kotlin.test.assertEquals
 
 class OutputTest {
     @Test
-    fun `writes empty table`() {
+    fun `writes empty definition list`() {
         val output = BufferingOutput()
-        output.table {
+        output.definitionList {
         }
         assertEquals("", output.text)
     }
 
     @Test
-    fun `writes table with empty cells`() {
+    fun `writes definition list`() {
         val output = BufferingOutput()
-        output.table {
-            row {
-                cell { }
-                cell { }
-                cell { write("cell3") }
+        output.definitionList {
+            item {
+                term { write("<one>") }
+                description { write("description of `one`") }
             }
-            row {
-                cell { write("cell1") }
-                cell { write("cell2") }
-                cell { }
+            item {
+                term { write("<a longer item>") }
+                description { write("description of a longer item") }
             }
         }
         assertEquals(
             """
-|      cell3
-|  cell1  cell2
+|  <one>            description of `one`
+|  <a longer item>  description of a longer item
+|""".trimMargin(), output.text
+        )
+    }
+
+    @Test
+    fun `writes definition list with empty descriptions`() {
+        val output = BufferingOutput()
+        output.definitionList {
+            item {
+                term { write("<one>") }
+                description { write("description of `one`") }
+            }
+            item {
+                term { write("<a longer item>") }
+            }
+        }
+        assertEquals(
+            """
+|  <one>            description of `one`
+|  <a longer item>
 |""".trimMargin(), output.text
         )
     }

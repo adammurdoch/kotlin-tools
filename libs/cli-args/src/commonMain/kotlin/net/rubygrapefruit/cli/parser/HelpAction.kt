@@ -17,13 +17,13 @@ internal class HelpAction(private val parser: ParserInternal<*>) : Runnable {
             writeLine()
             heading("USAGE:")
             writeLine()
-            table {
+            definitionList {
                 for (choice in choices) {
-                    row {
-                        cell {
+                    item {
+                        term {
                             choice.writeTo(false, this)
                         }
-                        cell {
+                        description {
                             choice.writeSummaryTo(this)
                         }
                     }
@@ -35,13 +35,13 @@ internal class HelpAction(private val parser: ParserInternal<*>) : Runnable {
                 writeLine()
                 heading("PARAMETERS:")
                 writeLine()
-                table {
+                definitionList {
                     for (positional in positionals) {
-                        row {
-                            cell {
+                        item {
+                            term {
                                 positional.writeTo(false, this)
                             }
-                            cell {
+                            description {
                                 positional.writePositionalSummaryTo(this)
                             }
                         }
@@ -54,13 +54,13 @@ internal class HelpAction(private val parser: ParserInternal<*>) : Runnable {
                 writeLine()
                 heading("OPTIONS:")
                 writeLine()
-                table {
+                definitionList {
                     for (option in options) {
-                        row {
-                            cell {
+                        item {
+                            term {
                                 option.writeOptionUsageTo(this)
                             }
-                            cell {
+                            description {
                                 option.writeOptionSummaryTo(this)
                             }
                         }

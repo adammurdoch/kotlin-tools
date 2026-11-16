@@ -53,7 +53,7 @@ class HelpAndStringOptionTest : AbstractParseTest() {
         app.help(
             """
 USAGE:
-  some_app -h | --help  Show some_app usage information
+  some_app -h | --help   Show some_app usage information
   some_app [-x <value>]
 
 OPTIONS:
@@ -76,7 +76,7 @@ OPTIONS:
         app.help(
             """
 USAGE:
-  some_app -h | --help  Show some_app usage information
+  some_app -h | --help   Show some_app usage information
   some_app [-x <value>]  Do the thing
 
 OPTIONS:

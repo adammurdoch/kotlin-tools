@@ -150,9 +150,7 @@ TODO
 - Combine all remaining unexpected arguments into a single failure
     - e.g. instead of "unexpected arg 'a'" + "unexpected arg 'b'" instead produce "unexpected args 'a b'"
 - Show usage on parse error
-    - Include app summary
     - Include 'run with --help', etc
-    - Include description of each choice, if specified
     - Show usage of recognized choice(s) only, e.g. for app with multiple commands, show usage of command that was invoked
     - Use a separate option list when there are many options
     - Use a separate command list when there are many commands
@@ -163,11 +161,9 @@ TODO
 - Convenience for help command or option
     - Add 'help' command when app uses commands
     - Help option has the highest priority
-    - Show option descriptions
     - Sort options
     - Show commands, sorted
-    - Merge duplicate options
-    - Display app usage + summary or options + summary in a table
+    - Merge duplicate options or switch to command list instead
     - Layout takes terminal width into account, handles long option names or long summaries
 - Required string option
     - Repeated option, badly formed option

@@ -91,7 +91,7 @@ some_app - Does something useful
 
 USAGE:
   some_app -h | --help  Show some_app usage information
-  some_app  Do the thing
+  some_app              Do the thing
 
 OPTIONS:
   -h, --help  Show usage information

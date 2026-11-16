@@ -69,8 +69,8 @@ OPTIONS:
             """
 USAGE:
   some_app -h | --help  Show some_app usage information
-  some_app start  Start the app
-  some_app stop  Stop the app
+  some_app start        Start the app
+  some_app stop         Stop the app
 
 OPTIONS:
   -h, --help  Show usage information

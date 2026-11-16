@@ -92,7 +92,7 @@ OPTIONS:
             """
 USAGE:
   some_app -h | --help  Show some_app usage information
-  some_app <thing>  Do the thing
+  some_app <thing>      Do the thing
 
 PARAMETERS:
   <thing>  Thing to act on

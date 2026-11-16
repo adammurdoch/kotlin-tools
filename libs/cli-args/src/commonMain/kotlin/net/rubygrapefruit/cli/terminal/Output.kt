@@ -37,22 +37,21 @@ sealed interface Output {
     fun maybeNewLine()
 
     /**
-     * Writes a table to the output
+     * Writes a list of definitions (term + description) to the output
      */
-    fun table(builder: Table.() -> Unit)
+    fun definitionList(builder: Definitions.() -> Unit)
 
-    interface Table {
+    interface Definitions {
         /**
-         * Adds a row to the table
+         * Adds an item to the list
          */
-        fun row(builder: Row.() -> Unit)
+        fun item(builder: Definition.() -> Unit)
     }
 
-    interface Row {
-        /**
-         * Adds a cell to the row
-         */
-        fun cell(builder: Output.() -> Unit)
+    interface Definition {
+        fun term(builder: Output.() -> Unit)
+
+        fun description(builder: Output.() -> Unit)
     }
 }
 

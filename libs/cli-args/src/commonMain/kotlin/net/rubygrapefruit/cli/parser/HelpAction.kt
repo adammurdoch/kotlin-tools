@@ -39,7 +39,7 @@ internal class HelpAction(private val parser: ParserInternal<*>) : Runnable {
                     for (positional in positionals) {
                         item {
                             term {
-                                positional.writeTo(false, this)
+                                positional.writePositionalUsageTo(this)
                             }
                             description {
                                 positional.writePositionalSummaryTo(this)

@@ -210,7 +210,7 @@ abstract class AbstractParseTest {
 
         private fun UsageInternal.PositionalUsage.usage(): String {
             val output = BufferingOutput()
-            writeTo(false, output)
+            writePositionalUsageTo(output)
             return output.text
         }
 

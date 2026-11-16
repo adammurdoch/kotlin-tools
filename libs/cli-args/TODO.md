@@ -105,6 +105,8 @@ Parsers
 - `positional(name): Positional<String>`
     - matches 1 positional, must be present
     - param `summary`
+- `positional(name).repeated(): Positional<List<String>>`
+    - matches 1 or more positional, must be present
 - `command(text): Parser<Unit>`
     - matches the given text, must be present
 - `params(producer): Parser<T>`
@@ -121,7 +123,7 @@ Parsers
     - adds application details to a parser
     - add help and completion actions
     - param `summary`
-    - param `helpAction`, param `completionAction` 
+    - param `helpAction`, param `completionAction`
 
 CLI app
 -------
@@ -148,7 +150,7 @@ TODO
 - `oneOf()` reports unexpected argument instead of unexpected option
 - `params()` does not parse positionals in order if the parsers also allow options
     - See MultipleCommandAndOptionsTest
-- When app has single action with required positional plus standard actions, reports "--help not provided" instead of "<positional> not provided" 
+- When app has single action with required positional plus standard actions, reports "--help not provided" instead of "<positional> not provided"
 - Literal currently fails inconsistently when unexpected argument or option is found
     - For unexpected argument, a single "unexpected argument x, expected y" problem is reported
     - For unexpected option, both "expected x" and "unexpected option -x" are reported

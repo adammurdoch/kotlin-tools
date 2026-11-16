@@ -2,17 +2,25 @@ package net.rubygrapefruit.cli.parser
 
 import net.rubygrapefruit.cli.terminal.Output
 
-internal class DefaultPositional(private val name: String, private val summary: String?) : AbstractParser<String>(), Positional<String> {
+internal class DefaultPositional(private val name: String, private val summary: String?) : AbstractParser<String>(), StringPositional {
+    override fun repeated(): Positional<List<String>> {
+        return DefaultRepeatedPositional(name, summary)
+    }
+
     override fun start(): ParseState<String> {
         return State(name)
     }
 
     override fun usage(): UsageInternal {
-        return ParameterUsage()
+        return PositionalUsage()
     }
 
-    private inner class ParameterUsage : UsageInternal.PositionalUsage {
+    private inner class PositionalUsage : UsageInternal.PositionalUsage {
         override fun writeTo(quoted: Boolean, output: Output) {
+            output.write("<$name>")
+        }
+
+        override fun writePositionalUsageTo(output: Output) {
             output.write("<$name>")
         }
 
@@ -41,22 +49,11 @@ internal class DefaultPositional(private val name: String, private val summary: 
 
         override fun finish(index: Int): ParsedArguments<String> {
             return if (result != null) {
-                Success(result!!)
+                ParsedArguments.FixedResult(result!!)
             } else {
-                Failure(listOf(ProblemAtIndex(index, MissingParameter(name))))
+                ParsedArguments.FixedProblems(listOf(ProblemAtIndex(index, MissingParameter(name))))
             }
         }
     }
 
-    private class Success(val value: String) : ParsedArguments.Success<String> {
-        override fun value(): String {
-            return value
-        }
-    }
-
-    private class Failure(val problems: List<ProblemAtIndex>) : ParsedArguments.Failure {
-        override fun problems(): List<ProblemAtIndex> {
-            return problems
-        }
-    }
 }

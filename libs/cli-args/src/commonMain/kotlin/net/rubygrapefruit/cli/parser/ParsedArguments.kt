@@ -20,4 +20,17 @@ internal sealed interface ParsedArguments<out T> {
          */
         fun problems(): List<ProblemAtIndex>
     }
+
+    class FixedResult<out T>(val value: T) : Success<T> {
+        override fun value(): T {
+            return value
+        }
+    }
+
+    class FixedProblems(val problems: List<ProblemAtIndex>) : Failure {
+        override fun problems(): List<ProblemAtIndex> {
+            return problems
+        }
+    }
+
 }

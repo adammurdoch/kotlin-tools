@@ -66,14 +66,15 @@ internal sealed interface UsageInternal : Usage {
 
         fun writeOptionUsageTo(output: Output)
 
-        fun writeOptionSummaryTo(output: Output) {
-        }
+        fun writeOptionSummaryTo(output: Output)
     }
 
     sealed interface PositionalUsage : UsageInternal {
         override fun positionals(): List<PositionalUsage> {
             return listOf(this)
         }
+
+        fun writePositionalUsageTo(output: Output)
 
         fun writePositionalSummaryTo(output: Output)
     }

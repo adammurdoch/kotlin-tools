@@ -105,8 +105,10 @@ Parsers
 - `positional(name): Positional<String>`
     - matches 1 positional, must be present
     - param `summary`
-- `positional(name).repeated(): Positional<List<String>>`
+- `positional(name).oneOrMore(): Positional<List<String>>`
     - matches 1 or more positional, must be present
+- `positional(name).zeroOrMore(): Positional<List<String>>`
+    - matches 0 or more positionals, empty list when not present
 - `command(text): Parser<Unit>`
     - matches the given text, must be present
 - `params(producer): Parser<T>`
@@ -151,6 +153,7 @@ TODO
 - `oneOf()` reports unexpected argument instead of unexpected option
 - `params()` does not parse positionals in order if the parsers also allow options
     - See MultipleCommandAndOptionsTest
+- Replace `option().required()`, `positional().oneOrMore()` etc. with combinator functions
 - When app has single action with required positional plus standard actions, reports "--help not provided" instead of "<positional> not provided"
 - Literal currently fails inconsistently when unexpected argument or option is found
     - For unexpected argument, a single "unexpected argument x, expected y" problem is reported
@@ -172,8 +175,6 @@ TODO
     - Show commands, sorted
     - Merge duplicate options or switch to command list instead
     - Layout takes terminal width into account, handles long option names or long summaries
-- Required string option
-    - Repeated option, badly formed option
 - Convenience for completion command or option
     - Add 'completion' command when app uses commands
     - Complete options

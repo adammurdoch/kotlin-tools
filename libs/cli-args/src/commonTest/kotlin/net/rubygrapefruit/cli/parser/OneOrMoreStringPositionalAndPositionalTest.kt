@@ -3,10 +3,10 @@ package net.rubygrapefruit.cli.parser
 import kotlin.test.Test
 import kotlin.test.fail
 
-class RepeatedStringPositionalAndPositionalTest : AbstractParseTest() {
+class OneOrMoreStringPositionalAndPositionalTest : AbstractParseTest() {
     @Test
     fun `repeated positional is greedy`() {
-        val parser = params(positional("a").repeated(), positional("b")) { _, _ -> fail() }
+        val parser = params(positional("a").oneOrMore(), positional("b")) { _, _ -> fail() }
 
         parser.fails("one") {
             failure(1, "Parameter <b> not provided")

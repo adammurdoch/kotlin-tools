@@ -73,6 +73,24 @@ class RequiredStringOptionTest : AbstractParseTest() {
     }
 
     @Test
+    fun `option with multiple names must be well formed`() {
+        val parser = option("long", "x").required()
+
+        parser.fails("-long", "value") {
+            failure(0, "Unexpected option '-long'. Try '--long' instead")
+        }
+        parser.fails("--Long", "value") {
+            failure(0, "Unexpected option '--Long'. Try '--long' instead")
+        }
+        parser.fails("-X", "value") {
+            failure(0, "Unexpected option '-X'. Try '-x' instead")
+        }
+        parser.fails("--x") {
+            failure(0, "Unexpected option '--x'. Try '-x' instead")
+        }
+    }
+
+    @Test
     fun `option with multiple names cannot appear twice`() {
         val parser = option("long", "x", "an-option").required()
 

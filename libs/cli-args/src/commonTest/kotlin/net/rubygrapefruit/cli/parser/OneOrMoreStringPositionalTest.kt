@@ -3,10 +3,10 @@ package net.rubygrapefruit.cli.parser
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class RepeatedStringPositionalTest : AbstractParseTest() {
+class OneOrMoreStringPositionalTest : AbstractParseTest() {
     @Test
     fun `parses one or more positional parameters`() {
-        val parser = positional("a").repeated()
+        val parser = positional("a").oneOrMore()
 
         assertEquals(listOf("value 1"), parser.parse("value 1").get())
         assertEquals(listOf("value 1", "value 2"), parser.parse("value 1", "value 2").get())
@@ -15,7 +15,7 @@ class RepeatedStringPositionalTest : AbstractParseTest() {
 
     @Test
     fun `reports usage`() {
-        val parser = positional("a").repeated()
+        val parser = positional("a").oneOrMore()
 
         parser.usage("<a>...")
         parser.noOptions()
@@ -24,14 +24,14 @@ class RepeatedStringPositionalTest : AbstractParseTest() {
 
     @Test
     fun `can provide summary`() {
-        val parser = positional("a", summary = "Something useful").repeated()
+        val parser = positional("a", summary = "Something useful").oneOrMore()
         parser.usage("<a>...")
         parser.positional("<a>", "Something useful")
     }
 
     @Test
     fun `positional must be provided`() {
-        val parser = positional("a").repeated()
+        val parser = positional("a").oneOrMore()
 
         parser.fails {
             failure(0, "Parameter <a> not provided")
@@ -44,7 +44,7 @@ class RepeatedStringPositionalTest : AbstractParseTest() {
 
     @Test
     fun `cannot include other input`() {
-        val parser = positional("a").repeated()
+        val parser = positional("a").oneOrMore()
 
         parser.fails("--unknown", "one") {
             failure(0, "Unexpected option '--unknown'")

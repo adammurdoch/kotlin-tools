@@ -2,7 +2,7 @@ package net.rubygrapefruit.cli.parser
 
 import net.rubygrapefruit.cli.terminal.Output
 
-internal class DefaultRepeatedPositional(private val name: String, private val summary: String?) : AbstractParser<List<String>>(), Positional<List<String>> {
+internal class DefaultOneOrMorePositional(private val name: String, private val summary: String?) : AbstractParser<List<String>>(), Positional<List<String>> {
     override fun start(): ParseState<List<String>> {
         return State(name)
     }

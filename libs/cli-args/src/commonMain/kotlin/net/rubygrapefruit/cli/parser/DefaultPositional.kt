@@ -3,8 +3,12 @@ package net.rubygrapefruit.cli.parser
 import net.rubygrapefruit.cli.terminal.Output
 
 internal class DefaultPositional(private val name: String, private val summary: String?) : AbstractParser<String>(), StringPositional {
-    override fun repeated(): Positional<List<String>> {
-        return DefaultRepeatedPositional(name, summary)
+    override fun oneOrMore(): Positional<List<String>> {
+        return DefaultOneOrMorePositional(name, summary)
+    }
+
+    override fun zeroOrMore(): Positional<List<String>> {
+        return DefaultZeroOrMorePositional(name, summary)
     }
 
     override fun start(): ParseState<String> {

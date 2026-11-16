@@ -18,6 +18,7 @@ class TwoCommandsTest : AbstractParseTest() {
 
         parser.usage("one two")
         parser.noOptions()
+        parser.noPositionals()
     }
 
     @Test

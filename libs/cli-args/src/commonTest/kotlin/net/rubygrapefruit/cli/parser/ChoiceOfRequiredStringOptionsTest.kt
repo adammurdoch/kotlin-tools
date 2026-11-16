@@ -36,5 +36,7 @@ class ChoiceOfRequiredStringOptionsTest : AbstractParseTest() {
             option("-b <value>")
             option("--long <value>")
         }
+
+        parser.noPositionals()
     }
 }

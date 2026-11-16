@@ -65,5 +65,7 @@ class MultipleBooleanOptionsTest : AbstractParseTest() {
             option("-b")
             option("--long")
         }
+
+        parser.noPositionals()
     }
 }

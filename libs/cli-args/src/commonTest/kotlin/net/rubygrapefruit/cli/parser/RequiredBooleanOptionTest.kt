@@ -34,6 +34,7 @@ class RequiredBooleanOptionTest : AbstractParseTest() {
 
         parser.usage("-x")
         parser.option("-x")
+        parser.noPositionals()
     }
 
     @Test
@@ -42,6 +43,7 @@ class RequiredBooleanOptionTest : AbstractParseTest() {
 
         parser.usage("--some-flag")
         parser.option("--some-flag")
+        parser.noPositionals()
     }
 
     @Test
@@ -50,6 +52,7 @@ class RequiredBooleanOptionTest : AbstractParseTest() {
 
         parser.usage("-a | -x | --long | --some-flag")
         parser.option("-a, -x, --long, --some-flag")
+        parser.noPositionals()
     }
 
     @Test

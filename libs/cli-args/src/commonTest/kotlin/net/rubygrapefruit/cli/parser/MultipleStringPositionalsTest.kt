@@ -25,6 +25,11 @@ class MultipleStringPositionalsTest : AbstractParseTest() {
 
         parser.usage("<a> <b> <c>")
         parser.noOptions()
+        parser.positionals {
+            positional("<a>")
+            positional("<b>")
+            positional("<c>")
+        }
     }
 
     @Test

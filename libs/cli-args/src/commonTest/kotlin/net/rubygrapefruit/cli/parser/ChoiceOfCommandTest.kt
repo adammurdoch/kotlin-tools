@@ -27,6 +27,7 @@ class ChoiceOfCommandTest : AbstractParseTest() {
             choice("two")
         }
         parser.noOptions()
+        parser.noPositionals()
     }
 
     @Test

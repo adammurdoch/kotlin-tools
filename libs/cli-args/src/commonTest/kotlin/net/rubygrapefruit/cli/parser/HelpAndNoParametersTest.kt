@@ -32,6 +32,7 @@ class HelpAndNoParametersTest : AbstractParseTest() {
             choice("some_app")
         }
         app.option("-h, --help", "Show usage information")
+        app.noPositionals()
     }
 
     @Test
@@ -49,6 +50,7 @@ class HelpAndNoParametersTest : AbstractParseTest() {
             choice("some_app", "Do the thing")
         }
         app.option("-h, --help", "Show usage information")
+        app.noPositionals()
     }
 
     @Test

@@ -62,6 +62,8 @@ class ChoiceOfStringOptionsTest : AbstractParseTest() {
             option("-b <value>")
             option("-c <value>")
         }
+
+        parser.noPositionals()
     }
 
     @Test

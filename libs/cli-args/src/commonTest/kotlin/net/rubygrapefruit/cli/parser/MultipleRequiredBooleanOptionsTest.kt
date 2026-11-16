@@ -26,6 +26,8 @@ class MultipleRequiredBooleanOptionsTest : AbstractParseTest() {
             option("-b")
             option("--long")
         }
+
+        parser.noPositionals()
     }
 
     @Test

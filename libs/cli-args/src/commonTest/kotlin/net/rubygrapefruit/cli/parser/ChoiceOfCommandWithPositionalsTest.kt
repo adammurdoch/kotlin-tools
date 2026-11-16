@@ -27,6 +27,9 @@ class ChoiceOfCommandWithPositionalsTest : AbstractParseTest() {
             choice("two")
         }
         parser.noOptions()
+        parser.positionals {
+            positional("<a>")
+        }
     }
 
     @Test

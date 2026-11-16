@@ -36,5 +36,6 @@ class AppWithStringOptionTest: AbstractParseTest() {
 
         parser.usage("some_app [-x <value>]")
         parser.option("-x <value>")
+        parser.noPositionals()
     }
 }

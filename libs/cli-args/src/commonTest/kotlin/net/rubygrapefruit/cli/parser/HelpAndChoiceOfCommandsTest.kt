@@ -24,6 +24,7 @@ class HelpAndChoiceOfCommandsTest : AbstractParseTest() {
         parser.options {
             option("-h, --help", "Show usage information")
         }
+        parser.noPositionals()
     }
 
     @Test

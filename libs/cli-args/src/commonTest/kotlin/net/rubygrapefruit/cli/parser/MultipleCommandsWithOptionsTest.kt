@@ -29,6 +29,8 @@ class MultipleCommandsWithOptionsTest : AbstractParseTest() {
             option("-a <value>")
             option("-b <value>")
         }
+
+        parser.noPositionals()
     }
 
     @Test

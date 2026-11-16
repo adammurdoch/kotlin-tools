@@ -18,6 +18,7 @@ class OneCommandTest : AbstractParseTest() {
 
         parser.usage("run")
         parser.noOptions()
+        parser.noPositionals()
     }
 
     @Test

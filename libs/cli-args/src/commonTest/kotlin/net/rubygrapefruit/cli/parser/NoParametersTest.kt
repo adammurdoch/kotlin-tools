@@ -18,6 +18,7 @@ class NoParametersTest : AbstractParseTest() {
 
         parser.usage("")
         parser.noOptions()
+        parser.noPositionals()
     }
 
     @Test
@@ -26,6 +27,7 @@ class NoParametersTest : AbstractParseTest() {
 
         parser.usage("", "Something useful")
         parser.noOptions()
+        parser.noPositionals()
     }
 
     @Test

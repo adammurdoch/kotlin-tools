@@ -18,6 +18,16 @@ class StringPositionalTest : AbstractParseTest() {
 
         parser.usage("<param>")
         parser.noOptions()
+        parser.positional("<param>")
+    }
+
+    @Test
+    fun `reports usage when summary provided`() {
+        val parser = positional("param", summary = "Something useful")
+
+        parser.usage("<param>")
+        parser.noOptions()
+        parser.positional("<param>", "Something useful")
     }
 
     @Test

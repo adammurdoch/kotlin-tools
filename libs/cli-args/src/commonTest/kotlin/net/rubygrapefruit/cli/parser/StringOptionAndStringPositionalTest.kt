@@ -20,6 +20,7 @@ class StringOptionAndStringPositionalTest : AbstractParseTest() {
 
         parser.usage("[-x <value>] <a>")
         parser.option("-x <value>")
+        parser.positional("<a>")
     }
 
     @Test

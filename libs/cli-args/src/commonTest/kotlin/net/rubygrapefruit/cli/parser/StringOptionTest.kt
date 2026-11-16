@@ -43,6 +43,7 @@ class StringOptionTest : AbstractParseTest() {
 
         parser.usage("[-x <value>]")
         parser.option("-x <value>")
+        parser.noPositionals()
     }
 
     @Test
@@ -51,6 +52,7 @@ class StringOptionTest : AbstractParseTest() {
 
         parser.usage("[--an-option <value>]")
         parser.option("--an-option <value>")
+        parser.noPositionals()
     }
 
     @Test
@@ -59,6 +61,7 @@ class StringOptionTest : AbstractParseTest() {
 
         parser.usage("[-a <value> | -x <value> | --aka <value> | --option-x <value>]")
         parser.option("-a <value>, -x <value>, --aka <value>, --option-x <value>")
+        parser.noPositionals()
     }
 
     @Test

@@ -34,6 +34,24 @@ class HelpAndPositionalTest : AbstractParseTest() {
             choice("some_app <thing>")
         }
         app.option("-h, --help", "Show usage information")
+        app.positional("<thing>")
+    }
+
+    @Test
+    fun `reports usage when positional has summary`() {
+        val app = app(
+            "some_app",
+            params(positional("thing", summary = "Some thing")) { OneParam(it) },
+            helpAction = true,
+            completionAction = false
+        )
+
+        app.usage {
+            choice("some_app -h | --help", "Show some_app usage information")
+            choice("some_app <thing>")
+        }
+        app.option("-h, --help", "Show usage information")
+        app.positional("<thing>", "Some thing")
     }
 
     @Test
@@ -62,7 +80,7 @@ OPTIONS:
     }
 
     @Test
-    fun `shows help when parameter has summary`() {
+    fun `shows help when positional has summary`() {
         val app = app(
             "some_app",
             params(positional("thing", summary = "Thing to act on"), summary = "Do the thing") { OneParam(it) },

@@ -36,6 +36,7 @@ class CommandTest : AbstractParseTest() {
 
         parser.usage("help")
         parser.noOptions()
+        parser.noPositionals()
     }
 
     @Test

@@ -110,6 +110,7 @@ class MultipleStringOptionsTest : AbstractParseTest() {
             option("-a <value>")
             option("-b <value>")
         }
+        parser.noPositionals()
     }
 
     @Test
@@ -122,6 +123,7 @@ class MultipleStringOptionsTest : AbstractParseTest() {
             option("-b <value>")
             option("--long <value>")
         }
+        parser.noPositionals()
     }
 
     @Test

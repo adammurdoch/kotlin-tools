@@ -31,6 +31,7 @@ class ChoiceOfOptionOrCommandTest : AbstractParseTest() {
         parser.options {
             option("-h, --help")
         }
+        parser.noPositionals()
     }
 
     @Test

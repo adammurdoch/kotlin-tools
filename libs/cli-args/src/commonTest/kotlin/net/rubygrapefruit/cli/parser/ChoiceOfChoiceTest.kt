@@ -46,5 +46,6 @@ class ChoiceOfChoiceTest : AbstractParseTest() {
             option("-3")
             option("-4")
         }
+        parser.noPositionals()
     }
 }

@@ -33,5 +33,7 @@ class CommandAndChoiceOfOptionsTest : AbstractParseTest() {
             option("-h <value>, --hostname <value>")
             option("--ip <value>")
         }
+
+        parser.noPositionals()
     }
 }

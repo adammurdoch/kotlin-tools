@@ -39,6 +39,21 @@ abstract class AbstractParseTest {
         DefaultOptions(options).check(config)
     }
 
+    protected fun Parser<*>.noPositionals() {
+        positionals { }
+    }
+
+    protected fun Parser<*>.positional(usage: String, summary: String? = null) {
+        positionals {
+            positional(usage, summary)
+        }
+    }
+
+    protected fun Parser<*>.positionals(config: Positionals.() -> Unit) {
+        val positionals = (usage() as UsageInternal).positionals()
+        DefaultPositionals(positionals).check(config)
+    }
+
     protected fun Parser<*>.help(help: String) {
         val action = assertIs<HelpAction>(parse("--help").get())
         val output = BufferingOutput()
@@ -170,4 +185,41 @@ abstract class AbstractParseTest {
             return if (text.isEmpty()) null else text.removePrefix("  ")
         }
     }
+
+    protected interface Positionals {
+        fun positional(usage: String, summary: String? = null)
+    }
+
+    private class DefaultPositionals(val positionals: List<UsageInternal.PositionalUsage>) : Positionals {
+        private var current = 0
+
+        fun check(config: Positionals.() -> Unit) {
+            current = 0
+            config()
+            assertEquals(current, positionals.size)
+        }
+
+        override fun positional(usage: String, summary: String?) {
+            val positional = positionals[current]
+
+            assertEquals(usage, positional.usage())
+            assertEquals(summary, positional.summary())
+
+            current++
+        }
+
+        private fun UsageInternal.PositionalUsage.usage(): String {
+            val output = BufferingOutput()
+            writeTo(false, output)
+            return output.text
+        }
+
+        private fun UsageInternal.PositionalUsage.summary(): String? {
+            val output = BufferingOutput()
+            writePositionalSummaryTo(output)
+            val text = output.text
+            return if (text.isEmpty()) null else text.removePrefix("  ")
+        }
+    }
+
 }

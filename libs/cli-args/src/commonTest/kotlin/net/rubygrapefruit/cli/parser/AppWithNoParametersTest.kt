@@ -14,5 +14,6 @@ class AppWithNoParametersTest: AbstractParseTest() {
 
         parser.usage("some_app")
         parser.noOptions()
+        parser.noPositionals()
     }
 }

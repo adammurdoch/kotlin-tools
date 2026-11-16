@@ -38,6 +38,7 @@ class HelpAndStringOptionTest : AbstractParseTest() {
             option("-h, --help", "Show usage information")
             option("-x <value>")
         }
+        app.noPositionals()
     }
 
     @Test

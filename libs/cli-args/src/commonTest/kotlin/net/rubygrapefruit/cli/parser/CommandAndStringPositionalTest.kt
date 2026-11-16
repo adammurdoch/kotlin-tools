@@ -27,6 +27,7 @@ class CommandAndStringPositionalTest : AbstractParseTest() {
 
         parser.usage("run <a>")
         parser.noOptions()
+        parser.positional("<a>")
     }
 
     @Test
@@ -35,6 +36,7 @@ class CommandAndStringPositionalTest : AbstractParseTest() {
 
         parser.usage("<a> run")
         parser.noOptions()
+        parser.positional("<a>")
     }
 
     @Test

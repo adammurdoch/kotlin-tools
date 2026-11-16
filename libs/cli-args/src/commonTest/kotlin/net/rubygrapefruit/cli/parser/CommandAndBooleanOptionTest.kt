@@ -27,6 +27,7 @@ class CommandAndBooleanOptionTest : AbstractParseTest() {
 
         parser.usage("run [-a]")
         parser.option("-a")
+        parser.noPositionals()
     }
 
     @Test

@@ -70,6 +70,16 @@ class StringOptionTest : AbstractParseTest() {
 
         parser.usage("[-x <value>]")
         parser.option("-x <value>", "Something useful")
+        parser.noPositionals()
+    }
+
+    @Test
+    fun `can provide value name`() {
+        val parser = option("x", valueName = "thing")
+
+        parser.usage("[-x <thing>]")
+        parser.option("-x <thing>")
+        parser.noPositionals()
     }
 
     @Test

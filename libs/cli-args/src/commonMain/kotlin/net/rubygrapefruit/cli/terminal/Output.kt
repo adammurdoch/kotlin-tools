@@ -10,6 +10,11 @@ sealed interface Output {
     fun write(text: String)
 
     /**
+     * Writes the given text to the output, or do nothing if the text is `null`.
+     */
+    fun writeNullable(text: String?)
+
+    /**
      * Writes the given text that was provided by the user to the output.
      *
      * May be quoted or rendered with a color.

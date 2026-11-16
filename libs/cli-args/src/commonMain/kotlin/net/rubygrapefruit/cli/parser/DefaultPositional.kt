@@ -17,9 +17,7 @@ internal class DefaultPositional(private val name: String, private val summary: 
         }
 
         override fun writePositionalSummaryTo(output: Output) {
-            if (summary != null) {
-                output.write(summary)
-            }
+            output.writeNullable(summary)
         }
     }
 

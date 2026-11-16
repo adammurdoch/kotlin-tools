@@ -30,9 +30,7 @@ private class TerminalOutput(val output: CPointer<FILE>?) : AbstractOutput() {
             }
 
             else -> {
-                if (text.isNotEmpty()) {
-                    fputs(text.toString(), output)
-                }
+                fputs(text.toString(), output)
             }
         }
     }

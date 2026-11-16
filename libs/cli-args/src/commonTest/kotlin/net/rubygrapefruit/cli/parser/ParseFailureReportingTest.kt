@@ -12,7 +12,7 @@ import kotlin.test.fail
 class ParseFailureReportingTest : AbstractParseTest() {
     @Test
     fun `reports problem and shows usage summary on parse failure`() {
-        val parser = params(option("a"), option("b")) { _, _ -> fail() }
+        val parser = params(option("a"), option("b", valueName = "thing")) { _, _ -> fail() }
 
         val result = parser.parse("-a", "--unknown")
         assertIs<Parser.Failure>(result)
@@ -25,7 +25,7 @@ class ParseFailureReportingTest : AbstractParseTest() {
             """No value provided for option -a
 Unexpected option '--unknown'
 
-USAGE: [-a <value>] [-b <value>]
+USAGE: [-a <value>] [-b <thing>]
 
 """, output.text
         )

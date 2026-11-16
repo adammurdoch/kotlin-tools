@@ -94,6 +94,8 @@ Parsers
 
 - `option(name): Option<String?>`
     - matches `-n value' or '--name value', null when not present
+    - param `summary`
+    - param `valueName`
 - `option(name).required(): Option<String>`
     - matches `-n value' or '--name value', must be present
 - `option(name).boolean(): Option<Boolean>`
@@ -102,6 +104,7 @@ Parsers
     - matches `-n` or `--name`, must be present
 - `positional(name): Positional<String>`
     - matches 1 positional, must be present
+    - param `summary`
 - `command(text): Parser<Unit>`
     - matches the given text, must be present
 - `params(producer): Parser<T>`
@@ -111,12 +114,14 @@ Parsers
 - `params(a, b, c, d, map): Parser<T>`
 - `params(a, b, c, d, e, map): Parser<T>`
     - matches the parsers and maps the result. Options can appear in any order, positionals must appear in the order specified
+    - param `summary`
 - `oneOf(choices...): Parser<T>`
     - matches the parses and returns the first matching
 - `app(name, parser): Application`
     - adds application details to a parser
-- `app(name, p).withHelp(): Application`
-    - add help action
+    - add help and completion actions
+    - param `summary`
+    - param `helpAction`, param `completionAction` 
 
 CLI app
 -------
@@ -154,7 +159,6 @@ TODO
     - Show usage of recognized choice(s) only, e.g. for app with multiple commands, show usage of command that was invoked
     - Use a separate option list when there are many options
     - Use a separate command list when there are many commands
-    - Allow value name to be provided for `option()`
     - Highlight problematic part of usage?
     - Sort choices by command name or option
 - Move `appMain()` into `cli-args` project

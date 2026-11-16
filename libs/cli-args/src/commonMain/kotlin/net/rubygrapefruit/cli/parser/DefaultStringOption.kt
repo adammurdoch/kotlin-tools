@@ -2,11 +2,15 @@ package net.rubygrapefruit.cli.parser
 
 import net.rubygrapefruit.cli.terminal.Output
 
-internal class DefaultStringOption(private val names: List<String>, private val summary: String?) : AbstractParser<String?>(), StringOption {
+internal class DefaultStringOption(
+    private val names: List<String>,
+    private val summary: String?,
+    private val valueName: String
+) : AbstractParser<String?>(), StringOption {
     private val flags = names.map { name -> if (name.length == 1) "-$name" else "--$name" }
 
     override fun required(): Option<String> {
-        return RequiredStringOption(flags, names, summary)
+        return RequiredStringOption(flags, names, summary, valueName)
     }
 
     override fun boolean(): BooleanOption {
@@ -25,21 +29,19 @@ internal class DefaultStringOption(private val names: List<String>, private val 
         override fun writeTo(quoted: Boolean, output: Output) {
             output.write("[")
             writeChoices(false, output, flags) { flag ->
-                output.write("$flag <value>")
+                output.write("$flag <$valueName>")
             }
             output.write("]")
         }
 
         override fun writeOptionUsageTo(output: Output) {
             writeList(output, flags) { flag ->
-                output.write("$flag <value>")
+                output.write("$flag <$valueName>")
             }
         }
 
         override fun writeOptionSummaryTo(output: Output) {
-            if (summary != null) {
-                output.write(summary)
-            }
+            output.writeNullable(summary)
         }
     }
 

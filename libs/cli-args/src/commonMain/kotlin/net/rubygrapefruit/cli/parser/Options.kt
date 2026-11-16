@@ -8,7 +8,8 @@ package net.rubygrapefruit.cli.parser
 fun option(
     name: String,
     vararg otherNames: String,
-    summary: String? = null
+    summary: String? = null,
+    valueName: String = "value"
 ): StringOption {
     val unsortedNames = listOf(name) + otherNames.toList()
     for (name in unsortedNames) {
@@ -31,5 +32,5 @@ fun option(
         }
     }
 
-    return DefaultStringOption(names, summary)
+    return DefaultStringOption(names, summary, valueName)
 }

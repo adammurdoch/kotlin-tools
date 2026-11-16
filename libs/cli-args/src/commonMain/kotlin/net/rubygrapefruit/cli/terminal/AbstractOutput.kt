@@ -4,7 +4,15 @@ abstract class AbstractOutput : Output {
     private var emptyLine = true
 
     override fun write(text: String) {
-        write(text, Appearance.Normal)
+        if (text.isNotEmpty()) {
+            write(text, Appearance.Normal)
+        }
+    }
+
+    override fun writeNullable(text: String?) {
+        if (!text.isNullOrEmpty()) {
+            write(text, Appearance.Normal)
+        }
     }
 
     override fun userInput(text: String) {
@@ -12,11 +20,15 @@ abstract class AbstractOutput : Output {
     }
 
     override fun heading(text: String) {
-        write(text, Appearance.Heading)
+        if (text.isNotEmpty()) {
+            write(text, Appearance.Heading)
+        }
     }
 
     override fun writeLine(text: String) {
-        put(text, Appearance.Normal)
+        if (text.isNotEmpty()) {
+            put(text, Appearance.Normal)
+        }
         writeLine()
     }
 
@@ -32,7 +44,7 @@ abstract class AbstractOutput : Output {
     }
 
     override fun definitionList(builder: Output.Definitions.() -> Unit) {
-        val definitions = DefaultDefinitions(this)
+        val definitions = DefaultDefinitions()
         definitions.builder()
         if (definitions.items.isEmpty()) {
             return
@@ -74,18 +86,18 @@ abstract class AbstractOutput : Output {
 
     private class Span(val text: String, val appearance: Appearance)
 
-    private class DefaultDefinitions(val owner: AbstractOutput) : Output.Definitions {
+    private class DefaultDefinitions : Output.Definitions {
         val items: List<DefaultDefinition>
             field = mutableListOf()
 
         override fun item(builder: Output.Definition.() -> Unit) {
-            val definition = DefaultDefinition(owner)
+            val definition = DefaultDefinition()
             definition.builder()
             items.add(definition)
         }
     }
 
-    private class DefaultDefinition(val owner: AbstractOutput) : Output.Definition {
+    private class DefaultDefinition : Output.Definition {
         var term: List<Span> = emptyList()
             private set
         var termLength: Int = 0
@@ -112,9 +124,7 @@ abstract class AbstractOutput : Output {
             field = mutableListOf<Span>()
 
         override fun put(text: CharSequence, appearance: Appearance) {
-            if (text.isNotEmpty()) {
-                spans.add(Span(text.toString(), appearance))
-            }
+            spans.add(Span(text.toString(), appearance))
         }
     }
 }

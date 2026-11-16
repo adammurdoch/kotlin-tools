@@ -139,6 +139,7 @@ TODO
 
 - `allOf()` currently skips over a positional that does not match to the next positional
     - See ChoiceOfStringLiteralAndParametersTest, e.g. <literal> <parameter>
+- `allOf()` should fail when repeated positional is followed by another positional
 - `oneOf()` currently reports each expected literal as a separate problem
     - See ChoiceOfCommandTest
 - `oneOf()` should report problems from choice that recognized something first

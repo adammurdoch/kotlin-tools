@@ -36,5 +36,25 @@ class RepeatedStringPositionalTest : AbstractParseTest() {
         parser.fails {
             failure(0, "Parameter <a> not provided")
         }
+        parser.fails("-unknown") {
+            failure(0, "Unexpected option '-unknown'")
+            failure(1, "Parameter <a> not provided")
+        }
+    }
+
+    @Test
+    fun `cannot include other input`() {
+        val parser = positional("a").repeated()
+
+        parser.fails("--unknown", "one") {
+            failure(0, "Unexpected option '--unknown'")
+        }
+        parser.fails("one", "--unknown", "two") {
+            failure(1, "Unexpected option '--unknown'")
+        }
+        parser.fails("one", "-u", "two", "--unknown") {
+            failure(1, "Unexpected option '-u'")
+            failure(3, "Unexpected option '--unknown'")
+        }
     }
 }

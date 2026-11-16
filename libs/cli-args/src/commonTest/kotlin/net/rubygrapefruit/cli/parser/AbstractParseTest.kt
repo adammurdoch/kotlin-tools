@@ -145,7 +145,7 @@ abstract class AbstractParseTest {
             return if (text.isEmpty()) {
                 null
             } else {
-                text.removePrefix("  ")
+                text
             }
         }
     }
@@ -182,7 +182,7 @@ abstract class AbstractParseTest {
             val output = BufferingOutput()
             writeOptionSummaryTo(output)
             val text = output.text
-            return if (text.isEmpty()) null else text.removePrefix("  ")
+            return if (text.isEmpty()) null else text
         }
     }
 
@@ -218,7 +218,7 @@ abstract class AbstractParseTest {
             val output = BufferingOutput()
             writePositionalSummaryTo(output)
             val text = output.text
-            return if (text.isEmpty()) null else text.removePrefix("  ")
+            return if (text.isEmpty()) null else text
         }
     }
 

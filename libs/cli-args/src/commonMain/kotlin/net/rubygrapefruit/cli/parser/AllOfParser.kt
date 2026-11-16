@@ -44,7 +44,6 @@ internal class AllOfParser<OUT>(
 
         override fun writeSummaryTo(output: Output) {
             if (summary != null) {
-                output.write("  ")
                 output.write(summary)
             }
         }

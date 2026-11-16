@@ -38,7 +38,6 @@ internal class DefaultStringOption(private val names: List<String>, private val 
 
         override fun writeOptionSummaryTo(output: Output) {
             if (summary != null) {
-                output.write("  ")
                 output.write(summary)
             }
         }

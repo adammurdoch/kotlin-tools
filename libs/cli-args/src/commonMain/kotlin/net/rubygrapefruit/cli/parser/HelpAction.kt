@@ -17,11 +17,17 @@ internal class HelpAction(private val parser: ParserInternal<*>) : Runnable {
             writeLine()
             heading("USAGE:")
             writeLine()
-            for (choice in choices) {
-                write("  ")
-                choice.writeTo(false, this)
-                choice.writeSummaryTo(this)
-                writeLine()
+            table {
+                for (choice in choices) {
+                    row {
+                        cell {
+                            choice.writeTo(false, this)
+                        }
+                        cell {
+                            choice.writeSummaryTo(this)
+                        }
+                    }
+                }
             }
 
             val positionals = usage.positionals()
@@ -29,12 +35,17 @@ internal class HelpAction(private val parser: ParserInternal<*>) : Runnable {
                 writeLine()
                 heading("PARAMETERS:")
                 writeLine()
-
-                for (positional in positionals) {
-                    write("  ")
-                    positional.writeTo(false, this)
-                    positional.writePositionalSummaryTo(this)
-                    writeLine()
+                table {
+                    for (positional in positionals) {
+                        row {
+                            cell {
+                                positional.writeTo(false, this)
+                            }
+                            cell {
+                                positional.writePositionalSummaryTo(this)
+                            }
+                        }
+                    }
                 }
             }
 
@@ -43,14 +54,20 @@ internal class HelpAction(private val parser: ParserInternal<*>) : Runnable {
                 writeLine()
                 heading("OPTIONS:")
                 writeLine()
-
-                for (option in options) {
-                    write("  ")
-                    option.writeOptionUsageTo(this)
-                    option.writeOptionSummaryTo(this)
-                    writeLine()
+                table {
+                    for (option in options) {
+                        row {
+                            cell {
+                                option.writeOptionUsageTo(this)
+                            }
+                            cell {
+                                option.writeOptionSummaryTo(this)
+                            }
+                        }
+                    }
                 }
             }
+
             writeLine()
         }
     }

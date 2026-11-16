@@ -32,7 +32,6 @@ internal class DefaultBooleanOption(private val flags: List<String>, private val
 
         override fun writeOptionSummaryTo(output: Output) {
             if (summary != null) {
-                output.write("  ")
                 output.write(summary)
             }
         }

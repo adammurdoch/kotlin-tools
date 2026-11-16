@@ -26,7 +26,6 @@ internal class RequiredBooleanOption(private val flags: List<String>, private va
 
         override fun writeOptionSummaryTo(output: Output) {
             if (summary != null) {
-                output.write("  ")
                 output.write(summary)
             }
         }

@@ -35,6 +35,25 @@ sealed interface Output {
      * Terminates the current line, if not already.
      */
     fun maybeNewLine()
+
+    /**
+     * Writes a table to the output
+     */
+    fun table(builder: Table.() -> Unit)
+
+    interface Table {
+        /**
+         * Adds a row to the table
+         */
+        fun row(builder: Row.() -> Unit)
+    }
+
+    interface Row {
+        /**
+         * Adds a cell to the row
+         */
+        fun cell(builder: Output.() -> Unit)
+    }
 }
 
 /**

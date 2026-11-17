@@ -260,16 +260,18 @@ abstract class AbstractParseTest {
 
         fun doesNotMatch(firstArg: String, vararg moreArgs: String)
 
-        fun fails(firstArg: String, vararg moreArgs: String)
+        fun fails(firstArg: String, vararg moreArgs: String, index: Int, message: String)
     }
 
     private class DefaultEdge(val edge: ParseEdge.NonPositional) : Edge {
         override fun match(firstArg: String, vararg moreArgs: String, config: Edges.() -> Unit) {
             val transition = next(firstArg, moreArgs)
-            val node = assertIs<ParseEdge.Transition.Matched>(transition).next
-            val edges = mutableListOf<ParseEdge>()
-            node.edges(edges)
-            DefaultEdges(edges).check(config)
+            assertIs<ParseEdge.Transition.Matched>(transition).apply {
+                val edges = mutableListOf<ParseEdge>()
+                next.edges(edges)
+                DefaultEdges(edges).check(config)
+                assertEquals(moreArgs.size + 1, count)
+            }
         }
 
         override fun doesNotMatch(firstArg: String, vararg moreArgs: String) {
@@ -277,9 +279,14 @@ abstract class AbstractParseTest {
             assertIs<ParseEdge.Transition.NotMatched>(transition)
         }
 
-        override fun fails(firstArg: String, vararg moreArgs: String) {
+        override fun fails(firstArg: String, vararg moreArgs: String, index: Int, message: String) {
             val transition = next(firstArg, moreArgs)
-            assertIs<ParseEdge.Transition.Failed>(transition)
+            assertIs<ParseEdge.Transition.Failed>(transition).apply {
+                val buffer = BufferingOutput()
+                problem.problem.writeTo(buffer)
+                assertEquals(message, buffer.text)
+                assertEquals(index, problem.index)
+            }
         }
 
         private fun next(firstArg: String, moreArgs: Array<out String>): ParseEdge.Transition {

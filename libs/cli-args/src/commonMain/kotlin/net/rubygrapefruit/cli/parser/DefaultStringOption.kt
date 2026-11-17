@@ -57,7 +57,7 @@ internal class DefaultStringOption(
                     val value = args.second()
                     ParseEdge.Transition.Matched(2, Finished(value))
                 } else {
-                    ParseEdge.Transition.Failed(1, ProblemAtIndex(args.index, MissingOptionValue(args.first())))
+                    ParseEdge.Transition.Failed(1, ProblemAtIndex(args.index + 1, MissingOptionValue(args.first())))
                 }
             } else {
                 ParseEdge.Transition.NotMatched

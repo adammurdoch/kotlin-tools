@@ -93,11 +93,11 @@ Parsers
 -------
 
 - `option(name): Option<String?>`
-    - matches `-n value' or '--name value', null when not present
+    - matches `-n value` or `--name value`, null when not present
     - param `summary`
     - param `valueName`
 - `option(name).required(): Option<String>`
-    - matches `-n value' or '--name value', must be present
+    - matches `-n value` or `--name value`, must be present
 - `option(name).boolean(): Option<Boolean>`
     - matches `-n` or `--name`, false when not present
 - `option(name).boolean().required(): Parser<Unit>`
@@ -121,7 +121,7 @@ Parsers
     - param `summary`
 - `oneOf(choices...): Parser<T>`
     - matches the parses and returns the first matching
-- `app(name, parser): Application`
+- `app(name, parser): Parser<Runnable>`
     - adds application details to a parser
     - add help and completion actions
     - param `summary`
@@ -147,10 +147,14 @@ TODO
 - `oneOf()` should report problems from choice that recognized something first
 - `oneOf()` with overlapping options, some with values and some without
 - `oneOf()` currently does not report conflicting options or literals
-    - See ChoiceOfStringOptionsTest
+    - See ChoiceOfStringOptionTest
 - `oneOf()` currently uses generic 'unexpected' problem instead of specific problems for option (e.g. repeated option, missing value)
 - `oneOf()` should fails when created with choice that can match no arguments when the choice is not the last
 - `oneOf()` reports unexpected argument instead of unexpected option
+- `oneOf()` reports failed choice when a later choice succeeds but there are extra arguments at the end
+    - See ChoiceOfOptionTest
+- `oneOf()` does not list all expected alternatives when none provided
+    - See ChoiceOfMultipleOptions
 - `params()` does not parse positionals in order if the parsers also allow options
     - See MultipleCommandAndOptionsTest
 - Replace `option().required()`, `positional().oneOrMore()` etc. with combinator functions

@@ -108,12 +108,12 @@ class MultipleStringOptionsTest : AbstractParseTest() {
         parser.edges {
             nonPositional {
                 matches("-a", "one") {
-                    skip()
-//                    nonPositional {
-//                        matches("-b", "two") {
-//                            endOfInput(listOf("one", "two"))
-//                        }
-//                    }
+                    nonPositional {
+                        matches("-b", "two") {
+                            endOfInput(listOf("one", "two"))
+                        }
+                    }
+                    endOfInput(listOf("one", null))
                 }
             }
             nonPositional {
@@ -124,6 +124,7 @@ class MultipleStringOptionsTest : AbstractParseTest() {
 //                            endOfInput(listOf("one", "two"))
 //                        }
 //                    }
+//                    endOfInput(listOf(null, "two"))
                 }
             }
             endOfInput(listOf(null, null))

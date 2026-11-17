@@ -42,7 +42,7 @@ internal class DefaultStringPositional(private val name: String, private val sum
             return if (args.firstIsOption()) {
                 ParseEdge.Transition.NotMatched
             } else {
-                ParseEdge.Transition.Matched(1, Finished(args.first()))
+                ParseEdge.Transition.Matched(1, FixedValue(args.first()))
             }
         }
     }

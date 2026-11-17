@@ -5,7 +5,7 @@ internal class StringOptionEdge(val flags: List<String>) : ParseEdge.NonPosition
         return if (flags.contains(args.first())) {
             if (args.hasSecond() && !args.secondIsOption()) {
                 val value = args.second()
-                ParseEdge.Transition.Matched(2, Finished(value))
+                ParseEdge.Transition.Matched(2, FixedValue(value))
             } else {
                 ParseEdge.Transition.Failed(1, ProblemAtIndex(args.index + 1, MissingOptionValue(args.first())))
             }

@@ -75,13 +75,13 @@ internal class AllOfParser<OUT>(
                 }
                 if (!hasPositional && element.positional.isNotEmpty()) {
                     for (edge in element.positional) {
-                        dest.add(ElementPositional(element, edge))
+                        dest.add(ElementPositional(element, edge, this))
                     }
                     hasPositional = true
                 }
             }
             if (elements.all { it.endOfInput != null }) {
-                dest.add(Finished(map(elements.map { ParsedArguments.FixedResult(it.endOfInput!!.value()) })))
+                dest.add(LazyValue { map(elements.map { ParsedArguments.FixedResult(it.endOfInput!!.value()) }) })
             }
         }
     }
@@ -105,9 +105,16 @@ internal class AllOfParser<OUT>(
         }
     }
 
-    private class ElementPositional(val element: ElementNode, val edge: ParseEdge.Positional) : ParseEdge.Positional {
+    private class ElementPositional(val element: ElementNode, val edge: ParseEdge.Positional, val owner: ElementNodes) : ParseEdge.Positional {
         override fun next(args: InputArgs): ParseEdge.Transition {
-            return edge.next(args)
+            val transition = edge.next(args)
+            return when (transition) {
+                is ParseEdge.Transition.NotMatched -> transition
+                is ParseEdge.Transition.Failed -> transition
+                is ParseEdge.Transition.Matched -> {
+                    ParseEdge.Transition.Matched(transition.count, owner.next(element, transition.next))
+                }
+            }
         }
     }
 

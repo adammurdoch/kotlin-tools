@@ -26,12 +26,11 @@ class MultipleStringPositionalsTest : AbstractParseTest() {
         parser.edges {
             positional {
                 matches("one") {
-                    skip()
-//                    positional {
-//                        matches("two") {
-//                            endOfInput(listOf("one", "two"))
-//                        }
-//                    }
+                    positional {
+                        matches("two") {
+                            endOfInput(listOf("one", "two"))
+                        }
+                    }
                 }
             }
         }

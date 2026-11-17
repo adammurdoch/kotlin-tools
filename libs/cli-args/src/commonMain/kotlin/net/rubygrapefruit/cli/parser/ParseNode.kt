@@ -27,9 +27,19 @@ internal sealed interface ParseEdge {
     }
 }
 
-internal class Finished(val value: Any?) : ParseNode, ParseEdge.EndOfInput {
+internal class FixedValue(val value: Any?) : ParseNode, ParseEdge.EndOfInput {
     override fun value(): Any? {
         return value
+    }
+
+    override fun edges(dest: MutableList<ParseEdge>) {
+        dest.add(this)
+    }
+}
+
+internal class LazyValue(val supplier: () -> Any?) : ParseNode, ParseEdge.EndOfInput {
+    override fun value(): Any? {
+        return supplier()
     }
 
     override fun edges(dest: MutableList<ParseEdge>) {

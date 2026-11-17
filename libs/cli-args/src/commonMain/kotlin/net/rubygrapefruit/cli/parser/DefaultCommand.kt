@@ -24,7 +24,7 @@ internal class DefaultCommand(private val text: String) : AbstractParser<Unit>()
     private class CommandEdge(private val text: String) : ParseEdge.Positional {
         override fun next(args: InputArgs): ParseEdge.Transition {
             return if (args.first() == text) {
-                ParseEdge.Transition.Matched(1, Finished(Unit))
+                ParseEdge.Transition.Matched(1, FixedValue(Unit))
             } else {
                 ParseEdge.Transition.NotMatched
             }

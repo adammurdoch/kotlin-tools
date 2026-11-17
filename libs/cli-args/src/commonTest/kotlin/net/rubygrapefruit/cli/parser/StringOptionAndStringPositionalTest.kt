@@ -30,23 +30,21 @@ class StringOptionAndStringPositionalTest : AbstractParseTest() {
         parser.edges {
             nonPositional {
                 matches("-x", "one") {
-                    skip()
-//                    positional {
-//                        matches("two") {
-//                            endOfInput(Pair("one", "two"))
-//                        }
-//                    }
+                    positional {
+                        matches("two") {
+                            endOfInput(Pair("one", "two"))
+                        }
+                    }
                 }
             }
             positional {
                 matches("two") {
-                    skip()
-//                    nonPositional {
-//                        matches("-x", "one") {
-//                            endOfInput(Pair("one", "two"))
-//                        }
-//                    }
-//                    endOfInput(Pair(null, "two"))
+                    nonPositional {
+                        matches("-x", "one") {
+                            endOfInput(Pair("one", "two"))
+                        }
+                    }
+                    endOfInput(Pair(null, "two"))
                 }
             }
         }

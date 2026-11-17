@@ -44,10 +44,10 @@ class StringOptionTest : AbstractParseTest() {
         parser.edges {
             nonPositional {
                 match("-x", "value") {
-                    endOfInput()
+                    endOfInput("value")
                 }
             }
-            endOfInput()
+            endOfInput(null)
         }
     }
 
@@ -58,10 +58,10 @@ class StringOptionTest : AbstractParseTest() {
         parser.edges {
             nonPositional {
                 match("--long", "value") {
-                    endOfInput()
+                    endOfInput("value")
                 }
             }
-            endOfInput()
+            endOfInput(null)
         }
     }
 

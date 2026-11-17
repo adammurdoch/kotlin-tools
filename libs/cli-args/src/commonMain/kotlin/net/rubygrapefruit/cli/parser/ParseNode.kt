@@ -5,12 +5,6 @@ package net.rubygrapefruit.cli.parser
  */
 internal sealed interface ParseNode {
     fun edges(dest: MutableList<ParseEdge>)
-
-    object Finished : ParseNode {
-        override fun edges(dest: MutableList<ParseEdge>) {
-            dest.add(ParseEdge.EndOfInput)
-        }
-    }
 }
 
 internal sealed interface ParseEdge {
@@ -18,6 +12,13 @@ internal sealed interface ParseEdge {
         fun next(args: InputArgs): ParseNode
     }
 
-    object EndOfInput : ParseEdge
+    sealed interface EndOfInput : ParseEdge {
+        val value: Any?
+    }
 }
 
+internal class Finished(override val value: Any?) : ParseNode, ParseEdge.EndOfInput {
+    override fun edges(dest: MutableList<ParseEdge>) {
+        dest.add(this)
+    }
+}

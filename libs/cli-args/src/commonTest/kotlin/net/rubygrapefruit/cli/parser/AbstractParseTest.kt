@@ -230,7 +230,7 @@ abstract class AbstractParseTest {
 
     protected interface Edges {
         fun nonPositional(config: Edge.() -> Unit = {})
-        fun endOfInput()
+        fun endOfInput(value: Any?)
     }
 
     private class DefaultEdges(val edges: List<ParseEdge>) : Edges {
@@ -243,14 +243,14 @@ abstract class AbstractParseTest {
         }
 
         override fun nonPositional(config: Edge.() -> Unit) {
-            val edge = edges[current]
-            assertIs<ParseEdge.NonPositional>(edge)
+            val edge = assertIs<ParseEdge.NonPositional>(edges[current])
             DefaultEdge(edge).config()
             current++
         }
 
-        override fun endOfInput() {
-            assertIs<ParseEdge.EndOfInput>(edges[current])
+        override fun endOfInput(value: Any?) {
+            val edge = assertIs<ParseEdge.EndOfInput>(edges[current])
+            assertEquals(value, edge.value)
             current++
         }
     }

@@ -229,6 +229,7 @@ abstract class AbstractParseTest {
     }
 
     protected interface Edges {
+        fun skip()
         fun nonPositional(config: Edge.() -> Unit = {})
         fun positional(config: Edge.() -> Unit = {})
         fun endOfInput(value: Any?)
@@ -241,6 +242,10 @@ abstract class AbstractParseTest {
             current = 0
             config()
             assertEquals(current, edges.size)
+        }
+
+        override fun skip() {
+            current = edges.size
         }
 
         override fun nonPositional(config: Edge.() -> Unit) {

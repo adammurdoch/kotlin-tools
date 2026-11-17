@@ -6,12 +6,50 @@ import kotlin.test.fail
 
 class StringOptionAndStringPositionalTest : AbstractParseTest() {
     @Test
-    fun `parses positional and option in any order`() {
-        val parser = params(option("x"), positional("a")) { a, b -> Pair(a, b) }
+    fun `parses option then positional in any order`() {
+        val parser = params(option("x"), positional("a")) { x, a -> Pair(x, a) }
 
         assertEquals(Pair("one", "two"), parser.parse("-x", "one", "two").get())
         assertEquals(Pair("one", "two"), parser.parse("two", "-x", "one").get())
         assertEquals(Pair(null, "two"), parser.parse("two").get())
+    }
+
+    @Test
+    fun `parses positional then option in any order`() {
+        val parser = params(positional("a"), option("x")) { a, x -> Pair(x, a) }
+
+        assertEquals(Pair("one", "two"), parser.parse("-x", "one", "two").get())
+        assertEquals(Pair("one", "two"), parser.parse("two", "-x", "one").get())
+        assertEquals(Pair(null, "two"), parser.parse("two").get())
+    }
+
+    @Test
+    fun `composes option then positional`() {
+        val parser = params(option("x"), positional("a")) { x, a -> Pair(x, a) }
+
+        parser.edges {
+            nonPositional {
+                matches("-x", "one") {
+                    skip()
+//                    positional {
+//                        matches("two") {
+//                            endOfInput(listOf("one", "two"))
+//                        }
+//                    }
+                }
+            }
+            positional {
+                matches("two") {
+                    skip()
+//                    nonPositional {
+//                        matches("-x", "one") {
+//                            endOfInput(listOf("one", "two"))
+//                        }
+//                    }
+//                    endOfInput(listOf(null, "two"))
+                }
+            }
+        }
     }
 
     @Test

@@ -20,6 +20,24 @@ class MultipleStringPositionalsTest : AbstractParseTest() {
     }
 
     @Test
+    fun `composes for two positionals in order`() {
+        val parser = params(positional("a"), positional("b")) { a, b -> listOf(a, b) }
+
+        parser.edges {
+            positional {
+                matches("one") {
+                    skip()
+//                    positional {
+//                        matches("two") {
+//                            endOfInput(listOf("one", "two"))
+//                        }
+//                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `reports usage of three positionals`() {
         val parser = params(positional("a"), positional("b"), positional("c")) { _, _, _ -> fail() }
 

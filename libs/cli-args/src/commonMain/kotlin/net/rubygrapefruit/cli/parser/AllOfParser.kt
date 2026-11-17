@@ -11,6 +11,26 @@ internal class AllOfParser<OUT>(
         return State(parsers.map { Element(it.start()) }, map)
     }
 
+    override fun edges(dest: MutableList<ParseEdge>) {
+        val elements = parsers.mapIndexed { index, element ->
+            val edges = mutableListOf<ParseEdge>()
+            element.edges(edges)
+            ElementNode(index, edges)
+        }
+        var hasPositional = false
+        for (element in elements) {
+            for (nonPositional in element.nonPositional) {
+                dest.add(ElementNonPositional(element, nonPositional))
+            }
+            if (!hasPositional && element.positional.isNotEmpty()) {
+                for (positional in element.positional) {
+                    dest.add(ElementPositional(element, positional))
+                }
+                hasPositional = true
+            }
+        }
+    }
+
     override fun usage(): UsageInternal {
         return AllOfUsage()
     }
@@ -44,6 +64,23 @@ internal class AllOfParser<OUT>(
 
         override fun writeSummaryTo(output: Output) {
             output.writeNullable(summary)
+        }
+    }
+
+    private class ElementNode(val index: Int, edges: List<ParseEdge>) {
+        val nonPositional = edges.filterIsInstance<ParseEdge.NonPositional>()
+        val positional = edges.filterIsInstance<ParseEdge.Positional>()
+    }
+
+    private class ElementNonPositional(val element: ElementNode, val edge: ParseEdge.NonPositional) : ParseEdge.NonPositional {
+        override fun next(args: InputArgs): ParseEdge.Transition {
+            return edge.next(args)
+        }
+    }
+
+    private class ElementPositional(val element: ElementNode, val edge: ParseEdge.Positional) : ParseEdge.Positional {
+        override fun next(args: InputArgs): ParseEdge.Transition {
+            return edge.next(args)
         }
     }
 

@@ -102,6 +102,35 @@ class MultipleStringOptionsTest : AbstractParseTest() {
     }
 
     @Test
+    fun `composes for two options with short name`() {
+        val parser = params(option("a"), option("b")) { a, b -> listOf(a, b) }
+
+        parser.edges {
+            nonPositional {
+                matches("-a", "one") {
+                    skip()
+//                    nonPositional {
+//                        matches("-b", "two") {
+//                            endOfInput(listOf("one", "two"))
+//                        }
+//                    }
+                }
+            }
+            nonPositional {
+                matches("-b", "two") {
+                    skip()
+//                    nonPositional {
+//                        matches("-a", "one") {
+//                            endOfInput(listOf("one", "two"))
+//                        }
+//                    }
+                }
+            }
+//            endOfInput(listOf(null, null))
+        }
+    }
+
+    @Test
     fun `reports usage for two options with short name`() {
         val parser = params(option("a"), option("b")) { a, b -> listOf(a, b) }
 

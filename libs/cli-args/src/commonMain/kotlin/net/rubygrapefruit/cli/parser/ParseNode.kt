@@ -19,6 +19,7 @@ internal sealed interface ParseEdge {
     sealed interface Transition {
         object NotMatched : Transition
         class Matched(val count: Int, val next: ParseNode) : Transition
+        class Failed(val count: Int, val problem: ProblemAtIndex) : Transition
     }
 }
 

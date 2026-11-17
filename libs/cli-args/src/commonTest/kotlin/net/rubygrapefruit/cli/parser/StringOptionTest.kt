@@ -3,6 +3,7 @@ package net.rubygrapefruit.cli.parser
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.fail
 
 class StringOptionTest : AbstractParseTest() {
     @Test
@@ -46,6 +47,10 @@ class StringOptionTest : AbstractParseTest() {
                 match("-x", "value") {
                     endOfInput("value")
                 }
+                doesNotMatch("unknown")
+                doesNotMatch("--other")
+                fails("-x")
+                fails("-x", "-y")
             }
             endOfInput(null)
         }
@@ -57,11 +62,17 @@ class StringOptionTest : AbstractParseTest() {
 
         parser.edges {
             nonPositional {
+                match("-x", "value") {
+                    endOfInput("value")
+                }
                 match("--long", "value") {
                     endOfInput("value")
                 }
                 doesNotMatch("unknown")
                 doesNotMatch("--other")
+                fails("-x")
+                fails("--long")
+                fails("-x", "-y")
             }
             endOfInput(null)
         }

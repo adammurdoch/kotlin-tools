@@ -259,12 +259,13 @@ abstract class AbstractParseTest {
         fun match(firstArg: String, vararg moreArgs: String, config: Edges.() -> Unit)
 
         fun doesNotMatch(firstArg: String, vararg moreArgs: String)
+
+        fun fails(firstArg: String, vararg moreArgs: String)
     }
 
     private class DefaultEdge(val edge: ParseEdge.NonPositional) : Edge {
         override fun match(firstArg: String, vararg moreArgs: String, config: Edges.() -> Unit) {
-            val args = listOf(firstArg) + moreArgs
-            val transition = edge.next(DefaultInputArgs(0, args, BooleanArray(args.size)))
+            val transition = next(firstArg, moreArgs)
             val node = assertIs<ParseEdge.Transition.Matched>(transition).next
             val edges = mutableListOf<ParseEdge>()
             node.edges(edges)
@@ -272,9 +273,19 @@ abstract class AbstractParseTest {
         }
 
         override fun doesNotMatch(firstArg: String, vararg moreArgs: String) {
+            val transition = next(firstArg, moreArgs)
+            assertIs<ParseEdge.Transition.NotMatched>(transition)
+        }
+
+        override fun fails(firstArg: String, vararg moreArgs: String) {
+            val transition = next(firstArg, moreArgs)
+            assertIs<ParseEdge.Transition.Failed>(transition)
+        }
+
+        private fun next(firstArg: String, moreArgs: Array<out String>): ParseEdge.Transition {
             val args = listOf(firstArg) + moreArgs
             val transition = edge.next(DefaultInputArgs(0, args, BooleanArray(args.size)))
-            assertIs<ParseEdge.Transition.NotMatched>(transition)
+            return transition
         }
     }
 }

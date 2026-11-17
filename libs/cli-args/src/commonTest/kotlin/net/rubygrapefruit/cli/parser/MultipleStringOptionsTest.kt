@@ -118,13 +118,12 @@ class MultipleStringOptionsTest : AbstractParseTest() {
             }
             nonPositional {
                 matches("-b", "two") {
-                    skip()
-//                    nonPositional {
-//                        matches("-a", "one") {
-//                            endOfInput(listOf("one", "two"))
-//                        }
-//                    }
-//                    endOfInput(listOf(null, "two"))
+                    nonPositional {
+                        matches("-a", "one") {
+                            endOfInput(listOf("one", "two"))
+                        }
+                    }
+                    endOfInput(listOf(null, "two"))
                 }
             }
             endOfInput(listOf(null, null))

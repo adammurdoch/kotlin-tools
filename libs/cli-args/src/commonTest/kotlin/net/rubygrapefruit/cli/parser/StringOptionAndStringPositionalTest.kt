@@ -33,7 +33,7 @@ class StringOptionAndStringPositionalTest : AbstractParseTest() {
                     skip()
 //                    positional {
 //                        matches("two") {
-//                            endOfInput(listOf("one", "two"))
+//                            endOfInput(Pair("one", "two"))
 //                        }
 //                    }
                 }
@@ -43,10 +43,10 @@ class StringOptionAndStringPositionalTest : AbstractParseTest() {
                     skip()
 //                    nonPositional {
 //                        matches("-x", "one") {
-//                            endOfInput(listOf("one", "two"))
+//                            endOfInput(Pair("one", "two"))
 //                        }
 //                    }
-//                    endOfInput(listOf(null, "two"))
+//                    endOfInput(Pair(null, "two"))
                 }
             }
         }

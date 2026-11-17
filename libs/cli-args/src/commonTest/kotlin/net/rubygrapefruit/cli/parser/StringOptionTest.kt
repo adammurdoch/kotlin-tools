@@ -43,7 +43,7 @@ class StringOptionTest : AbstractParseTest() {
 
         parser.edges {
             nonPositional {
-                match("-x", "value") {
+                matches("-x", "value") {
                     endOfInput("value")
                 }
                 doesNotMatch("unknown")
@@ -61,10 +61,10 @@ class StringOptionTest : AbstractParseTest() {
 
         parser.edges {
             nonPositional {
-                match("-x", "value") {
+                matches("-x", "value") {
                     endOfInput("value")
                 }
-                match("--long", "value") {
+                matches("--long", "value") {
                     endOfInput("value")
                 }
                 doesNotMatch("unknown")

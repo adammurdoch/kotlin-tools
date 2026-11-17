@@ -16,6 +16,10 @@ internal class RequiredStringOption(
         return OptionUsage()
     }
 
+    override fun edges(dest: MutableList<ParseEdge>) {
+        dest.add(StringOptionEdge(flags))
+    }
+
     private inner class OptionUsage : UsageInternal.OptionUsage {
         override fun writeTo(quoted: Boolean, output: Output) {
             writeChoices(quoted, output, flags) { flag ->

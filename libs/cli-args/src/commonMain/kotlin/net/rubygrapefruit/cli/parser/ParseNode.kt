@@ -8,9 +8,13 @@ internal sealed interface ParseNode {
 }
 
 internal sealed interface ParseEdge {
-    sealed interface NonPositional : ParseEdge {
+    sealed interface Matcher : ParseEdge {
         fun next(args: InputArgs): Transition
     }
+
+    sealed interface NonPositional : Matcher
+
+    sealed interface Positional : Matcher
 
     sealed interface EndOfInput : ParseEdge {
         val value: Any?

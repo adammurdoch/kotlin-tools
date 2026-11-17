@@ -28,6 +28,23 @@ class RequiredStringOptionTest : AbstractParseTest() {
     }
 
     @Test
+    fun `option with short name composes`() {
+        val parser = option("x").required()
+
+        parser.edges {
+            nonPositional {
+                matches("-x", "value") {
+                    endOfInput("value")
+                }
+                doesNotMatch("unknown")
+                doesNotMatch("--other")
+                fails("-x", index = 1, message = "No value provided for option -x")
+                fails("-x", "-y", index = 1, message = "No value provided for option -x")
+            }
+        }
+    }
+
+    @Test
     fun `reports usage of option with short name`() {
         val parser = option("x").required()
 

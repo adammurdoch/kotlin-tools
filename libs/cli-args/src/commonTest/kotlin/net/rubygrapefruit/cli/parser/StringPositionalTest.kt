@@ -13,6 +13,20 @@ class StringPositionalTest : AbstractParseTest() {
     }
 
     @Test
+    fun composes() {
+        val parser = positional("param")
+
+        parser.edges {
+            positional {
+                matches("value") {
+                    endOfInput("value")
+                }
+                doesNotMatch("-x")
+            }
+        }
+    }
+
+    @Test
     fun `reports usage`() {
         val parser = positional("param")
 

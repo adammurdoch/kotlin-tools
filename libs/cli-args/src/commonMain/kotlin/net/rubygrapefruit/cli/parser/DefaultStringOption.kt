@@ -21,6 +21,11 @@ internal class DefaultStringOption(
         return State(flags, names)
     }
 
+    override fun edges(dest: MutableList<ParseEdge>) {
+        dest.add(OptionEdge())
+        dest.add(ParseEdge.EndOfInput)
+    }
+
     override fun usage(): UsageInternal {
         return OptionUsage()
     }
@@ -42,6 +47,12 @@ internal class DefaultStringOption(
 
         override fun writeOptionSummaryTo(output: Output) {
             output.writeNullable(summary)
+        }
+    }
+
+    private class OptionEdge: ParseEdge.NonPositional {
+        override fun next(args: InputArgs): ParseNode {
+            return ParseNode.Finished
         }
     }
 

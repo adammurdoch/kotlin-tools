@@ -3,7 +3,7 @@ package net.rubygrapefruit.cli.parser
 import net.rubygrapefruit.cli.terminal.BufferingOutput
 import net.rubygrapefruit.cli.terminal.Output
 
-internal interface ParserInternal<out T> {
+internal interface ParserInternal<out T> : ParseNode {
     fun start(): ParseState<T>
 
     fun startAll(): List<ParseState<T>>

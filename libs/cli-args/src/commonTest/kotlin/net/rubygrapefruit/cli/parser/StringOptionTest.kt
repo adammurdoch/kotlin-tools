@@ -2,7 +2,6 @@ package net.rubygrapefruit.cli.parser
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertIs
 import kotlin.test.assertNull
 
 class StringOptionTest : AbstractParseTest() {
@@ -42,26 +41,28 @@ class StringOptionTest : AbstractParseTest() {
     fun `option with short name composes`() {
         val parser = option("x")
 
-        val edges = parser.edges()
-        assertEquals(2, edges.size)
-        assertIs<ParseEdge.NonPositional>(edges[0])
-        assertIs<ParseEdge.EndOfInput>(edges[1])
+        parser.edges {
+            nonPositional {
+                match("-x", "value") {
+                    endOfInput()
+                }
+            }
+            endOfInput()
+        }
     }
 
     @Test
     fun `option with multiple names composes`() {
         val parser = option("long", "x")
 
-        val edges = parser.edges()
-        assertEquals(2, edges.size)
-        assertIs<ParseEdge.NonPositional>(edges[0])
-        assertIs<ParseEdge.EndOfInput>(edges[1])
-    }
-
-    internal fun Parser<*>.edges(): List<ParseEdge> {
-        val edges = mutableListOf<ParseEdge>()
-        (this as ParserInternal<*>).edges(edges)
-        return edges
+        parser.edges {
+            nonPositional {
+                match("--long", "value") {
+                    endOfInput()
+                }
+            }
+            endOfInput()
+        }
     }
 
     @Test

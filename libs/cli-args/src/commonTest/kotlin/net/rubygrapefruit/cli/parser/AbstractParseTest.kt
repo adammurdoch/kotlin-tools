@@ -54,6 +54,12 @@ abstract class AbstractParseTest {
         DefaultPositionals(positionals).check(config)
     }
 
+    protected fun Parser<*>.edges(config: Edges.() -> Unit) {
+        val edges = mutableListOf<ParseEdge>()
+        (this as ParserInternal<*>).edges(edges)
+        DefaultEdges(edges).check(config)
+    }
+
     protected fun Parser<*>.help(help: String) {
         val action = assertIs<HelpAction>(parse("--help").get())
         val output = BufferingOutput()
@@ -222,4 +228,44 @@ abstract class AbstractParseTest {
         }
     }
 
+    protected interface Edges {
+        fun nonPositional(config: Edge.() -> Unit = {})
+        fun endOfInput()
+    }
+
+    private class DefaultEdges(val edges: List<ParseEdge>) : Edges {
+        private var current = 0
+
+        fun check(config: Edges.() -> Unit) {
+            current = 0
+            config()
+            assertEquals(current, edges.size)
+        }
+
+        override fun nonPositional(config: Edge.() -> Unit) {
+            val edge = edges[current]
+            assertIs<ParseEdge.NonPositional>(edge)
+            DefaultEdge(edge).config()
+            current++
+        }
+
+        override fun endOfInput() {
+            assertIs<ParseEdge.EndOfInput>(edges[current])
+            current++
+        }
+    }
+
+    protected interface Edge {
+        fun match(firstArg: String, vararg moreArgs: String, config: Edges.() -> Unit)
+    }
+
+    private class DefaultEdge(val edge: ParseEdge.NonPositional) : Edge {
+        override fun match(firstArg: String, vararg moreArgs: String, config: Edges.() -> Unit) {
+            val args = listOf(firstArg) + moreArgs
+            val node = edge.next(DefaultInputArgs(0, args, BooleanArray(args.size)))
+            val edges = mutableListOf<ParseEdge>()
+            node.edges(edges)
+            DefaultEdges(edges).check(config)
+        }
+    }
 }

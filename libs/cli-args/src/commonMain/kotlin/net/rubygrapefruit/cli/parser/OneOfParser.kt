@@ -81,7 +81,7 @@ internal class OneOfParser<OUT>(val choices: List<ParserInternal<OUT>>) : Abstra
             }
             val best = choices.find { it.recognized }
             if (best != null) {
-                return Failure(best.problems!!)
+                return ParsedArguments.FixedProblems(best.problems!!)
             }
 
             var problems: List<ProblemAtIndex> = emptyList()
@@ -89,18 +89,12 @@ internal class OneOfParser<OUT>(val choices: List<ParserInternal<OUT>>) : Abstra
                 problems += choice.problems!!
             }
 
-            return Failure(problems)
+            return ParsedArguments.FixedProblems(problems)
         }
     }
 
     private class ChoiceState<OUT>(val state: ParseState<OUT>) {
         var problems: List<ProblemAtIndex>? = null
         var recognized = false
-    }
-
-    private class Failure(val problems: List<ProblemAtIndex>) : ParsedArguments.Failure {
-        override fun problems(): List<ProblemAtIndex> {
-            return problems
-        }
     }
 }

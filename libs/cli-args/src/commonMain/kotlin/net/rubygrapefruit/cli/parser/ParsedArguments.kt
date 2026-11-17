@@ -32,5 +32,4 @@ internal sealed interface ParsedArguments<out T> {
             return problems
         }
     }
-
 }

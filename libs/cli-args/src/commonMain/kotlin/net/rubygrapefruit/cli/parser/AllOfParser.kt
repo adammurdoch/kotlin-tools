@@ -105,8 +105,11 @@ internal class AllOfParser<OUT>(
         }
     }
 
-    private class Success<T>(elements: List<ParsedArguments.Success<*>>, val map: (List<ParsedArguments.Success<*>>) -> T) : Result<ParsedArguments.Success<*>>(elements),
-        ParsedArguments.Success<T> {
+    private class Success<T>(
+        elements: List<ParsedArguments.Success<*>>,
+        val map: (List<ParsedArguments.Success<*>>) -> T
+    ) : Result<ParsedArguments.Success<*>>(elements), ParsedArguments.Success<T> {
+
         override fun value(): T {
             return map(elements)
         }

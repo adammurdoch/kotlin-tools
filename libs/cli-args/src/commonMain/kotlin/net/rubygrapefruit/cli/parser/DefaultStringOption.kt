@@ -22,7 +22,7 @@ internal class DefaultStringOption(
     }
 
     override fun edges(dest: MutableList<ParseEdge>) {
-        dest.add(OptionEdge())
+        dest.add(OptionEdge(flags))
         dest.add(Finished(null))
     }
 
@@ -50,10 +50,14 @@ internal class DefaultStringOption(
         }
     }
 
-    private class OptionEdge : ParseEdge.NonPositional {
-        override fun next(args: InputArgs): ParseNode {
-            val value = args.second()
-            return Finished(value)
+    private class OptionEdge(val flags: List<String>) : ParseEdge.NonPositional {
+        override fun next(args: InputArgs): ParseEdge.Transition {
+            return if (flags.contains(args.first())) {
+                val value = args.second()
+                ParseEdge.Transition.Matched(2, Finished(value))
+            } else {
+                ParseEdge.Transition.NotMatched
+            }
         }
     }
 

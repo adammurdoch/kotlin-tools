@@ -9,11 +9,16 @@ internal sealed interface ParseNode {
 
 internal sealed interface ParseEdge {
     sealed interface NonPositional : ParseEdge {
-        fun next(args: InputArgs): ParseNode
+        fun next(args: InputArgs): Transition
     }
 
     sealed interface EndOfInput : ParseEdge {
         val value: Any?
+    }
+
+    sealed interface Transition {
+        object NotMatched : Transition
+        class Matched(val count: Int, val next: ParseNode) : Transition
     }
 }
 

@@ -60,6 +60,8 @@ class StringOptionTest : AbstractParseTest() {
                 match("--long", "value") {
                     endOfInput("value")
                 }
+                doesNotMatch("unknown")
+                doesNotMatch("--other")
             }
             endOfInput(null)
         }

@@ -257,15 +257,24 @@ abstract class AbstractParseTest {
 
     protected interface Edge {
         fun match(firstArg: String, vararg moreArgs: String, config: Edges.() -> Unit)
+
+        fun doesNotMatch(firstArg: String, vararg moreArgs: String)
     }
 
     private class DefaultEdge(val edge: ParseEdge.NonPositional) : Edge {
         override fun match(firstArg: String, vararg moreArgs: String, config: Edges.() -> Unit) {
             val args = listOf(firstArg) + moreArgs
-            val node = edge.next(DefaultInputArgs(0, args, BooleanArray(args.size)))
+            val transition = edge.next(DefaultInputArgs(0, args, BooleanArray(args.size)))
+            val node = assertIs<ParseEdge.Transition.Matched>(transition).next
             val edges = mutableListOf<ParseEdge>()
             node.edges(edges)
             DefaultEdges(edges).check(config)
+        }
+
+        override fun doesNotMatch(firstArg: String, vararg moreArgs: String) {
+            val args = listOf(firstArg) + moreArgs
+            val transition = edge.next(DefaultInputArgs(0, args, BooleanArray(args.size)))
+            assertIs<ParseEdge.Transition.NotMatched>(transition)
         }
     }
 }

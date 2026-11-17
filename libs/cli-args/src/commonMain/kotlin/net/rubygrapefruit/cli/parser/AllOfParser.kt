@@ -15,18 +15,54 @@ internal class AllOfParser<OUT>(
         val elements = parsers.mapIndexed { index, element ->
             val edges = mutableListOf<ParseEdge>()
             element.edges(edges)
-            ElementNode(index, edges)
+            ElementNode(element, edges)
         }
+        val results = emptyList<ParsedArguments.Success<*>>()
+        edges(elements, results, dest)
+    }
+
+    private fun edges(
+        elements: List<ElementNode>,
+        results: List<ParsedArguments.Success<*>>,
+        dest: MutableList<ParseEdge>
+    ) {
         var hasPositional = false
-        for (element in elements) {
-            for (nonPositional in element.nonPositional) {
-                dest.add(ElementNonPositional(element, nonPositional))
-            }
-            if (!hasPositional && element.positional.isNotEmpty()) {
-                for (positional in element.positional) {
-                    dest.add(ElementPositional(element, positional))
+        for (index in elements.indices) {
+            val element = elements[index]
+            var elementHasPositional = false
+            var finished = false
+            for (edge in element.edges) {
+                when (edge) {
+                    is ParseEdge.NonPositional -> {
+                        dest.add(ElementNonPositional(element, edge))
+                    }
+
+                    is ParseEdge.Positional -> {
+                        if (!hasPositional) {
+                            dest.add(ElementPositional(element, edge))
+                            elementHasPositional = true
+                        }
+                    }
+
+                    is ParseEdge.EndOfInput -> {
+                        if (index == 0) {
+                            val newResults = results + ParsedArguments.FixedResult(edge.value())
+                            if (elements.size == 1) {
+                                dest.add(Finished(map(newResults)))
+                            } else {
+                                edges(elements.drop(1), newResults, dest)
+                            }
+                            finished = true
+                        }
+                    }
                 }
-                hasPositional = true
+                if (elementHasPositional) {
+                    hasPositional = true
+                }
+            }
+            if (finished) {
+                // The edge for subsequent elements have already been added via recursive call above
+                break
             }
         }
     }
@@ -67,10 +103,7 @@ internal class AllOfParser<OUT>(
         }
     }
 
-    private class ElementNode(val index: Int, edges: List<ParseEdge>) {
-        val nonPositional = edges.filterIsInstance<ParseEdge.NonPositional>()
-        val positional = edges.filterIsInstance<ParseEdge.Positional>()
-    }
+    private class ElementNode(val element: ParserInternal<*>, val edges: List<ParseEdge>)
 
     private class ElementNonPositional(val element: ElementNode, val edge: ParseEdge.NonPositional) : ParseEdge.NonPositional {
         override fun next(args: InputArgs): ParseEdge.Transition {

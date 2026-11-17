@@ -126,7 +126,7 @@ class MultipleStringOptionsTest : AbstractParseTest() {
 //                    }
                 }
             }
-//            endOfInput(listOf(null, null))
+            endOfInput(listOf(null, null))
         }
     }
 

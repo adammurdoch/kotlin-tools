@@ -235,13 +235,16 @@ abstract class AbstractParseTest {
         fun endOfInput(value: Any?)
     }
 
+    @OptIn(ExperimentalKotlinTestApi::class)
     private class DefaultEdges(val edges: List<ParseEdge>) : Edges {
         private var current = 0
 
         fun check(config: Edges.() -> Unit) {
             current = 0
             config()
-            assertEquals(current, edges.size)
+            assertEquals(current, edges.size) {
+                "Unexpected edges found in $edges"
+            }
         }
 
         override fun skip() {
@@ -262,7 +265,7 @@ abstract class AbstractParseTest {
 
         override fun endOfInput(value: Any?) {
             val edge = assertIs<ParseEdge.EndOfInput>(edges[current])
-            assertEquals(value, edge.value)
+            assertEquals(value, edge.value())
             current++
         }
     }

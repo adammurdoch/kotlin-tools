@@ -17,7 +17,7 @@ internal sealed interface ParseEdge {
     sealed interface Positional : Matcher
 
     sealed interface EndOfInput : ParseEdge {
-        val value: Any?
+        fun value(): Any?
     }
 
     sealed interface Transition {
@@ -27,7 +27,11 @@ internal sealed interface ParseEdge {
     }
 }
 
-internal class Finished(override val value: Any?) : ParseNode, ParseEdge.EndOfInput {
+internal class Finished(val value: Any?) : ParseNode, ParseEdge.EndOfInput {
+    override fun value(): Any? {
+        return value
+    }
+
     override fun edges(dest: MutableList<ParseEdge>) {
         dest.add(this)
     }

@@ -18,6 +18,33 @@ class ChoiceOfRequiredStringOptionTest : AbstractParseTest() {
     }
 
     @Test
+    fun composes() {
+        val parser = oneOf(
+            option("a").required(),
+            option("b").required(),
+            option("long").required()
+        )
+
+        parser.edges {
+            nonPositional {
+                matches("-a", "value") {
+                    endOfInput("value")
+                }
+            }
+            nonPositional {
+                matches("-b", "value") {
+                    endOfInput("value")
+                }
+            }
+            nonPositional {
+                matches("--long", "value") {
+                    endOfInput("value")
+                }
+            }
+        }
+    }
+
+    @Test
     fun `reports usage`() {
         val parser = oneOf(
             option("a").required(),

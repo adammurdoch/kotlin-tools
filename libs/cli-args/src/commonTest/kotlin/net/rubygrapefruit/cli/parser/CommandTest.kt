@@ -31,6 +31,21 @@ class CommandTest : AbstractParseTest() {
     }
 
     @Test
+    fun composes() {
+        val parser = command("help")
+
+        parser.edges {
+            positional {
+                matches("help") {
+                    endOfInput(Unit)
+                }
+                doesNotMatch("other")
+                doesNotMatch("-x")
+            }
+        }
+    }
+
+    @Test
     fun `reports usage`() {
         val parser = command("help")
 

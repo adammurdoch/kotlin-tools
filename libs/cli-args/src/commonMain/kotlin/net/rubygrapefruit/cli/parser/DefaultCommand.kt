@@ -32,7 +32,7 @@ internal class DefaultCommand(private val text: String) : AbstractParser<Unit>()
         }
     }
 
-    private class RequiredCommend(private val text: String) : ParseEdge.Required {
+    private class RequiredCommend(private val text: String) : ParseEdge.NotEndOfInput {
         override fun abort(): Problem {
             return MissingCommand(text)
         }

@@ -12,7 +12,10 @@ class StringOptionTest : AbstractParseTest() {
         parser.edges {
             nonPositional {
                 matches("-x", "value") {
-                    endOfInput("value")
+                    endOfInput("value") {
+                        doesNotMatch("-x", message = "Option -x can only appear once")
+                        doesNotMatch("-x", "value", message = "Option -x can only appear once")
+                    }
                 }
                 matches("-x", "") {
                     endOfInput("")

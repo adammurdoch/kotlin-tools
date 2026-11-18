@@ -48,7 +48,7 @@ internal class DefaultStringPositional(private val name: String, private val sum
         }
     }
 
-    private class RequiredPositional(val name: String) : ParseEdge.Required {
+    private class RequiredPositional(val name: String) : ParseEdge.NotEndOfInput {
         override fun abort(): Problem {
             return MissingPositional(name)
         }

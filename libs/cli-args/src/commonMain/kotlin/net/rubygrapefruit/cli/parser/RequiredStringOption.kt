@@ -39,7 +39,7 @@ internal class RequiredStringOption(
         }
     }
 
-    private class RequiredOption(val flags: List<String>) : ParseEdge.Required {
+    private class RequiredOption(val flags: List<String>) : ParseEdge.NotEndOfInput {
         override fun abort(): Problem {
             val longest = flags.maxBy { it.length }
             return MissingOption(longest)

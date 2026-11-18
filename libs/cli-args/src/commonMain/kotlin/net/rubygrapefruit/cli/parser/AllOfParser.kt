@@ -90,7 +90,7 @@ internal class AllOfParser<OUT>(
     private class ElementNode(val element: ParserInternal<*>, edges: List<ParseEdge>) {
         val nonPositional = edges.filterIsInstance<ParseEdge.NonPositional>()
         val positional = edges.filterIsInstance<ParseEdge.Positional>()
-        val required = edges.filterIsInstance<ParseEdge.Required>()
+        val required = edges.filterIsInstance<ParseEdge.NotEndOfInput>()
         val endOfInput = edges.filterIsInstance<ParseEdge.EndOfInput>().firstOrNull()
     }
 

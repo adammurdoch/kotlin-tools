@@ -7,6 +7,11 @@ internal class DefaultOneOrMorePositional(private val name: String, private val 
         return State(name)
     }
 
+    override fun edges(dest: MutableList<ParseEdge>) {
+        dest.add(OneOrMorePositionalEdge())
+        dest.add(RequiredPositional(name))
+    }
+
     override fun usage(): UsageInternal {
         return PositionalUsage()
     }
@@ -22,6 +27,16 @@ internal class DefaultOneOrMorePositional(private val name: String, private val 
 
         override fun writePositionalSummaryTo(output: Output) {
             output.writeNullable(summary)
+        }
+    }
+
+    private class OneOrMorePositionalEdge : ParseEdge.Positional {
+        override fun next(args: InputArgs): ParseEdge.Transition {
+            return if (args.firstIsOption()) {
+                ParseEdge.Transition.NotMatched
+            } else {
+                ParseEdge.Transition.Matched(1, ZeroOrMorePositionalEdge(listOf(args.first())))
+            }
         }
     }
 

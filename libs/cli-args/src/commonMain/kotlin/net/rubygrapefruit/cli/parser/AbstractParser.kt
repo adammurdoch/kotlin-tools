@@ -5,9 +5,6 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
         return listOf(start())
     }
 
-    override fun edges(dest: MutableList<ParseEdge>) {
-    }
-
     override fun parse(args: List<String>): Parser.Result<T> {
         val results = parseAlternatives(args, startAll().map { Alternative(it, BooleanArray(args.size)) })
         for (alternative in results) {

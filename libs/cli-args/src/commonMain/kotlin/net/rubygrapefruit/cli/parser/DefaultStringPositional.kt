@@ -48,12 +48,6 @@ internal class DefaultStringPositional(private val name: String, private val sum
         }
     }
 
-    private class RequiredPositional(val name: String) : ParseEdge.NotEndOfInput {
-        override fun abort(): Problem {
-            return MissingPositional(name)
-        }
-    }
-
     private class State(val name: String) : ParseState<String> {
         private var result: String? = null
 

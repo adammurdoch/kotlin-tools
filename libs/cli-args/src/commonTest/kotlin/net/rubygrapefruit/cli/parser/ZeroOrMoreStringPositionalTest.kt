@@ -12,6 +12,30 @@ class ZeroOrMoreStringPositionalTest : AbstractParseTest() {
         assertEquals(listOf("value 1"), parser.parse("value 1").get())
         assertEquals(listOf("value 1", "value 2"), parser.parse("value 1", "value 2").get())
         assertEquals(listOf("value 1", "", "value 2"), parser.parse("value 1", "", "value 2").get())
+
+        parser.edges {
+            positional {
+                matches("value 1") {
+                    positional {
+                        matches("value 2") {
+                            positional { }
+                            endOfInput(listOf("value 1", "value 2"))
+                        }
+                        matches("") {
+                            positional {
+                                matches("value 2") {
+                                    positional { }
+                                    endOfInput(listOf("value 1", "", "value 2"))
+                                }
+                            }
+                            endOfInput(listOf("value 1", ""))
+                        }
+                    }
+                    endOfInput(listOf("value 1"))
+                }
+            }
+            endOfInput(emptyList<String>())
+        }
     }
 
     @Test

@@ -5,6 +5,11 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
         return listOf(start())
     }
 
+    override fun parse(args: List<String>): Parser.Result<T> {
+        return parseUsingState(args)
+//        return parseUsingEdges(args)
+    }
+
     override fun parseUsingEdges(args: List<String>): Parser.Result<T> {
         val candidates = mutableListOf<EdgeState>()
         edges {
@@ -42,10 +47,35 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
                     }
                 }
             }
-            require(nextCandidates.isNotEmpty())
-            candidates.clear()
-            candidates.addAll(nextCandidates)
-            nextCandidates.clear()
+            if (nextCandidates.isEmpty()) {
+                // skip next input and try to recover
+            } else {
+                recognized[index] = true
+                candidates.clear()
+                candidates.addAll(nextCandidates)
+                nextCandidates.clear()
+            }
+        }
+
+        val unrecognizedProblems = mutableListOf<ProblemAtIndex>()
+        var index = 0
+        while (index < args.size) {
+            if (recognized[index]) {
+                index++
+                continue
+            }
+
+            val current = DefaultInputArgs(index, args, recognized)
+            val problem = if (current.firstIsOption()) {
+                UnexpectedOption(current.first())
+            } else {
+                UnexpectedArgument(current.first())
+            }
+            unrecognizedProblems.add(ProblemAtIndex(index, problem))
+            index++
+        }
+        if (unrecognizedProblems.isNotEmpty()) {
+            return ParserInternal.Failure(unrecognizedProblems, this)
         }
 
         for (candidate in candidates) {
@@ -58,7 +88,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
         TODO()
     }
 
-    override fun parse(args: List<String>): Parser.Result<T> {
+    private fun parseUsingState(args: List<String>): Parser.Result<T> {
         val results = parseAlternatives(args, startAll().map { Alternative(it, BooleanArray(args.size)) })
         for (alternative in results) {
             if (alternative.result is ParsedArguments.Success && alternative.recognizedCount == args.size) {

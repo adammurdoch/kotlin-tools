@@ -45,6 +45,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
             require(nextCandidates.isNotEmpty())
             candidates.clear()
             candidates.addAll(nextCandidates)
+            nextCandidates.clear()
         }
 
         for (candidate in candidates) {
@@ -190,5 +191,5 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
         val recognizedCount = recognized.count { it }
     }
 
-    private class EdgeState(val edge: ParseEdge, var advance: Int)
+    private data class EdgeState(val edge: ParseEdge, var advance: Int)
 }

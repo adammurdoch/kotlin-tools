@@ -264,7 +264,7 @@ abstract class AbstractParseTest {
 
             assertEquals(value, parser.parse(previousArgs).get())
 
-//            assertEquals(value, (parser as ParserInternal<*>).parseUsingEdges(previousArgs).get())
+            assertEquals(value, (parser as ParserInternal<*>).parseUsingEdges(previousArgs).get())
 
             DefaultEndOfInput(edge, parser, previousArgs).config()
             current++

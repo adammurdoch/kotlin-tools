@@ -4,7 +4,7 @@ import net.rubygrapefruit.cli.terminal.Output
 
 internal class DefaultZeroOrMorePositional(private val name: String, private val summary: String?) : AbstractParser<List<String>>(), Positional<List<String>> {
     override fun start(): ParseState<List<String>> {
-        return State(name)
+        return State()
     }
 
     override fun edges(dest: MutableList<ParseEdge>) {
@@ -29,7 +29,7 @@ internal class DefaultZeroOrMorePositional(private val name: String, private val
         }
     }
 
-    private class State(private val name: String) : ParseState<List<String>> {
+    private class State : ParseState<List<String>> {
         private val result = mutableListOf<String>()
 
         override val expectingOption: Boolean

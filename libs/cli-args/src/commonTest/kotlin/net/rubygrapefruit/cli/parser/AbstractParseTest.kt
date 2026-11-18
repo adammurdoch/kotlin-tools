@@ -261,7 +261,11 @@ abstract class AbstractParseTest {
         override fun endOfInput(value: Any?, config: Edge.() -> Unit) {
             val edge = assertIs<ParseEdge.EndOfInput>(edges[current])
             assertEquals(value, edge.value())
+
             assertEquals(value, parser.parse(previousArgs).get())
+
+//            assertEquals(value, (parser as ParserInternal<*>).parseUsingEdges(previousArgs).get())
+
             DefaultEndOfInput(edge, parser, previousArgs).config()
             current++
         }

@@ -10,6 +10,8 @@ internal interface ParserInternal<out T> : ParseNode {
 
     fun usage(): UsageInternal
 
+    fun parseUsingEdges(args: List<String>): Parser.Result<T>
+
     class Success<out T>(override val result: T) : Parser.Success<T> {
         override fun get(): T {
             return result

@@ -8,11 +8,6 @@ class ZeroOrMoreStringPositionalTest : AbstractParseTest() {
     fun `parses zero or more positional parameters`() {
         val parser = positional("a").zeroOrMore()
 
-        assertEquals(listOf(), parser.parse().get())
-        assertEquals(listOf("value 1"), parser.parse("value 1").get())
-        assertEquals(listOf("value 1", "value 2"), parser.parse("value 1", "value 2").get())
-        assertEquals(listOf("value 1", "", "value 2"), parser.parse("value 1", "", "value 2").get())
-
         parser.edges {
             positional {
                 matches("value 1") {

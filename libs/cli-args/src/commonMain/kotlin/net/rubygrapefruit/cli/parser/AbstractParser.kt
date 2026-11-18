@@ -5,6 +5,48 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
         return listOf(start())
     }
 
+    override fun parseUsingEdges(args: List<String>): Parser.Result<T> {
+        val edges = mutableListOf<ParseEdge>()
+        edges(edges)
+
+        val nextEdges = mutableListOf<ParseEdge>()
+
+        val recognized = BooleanArray(args.size)
+        for (index in args.indices) {
+            val current = DefaultInputArgs(index, args, recognized)
+            for (edge in edges) {
+                if (edge is ParseEdge.Matcher) {
+                    val result = edge.next(current)
+                    when (result) {
+                        is ParseEdge.Transition.Matched -> {
+                            require(result.count == 1)
+                            result.next.edges(nextEdges)
+                        }
+
+                        is ParseEdge.Transition.NotMatched -> {
+                            // Ignore
+                        }
+
+                        is ParseEdge.Transition.Failed -> {
+                            TODO()
+                        }
+                    }
+                }
+            }
+            require(nextEdges.isNotEmpty())
+            edges.clear()
+            edges.addAll(nextEdges)
+        }
+
+        for (edge in edges) {
+            if (edge is ParseEdge.EndOfInput) {
+                return ParserInternal.Success(edge.value() as T)
+            }
+        }
+
+        TODO()
+    }
+
     override fun parse(args: List<String>): Parser.Result<T> {
         val results = parseAlternatives(args, startAll().map { Alternative(it, BooleanArray(args.size)) })
         for (alternative in results) {

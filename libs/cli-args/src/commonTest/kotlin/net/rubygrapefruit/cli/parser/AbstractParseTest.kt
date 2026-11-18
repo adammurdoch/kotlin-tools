@@ -353,10 +353,6 @@ abstract class AbstractParseTest {
             }
         }
 
-        private fun next(firstArg: String, moreArgs: Array<out String>): ParseEdge.Transition {
-            return next(listOf(firstArg) + moreArgs)
-        }
-
         private fun next(args: List<String>): ParseEdge.Transition {
             return edge.next(DefaultInputArgs(0, args, BooleanArray(args.size)))
         }

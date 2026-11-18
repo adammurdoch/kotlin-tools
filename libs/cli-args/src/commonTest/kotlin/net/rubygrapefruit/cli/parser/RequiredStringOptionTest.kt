@@ -18,7 +18,6 @@ class RequiredStringOptionTest : AbstractParseTest() {
                 }
                 doesNotMatch("unknown")
                 doesNotMatch("--other")
-                fails("-x", index = 1, message = "No value provided for option -x")
             }
             aborts("Option -x not provided")
         }
@@ -35,8 +34,6 @@ class RequiredStringOptionTest : AbstractParseTest() {
     fun `parses option with multiple names`() {
         val parser = option("some-option", "x").required()
 
-        assertEquals("value", parser.parse("--some-option", "value").get())
-        assertEquals("value", parser.parse("-x", "value").get())
         parser.edges {
             nonPositional {
                 matches("-x", "value") {
@@ -78,7 +75,25 @@ class RequiredStringOptionTest : AbstractParseTest() {
     }
 
     @Test
-    fun `option must be present`() {
+    fun `option with short name must be present`() {
+        val parser = option("x").required()
+
+        parser.fails {
+            failure(0, "Option -x not provided")
+        }
+
+        parser.fails("--unknown") {
+            failure(0, "Unexpected option '--unknown'")
+            failure(1, "Option -x not provided")
+        }
+        parser.fails("unknown") {
+            failure(0, "Unexpected argument 'unknown'")
+            failure(1, "Option -x not provided")
+        }
+    }
+
+    @Test
+    fun `option with multiple names must be present`() {
         val parser = option("some-flag", "x").required()
 
         parser.fails {
@@ -110,6 +125,19 @@ class RequiredStringOptionTest : AbstractParseTest() {
         }
         parser.fails("--x") {
             failure(0, "Unexpected option '--x'. Try '-x' instead")
+        }
+    }
+
+    @Test
+    fun `option must have value`() {
+        val parser = option("x", "long").required()
+
+        parser.edges {
+            nonPositional {
+                fails("-x", index = 1, message = "No value provided for option -x")
+                fails("--long", index = 1, message = "No value provided for option --long")
+            }
+            aborts("Option --long not provided")
         }
     }
 

@@ -93,6 +93,16 @@ class BooleanOptionTest : AbstractParseTest() {
         parser.fails("--x", "-x") {
             failure(0, "Unexpected option '--x'. Try '-x' instead")
         }
+
+        parser.edges {
+            nonPositional {
+                matches("-x") {
+                    endOfInput(true)
+                }
+                doesNotMatch("--x", message = "Unexpected option '--x'. Try '-x' instead")
+            }
+            endOfInput(false)
+        }
     }
 
     @Test

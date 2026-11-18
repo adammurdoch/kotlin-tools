@@ -40,9 +40,7 @@ class StringOptionTest : AbstractParseTest() {
         parser.edges {
             nonPositional {
                 matches("-x", "value") {
-                    endOfInput("value") {
-                        doesNotMatch("--long-x", message = "Option --long-x cannot be used with -x")
-                    }
+                    endOfInput("value")
                 }
                 matches("-x", "") {
                     endOfInput("")
@@ -51,17 +49,13 @@ class StringOptionTest : AbstractParseTest() {
                     endOfInput("value")
                 }
                 matches("-y", "value") {
-                    endOfInput("value") {
-                        doesNotMatch("-x", message = "Option -x cannot be used with -y")
-                    }
+                    endOfInput("value")
                 }
                 matches("--option-x", "value") {
                     endOfInput("value")
                 }
                 doesNotMatch("unknown")
                 doesNotMatch("--other")
-                fails("-x", index = 1, message = "No value provided for option -x")
-                fails("--long-x", index = 1, message = "No value provided for option --long-x")
             }
             endOfInput(null)
         }
@@ -259,24 +253,32 @@ class StringOptionTest : AbstractParseTest() {
     fun `option with multiple names cannot appear twice`() {
         val parser = option("long", "x", "an-option")
 
-        parser.fails("-x", "value", "-x", "value") {
-            failure(2, "Option -x can only appear once")
-        }
-        parser.fails("-x", "value", "--long", "value") {
-            failure(2, "Option --long cannot be used with -x")
-        }
         parser.fails("--an-option", "value", "--long", "value") {
             failure(2, "Option --long cannot be used with --an-option")
-        }
-        parser.fails("-x", "value", "-x") {
-            failure(2, "Option -x can only appear once")
-        }
-        parser.fails("--long", "value", "-x") {
-            failure(2, "Option -x cannot be used with --long")
         }
         parser.fails("--an-option", "value", "-x", "--long") {
             failure(2, "Option -x cannot be used with --an-option")
             failure(3, "Option --long cannot be used with --an-option")
+        }
+
+        parser.edges {
+            nonPositional {
+                matches("-x", "value") {
+                    endOfInput("value") {
+                        doesNotMatch("-x", "value", message = "Option -x can only appear once")
+                        doesNotMatch("-x", message = "Option -x can only appear once")
+                        doesNotMatch("--long", message = "Option --long cannot be used with -x")
+                        doesNotMatch("--long", "value", message = "Option --long cannot be used with -x")
+                    }
+                }
+                matches("--long", "value") {
+                    endOfInput("value") {
+                        doesNotMatch("--long", "value", message = "Option --long can only appear once")
+                        doesNotMatch("-x", message = "Option -x cannot be used with --long")
+                    }
+                }
+            }
+            endOfInput(null)
         }
     }
 }

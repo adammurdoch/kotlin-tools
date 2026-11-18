@@ -1,6 +1,18 @@
 package net.rubygrapefruit.cli.parser
 
-internal class FlagEdge(val flags: List<String>, val value: Any) : ParseEdge.NonPositional {
+internal abstract class OptionEdge(val flags: List<String>, val names: List<String>) : ParseEdge.NonPositional {
+    override fun maybeClaimUnrecognized(args: InputArgs): Problem? {
+        val first = args.first()
+        names.forEachIndexed { index, name ->
+            if (first.equals("-$name", true) || first.equals("--$name", true)) {
+                return UnexpectedOption(first, flags[index])
+            }
+        }
+        return null
+    }
+}
+
+internal class FlagEdge(flags: List<String>, names: List<String>, val value: Any) : OptionEdge(flags, names) {
     override fun next(args: InputArgs): ParseEdge.Transition {
         val first = args.first()
         return if (flags.contains(first)) {
@@ -11,17 +23,7 @@ internal class FlagEdge(val flags: List<String>, val value: Any) : ParseEdge.Non
     }
 }
 
-internal class StringOptionEdge(val flags: List<String>, val names: List<String>) : ParseEdge.NonPositional {
-    override fun maybeClaimUnrecognized(args: InputArgs): Problem? {
-        val first = args.first()
-        names.forEachIndexed { index, name ->
-            if (first.equals("-$name", true) || first.equals("--$name", true)) {
-                return UnexpectedOption(first, flags[index])
-            }
-        }
-        return null
-    }
-
+internal class StringOptionEdge(flags: List<String>, names: List<String>) : OptionEdge(flags, names) {
     override fun next(args: InputArgs): ParseEdge.Transition {
         val first = args.first()
         return if (flags.contains(first)) {
@@ -37,7 +39,7 @@ internal class StringOptionEdge(val flags: List<String>, val names: List<String>
     }
 }
 
-private class OptionValue(val value: String, val matchedFlag: String, val source: StringOptionEdge) : ParseEdge.EndOfInput, ParseNode {
+private class OptionValue(val value: Any, val matchedFlag: String, val source: OptionEdge) : ParseEdge.EndOfInput, ParseNode {
     override fun edges(dest: MutableList<ParseEdge>) {
         dest.add(this)
     }

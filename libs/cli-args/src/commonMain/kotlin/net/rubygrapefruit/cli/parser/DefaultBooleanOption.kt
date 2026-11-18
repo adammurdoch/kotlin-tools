@@ -12,7 +12,7 @@ internal class DefaultBooleanOption(private val flags: List<String>, private val
     }
 
     override fun edges(dest: MutableList<ParseEdge>) {
-        dest.add(FlagEdge(flags, true))
+        dest.add(FlagEdge(flags, names, true))
         dest.add(FixedValue(false))
     }
 

@@ -15,15 +15,17 @@ class StringOptionTest : AbstractParseTest() {
                     endOfInput("value") {
                         doesNotMatch("-x", message = "Option -x can only appear once")
                         doesNotMatch("-x", "value", message = "Option -x can only appear once")
+                        doesNotMatch("--x", "value", message = "Unexpected option '--x'. Try '-x' instead")
                     }
                 }
                 matches("-x", "") {
                     endOfInput("")
                 }
-                doesNotMatch("unknown")
-                doesNotMatch("--other")
                 fails("-x", index = 1, message = "No value provided for option -x")
                 fails("-x", "-y", index = 1, message = "No value provided for option -x")
+                doesNotMatch("unknown")
+                doesNotMatch("--other")
+                doesNotMatch("--x", "value", message = "Unexpected option '--x'. Try '-x' instead")
             }
             endOfInput(null)
         }
@@ -45,7 +47,9 @@ class StringOptionTest : AbstractParseTest() {
         parser.edges {
             nonPositional {
                 matches("-x", "value") {
-                    endOfInput("value")
+                    endOfInput("value") {
+                        doesNotMatch("--long-x", message = "Option --long-x cannot be used with -x")
+                    }
                 }
                 matches("-x", "") {
                     endOfInput("")
@@ -54,7 +58,9 @@ class StringOptionTest : AbstractParseTest() {
                     endOfInput("value")
                 }
                 matches("-y", "value") {
-                    endOfInput("value")
+                    endOfInput("value") {
+                        doesNotMatch("-x", message = "Option -x cannot be used with -y")
+                    }
                 }
                 matches("--option-x", "value") {
                     endOfInput("value")
@@ -220,7 +226,6 @@ class StringOptionTest : AbstractParseTest() {
             failure(1, "No value provided for option --long")
         }
 
-        println("-> START")
         parser.fails("-x", "-unknown") {
             failure(1, "No value provided for option -x")
             failure(1, "Unexpected option '-unknown'")

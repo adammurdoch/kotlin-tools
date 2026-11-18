@@ -22,7 +22,7 @@ internal class DefaultStringOption(
     }
 
     override fun edges(dest: MutableList<ParseEdge>) {
-        dest.add(StringOptionEdge(flags))
+        dest.add(StringOptionEdge(flags, names))
         dest.add(FixedValue(null))
     }
 

@@ -17,7 +17,7 @@ internal class RequiredStringOption(
     }
 
     override fun edges(dest: MutableList<ParseEdge>) {
-        dest.add(StringOptionEdge(flags))
+        dest.add(StringOptionEdge(flags, names))
         dest.add(RequiredOption(flags))
     }
 

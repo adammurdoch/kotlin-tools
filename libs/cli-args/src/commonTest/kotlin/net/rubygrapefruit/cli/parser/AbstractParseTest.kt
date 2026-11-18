@@ -291,13 +291,9 @@ abstract class AbstractParseTest {
         fun fails(firstArg: String, vararg moreArgs: String, index: Int, message: String)
     }
 
-    private class DefaultEndOfInput(val edge: ParseEdge.EndOfInput, val previousArgs: List<String>) : Edge {
-        override fun doesNotMatch(firstArg: String, vararg moreArgs: String, message: String?) {
-            val allArgs = buildList {
-                addAll(previousArgs)
-                add(firstArg)
-                addAll(moreArgs)
-            }
+    private abstract class DefaultEdge : Edge {
+        protected fun claimsUnrecognized(edge: ParseEdge, previousArgs: List<String>, args: List<String>, message: String?) {
+            val allArgs = previousArgs + args
             val recognized = BooleanArray(allArgs.size)
             val args = DefaultInputArgs(previousArgs.size, allArgs, recognized)
 
@@ -310,7 +306,14 @@ abstract class AbstractParseTest {
         }
     }
 
-    private class DefaultMatcherEdge(val edge: ParseEdge.Matcher, val parser: Parser<*>, val previousArgs: List<String>) : MatcherEdge {
+    private class DefaultEndOfInput(val edge: ParseEdge.EndOfInput, val previousArgs: List<String>) : DefaultEdge() {
+        override fun doesNotMatch(firstArg: String, vararg moreArgs: String, message: String?) {
+            val args = listOf(firstArg) + moreArgs
+            claimsUnrecognized(edge, previousArgs, args, message)
+        }
+    }
+
+    private class DefaultMatcherEdge(val edge: ParseEdge.Matcher, val parser: Parser<*>, val previousArgs: List<String>) : DefaultEdge(), MatcherEdge {
         override fun matches(firstArg: String, vararg moreArgs: String, config: Edges.() -> Unit) {
             val args = listOf(firstArg) + moreArgs
             val transition = next(args)
@@ -323,11 +326,12 @@ abstract class AbstractParseTest {
         }
 
         override fun doesNotMatch(firstArg: String, vararg moreArgs: String, message: String?) {
-            val transition = next(firstArg, moreArgs)
+            val args = listOf(firstArg) + moreArgs
+            val transition = next(args)
             assertIs<ParseEdge.Transition.NotMatched>(transition)
 
             if (message != null) {
-                TODO()
+                claimsUnrecognized(edge, previousArgs, args, message)
             }
         }
 

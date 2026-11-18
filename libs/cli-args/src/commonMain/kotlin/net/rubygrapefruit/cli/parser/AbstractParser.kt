@@ -54,6 +54,18 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
         }
 
         val unrecognizedProblems = mutableListOf<ProblemAtIndex>()
+        var success: ParseEdge.EndOfInput? = null
+        for (candidate in candidates) {
+            val edge = candidate.edge
+            if (edge is ParseEdge.Failed) {
+                unrecognizedProblems.add(edge.failure())
+            } else if (edge is ParseEdge.NotEndOfInput) {
+                unrecognizedProblems.add(ProblemAtIndex(args.size, edge.abort()))
+            } else if (edge is ParseEdge.EndOfInput) {
+                success = edge
+            }
+        }
+
         var index = 0
         while (index < args.size) {
             if (recognized[index]) {
@@ -62,7 +74,10 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
             }
 
             val current = DefaultInputArgs(index, args, recognized)
-            val problem = if (current.firstIsOption()) {
+            val claimed = candidates.firstNotNullOfOrNull { it.edge.maybeClaimUnrecognized(current) }
+            val problem = if (claimed != null) {
+                claimed
+            } else if (current.firstIsOption()) {
                 UnexpectedOption(current.first())
             } else {
                 UnexpectedArgument(current.first())
@@ -71,21 +86,14 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
             index++
         }
 
-        for (candidate in candidates) {
-            val edge = candidate.edge
-            if (edge is ParseEdge.Failed) {
-                unrecognizedProblems.add(edge.failure())
-            }
-        }
         if (unrecognizedProblems.isNotEmpty()) {
             return ParserInternal.Failure(unrecognizedProblems, this)
         }
-        for (candidate in candidates) {
-            if (candidate.edge is ParseEdge.EndOfInput) {
-                return ParserInternal.Success(candidate.edge.value() as T)
-            }
+        if (success != null) {
+            return ParserInternal.Success(success.value() as T)
+        } else {
+            throw IllegalStateException()
         }
-        throw IllegalStateException()
     }
 
     private fun parseUsingState(args: List<String>): Parser.Result<T> {

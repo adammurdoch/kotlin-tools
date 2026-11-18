@@ -227,15 +227,6 @@ class StringOptionTest : AbstractParseTest() {
     fun `option cannot appear twice`() {
         val parser = option("x")
 
-        parser.fails("-x", "-x", "value") {
-            failure(1, "No value provided for option -x")
-            failure(1, "Option -x can only appear once")
-        }
-        parser.fails("-x", "-x") {
-            failure(1, "No value provided for option -x")
-            failure(1, "Option -x can only appear once")
-        }
-
         parser.edges {
             nonPositional {
                 matches("-x", "value") {
@@ -243,6 +234,10 @@ class StringOptionTest : AbstractParseTest() {
                         doesNotMatch("-x", "value", message = "Option -x can only appear once")
                         doesNotMatch("-x", message = "Option -x can only appear once")
                     }
+                }
+                fails("-x", index = 1, message = "No value provided for option -x") {
+                    doesNotMatch("-x", "value", message = "Option -x can only appear once")
+                    doesNotMatch("-x", message = "Option -x can only appear once")
                 }
             }
             endOfInput(null)

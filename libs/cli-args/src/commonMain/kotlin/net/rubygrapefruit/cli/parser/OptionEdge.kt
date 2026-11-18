@@ -31,7 +31,7 @@ internal class StringOptionEdge(flags: List<String>, names: List<String>) : Opti
                 val value = args.second()
                 ParseEdge.Transition.Matched(2, OptionValue(value, first, this))
             } else {
-                ParseEdge.Transition.Matched(1, MissingOptionValueEdge(args.index + 1, first))
+                ParseEdge.Transition.Matched(1, MissingOptionValueEdge(args.index + 1, first, this))
             }
         } else {
             ParseEdge.Transition.NotMatched
@@ -39,21 +39,7 @@ internal class StringOptionEdge(flags: List<String>, names: List<String>) : Opti
     }
 }
 
-private class MissingOptionValueEdge(val index: Int, val matchedFlag: String) : ParseEdge.Failed, ParseNode {
-    override fun edges(consumer: (ParseEdge) -> Unit) {
-        consumer(this)
-    }
-
-    override fun failure(): ProblemAtIndex {
-        return ProblemAtIndex(index, MissingOptionValue(matchedFlag))
-    }
-}
-
-private class OptionValue(val value: Any, val matchedFlag: String, val source: OptionEdge) : ParseEdge.EndOfInput, ParseNode {
-    override fun edges(consumer: (ParseEdge) -> Unit) {
-        consumer(this)
-    }
-
+private abstract class AfterOptionEdge(val matchedFlag: String, val source: OptionEdge) : ParseEdge, ParseNode {
     override fun maybeClaimUnrecognized(args: InputArgs): Problem? {
         val first = args.first()
         return if (source.flags.contains(first)) {
@@ -67,6 +53,18 @@ private class OptionValue(val value: Any, val matchedFlag: String, val source: O
         }
     }
 
+    override fun edges(consumer: (ParseEdge) -> Unit) {
+        consumer(this)
+    }
+}
+
+private class MissingOptionValueEdge(val index: Int, matchedFlag: String, source: OptionEdge) : AfterOptionEdge(matchedFlag, source), ParseEdge.Failed {
+    override fun failure(): ProblemAtIndex {
+        return ProblemAtIndex(index, MissingOptionValue(matchedFlag))
+    }
+}
+
+private class OptionValue(val value: Any, matchedFlag: String, source: OptionEdge) : AfterOptionEdge(matchedFlag, source), ParseEdge.EndOfInput {
     override fun value(): Any {
         return value
     }

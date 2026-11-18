@@ -57,7 +57,7 @@ abstract class AbstractParseTest {
     protected fun Parser<*>.edges(config: Edges.() -> Unit) {
         val edges = mutableListOf<ParseEdge>()
         (this as ParserInternal<*>).edges(edges::add)
-        DefaultEdges(edges, this, emptyList()).check(config)
+        DefaultEdges(edges, EdgeContext(this)).check(config)
     }
 
     protected fun Parser<*>.help(help: String) {
@@ -223,14 +223,14 @@ abstract class AbstractParseTest {
     }
 
     protected interface Edges {
-        fun nonPositional(config: MatcherEdge.() -> Unit = {})
-        fun positional(config: MatcherEdge.() -> Unit = {})
-        fun endOfInput(value: Any?, config: Edge.() -> Unit = {})
+        fun nonPositional(config: (MatcherEdge.() -> Unit)? = null)
+        fun positional(config: (MatcherEdge.() -> Unit)? = null)
+        fun endOfInput(value: Any?, config: (Edge.() -> Unit)? = null)
         fun aborts(message: String)
     }
 
     @OptIn(ExperimentalKotlinTestApi::class)
-    private class DefaultEdges(val edges: List<ParseEdge>, val parser: Parser<*>, val previousArgs: List<String>) : Edges {
+    private class DefaultEdges(val edges: List<ParseEdge>, val context: EdgeContext) : Edges {
         private var current = 0
 
         fun check(config: Edges.() -> Unit) {
@@ -241,32 +241,38 @@ abstract class AbstractParseTest {
             }
 
             assertTrue(edges.isNotEmpty())
-            val required = edges.count { it is ParseEdge.NotEndOfInput }
-            val endOfInput = edges.count { it is ParseEdge.EndOfInput }
-            assertTrue(required > 0 || endOfInput > 0) { "expected a required or end-of-input edge in $edges" }
+            val terminating = edges.count { it is ParseEdge.Terminating }
+            assertTrue(terminating > 0) { "expected a terminating edge in $edges" }
         }
 
-        override fun nonPositional(config: MatcherEdge.() -> Unit) {
+        override fun nonPositional(config: (MatcherEdge.() -> Unit)?) {
             val edge = assertIs<ParseEdge.NonPositional>(edges[current])
-            DefaultMatcherEdge(edge, parser, previousArgs).config()
+            if (config != null) {
+                DefaultMatcherEdge(edge, context).config()
+            }
             current++
         }
 
-        override fun positional(config: MatcherEdge.() -> Unit) {
+        override fun positional(config: (MatcherEdge.() -> Unit)?) {
             val edge = assertIs<ParseEdge.Positional>(edges[current])
-            DefaultMatcherEdge(edge, parser, previousArgs).config()
+            if (config != null) {
+                DefaultMatcherEdge(edge, context).config()
+            }
             current++
         }
 
-        override fun endOfInput(value: Any?, config: Edge.() -> Unit) {
+        override fun endOfInput(value: Any?, config: (Edge.() -> Unit)?) {
             val edge = assertIs<ParseEdge.EndOfInput>(edges[current])
             assertEquals(value, edge.value())
 
-            assertEquals(value, parser.parse(previousArgs).get())
+            assertEquals(value, context.parser.parse(context.previousArgs).get())
 
-            assertEquals(value, (parser as ParserInternal<*>).parseUsingEdges(previousArgs).get())
+            assertEquals(value, (context.parser as ParserInternal<*>).parseUsingEdges(context.previousArgs).get())
 
-            DefaultEndOfInput(edge, parser, previousArgs).config()
+            if (config != null) {
+                DefaultEndOfInput(edge, context).config()
+            }
+
             current++
         }
 
@@ -284,48 +290,62 @@ abstract class AbstractParseTest {
     }
 
     protected interface MatcherEdge : Edge {
-        fun matches(firstArg: String, vararg moreArgs: String, config: Edges.() -> Unit)
+        fun matches(firstArg: String, vararg moreArgs: String, config: (Edges.() -> Unit)? = null)
 
-        fun fails(firstArg: String, vararg moreArgs: String, index: Int, message: String)
+        fun fails(firstArg: String, vararg moreArgs: String, index: Int, message: String, config: (Edge.() -> Unit)? = null)
     }
 
+    private class ExpectedProblem(val index: Int, val message: String)
+
+    private class EdgeContext(val parser: Parser<*>, val previousArgs: List<String>, val previousProblems: List<ExpectedProblem>) {
+        constructor(parser: Parser<*>) : this(parser, emptyList(), emptyList())
+
+        fun plusArgs(args: List<String>) = EdgeContext(parser, previousArgs + args, previousProblems)
+    }
+
+    @OptIn(ExperimentalKotlinTestApi::class)
     private abstract class DefaultEdge : Edge {
-        protected fun claimsUnrecognized(parser: Parser<*>, edge: ParseEdge, previousArgs: List<String>, args: List<String>, message: String) {
+        protected fun claimsUnrecognized(parser: Parser<*>, edge: ParseEdge, previousArgs: List<String>, args: List<String>, expectedProblems: List<ExpectedProblem>) {
             val allArgs = previousArgs + args
             val recognized = BooleanArray(allArgs.size)
             val args = DefaultInputArgs(previousArgs.size, allArgs, recognized)
 
             val claimedProblem = edge.maybeClaimUnrecognized(args)
             assertNotNull(claimedProblem)
-            assertEquals(message, claimedProblem.text())
+            assertEquals(expectedProblems.last().message, claimedProblem.text())
 
             val result = parser.parse(allArgs)
             assertIs<Parser.Failure>(result)
 
-            assertEquals(1, result.problems.size)
-            val parseProblem = result.problems.first()
-            assertEquals(message, parseProblem.problem.text())
-            assertEquals(previousArgs.size, parseProblem.index)
-        }
-    }
+            assertEquals(expectedProblems.size, result.problems.size) { "unexpected problems in ${result.problems}" }
+            expectedProblems.forEachIndexed { index, expectedProblem ->
+                val parseProblem = result.problems[index]
+                assertEquals(expectedProblem.message, parseProblem.problem.text())
+                assertEquals(expectedProblem.index, parseProblem.index)
 
-    private class DefaultEndOfInput(val edge: ParseEdge.EndOfInput, val parser: Parser<*>, val previousArgs: List<String>) : DefaultEdge() {
-        override fun doesNotMatch(firstArg: String, vararg moreArgs: String, message: String?) {
-            val args = listOf(firstArg) + moreArgs
-            if (message != null) {
-                claimsUnrecognized(parser, edge, previousArgs, args, message)
             }
         }
     }
 
-    private class DefaultMatcherEdge(val edge: ParseEdge.Matcher, val parser: Parser<*>, val previousArgs: List<String>) : DefaultEdge(), MatcherEdge {
-        override fun matches(firstArg: String, vararg moreArgs: String, config: Edges.() -> Unit) {
+    private class DefaultEndOfInput(val edge: ParseEdge.Terminating, val context: EdgeContext) : DefaultEdge() {
+        override fun doesNotMatch(firstArg: String, vararg moreArgs: String, message: String?) {
+            val args = listOf(firstArg) + moreArgs
+            if (message != null) {
+                claimsUnrecognized(context.parser, edge, context.previousArgs, args, context.previousProblems + ExpectedProblem(context.previousArgs.size, message))
+            }
+        }
+    }
+
+    private class DefaultMatcherEdge(val edge: ParseEdge.Matcher, val context: EdgeContext) : DefaultEdge(), MatcherEdge {
+        override fun matches(firstArg: String, vararg moreArgs: String, config: (Edges.() -> Unit)?) {
             val args = listOf(firstArg) + moreArgs
             val transition = next(args)
             assertIs<ParseEdge.Transition.Matched>(transition).apply {
                 val edges = mutableListOf<ParseEdge>()
                 next.edges(edges::add)
-                DefaultEdges(edges, parser, previousArgs + args).check(config)
+                if (config != null) {
+                    DefaultEdges(edges, context.plusArgs(args)).check(config)
+                }
                 assertEquals(moreArgs.size + 1, count)
             }
         }
@@ -336,11 +356,11 @@ abstract class AbstractParseTest {
             assertIs<ParseEdge.Transition.NotMatched>(transition)
 
             if (message != null) {
-                claimsUnrecognized(parser, edge, previousArgs, args, message)
+                claimsUnrecognized(context.parser, edge, context.previousArgs, args, context.previousProblems + ExpectedProblem(context.previousArgs.size, message))
             }
         }
 
-        override fun fails(firstArg: String, vararg moreArgs: String, index: Int, message: String) {
+        override fun fails(firstArg: String, vararg moreArgs: String, index: Int, message: String, config: (Edge.() -> Unit)?) {
             val args = listOf(firstArg) + moreArgs
             val transition = next(args)
             val matched = assertIs<ParseEdge.Transition.Matched>(transition)
@@ -352,13 +372,20 @@ abstract class AbstractParseTest {
                 assertEquals(message, problem.problem.text())
                 assertEquals(index, problem.index)
 
-                val result = parser.parse(args)
+                require(context.previousProblems.isEmpty())
+                val expectedProblem = ExpectedProblem(context.previousArgs.size + index, message)
+
+                val result = context.parser.parse(context.previousArgs + args)
                 assertIs<Parser.Failure>(result)
 
                 assertEquals(1, result.problems.size)
                 val parseProblem = result.problems.first()
                 assertEquals(message, parseProblem.problem.text())
-                assertEquals(index, parseProblem.index)
+                assertEquals(expectedProblem.index, parseProblem.index)
+
+                if (config != null) {
+                    DefaultEndOfInput(this, EdgeContext(context.parser, context.previousArgs + args, listOf(expectedProblem))).config()
+                }
             }
         }
 

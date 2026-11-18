@@ -13,13 +13,13 @@ class ZeroOrMoreStringPositionalTest : AbstractParseTest() {
                 matches("value 1") {
                     positional {
                         matches("value 2") {
-                            positional { }
+                            positional()
                             endOfInput(listOf("value 1", "value 2"))
                         }
                         matches("") {
                             positional {
                                 matches("value 2") {
-                                    positional { }
+                                    positional()
                                     endOfInput(listOf("value 1", "", "value 2"))
                                 }
                             }

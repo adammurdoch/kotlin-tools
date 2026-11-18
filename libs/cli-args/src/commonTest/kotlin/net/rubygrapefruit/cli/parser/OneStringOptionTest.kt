@@ -9,11 +9,13 @@ class OneStringOptionTest : AbstractParseTest() {
     fun `parses option with short name`() {
         val parser = params(option("a")) { a -> a?.length }
 
-        assertEquals(3, parser.parse("-a", "one").get())
-        assertEquals(null, parser.parse().get())
-
-        parser.fails("--a", "value") {
-            failure(0, "Unexpected option '--a'. Try '-a' instead")
+        parser.edges {
+            nonPositional {
+                matches("-a", "one") {
+                    endOfInput(3)
+                }
+            }
+            endOfInput(null)
         }
     }
 
@@ -33,6 +35,22 @@ class OneStringOptionTest : AbstractParseTest() {
         }
         parser.fails("value", "-a", "one") {
             failure(0, "Unexpected argument 'value'")
+        }
+    }
+
+    @Test
+    fun `option must be well formed`() {
+        val parser = params(option("a")) { a -> a?.length }
+
+        parser.fails("--a", "value") {
+            failure(0, "Unexpected option '--a'. Try '-a' instead")
+        }
+
+        parser.edges {
+            nonPositional {
+                doesNotMatch("--a", "value", count = 2, message = "Unexpected option '--a'. Try '-a' instead")
+            }
+            endOfInput(null)
         }
     }
 }

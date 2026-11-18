@@ -97,6 +97,10 @@ internal class AllOfParser<OUT>(
     }
 
     private class ElementNonPositional(val element: ElementNode, val edge: ParseEdge.NonPositional, val owner: ElementNodes) : ParseEdge.NonPositional {
+        override fun maybeClaimUnrecognized(args: InputArgs): ParseEdge.Claimed? {
+            return edge.maybeClaimUnrecognized(args)
+        }
+
         override fun next(args: InputArgs): ParseEdge.Transition {
             val transition = edge.next(args)
             return when (transition) {

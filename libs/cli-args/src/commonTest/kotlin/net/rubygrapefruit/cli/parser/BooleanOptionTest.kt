@@ -152,9 +152,6 @@ class BooleanOptionTest : AbstractParseTest() {
     fun `option cannot appear twice`() {
         val parser = option("x").boolean()
 
-        parser.fails("-x", "-x") {
-            failure(1, "Option -x can only appear once")
-        }
         parser.fails("-x", "value", "-x") {
             failure(1, "Unexpected argument 'value'")
             failure(2, "Option -x can only appear once")
@@ -162,6 +159,17 @@ class BooleanOptionTest : AbstractParseTest() {
         parser.fails("-x", "-x", "value") {
             failure(1, "Option -x can only appear once")
             failure(2, "Unexpected argument 'value'")
+        }
+
+        parser.edges {
+            nonPositional {
+                matches("-x") {
+                    endOfInput(true) {
+                        doesNotMatch("-x", message = "Option -x can only appear once")
+                    }
+                }
+            }
+            endOfInput(false)
         }
     }
 }

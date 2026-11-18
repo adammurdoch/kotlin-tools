@@ -18,7 +18,7 @@ internal class FlagEdge(flags: List<String>, names: List<String>, val value: Any
     override fun next(args: InputArgs): ParseEdge.Transition {
         val first = args.first()
         return if (flags.contains(first)) {
-            ParseEdge.Transition.Matched(1, FixedValue(value))
+            ParseEdge.Transition.Matched(1, OptionValue(value, first, this))
         } else {
             ParseEdge.Transition.NotMatched
         }

@@ -9,6 +9,7 @@ internal class DefaultCommand(private val text: String) : AbstractParser<Unit>()
 
     override fun edges(dest: MutableList<ParseEdge>) {
         dest.add(CommandEdge(text))
+        dest.add(RequiredCommend(text))
     }
 
     override fun usage(): UsageInternal {
@@ -28,6 +29,12 @@ internal class DefaultCommand(private val text: String) : AbstractParser<Unit>()
             } else {
                 ParseEdge.Transition.NotMatched
             }
+        }
+    }
+
+    private class RequiredCommend(private val text: String) : ParseEdge.Required {
+        override fun abort(): Problem {
+            return MissingCommand(text)
         }
     }
 

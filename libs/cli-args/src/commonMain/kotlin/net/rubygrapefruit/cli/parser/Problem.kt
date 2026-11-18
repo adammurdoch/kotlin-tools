@@ -63,7 +63,7 @@ internal class MissingOption(val option: String) : Problem {
     }
 }
 
-internal class MissingParameter(val name: String) : Problem {
+internal class MissingPositional(val name: String) : Problem {
     override fun writeTo(output: Output) {
         output.write("Parameter <$name> not provided")
     }

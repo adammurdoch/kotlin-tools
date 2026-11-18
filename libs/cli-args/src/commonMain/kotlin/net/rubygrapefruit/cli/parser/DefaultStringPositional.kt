@@ -17,6 +17,7 @@ internal class DefaultStringPositional(private val name: String, private val sum
 
     override fun edges(dest: MutableList<ParseEdge>) {
         dest.add(PositionalEdge)
+        dest.add(RequiredPositional(name))
     }
 
     override fun usage(): UsageInternal {
@@ -47,6 +48,12 @@ internal class DefaultStringPositional(private val name: String, private val sum
         }
     }
 
+    private class RequiredPositional(val name: String) : ParseEdge.Required {
+        override fun abort(): Problem {
+            return MissingPositional(name)
+        }
+    }
+
     private class State(val name: String) : ParseState<String> {
         private var result: String? = null
 
@@ -69,7 +76,7 @@ internal class DefaultStringPositional(private val name: String, private val sum
             return if (result != null) {
                 ParsedArguments.FixedResult(result!!)
             } else {
-                ParsedArguments.FixedProblems(listOf(ProblemAtIndex(index, MissingParameter(name))))
+                ParsedArguments.FixedProblems(listOf(ProblemAtIndex(index, MissingPositional(name))))
             }
         }
     }

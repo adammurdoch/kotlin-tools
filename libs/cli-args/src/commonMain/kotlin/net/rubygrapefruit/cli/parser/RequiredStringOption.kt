@@ -18,6 +18,7 @@ internal class RequiredStringOption(
 
     override fun edges(dest: MutableList<ParseEdge>) {
         dest.add(StringOptionEdge(flags))
+        dest.add(RequiredOption(flags))
     }
 
     private inner class OptionUsage : UsageInternal.OptionUsage {
@@ -35,6 +36,13 @@ internal class RequiredStringOption(
 
         override fun writeOptionSummaryTo(output: Output) {
             output.writeNullable(summary)
+        }
+    }
+
+    private class RequiredOption(val flags: List<String>) : ParseEdge.Required {
+        override fun abort(): Problem {
+            val longest = flags.maxBy { it.length }
+            return MissingOption(longest)
         }
     }
 

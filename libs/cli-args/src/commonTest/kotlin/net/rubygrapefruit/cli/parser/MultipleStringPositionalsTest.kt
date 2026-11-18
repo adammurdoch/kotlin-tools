@@ -31,8 +31,11 @@ class MultipleStringPositionalsTest : AbstractParseTest() {
                             endOfInput(listOf("one", "two"))
                         }
                     }
+                    aborts("Parameter <b> not provided")
                 }
             }
+            aborts("Parameter <a> not provided")
+            aborts("Parameter <b> not provided")
         }
     }
 

@@ -23,6 +23,7 @@ class StringPositionalTest : AbstractParseTest() {
                 }
                 doesNotMatch("-x")
             }
+            aborts("Parameter <param> not provided")
         }
     }
 

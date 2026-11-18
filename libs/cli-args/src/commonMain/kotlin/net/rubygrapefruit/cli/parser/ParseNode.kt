@@ -4,12 +4,19 @@ package net.rubygrapefruit.cli.parser
  * Represents some expectation of the next input argument
  */
 internal sealed interface ParseNode {
+    /**
+     * Constraint: must include at least one [ParseEdge.Required] or at least one [ParseEdge.EndOfInput].
+     */
     fun edges(dest: MutableList<ParseEdge>)
 }
 
 internal sealed interface ParseEdge {
     sealed interface Matcher : ParseEdge {
         fun next(args: InputArgs): Transition
+    }
+
+    sealed interface Required : ParseEdge {
+        fun abort(): Problem
     }
 
     sealed interface NonPositional : Matcher

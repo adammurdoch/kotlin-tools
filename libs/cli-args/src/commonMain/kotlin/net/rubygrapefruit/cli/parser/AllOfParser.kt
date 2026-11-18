@@ -79,6 +79,7 @@ internal class AllOfParser<OUT>(
                     }
                     hasPositional = true
                 }
+                dest.addAll(element.required)
             }
             if (elements.all { it.endOfInput != null }) {
                 dest.add(LazyValue { map(elements.map { ParsedArguments.FixedResult(it.endOfInput!!.value()) }) })
@@ -89,6 +90,7 @@ internal class AllOfParser<OUT>(
     private class ElementNode(val element: ParserInternal<*>, edges: List<ParseEdge>) {
         val nonPositional = edges.filterIsInstance<ParseEdge.NonPositional>()
         val positional = edges.filterIsInstance<ParseEdge.Positional>()
+        val required = edges.filterIsInstance<ParseEdge.Required>()
         val endOfInput = edges.filterIsInstance<ParseEdge.EndOfInput>().firstOrNull()
     }
 

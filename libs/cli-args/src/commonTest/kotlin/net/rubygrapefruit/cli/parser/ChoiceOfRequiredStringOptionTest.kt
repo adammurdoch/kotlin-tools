@@ -31,16 +31,19 @@ class ChoiceOfRequiredStringOptionTest : AbstractParseTest() {
                     endOfInput("value")
                 }
             }
+            aborts("Option -a not provided")
             nonPositional {
                 matches("-b", "value") {
                     endOfInput("value")
                 }
             }
+            aborts("Option -b not provided")
             nonPositional {
                 matches("--long", "value") {
                     endOfInput("value")
                 }
             }
+            aborts("Option --long not provided")
         }
     }
 

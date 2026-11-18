@@ -41,6 +41,24 @@ class RequiredStringOptionTest : AbstractParseTest() {
                 fails("-x", index = 1, message = "No value provided for option -x")
                 fails("-x", "-y", index = 1, message = "No value provided for option -x")
             }
+            aborts("Option -x not provided")
+        }
+    }
+
+    @Test
+    fun `option with multiple names composes`() {
+        val parser = option("long", "x").required()
+
+        parser.edges {
+            nonPositional {
+                matches("-x", "value") {
+                    endOfInput("value")
+                }
+                matches("--long", "value") {
+                    endOfInput("value")
+                }
+            }
+            aborts("Option --long not provided")
         }
     }
 

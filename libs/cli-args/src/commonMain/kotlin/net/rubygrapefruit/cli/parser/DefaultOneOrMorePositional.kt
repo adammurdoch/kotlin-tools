@@ -47,7 +47,7 @@ internal class DefaultOneOrMorePositional(private val name: String, private val 
             return if (result.isNotEmpty()) {
                 ParsedArguments.FixedResult(result)
             } else {
-                ParsedArguments.FixedProblems(listOf(ProblemAtIndex(index, MissingParameter(name))))
+                ParsedArguments.FixedProblems(listOf(ProblemAtIndex(index, MissingPositional(name))))
             }
         }
     }

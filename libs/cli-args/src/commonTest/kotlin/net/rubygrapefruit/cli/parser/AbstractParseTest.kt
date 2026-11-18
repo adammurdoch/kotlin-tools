@@ -229,10 +229,10 @@ abstract class AbstractParseTest {
     }
 
     protected interface Edges {
-        fun skip()
         fun nonPositional(config: Edge.() -> Unit = {})
         fun positional(config: Edge.() -> Unit = {})
         fun endOfInput(value: Any?)
+        fun aborts(message: String)
     }
 
     @OptIn(ExperimentalKotlinTestApi::class)
@@ -245,10 +245,11 @@ abstract class AbstractParseTest {
             assertEquals(current, edges.size) {
                 "Unexpected edges found in $edges"
             }
-        }
 
-        override fun skip() {
-            current = edges.size
+            assertTrue(edges.isNotEmpty())
+            val required = edges.count { it is ParseEdge.Required }
+            val endOfInput = edges.count { it is ParseEdge.EndOfInput }
+            assertTrue(required > 0 || endOfInput > 0) { "expected a required or end-of-input edge in $edges" }
         }
 
         override fun nonPositional(config: Edge.() -> Unit) {
@@ -266,6 +267,14 @@ abstract class AbstractParseTest {
         override fun endOfInput(value: Any?) {
             val edge = assertIs<ParseEdge.EndOfInput>(edges[current])
             assertEquals(value, edge.value())
+            current++
+        }
+
+        override fun aborts(message: String) {
+            val edge = assertIs<ParseEdge.Required>(edges[current])
+            val buffer = BufferingOutput()
+            edge.abort().writeTo(buffer)
+            assertEquals(message, buffer.text)
             current++
         }
     }

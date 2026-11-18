@@ -8,8 +8,21 @@ class RequiredStringOptionTest : AbstractParseTest() {
     fun `parses option with short name`() {
         val parser = option("x").required()
 
-        assertEquals("value", parser.parse("-x", "value").get())
-        assertEquals("", parser.parse("-x", "").get())
+        parser.edges {
+            nonPositional {
+                matches("-x", "value") {
+                    endOfInput("value")
+                }
+                matches("-x", "") {
+                    endOfInput("")
+                }
+                doesNotMatch("unknown")
+                doesNotMatch("--other")
+                fails("-x", index = 1, message = "No value provided for option -x")
+                fails("-x", "-y", index = 1, message = "No value provided for option -x")
+            }
+            aborts("Option -x not provided")
+        }
     }
 
     @Test
@@ -25,40 +38,16 @@ class RequiredStringOptionTest : AbstractParseTest() {
 
         assertEquals("value", parser.parse("--some-option", "value").get())
         assertEquals("value", parser.parse("-x", "value").get())
-    }
-
-    @Test
-    fun `option with short name composes`() {
-        val parser = option("x").required()
-
         parser.edges {
             nonPositional {
                 matches("-x", "value") {
                     endOfInput("value")
                 }
-                doesNotMatch("unknown")
-                doesNotMatch("--other")
-                fails("-x", index = 1, message = "No value provided for option -x")
-                fails("-x", "-y", index = 1, message = "No value provided for option -x")
-            }
-            aborts("Option -x not provided")
-        }
-    }
-
-    @Test
-    fun `option with multiple names composes`() {
-        val parser = option("long", "x").required()
-
-        parser.edges {
-            nonPositional {
-                matches("-x", "value") {
-                    endOfInput("value")
-                }
-                matches("--long", "value") {
+                matches("--some-option", "value") {
                     endOfInput("value")
                 }
             }
-            aborts("Option --long not provided")
+            aborts("Option --some-option not provided")
         }
     }
 

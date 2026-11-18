@@ -57,7 +57,7 @@ abstract class AbstractParseTest {
     protected fun Parser<*>.edges(config: Edges.() -> Unit) {
         val edges = mutableListOf<ParseEdge>()
         (this as ParserInternal<*>).edges(edges)
-        DefaultEdges(edges).check(config)
+        DefaultEdges(edges, this, emptyList()).check(config)
     }
 
     protected fun Parser<*>.help(help: String) {
@@ -236,7 +236,7 @@ abstract class AbstractParseTest {
     }
 
     @OptIn(ExperimentalKotlinTestApi::class)
-    private class DefaultEdges(val edges: List<ParseEdge>) : Edges {
+    private class DefaultEdges(val edges: List<ParseEdge>, val parser: Parser<*>, val previousArgs: List<String>) : Edges {
         private var current = 0
 
         fun check(config: Edges.() -> Unit) {
@@ -254,19 +254,20 @@ abstract class AbstractParseTest {
 
         override fun nonPositional(config: Edge.() -> Unit) {
             val edge = assertIs<ParseEdge.NonPositional>(edges[current])
-            DefaultEdge(edge).config()
+            DefaultEdge(edge, parser, previousArgs).config()
             current++
         }
 
         override fun positional(config: Edge.() -> Unit) {
             val edge = assertIs<ParseEdge.Positional>(edges[current])
-            DefaultEdge(edge).config()
+            DefaultEdge(edge, parser, previousArgs).config()
             current++
         }
 
         override fun endOfInput(value: Any?) {
             val edge = assertIs<ParseEdge.EndOfInput>(edges[current])
             assertEquals(value, edge.value())
+            assertEquals(value, parser.parse(previousArgs).get())
             current++
         }
 
@@ -287,13 +288,14 @@ abstract class AbstractParseTest {
         fun fails(firstArg: String, vararg moreArgs: String, index: Int, message: String)
     }
 
-    private class DefaultEdge(val edge: ParseEdge.Matcher) : Edge {
+    private class DefaultEdge(val edge: ParseEdge.Matcher, val parser: Parser<*>, val previousArgs: List<String>) : Edge {
         override fun matches(firstArg: String, vararg moreArgs: String, config: Edges.() -> Unit) {
-            val transition = next(firstArg, moreArgs)
+            val args = listOf(firstArg) + moreArgs
+            val transition = next(args)
             assertIs<ParseEdge.Transition.Matched>(transition).apply {
                 val edges = mutableListOf<ParseEdge>()
                 next.edges(edges)
-                DefaultEdges(edges).check(config)
+                DefaultEdges(edges, parser, previousArgs + args).check(config)
                 assertEquals(moreArgs.size + 1, count)
             }
         }
@@ -314,9 +316,11 @@ abstract class AbstractParseTest {
         }
 
         private fun next(firstArg: String, moreArgs: Array<out String>): ParseEdge.Transition {
-            val args = listOf(firstArg) + moreArgs
-            val transition = edge.next(DefaultInputArgs(0, args, BooleanArray(args.size)))
-            return transition
+            return next(listOf(firstArg) + moreArgs)
+        }
+
+        private fun next(args: List<String>): ParseEdge.Transition {
+            return edge.next(DefaultInputArgs(0, args, BooleanArray(args.size)))
         }
     }
 }

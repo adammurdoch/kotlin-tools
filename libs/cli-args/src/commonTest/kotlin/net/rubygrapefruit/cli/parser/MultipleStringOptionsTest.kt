@@ -9,19 +9,35 @@ class MultipleStringOptionsTest : AbstractParseTest() {
     fun `parses two options with short name in any order`() {
         val parser = params(option("a"), option("b")) { a, b -> listOf(a, b) }
 
-        assertEquals(listOf("one", "two"), parser.parse("-a", "one", "-b", "two").get())
-        assertEquals(listOf("one", "two"), parser.parse("-b", "two", "-a", "one").get())
-
-        assertEquals(listOf("one", null), parser.parse("-a", "one").get())
-        assertEquals(listOf(null, "two"), parser.parse("-b", "two").get())
-
-        assertEquals(listOf(null, null), parser.parse().get())
-
         parser.fails("--a", "value", "-b", "value") {
             failure(0, "Unexpected option '--a'. Try '-a' instead")
         }
         parser.fails("-a", "value", "--b", "value") {
             failure(2, "Unexpected option '--b'. Try '-b' instead")
+        }
+
+        parser.edges {
+            nonPositional {
+                matches("-a", "one") {
+                    nonPositional {
+                        matches("-b", "two") {
+                            endOfInput(listOf("one", "two"))
+                        }
+                    }
+                    endOfInput(listOf("one", null))
+                }
+            }
+            nonPositional {
+                matches("-b", "two") {
+                    nonPositional {
+                        matches("-a", "one") {
+                            endOfInput(listOf("one", "two"))
+                        }
+                    }
+                    endOfInput(listOf(null, "two"))
+                }
+            }
+            endOfInput(listOf(null, null))
         }
     }
 
@@ -99,35 +115,6 @@ class MultipleStringOptionsTest : AbstractParseTest() {
         assertEquals(listOf(null, null, null, null, "5"), parser.parse("--last", "5").get())
 
         assertEquals(listOf(null, null, null, null, null), parser.parse().get())
-    }
-
-    @Test
-    fun `composes for two options with short name`() {
-        val parser = params(option("a"), option("b")) { a, b -> listOf(a, b) }
-
-        parser.edges {
-            nonPositional {
-                matches("-a", "one") {
-                    nonPositional {
-                        matches("-b", "two") {
-                            endOfInput(listOf("one", "two"))
-                        }
-                    }
-                    endOfInput(listOf("one", null))
-                }
-            }
-            nonPositional {
-                matches("-b", "two") {
-                    nonPositional {
-                        matches("-a", "one") {
-                            endOfInput(listOf("one", "two"))
-                        }
-                    }
-                    endOfInput(listOf(null, "two"))
-                }
-            }
-            endOfInput(listOf(null, null))
-        }
     }
 
     @Test

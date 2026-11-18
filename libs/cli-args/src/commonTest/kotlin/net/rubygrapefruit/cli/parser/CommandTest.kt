@@ -9,14 +9,23 @@ class CommandTest : AbstractParseTest() {
     fun `parses command`() {
         val parser = command("help")
 
-        assertEquals(Unit, parser.parse("help").get())
+        parser.edges {
+            positional {
+                matches("help") {
+                    endOfInput(Unit)
+                }
+                doesNotMatch("other")
+                doesNotMatch("-x")
+            }
+            aborts("Expected 'help'")
+        }
     }
 
     @Test
     fun `name must be well formed`() {
         val candidates = listOf(
             "" to "Command name cannot be empty",
-            "-"  to "Command name '-' cannot start with '-'",
+            "-" to "Command name '-' cannot start with '-'",
             "-x" to "Command name '-x' cannot start with '-'",
             "two words" to "Command name 'two words' cannot contain whitespace"
         )
@@ -27,22 +36,6 @@ class CommandTest : AbstractParseTest() {
             }.apply {
                 assertEquals(expected, message)
             }
-        }
-    }
-
-    @Test
-    fun composes() {
-        val parser = command("help")
-
-        parser.edges {
-            positional {
-                matches("help") {
-                    endOfInput(Unit)
-                }
-                doesNotMatch("other")
-                doesNotMatch("-x")
-            }
-            aborts("Expected 'help'")
         }
     }
 
@@ -59,7 +52,7 @@ class CommandTest : AbstractParseTest() {
     fun `cannot include other input values`() {
         val parser = command("help")
 
-       parser.fails("HELP") {
+        parser.fails("HELP") {
             failure(0, "Unexpected argument 'HELP'. Expected 'help' instead")
         }
         parser.fails("help", "HELP") {

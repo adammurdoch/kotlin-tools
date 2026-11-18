@@ -9,9 +9,21 @@ class StringOptionTest : AbstractParseTest() {
     fun `parses option with short name`() {
         val parser = option("x")
 
-        assertEquals("value", parser.parse("-x", "value").get())
-        assertEquals("", parser.parse("-x", "").get())
-        assertNull(parser.parse().get())
+        parser.edges {
+            nonPositional {
+                matches("-x", "value") {
+                    endOfInput("value")
+                }
+                matches("-x", "") {
+                    endOfInput("")
+                }
+                doesNotMatch("unknown")
+                doesNotMatch("--other")
+                fails("-x", index = 1, message = "No value provided for option -x")
+                fails("-x", "-y", index = 1, message = "No value provided for option -x")
+            }
+            endOfInput(null)
+        }
     }
 
     @Test
@@ -27,50 +39,27 @@ class StringOptionTest : AbstractParseTest() {
     fun `parses option with multiple names`() {
         val parser = option("x", "long-x", "y", "option-x")
 
-        assertEquals("value", parser.parse("-x", "value").get())
-        assertEquals("", parser.parse("-x", "").get())
-
-        assertEquals("value", parser.parse("--long-x", "value").get())
-        assertEquals("value", parser.parse("-y", "value").get())
-        assertEquals("value", parser.parse("--option-x", "value").get())
-
-        assertNull(parser.parse().get())
-    }
-
-    @Test
-    fun `option with short name composes`() {
-        val parser = option("x")
-
         parser.edges {
             nonPositional {
                 matches("-x", "value") {
                     endOfInput("value")
                 }
-                doesNotMatch("unknown")
-                doesNotMatch("--other")
-                fails("-x", index = 1, message = "No value provided for option -x")
-                fails("-x", "-y", index = 1, message = "No value provided for option -x")
-            }
-            endOfInput(null)
-        }
-    }
-
-    @Test
-    fun `option with multiple names composes`() {
-        val parser = option("long", "x")
-
-        parser.edges {
-            nonPositional {
-                matches("-x", "value") {
+                matches("-x", "") {
+                    endOfInput("")
+                }
+                matches("--long-x", "value") {
                     endOfInput("value")
                 }
-                matches("--long", "value") {
+                matches("-y", "value") {
+                    endOfInput("value")
+                }
+                matches("--option-x", "value") {
                     endOfInput("value")
                 }
                 doesNotMatch("unknown")
                 doesNotMatch("--other")
                 fails("-x", index = 1, message = "No value provided for option -x")
-                fails("--long", index = 1, message = "No value provided for option --long")
+                fails("--long-x", index = 1, message = "No value provided for option --long-x")
                 fails("-x", "-y", index = 1, message = "No value provided for option -x")
             }
             endOfInput(null)

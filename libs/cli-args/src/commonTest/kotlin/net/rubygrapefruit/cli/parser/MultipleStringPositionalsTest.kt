@@ -9,20 +9,6 @@ class MultipleStringPositionalsTest : AbstractParseTest() {
     fun `parses two positionals in order`() {
         val parser = params(positional("a"), positional("b")) { a, b -> listOf(a, b) }
 
-        assertEquals(listOf("one", "two"), parser.parse("one", "two").get())
-    }
-
-    @Test
-    fun `parses three positionals in order`() {
-        val parser = params(positional("a"), positional("b"), positional("c")) { a, b, c -> listOf(a, b, c) }
-
-        assertEquals(listOf("one", "two", "three"), parser.parse("one", "two", "three").get())
-    }
-
-    @Test
-    fun `composes for two positionals in order`() {
-        val parser = params(positional("a"), positional("b")) { a, b -> listOf(a, b) }
-
         parser.edges {
             positional {
                 matches("one") {
@@ -36,6 +22,33 @@ class MultipleStringPositionalsTest : AbstractParseTest() {
             }
             aborts("Parameter <a> not provided")
             aborts("Parameter <b> not provided")
+        }
+    }
+
+    @Test
+    fun `parses three positionals in order`() {
+        val parser = params(positional("a"), positional("b"), positional("c")) { a, b, c -> listOf(a, b, c) }
+
+        parser.edges {
+            positional {
+                matches("one") {
+                    positional {
+                        matches("two") {
+                            positional {
+                                matches("three") {
+                                    endOfInput(listOf("one", "two", "three"))
+                                }
+                            }
+                            aborts("Parameter <c> not provided")
+                        }
+                    }
+                    aborts("Parameter <b> not provided")
+                    aborts("Parameter <c> not provided")
+                }
+            }
+            aborts("Parameter <a> not provided")
+            aborts("Parameter <b> not provided")
+            aborts("Parameter <c> not provided")
         }
     }
 

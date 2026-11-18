@@ -1,7 +1,6 @@
 package net.rubygrapefruit.cli.parser
 
 import kotlin.test.Test
-import kotlin.test.assertEquals
 
 class ChoiceOfRequiredStringOptionTest : AbstractParseTest() {
     @Test
@@ -12,35 +11,22 @@ class ChoiceOfRequiredStringOptionTest : AbstractParseTest() {
             option("long").required()
         )
 
-        assertEquals("one", parser.parse("-a", "one").get())
-        assertEquals("two", parser.parse("-b", "two").get())
-        assertEquals("three", parser.parse("--long", "three").get())
-    }
-
-    @Test
-    fun composes() {
-        val parser = oneOf(
-            option("a").required(),
-            option("b").required(),
-            option("long").required()
-        )
-
         parser.edges {
             nonPositional {
-                matches("-a", "value") {
-                    endOfInput("value")
+                matches("-a", "one") {
+                    endOfInput("one")
                 }
             }
             aborts("Option -a not provided")
             nonPositional {
-                matches("-b", "value") {
-                    endOfInput("value")
+                matches("-b", "two") {
+                    endOfInput("two")
                 }
             }
             aborts("Option -b not provided")
             nonPositional {
-                matches("--long", "value") {
-                    endOfInput("value")
+                matches("--long", "three") {
+                    endOfInput("three")
                 }
             }
             aborts("Option --long not provided")

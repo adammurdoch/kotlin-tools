@@ -8,18 +8,13 @@ class StringPositionalTest : AbstractParseTest() {
     fun `parses positional`() {
         val parser = positional("param")
 
-        assertEquals("value", parser.parse("value").get())
-        assertEquals("", parser.parse("").get())
-    }
-
-    @Test
-    fun composes() {
-        val parser = positional("param")
-
         parser.edges {
             positional {
                 matches("value") {
                     endOfInput("value")
+                }
+                matches("") {
+                    endOfInput("")
                 }
                 doesNotMatch("-x")
             }

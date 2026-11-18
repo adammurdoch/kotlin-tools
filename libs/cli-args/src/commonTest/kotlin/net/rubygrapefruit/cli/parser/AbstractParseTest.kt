@@ -286,7 +286,15 @@ abstract class AbstractParseTest {
     }
 
     protected interface Edge {
-        fun doesNotMatch(firstArg: String, vararg moreArgs: String, message: String? = null)
+        /**
+         * Fails with generic unexpected message
+         */
+        fun doesNotMatch(firstArg: String, vararg moreArgs: String)
+
+        /**
+         * Fails with specific message
+         */
+        fun doesNotMatch(firstArg: String, vararg moreArgs: String, count: Int = 1, message: String)
     }
 
     protected interface MatcherEdge : Edge {
@@ -305,14 +313,15 @@ abstract class AbstractParseTest {
 
     @OptIn(ExperimentalKotlinTestApi::class)
     private abstract class DefaultEdge : Edge {
-        protected fun claimsUnrecognized(parser: Parser<*>, edge: ParseEdge, previousArgs: List<String>, args: List<String>, expectedProblems: List<ExpectedProblem>) {
+        protected fun claimsUnrecognized(parser: Parser<*>, edge: ParseEdge, previousArgs: List<String>, args: List<String>, count: Int, expectedProblems: List<ExpectedProblem>) {
             val allArgs = previousArgs + args
             val recognized = BooleanArray(allArgs.size)
             val args = DefaultInputArgs(previousArgs.size, allArgs, recognized)
 
             val claimedProblem = edge.maybeClaimUnrecognized(args)
             assertNotNull(claimedProblem)
-            assertEquals(expectedProblems.last().message, claimedProblem.text())
+            assertEquals(expectedProblems.last().message, claimedProblem.problem.text())
+            assertEquals(count, claimedProblem.count)
 
             val result = parser.parse(allArgs)
             assertIs<Parser.Failure>(result)
@@ -328,11 +337,13 @@ abstract class AbstractParseTest {
     }
 
     private class DefaultEndOfInput(val edge: ParseEdge.Terminating, val context: EdgeContext) : DefaultEdge() {
-        override fun doesNotMatch(firstArg: String, vararg moreArgs: String, message: String?) {
+        override fun doesNotMatch(firstArg: String, vararg moreArgs: String) {
+            throw IllegalStateException()
+        }
+
+        override fun doesNotMatch(firstArg: String, vararg moreArgs: String, count: Int, message: String) {
             val args = listOf(firstArg) + moreArgs
-            if (message != null) {
-                claimsUnrecognized(context.parser, edge, context.previousArgs, args, context.previousProblems + ExpectedProblem(context.previousArgs.size, message))
-            }
+            claimsUnrecognized(context.parser, edge, context.previousArgs, args, count, context.previousProblems + ExpectedProblem(context.previousArgs.size, message))
         }
     }
 
@@ -350,13 +361,21 @@ abstract class AbstractParseTest {
             }
         }
 
-        override fun doesNotMatch(firstArg: String, vararg moreArgs: String, message: String?) {
+        override fun doesNotMatch(firstArg: String, vararg moreArgs: String) {
+            checkDoesNotMatch(firstArg, moreArgs, 1, null)
+        }
+
+        override fun doesNotMatch(firstArg: String, vararg moreArgs: String, count: Int, message: String) {
+            checkDoesNotMatch(firstArg, moreArgs, count, message)
+        }
+
+        private fun checkDoesNotMatch(firstArg: String, moreArgs: Array<out String>, count: Int, message: String?) {
             val args = listOf(firstArg) + moreArgs
             val transition = next(args)
             assertIs<ParseEdge.Transition.NotMatched>(transition)
 
             if (message != null) {
-                claimsUnrecognized(context.parser, edge, context.previousArgs, args, context.previousProblems + ExpectedProblem(context.previousArgs.size, message))
+                claimsUnrecognized(context.parser, edge, context.previousArgs, args, count, context.previousProblems + ExpectedProblem(context.previousArgs.size, message))
             }
         }
 

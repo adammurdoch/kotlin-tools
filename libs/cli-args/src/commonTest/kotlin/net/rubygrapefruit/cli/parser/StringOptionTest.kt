@@ -151,13 +151,13 @@ class StringOptionTest : AbstractParseTest() {
             nonPositional {
                 matches("-x", "value") {
                     endOfInput("value") {
-                        doesNotMatch("--x", "value", message = "Unexpected option '--x'. Try '-x' instead")
+                        doesNotMatch("--x", "value", count = 2, message = "Unexpected option '--x'. Try '-x' instead")
                     }
                 }
-                doesNotMatch("--x", "value", message = "Unexpected option '--x'. Try '-x' instead")
+                doesNotMatch("--x", "value", count = 2, message = "Unexpected option '--x'. Try '-x' instead")
                 doesNotMatch("--x", message = "Unexpected option '--x'. Try '-x' instead")
-                doesNotMatch("-X", "value", message = "Unexpected option '-X'. Try '-x' instead")
-                doesNotMatch("--X", "value", message = "Unexpected option '--X'. Try '-x' instead")
+                doesNotMatch("-X", "value", count = 2, message = "Unexpected option '-X'. Try '-x' instead")
+                doesNotMatch("--X", "value", count = 2, message = "Unexpected option '--X'. Try '-x' instead")
             }
             endOfInput(null)
         }
@@ -231,12 +231,12 @@ class StringOptionTest : AbstractParseTest() {
             nonPositional {
                 matches("-x", "value") {
                     endOfInput("value") {
-                        doesNotMatch("-x", "value", message = "Option -x can only appear once")
+                        doesNotMatch("-x", "value", count = 2, message = "Option -x can only appear once")
                         doesNotMatch("-x", message = "Option -x can only appear once")
                     }
                 }
                 fails("-x", index = 1, message = "No value provided for option -x") {
-                    doesNotMatch("-x", "value", message = "Option -x can only appear once")
+                    doesNotMatch("-x", "value", count = 2, message = "Option -x can only appear once")
                     doesNotMatch("-x", message = "Option -x can only appear once")
                 }
             }
@@ -260,15 +260,15 @@ class StringOptionTest : AbstractParseTest() {
             nonPositional {
                 matches("-x", "value") {
                     endOfInput("value") {
-                        doesNotMatch("-x", "value", message = "Option -x can only appear once")
+                        doesNotMatch("-x", "value", count = 2, message = "Option -x can only appear once")
                         doesNotMatch("-x", message = "Option -x can only appear once")
                         doesNotMatch("--long", message = "Option --long cannot be used with -x")
-                        doesNotMatch("--long", "value", message = "Option --long cannot be used with -x")
+                        doesNotMatch("--long", "value", count = 2, message = "Option --long cannot be used with -x")
                     }
                 }
                 matches("--long", "value") {
                     endOfInput("value") {
-                        doesNotMatch("--long", "value", message = "Option --long can only appear once")
+                        doesNotMatch("--long", "value", count = 2, message = "Option --long can only appear once")
                         doesNotMatch("-x", message = "Option -x cannot be used with --long")
                     }
                 }

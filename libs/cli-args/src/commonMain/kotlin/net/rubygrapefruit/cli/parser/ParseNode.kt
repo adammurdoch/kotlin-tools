@@ -12,9 +12,11 @@ internal sealed interface ParseNode {
 }
 
 internal sealed interface ParseEdge {
-    fun maybeClaimUnrecognized(args: InputArgs): Problem? {
+    fun maybeClaimUnrecognized(args: InputArgs): Claimed? {
         return null
     }
+
+    class Claimed(val count: Int, val problem: Problem)
 
     sealed interface Matcher : ParseEdge {
         fun next(args: InputArgs): Transition
@@ -30,7 +32,7 @@ internal sealed interface ParseEdge {
      */
     sealed interface Positional : Matcher
 
-    sealed interface Terminating: ParseEdge
+    sealed interface Terminating : ParseEdge
 
     /**
      * Expects end of input, then succeeds with the given value

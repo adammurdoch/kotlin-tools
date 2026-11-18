@@ -1,15 +1,17 @@
 package net.rubygrapefruit.cli.parser
 
 internal abstract class OptionEdge(val flags: List<String>, val names: List<String>) : ParseEdge.NonPositional {
-    override fun maybeClaimUnrecognized(args: InputArgs): Problem? {
+    override fun maybeClaimUnrecognized(args: InputArgs): ParseEdge.Claimed? {
         val first = args.first()
         names.forEachIndexed { index, name ->
             if (first.equals("-$name", true) || first.equals("--$name", true)) {
-                return UnexpectedOption(first, flags[index])
+                return ParseEdge.Claimed(claim(args), UnexpectedOption(first, flags[index]))
             }
         }
         return null
     }
+
+    abstract fun claim(args: InputArgs): Int
 }
 
 internal class FlagEdge(flags: List<String>, names: List<String>, val value: Any) : OptionEdge(flags, names) {
@@ -20,6 +22,10 @@ internal class FlagEdge(flags: List<String>, names: List<String>, val value: Any
         } else {
             ParseEdge.Transition.NotMatched
         }
+    }
+
+    override fun claim(args: InputArgs): Int {
+        return 1
     }
 }
 
@@ -37,16 +43,20 @@ internal class StringOptionEdge(flags: List<String>, names: List<String>) : Opti
             ParseEdge.Transition.NotMatched
         }
     }
+
+    override fun claim(args: InputArgs): Int {
+        return if (args.hasSecond() && !args.secondIsOption()) 2 else 1
+    }
 }
 
 private abstract class AfterOptionEdge(val matchedFlag: String, val source: OptionEdge) : ParseEdge, ParseNode {
-    override fun maybeClaimUnrecognized(args: InputArgs): Problem? {
+    override fun maybeClaimUnrecognized(args: InputArgs): ParseEdge.Claimed? {
         val first = args.first()
         return if (source.flags.contains(first)) {
             if (first == matchedFlag) {
-                RepeatedOption(first, null)
+                ParseEdge.Claimed(source.claim(args), RepeatedOption(first, null))
             } else {
-                RepeatedOption(first, matchedFlag)
+                ParseEdge.Claimed(source.claim(args), RepeatedOption(first, matchedFlag))
             }
         } else {
             source.maybeClaimUnrecognized(args)

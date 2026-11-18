@@ -1,7 +1,6 @@
 package net.rubygrapefruit.cli.parser
 
 import kotlin.test.Test
-import kotlin.test.assertEquals
 
 class ZeroOrMoreStringPositionalTest : AbstractParseTest() {
     @Test

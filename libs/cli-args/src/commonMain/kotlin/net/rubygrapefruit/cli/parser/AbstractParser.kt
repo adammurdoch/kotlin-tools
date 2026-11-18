@@ -75,15 +75,22 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
 
             val current = DefaultInputArgs(index, args, recognized)
             val claimed = candidates.firstNotNullOfOrNull { it.edge.maybeClaimUnrecognized(current) }
-            val problem = if (claimed != null) {
-                claimed
-            } else if (current.firstIsOption()) {
-                UnexpectedOption(current.first())
+            if (claimed != null) {
+                unrecognizedProblems.add(ProblemAtIndex(index, claimed.problem))
+                if (claimed.count > 1 && !recognized[index + 1]) {
+                    index += 2
+                } else {
+                    index++
+                }
             } else {
-                UnexpectedArgument(current.first())
+                val problem = if (current.firstIsOption()) {
+                    UnexpectedOption(current.first())
+                } else {
+                    UnexpectedArgument(current.first())
+                }
+                unrecognizedProblems.add(ProblemAtIndex(index, problem))
+                index++
             }
-            unrecognizedProblems.add(ProblemAtIndex(index, problem))
-            index++
         }
 
         if (unrecognizedProblems.isNotEmpty()) {

@@ -40,8 +40,8 @@ internal class StringOptionEdge(flags: List<String>, names: List<String>) : Opti
 }
 
 private class OptionValue(val value: Any, val matchedFlag: String, val source: OptionEdge) : ParseEdge.EndOfInput, ParseNode {
-    override fun edges(dest: MutableList<ParseEdge>) {
-        dest.add(this)
+    override fun edges(consumer: (ParseEdge) -> Unit) {
+        consumer(this)
     }
 
     override fun maybeClaimUnrecognized(args: InputArgs): Problem? {

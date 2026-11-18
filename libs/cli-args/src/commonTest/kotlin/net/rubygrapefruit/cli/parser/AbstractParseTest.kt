@@ -56,7 +56,7 @@ abstract class AbstractParseTest {
 
     protected fun Parser<*>.edges(config: Edges.() -> Unit) {
         val edges = mutableListOf<ParseEdge>()
-        (this as ParserInternal<*>).edges(edges)
+        (this as ParserInternal<*>).edges(edges::add)
         DefaultEdges(edges, this, emptyList()).check(config)
     }
 
@@ -324,7 +324,7 @@ abstract class AbstractParseTest {
             val transition = next(args)
             assertIs<ParseEdge.Transition.Matched>(transition).apply {
                 val edges = mutableListOf<ParseEdge>()
-                next.edges(edges)
+                next.edges(edges::add)
                 DefaultEdges(edges, parser, previousArgs + args).check(config)
                 assertEquals(moreArgs.size + 1, count)
             }

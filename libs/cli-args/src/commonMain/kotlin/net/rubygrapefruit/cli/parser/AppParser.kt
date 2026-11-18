@@ -18,8 +18,8 @@ internal class AppParser(
         return parser().startAll()
     }
 
-    override fun edges(dest: MutableList<ParseEdge>) {
-        parser().edges(dest)
+    override fun edges(consumer: (ParseEdge) -> Unit) {
+        parser().edges(consumer)
     }
 
     override fun usage(): UsageInternal {

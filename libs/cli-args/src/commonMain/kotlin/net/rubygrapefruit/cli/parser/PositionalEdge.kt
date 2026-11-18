@@ -1,9 +1,9 @@
 package net.rubygrapefruit.cli.parser
 
 internal class ZeroOrMorePositionalEdge(val value: List<String>) : ParseEdge.Positional, ParseNode {
-    override fun edges(dest: MutableList<ParseEdge>) {
-        dest.add(this)
-        dest.add(FixedValue(value))
+    override fun edges(consumer: (ParseEdge) -> Unit) {
+        consumer(this)
+        consumer(FixedValue(value))
     }
 
     override fun next(args: InputArgs): ParseEdge.Transition {

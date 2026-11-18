@@ -6,39 +6,49 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
     }
 
     override fun parseUsingEdges(args: List<String>): Parser.Result<T> {
-        val edges = mutableListOf<ParseEdge>()
-        edges(edges)
+        val candidates = mutableListOf<EdgeState>()
+        edges {
+            candidates.add(EdgeState(it, 1))
+        }
 
-        val nextEdges = mutableListOf<ParseEdge>()
+        val nextCandidates = mutableListOf<EdgeState>()
 
         val recognized = BooleanArray(args.size)
         for (index in args.indices) {
             val current = DefaultInputArgs(index, args, recognized)
-            for (edge in edges) {
-                if (edge is ParseEdge.Matcher) {
-                    val result = edge.next(current)
-                    when (result) {
-                        is ParseEdge.Transition.Matched -> {
-                            require(result.count == 1)
-                            result.next.edges(nextEdges)
-                        }
+            for (candidate in candidates) {
+                if (candidate.advance > 1) {
+                    candidate.advance--
+                    nextCandidates.add(candidate)
+                } else {
+                    val edge = candidate.edge
+                    if (edge is ParseEdge.Matcher) {
+                        val result = edge.next(current)
+                        when (result) {
+                            is ParseEdge.Transition.Matched -> {
+                                result.next.edges {
+                                    nextCandidates.add(EdgeState(it, result.count))
+                                }
+                            }
 
-                        is ParseEdge.Transition.NotMatched -> {
-                            // Ignore
-                        }
+                            is ParseEdge.Transition.NotMatched -> {
+                                // Ignore
+                            }
 
-                        is ParseEdge.Transition.Failed -> {
-                            TODO()
+                            is ParseEdge.Transition.Failed -> {
+                                TODO()
+                            }
                         }
                     }
                 }
             }
-            require(nextEdges.isNotEmpty())
-            edges.clear()
-            edges.addAll(nextEdges)
+            require(nextCandidates.isNotEmpty())
+            candidates.clear()
+            candidates.addAll(nextCandidates)
         }
 
-        for (edge in edges) {
+        for (candidate in candidates) {
+            val edge = candidate.edge
             if (edge is ParseEdge.EndOfInput) {
                 return ParserInternal.Success(edge.value() as T)
             }
@@ -179,4 +189,6 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
     private class Result<T>(val result: ParsedArguments<T>, val recognized: BooleanArray) {
         val recognizedCount = recognized.count { it }
     }
+
+    private class EdgeState(val edge: ParseEdge, var advance: Int)
 }

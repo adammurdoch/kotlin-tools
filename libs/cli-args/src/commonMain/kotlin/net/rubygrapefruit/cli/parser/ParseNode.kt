@@ -8,7 +8,7 @@ internal sealed interface ParseNode {
      * Constraint: must include at least one [ParseEdge.NotEndOfInput] or at least one [ParseEdge.EndOfInput].
      * Can include both [ParseEdge.EndOfInput] and [ParseEdge.NotEndOfInput], in which case the required is ignored.
      */
-    fun edges(dest: MutableList<ParseEdge>)
+    fun edges(consumer: (ParseEdge) -> Unit)
 }
 
 internal sealed interface ParseEdge {
@@ -44,8 +44,8 @@ internal class FixedValue(val value: Any?) : ParseNode, ParseEdge.EndOfInput {
         return value
     }
 
-    override fun edges(dest: MutableList<ParseEdge>) {
-        dest.add(this)
+    override fun edges(consumer: (ParseEdge) -> Unit) {
+        consumer(this)
     }
 }
 
@@ -54,7 +54,7 @@ internal class LazyValue(val supplier: () -> Any?) : ParseNode, ParseEdge.EndOfI
         return supplier()
     }
 
-    override fun edges(dest: MutableList<ParseEdge>) {
-        dest.add(this)
+    override fun edges(consumer: (ParseEdge) -> Unit) {
+        consumer(this)
     }
 }

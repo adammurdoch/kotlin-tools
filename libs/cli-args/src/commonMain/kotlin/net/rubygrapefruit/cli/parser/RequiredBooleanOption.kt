@@ -7,9 +7,9 @@ internal class RequiredBooleanOption(private val flags: List<String>, private va
         return State(flags, names)
     }
 
-    override fun edges(dest: MutableList<ParseEdge>) {
-        dest.add(FlagEdge(flags, names, Unit))
-        dest.add(RequiredOption(flags))
+    override fun edges(consumer: (ParseEdge) -> Unit) {
+        consumer(FlagEdge(flags, names, Unit))
+        consumer(RequiredOption(flags))
     }
 
     override fun usage(): UsageInternal {

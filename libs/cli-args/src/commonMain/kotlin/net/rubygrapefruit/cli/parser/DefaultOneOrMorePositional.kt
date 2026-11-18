@@ -7,9 +7,9 @@ internal class DefaultOneOrMorePositional(private val name: String, private val 
         return State(name)
     }
 
-    override fun edges(dest: MutableList<ParseEdge>) {
-        dest.add(OneOrMorePositionalEdge())
-        dest.add(RequiredPositional(name))
+    override fun edges(consumer: (ParseEdge) -> Unit) {
+        consumer(OneOrMorePositionalEdge())
+        consumer(RequiredPositional(name))
     }
 
     override fun usage(): UsageInternal {

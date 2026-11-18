@@ -15,9 +15,9 @@ internal class DefaultStringPositional(private val name: String, private val sum
         return State(name)
     }
 
-    override fun edges(dest: MutableList<ParseEdge>) {
-        dest.add(PositionalEdge)
-        dest.add(RequiredPositional(name))
+    override fun edges(consumer: (ParseEdge) -> Unit) {
+        consumer(PositionalEdge)
+        consumer(RequiredPositional(name))
     }
 
     override fun usage(): UsageInternal {

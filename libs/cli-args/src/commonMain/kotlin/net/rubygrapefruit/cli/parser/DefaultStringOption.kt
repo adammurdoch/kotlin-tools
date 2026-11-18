@@ -21,9 +21,9 @@ internal class DefaultStringOption(
         return State(flags, names)
     }
 
-    override fun edges(dest: MutableList<ParseEdge>) {
-        dest.add(StringOptionEdge(flags, names))
-        dest.add(FixedValue(null))
+    override fun edges(consumer: (ParseEdge) -> Unit) {
+        consumer(StringOptionEdge(flags, names))
+        consumer(FixedValue(null))
     }
 
     override fun usage(): UsageInternal {

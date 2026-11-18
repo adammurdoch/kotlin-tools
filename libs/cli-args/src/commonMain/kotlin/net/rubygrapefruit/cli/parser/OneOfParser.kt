@@ -12,9 +12,9 @@ internal class OneOfParser<OUT>(val choices: List<ParserInternal<OUT>>) : Abstra
         return choices.map { it.start() }
     }
 
-    override fun edges(dest: MutableList<ParseEdge>) {
+    override fun edges(consumer: (ParseEdge) -> Unit) {
         for (choice in choices) {
-            choice.edges(dest)
+            choice.edges(consumer)
         }
     }
 

@@ -16,9 +16,9 @@ internal class RequiredStringOption(
         return OptionUsage()
     }
 
-    override fun edges(dest: MutableList<ParseEdge>) {
-        dest.add(StringOptionEdge(flags, names))
-        dest.add(RequiredOption(flags))
+    override fun edges(consumer: (ParseEdge) -> Unit) {
+        consumer(StringOptionEdge(flags, names))
+        consumer(RequiredOption(flags))
     }
 
     private inner class OptionUsage : UsageInternal.OptionUsage {

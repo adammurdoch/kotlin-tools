@@ -11,9 +11,9 @@ internal class DefaultBooleanOption(private val flags: List<String>, private val
         return State(flags, names)
     }
 
-    override fun edges(dest: MutableList<ParseEdge>) {
-        dest.add(FlagEdge(flags, names, true))
-        dest.add(FixedValue(false))
+    override fun edges(consumer: (ParseEdge) -> Unit) {
+        consumer(FlagEdge(flags, names, true))
+        consumer(FixedValue(false))
     }
 
     override fun usage(): UsageInternal {

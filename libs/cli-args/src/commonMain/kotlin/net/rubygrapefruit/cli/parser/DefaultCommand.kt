@@ -7,9 +7,9 @@ internal class DefaultCommand(private val text: String) : AbstractParser<Unit>()
         return State(text)
     }
 
-    override fun edges(dest: MutableList<ParseEdge>) {
-        dest.add(CommandEdge(text))
-        dest.add(RequiredCommend(text))
+    override fun edges(consumer: (ParseEdge) -> Unit) {
+        consumer(CommandEdge(text))
+        consumer(RequiredCommend(text))
     }
 
     override fun usage(): UsageInternal {

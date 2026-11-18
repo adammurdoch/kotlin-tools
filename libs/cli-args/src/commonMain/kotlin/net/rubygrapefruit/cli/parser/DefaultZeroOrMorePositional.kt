@@ -7,8 +7,8 @@ internal class DefaultZeroOrMorePositional(private val name: String, private val
         return State()
     }
 
-    override fun edges(dest: MutableList<ParseEdge>) {
-        ZeroOrMorePositionalEdge(emptyList()).edges(dest)
+    override fun edges(consumer: (ParseEdge) -> Unit) {
+        ZeroOrMorePositionalEdge(emptyList()).edges(consumer)
     }
 
     override fun usage(): UsageInternal {

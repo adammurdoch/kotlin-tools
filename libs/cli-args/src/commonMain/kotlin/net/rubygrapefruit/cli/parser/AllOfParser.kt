@@ -11,14 +11,14 @@ internal class AllOfParser<OUT>(
         return State(parsers.map { Element(it.start()) }, map)
     }
 
-    override fun edges(dest: MutableList<ParseEdge>) {
+    override fun edges(consumer: (ParseEdge) -> Unit) {
         val elements = parsers.map { element ->
             val edges = mutableListOf<ParseEdge>()
-            element.edges(edges)
+            element.edges(edges::add)
             ElementNode(element, edges)
         }
         val results = emptyList<ParsedArguments.Success<*>>()
-        ElementNodes(elements, results, map).edges(dest)
+        ElementNodes(elements, results, map).edges(consumer)
     }
 
     override fun usage(): UsageInternal {
@@ -60,29 +60,31 @@ internal class AllOfParser<OUT>(
     private class ElementNodes(val elements: List<ElementNode>, val results: List<ParsedArguments.Success<*>>, val map: (List<ParsedArguments.Success<*>>) -> Any?) : ParseNode {
         fun next(element: ElementNode, next: ParseNode): ParseNode {
             val edges = mutableListOf<ParseEdge>()
-            next.edges(edges)
+            next.edges(edges::add)
             val newElement = ElementNode(element.element, edges)
             val newElements = elements.map { if (it == element) newElement else it }
             return ElementNodes(newElements, results, map)
         }
 
-        override fun edges(dest: MutableList<ParseEdge>) {
+        override fun edges(consumer: (ParseEdge) -> Unit) {
             var hasPositional = false
             for (index in elements.indices) {
                 val element = elements[index]
                 for (edge in element.nonPositional) {
-                    dest.add(ElementNonPositional(element, edge, this))
+                    consumer(ElementNonPositional(element, edge, this))
                 }
                 if (!hasPositional && element.positional.isNotEmpty()) {
                     for (edge in element.positional) {
-                        dest.add(ElementPositional(element, edge, this))
+                        consumer(ElementPositional(element, edge, this))
                     }
                     hasPositional = true
                 }
-                dest.addAll(element.required)
+                for (edge in element.required) {
+                    consumer(edge)
+                }
             }
             if (elements.all { it.endOfInput != null }) {
-                dest.add(LazyValue { map(elements.map { ParsedArguments.FixedResult(it.endOfInput!!.value()) }) })
+                consumer(LazyValue { map(elements.map { ParsedArguments.FixedResult(it.endOfInput!!.value()) }) })
             }
         }
     }

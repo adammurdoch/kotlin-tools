@@ -39,13 +39,6 @@ internal class RequiredStringOption(
         }
     }
 
-    private class RequiredOption(val flags: List<String>) : ParseEdge.NotEndOfInput {
-        override fun abort(): Problem {
-            val longest = flags.maxBy { it.length }
-            return MissingOption(longest)
-        }
-    }
-
     private class State(flags: List<String>, names: List<String>) : OptionParseState<String>(flags, names) {
         override fun matched(args: InputArgs): Finished<String> {
             return if (!args.hasSecond() || args.secondIsOption()) {

@@ -8,7 +8,14 @@ class RequiredBooleanOptionTest : AbstractParseTest() {
     fun `parses option with short name`() {
         val parser = option("x").boolean().required()
 
-        assertEquals(Unit, parser.parse("-x").get())
+        parser.edges {
+            nonPositional {
+                matches("-x") {
+                    endOfInput(Unit)
+                }
+            }
+            aborts("Option -x not provided")
+        }
     }
 
     @Test

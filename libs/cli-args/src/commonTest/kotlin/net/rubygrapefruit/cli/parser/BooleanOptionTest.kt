@@ -8,8 +8,14 @@ class BooleanOptionTest : AbstractParseTest() {
     fun `parses option with short name`() {
         val parser = option("x").boolean()
 
-        assertEquals(true, parser.parse("-x").get())
-        assertEquals(false, parser.parse().get())
+        parser.edges {
+            nonPositional {
+                matches("-x") {
+                    endOfInput(true)
+                }
+            }
+            endOfInput(false)
+        }
     }
 
     @Test

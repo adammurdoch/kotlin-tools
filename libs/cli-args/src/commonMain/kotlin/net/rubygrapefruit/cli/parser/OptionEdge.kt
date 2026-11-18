@@ -1,5 +1,16 @@
 package net.rubygrapefruit.cli.parser
 
+internal class FlagEdge(val flags: List<String>, val value: Any) : ParseEdge.NonPositional {
+    override fun next(args: InputArgs): ParseEdge.Transition {
+        val first = args.first()
+        return if (flags.contains(first)) {
+            ParseEdge.Transition.Matched(1, FixedValue(value))
+        } else {
+            ParseEdge.Transition.NotMatched
+        }
+    }
+}
+
 internal class StringOptionEdge(val flags: List<String>, val names: List<String>) : ParseEdge.NonPositional {
     override fun maybeClaimUnrecognized(args: InputArgs): Problem? {
         val first = args.first()
@@ -46,5 +57,12 @@ private class OptionValue(val value: String, val matchedFlag: String, val source
 
     override fun value(): Any {
         return value
+    }
+}
+
+internal class RequiredOption(val flags: List<String>) : ParseEdge.NotEndOfInput {
+    override fun abort(): Problem {
+        val longest = flags.maxBy { it.length }
+        return MissingOption(longest)
     }
 }

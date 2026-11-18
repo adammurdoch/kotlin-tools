@@ -11,6 +11,11 @@ internal class DefaultBooleanOption(private val flags: List<String>, private val
         return State(flags, names)
     }
 
+    override fun edges(dest: MutableList<ParseEdge>) {
+        dest.add(FlagEdge(flags, true))
+        dest.add(FixedValue(false))
+    }
+
     override fun usage(): UsageInternal {
         return OptionUsage()
     }

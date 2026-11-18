@@ -31,11 +31,21 @@ internal class StringOptionEdge(flags: List<String>, names: List<String>) : Opti
                 val value = args.second()
                 ParseEdge.Transition.Matched(2, OptionValue(value, first, this))
             } else {
-                ParseEdge.Transition.Failed(1, ProblemAtIndex(args.index + 1, MissingOptionValue(first)))
+                ParseEdge.Transition.Matched(1, MissingOptionValueEdge(args.index + 1, first))
             }
         } else {
             ParseEdge.Transition.NotMatched
         }
+    }
+}
+
+private class MissingOptionValueEdge(val index: Int, val matchedFlag: String) : ParseEdge.Failed, ParseNode {
+    override fun edges(consumer: (ParseEdge) -> Unit) {
+        consumer(this)
+    }
+
+    override fun failure(): ProblemAtIndex {
+        return ProblemAtIndex(index, MissingOptionValue(matchedFlag))
     }
 }
 

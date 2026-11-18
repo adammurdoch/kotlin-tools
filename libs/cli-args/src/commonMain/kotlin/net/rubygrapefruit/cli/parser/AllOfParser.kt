@@ -101,7 +101,6 @@ internal class AllOfParser<OUT>(
             val transition = edge.next(args)
             return when (transition) {
                 is ParseEdge.Transition.NotMatched -> transition
-                is ParseEdge.Transition.Failed -> transition
                 is ParseEdge.Transition.Matched -> {
                     ParseEdge.Transition.Matched(transition.count, owner.next(element, transition.next))
                 }
@@ -114,7 +113,6 @@ internal class AllOfParser<OUT>(
             val transition = edge.next(args)
             return when (transition) {
                 is ParseEdge.Transition.NotMatched -> transition
-                is ParseEdge.Transition.Failed -> transition
                 is ParseEdge.Transition.Matched -> {
                     ParseEdge.Transition.Matched(transition.count, owner.next(element, transition.next))
                 }

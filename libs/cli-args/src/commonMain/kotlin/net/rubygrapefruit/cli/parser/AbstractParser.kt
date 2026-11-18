@@ -39,10 +39,6 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
                             is ParseEdge.Transition.NotMatched -> {
                                 // Ignore
                             }
-
-                            is ParseEdge.Transition.Failed -> {
-                                TODO()
-                            }
                         }
                     }
                 }
@@ -74,18 +70,22 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
             unrecognizedProblems.add(ProblemAtIndex(index, problem))
             index++
         }
-        if (unrecognizedProblems.isNotEmpty()) {
-            return ParserInternal.Failure(unrecognizedProblems, this)
-        }
 
         for (candidate in candidates) {
             val edge = candidate.edge
-            if (edge is ParseEdge.EndOfInput) {
-                return ParserInternal.Success(edge.value() as T)
+            if (edge is ParseEdge.Failed) {
+                unrecognizedProblems.add(edge.failure())
             }
         }
-
-        TODO()
+        if (unrecognizedProblems.isNotEmpty()) {
+            return ParserInternal.Failure(unrecognizedProblems, this)
+        }
+        for (candidate in candidates) {
+            if (candidate.edge is ParseEdge.EndOfInput) {
+                return ParserInternal.Success(candidate.edge.value() as T)
+            }
+        }
+        throw IllegalStateException()
     }
 
     private fun parseUsingState(args: List<String>): Parser.Result<T> {

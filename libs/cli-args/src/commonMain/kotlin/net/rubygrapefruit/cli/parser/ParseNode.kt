@@ -5,8 +5,8 @@ package net.rubygrapefruit.cli.parser
  */
 internal sealed interface ParseNode {
     /**
-     * Constraint: must include at least one [ParseEdge.NotEndOfInput] or at least one [ParseEdge.EndOfInput].
-     * Can include both [ParseEdge.EndOfInput] and [ParseEdge.NotEndOfInput], in which case the required is ignored.
+     * Constraint: must include at least one [ParseEdge.Terminating]
+     * Can include both [ParseEdge.EndOfInput] and [ParseEdge.NotEndOfInput] or [ParseEdge.Failed], in which case the required is ignored.
      */
     fun edges(consumer: (ParseEdge) -> Unit)
 }
@@ -20,22 +20,42 @@ internal sealed interface ParseEdge {
         fun next(args: InputArgs): Transition
     }
 
+    /**
+     * Expects a non-positional argument
+     */
     sealed interface NonPositional : Matcher
 
+    /**
+     * Expects a positional argument
+     */
     sealed interface Positional : Matcher
 
-    sealed interface NotEndOfInput : ParseEdge {
+    sealed interface Terminating: ParseEdge
+
+    /**
+     * Expects end of input, then succeeds with the given value
+     */
+    sealed interface EndOfInput : Terminating {
+        fun value(): Any?
+    }
+
+    /**
+     * Expects anything other than the end of input.
+     */
+    sealed interface NotEndOfInput : Terminating {
         fun abort(): Problem
     }
 
-    sealed interface EndOfInput : ParseEdge {
-        fun value(): Any?
+    /**
+     * Cannot proceed.
+     */
+    sealed interface Failed : Terminating {
+        fun failure(): ProblemAtIndex
     }
 
     sealed interface Transition {
         object NotMatched : Transition
         class Matched(val count: Int, val next: ParseNode) : Transition
-        class Failed(val count: Int, val problem: ProblemAtIndex) : Transition
     }
 }
 

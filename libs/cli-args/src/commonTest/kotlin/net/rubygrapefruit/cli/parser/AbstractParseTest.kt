@@ -343,7 +343,12 @@ abstract class AbstractParseTest {
         override fun fails(firstArg: String, vararg moreArgs: String, index: Int, message: String) {
             val args = listOf(firstArg) + moreArgs
             val transition = next(args)
-            assertIs<ParseEdge.Transition.Failed>(transition).apply {
+            val matched = assertIs<ParseEdge.Transition.Matched>(transition)
+            val edges = mutableListOf<ParseEdge>()
+            matched.next.edges(edges::add)
+            assertEquals(1, edges.size)
+            assertIs<ParseEdge.Failed>(edges.first()).apply {
+                val problem = failure()
                 assertEquals(message, problem.problem.text())
                 assertEquals(index, problem.index)
 

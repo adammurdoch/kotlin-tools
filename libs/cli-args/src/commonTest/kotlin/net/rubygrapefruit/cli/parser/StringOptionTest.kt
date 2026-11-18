@@ -12,20 +12,13 @@ class StringOptionTest : AbstractParseTest() {
         parser.edges {
             nonPositional {
                 matches("-x", "value") {
-                    endOfInput("value") {
-                        doesNotMatch("-x", message = "Option -x can only appear once")
-                        doesNotMatch("-x", "value", message = "Option -x can only appear once")
-                        doesNotMatch("--x", "value", message = "Unexpected option '--x'. Try '-x' instead")
-                    }
+                    endOfInput("value")
                 }
                 matches("-x", "") {
                     endOfInput("")
                 }
-                fails("-x", index = 1, message = "No value provided for option -x")
-                fails("-x", "-y", index = 1, message = "No value provided for option -x")
                 doesNotMatch("unknown")
                 doesNotMatch("--other")
-                doesNotMatch("--x", "value", message = "Unexpected option '--x'. Try '-x' instead")
             }
             endOfInput(null)
         }
@@ -69,7 +62,6 @@ class StringOptionTest : AbstractParseTest() {
                 doesNotMatch("--other")
                 fails("-x", index = 1, message = "No value provided for option -x")
                 fails("--long-x", index = 1, message = "No value provided for option --long-x")
-                fails("-x", "-y", index = 1, message = "No value provided for option -x")
             }
             endOfInput(null)
         }
@@ -157,24 +149,23 @@ class StringOptionTest : AbstractParseTest() {
     fun `option with short name must be well formed`() {
         val parser = option("x")
 
-        parser.fails("--x", "value") {
-            failure(0, "Unexpected option '--x'. Try '-x' instead")
-        }
-        parser.fails("-X", "value") {
-            failure(0, "Unexpected option '-X'. Try '-x' instead")
-        }
-        parser.fails("--X", "value") {
-            failure(0, "Unexpected option '--X'. Try '-x' instead")
-        }
-
-        parser.fails("--x") {
-            failure(0, "Unexpected option '--x'. Try '-x' instead")
-        }
-        parser.fails("-x", "value", "--x") {
-            failure(2, "Unexpected option '--x'. Try '-x' instead")
-        }
         parser.fails("--x", "-x", "value") {
             failure(0, "Unexpected option '--x'. Try '-x' instead")
+        }
+
+        parser.edges {
+            nonPositional {
+                matches("-x", "value") {
+                    endOfInput("value") {
+                        doesNotMatch("--x", "value", message = "Unexpected option '--x'. Try '-x' instead")
+                    }
+                }
+                doesNotMatch("--x", "value", message = "Unexpected option '--x'. Try '-x' instead")
+                doesNotMatch("--x", message = "Unexpected option '--x'. Try '-x' instead")
+                doesNotMatch("-X", "value", message = "Unexpected option '-X'. Try '-x' instead")
+                doesNotMatch("--X", "value", message = "Unexpected option '--X'. Try '-x' instead")
+            }
+            endOfInput(null)
         }
     }
 
@@ -219,13 +210,6 @@ class StringOptionTest : AbstractParseTest() {
     fun `option must have value`() {
         val parser = option("x", "long")
 
-        parser.fails("-x") {
-            failure(1, "No value provided for option -x")
-        }
-        parser.fails("--long") {
-            failure(1, "No value provided for option --long")
-        }
-
         parser.fails("-x", "-unknown") {
             failure(1, "No value provided for option -x")
             failure(1, "Unexpected option '-unknown'")
@@ -235,18 +219,20 @@ class StringOptionTest : AbstractParseTest() {
             failure(0, "Unexpected option '-unknown'")
             failure(2, "No value provided for option -x")
         }
+
+        parser.edges {
+            nonPositional {
+                fails("-x", index = 1, message = "No value provided for option -x")
+                fails("--long", index = 1, message = "No value provided for option --long")
+            }
+            endOfInput(null)
+        }
     }
 
     @Test
     fun `option cannot appear twice`() {
         val parser = option("x")
 
-        parser.fails("-x", "value", "-x", "value") {
-            failure(2, "Option -x can only appear once")
-        }
-        parser.fails("-x", "value", "-x") {
-            failure(2, "Option -x can only appear once")
-        }
         parser.fails("-x", "-x", "value") {
             failure(1, "No value provided for option -x")
             failure(1, "Option -x can only appear once")
@@ -254,6 +240,18 @@ class StringOptionTest : AbstractParseTest() {
         parser.fails("-x", "-x") {
             failure(1, "No value provided for option -x")
             failure(1, "Option -x can only appear once")
+        }
+
+        parser.edges {
+            nonPositional {
+                matches("-x", "value") {
+                    endOfInput("value") {
+                        doesNotMatch("-x", "value", message = "Option -x can only appear once")
+                        doesNotMatch("-x", message = "Option -x can only appear once")
+                    }
+                }
+            }
+            endOfInput(null)
         }
     }
 

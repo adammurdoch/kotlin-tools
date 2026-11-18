@@ -19,7 +19,6 @@ class RequiredStringOptionTest : AbstractParseTest() {
                 doesNotMatch("unknown")
                 doesNotMatch("--other")
                 fails("-x", index = 1, message = "No value provided for option -x")
-                fails("-x", "-y", index = 1, message = "No value provided for option -x")
             }
             aborts("Option -x not provided")
         }

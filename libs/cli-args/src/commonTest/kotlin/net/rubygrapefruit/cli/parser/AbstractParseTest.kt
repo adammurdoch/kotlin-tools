@@ -103,12 +103,6 @@ abstract class AbstractParseTest {
         private fun List<ProblemAtIndex>.text(): String {
             return map { "(${it.index} - ${it.problem.text()})" }.toString()
         }
-
-        private fun Problem.text(): String {
-            val buffer = BufferingOutput()
-            writeTo(buffer)
-            return buffer.text
-        }
     }
 
     protected interface UsageSummary {
@@ -268,7 +262,7 @@ abstract class AbstractParseTest {
             val edge = assertIs<ParseEdge.EndOfInput>(edges[current])
             assertEquals(value, edge.value())
             assertEquals(value, parser.parse(previousArgs).get())
-            DefaultEndOfInput(edge, previousArgs).config()
+            DefaultEndOfInput(edge, parser, previousArgs).config()
             current++
         }
 
@@ -292,24 +286,31 @@ abstract class AbstractParseTest {
     }
 
     private abstract class DefaultEdge : Edge {
-        protected fun claimsUnrecognized(edge: ParseEdge, previousArgs: List<String>, args: List<String>, message: String?) {
+        protected fun claimsUnrecognized(parser: Parser<*>, edge: ParseEdge, previousArgs: List<String>, args: List<String>, message: String) {
             val allArgs = previousArgs + args
             val recognized = BooleanArray(allArgs.size)
             val args = DefaultInputArgs(previousArgs.size, allArgs, recognized)
 
-            val problem = edge.maybeClaimUnrecognized(args)
+            val claimedProblem = edge.maybeClaimUnrecognized(args)
+            assertNotNull(claimedProblem)
+            assertEquals(message, claimedProblem.text())
 
-            assertNotNull(problem)
-            val buffer = BufferingOutput()
-            problem.writeTo(buffer)
-            assertEquals(message, buffer.text)
+            val result = parser.parse(allArgs)
+            assertIs<Parser.Failure>(result)
+
+            assertEquals(1, result.problems.size)
+            val parseProblem = result.problems.first()
+            assertEquals(message, parseProblem.problem.text())
+            assertEquals(previousArgs.size, parseProblem.index)
         }
     }
 
-    private class DefaultEndOfInput(val edge: ParseEdge.EndOfInput, val previousArgs: List<String>) : DefaultEdge() {
+    private class DefaultEndOfInput(val edge: ParseEdge.EndOfInput, val parser: Parser<*>, val previousArgs: List<String>) : DefaultEdge() {
         override fun doesNotMatch(firstArg: String, vararg moreArgs: String, message: String?) {
             val args = listOf(firstArg) + moreArgs
-            claimsUnrecognized(edge, previousArgs, args, message)
+            if (message != null) {
+                claimsUnrecognized(parser, edge, previousArgs, args, message)
+            }
         }
     }
 
@@ -331,17 +332,24 @@ abstract class AbstractParseTest {
             assertIs<ParseEdge.Transition.NotMatched>(transition)
 
             if (message != null) {
-                claimsUnrecognized(edge, previousArgs, args, message)
+                claimsUnrecognized(parser, edge, previousArgs, args, message)
             }
         }
 
         override fun fails(firstArg: String, vararg moreArgs: String, index: Int, message: String) {
-            val transition = next(firstArg, moreArgs)
+            val args = listOf(firstArg) + moreArgs
+            val transition = next(args)
             assertIs<ParseEdge.Transition.Failed>(transition).apply {
-                val buffer = BufferingOutput()
-                problem.problem.writeTo(buffer)
-                assertEquals(message, buffer.text)
+                assertEquals(message, problem.problem.text())
                 assertEquals(index, problem.index)
+
+                val result = parser.parse(args)
+                assertIs<Parser.Failure>(result)
+
+                assertEquals(1, result.problems.size)
+                val parseProblem = result.problems.first()
+                assertEquals(message, parseProblem.problem.text())
+                assertEquals(index, parseProblem.index)
             }
         }
 
@@ -353,4 +361,10 @@ abstract class AbstractParseTest {
             return edge.next(DefaultInputArgs(0, args, BooleanArray(args.size)))
         }
     }
+}
+
+private fun Problem.text(): String {
+    val buffer = BufferingOutput()
+    writeTo(buffer)
+    return buffer.text
 }

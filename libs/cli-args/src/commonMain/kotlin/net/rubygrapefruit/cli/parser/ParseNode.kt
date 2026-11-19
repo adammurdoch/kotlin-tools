@@ -7,6 +7,7 @@ internal sealed interface ParseNode {
     /**
      * Constraint: must include at least one [ParseEdge.Terminating] to specify how to stop parsing at the (possibly unexpected) end of the inputs
      * Cannot include both [ParseEdge.EndOfInput] and [ParseEdge.NotEndOfInput].
+     * Can include both [ParseEdge.EndOfInput] and [ParseEdge.Failed], in which case [ParseEdge.EndOfInput] wins
      */
     fun edges(consumer: (ParseEdge) -> Unit)
 }

@@ -57,21 +57,31 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
             }
         }
 
-        val unrecognizedProblems = mutableListOf<ProblemAtIndex>()
-        val expected = mutableSetOf<String>()
-        var success: ParseEdge.EndOfInput? = null
-        for (candidate in candidates) {
-            val edge = candidate.edge
-            if (edge is ParseEdge.Failed) {
-                unrecognizedProblems.add(edge.failure())
-            } else if (edge is ParseEdge.NotEndOfInput) {
-                expected.add(edge.expecting)
-            } else if (edge is ParseEdge.EndOfInput) {
-                success = edge
+        val success = candidates.firstNotNullOfOrNull { if (it.edge is ParseEdge.EndOfInput) it.edge else null }
+
+        val problems = mutableListOf<ProblemAtIndex>()
+
+        if (success == null) {
+            val expected = mutableSetOf<String>()
+            for (candidate in candidates) {
+                val edge = candidate.edge
+                when (edge) {
+                    is ParseEdge.Failed -> {
+                        problems.add(edge.failure())
+                    }
+
+                    is ParseEdge.NotEndOfInput -> {
+                        expected.add(edge.expecting)
+                    }
+
+                    else -> {
+                        // ignore
+                    }
+                }
             }
-        }
-        if (expected.isNotEmpty()) {
-            unrecognizedProblems.add(ProblemAtIndex(args.size, MissingParameters(expected.toList())))
+            if (expected.isNotEmpty()) {
+                problems.add(ProblemAtIndex(args.size, MissingParameters(expected.toList())))
+            }
         }
 
         var index = 0
@@ -85,7 +95,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
             val current = DefaultInputArgs(index, args, recognized)
             val claimed = candidates.firstNotNullOfOrNull { it.edge.maybeClaimUnrecognized(current) }
             if (claimed != null) {
-                unrecognizedProblems.add(ProblemAtIndex(index, claimed.problem))
+                problems.add(ProblemAtIndex(index, claimed.problem))
                 if (claimed.count > 1 && !recognized[index + 1]) {
                     index += 2
                 } else {
@@ -103,13 +113,13 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
                 } else {
                     UnexpectedArgument(current.first(), expected.toList())
                 }
-                unrecognizedProblems.add(ProblemAtIndex(index, problem))
+                problems.add(ProblemAtIndex(index, problem))
                 index++
             }
         }
 
-        if (unrecognizedProblems.isNotEmpty()) {
-            return ParserInternal.Failure(unrecognizedProblems, this)
+        if (problems.isNotEmpty()) {
+            return ParserInternal.Failure(problems, this)
         }
         if (success != null) {
             return ParserInternal.Success(success.value() as T)

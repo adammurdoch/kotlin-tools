@@ -1,6 +1,7 @@
 package net.rubygrapefruit.cli.parser
 
 import net.rubygrapefruit.cli.terminal.BufferingOutput
+import kotlin.test.ExperimentalKotlinTestApi
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -9,6 +10,7 @@ import kotlin.test.fail
 /**
  * Some cross-cutting tests, most error handling is covered by the parser specific tests.
  */
+@OptIn(ExperimentalKotlinTestApi::class)
 class ParseFailureReportingTest : AbstractParseTest() {
     @Test
     fun `reports problem and shows usage summary on parse failure`() {
@@ -17,7 +19,7 @@ class ParseFailureReportingTest : AbstractParseTest() {
         val result = parser.parse("-a", "--unknown")
         assertIs<Parser.Failure>(result)
 
-        assertEquals(2, result.problems.size)
+        assertEquals(2, result.problems.size) { "expected 2 problems in ${result.problems}" }
 
         val output = BufferingOutput()
         result.writeTo(output)

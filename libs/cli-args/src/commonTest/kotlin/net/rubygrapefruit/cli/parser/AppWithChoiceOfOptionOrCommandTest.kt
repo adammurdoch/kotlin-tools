@@ -22,6 +22,21 @@ class AppWithChoiceOfOptionOrCommandTest : AbstractParseTest() {
             assertIs<OneParam>(this)
             assertEquals("run", value)
         }
+
+        parser.edges {
+            nonPositional {
+                matches("--help") {
+                    endOfInput(OneParam("help"))
+                }
+            }
+            expectingOption("--help")
+            positional {
+                matches("run") {
+                    endOfInput(OneParam("run"))
+                }
+            }
+            expectingCommand("run")
+        }
     }
 
     @Test

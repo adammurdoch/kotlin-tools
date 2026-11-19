@@ -54,16 +54,20 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
         }
 
         val unrecognizedProblems = mutableListOf<ProblemAtIndex>()
+        val expected = mutableSetOf<String>()
         var success: ParseEdge.EndOfInput? = null
         for (candidate in candidates) {
             val edge = candidate.edge
             if (edge is ParseEdge.Failed) {
                 unrecognizedProblems.add(edge.failure())
             } else if (edge is ParseEdge.NotEndOfInput) {
-                unrecognizedProblems.add(ProblemAtIndex(args.size, MissingParameter(edge.expecting)))
+                expected.add(edge.expecting)
             } else if (edge is ParseEdge.EndOfInput) {
                 success = edge
             }
+        }
+        if (expected.isNotEmpty()) {
+            unrecognizedProblems.add(ProblemAtIndex(args.size, MissingParameters(expected.toList())))
         }
 
         var index = 0

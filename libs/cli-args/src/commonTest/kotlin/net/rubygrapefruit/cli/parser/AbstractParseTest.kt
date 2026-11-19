@@ -10,7 +10,7 @@ abstract class AbstractParseTest {
         }
     }
 
-    protected class OneParam(val value: String?) : Runnable {
+    protected data class OneParam(val value: String?) : Runnable {
         override fun Runnable.Context.run() {
         }
     }

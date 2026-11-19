@@ -75,9 +75,19 @@ internal class MissingCommand(val name: String) : Problem {
     }
 }
 
-internal class MissingParameter(val description: String): Problem {
+internal class MissingParameters(val descriptions: List<String>) : Problem {
     override fun writeTo(output: Output) {
-        output.write("Expected $description")
+        output.write("Expected ")
+        descriptions.forEachIndexed { index, description ->
+            if (index > 0) {
+                if (index == descriptions.lastIndex) {
+                    output.write(" or ")
+                } else {
+                    output.write(", ")
+                }
+            }
+            output.write(description)
+        }
     }
 }
 

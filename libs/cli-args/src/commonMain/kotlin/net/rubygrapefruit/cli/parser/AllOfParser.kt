@@ -84,7 +84,7 @@ internal class AllOfParser<OUT>(
                 }
             }
             if (elements.all { it.endOfInput != null }) {
-                consumer(LazyValue { map(elements.map { ParsedArguments.FixedResult(it.endOfInput!!.value()) }) })
+                consumer(MappedResult(elements.map { it.endOfInput!! }, map))
             }
         }
     }
@@ -121,6 +121,16 @@ internal class AllOfParser<OUT>(
                     ParseEdge.Transition.Matched(transition.count, owner.next(element, transition.next))
                 }
             }
+        }
+    }
+
+    private class MappedResult(val elements: List<ParseEdge.EndOfInput>, val map: (List<ParsedArguments.Success<*>>) -> Any?) : ParseEdge.EndOfInput {
+        override fun maybeClaimUnrecognized(args: InputArgs): ParseEdge.Claimed? {
+            return elements.firstNotNullOfOrNull { it.maybeClaimUnrecognized(args) }
+        }
+
+        override fun value(): Any? {
+            return map(elements.map { ParsedArguments.FixedResult(it.value()) })
         }
     }
 

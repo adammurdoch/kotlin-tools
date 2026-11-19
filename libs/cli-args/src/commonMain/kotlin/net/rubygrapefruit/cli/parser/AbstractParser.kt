@@ -11,12 +11,14 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
     }
 
     override fun parseUsingEdges(args: List<String>): Parser.Result<T> {
-        val candidates = mutableListOf<EdgeState>()
+        var candidates = mutableListOf<EdgeState>()
         edges {
             candidates.add(EdgeState(it, 1))
         }
 
-        val nextCandidates = mutableListOf<EdgeState>()
+        var nextCandidates = mutableListOf<EdgeState>()
+
+        val unrecognized = Array<List<EdgeState>?>(args.size) { _ -> null }
 
         val recognized = BooleanArray(args.size)
         for (index in args.indices) {
@@ -45,11 +47,13 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
             }
             if (nextCandidates.isEmpty()) {
                 // skip next input and try to recover
+                unrecognized[index] = candidates.toList()
             } else {
                 recognized[index] = true
-                candidates.clear()
-                candidates.addAll(nextCandidates)
-                nextCandidates.clear()
+                val tmp = candidates
+                candidates = nextCandidates
+                tmp.clear()
+                nextCandidates = tmp
             }
         }
 
@@ -72,7 +76,8 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
 
         var index = 0
         while (index < args.size) {
-            if (recognized[index]) {
+            val candidates = unrecognized[index]
+            if (candidates == null) {
                 index++
                 continue
             }
@@ -87,10 +92,16 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
                     index++
                 }
             } else {
+                val expected = mutableSetOf<String>()
+                for (candidate in candidates) {
+                    if (candidate.advance == 1 && candidate.edge is ParseEdge.NotEndOfInput) {
+                        expected.add(candidate.edge.expecting)
+                    }
+                }
                 val problem = if (current.firstIsOption()) {
                     UnexpectedOption(current.first())
                 } else {
-                    UnexpectedArgument(current.first())
+                    UnexpectedArgument(current.first(), expected.toList())
                 }
                 unrecognizedProblems.add(ProblemAtIndex(index, problem))
                 index++

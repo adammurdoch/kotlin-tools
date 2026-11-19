@@ -15,6 +15,21 @@ class ChoiceOfOptionOrCommandTest : AbstractParseTest() {
         assertEquals("help", parser.parse("-h").get())
         assertEquals("help", parser.parse("--help").get())
         assertEquals("run", parser.parse("run").get())
+
+        parser.edges {
+            nonPositional {
+                matches("--help") {
+                    endOfInput("help")
+                }
+            }
+            expectingOption("--help")
+            positional {
+                matches("run") {
+                    endOfInput("run")
+                }
+            }
+            expectingCommand("run")
+        }
     }
 
     @Test
@@ -101,8 +116,8 @@ class ChoiceOfOptionOrCommandTest : AbstractParseTest() {
     @Test
     fun `option or command cannot appear twice`() {
         val parser = oneOf(
-            params(option("help", "h").boolean().required()) { fail() },
-            params(command("run")) { fail() }
+            params(option("help", "h").boolean().required()) { "help" },
+            params(command("run")) { "run" }
         )
 
         parser.fails("run", "run") {
@@ -111,5 +126,23 @@ class ChoiceOfOptionOrCommandTest : AbstractParseTest() {
         parser.fails("--help", "--help") {
             failure(1, "Option --help can only appear once")
         }
+
+        parser.edges {
+            nonPositional {
+                matches("--help") {
+                    endOfInput("help") {
+                        doesNotMatch("--help", message = "Option --help can only appear once")
+                    }
+                }
+            }
+            expectingOption("--help")
+            positional {
+                matches("run") {
+                    endOfInput("run")
+                }
+            }
+            expectingCommand("run")
+        }
+
     }
 }

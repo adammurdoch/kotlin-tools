@@ -70,13 +70,3 @@ internal class FixedValue(val value: Any?) : ParseNode, ParseEdge.EndOfInput {
         consumer(this)
     }
 }
-
-internal class LazyValue(val supplier: () -> Any?) : ParseNode, ParseEdge.EndOfInput {
-    override fun value(): Any? {
-        return supplier()
-    }
-
-    override fun edges(consumer: (ParseEdge) -> Unit) {
-        consumer(this)
-    }
-}

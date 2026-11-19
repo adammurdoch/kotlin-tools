@@ -75,6 +75,12 @@ internal class MissingCommand(val name: String) : Problem {
     }
 }
 
+internal class MissingParameter(val description: String): Problem {
+    override fun writeTo(output: Output) {
+        output.write("Expected $description")
+    }
+}
+
 internal class MissingCommands(val names: List<String>) : Problem {
     override fun writeTo(output: Output) {
         output.write("Expected ")

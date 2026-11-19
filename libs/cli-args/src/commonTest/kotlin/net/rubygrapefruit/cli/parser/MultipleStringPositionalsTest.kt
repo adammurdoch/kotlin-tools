@@ -16,11 +16,11 @@ class MultipleStringPositionalsTest : AbstractParseTest() {
                             endOfInput(listOf("one", "two"))
                         }
                     }
-                    aborts("Parameter <b> not provided")
+                    expectingPositional("b")
                 }
             }
-            aborts("Parameter <a> not provided")
-            aborts("Parameter <b> not provided")
+            expectingPositional("a")
+            expectingPositional("b")
         }
     }
 
@@ -38,16 +38,16 @@ class MultipleStringPositionalsTest : AbstractParseTest() {
                                     endOfInput(listOf("one", "two", "three"))
                                 }
                             }
-                            aborts("Parameter <c> not provided")
+                            expectingPositional("c")
                         }
                     }
-                    aborts("Parameter <b> not provided")
-                    aborts("Parameter <c> not provided")
+                    expectingPositional("b")
+                    expectingPositional("c")
                 }
             }
-            aborts("Parameter <a> not provided")
-            aborts("Parameter <b> not provided")
-            aborts("Parameter <c> not provided")
+            expectingPositional("a")
+            expectingPositional("b")
+            expectingPositional("c")
         }
     }
 

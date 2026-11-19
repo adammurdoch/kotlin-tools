@@ -14,7 +14,7 @@ class RequiredBooleanOptionTest : AbstractParseTest() {
                     endOfInput(Unit)
                 }
             }
-            aborts("Option -x not provided")
+            expectingOption("-x")
         }
     }
 

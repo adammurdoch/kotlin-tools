@@ -1,7 +1,6 @@
 package net.rubygrapefruit.cli.parser
 
 import kotlin.test.Test
-import kotlin.test.assertEquals
 
 class ChoiceOfCommandOrNoParametersTest : AbstractParseTest() {
     @Test
@@ -11,8 +10,14 @@ class ChoiceOfCommandOrNoParametersTest : AbstractParseTest() {
             params { "none" }
         )
 
-        assertEquals("command", parser.parse("one").get())
-        assertEquals("none", parser.parse().get())
+        parser.edges {
+            positional {
+                matches("one") {
+                    endOfInput("command")
+                }
+            }
+            endOfInput("none")
+        }
     }
 
     @Test
@@ -22,7 +27,13 @@ class ChoiceOfCommandOrNoParametersTest : AbstractParseTest() {
             params(command("one")) { "command" }
         )
 
-        assertEquals("command", parser.parse("one").get())
-        assertEquals("none", parser.parse().get())
+        parser.edges {
+            endOfInput("none")
+            positional {
+                matches("one") {
+                    endOfInput("command")
+                }
+            }
+        }
     }
 }

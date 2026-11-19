@@ -81,8 +81,9 @@ private class OptionValue(val value: Any, matchedFlag: String, source: OptionEdg
 }
 
 internal class RequiredOption(val flags: List<String>) : ParseEdge.NotEndOfInput {
-    override fun abort(): Problem {
-        val longest = flags.maxBy { it.length }
-        return MissingOption(longest)
-    }
+    override val expecting: String
+        get() {
+            val longest = flags.maxBy { it.length }
+            return "option $longest"
+        }
 }

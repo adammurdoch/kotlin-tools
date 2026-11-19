@@ -17,7 +17,7 @@ class StringOptionAndStringPositionalTest : AbstractParseTest() {
                             endOfInput(Pair("one", "two"))
                         }
                     }
-                    aborts("Parameter <a> not provided")
+                    expectingPositional("a")
                 }
             }
             positional {
@@ -30,7 +30,7 @@ class StringOptionAndStringPositionalTest : AbstractParseTest() {
                     endOfInput(Pair(null, "two"))
                 }
             }
-            aborts("Parameter <a> not provided")
+            expectingPositional("a")
         }
     }
 

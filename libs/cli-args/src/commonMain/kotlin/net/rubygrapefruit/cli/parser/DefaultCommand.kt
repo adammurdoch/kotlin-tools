@@ -33,9 +33,8 @@ internal class DefaultCommand(private val text: String) : AbstractParser<Unit>()
     }
 
     private class RequiredCommend(private val text: String) : ParseEdge.NotEndOfInput {
-        override fun abort(): Problem {
-            return MissingCommand(text)
-        }
+        override val expecting: String
+            get() = "'$text'"
     }
 
     private class State(val text: String) : ParseState<Unit> {

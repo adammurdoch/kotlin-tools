@@ -28,7 +28,7 @@ class OneOrMoreStringPositionalTest : AbstractParseTest() {
                     endOfInput(listOf("value 1"))
                 }
             }
-            aborts("Parameter <a> not provided")
+            expectingPositional("a")
         }
     }
 

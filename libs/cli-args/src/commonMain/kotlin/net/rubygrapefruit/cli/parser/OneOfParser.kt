@@ -13,8 +13,29 @@ internal class OneOfParser<OUT>(val choices: List<ParserInternal<OUT>>) : Abstra
     }
 
     override fun edges(consumer: (ParseEdge) -> Unit) {
+        val edges = mutableListOf<ParseEdge>()
+        var matchesEndOfInput = false
+        var matchesNotEndOfInput = false
         for (choice in choices) {
-            choice.edges(consumer)
+            choice.edges { edge ->
+                edges.add(edge)
+                if (edge is ParseEdge.EndOfInput) {
+                    matchesEndOfInput = true
+                } else if (edge is ParseEdge.NotEndOfInput) {
+                    matchesNotEndOfInput = true
+                }
+            }
+        }
+
+        if (matchesEndOfInput && matchesNotEndOfInput) {
+            for (edge in edges) {
+                // Discard not end of input
+                if (edge !is ParseEdge.NotEndOfInput) {
+                    consumer(edge)
+                }
+            }
+        } else {
+            edges.forEach(consumer)
         }
     }
 

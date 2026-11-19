@@ -17,19 +17,19 @@ class ChoiceOfRequiredStringOptionTest : AbstractParseTest() {
                     endOfInput("one")
                 }
             }
-            aborts("Option -a not provided")
+            expectingOption("-a")
             nonPositional {
                 matches("-b", "two") {
                     endOfInput("two")
                 }
             }
-            aborts("Option -b not provided")
+            expectingOption("-b")
             nonPositional {
                 matches("--long", "three") {
                     endOfInput("three")
                 }
             }
-            aborts("Option --long not provided")
+            expectingOption("--long")
         }
     }
 

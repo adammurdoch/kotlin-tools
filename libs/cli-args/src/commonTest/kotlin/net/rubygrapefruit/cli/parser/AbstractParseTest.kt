@@ -226,7 +226,9 @@ abstract class AbstractParseTest {
         fun nonPositional(config: (MatcherEdge.() -> Unit)? = null)
         fun positional(config: (MatcherEdge.() -> Unit)? = null)
         fun endOfInput(value: Any?, config: (Edge.() -> Unit)? = null)
-        fun aborts(message: String)
+        fun expectingOption(name: String)
+        fun expectingCommand(name: String)
+        fun expectingPositional(name: String)
     }
 
     @OptIn(ExperimentalKotlinTestApi::class)
@@ -243,6 +245,9 @@ abstract class AbstractParseTest {
             assertTrue(edges.isNotEmpty())
             val terminating = edges.count { it is ParseEdge.Terminating }
             assertTrue(terminating > 0) { "expected a terminating edge in $edges" }
+            val endOfInput = edges.count { it is ParseEdge.EndOfInput }
+            val notEndOfInput = edges.count { it is ParseEdge.NotEndOfInput }
+            assertTrue((endOfInput > 0).xor(notEndOfInput > 0)) { "expected end or input or not end of input but not both in $edges" }
         }
 
         override fun nonPositional(config: (MatcherEdge.() -> Unit)?) {
@@ -276,11 +281,21 @@ abstract class AbstractParseTest {
             current++
         }
 
-        override fun aborts(message: String) {
+        override fun expectingOption(name: String) {
+            aborts("option $name")
+        }
+
+        override fun expectingPositional(name: String) {
+            aborts("parameter <$name>")
+        }
+
+        override fun expectingCommand(name: String) {
+            aborts("'$name'")
+        }
+
+        private fun aborts(expecting: String) {
             val edge = assertIs<ParseEdge.NotEndOfInput>(edges[current])
-            val buffer = BufferingOutput()
-            edge.abort().writeTo(buffer)
-            assertEquals(message, buffer.text)
+            assertEquals(expecting, edge.expecting)
             current++
         }
     }

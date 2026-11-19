@@ -16,7 +16,6 @@ internal class ZeroOrMorePositionalEdge(val value: List<String>) : ParseEdge.Pos
 }
 
 internal class RequiredPositional(val name: String) : ParseEdge.NotEndOfInput {
-    override fun abort(): Problem {
-        return MissingPositional(name)
-    }
+    override val expecting: String
+        get() = "parameter <$name>"
 }

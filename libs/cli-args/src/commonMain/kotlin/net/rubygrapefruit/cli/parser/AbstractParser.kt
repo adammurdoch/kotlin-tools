@@ -60,7 +60,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
             if (edge is ParseEdge.Failed) {
                 unrecognizedProblems.add(edge.failure())
             } else if (edge is ParseEdge.NotEndOfInput) {
-                unrecognizedProblems.add(ProblemAtIndex(args.size, edge.abort()))
+                unrecognizedProblems.add(ProblemAtIndex(args.size, MissingParameter(edge.expecting)))
             } else if (edge is ParseEdge.EndOfInput) {
                 success = edge
             }

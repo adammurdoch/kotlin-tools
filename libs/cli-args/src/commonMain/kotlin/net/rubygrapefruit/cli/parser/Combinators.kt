@@ -104,7 +104,7 @@ fun action(summary: String? = null, action: Runnable.Context.() -> Unit): Parser
     }
 }
 
-fun <A> action(a: Parser<A>, summary: String? = null, action: (A) -> Unit): Parser<Runnable> {
+fun <A> action(a: Parser<A>, summary: String? = null, action: Runnable.Context.(A) -> Unit): Parser<Runnable> {
     return params(a, summary) { a ->
         object : Runnable {
             override fun Runnable.Context.run() {
@@ -114,7 +114,7 @@ fun <A> action(a: Parser<A>, summary: String? = null, action: (A) -> Unit): Pars
     }
 }
 
-fun <A, B> action(a: Parser<A>, b: Parser<B>, summary: String? = null, action: (A, B) -> Unit): Parser<Runnable> {
+fun <A, B> action(a: Parser<A>, b: Parser<B>, summary: String? = null, action: Runnable.Context.(A, B) -> Unit): Parser<Runnable> {
     return params(a, b, summary) { a, b ->
         object : Runnable {
             override fun Runnable.Context.run() {
@@ -124,7 +124,7 @@ fun <A, B> action(a: Parser<A>, b: Parser<B>, summary: String? = null, action: (
     }
 }
 
-fun <A, B, C> action(a: Parser<A>, b: Parser<B>, c: Parser<C>, summary: String? = null, action: (A, B, C) -> Unit): Parser<Runnable> {
+fun <A, B, C> action(a: Parser<A>, b: Parser<B>, c: Parser<C>, summary: String? = null, action: Runnable.Context.(A, B, C) -> Unit): Parser<Runnable> {
     return params(a, b, c, summary) { a, b, c ->
         object : Runnable {
             override fun Runnable.Context.run() {
@@ -134,7 +134,7 @@ fun <A, B, C> action(a: Parser<A>, b: Parser<B>, c: Parser<C>, summary: String? 
     }
 }
 
-fun <A, B, C, D> action(a: Parser<A>, b: Parser<B>, c: Parser<C>, d: Parser<D>, summary: String? = null, action: (A, B, C, D) -> Unit): Parser<Runnable> {
+fun <A, B, C, D> action(a: Parser<A>, b: Parser<B>, c: Parser<C>, d: Parser<D>, summary: String? = null, action: Runnable.Context.(A, B, C, D) -> Unit): Parser<Runnable> {
     return params(a, b, c, d, summary) { a, b, c, d ->
         object : Runnable {
             override fun Runnable.Context.run() {
@@ -144,7 +144,7 @@ fun <A, B, C, D> action(a: Parser<A>, b: Parser<B>, c: Parser<C>, d: Parser<D>, 
     }
 }
 
-fun <A, B, C, D, E> action(a: Parser<A>, b: Parser<B>, c: Parser<C>, d: Parser<D>, e: Parser<E>, summary: String? = null, action: (A, B, C, D, E) -> Unit): Parser<Runnable> {
+fun <A, B, C, D, E> action(a: Parser<A>, b: Parser<B>, c: Parser<C>, d: Parser<D>, e: Parser<E>, summary: String? = null, action: Runnable.Context.(A, B, C, D, E) -> Unit): Parser<Runnable> {
     return params(a, b, c, d, e, summary) { a, b, c, d, e ->
         object : Runnable {
             override fun Runnable.Context.run() {

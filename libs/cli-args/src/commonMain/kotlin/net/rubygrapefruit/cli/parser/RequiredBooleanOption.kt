@@ -3,10 +3,10 @@ package net.rubygrapefruit.cli.parser
 import net.rubygrapefruit.cli.terminal.Output
 
 internal class RequiredBooleanOption(private val flags: List<String>, private val names: List<String>, private val summary: String?) : AbstractParser<Unit>(), Option<Unit> {
+    private val expecting = "option " + flags.maxBy { it.length }
 
     override fun edges(consumer: (ParseEdge) -> Unit) {
-        consumer(FlagEdge(flags, names, Unit))
-        consumer(RequiredOption(flags))
+        consumer(FlagEdge(flags, names, expecting, Unit))
     }
 
     override fun usage(): UsageInternal {

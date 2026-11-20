@@ -8,7 +8,7 @@ internal class DefaultBooleanOption(private val flags: List<String>, private val
     }
 
     override fun edges(consumer: (ParseEdge) -> Unit) {
-        consumer(FlagEdge(flags, names, true))
+        consumer(FlagEdge(flags, names, null, true))
         consumer(FixedValue(false))
     }
 

@@ -16,16 +16,16 @@ class ZeroOrMoreStringPositionalAndPositionalTest : AbstractParseTest() {
                         matches("two") {
                             endOfInput(Pair(listOf("one"), "two"))
                         }
+                        expectingPositional("b")
                     }
-                    expectingPositional("b")
                 }
             }
             positional {
                 matches("one") {
                     endOfInput(Pair(emptyList<String>(), "one"))
                 }
+                expectingPositional("b")
             }
-            expectingPositional("b")
         }
     }
 

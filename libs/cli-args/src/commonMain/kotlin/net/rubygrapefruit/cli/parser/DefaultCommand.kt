@@ -6,7 +6,6 @@ internal class DefaultCommand(private val text: String) : AbstractParser<Unit>()
 
     override fun edges(consumer: (ParseEdge) -> Unit) {
         consumer(CommandEdge(text))
-        consumer(RequiredCommand(text))
     }
 
     override fun usage(): UsageInternal {
@@ -23,6 +22,9 @@ internal class DefaultCommand(private val text: String) : AbstractParser<Unit>()
         override val positional: Boolean
             get() = true
 
+        override val expecting: String
+            get() = "'$text'"
+
         override fun next(args: InputArgs): ParseEdge.Transition {
             return if (args.first() == text) {
                 ParseEdge.Transition.Matched(1, FixedValue(Unit))
@@ -30,10 +32,5 @@ internal class DefaultCommand(private val text: String) : AbstractParser<Unit>()
                 ParseEdge.Transition.NotMatched
             }
         }
-    }
-
-    private class RequiredCommand(private val text: String) : ParseEdge.NotEndOfInput {
-        override val expecting: String
-            get() = "'$text'"
     }
 }

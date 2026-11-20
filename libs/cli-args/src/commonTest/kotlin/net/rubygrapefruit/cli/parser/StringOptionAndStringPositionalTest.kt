@@ -16,8 +16,8 @@ class StringOptionAndStringPositionalTest : AbstractParseTest() {
                         matches("two") {
                             endOfInput(Pair("one", "two"))
                         }
+                        expectingPositional("a")
                     }
-                    expectingPositional("a")
                 }
             }
             positional {
@@ -29,8 +29,8 @@ class StringOptionAndStringPositionalTest : AbstractParseTest() {
                     }
                     endOfInput(Pair(null, "two"))
                 }
+                expectingPositional("a")
             }
-            expectingPositional("a")
         }
     }
 

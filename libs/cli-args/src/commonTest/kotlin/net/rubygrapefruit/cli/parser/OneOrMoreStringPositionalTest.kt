@@ -27,8 +27,8 @@ class OneOrMoreStringPositionalTest : AbstractParseTest() {
                     }
                     endOfInput(listOf("value 1"))
                 }
+                expectingPositional("a")
             }
-            expectingPositional("a")
         }
     }
 

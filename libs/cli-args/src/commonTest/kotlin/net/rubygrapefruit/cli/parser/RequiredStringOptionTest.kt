@@ -18,8 +18,8 @@ class RequiredStringOptionTest : AbstractParseTest() {
                 }
                 doesNotMatch("unknown")
                 doesNotMatch("--other")
+                expectingOption("-x")
             }
-            expectingOption("-x")
         }
     }
 
@@ -42,8 +42,8 @@ class RequiredStringOptionTest : AbstractParseTest() {
                 matches("--some-option", "value") {
                     endOfInput("value")
                 }
+                expectingOption("--some-option")
             }
-            expectingOption("--some-option")
         }
     }
 
@@ -132,8 +132,8 @@ class RequiredStringOptionTest : AbstractParseTest() {
             nonPositional {
                 fails("-x", index = 1, message = "No value provided for option -x")
                 fails("--long", index = 1, message = "No value provided for option --long")
+                expectingOption("--long")
             }
-            expectingOption("--long")
         }
     }
 

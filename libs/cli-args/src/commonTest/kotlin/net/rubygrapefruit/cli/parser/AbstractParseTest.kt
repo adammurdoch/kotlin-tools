@@ -238,9 +238,6 @@ abstract class AbstractParseTest {
         fun nonPositional(config: (MatcherEdge.() -> Unit)? = null)
         fun positional(config: (MatcherEdge.() -> Unit)? = null)
         fun endOfInput(value: Any?, config: (Edge.() -> Unit)? = null)
-        fun expectingOption(name: String)
-        fun expectingCommand(name: String)
-        fun expectingPositional(name: String)
     }
 
     @OptIn(ExperimentalKotlinTestApi::class)
@@ -255,11 +252,9 @@ abstract class AbstractParseTest {
             }
 
             assertTrue(edges.isNotEmpty())
+            val notEndOfInput = edges.count { it is ParseEdge.Matcher && it.expecting != null }
             val terminating = edges.count { it is ParseEdge.Terminating }
-            assertTrue(terminating > 0) { "expected a terminating edge in $edges" }
-            val endOfInput = edges.count { it is ParseEdge.EndOfInput }
-            val notEndOfInput = edges.count { it is ParseEdge.NotEndOfInput }
-            assertTrue((endOfInput > 0).xor(notEndOfInput > 0)) { "expected end or input or not end of input but not both in $edges" }
+            assertTrue(terminating > 0 || notEndOfInput > 0) { "expected a terminating edge in $edges" }
         }
 
         override fun nonPositional(config: (MatcherEdge.() -> Unit)?) {
@@ -292,24 +287,6 @@ abstract class AbstractParseTest {
 
             current++
         }
-
-        override fun expectingOption(name: String) {
-            aborts("option $name")
-        }
-
-        override fun expectingPositional(name: String) {
-            aborts("parameter <$name>")
-        }
-
-        override fun expectingCommand(name: String) {
-            aborts("'$name'")
-        }
-
-        private fun aborts(expecting: String) {
-            val edge = assertIs<ParseEdge.NotEndOfInput>(edges[current])
-            assertEquals(expecting, edge.expecting)
-            current++
-        }
     }
 
     protected interface Edge {
@@ -328,6 +305,10 @@ abstract class AbstractParseTest {
         fun matches(firstArg: String, vararg moreArgs: String, config: (Edges.() -> Unit)? = null)
 
         fun fails(firstArg: String, vararg moreArgs: String, index: Int, message: String, config: (Edge.() -> Unit)? = null)
+
+        fun expectingOption(name: String)
+        fun expectingCommand(name: String)
+        fun expectingPositional(name: String)
     }
 
     private class ExpectedProblem(val index: Int, val message: String)
@@ -436,6 +417,22 @@ abstract class AbstractParseTest {
 
         private fun next(args: List<String>): ParseEdge.Transition {
             return edge.next(DefaultInputArgs(0, args))
+        }
+
+        override fun expectingOption(name: String) {
+            aborts("option $name")
+        }
+
+        override fun expectingPositional(name: String) {
+            aborts("parameter <$name>")
+        }
+
+        override fun expectingCommand(name: String) {
+            aborts("'$name'")
+        }
+
+        private fun aborts(expecting: String) {
+            assertEquals(expecting, edge.expecting)
         }
     }
 }

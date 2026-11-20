@@ -16,8 +16,8 @@ class CommandTest : AbstractParseTest() {
                 }
                 doesNotMatch("other")
                 doesNotMatch("-x")
+                expectingCommand("help")
             }
-            expectingCommand("help")
         }
     }
 

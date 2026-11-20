@@ -57,14 +57,15 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
         val problems = mutableListOf<ProblemAtIndex>()
 
         val finalExpected = mutableSetOf<String>()
-        if (success == null) {
-            // Parsing did not succeed (vs did succeed but there are unrecognized arguments)
-            for (candidate in candidates) {
-                val edge = candidate.edge
-                if (edge is ParseEdge.Failed) {
-                    problems.add(edge.failure())
-                } else if (edge is ParseEdge.NotEndOfInput) {
-                    finalExpected.add(edge.expecting)
+        for (candidate in candidates) {
+            val edge = candidate.edge
+            if (edge is ParseEdge.Failed && success == null) {
+                // Ignore failure if parsing was successful
+                problems.add(edge.failure())
+            } else if (edge is ParseEdge.Matcher) {
+                val expecting = edge.expecting
+                if (expecting != null) {
+                    finalExpected.add(expecting)
                 }
             }
         }
@@ -94,9 +95,10 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
             } else {
                 val expected = mutableSetOf<String>()
                 for (candidate in candidates) {
-                    if (candidate.advance == 1 && candidate.edge is ParseEdge.NotEndOfInput) {
-                        if (finalExpected.contains(candidate.edge.expecting) && reportedExpected.add(candidate.edge.expecting)) {
-                            expected.add(candidate.edge.expecting)
+                    if (candidate.advance == 1 && candidate.edge is ParseEdge.Matcher) {
+                        val expecting = candidate.edge.expecting
+                        if (expecting != null && finalExpected.contains(expecting) && reportedExpected.add(expecting)) {
+                            expected.add(expecting)
                         }
                     }
                 }

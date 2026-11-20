@@ -14,18 +14,17 @@ class OneOrMoreStringPositionalAndPositionalTest : AbstractParseTest() {
                         matches("two") {
                             positional { }
                             positional { }
-                            expectingPositional("b")
                         }
                     }
                     positional {
                         matches("two") {
                             endOfInput(Pair(listOf("one"), "two"))
                         }
+                        expectingPositional("b")
                     }
-                    expectingPositional("b")
                 }
+                expectingPositional("a")
             }
-            expectingPositional("a")
         }
     }
 

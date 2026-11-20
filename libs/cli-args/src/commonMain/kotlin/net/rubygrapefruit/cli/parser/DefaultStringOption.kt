@@ -18,7 +18,7 @@ internal class DefaultStringOption(
     }
 
     override fun edges(consumer: (ParseEdge) -> Unit) {
-        consumer(StringOptionEdge(flags, names))
+        consumer(StringOptionEdge(flags, names, null))
         consumer(FixedValue(null))
     }
 

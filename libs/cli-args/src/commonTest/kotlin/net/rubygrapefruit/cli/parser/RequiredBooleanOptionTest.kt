@@ -13,8 +13,8 @@ class RequiredBooleanOptionTest : AbstractParseTest() {
                 matches("-x") {
                     endOfInput(Unit)
                 }
+                expectingOption("-x")
             }
-            expectingOption("-x")
         }
     }
 

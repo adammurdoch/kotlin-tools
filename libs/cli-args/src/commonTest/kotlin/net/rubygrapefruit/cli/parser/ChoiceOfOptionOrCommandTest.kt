@@ -21,14 +21,14 @@ class ChoiceOfOptionOrCommandTest : AbstractParseTest() {
                 matches("--help") {
                     endOfInput("help")
                 }
+                expectingOption("--help")
             }
-            expectingOption("--help")
             positional {
                 matches("run") {
                     endOfInput("run")
                 }
+                expectingCommand("run")
             }
-            expectingCommand("run")
         }
     }
 
@@ -134,15 +134,14 @@ class ChoiceOfOptionOrCommandTest : AbstractParseTest() {
                         doesNotMatch("--help", message = "Option --help can only appear once")
                     }
                 }
+                expectingOption("--help")
             }
-            expectingOption("--help")
             positional {
                 matches("run") {
                     endOfInput("run")
                 }
+                expectingCommand("run")
             }
-            expectingCommand("run")
         }
-
     }
 }

@@ -1,6 +1,6 @@
 package net.rubygrapefruit.cli.parser
 
-internal abstract class OptionEdge(val flags: List<String>, val names: List<String>) : ParseEdge.Matcher {
+internal abstract class OptionEdge(val flags: List<String>, val names: List<String>, override val expecting: String?) : ParseEdge.Matcher {
     override val positional: Boolean
         get() = false
 
@@ -18,7 +18,7 @@ internal abstract class OptionEdge(val flags: List<String>, val names: List<Stri
     abstract fun claim(args: InputArgs): Int
 }
 
-internal class FlagEdge(flags: List<String>, names: List<String>, val value: Any) : OptionEdge(flags, names) {
+internal class FlagEdge(flags: List<String>, names: List<String>, expecting: String?, val value: Any) : OptionEdge(flags, names, expecting) {
     override fun next(args: InputArgs): ParseEdge.Transition {
         val first = args.first()
         return if (flags.contains(first)) {
@@ -33,7 +33,7 @@ internal class FlagEdge(flags: List<String>, names: List<String>, val value: Any
     }
 }
 
-internal class StringOptionEdge(flags: List<String>, names: List<String>) : OptionEdge(flags, names) {
+internal class StringOptionEdge(flags: List<String>, names: List<String>, expecting: String?) : OptionEdge(flags, names, expecting) {
     override fun next(args: InputArgs): ParseEdge.Transition {
         val first = args.first()
         return if (flags.contains(first)) {
@@ -85,12 +85,4 @@ private class OptionValue(val value: Any, matchedFlag: String, source: OptionEdg
     override fun value(): Any {
         return value
     }
-}
-
-internal class RequiredOption(val flags: List<String>) : ParseEdge.NotEndOfInput {
-    override val expecting: String
-        get() {
-            val longest = flags.maxBy { it.length }
-            return "option $longest"
-        }
 }

@@ -12,8 +12,7 @@ internal class DefaultStringPositional(private val name: String, private val sum
     }
 
     override fun edges(consumer: (ParseEdge) -> Unit) {
-        consumer(PositionalEdge)
-        consumer(RequiredPositional(name))
+        consumer(PositionalEdge(name))
     }
 
     override fun usage(): UsageInternal {
@@ -34,9 +33,12 @@ internal class DefaultStringPositional(private val name: String, private val sum
         }
     }
 
-    private object PositionalEdge : ParseEdge.Matcher {
+    private class PositionalEdge(val name: String) : ParseEdge.Matcher {
         override val positional: Boolean
             get() = true
+
+        override val expecting: String
+            get() = "parameter <$name>"
 
         override fun next(args: InputArgs): ParseEdge.Transition {
             return if (args.firstIsOption()) {

@@ -101,12 +101,6 @@ internal class AllOfParser<OUT>(
                             elementHasEndOfInput = true
                         }
 
-                        is ParseEdge.NotEndOfInput -> {
-                            if (addPositional) {
-                                consumer(edge)
-                            }
-                        }
-
                         else -> {
                             consumer(edge)
                         }
@@ -129,6 +123,9 @@ internal class AllOfParser<OUT>(
     private class ElementMatcher(val element: ElementNode, val edge: ParseEdge.Matcher, val owner: ElementNodes) : ParseEdge.Matcher {
         override val positional: Boolean
             get() = edge.positional
+
+        override val expecting: String?
+            get() = edge.expecting
 
         override fun maybeClaimUnrecognized(args: InputArgs): ParseEdge.Claimed? {
             return edge.maybeClaimUnrecognized(args)

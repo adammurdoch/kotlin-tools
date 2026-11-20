@@ -28,14 +28,14 @@ class AppWithChoiceOfOptionOrCommandTest : AbstractParseTest() {
                 matches("--help") {
                     endOfInput(OneParam("help"))
                 }
+                expectingOption("--help")
             }
-            expectingOption("--help")
             positional {
                 matches("run") {
                     endOfInput(OneParam("run"))
                 }
+                expectingCommand("run")
             }
-            expectingCommand("run")
         }
     }
 

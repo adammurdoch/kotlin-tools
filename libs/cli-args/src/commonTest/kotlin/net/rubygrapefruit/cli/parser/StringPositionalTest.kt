@@ -16,8 +16,8 @@ class StringPositionalTest : AbstractParseTest() {
                     endOfInput("")
                 }
                 doesNotMatch("-x")
+                expectingPositional("param")
             }
-            expectingPositional("param")
         }
     }
 

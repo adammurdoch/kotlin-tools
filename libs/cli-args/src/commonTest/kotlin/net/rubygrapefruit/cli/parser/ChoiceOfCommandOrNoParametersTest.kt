@@ -1,6 +1,7 @@
 package net.rubygrapefruit.cli.parser
 
 import kotlin.test.Test
+import kotlin.test.fail
 
 class ChoiceOfCommandOrNoParametersTest : AbstractParseTest() {
     @Test
@@ -34,6 +35,33 @@ class ChoiceOfCommandOrNoParametersTest : AbstractParseTest() {
                     endOfInput("command")
                 }
             }
+        }
+    }
+
+    @Test
+    fun `cannot include extra inputs`() {
+        val parser = oneOf(
+            params(command("one")) { fail() },
+            params { fail() }
+        )
+
+        parser.fails("unknown") {
+            failure(0, "Unexpected argument 'unknown'. Expected 'one' instead")
+        }
+        parser.fails("--unknown") {
+            failure(0, "Unexpected option '--unknown'. Expected 'one' instead")
+        }
+        parser.fails("one", "unknown") {
+            failure(1, "Unexpected argument 'unknown'")
+        }
+        parser.fails("one", "one") {
+            failure(1, "Unexpected argument 'one'")
+        }
+        parser.fails("unknown", "one") {
+            failure(0, "Unexpected argument 'unknown'")
+        }
+        parser.fails("one", "-unknown") {
+            failure(1, "Unexpected option '-unknown'")
         }
     }
 }

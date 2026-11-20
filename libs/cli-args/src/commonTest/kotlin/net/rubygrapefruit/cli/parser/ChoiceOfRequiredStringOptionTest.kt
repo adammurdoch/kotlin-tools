@@ -16,20 +16,20 @@ class ChoiceOfRequiredStringOptionTest : AbstractParseTest() {
                 matches("-a", "one") {
                     endOfInput("one")
                 }
+                expectingOption("-a")
             }
-            expectingOption("-a")
             nonPositional {
                 matches("-b", "two") {
                     endOfInput("two")
                 }
+                expectingOption("-b")
             }
-            expectingOption("-b")
             nonPositional {
                 matches("--long", "three") {
                     endOfInput("three")
                 }
+                expectingOption("--long")
             }
-            expectingOption("--long")
         }
     }
 

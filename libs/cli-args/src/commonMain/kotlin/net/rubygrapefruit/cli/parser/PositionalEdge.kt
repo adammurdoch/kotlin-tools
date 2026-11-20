@@ -4,6 +4,9 @@ internal class ZeroOrMorePositionalEdge(val value: List<String>) : ParseEdge.Mat
     override val positional: Boolean
         get() = true
 
+    override val expecting: String?
+        get() = null
+
     override fun edges(consumer: (ParseEdge) -> Unit) {
         consumer(this)
         consumer(FixedValue(value))
@@ -16,9 +19,4 @@ internal class ZeroOrMorePositionalEdge(val value: List<String>) : ParseEdge.Mat
             ParseEdge.Transition.Matched(1, ZeroOrMorePositionalEdge(value + args.first()))
         }
     }
-}
-
-internal class RequiredPositional(val name: String) : ParseEdge.NotEndOfInput {
-    override val expecting: String
-        get() = "parameter <$name>"
 }

@@ -15,11 +15,11 @@ class MultipleStringPositionalsTest : AbstractParseTest() {
                         matches("two") {
                             endOfInput(listOf("one", "two"))
                         }
+                        expectingPositional("b")
                     }
-                    expectingPositional("b")
                 }
+                expectingPositional("a")
             }
-            expectingPositional("a")
         }
     }
 
@@ -36,14 +36,14 @@ class MultipleStringPositionalsTest : AbstractParseTest() {
                                 matches("three") {
                                     endOfInput(listOf("one", "two", "three"))
                                 }
+                                expectingPositional("c")
                             }
-                            expectingPositional("c")
                         }
+                        expectingPositional("b")
                     }
-                    expectingPositional("b")
                 }
+                expectingPositional("a")
             }
-            expectingPositional("a")
         }
     }
 

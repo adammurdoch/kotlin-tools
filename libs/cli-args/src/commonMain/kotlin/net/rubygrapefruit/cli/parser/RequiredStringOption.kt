@@ -8,14 +8,14 @@ internal class RequiredStringOption(
     private val summary: String?,
     private val valueName: String
 ) : AbstractParser<String>(), Option<String> {
+    private val expecting = "option " + flags.maxBy { it.length }
 
     override fun usage(): UsageInternal {
         return OptionUsage()
     }
 
     override fun edges(consumer: (ParseEdge) -> Unit) {
-        consumer(StringOptionEdge(flags, names))
-        consumer(RequiredOption(flags))
+        consumer(StringOptionEdge(flags, names, expecting))
     }
 
     private inner class OptionUsage : UsageInternal.OptionUsage {

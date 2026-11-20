@@ -58,7 +58,6 @@ class StringPositionalTest : AbstractParseTest() {
         parser.fails("value", "other") {
             failure(1, "Unexpected argument 'other'")
         }
-        println("-> START")
         parser.fails("-unknown", "value") {
             failure(0, "Unexpected option '-unknown'")
         }

@@ -28,8 +28,8 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
                         val result = edge.next(current)
                         when (result) {
                             is ParseEdge.Transition.Matched -> {
-                                result.next.edges {
-                                    nextCandidates.add(EdgeState(it, result.count))
+                                result.next.edges { edge ->
+                                    nextCandidates.add(EdgeState(edge, result.count))
                                 }
                             }
 

@@ -6,7 +6,7 @@ internal class DefaultCommand(private val text: String) : AbstractParser<Unit>()
 
     override fun edges(consumer: (ParseEdge) -> Unit) {
         consumer(CommandEdge(text))
-        consumer(RequiredCommend(text))
+        consumer(RequiredCommand(text))
     }
 
     override fun usage(): UsageInternal {
@@ -29,7 +29,7 @@ internal class DefaultCommand(private val text: String) : AbstractParser<Unit>()
         }
     }
 
-    private class RequiredCommend(private val text: String) : ParseEdge.NotEndOfInput {
+    private class RequiredCommand(private val text: String) : ParseEdge.NotEndOfInput {
         override val expecting: String
             get() = "'$text'"
     }

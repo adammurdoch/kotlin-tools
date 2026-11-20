@@ -45,6 +45,8 @@ internal sealed interface ParseEdge {
      * Cannot proceed.
      */
     sealed interface Failed : Terminating {
+        val positional: Boolean
+
         fun failure(): ProblemAtIndex
     }
 

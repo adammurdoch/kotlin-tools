@@ -86,8 +86,14 @@ internal class AllOfParser<OUT>(
                         }
 
                         is ParseEdge.Failed -> {
-                            consumer(edge)
-                            elementHasPositional = true
+                            if (edge.positional) {
+                                if (addPositional) {
+                                    consumer(edge)
+                                    elementHasPositional = true
+                                }
+                            } else {
+                                consumer(edge)
+                            }
                         }
 
                         is ParseEdge.EndOfInput -> {

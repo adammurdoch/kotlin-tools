@@ -73,6 +73,9 @@ private abstract class AfterOptionEdge(val matchedFlag: String, val source: Opti
 }
 
 private class MissingOptionValueEdge(val index: Int, matchedFlag: String, source: OptionEdge) : AfterOptionEdge(matchedFlag, source), ParseEdge.Failed {
+    override val positional: Boolean
+        get() = false
+
     override fun failure(): ProblemAtIndex {
         return ProblemAtIndex(index, MissingOptionValue(matchedFlag))
     }

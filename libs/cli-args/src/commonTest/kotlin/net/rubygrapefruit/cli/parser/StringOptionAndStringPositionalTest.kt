@@ -73,7 +73,7 @@ class StringOptionAndStringPositionalTest : AbstractParseTest() {
         }
         parser.fails("-x") {
             failure(1, "No value provided for option -x")
-//            failure(1, "Parameter <a> not provided")
+            expectedParameter(1, "a")
         }
     }
 }

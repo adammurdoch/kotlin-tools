@@ -14,5 +14,16 @@ class OneOrMoreStringPositionalAndPositionalTest : AbstractParseTest() {
         parser.fails("one", "two") {
             failure(2, "Parameter <b> not provided")
         }
+
+        parser.edges {
+            positional {
+                matches("one") {
+                    positional {  }
+                    positional {  } // this will never be matched, should probably fail early
+                    expectingPositional("b")
+                }
+            }
+            expectingPositional("a")
+        }
     }
 }

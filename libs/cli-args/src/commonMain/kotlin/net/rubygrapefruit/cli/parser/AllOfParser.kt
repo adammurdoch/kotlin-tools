@@ -71,6 +71,7 @@ internal class AllOfParser<OUT>(
             for (index in elements.indices) {
                 val element = elements[index]
                 var elementHasPositional = false
+                var elementHasEndOfInput = false
                 for (edge in element.edges) {
                     when (edge) {
                         is ParseEdge.NonPositional -> {
@@ -91,6 +92,7 @@ internal class AllOfParser<OUT>(
 
                         is ParseEdge.EndOfInput -> {
                             // Hold back until all elements allow end of input
+                            elementHasEndOfInput = true
                         }
 
                         is ParseEdge.NotEndOfInput -> {
@@ -104,7 +106,7 @@ internal class AllOfParser<OUT>(
                         }
                     }
                 }
-                if (elementHasPositional) {
+                if (elementHasPositional && !elementHasEndOfInput) {
                     addPositional = false
                 }
             }

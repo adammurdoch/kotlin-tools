@@ -59,31 +59,23 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
         }
 
         val success = candidates.firstNotNullOfOrNull { it.edge as? ParseEdge.EndOfInput }
+        val totalUnrecognized = unrecognized.count { it != null }
+        if (success != null && totalUnrecognized == 0) {
+            return ParserInternal.Success(success.value() as T)
+        }
 
         val problems = mutableListOf<ProblemAtIndex>()
 
         if (success == null) {
-            val expected = mutableSetOf<String>()
             for (candidate in candidates) {
                 val edge = candidate.edge
-                when (edge) {
-                    is ParseEdge.Failed -> {
-                        problems.add(edge.failure())
-                    }
-
-                    is ParseEdge.NotEndOfInput -> {
-                        expected.add(edge.expecting)
-                    }
-
-                    else -> {
-                        // ignore
-                    }
+                if (edge is ParseEdge.Failed) {
+                    problems.add(edge.failure())
                 }
             }
-            if (expected.isNotEmpty()) {
-                problems.add(ProblemAtIndex(args.size, MissingParameters(expected.toList())))
-            }
         }
+
+        val allExpected = mutableSetOf<String>()
 
         var index = 0
         while (index < args.size) {
@@ -106,7 +98,9 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
                 val expected = mutableSetOf<String>()
                 for (candidate in candidates) {
                     if (candidate.advance == 1 && candidate.edge is ParseEdge.NotEndOfInput) {
-                        expected.add(candidate.edge.expecting)
+                        if (allExpected.add(candidate.edge.expecting)) {
+                            expected.add(candidate.edge.expecting)
+                        }
                     }
                 }
                 val problem = if (current.firstIsOption()) {
@@ -119,14 +113,25 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
             }
         }
 
+        if (success == null) {
+            val expected = mutableSetOf<String>()
+            for (candidate in candidates) {
+                val edge = candidate.edge
+                if (edge is ParseEdge.NotEndOfInput) {
+                    if (allExpected.add(edge.expecting)) {
+                        expected.add(edge.expecting)
+                    }
+                }
+            }
+            if (expected.isNotEmpty()) {
+                problems.add(ProblemAtIndex(args.size, MissingParameters(expected.toList())))
+            }
+        }
+
         if (problems.isNotEmpty()) {
             return ParserInternal.Failure(problems, this)
         }
-        if (success != null) {
-            return ParserInternal.Success(success.value() as T)
-        } else {
-            throw IllegalStateException()
-        }
+        throw IllegalStateException()
     }
 
     private fun parseUsingState(args: List<String>): Parser.Result<T> {

@@ -66,11 +66,15 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
 
         val problems = mutableListOf<ProblemAtIndex>()
 
+        val finalExpected = mutableSetOf<String>()
         if (success == null) {
+            // Parsing did not succeed (vs did succeed but there are unrecognized arguments)
             for (candidate in candidates) {
                 val edge = candidate.edge
                 if (edge is ParseEdge.Failed) {
                     problems.add(edge.failure())
+                } else if (edge is ParseEdge.NotEndOfInput) {
+                    finalExpected.add(edge.expecting)
                 }
             }
         }
@@ -98,7 +102,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
                 val expected = mutableSetOf<String>()
                 for (candidate in candidates) {
                     if (candidate.advance == 1 && candidate.edge is ParseEdge.NotEndOfInput) {
-                        if (allExpected.add(candidate.edge.expecting)) {
+                        if (finalExpected.contains(candidate.edge.expecting) && allExpected.add(candidate.edge.expecting)) {
                             expected.add(candidate.edge.expecting)
                         }
                     }
@@ -113,18 +117,10 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
             }
         }
 
-        if (success == null) {
-            val expected = mutableSetOf<String>()
-            for (candidate in candidates) {
-                val edge = candidate.edge
-                if (edge is ParseEdge.NotEndOfInput) {
-                    if (allExpected.add(edge.expecting)) {
-                        expected.add(edge.expecting)
-                    }
-                }
-            }
-            if (expected.isNotEmpty()) {
-                problems.add(ProblemAtIndex(args.size, MissingParameters(expected.toList())))
+        if (finalExpected.isNotEmpty()) {
+            val remainingExpected = finalExpected - allExpected
+            if (remainingExpected.isNotEmpty()) {
+                problems.add(ProblemAtIndex(args.size, MissingParameters(remainingExpected.toList())))
             }
         }
 

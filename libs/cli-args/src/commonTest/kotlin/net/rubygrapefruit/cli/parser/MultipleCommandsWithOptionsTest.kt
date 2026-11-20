@@ -52,7 +52,7 @@ class MultipleCommandsWithOptionsTest : AbstractParseTest() {
         val parser = params(command1, command2) { a, b -> listOf(a, b) }
 
         parser.fails("two", "one") {
-            failure(0, "Unexpected argument 'two'. Expected 'one' instead")
+            failure(0, "Unexpected argument 'two'")
             failure(2, "Expected 'two'")
         }
         parser.fails("one") {

@@ -53,11 +53,10 @@ class OneOrMoreStringPositionalTest : AbstractParseTest() {
         val parser = positional("a").oneOrMore()
 
         parser.fails {
-            failure(0, "Parameter <a> not provided")
+            expectedParameter(0, "a")
         }
         parser.fails("-unknown") {
-            failure(0, "Unexpected option '-unknown'")
-            failure(1, "Parameter <a> not provided")
+            failure(0, "Unexpected option '-unknown'. Expected parameter <a> instead")
         }
     }
 

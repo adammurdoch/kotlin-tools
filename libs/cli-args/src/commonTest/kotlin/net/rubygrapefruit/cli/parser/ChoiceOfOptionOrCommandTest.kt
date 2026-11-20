@@ -99,7 +99,7 @@ class ChoiceOfOptionOrCommandTest : AbstractParseTest() {
             failure(1, "Unexpected option '--unknown'")
         }
         parser.fails("unknown", "run") {
-            failure(0, "Unexpected argument 'unknown'. Expected option --help or 'run' instead")
+            failure(0, "Unexpected argument 'unknown'")
         }
         parser.fails("--help", "unknown") {
             failure(1, "Unexpected argument 'unknown'")

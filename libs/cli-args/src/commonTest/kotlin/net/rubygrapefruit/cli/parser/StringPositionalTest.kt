@@ -44,11 +44,10 @@ class StringPositionalTest : AbstractParseTest() {
         val parser = positional("param")
 
         parser.fails {
-            failure(0, "Parameter <param> not provided")
+            expectedParameter(0, "param")
         }
         parser.fails("-unknown") {
-            failure(0, "Unexpected option '-unknown'")
-            failure(1, "Parameter <param> not provided")
+            failure(0, "Unexpected option '-unknown'. Expected parameter <param> instead")
         }
     }
 
@@ -59,6 +58,7 @@ class StringPositionalTest : AbstractParseTest() {
         parser.fails("value", "other") {
             failure(1, "Unexpected argument 'other'")
         }
+        println("-> START")
         parser.fails("-unknown", "value") {
             failure(0, "Unexpected option '-unknown'")
         }

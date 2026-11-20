@@ -65,21 +65,17 @@ class MultipleStringPositionalsTest : AbstractParseTest() {
         val parser = params(positional("a"), positional("b")) { _, _ -> fail() }
 
         parser.fails {
-            failure(0, "Parameter <a> not provided")
-            failure(0, "Parameter <b> not provided")
+            expectedParameter(0, "a")
         }
         parser.fails("one") {
-            failure(1, "Parameter <b> not provided")
+            expectedParameter(1, "b")
         }
 
         parser.fails("--unknown") {
-            failure(0, "Unexpected option '--unknown'")
-            failure(1, "Parameter <a> not provided")
-            failure(1, "Parameter <b> not provided")
+            failure(0, "Unexpected option '--unknown'. Expected parameter <a> instead")
         }
         parser.fails("one", "--unknown") {
-            failure(1, "Unexpected option '--unknown'")
-            failure(2, "Parameter <b> not provided")
+            failure(1, "Unexpected option '--unknown'. Expected parameter <b> instead")
         }
     }
 

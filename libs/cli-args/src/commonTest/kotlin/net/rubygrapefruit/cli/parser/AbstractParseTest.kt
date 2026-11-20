@@ -88,6 +88,10 @@ abstract class AbstractParseTest {
         fun expectedParameter(index: Int, name: String) {
             failure(index, "Expected parameter <$name>")
         }
+
+        fun expectedCommand(index: Int, name: String) {
+            failure(index, "Expected '$name'")
+        }
     }
 
     @OptIn(ExperimentalKotlinTestApi::class)

@@ -4,25 +4,40 @@ import kotlin.test.Test
 
 class OneOrMoreStringPositionalAndPositionalTest : AbstractParseTest() {
     @Test
-    fun `repeated positional is greedy`() {
-        val parser = params(positional("a").oneOrMore(), positional("b")) { a, b -> a + b }
-
-        parser.fails("one") {
-            expectedParameter(1, "b")
-        }
-        parser.fails("one", "two") {
-            expectedParameter(2, "b")
-        }
+    fun `repeated positional is reluctant`() {
+        val parser = params(positional("a").oneOrMore(), positional("b")) { a, b -> Pair(a, b) }
 
         parser.edges {
             positional {
                 matches("one") {
-                    positional {  }
-                    positional {  } // this will never be matched, should probably fail early
+                    positional {
+                        matches("two") {
+                            positional { }
+                            positional { }
+                            expectingPositional("b")
+                        }
+                    }
+                    positional {
+                        matches("two") {
+                            endOfInput(Pair(listOf("one"), "two"))
+                        }
+                    }
                     expectingPositional("b")
                 }
             }
             expectingPositional("a")
+        }
+    }
+
+    @Test
+    fun `parameters must be provided`() {
+        val parser = params(positional("a").oneOrMore(), positional("b")) { a, b -> Pair(a, b) }
+
+        parser.fails {
+            expectedParameter(0, "a")
+        }
+        parser.fails("one") {
+            expectedParameter(1, "b")
         }
     }
 }

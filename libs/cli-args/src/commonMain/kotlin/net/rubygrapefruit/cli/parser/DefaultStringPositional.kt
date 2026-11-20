@@ -34,7 +34,10 @@ internal class DefaultStringPositional(private val name: String, private val sum
         }
     }
 
-    private object PositionalEdge : ParseEdge.Positional {
+    private object PositionalEdge : ParseEdge.Matcher {
+        override val positional: Boolean
+            get() = true
+
         override fun next(args: InputArgs): ParseEdge.Transition {
             return if (args.firstIsOption()) {
                 ParseEdge.Transition.NotMatched

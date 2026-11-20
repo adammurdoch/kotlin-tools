@@ -3,10 +3,6 @@ package net.rubygrapefruit.cli.parser
 internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
 
     override fun parse(args: List<String>): Parser.Result<T> {
-        return parseUsingEdges(args)
-    }
-
-    override fun parseUsingEdges(args: List<String>): Parser.Result<T> {
         var candidates = mutableListOf<EdgeState>()
         edges {
             candidates.add(EdgeState(it, 1))

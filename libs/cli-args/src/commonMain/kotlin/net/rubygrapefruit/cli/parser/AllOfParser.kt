@@ -74,14 +74,14 @@ internal class AllOfParser<OUT>(
                 }
                 for (edge in element.edges) {
                     when (edge) {
-                        is ParseEdge.NonPositional -> {
-                            consumer(ElementNonPositional(element, edge, this))
-                        }
-
-                        is ParseEdge.Positional -> {
-                            if (addPositional) {
-                                consumer(ElementPositional(element, edge, this))
-                                elementHasPositional = true
+                        is ParseEdge.Matcher -> {
+                            if (edge.positional) {
+                                if (addPositional) {
+                                    consumer(ElementMatcher(element, edge, this))
+                                    elementHasPositional = true
+                                }
+                            } else {
+                                consumer(ElementMatcher(element, edge, this))
                             }
                         }
 
@@ -120,7 +120,10 @@ internal class AllOfParser<OUT>(
         val endOfInput = edges.filterIsInstance<ParseEdge.EndOfInput>().firstOrNull()
     }
 
-    private class ElementNonPositional(val element: ElementNode, val edge: ParseEdge.NonPositional, val owner: ElementNodes) : ParseEdge.NonPositional {
+    private class ElementMatcher(val element: ElementNode, val edge: ParseEdge.Matcher, val owner: ElementNodes) : ParseEdge.Matcher {
+        override val positional: Boolean
+            get() = edge.positional
+
         override fun maybeClaimUnrecognized(args: InputArgs): ParseEdge.Claimed? {
             return edge.maybeClaimUnrecognized(args)
         }
@@ -130,19 +133,8 @@ internal class AllOfParser<OUT>(
             return when (transition) {
                 is ParseEdge.Transition.NotMatched -> transition
                 is ParseEdge.Transition.Matched -> {
-                    ParseEdge.Transition.Matched(transition.count, owner.next(element, transition.next, owner.positionalIndex))
-                }
-            }
-        }
-    }
-
-    private class ElementPositional(val element: ElementNode, val edge: ParseEdge.Positional, val owner: ElementNodes) : ParseEdge.Positional {
-        override fun next(args: InputArgs): ParseEdge.Transition {
-            val transition = edge.next(args)
-            return when (transition) {
-                is ParseEdge.Transition.NotMatched -> transition
-                is ParseEdge.Transition.Matched -> {
-                    ParseEdge.Transition.Matched(transition.count, owner.next(element, transition.next, element.index))
+                    val nextIndex = if (edge.positional) element.index else owner.positionalIndex
+                    ParseEdge.Transition.Matched(transition.count, owner.next(element, transition.next, nextIndex))
                 }
             }
         }

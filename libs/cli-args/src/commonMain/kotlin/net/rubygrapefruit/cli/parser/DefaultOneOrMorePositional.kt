@@ -27,7 +27,10 @@ internal class DefaultOneOrMorePositional(private val name: String, private val 
         }
     }
 
-    private object OneOrMorePositionalEdge : ParseEdge.Positional {
+    private object OneOrMorePositionalEdge : ParseEdge.Matcher {
+        override val positional: Boolean
+            get() = true
+
         override fun next(args: InputArgs): ParseEdge.Transition {
             return if (args.firstIsOption()) {
                 ParseEdge.Transition.NotMatched

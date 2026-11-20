@@ -263,7 +263,8 @@ abstract class AbstractParseTest {
         }
 
         override fun nonPositional(config: (MatcherEdge.() -> Unit)?) {
-            val edge = assertIs<ParseEdge.NonPositional>(edges[current])
+            val edge = assertIs<ParseEdge.Matcher>(edges[current])
+            assertFalse(edge.positional)
             if (config != null) {
                 DefaultMatcherEdge(edge, context).config()
             }
@@ -271,7 +272,8 @@ abstract class AbstractParseTest {
         }
 
         override fun positional(config: (MatcherEdge.() -> Unit)?) {
-            val edge = assertIs<ParseEdge.Positional>(edges[current])
+            val edge = assertIs<ParseEdge.Matcher>(edges[current])
+            assertTrue(edge.positional)
             if (config != null) {
                 DefaultMatcherEdge(edge, context).config()
             }
@@ -283,8 +285,6 @@ abstract class AbstractParseTest {
             assertEquals(value, edge.value())
 
             assertEquals(value, context.parser.parse(context.previousArgs).get())
-
-            assertEquals(value, (context.parser as ParserInternal<*>).parseUsingEdges(context.previousArgs).get())
 
             if (config != null) {
                 DefaultEndOfInput(edge, context).config()

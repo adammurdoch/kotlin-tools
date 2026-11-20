@@ -1,6 +1,9 @@
 package net.rubygrapefruit.cli.parser
 
-internal abstract class OptionEdge(val flags: List<String>, val names: List<String>) : ParseEdge.NonPositional {
+internal abstract class OptionEdge(val flags: List<String>, val names: List<String>) : ParseEdge.Matcher {
+    override val positional: Boolean
+        get() = false
+
     override fun maybeClaimUnrecognized(args: InputArgs): ParseEdge.Claimed? {
         val first = args.first()
         names.forEachIndexed { index, name ->

@@ -20,18 +20,10 @@ internal sealed interface ParseEdge {
     class Claimed(val count: Int, val problem: Problem)
 
     sealed interface Matcher : ParseEdge {
+        val positional: Boolean
+
         fun next(args: InputArgs): Transition
     }
-
-    /**
-     * Expects a non-positional argument
-     */
-    sealed interface NonPositional : Matcher
-
-    /**
-     * Expects a positional argument
-     */
-    sealed interface Positional : Matcher
 
     sealed interface Terminating : ParseEdge
 

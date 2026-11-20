@@ -338,8 +338,7 @@ abstract class AbstractParseTest {
     private abstract class DefaultEdge : Edge {
         protected fun claimsUnrecognized(parser: Parser<*>, edge: ParseEdge, previousArgs: List<String>, args: List<String>, count: Int, expectedProblems: List<ExpectedProblem>) {
             val allArgs = previousArgs + args
-            val recognized = BooleanArray(allArgs.size)
-            val args = DefaultInputArgs(previousArgs.size, allArgs, recognized)
+            val args = DefaultInputArgs(previousArgs.size, allArgs)
 
             val claimedProblem = edge.maybeClaimUnrecognized(args)
             assertNotNull(claimedProblem)
@@ -432,7 +431,7 @@ abstract class AbstractParseTest {
         }
 
         private fun next(args: List<String>): ParseEdge.Transition {
-            return edge.next(DefaultInputArgs(0, args, BooleanArray(args.size)))
+            return edge.next(DefaultInputArgs(0, args))
         }
     }
 }

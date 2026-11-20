@@ -16,9 +16,8 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
 
         val unrecognized = Array<List<EdgeState>?>(args.size) { _ -> null }
 
-        val recognized = BooleanArray(args.size)
         for (index in args.indices) {
-            val current = DefaultInputArgs(index, args, recognized)
+            val current = DefaultInputArgs(index, args)
             for (candidate in candidates) {
                 if (candidate.advance > 1) {
                     candidate.advance--
@@ -46,7 +45,6 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
                 // skip next input and try to recover
                 unrecognized[index] = candidates.toList()
             } else {
-                recognized[index] = true
                 val tmp = candidates
                 candidates = nextCandidates
                 tmp.clear()
@@ -75,7 +73,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
             }
         }
 
-        val allExpected = mutableSetOf<String>()
+        val reportedExpected = mutableSetOf<String>()
 
         var index = 0
         while (index < args.size) {
@@ -85,11 +83,14 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
                 continue
             }
 
-            val current = DefaultInputArgs(index, args, recognized)
+            val current = DefaultInputArgs(index, args)
             val claimed = candidates.firstNotNullOfOrNull { it.edge.maybeClaimUnrecognized(current) }
             if (claimed != null) {
+                if (claimed.problem is BadlyFormedOption) {
+                    reportedExpected.add(claimed.problem.implies)
+                }
                 problems.add(ProblemAtIndex(index, claimed.problem))
-                if (claimed.count > 1 && !recognized[index + 1]) {
+                if (claimed.count > 1 && unrecognized[index + 1] != null) {
                     index += 2
                 } else {
                     index++
@@ -98,7 +99,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
                 val expected = mutableSetOf<String>()
                 for (candidate in candidates) {
                     if (candidate.advance == 1 && candidate.edge is ParseEdge.NotEndOfInput) {
-                        if (finalExpected.contains(candidate.edge.expecting) && allExpected.add(candidate.edge.expecting)) {
+                        if (finalExpected.contains(candidate.edge.expecting) && reportedExpected.add(candidate.edge.expecting)) {
                             expected.add(candidate.edge.expecting)
                         }
                     }
@@ -114,7 +115,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
         }
 
         if (finalExpected.isNotEmpty()) {
-            val remainingExpected = finalExpected - allExpected
+            val remainingExpected = finalExpected - reportedExpected
             if (remainingExpected.isNotEmpty()) {
                 problems.add(ProblemAtIndex(args.size, MissingParameters(remainingExpected.toList())))
             }

@@ -8,7 +8,7 @@ sealed interface Problem {
     fun writeTo(output: Output)
 }
 
-internal class BadlyFormedOption(val option: String, val suggestion: String) : Problem {
+internal class BadlyFormedOption(val option: String, val suggestion: String, val implies: String) : Problem {
     override fun writeTo(output: Output) {
         output.write("Unexpected option ")
         output.userInput(option)
@@ -76,24 +76,6 @@ internal class MissingOptionValue(val option: String) : Problem {
     }
 }
 
-internal class MissingOption(val option: String) : Problem {
-    override fun writeTo(output: Output) {
-        output.write("Option $option not provided")
-    }
-}
-
-internal class MissingPositional(val name: String) : Problem {
-    override fun writeTo(output: Output) {
-        output.write("Parameter <$name> not provided")
-    }
-}
-
-internal class MissingCommand(val name: String) : Problem {
-    override fun writeTo(output: Output) {
-        output.write("Expected '$name'")
-    }
-}
-
 internal class MissingParameters(val descriptions: List<String>) : Problem {
     override fun writeTo(output: Output) {
         output.write("Expected ")
@@ -106,22 +88,6 @@ internal class MissingParameters(val descriptions: List<String>) : Problem {
                 }
             }
             output.write(description)
-        }
-    }
-}
-
-internal class MissingCommands(val names: List<String>) : Problem {
-    override fun writeTo(output: Output) {
-        output.write("Expected ")
-        names.forEachIndexed { index, name ->
-            if (index > 0) {
-                if (index == names.lastIndex) {
-                    output.write(" or ")
-                } else {
-                    output.write(", ")
-                }
-            }
-            output.write("'$name'")
         }
     }
 }

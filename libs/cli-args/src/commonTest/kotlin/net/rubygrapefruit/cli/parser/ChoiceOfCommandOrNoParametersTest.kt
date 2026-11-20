@@ -48,10 +48,10 @@ class ChoiceOfCommandOrNoParametersTest : AbstractParseTest() {
         )
 
         parser.fails("unknown") {
-            failure(0, "Unexpected argument 'unknown'. Expected 'one' instead")
+            failure(0, "Unexpected argument 'unknown'")
         }
         parser.fails("--unknown") {
-            failure(0, "Unexpected option '--unknown'. Expected 'one' instead")
+            failure(0, "Unexpected option '--unknown'")
         }
         parser.fails("one", "unknown") {
             failure(1, "Unexpected argument 'unknown'")

@@ -100,4 +100,29 @@ class ChoiceOfStringOptionTest : AbstractParseTest() {
             failure(1, "No value provided for option -c")
         }
     }
+
+    @Test
+    fun `option cannot be repeated`() {
+        val parser = oneOf(
+            option("a"),
+            option("b"),
+            option("c")
+        )
+
+        parser.fails("-a", "value", "-a") {
+            failure(2, "Option -a can only appear once")
+        }
+        parser.fails("-a", "-a") {
+            failure(1, "No value provided for option -a")
+            failure(1, "Option -a can only appear once")
+        }
+        parser.fails("-a", "-a", "value") {
+            failure(1, "No value provided for option -a")
+            failure(1, "Option -a can only appear once")
+        }
+        parser.fails("-a", "value", "-b", "-a", "value") {
+            failure(2, "Unexpected option '-b'")
+            failure(3, "Option -a can only appear once")
+        }
+    }
 }

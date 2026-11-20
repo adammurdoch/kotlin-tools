@@ -21,6 +21,20 @@ class HelpAndPositionalTest : AbstractParseTest() {
     }
 
     @Test
+    fun `positional must be provided`() {
+        val app = app(
+            "some_app",
+            params(positional("thing")) { OneParam(it) },
+            helpAction = true,
+            completionAction = false
+        )
+
+        app.fails {
+            failure(0, "Expected option --help or parameter <thing>")
+        }
+    }
+
+    @Test
     fun `reports usage`() {
         val app = app(
             "some_app",

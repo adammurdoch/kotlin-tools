@@ -139,31 +139,12 @@ CLI app
 TODO
 ----
 
-- `allOf()` currently skips over a positional that does not match to the next positional
-    - See ChoiceOfStringLiteralAndParametersTest, e.g. <literal> <parameter>
-- `allOf()` should fail when repeated positional is followed by another positional
-- `oneOf()` currently reports each expected literal as a separate problem
-    - See ChoiceOfCommandTest
-- `oneOf()` should report problems from choice that recognized something first
 - `oneOf()` with overlapping options, some with values and some without
 - `oneOf()` currently does not report conflicting options or literals
     - See ChoiceOfStringOptionTest
-- `oneOf()` currently uses generic 'unexpected' problem instead of specific problems for option (e.g. repeated option, missing value)
-- `oneOf()` should fails when created with choice that can match no arguments when the choice is not the last
-- `oneOf()` reports unexpected argument instead of unexpected option
-- `oneOf()` reports failed choice when a later choice succeeds but there are extra arguments at the end
-    - See ChoiceOfOptionTest
-- `oneOf()` does not list all expected alternatives when none provided
-    - See ChoiceOfMultipleOptions
-- `params()` does not parse positionals in order if the parsers also allow options
-    - See MultipleCommandAndOptionsTest
+- `oneOf()` should fail when created with choice that can match no arguments when the choice is not the last
 - Replace `option().required()`, `positional().oneOrMore()` etc. with combinator functions
 - Sort and merge expectations in unknown param, expected, etc. problem messages
-- `oneOf()` - distinguish between failed positional and failed non-positional, same for not-end-of-input?
-- When app has single action with required positional plus standard actions, reports "--help not provided" instead of "<positional> not provided"
-- Literal currently fails inconsistently when unexpected argument or option is found
-    - For unexpected argument, a single "unexpected argument x, expected y" problem is reported
-    - For unexpected option, both "expected x" and "unexpected option -x" are reported
 - Combine all remaining unexpected arguments into a single failure
     - e.g. instead of "unexpected arg 'a'" + "unexpected arg 'b'" instead produce "unexpected args 'a b'"
 - Show usage on parse error

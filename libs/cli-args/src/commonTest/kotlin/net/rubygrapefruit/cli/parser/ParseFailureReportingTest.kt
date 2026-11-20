@@ -19,7 +19,7 @@ class ParseFailureReportingTest : AbstractParseTest() {
         val result = parser.parse("-a", "--unknown")
         assertIs<Parser.Failure>(result)
 
-        assertEquals(2, result.problems.size) { "expected 2 problems in ${result.problems}" }
+        assertEquals(2, result.problems.size) { "expected 2 problems in ${result.problems.joinToString { it.problem.text() }}" }
 
         val output = BufferingOutput()
         result.writeTo(output)

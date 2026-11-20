@@ -45,6 +45,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
                     }
                 }
             }
+
             if (nextCandidates.isEmpty()) {
                 // skip next input and try to recover
                 unrecognized[index] = candidates.toList()
@@ -57,7 +58,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
             }
         }
 
-        val success = candidates.firstNotNullOfOrNull { if (it.edge is ParseEdge.EndOfInput) it.edge else null }
+        val success = candidates.firstNotNullOfOrNull { it.edge as? ParseEdge.EndOfInput }
 
         val problems = mutableListOf<ProblemAtIndex>()
 

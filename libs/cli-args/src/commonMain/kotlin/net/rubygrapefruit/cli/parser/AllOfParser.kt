@@ -67,20 +67,45 @@ internal class AllOfParser<OUT>(
         }
 
         override fun edges(consumer: (ParseEdge) -> Unit) {
-            var hasPositional = false
+            var addPositional = true
             for (index in elements.indices) {
                 val element = elements[index]
-                for (edge in element.nonPositional) {
-                    consumer(ElementNonPositional(element, edge, this))
-                }
-                if (!hasPositional && element.positional.isNotEmpty()) {
-                    for (edge in element.positional) {
-                        consumer(ElementPositional(element, edge, this))
+                var elementHasPositional = false
+                for (edge in element.edges) {
+                    when (edge) {
+                        is ParseEdge.NonPositional -> {
+                            consumer(ElementNonPositional(element, edge, this))
+                        }
+
+                        is ParseEdge.Positional -> {
+                            if (addPositional) {
+                                consumer(ElementPositional(element, edge, this))
+                                elementHasPositional = true
+                            }
+                        }
+
+                        is ParseEdge.Failed -> {
+                            consumer(edge)
+                            elementHasPositional = true
+                        }
+
+                        is ParseEdge.EndOfInput -> {
+                            // Hold back until all elements allow end of input
+                        }
+
+                        is ParseEdge.NotEndOfInput -> {
+                            if (addPositional) {
+                                consumer(edge)
+                            }
+                        }
+
+                        else -> {
+                            consumer(edge)
+                        }
                     }
-                    hasPositional = true
                 }
-                for (edge in element.required) {
-                    consumer(edge)
+                if (elementHasPositional) {
+                    addPositional = false
                 }
             }
             if (elements.all { it.endOfInput != null }) {
@@ -89,10 +114,7 @@ internal class AllOfParser<OUT>(
         }
     }
 
-    private class ElementNode(val element: ParserInternal<*>, edges: List<ParseEdge>) {
-        val nonPositional = edges.filterIsInstance<ParseEdge.NonPositional>()
-        val positional = edges.filterIsInstance<ParseEdge.Positional>()
-        val required = edges.filterIsInstance<ParseEdge.NotEndOfInput>()
+    private class ElementNode(val element: ParserInternal<*>, val edges: List<ParseEdge>) {
         val endOfInput = edges.filterIsInstance<ParseEdge.EndOfInput>().firstOrNull()
     }
 

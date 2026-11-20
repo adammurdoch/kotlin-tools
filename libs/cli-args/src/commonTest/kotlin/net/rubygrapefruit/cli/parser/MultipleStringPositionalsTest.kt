@@ -20,7 +20,6 @@ class MultipleStringPositionalsTest : AbstractParseTest() {
                 }
             }
             expectingPositional("a")
-            expectingPositional("b")
         }
     }
 
@@ -42,12 +41,9 @@ class MultipleStringPositionalsTest : AbstractParseTest() {
                         }
                     }
                     expectingPositional("b")
-                    expectingPositional("c")
                 }
             }
             expectingPositional("a")
-            expectingPositional("b")
-            expectingPositional("c")
         }
     }
 

@@ -429,7 +429,7 @@ abstract class AbstractParseTest {
     }
 }
 
-private fun Problem.text(): String {
+internal fun Problem.text(): String {
     val buffer = BufferingOutput()
     writeTo(buffer)
     return buffer.text

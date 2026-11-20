@@ -196,7 +196,6 @@ class StringOptionTest : AbstractActionTest() {
             val option2 by option("p")
         }
 
-        println("-> START TEST")
         parseFails(::Option, listOf("-o", "1", "-o", "2", "-p", "3"), "Value for option -o already provided")
         parseFails(::Option, listOf("-o", "1", "-p", "2", "-o", "3"), "Value for option -o already provided")
     }

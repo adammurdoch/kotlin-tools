@@ -5,7 +5,7 @@ import net.rubygrapefruit.cli.terminal.Output
 internal class AllOfParser<OUT>(
     private val parsers: List<ParserInternal<*>>,
     private val summary: String?,
-    private val map: (List<ParsedArguments.Success<*>>) -> OUT
+    private val map: (List<ParseEdge.EndOfInput>) -> OUT
 ) : AbstractParser<OUT>() {
 
     override fun edges(consumer: (ParseEdge) -> Unit) {
@@ -14,8 +14,7 @@ internal class AllOfParser<OUT>(
             element.edges(edges::add)
             ElementNode(element, edges)
         }
-        val results = emptyList<ParsedArguments.Success<*>>()
-        ElementNodes(elements, results, map).edges(consumer)
+        ElementNodes(elements, emptyList(), map).edges(consumer)
     }
 
     override fun usage(): UsageInternal {
@@ -54,7 +53,7 @@ internal class AllOfParser<OUT>(
         }
     }
 
-    private class ElementNodes(val elements: List<ElementNode>, val results: List<ParsedArguments.Success<*>>, val map: (List<ParsedArguments.Success<*>>) -> Any?) : ParseNode {
+    private class ElementNodes(val elements: List<ElementNode>, val results: List<ParseEdge.EndOfInput>, val map: (List<ParseEdge.EndOfInput>) -> Any?) : ParseNode {
         fun next(element: ElementNode, next: ParseNode): ParseNode {
             val edges = mutableListOf<ParseEdge>()
             next.edges(edges::add)
@@ -145,13 +144,13 @@ internal class AllOfParser<OUT>(
         }
     }
 
-    private class MappedResult(val elements: List<ParseEdge.EndOfInput>, val map: (List<ParsedArguments.Success<*>>) -> Any?) : ParseEdge.EndOfInput {
+    private class MappedResult(val elements: List<ParseEdge.EndOfInput>, val map: (List<ParseEdge.EndOfInput>) -> Any?) : ParseEdge.EndOfInput {
         override fun maybeClaimUnrecognized(args: InputArgs): ParseEdge.Claimed? {
             return elements.firstNotNullOfOrNull { it.maybeClaimUnrecognized(args) }
         }
 
         override fun value(): Any? {
-            return map(elements.map { ParsedArguments.FixedResult(it.value()) })
+            return map(elements)
         }
     }
 }

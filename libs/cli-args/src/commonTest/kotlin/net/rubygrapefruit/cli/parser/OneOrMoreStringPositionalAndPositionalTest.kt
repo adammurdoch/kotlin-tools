@@ -13,7 +13,9 @@ class OneOrMoreStringPositionalAndPositionalTest : AbstractParseTest() {
                     positional {
                         matches("two") {
                             positional { }
-                            positional { }
+                            positional {
+                                expectingPositional("b")
+                            }
                         }
                     }
                     positional {

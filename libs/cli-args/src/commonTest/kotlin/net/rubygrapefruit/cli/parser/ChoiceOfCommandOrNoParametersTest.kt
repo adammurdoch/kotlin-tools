@@ -16,6 +16,7 @@ class ChoiceOfCommandOrNoParametersTest : AbstractParseTest() {
                 matches("one") {
                     endOfInput("command")
                 }
+                expectingCommand("one")
             }
             endOfInput("none")
         }
@@ -34,6 +35,7 @@ class ChoiceOfCommandOrNoParametersTest : AbstractParseTest() {
                 matches("one") {
                     endOfInput("command")
                 }
+                expectingCommand("one")
             }
         }
     }

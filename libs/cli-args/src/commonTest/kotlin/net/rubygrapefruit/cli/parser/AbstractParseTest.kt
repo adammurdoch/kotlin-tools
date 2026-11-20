@@ -261,7 +261,7 @@ abstract class AbstractParseTest {
             val edge = assertIs<ParseEdge.Matcher>(edges[current])
             assertFalse(edge.positional)
             if (config != null) {
-                DefaultMatcherEdge(edge, context).config()
+                DefaultMatcherEdge(edge, context).check(config)
             }
             current++
         }
@@ -270,7 +270,7 @@ abstract class AbstractParseTest {
             val edge = assertIs<ParseEdge.Matcher>(edges[current])
             assertTrue(edge.positional)
             if (config != null) {
-                DefaultMatcherEdge(edge, context).config()
+                DefaultMatcherEdge(edge, context).check(config)
             }
             current++
         }
@@ -355,6 +355,13 @@ abstract class AbstractParseTest {
     }
 
     private class DefaultMatcherEdge(val edge: ParseEdge.Matcher, val context: EdgeContext) : DefaultEdge(), MatcherEdge {
+        var checkedExpectation = false
+
+        fun check(config: MatcherEdge.() -> Unit) {
+            config()
+            assertTrue(edge.expecting == null || checkedExpectation)
+        }
+
         override fun matches(firstArg: String, vararg moreArgs: String, config: (Edges.() -> Unit)?) {
             val args = listOf(firstArg) + moreArgs
             val transition = next(args)
@@ -433,6 +440,7 @@ abstract class AbstractParseTest {
 
         private fun aborts(expecting: String) {
             assertEquals(expecting, edge.expecting)
+            checkedExpectation = true
         }
     }
 }

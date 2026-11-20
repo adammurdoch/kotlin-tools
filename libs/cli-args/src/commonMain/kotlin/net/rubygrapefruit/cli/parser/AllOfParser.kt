@@ -9,12 +9,12 @@ internal class AllOfParser<OUT>(
 ) : AbstractParser<OUT>() {
 
     override fun edges(consumer: (ParseEdge) -> Unit) {
-        val elements = parsers.map { element ->
+        val elements = parsers.mapIndexed { index, element ->
             val edges = mutableListOf<ParseEdge>()
             element.edges(edges::add)
-            ElementNode(element, edges)
+            ElementNode(index, edges)
         }
-        ElementNodes(elements, emptyList(), map).edges(consumer)
+        ElementNodes(elements, 0, map).edges(consumer)
     }
 
     override fun usage(): UsageInternal {
@@ -53,21 +53,25 @@ internal class AllOfParser<OUT>(
         }
     }
 
-    private class ElementNodes(val elements: List<ElementNode>, val results: List<ParseEdge.EndOfInput>, val map: (List<ParseEdge.EndOfInput>) -> Any?) : ParseNode {
-        fun next(element: ElementNode, next: ParseNode): ParseNode {
+    private class ElementNodes(val elements: List<ElementNode>, val positionalIndex: Int, val map: (List<ParseEdge.EndOfInput>) -> Any?) : ParseNode {
+        fun next(element: ElementNode, next: ParseNode, newPositionalIndex: Int): ParseNode {
             val edges = mutableListOf<ParseEdge>()
             next.edges(edges::add)
-            val newElement = ElementNode(element.element, edges)
-            val newElements = elements.map { if (it == element) newElement else it }
-            return ElementNodes(newElements, results, map)
+            val newElement = ElementNode(element.index, edges)
+            val newElements = elements.toMutableList()
+            newElements[element.index] = newElement
+            return ElementNodes(newElements, newPositionalIndex, map)
         }
 
         override fun edges(consumer: (ParseEdge) -> Unit) {
-            var addPositional = true
+            var addPositional = false
             for (index in elements.indices) {
                 val element = elements[index]
                 var elementHasPositional = false
                 var elementHasEndOfInput = false
+                if (!addPositional && index == positionalIndex) {
+                    addPositional = true
+                }
                 for (edge in element.edges) {
                     when (edge) {
                         is ParseEdge.NonPositional -> {
@@ -102,8 +106,8 @@ internal class AllOfParser<OUT>(
                         }
                     }
                 }
-                if (elementHasPositional && !elementHasEndOfInput) {
-                    addPositional = false
+                if (addPositional) {
+                    addPositional = !elementHasPositional || elementHasEndOfInput
                 }
             }
             if (elements.all { it.endOfInput != null }) {
@@ -112,7 +116,7 @@ internal class AllOfParser<OUT>(
         }
     }
 
-    private class ElementNode(val element: ParserInternal<*>, val edges: List<ParseEdge>) {
+    private class ElementNode(val index: Int, val edges: List<ParseEdge>) {
         val endOfInput = edges.filterIsInstance<ParseEdge.EndOfInput>().firstOrNull()
     }
 
@@ -126,7 +130,7 @@ internal class AllOfParser<OUT>(
             return when (transition) {
                 is ParseEdge.Transition.NotMatched -> transition
                 is ParseEdge.Transition.Matched -> {
-                    ParseEdge.Transition.Matched(transition.count, owner.next(element, transition.next))
+                    ParseEdge.Transition.Matched(transition.count, owner.next(element, transition.next, owner.positionalIndex))
                 }
             }
         }
@@ -138,7 +142,7 @@ internal class AllOfParser<OUT>(
             return when (transition) {
                 is ParseEdge.Transition.NotMatched -> transition
                 is ParseEdge.Transition.Matched -> {
-                    ParseEdge.Transition.Matched(transition.count, owner.next(element, transition.next))
+                    ParseEdge.Transition.Matched(transition.count, owner.next(element, transition.next, element.index))
                 }
             }
         }

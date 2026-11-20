@@ -1,9 +1,10 @@
 package net.rubygrapefruit.cli.parser
 
+import net.rubygrapefruit.cli.Runnable
 import kotlin.jvm.JvmName
 
 /**
- * Creates a parser that does not take any parameters.
+ * Creates a parser that does not match any arguments.
  *
  * The parser produces the result of the given function.
  */
@@ -90,6 +91,66 @@ fun <A, B, C, D, E, OUT> params(a: Parser<A>, b: Parser<B>, c: Parser<C>, d: Par
     @Suppress("UNCHECKED_CAST")
     return AllOfParser(listOf(a, b, c, d, e).cast(), summary) { results ->
         map(results[0].value() as A, results[1].value() as B, results[2].value() as C, results[3].value() as D, results[4].value() as E)
+    }
+}
+
+fun action(summary: String? = null, action: Runnable.Context.() -> Unit): Parser<Runnable> {
+    return params(summary) {
+        object : Runnable {
+            override fun Runnable.Context.run() {
+                action()
+            }
+        }
+    }
+}
+
+fun <A> action(a: Parser<A>, summary: String? = null, action: (A) -> Unit): Parser<Runnable> {
+    return params(a, summary) { a ->
+        object : Runnable {
+            override fun Runnable.Context.run() {
+                action(a)
+            }
+        }
+    }
+}
+
+fun <A, B> action(a: Parser<A>, b: Parser<B>, summary: String? = null, action: (A, B) -> Unit): Parser<Runnable> {
+    return params(a, b, summary) { a, b ->
+        object : Runnable {
+            override fun Runnable.Context.run() {
+                action(a, b)
+            }
+        }
+    }
+}
+
+fun <A, B, C> action(a: Parser<A>, b: Parser<B>, c: Parser<C>, summary: String? = null, action: (A, B, C) -> Unit): Parser<Runnable> {
+    return params(a, b, c, summary) { a, b, c ->
+        object : Runnable {
+            override fun Runnable.Context.run() {
+                action(a, b, c)
+            }
+        }
+    }
+}
+
+fun <A, B, C, D> action(a: Parser<A>, b: Parser<B>, c: Parser<C>, d: Parser<D>, summary: String? = null, action: (A, B, C, D) -> Unit): Parser<Runnable> {
+    return params(a, b, c, d, summary) { a, b, c, d ->
+        object : Runnable {
+            override fun Runnable.Context.run() {
+                action(a, b, c, d)
+            }
+        }
+    }
+}
+
+fun <A, B, C, D, E> action(a: Parser<A>, b: Parser<B>, c: Parser<C>, d: Parser<D>, e: Parser<E>, summary: String? = null, action: (A, B, C, D, E) -> Unit): Parser<Runnable> {
+    return params(a, b, c, d, e, summary) { a, b, c, d, e ->
+        object : Runnable {
+            override fun Runnable.Context.run() {
+                action(a, b, c, d, e)
+            }
+        }
     }
 }
 

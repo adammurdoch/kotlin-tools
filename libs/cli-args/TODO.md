@@ -119,6 +119,7 @@ Parsers
 - `params(a, b, c, d, e, map): Parser<T>`
     - matches the parsers and maps the result. Options can appear in any order, positionals must appear in the order specified
     - param `summary`
+- `action(action): Parser<Runnable>`
 - `oneOf(choices...): Parser<T>`
     - matches the parses and returns the first matching
 - `app(name, parser): Parser<Runnable>`
@@ -183,3 +184,4 @@ TODO
     - Can be used by app code
 - Terminal integration API distinguishes between diagnostic output and app output
 - Convenience for `--no-color`, etc
+- Don't report expected options when there are commands?

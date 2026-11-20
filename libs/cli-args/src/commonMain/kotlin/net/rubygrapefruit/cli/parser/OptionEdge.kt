@@ -5,7 +5,7 @@ internal abstract class OptionEdge(val flags: List<String>, val names: List<Stri
         val first = args.first()
         names.forEachIndexed { index, name ->
             if (first.equals("-$name", true) || first.equals("--$name", true)) {
-                return ParseEdge.Claimed(claim(args), UnexpectedOption(first, flags[index]))
+                return ParseEdge.Claimed(claim(args), BadlyFormedOption(first, flags[index]))
             }
         }
         return null

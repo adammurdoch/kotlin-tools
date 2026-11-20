@@ -31,7 +31,7 @@ class RunAppTest {
 
         assertEquals(1, runApp(listOf("one"), output, { parser }))
         assertEquals(
-            """Parameter <b> not provided
+            """Expected parameter <b>
 
 USAGE: <a> <b>
 

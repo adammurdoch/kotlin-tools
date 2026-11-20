@@ -55,7 +55,7 @@ class ChoiceOfCommandWithPositionalsTest : AbstractParseTest() {
         )
 
         parser.fails("one") {
-            failure(1, "Parameter <a> not provided")
+            expectedParameter(1, "a")
         }
     }
 }

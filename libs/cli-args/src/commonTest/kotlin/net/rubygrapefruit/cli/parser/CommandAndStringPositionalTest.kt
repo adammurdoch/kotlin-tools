@@ -45,16 +45,12 @@ class CommandAndStringPositionalTest : AbstractParseTest() {
 
         parser.fails {
             failure(0, "Expected 'run'")
-            failure(0, "Parameter <a> not provided")
         }
         parser.fails("one") {
             failure(0, "Unexpected argument 'one'. Expected 'run' instead")
-            failure(1, "Parameter <a> not provided")
         }
         parser.fails("--unknown") {
-            failure(0, "Unexpected option '--unknown'")
-            failure(1, "Expected 'run'")
-            failure(1, "Parameter <a> not provided")
+            failure(0, "Unexpected option '--unknown'. Expected 'run' instead")
         }
     }
 
@@ -63,11 +59,10 @@ class CommandAndStringPositionalTest : AbstractParseTest() {
         val parser = params(command("run"), positional("a")) { a -> a }
 
         parser.fails("run") {
-            failure(1, "Parameter <a> not provided")
+            expectedParameter(1, "a")
         }
         parser.fails("run", "--unknown") {
-            failure(1, "Unexpected option '--unknown'")
-            failure(2, "Parameter <a> not provided")
+            failure(1, "Unexpected option '--unknown'. Expected parameter <a> instead")
         }
     }
 }

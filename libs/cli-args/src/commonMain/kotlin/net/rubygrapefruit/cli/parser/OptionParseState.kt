@@ -70,7 +70,7 @@ internal abstract class OptionParseState<T>(protected val flags: List<String>, p
                     if (first.equals("-$name", true) || first.equals("--$name", true)) {
                         val count = consumeBadlyFormed(args)
                         suggested = true
-                        return ParsedArguments.Unrecognized(count, ProblemAtIndex(args.index, UnexpectedOption(first, flags[index])))
+                        return ParsedArguments.Unrecognized(count, ProblemAtIndex(args.index, BadlyFormedOption(first, flags[index])))
                     }
                 }
             }

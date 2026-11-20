@@ -158,6 +158,8 @@ TODO
 - `params()` does not parse positionals in order if the parsers also allow options
     - See MultipleCommandAndOptionsTest
 - Replace `option().required()`, `positional().oneOrMore()` etc. with combinator functions
+- Sort and merge expectations in unknown param, expected, etc. problem messages
+- `oneOf()` - distinguish between failed positional and failed non-positional, same for not-end-of-input?
 - When app has single action with required positional plus standard actions, reports "--help not provided" instead of "<positional> not provided"
 - Literal currently fails inconsistently when unexpected argument or option is found
     - For unexpected argument, a single "unexpected argument x, expected y" problem is reported

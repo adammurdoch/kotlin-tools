@@ -120,16 +120,14 @@ class RequiredBooleanOptionTest : AbstractParseTest() {
         val parser = option("some-flag", "x").boolean().required()
 
         parser.fails {
-            failure(0, "Option --some-flag not provided")
+            expectedOption(0, "--some-flag")
         }
 
         parser.fails("--unknown") {
-            failure(0, "Unexpected option '--unknown'")
-            failure(1, "Option --some-flag not provided")
+            failure(0, "Unexpected option '--unknown'. Expected option --some-flag instead")
         }
         parser.fails("unknown") {
-            failure(0, "Unexpected argument 'unknown'")
-            failure(1, "Option --some-flag not provided")
+            failure(0, "Unexpected argument 'unknown'. Expected option --some-flag instead")
         }
     }
 

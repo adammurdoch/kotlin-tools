@@ -50,8 +50,7 @@ class CommandAndBooleanOptionTest : AbstractParseTest() {
             failure(0, "Unexpected argument 'unknown'. Expected 'run' instead")
         }
         parser.fails("-a", "-unknown") {
-            failure(1, "Unexpected option '-unknown'")
-            failure(2, "Expected 'run'")
+            failure(1, "Unexpected option '-unknown'. Expected 'run' instead")
         }
     }
 

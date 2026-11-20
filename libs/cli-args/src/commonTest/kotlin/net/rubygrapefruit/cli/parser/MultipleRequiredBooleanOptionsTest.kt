@@ -39,16 +39,13 @@ class MultipleRequiredBooleanOptionsTest : AbstractParseTest() {
         ) { a, b, c -> listOf(a, b, c) }
 
         parser.fails {
-            failure(0, "Option -a not provided")
-            failure(0, "Option -b not provided")
-            failure(0, "Option --long not provided")
+            failure(0, "Expected option -a, option -b or option --long")
         }
         parser.fails("-a") {
-            failure(1, "Option -b not provided")
-            failure(1, "Option --long not provided")
+            failure(1, "Expected option -b or option --long")
         }
         parser.fails("-b", "-a") {
-            failure(2, "Option --long not provided")
+            failure(2, "Expected option --long")
         }
     }
 

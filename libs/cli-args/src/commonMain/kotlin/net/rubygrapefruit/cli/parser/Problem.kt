@@ -8,13 +8,32 @@ sealed interface Problem {
     fun writeTo(output: Output)
 }
 
-internal class UnexpectedOption(val option: String, val suggestion: String? = null) : Problem {
+internal class BadlyFormedOption(val option: String, val suggestion: String) : Problem {
     override fun writeTo(output: Output) {
         output.write("Unexpected option ")
         output.userInput(option)
-        if (suggestion != null) {
-            output.write(". Try ")
-            output.userInput(suggestion)
+        output.write(". Try ")
+        output.userInput(suggestion)
+        output.write(" instead")
+    }
+}
+
+internal class UnexpectedOption(val option: String, val expected: List<String> = emptyList()) : Problem {
+    override fun writeTo(output: Output) {
+        output.write("Unexpected option ")
+        output.userInput(option)
+        if (expected.isNotEmpty()) {
+            output.write(". Expected ")
+            expected.forEachIndexed { index, description ->
+                if (index > 0) {
+                    if (index == expected.lastIndex) {
+                        output.write(" or ")
+                    } else {
+                        output.write(", ")
+                    }
+                }
+                output.write(description)
+            }
             output.write(" instead")
         }
     }
@@ -26,7 +45,7 @@ internal class UnexpectedArgument(val argument: String, val expected: List<Strin
         output.userInput(argument)
         if (expected.isNotEmpty()) {
             output.write(". Expected ")
-            expected.forEachIndexed { index, name ->
+            expected.forEachIndexed { index, description ->
                 if (index > 0) {
                     if (index == expected.lastIndex) {
                         output.write(" or ")
@@ -34,7 +53,7 @@ internal class UnexpectedArgument(val argument: String, val expected: List<Strin
                         output.write(", ")
                     }
                 }
-                output.write("'$name'")
+                output.write(description)
             }
             output.write(" instead")
         }

@@ -51,17 +51,15 @@ class MultipleCommandsWithOptionsTest : AbstractParseTest() {
         val command2 = params(command("two"), option("b")) { it }
         val parser = params(command1, command2) { a, b -> listOf(a, b) }
 
-        // this is wrong
-        parser.parse("two", "one").get()
-//        parser.fails("two", "one") {
-//            failure(0, "??")
-//        }
+        parser.fails("two", "one") {
+            failure(0, "Unexpected argument 'two'. Expected 'one' instead")
+            failure(2, "Expected 'two'")
+        }
         parser.fails("one") {
             failure(1, "Expected 'two'")
         }
         parser.fails("two") {
-//            failure(0, "Expected 'one'")
-            failure(1, "Expected 'one'")
+            failure(0, "Unexpected argument 'two'. Expected 'one' instead")
         }
     }
 }

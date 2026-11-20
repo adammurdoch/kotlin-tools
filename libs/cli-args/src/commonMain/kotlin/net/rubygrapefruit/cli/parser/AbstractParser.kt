@@ -6,8 +6,8 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
     }
 
     override fun parse(args: List<String>): Parser.Result<T> {
-        return parseUsingState(args)
-//        return parseUsingEdges(args)
+//        return parseUsingState(args)
+        return parseUsingEdges(args)
     }
 
     override fun parseUsingEdges(args: List<String>): Parser.Result<T> {
@@ -104,7 +104,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
                     }
                 }
                 val problem = if (current.firstIsOption()) {
-                    UnexpectedOption(current.first())
+                    UnexpectedOption(current.first(), expected.toList())
                 } else {
                     UnexpectedArgument(current.first(), expected.toList())
                 }

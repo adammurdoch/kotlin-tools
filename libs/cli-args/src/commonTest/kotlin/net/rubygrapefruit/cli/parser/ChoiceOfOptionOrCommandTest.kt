@@ -57,14 +57,13 @@ class ChoiceOfOptionOrCommandTest : AbstractParseTest() {
         )
 
         parser.fails {
-            failure(0, "Expected 'run'")
+            failure(0, "Expected option --help or 'run'")
         }
         parser.fails("unknown") {
-            failure(0, "Unexpected argument 'unknown'. Expected 'run' instead")
+            failure(0, "Unexpected argument 'unknown'. Expected option --help or 'run' instead")
         }
         parser.fails("--unknown") {
-            failure(0, "Unexpected option '--unknown'")
-            failure(1, "Expected 'run'")
+            failure(0, "Unexpected option '--unknown'. Expected option --help or 'run' instead")
         }
 
         // Both
@@ -80,8 +79,9 @@ class ChoiceOfOptionOrCommandTest : AbstractParseTest() {
 
         parser.fails("unknown", "run", "--help") {
             failure(0, "Unexpected argument 'unknown'")
-//            failure(2, "Cannot use '--help' with 'run'")
             failure(2, "Unexpected option '--help'")
+//            failure(0, "Unexpected argument 'unknown'")
+//            failure(2, "Cannot use '--help' with 'run'")
         }
     }
 
@@ -99,7 +99,7 @@ class ChoiceOfOptionOrCommandTest : AbstractParseTest() {
             failure(1, "Unexpected option '--unknown'")
         }
         parser.fails("unknown", "run") {
-            failure(0, "Unexpected argument 'unknown'")
+            failure(0, "Unexpected argument 'unknown'. Expected option --help or 'run' instead")
         }
         parser.fails("--help", "unknown") {
             failure(1, "Unexpected argument 'unknown'")

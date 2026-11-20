@@ -80,6 +80,14 @@ abstract class AbstractParseTest {
 
     protected interface Failures {
         fun failure(index: Int, message: String)
+
+        fun expectedOption(index: Int, flag: String) {
+            failure(index, "Expected option $flag")
+        }
+
+        fun expectedParameter(index: Int, name: String) {
+            failure(index, "Expected parameter <$name>")
+        }
     }
 
     @OptIn(ExperimentalKotlinTestApi::class)

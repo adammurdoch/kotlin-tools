@@ -66,14 +66,13 @@ class AppWithChoiceOfOptionOrCommandTest : AbstractParseTest() {
         val parser = app("some_app", choices, helpAction = false, completionAction = false)
 
         parser.fails {
-            failure(0, "Expected 'run'")
+            failure(0, "Expected option --help or 'run'")
         }
         parser.fails("unknown") {
-            failure(0, "Unexpected argument 'unknown'. Expected 'run' instead")
+            failure(0, "Unexpected argument 'unknown'. Expected option --help or 'run' instead")
         }
         parser.fails("-unknown") {
-            failure(0, "Unexpected option '-unknown'")
-            failure(1, "Expected 'run'")
+            failure(0, "Unexpected option '-unknown'. Expected option --help or 'run' instead")
         }
     }
 }

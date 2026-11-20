@@ -59,7 +59,7 @@ class CommandTest : AbstractParseTest() {
             failure(1, "Unexpected argument 'HELP'")
         }
         parser.fails("HELP", "help") {
-            failure(0, "Unexpected argument 'HELP'")
+            failure(0, "Unexpected argument 'HELP'. Expected 'help' instead")
         }
     }
 
@@ -74,8 +74,7 @@ class CommandTest : AbstractParseTest() {
             failure(0, "Unexpected argument 'other'. Expected 'help' instead")
         }
         parser.fails("-unknown") {
-            failure(0, "Unexpected option '-unknown'")
-            failure(1, "Expected 'help'")
+            failure(0, "Unexpected option '-unknown'. Expected 'help' instead")
         }
     }
 

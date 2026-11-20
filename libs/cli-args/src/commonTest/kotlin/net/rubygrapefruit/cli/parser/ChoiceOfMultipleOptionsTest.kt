@@ -4,7 +4,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
 
-class ChoiceOfMultipleOptions : AbstractParseTest() {
+class ChoiceOfMultipleOptionsTest : AbstractParseTest() {
     @Test
     fun `parses choice with shared options`() {
         val parser = oneOf(
@@ -49,17 +49,13 @@ class ChoiceOfMultipleOptions : AbstractParseTest() {
         )
 
         parser.fails {
-            failure(0, "Option -a not provided")
-//            failure(0, "Option -c not provided")
+            failure(0, "Expected option -a or option -c")
         }
         parser.fails("-b", "b") {
-            failure(2, "Option -a not provided")
-//            failure(2, "Option -c not provided")
+            failure(2, "Expected option -a or option -c")
         }
         parser.fails("--unknown") {
-            failure(0, "Unexpected option '--unknown'")
-            failure(1, "Option -a not provided")
-//            failure(1, "Option -c not provided")
+            failure(0, "Unexpected option '--unknown'. Expected option -a or option -c instead")
         }
     }
 }

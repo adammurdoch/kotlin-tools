@@ -65,13 +65,10 @@ class ChoiceOfRequiredStringOptionTest : AbstractParseTest() {
         )
 
         parser.fails {
-            failure(0, "Option -a not provided")
-//            failure(0, "Option -b not provided")
-//            failure(0, "Option --long not provided")
+            failure(0, "Expected option -a, option -b or option --long")
         }
         parser.fails("--unknown") {
-            failure(0, "Unexpected option '--unknown'")
-            failure(1, "Option -a not provided")
+            failure(0, "Unexpected option '--unknown'. Expected option -a, option -b or option --long instead")
         }
     }
 }

@@ -36,8 +36,6 @@ class ChoiceOfOptionTest: AbstractParseTest() {
         )
 
         parser.fails("-x", "-x") {
-            // This one shouldn't appear
-            failure(1, "No value provided for option -x")
             failure(1, "Option -x can only appear once")
         }
     }
@@ -50,11 +48,10 @@ class ChoiceOfOptionTest: AbstractParseTest() {
         )
 
         parser.fails {
-            failure(0, "Option -x not provided")
+            expectedOption(0, "-x")
         }
         parser.fails("--unknown") {
-            failure(0, "Unexpected option '--unknown'")
-            failure(1, "Option -x not provided")
+            failure(0, "Unexpected option '--unknown'. Expected option -x instead")
         }
     }
 }

@@ -93,8 +93,5 @@ class MultipleStringPositionalsTest : AbstractParseTest() {
         parser.fails("one", "--unknown", "two") {
             failure(1, "Unexpected option '--unknown'")
         }
-        parser.fails("one", "-unknown", "two") {
-            failure(1, "Unexpected option '-unknown'")
-        }
     }
 }

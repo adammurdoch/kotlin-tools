@@ -6,13 +6,13 @@ import kotlin.test.fail
 class OneOrMoreStringPositionalAndPositionalTest : AbstractParseTest() {
     @Test
     fun `repeated positional is greedy`() {
-        val parser = params(positional("a").oneOrMore(), positional("b")) { _, _ -> fail() }
+        val parser = params(positional("a").oneOrMore(), positional("b")) { a, b -> a + b }
 
         parser.fails("one") {
-            failure(1, "Parameter <b> not provided")
+            expectedParameter(1, "b")
         }
         parser.fails("one", "two") {
-            failure(2, "Parameter <b> not provided")
+            expectedParameter(2, "b")
         }
 
         parser.edges {

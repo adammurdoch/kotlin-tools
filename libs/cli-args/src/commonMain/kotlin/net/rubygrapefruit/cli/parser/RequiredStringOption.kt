@@ -8,9 +8,6 @@ internal class RequiredStringOption(
     private val summary: String?,
     private val valueName: String
 ) : AbstractParser<String>(), Option<String> {
-    override fun start(): ParseState<String> {
-        return State(flags, names)
-    }
 
     override fun usage(): UsageInternal {
         return OptionUsage()
@@ -36,25 +33,6 @@ internal class RequiredStringOption(
 
         override fun writeOptionSummaryTo(output: Output) {
             output.writeNullable(summary)
-        }
-    }
-
-    private class State(flags: List<String>, names: List<String>) : OptionParseState<String>(flags, names) {
-        override fun matched(args: InputArgs): Finished<String> {
-            return if (!args.hasSecond() || args.secondIsOption()) {
-                Finished.Failure(1, ProblemAtIndex(args.index + 1, MissingOptionValue(args.first())))
-            } else {
-                val value = args.second()
-                Finished.Success(2, value)
-            }
-        }
-
-        override fun endOfArguments(index: Int): Finished<String> {
-            return Finished.MissingOption
-        }
-
-        override fun consumeBadlyFormed(args: InputArgs): Int {
-            return if (args.hasSecond() && !args.secondIsOption() && !args.secondIsRecognized()) 2 else 1
         }
     }
 }

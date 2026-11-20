@@ -3,9 +3,6 @@ package net.rubygrapefruit.cli.parser
 import net.rubygrapefruit.cli.terminal.Output
 
 internal class DefaultZeroOrMorePositional(private val name: String, private val summary: String?) : AbstractParser<List<String>>(), Positional<List<String>> {
-    override fun start(): ParseState<List<String>> {
-        return State()
-    }
 
     override fun edges(consumer: (ParseEdge) -> Unit) {
         ZeroOrMorePositionalEdge(emptyList()).edges(consumer)
@@ -26,29 +23,6 @@ internal class DefaultZeroOrMorePositional(private val name: String, private val
 
         override fun writePositionalSummaryTo(output: Output) {
             output.writeNullable(summary)
-        }
-    }
-
-    private class State : ParseState<List<String>> {
-        private val result = mutableListOf<String>()
-
-        override val expectingOption: Boolean
-            get() = false
-
-        override val expectingPositional: Boolean
-            get() = true
-
-        override fun maybeParse(args: InputArgs): ParseState.Result {
-            return if (args.firstIsOption()) {
-                ParseState.NotRecognized
-            } else {
-                result.add(args.first())
-                ParseState.Recognized(1)
-            }
-        }
-
-        override fun finish(index: Int): ParsedArguments<List<String>> {
-            return ParsedArguments.FixedResult(result)
         }
     }
 }

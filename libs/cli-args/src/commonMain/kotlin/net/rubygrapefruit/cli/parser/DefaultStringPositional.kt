@@ -11,10 +11,6 @@ internal class DefaultStringPositional(private val name: String, private val sum
         return DefaultZeroOrMorePositional(name, summary)
     }
 
-    override fun start(): ParseState<String> {
-        return State(name)
-    }
-
     override fun edges(consumer: (ParseEdge) -> Unit) {
         consumer(PositionalEdge)
         consumer(RequiredPositional(name))
@@ -47,32 +43,4 @@ internal class DefaultStringPositional(private val name: String, private val sum
             }
         }
     }
-
-    private class State(val name: String) : ParseState<String> {
-        private var result: String? = null
-
-        override val expectingOption: Boolean
-            get() = false
-
-        override val expectingPositional: Boolean
-            get() = result == null
-
-        override fun maybeParse(args: InputArgs): ParseState.Result {
-            return if (args.firstIsOption()) {
-                ParseState.NotRecognized
-            } else {
-                result = args.first()
-                ParseState.Recognized(1)
-            }
-        }
-
-        override fun finish(index: Int): ParsedArguments<String> {
-            return if (result != null) {
-                ParsedArguments.FixedResult(result!!)
-            } else {
-                ParsedArguments.FixedProblems(listOf(ProblemAtIndex(index, MissingPositional(name))))
-            }
-        }
-    }
-
 }

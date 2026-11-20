@@ -17,10 +17,6 @@ internal class DefaultStringOption(
         return DefaultBooleanOption(flags, names, summary)
     }
 
-    override fun start(): ParseState<String?> {
-        return State(flags, names)
-    }
-
     override fun edges(consumer: (ParseEdge) -> Unit) {
         consumer(StringOptionEdge(flags, names))
         consumer(FixedValue(null))
@@ -47,25 +43,6 @@ internal class DefaultStringOption(
 
         override fun writeOptionSummaryTo(output: Output) {
             output.writeNullable(summary)
-        }
-    }
-
-    private class State(flags: List<String>, names: List<String>) : OptionParseState<String?>(flags, names) {
-        override fun matched(args: InputArgs): Finished<String?> {
-            return if (!args.hasSecond() || args.secondIsOption()) {
-                Finished.Failure(1, ProblemAtIndex(args.index + 1, MissingOptionValue(args.first())))
-            } else {
-                val value = args.second()
-                Finished.Success(2, value)
-            }
-        }
-
-        override fun endOfArguments(index: Int): Finished<String?> {
-            return Finished.Success(0, null)
-        }
-
-        override fun consumeBadlyFormed(args: InputArgs): Int {
-            return if (args.hasSecond() && !args.secondIsOption() && !args.secondIsRecognized()) 2 else 1
         }
     }
 }

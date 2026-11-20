@@ -10,13 +10,6 @@ internal class AppParser(
     private val help: Boolean,
     private val completion: Boolean,
 ) : AbstractParser<Runnable>(), Parser<Runnable> {
-    override fun start(): ParseState<Runnable> {
-        return parser().start()
-    }
-
-    override fun startAll(): List<ParseState<Runnable>> {
-        return parser().startAll()
-    }
 
     override fun edges(consumer: (ParseEdge) -> Unit) {
         parser().edges(consumer)

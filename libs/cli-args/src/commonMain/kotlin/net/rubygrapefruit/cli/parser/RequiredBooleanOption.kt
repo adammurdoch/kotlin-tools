@@ -3,9 +3,6 @@ package net.rubygrapefruit.cli.parser
 import net.rubygrapefruit.cli.terminal.Output
 
 internal class RequiredBooleanOption(private val flags: List<String>, private val names: List<String>, private val summary: String?) : AbstractParser<Unit>(), Option<Unit> {
-    override fun start(): ParseState<Unit> {
-        return State(flags, names)
-    }
 
     override fun edges(consumer: (ParseEdge) -> Unit) {
         consumer(FlagEdge(flags, names, Unit))
@@ -31,20 +28,6 @@ internal class RequiredBooleanOption(private val flags: List<String>, private va
 
         override fun writeOptionSummaryTo(output: Output) {
             output.writeNullable(summary)
-        }
-    }
-
-    private class State(flags: List<String>, names: List<String>) : OptionParseState<Unit>(flags, names) {
-        override fun matched(args: InputArgs): Finished<Unit> {
-            return Finished.Success(1, Unit)
-        }
-
-        override fun endOfArguments(index: Int): Finished<Unit> {
-            return Finished.MissingOption
-        }
-
-        override fun consumeBadlyFormed(args: InputArgs): Int {
-            return 1
         }
     }
 }

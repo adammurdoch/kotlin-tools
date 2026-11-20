@@ -7,10 +7,6 @@ internal class DefaultBooleanOption(private val flags: List<String>, private val
         return RequiredBooleanOption(flags, names, summary)
     }
 
-    override fun start(): ParseState<Boolean> {
-        return State(flags, names)
-    }
-
     override fun edges(consumer: (ParseEdge) -> Unit) {
         consumer(FlagEdge(flags, names, true))
         consumer(FixedValue(false))
@@ -37,20 +33,6 @@ internal class DefaultBooleanOption(private val flags: List<String>, private val
 
         override fun writeOptionSummaryTo(output: Output) {
             output.writeNullable(summary)
-        }
-    }
-
-    private class State(flags: List<String>, names: List<String>) : OptionParseState<Boolean>(flags, names) {
-        override fun matched(args: InputArgs): Finished<Boolean> {
-            return Finished.Success(1, true)
-        }
-
-        override fun endOfArguments(index: Int): Finished<Boolean> {
-            return Finished.Success(0, false)
-        }
-
-        override fun consumeBadlyFormed(args: InputArgs): Int {
-            return 1
         }
     }
 }

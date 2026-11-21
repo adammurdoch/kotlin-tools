@@ -4,7 +4,7 @@ import net.rubygrapefruit.cli.terminal.Output
 
 internal class AnythingParser : AbstractParser<String>(), StringPositional {
     override fun oneOrMore(): Positional<List<String>> {
-        TODO("Not yet implemented")
+        return OneOrMoreAnything
     }
 
     override fun zeroOrMore(): Positional<List<String>> {
@@ -25,12 +25,16 @@ internal class AnythingParser : AbstractParser<String>(), StringPositional {
         }
     }
 
-    private object AnythingEdge : ParseEdge.Matcher {
+    object AnythingEdge : ParseEdge.Matcher, SingleArgumentMatcher {
         override val positional: Boolean
             get() = true
 
         override val expecting: String
             get() = "an argument"
+
+        override fun matches(args: InputArgs): Boolean {
+            return true
+        }
 
         override fun next(args: InputArgs): ParseEdge.Transition {
             return ParseEdge.Transition.Matched(1, FixedValue(args.first()))

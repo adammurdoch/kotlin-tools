@@ -33,12 +33,16 @@ internal class DefaultStringPositional(private val name: String, private val sum
         }
     }
 
-    private class PositionalEdge(val name: String) : ParseEdge.Matcher {
+    class PositionalEdge(val name: String) : ParseEdge.Matcher, SingleArgumentMatcher {
         override val positional: Boolean
             get() = true
 
         override val expecting: String
             get() = "parameter <$name>"
+
+        override fun matches(args: InputArgs): Boolean {
+            return !args.firstIsOption()
+        }
 
         override fun next(args: InputArgs): ParseEdge.Transition {
             return if (args.firstIsOption()) {

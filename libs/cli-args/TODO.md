@@ -115,6 +115,8 @@ Parsers
     - matches 1 argument - positional or option
 - `anything().zeroOrMore(): Parser<List<String>>`
     - matches 0 or more arguments, empty list when not present
+- `anything().oneOrMore(): Parser<List<String>>`
+    - matches 1 or more arguments, must be present
 - `params(producer): Parser<T>`
 - `params(a, map): Parser<T>`
 - `params(a, b, map): Parser<T>`

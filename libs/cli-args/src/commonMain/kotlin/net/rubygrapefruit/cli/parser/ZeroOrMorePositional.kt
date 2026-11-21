@@ -3,10 +3,8 @@ package net.rubygrapefruit.cli.parser
 import net.rubygrapefruit.cli.terminal.Output
 
 internal class ZeroOrMorePositional(private val name: String, private val summary: String?) : AbstractParser<List<String>>(), Positional<List<String>> {
-    private val predicate = { args: InputArgs -> !args.firstIsOption() }
-
     override fun edges(consumer: (ParseEdge) -> Unit) {
-        ZeroOrMorePositionalEdge(emptyList(), predicate).edges(consumer)
+        ZeroOrMorePositionalEdge(emptyList(), DefaultStringPositional.PositionalEdge(name)).edges(consumer)
     }
 
     override fun usage(): UsageInternal {

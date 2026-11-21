@@ -94,6 +94,11 @@ fun <A, B, C, D, E, OUT> params(a: Parser<A>, b: Parser<B>, c: Parser<C>, d: Par
     }
 }
 
+/**
+ * Creates a parser that does not match any arguments.
+ *
+ * The parser produces a [Runnable] that runs the given function.
+ */
 fun action(summary: String? = null, action: Runnable.Context.() -> Unit): Parser<Runnable> {
     return params(summary) {
         object : Runnable {
@@ -104,6 +109,9 @@ fun action(summary: String? = null, action: Runnable.Context.() -> Unit): Parser
     }
 }
 
+/**
+ * Creates a parser that applies the given parser and produces a [Runnable] that runs the given action with the parse result.
+ */
 fun <A> action(a: Parser<A>, summary: String? = null, action: Runnable.Context.(A) -> Unit): Parser<Runnable> {
     return params(a, summary) { a ->
         object : Runnable {
@@ -114,6 +122,9 @@ fun <A> action(a: Parser<A>, summary: String? = null, action: Runnable.Context.(
     }
 }
 
+/**
+ * Creates a parser that applies the given parsers and produces a [Runnable] that runs the given action with the parse results.
+ */
 fun <A, B> action(a: Parser<A>, b: Parser<B>, summary: String? = null, action: Runnable.Context.(A, B) -> Unit): Parser<Runnable> {
     return params(a, b, summary) { a, b ->
         object : Runnable {
@@ -124,6 +135,9 @@ fun <A, B> action(a: Parser<A>, b: Parser<B>, summary: String? = null, action: R
     }
 }
 
+/**
+ * Creates a parser that applies the given parsers and produces a [Runnable] that runs the given action with the parse results.
+ */
 fun <A, B, C> action(a: Parser<A>, b: Parser<B>, c: Parser<C>, summary: String? = null, action: Runnable.Context.(A, B, C) -> Unit): Parser<Runnable> {
     return params(a, b, c, summary) { a, b, c ->
         object : Runnable {
@@ -134,6 +148,9 @@ fun <A, B, C> action(a: Parser<A>, b: Parser<B>, c: Parser<C>, summary: String? 
     }
 }
 
+/**
+ * Creates a parser that applies the given parsers and produces a [Runnable] that runs the given action with the parse results.
+ */
 fun <A, B, C, D> action(a: Parser<A>, b: Parser<B>, c: Parser<C>, d: Parser<D>, summary: String? = null, action: Runnable.Context.(A, B, C, D) -> Unit): Parser<Runnable> {
     return params(a, b, c, d, summary) { a, b, c, d ->
         object : Runnable {
@@ -144,6 +161,9 @@ fun <A, B, C, D> action(a: Parser<A>, b: Parser<B>, c: Parser<C>, d: Parser<D>, 
     }
 }
 
+/**
+ * Creates a parser that applies the given parsers and produces a [Runnable] that runs the given action with the parse results.
+ */
 fun <A, B, C, D, E> action(a: Parser<A>, b: Parser<B>, c: Parser<C>, d: Parser<D>, e: Parser<E>, summary: String? = null, action: Runnable.Context.(A, B, C, D, E) -> Unit): Parser<Runnable> {
     return params(a, b, c, d, e, summary) { a, b, c, d, e ->
         object : Runnable {

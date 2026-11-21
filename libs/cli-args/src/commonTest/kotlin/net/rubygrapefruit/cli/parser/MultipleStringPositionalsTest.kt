@@ -1,12 +1,16 @@
 package net.rubygrapefruit.cli.parser
 
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.fail
 
 class MultipleStringPositionalsTest : AbstractParseTest() {
     @Test
     fun `parses two positionals in order`() {
-        val parser = params(positional("a"), positional("b")) { a, b -> listOf(a, b) }
+        val parser = params(
+            positional("a"),
+            positional("b")
+        ) { a, b -> listOf(a, b) }
 
         parser.edges {
             positional {
@@ -25,7 +29,11 @@ class MultipleStringPositionalsTest : AbstractParseTest() {
 
     @Test
     fun `parses three positionals in order`() {
-        val parser = params(positional("a"), positional("b"), positional("c")) { a, b, c -> listOf(a, b, c) }
+        val parser = params(
+            positional("a"),
+            positional("b"),
+            positional("c")
+        ) { a, b, c -> listOf(a, b, c) }
 
         parser.edges {
             positional {
@@ -48,8 +56,37 @@ class MultipleStringPositionalsTest : AbstractParseTest() {
     }
 
     @Test
+    fun `parses four positionals in order`() {
+        val parser = params(
+            positional("a"),
+            positional("b"),
+            positional("c"),
+            positional("d"),
+        ) { a, b, c, d -> listOf(a, b, c, d) }
+
+        assertEquals(listOf("one", "two", "three", "four"), parser.parse("one", "two", "three", "four").get())
+    }
+
+    @Test
+    fun `parses five positionals in order`() {
+        val parser = params(
+            positional("a"),
+            positional("b"),
+            positional("c"),
+            positional("d"),
+            positional("e"),
+        ) { a, b, c, d, e -> listOf(a, b, c, d, e) }
+
+        assertEquals(listOf("one", "two", "three", "four", "five"), parser.parse("one", "two", "three", "four", "five").get())
+    }
+
+    @Test
     fun `reports usage of three positionals`() {
-        val parser = params(positional("a"), positional("b"), positional("c")) { _, _, _ -> fail() }
+        val parser = params(
+            positional("a"),
+            positional("b"),
+            positional("c")
+        ) { _, _, _ -> fail() }
 
         parser.usage("<a> <b> <c>")
         parser.noOptions()

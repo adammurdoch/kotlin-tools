@@ -120,6 +120,13 @@ Parsers
     - matches the parsers and maps the result. Options can appear in any order, positionals must appear in the order specified
     - param `summary`
 - `action(action): Parser<Runnable>`
+- `action(a, action): Parser<Runnable>`
+- `action(a, b, action): Parser<Runnable>`
+- `action(a, b, c, action): Parser<Runnable>`
+- `action(a, b, c, d, action): Parser<Runnable>`
+- `action(a, b, c, d, e, action): Parser<Runnable>`
+    - matches the parsers as per `params()` and produces a `Runnable` that runs the function with the parse results as arguments.
+    - param `summary`
 - `oneOf(choices...): Parser<T>`
     - matches the parses and returns the first matching
 - `app(name, parser): Parser<Runnable>`

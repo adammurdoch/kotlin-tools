@@ -1,12 +1,10 @@
 package net.rubygrapefruit.cli.parser
 
-import net.rubygrapefruit.cli.Runnable
-import net.rubygrapefruit.cli.terminal.Output
 import kotlin.test.Test
 import kotlin.test.assertTrue
 import kotlin.test.fail
 
-class NoParametersActionTest : AbstractParseTest() {
+class NoParametersActionTest : AbstractActionParseTest() {
     @Test
     fun `parses no parameters`() {
         var done = false
@@ -36,12 +34,5 @@ class NoParametersActionTest : AbstractParseTest() {
         parser.usage("", "Something useful")
         parser.noOptions()
         parser.noPositionals()
-    }
-
-    private object TestContext : Runnable.Context {
-        override val output: Output
-            get() = TODO("Not yet implemented")
-        override val diagnostics: Output
-            get() = TODO("Not yet implemented")
     }
 }

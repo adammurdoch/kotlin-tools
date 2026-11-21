@@ -41,10 +41,6 @@ class OneStringOptionTest : AbstractParseTest() {
     fun `option must be well formed`() {
         val parser = params(option("a")) { a -> a?.length }
 
-        parser.fails("--a", "value") {
-            failure(0, "Unexpected option '--a'. Try '-a' instead")
-        }
-
         parser.edges {
             nonPositional {
                 doesNotMatch("--a", "value", count = 2, message = "Unexpected option '--a'. Try '-a' instead")

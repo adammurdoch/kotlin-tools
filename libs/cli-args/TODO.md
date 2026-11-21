@@ -111,6 +111,8 @@ Parsers
     - matches 0 or more positionals, empty list when not present
 - `command(text): Parser<Unit>`
     - matches the given text, must be present
+  - `anything(): Parser<String>`
+    - matches anything - positional or option
 - `params(producer): Parser<T>`
 - `params(a, map): Parser<T>`
 - `params(a, b, map): Parser<T>`

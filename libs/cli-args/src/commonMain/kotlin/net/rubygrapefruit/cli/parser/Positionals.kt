@@ -1,16 +1,16 @@
 package net.rubygrapefruit.cli.parser
 
 /**
- * Creates a positional parameter with the given name.
+ * Creates a parser that matches a single argument that isn't an option. The parser produces the matched argument as its value.
  *
- * The returned parser will match a single argument that isn't an option.
+ * @param name Used for diagnostics and usage messages.
  */
 fun positional(name: String, summary: String? = null): StringPositional {
     return DefaultStringPositional(name, summary)
 }
 
 /**
- * Creates a parser that matches the given text.
+ * Creates a parser that matches the given command name. The parser produces `Unit` as its result.
  */
 fun command(name: String): Parser<Unit> {
     if (name.isEmpty()) {
@@ -23,4 +23,11 @@ fun command(name: String): Parser<Unit> {
         throw IllegalArgumentException("Command name '$name' cannot contain whitespace")
     }
     return DefaultCommand(name)
+}
+
+/**
+ * Creates a parser that matches any single argument, include any option. The parser produces the matched argument as its value.
+ */
+fun anything(): Parser<String> {
+    return AnythingParser()
 }

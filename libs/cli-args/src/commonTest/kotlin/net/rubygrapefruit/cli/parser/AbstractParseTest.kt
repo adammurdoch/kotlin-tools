@@ -309,6 +309,7 @@ abstract class AbstractParseTest {
         fun expectingOption(name: String)
         fun expectingCommand(name: String)
         fun expectingPositional(name: String)
+        fun expecting(text: String)
     }
 
     private class ExpectedProblem(val index: Int, val message: String)
@@ -354,12 +355,13 @@ abstract class AbstractParseTest {
         }
     }
 
+    @OptIn(ExperimentalKotlinTestApi::class)
     private class DefaultMatcherEdge(val edge: ParseEdge.Matcher, val context: EdgeContext) : DefaultEdge(), MatcherEdge {
         var checkedExpectation = false
 
         fun check(config: MatcherEdge.() -> Unit) {
             config()
-            assertTrue(edge.expecting == null || checkedExpectation)
+            assertTrue(edge.expecting == null || checkedExpectation) { "edge has an expectation but it was not checked by the test" }
         }
 
         override fun matches(firstArg: String, vararg moreArgs: String, config: (Edges.() -> Unit)?) {
@@ -427,19 +429,19 @@ abstract class AbstractParseTest {
         }
 
         override fun expectingOption(name: String) {
-            aborts("option $name")
+            expecting("option $name")
         }
 
         override fun expectingPositional(name: String) {
-            aborts("parameter <$name>")
+            expecting("parameter <$name>")
         }
 
         override fun expectingCommand(name: String) {
-            aborts("'$name'")
+            expecting("'$name'")
         }
 
-        private fun aborts(expecting: String) {
-            assertEquals(expecting, edge.expecting)
+        override fun expecting(text: String) {
+            assertEquals(text, edge.expecting)
             checkedExpectation = true
         }
     }

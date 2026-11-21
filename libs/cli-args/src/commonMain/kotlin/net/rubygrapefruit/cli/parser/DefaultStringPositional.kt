@@ -4,11 +4,11 @@ import net.rubygrapefruit.cli.terminal.Output
 
 internal class DefaultStringPositional(private val name: String, private val summary: String?) : AbstractParser<String>(), StringPositional {
     override fun oneOrMore(): Positional<List<String>> {
-        return DefaultOneOrMorePositional(name, summary)
+        return OneOrMorePositional(name, summary)
     }
 
     override fun zeroOrMore(): Positional<List<String>> {
-        return DefaultZeroOrMorePositional(name, summary)
+        return ZeroOrMorePositional(name, summary)
     }
 
     override fun edges(consumer: (ParseEdge) -> Unit) {

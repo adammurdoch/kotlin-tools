@@ -3,7 +3,7 @@ package net.rubygrapefruit.cli.parser
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class MultipleStringPositionalsActionTest : AbstractActionParseTest() {
+class MultipleParameterActionWithPositionalsTest : AbstractActionParseTest() {
     @Test
     fun `parses two positionals`() {
         var value: List<String>? = null

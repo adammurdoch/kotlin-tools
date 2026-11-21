@@ -1,6 +1,6 @@
 package net.rubygrapefruit.cli.parser
 
-internal class ZeroOrMorePositionalEdge(val value: List<String>) : ParseEdge.Matcher, ParseNode {
+internal class ZeroOrMorePositionalEdge(val value: List<String>, val predicate: (InputArgs) -> Boolean) : ParseEdge.Matcher, ParseNode {
     override val positional: Boolean
         get() = true
 
@@ -13,10 +13,10 @@ internal class ZeroOrMorePositionalEdge(val value: List<String>) : ParseEdge.Mat
     }
 
     override fun next(args: InputArgs): ParseEdge.Transition {
-        return if (args.firstIsOption()) {
-            ParseEdge.Transition.NotMatched
+        return if (predicate(args)) {
+            ParseEdge.Transition.Matched(1, ZeroOrMorePositionalEdge(value + args.first(), predicate))
         } else {
-            ParseEdge.Transition.Matched(1, ZeroOrMorePositionalEdge(value + args.first()))
+            ParseEdge.Transition.NotMatched
         }
     }
 }

@@ -4,7 +4,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
 
-class OneCommandTest : AbstractParseTest() {
+class OneParameterWithCommandTest : AbstractParseTest() {
     @Test
     fun `parses command`() {
         val parser = params(command("run")) { "result" }

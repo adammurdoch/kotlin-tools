@@ -2,7 +2,15 @@ package net.rubygrapefruit.cli.parser
 
 import net.rubygrapefruit.cli.terminal.Output
 
-internal class AnythingParser : AbstractParser<String>() {
+internal class AnythingParser : AbstractParser<String>(), StringPositional {
+    override fun oneOrMore(): Positional<List<String>> {
+        TODO("Not yet implemented")
+    }
+
+    override fun zeroOrMore(): Positional<List<String>> {
+        return ZeroOrMoreAnything
+    }
+
     override fun edges(consumer: (ParseEdge) -> Unit) {
         consumer(AnythingEdge)
     }

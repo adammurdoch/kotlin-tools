@@ -3,7 +3,7 @@ package net.rubygrapefruit.cli.parser
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class OneStringPositionalActionTest : AbstractActionParseTest() {
+class OneParameterActionWithStringPositionalTest : AbstractActionParseTest() {
     @Test
     fun `parses positional`() {
         var value: String? = null

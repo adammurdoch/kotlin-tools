@@ -2,7 +2,7 @@ package net.rubygrapefruit.cli.parser
 
 import net.rubygrapefruit.cli.terminal.Output
 
-internal class DefaultOneOrMorePositional(private val name: String, private val summary: String?) : AbstractParser<List<String>>(), Positional<List<String>> {
+internal class OneOrMorePositional(private val name: String, private val summary: String?) : AbstractParser<List<String>>(), Positional<List<String>> {
 
     override fun edges(consumer: (ParseEdge) -> Unit) {
         consumer(OneOrMorePositionalEdge(name))
@@ -37,7 +37,7 @@ internal class DefaultOneOrMorePositional(private val name: String, private val 
             return if (args.firstIsOption()) {
                 ParseEdge.Transition.NotMatched
             } else {
-                ParseEdge.Transition.Matched(1, ZeroOrMorePositionalEdge(listOf(args.first())))
+                ParseEdge.Transition.Matched(1, ZeroOrMorePositionalEdge(listOf(args.first()), { !it.firstIsOption() }))
             }
         }
     }

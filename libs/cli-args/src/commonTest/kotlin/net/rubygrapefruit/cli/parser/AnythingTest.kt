@@ -12,6 +12,9 @@ class AnythingTest : AbstractParseTest() {
                 matches("one") {
                     endOfInput("one")
                 }
+                matches("") {
+                    endOfInput("")
+                }
                 matches("-x") {
                     endOfInput("-x")
                 }
@@ -28,6 +31,8 @@ class AnythingTest : AbstractParseTest() {
         val parser = anything()
 
         parser.usage("<argument>")
+        parser.noOptions()
+        parser.noPositionals()
     }
 
     @Test

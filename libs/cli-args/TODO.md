@@ -86,7 +86,7 @@ Combinator API
 - *Option* - a parameter that may be provided anywhere in the command-line arguments.
     - A fixed string that starts with `-`, possibly also followed by zero or more values
 - *Positional* - a parameter that may must appear at a certain position in the command-line arguments
-- *Parser* - takes command-line arguments and produces some value of type T
+- *Parser* - takes command-line arguments and produces some value of type `T`
 - *Command* - a literal string that must appear at a certain position in the command-line arguments
 
 Parsers
@@ -111,8 +111,10 @@ Parsers
     - matches 0 or more positionals, empty list when not present
 - `command(text): Parser<Unit>`
     - matches the given text, must be present
-  - `anything(): Parser<String>`
-    - matches anything - positional or option
+- `anything(): Parser<String>`
+    - matches 1 argument - positional or option
+- `anything().zeroOrMore(): Parser<List<String>>`
+    - matches 0 or more arguments, empty list when not present
 - `params(producer): Parser<T>`
 - `params(a, map): Parser<T>`
 - `params(a, b, map): Parser<T>`
@@ -185,12 +187,11 @@ TODO
 - Convenience for `--stack`
 - Convenience for @arg file.
 - `-Dx=y` style
-- Compose value parsers (e.g. value is ip address or host name)
+- Compose value parsers (e.g. value is one-of ip address or host name)
 - Deprecated, hidden options + commands
 - Terminal integration for JVM
 - Terminal integration is thread-safe
     - Does not interleave partial outputs
     - Can be used by app code
-- Terminal integration API distinguishes between diagnostic output and app output
 - Convenience for `--no-color`, etc
 - Don't report expected options when there are commands?

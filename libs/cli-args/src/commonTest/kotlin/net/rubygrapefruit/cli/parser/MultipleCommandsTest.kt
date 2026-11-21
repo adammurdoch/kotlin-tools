@@ -4,9 +4,9 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
 
-class TwoCommandsTest : AbstractParseTest() {
+class MultipleCommandsTest : AbstractParseTest() {
     @Test
-    fun `parses commands`() {
+    fun `parses two commands`() {
         val parser = params(command("one"), command("two")) { "result" }
 
         assertEquals("result", parser.parse("one", "two").get())

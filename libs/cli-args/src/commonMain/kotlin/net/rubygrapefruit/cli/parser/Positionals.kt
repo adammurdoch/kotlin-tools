@@ -28,6 +28,6 @@ fun command(name: String): Parser<Unit> {
 /**
  * Creates a parser that matches any single argument, include any option. The parser produces the matched argument as its value.
  */
-fun anything(): Parser<String> {
+fun anything(): StringPositional {
     return AnythingParser()
 }

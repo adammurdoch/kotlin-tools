@@ -3,7 +3,7 @@ package net.rubygrapefruit.cli.parser
 import kotlin.test.Test
 import kotlin.test.fail
 
-class OneStringOptionTest : AbstractParseTest() {
+class OneParameterWithStringOptionTest : AbstractParseTest() {
     @Test
     fun `parses option with short name`() {
         val parser = params(option("a")) { a -> a?.length }

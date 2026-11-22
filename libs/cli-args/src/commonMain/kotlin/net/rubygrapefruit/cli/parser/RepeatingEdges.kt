@@ -2,10 +2,10 @@ package net.rubygrapefruit.cli.parser
 
 internal interface SingleArgumentMatcher {
     val expecting: String
-    fun matches(args: InputArgs): Boolean
+    fun match(args: InputArgs, next: (Any?) -> ParseNode): ParseEdge.Transition
 }
 
-internal class ZeroOrMorePositionalEdge(val value: List<String>, val matcher: SingleArgumentMatcher) : ParseEdge.Matcher, ParseNode {
+internal class ZeroOrMorePositionalEdge(val value: List<Any?>, val matcher: SingleArgumentMatcher) : ParseEdge.Matcher, ParseNode {
     override val positional: Boolean
         get() = true
 
@@ -18,11 +18,7 @@ internal class ZeroOrMorePositionalEdge(val value: List<String>, val matcher: Si
     }
 
     override fun next(args: InputArgs): ParseEdge.Transition {
-        return if (matcher.matches(args)) {
-            ParseEdge.Transition.Matched(1, ZeroOrMorePositionalEdge(value + args.first(), matcher))
-        } else {
-            ParseEdge.Transition.NotMatched
-        }
+        return matcher.match(args) { ZeroOrMorePositionalEdge(value + it, matcher) }
     }
 }
 
@@ -38,11 +34,7 @@ internal class OneOrMorePositionalEdge(val matcher: SingleArgumentMatcher) : Par
     }
 
     override fun next(args: InputArgs): ParseEdge.Transition {
-        return if (matcher.matches(args)) {
-            ParseEdge.Transition.Matched(1, ZeroOrMorePositionalEdge(listOf(args.first()), matcher))
-        } else {
-            ParseEdge.Transition.NotMatched
-        }
+        return matcher.match(args) { ZeroOrMorePositionalEdge(listOf(it), matcher) }
     }
 }
 

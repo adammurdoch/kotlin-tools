@@ -32,8 +32,8 @@ internal class AnythingParser : AbstractParser<String>(), ScalarPositional<Strin
         override val expecting: String
             get() = "an argument"
 
-        override fun matches(args: InputArgs): Boolean {
-            return true
+        override fun match(args: InputArgs, next: (Any?) -> ParseNode): ParseEdge.Transition {
+            return ParseEdge.Transition.Matched(1, next(args.first()))
         }
 
         override fun next(args: InputArgs): ParseEdge.Transition {

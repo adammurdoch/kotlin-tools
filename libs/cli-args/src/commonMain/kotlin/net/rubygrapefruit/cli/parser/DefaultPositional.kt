@@ -44,34 +44,33 @@ internal class DefaultPositional<OUT>(
         override val expecting: String
             get() = "parameter <$name>"
 
-        override fun matches(args: InputArgs): Boolean {
-            return !args.firstIsOption()
+        override fun maybeClaimUnrecognized(args: InputArgs): ParseEdge.Claimed? {
+            return if (args.firstIsOption()) {
+                null
+            } else {
+                val problem = type.unexpectedType(args.first())
+                if (problem != null) {
+                    ParseEdge.Claimed(1, problem)
+                } else {
+                    null
+                }
+            }
         }
 
         override fun next(args: InputArgs): ParseEdge.Transition {
+            return match(args) { FixedValue(it) }
+        }
+
+        override fun match(args: InputArgs, next: (Any?) -> ParseNode): ParseEdge.Transition {
             return if (args.firstIsOption()) {
                 ParseEdge.Transition.NotMatched
             } else {
                 val result = type.convert(args.first())
-                val node = when (result) {
-                    is StringTypeInternal.Success -> FixedValue(result.value)
-                    is StringTypeInternal.Failure -> BadlyFormedValue(args.index, result.problem)
+                when (result) {
+                    is StringTypeInternal.Success -> ParseEdge.Transition.Matched(1, next(result.value))
+                    is StringTypeInternal.Failure -> ParseEdge.Transition.NotMatched
                 }
-                ParseEdge.Transition.Matched(1, node)
             }
-        }
-    }
-
-    private class BadlyFormedValue(val index: Int, val problem: Problem) : ParseNode, ParseEdge.Failed {
-        override val positional: Boolean
-            get() = true
-
-        override fun edges(consumer: (ParseEdge) -> Unit) {
-            consumer(this)
-        }
-
-        override fun failure(): ProblemAtIndex {
-            return ProblemAtIndex(index, problem)
         }
     }
 }

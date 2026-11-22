@@ -2,10 +2,14 @@ package net.rubygrapefruit.cli.parser
 
 import net.rubygrapefruit.cli.terminal.Output
 
-internal class OneOrMorePositional(private val name: String, private val summary: String?) : AbstractParser<List<String>>(), Positional<List<String>> {
+internal class OneOrMorePositional<OUT>(
+    private val name: String,
+    private val type: StringTypeInternal<OUT>,
+    private val summary: String?
+) : AbstractParser<List<OUT>>(), Positional<List<OUT>> {
 
     override fun edges(consumer: (ParseEdge) -> Unit) {
-        consumer(OneOrMorePositionalEdge(DefaultStringPositional.PositionalEdge(name)))
+        consumer(OneOrMorePositionalEdge(DefaultPositional.PositionalEdge(name, type)))
     }
 
     override fun usage(): UsageInternal {

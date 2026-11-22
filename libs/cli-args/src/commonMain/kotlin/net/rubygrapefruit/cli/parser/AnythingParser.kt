@@ -2,7 +2,7 @@ package net.rubygrapefruit.cli.parser
 
 import net.rubygrapefruit.cli.terminal.Output
 
-internal class AnythingParser : AbstractParser<String>(), StringPositional {
+internal class AnythingParser : AbstractParser<String>(), ScalarPositional<String> {
     override fun oneOrMore(): Positional<List<String>> {
         return OneOrMoreAnything
     }

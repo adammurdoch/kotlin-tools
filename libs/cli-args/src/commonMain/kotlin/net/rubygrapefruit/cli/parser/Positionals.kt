@@ -5,8 +5,12 @@ package net.rubygrapefruit.cli.parser
  *
  * @param name Used for diagnostics and usage messages.
  */
-fun positional(name: String, summary: String? = null): StringPositional {
-    return DefaultStringPositional(name, summary)
+fun positional(name: String, summary: String? = null): ScalarPositional<String> {
+    return positional(name, IdentityStringType, summary)
+}
+
+fun <OUT> positional(name: String, type: StringType<OUT>, summary: String? = null): ScalarPositional<OUT> {
+    return DefaultPositional(name, type as StringTypeInternal<OUT>, summary)
 }
 
 /**
@@ -28,6 +32,6 @@ fun command(name: String): Parser<Unit> {
 /**
  * Creates a parser that matches any single argument, include any option. The parser produces the matched argument as its value.
  */
-fun anything(): StringPositional {
+fun anything(): ScalarPositional<String> {
     return AnythingParser()
 }

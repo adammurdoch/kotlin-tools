@@ -91,3 +91,10 @@ internal class MissingParameters(val descriptions: List<String>) : Problem {
         }
     }
 }
+
+internal class ValueIsNotAnInt(val value: String) : Problem {
+    override fun writeTo(output: Output) {
+        output.userInput(value)
+        output.write(" is not an unsigned integer")
+    }
+}

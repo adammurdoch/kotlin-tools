@@ -105,6 +105,8 @@ Parsers
 - `positional(name): Positional<String>`
     - matches 1 positional, must be present
     - param `summary`
+- `positional(name, unsignedInteger()): Positional<Int>`
+    - matches 1 positional, must be present and an unsigned integer
 - `positional(name).oneOrMore(): Positional<List<String>>`
     - matches 1 or more positional, must be present
 - `positional(name).zeroOrMore(): Positional<List<String>>`
@@ -153,6 +155,10 @@ CLI app
 TODO
 ----
 
+- Migration
+  - positional value is choice of `T`
+  - file, directory option, positional
+  - int positional
 - `oneOf()` with overlapping options, some with values and some without
 - `oneOf()` currently does not report conflicting options or literals
     - See ChoiceOfStringOptionTest

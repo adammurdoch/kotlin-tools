@@ -1,0 +1,66 @@
+package net.rubygrapefruit.cli.parser
+
+import kotlin.test.Test
+
+class UnsignedIntPositionalTest : AbstractParseTest() {
+    @Test
+    fun `parses positional`() {
+        val parser = positional("param", unsignedInteger())
+
+        parser.edges {
+            positional {
+                matches("12") {
+                    endOfInput(12)
+                }
+                matches("0") {
+                    endOfInput(0)
+                }
+                matches(Int.MAX_VALUE.toString()) {
+                    endOfInput(Int.MAX_VALUE)
+                }
+                doesNotMatch("-x")
+                expectingPositional("param")
+            }
+        }
+    }
+
+    @Test
+    fun `reports usage`() {
+        val parser = positional("param", unsignedInteger())
+
+        parser.usage("<param>")
+        parser.noOptions()
+        parser.positional("<param>")
+    }
+
+    @Test
+    fun `argument must be provided`() {
+        val parser = positional("param", unsignedInteger())
+
+        parser.fails {
+            expectedParameter(0, "param")
+        }
+    }
+
+    @Test
+    fun `argument must be an unsigned integer`() {
+        val parser = positional("param", unsignedInteger())
+
+        parser.fails("string") {
+            failure(0, "'string' is not an unsigned integer")
+        }
+        parser.fails("") {
+            failure(0, "'' is not an unsigned integer")
+        }
+        parser.fails("-12") {
+            failure(0, "Unexpected option '-12'. Expected parameter <param> instead")
+        }
+        parser.fails("1.2") {
+            failure(0, "'1.2' is not an unsigned integer")
+        }
+        val overflow = (Int.MAX_VALUE.toLong() + 1).toString()
+        parser.fails(overflow) {
+            failure(0, "'$overflow' is not an unsigned integer")
+        }
+    }
+}

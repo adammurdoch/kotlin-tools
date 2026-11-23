@@ -58,13 +58,11 @@ class MultipleUnsignedIntPositionalsTest : AbstractParseTest() {
         parser.fails("one", "two") {
             failure(0, "'one' is not an unsigned integer")
             failure(1, "'two' is not an unsigned integer")
-            failure(2, "Expected parameter <a>")
         }
         parser.fails("one", "two", "three") {
             failure(0, "'one' is not an unsigned integer")
             failure(1, "'two' is not an unsigned integer")
             failure(2, "'three' is not an unsigned integer")
-            failure(3, "Expected parameter <a>")
         }
         parser.fails("one", "2") {
             failure(0, "'one' is not an unsigned integer")
@@ -72,7 +70,6 @@ class MultipleUnsignedIntPositionalsTest : AbstractParseTest() {
         }
         parser.fails("1", "two") {
             failure(1, "'two' is not an unsigned integer")
-            failure(2, "Expected parameter <b>")
         }
     }
 

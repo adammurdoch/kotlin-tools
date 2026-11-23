@@ -83,18 +83,27 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
             }
 
             val current = DefaultInputArgs(index, args)
-            val claimed = candidates.firstNotNullOfOrNull { it.edge.maybeClaimUnrecognized(current) }
-            if (claimed != null) {
-                if (claimed.problem is BadlyFormedOption) {
-                    reportedExpected.add(claimed.problem.implies)
+            var handled = false
+            for (candidate in candidates) {
+                val claimed = candidate.edge.maybeClaimUnrecognized(current)
+                if (claimed != null) {
+                    problems.add(ProblemAtIndex(index, claimed.problem))
+                    if (candidate.edge is ParseEdge.Matcher) {
+                        val expecting = candidate.edge.expecting
+                        if (expecting != null) {
+                            reportedExpected.add(expecting)
+                        }
+                    }
+                    if (claimed.count > 1 && unrecognized[index + 1] != null) {
+                        index += 2
+                    } else {
+                        index++
+                    }
+                    handled = true
+                    break
                 }
-                problems.add(ProblemAtIndex(index, claimed.problem))
-                if (claimed.count > 1 && unrecognized[index + 1] != null) {
-                    index += 2
-                } else {
-                    index++
-                }
-            } else {
+            }
+            if (!handled) {
                 val expected = mutableSetOf<String>()
                 for (candidate in candidates) {
                     if (candidate.advance == 1 && candidate.edge is ParseEdge.Matcher) {

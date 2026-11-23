@@ -2,7 +2,10 @@ package net.rubygrapefruit.cli.parser
 
 internal interface SingleArgumentMatcher {
     val expecting: String
+
     fun match(args: InputArgs, next: (Any?) -> ParseNode): ParseEdge.Transition
+
+    fun maybeClaimUnrecognized(args: InputArgs): ParseEdge.Claimed?
 }
 
 internal class ZeroOrMorePositionalEdge(val value: List<Any?>, val matcher: SingleArgumentMatcher) : ParseEdge.Matcher, ParseNode {
@@ -20,6 +23,10 @@ internal class ZeroOrMorePositionalEdge(val value: List<Any?>, val matcher: Sing
     override fun next(args: InputArgs): ParseEdge.Transition {
         return matcher.match(args) { ZeroOrMorePositionalEdge(value + it, matcher) }
     }
+
+    override fun maybeClaimUnrecognized(args: InputArgs): ParseEdge.Claimed? {
+        return matcher.maybeClaimUnrecognized(args)
+    }
 }
 
 internal class OneOrMorePositionalEdge(val matcher: SingleArgumentMatcher) : ParseEdge.Matcher, ParseNode {
@@ -35,6 +42,10 @@ internal class OneOrMorePositionalEdge(val matcher: SingleArgumentMatcher) : Par
 
     override fun next(args: InputArgs): ParseEdge.Transition {
         return matcher.match(args) { ZeroOrMorePositionalEdge(listOf(it), matcher) }
+    }
+
+    override fun maybeClaimUnrecognized(args: InputArgs): ParseEdge.Claimed? {
+        return matcher.maybeClaimUnrecognized(args)
     }
 }
 

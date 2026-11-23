@@ -8,7 +8,7 @@ sealed interface Problem {
     fun writeTo(output: Output)
 }
 
-internal class BadlyFormedOption(val option: String, val suggestion: String, val implies: String) : Problem {
+internal class BadlyFormedOption(val option: String, val suggestion: String) : Problem {
     override fun writeTo(output: Output) {
         output.write("Unexpected option ")
         output.userInput(option)

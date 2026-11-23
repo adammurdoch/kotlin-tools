@@ -9,7 +9,7 @@ internal abstract class OptionEdge(val flags: List<String>, val names: List<Stri
         names.forEachIndexed { index, name ->
             if (first.equals("-$name", true) || first.equals("--$name", true)) {
                 val longest = flags.maxBy { it.length }
-                return ParseEdge.Claimed(claim(args), BadlyFormedOption(first, flags[index], "option $longest"))
+                return ParseEdge.Claimed(claim(args), BadlyFormedOption(first, flags[index]))
             }
         }
         return null

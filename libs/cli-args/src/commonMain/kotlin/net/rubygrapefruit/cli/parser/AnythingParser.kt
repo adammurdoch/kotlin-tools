@@ -39,5 +39,9 @@ internal class AnythingParser : AbstractParser<String>(), ScalarPositional<Strin
         override fun next(args: InputArgs): ParseEdge.Transition {
             return ParseEdge.Transition.Matched(1, FixedValue(args.first()))
         }
+
+        override fun maybeClaimUnrecognized(args: InputArgs): ParseEdge.Claimed? {
+            return null
+        }
     }
 }

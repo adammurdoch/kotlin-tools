@@ -1,14 +1,12 @@
 package net.rubygrapefruit.cli.parser
 
-import net.rubygrapefruit.cli.terminal.Output
-
 internal class AnythingParser(private val name: String, private val summary: String?) : AbstractParser<String>(), ScalarPositional<String> {
     override fun oneOrMore(): Positional<List<String>> {
-        return OneOrMoreAnything(name)
+        return OneOrMoreAnything(name, summary)
     }
 
     override fun zeroOrMore(): Positional<List<String>> {
-        return ZeroOrMoreAnything(name)
+        return ZeroOrMoreAnything(name, summary)
     }
 
     override fun edges(consumer: (ParseEdge) -> Unit) {
@@ -16,21 +14,7 @@ internal class AnythingParser(private val name: String, private val summary: Str
     }
 
     override fun usage(): UsageInternal {
-        return AnythingUsage()
-    }
-
-    private inner class AnythingUsage : UsageInternal.PositionalUsage {
-        override fun writeTo(quoted: Boolean, output: Output) {
-            output.write("<$name>")
-        }
-
-        override fun writePositionalUsageTo(output: Output) {
-            output.write("<$name>")
-        }
-
-        override fun writePositionalSummaryTo(output: Output) {
-            output.writeNullable(summary)
-        }
+        return PositionalUsage(name, summary)
     }
 
     class AnythingEdge(val name: String) : ParseEdge.Matcher, SingleArgumentMatcher {

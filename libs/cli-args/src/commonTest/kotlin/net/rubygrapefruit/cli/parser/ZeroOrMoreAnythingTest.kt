@@ -39,4 +39,13 @@ class ZeroOrMoreAnythingTest : AbstractParseTest() {
         parser.noOptions()
         parser.positional("<a>")
     }
+
+    @Test
+    fun `can provide summary`() {
+        val parser = anything("a", "Something useful").zeroOrMore()
+
+        parser.usage("[<a>...]")
+        parser.noOptions()
+        parser.positional("<a>", "Something useful")
+    }
 }

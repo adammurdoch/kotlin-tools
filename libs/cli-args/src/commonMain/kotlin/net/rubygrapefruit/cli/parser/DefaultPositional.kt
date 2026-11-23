@@ -1,7 +1,5 @@
 package net.rubygrapefruit.cli.parser
 
-import net.rubygrapefruit.cli.terminal.Output
-
 internal class DefaultPositional<OUT>(
     private val name: String,
     private val type: StringTypeInternal<OUT>,
@@ -20,21 +18,7 @@ internal class DefaultPositional<OUT>(
     }
 
     override fun usage(): UsageInternal {
-        return PositionalUsage()
-    }
-
-    private inner class PositionalUsage : UsageInternal.PositionalUsage {
-        override fun writeTo(quoted: Boolean, output: Output) {
-            output.write("<$name>")
-        }
-
-        override fun writePositionalUsageTo(output: Output) {
-            output.write("<$name>")
-        }
-
-        override fun writePositionalSummaryTo(output: Output) {
-            output.writeNullable(summary)
-        }
+        return PositionalUsage(name, summary)
     }
 
     class PositionalEdge(val name: String, val type: StringTypeInternal<*>) : ParseEdge.Matcher, SingleArgumentMatcher {

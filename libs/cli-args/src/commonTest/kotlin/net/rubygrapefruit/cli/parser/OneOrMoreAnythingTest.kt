@@ -42,6 +42,15 @@ class OneOrMoreAnythingTest : AbstractParseTest() {
     }
 
     @Test
+    fun `can provide summary`() {
+        val parser = anything("a", "Something useful").oneOrMore()
+
+        parser.usage("<a>...")
+        parser.noOptions()
+        parser.positional("<a>", "Something useful")
+    }
+
+    @Test
     fun `argument must be provided`() {
         val parser = anything("a").oneOrMore()
 

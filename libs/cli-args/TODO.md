@@ -159,7 +159,6 @@ TODO
 ----
 
 - Migration
-  - anything() is-a positional (with name, summary, etc)
   - positional whose value is choice from `String -> T` mapping
   - file, directory option and positional
 - `oneOf()` with overlapping options, some with values and some without

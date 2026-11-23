@@ -10,8 +10,35 @@ fun option(
     vararg otherNames: String,
     summary: String? = null,
     valueName: String = "value"
-): StringOption {
-    val unsortedNames = listOf(name) + otherNames.toList()
+): ScalarOption<String> {
+    return option(listOf(name) + otherNames.toList(), type = IdentityStringType, summary = summary, valueName = valueName)
+}
+
+fun <OUT> option(
+    name: String,
+    type: StringType<OUT>,
+    summary: String? = null,
+    valueName: String = "value"
+): ScalarOption<OUT> {
+    return option(listOf(name), type = type, summary = summary, valueName = valueName)
+}
+
+fun <OUT> option(
+    name: String,
+    vararg otherNames: String,
+    type: StringType<OUT>,
+    summary: String? = null,
+    valueName: String = "value"
+): ScalarOption<OUT> {
+    return option(listOf(name) + otherNames.toList(), type = type, summary = summary, valueName = valueName)
+}
+
+private fun <OUT> option(
+    unsortedNames: List<String>,
+    type: StringType<OUT>,
+    summary: String?,
+    valueName: String
+): ScalarOption<OUT> {
     for (name in unsortedNames) {
         if (name.isEmpty()) {
             throw IllegalArgumentException("Option name cannot be empty")
@@ -32,5 +59,5 @@ fun option(
         }
     }
 
-    return DefaultStringOption(names, summary, valueName)
+    return DefaultOption(names, type as StringTypeInternal, summary, valueName)
 }

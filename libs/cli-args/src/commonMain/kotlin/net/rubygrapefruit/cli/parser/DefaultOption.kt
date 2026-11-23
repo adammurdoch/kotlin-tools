@@ -2,15 +2,16 @@ package net.rubygrapefruit.cli.parser
 
 import net.rubygrapefruit.cli.terminal.Output
 
-internal class DefaultStringOption(
+internal class DefaultOption<OUT>(
     private val names: List<String>,
+    private val type: StringTypeInternal<OUT>,
     private val summary: String?,
     private val valueName: String
-) : AbstractParser<String?>(), StringOption {
+) : AbstractParser<OUT?>(), ScalarOption<OUT> {
     private val flags = names.map { name -> if (name.length == 1) "-$name" else "--$name" }
 
-    override fun required(): Option<String> {
-        return RequiredStringOption(flags, names, summary, valueName)
+    override fun required(): Option<OUT> {
+        return DefaultRequiredOption(flags, names, type, summary, valueName)
     }
 
     override fun boolean(): BooleanOption {
@@ -18,7 +19,7 @@ internal class DefaultStringOption(
     }
 
     override fun edges(consumer: (ParseEdge) -> Unit) {
-        consumer(StringOptionEdge(flags, names, null))
+        consumer(OptionEdgeWithValue(flags, names, null, type))
         consumer(FixedValue(null))
     }
 

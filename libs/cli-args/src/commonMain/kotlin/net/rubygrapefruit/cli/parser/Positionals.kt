@@ -9,6 +9,11 @@ fun positional(name: String, summary: String? = null): ScalarPositional<String> 
     return positional(name, IdentityStringType, summary)
 }
 
+/**
+ * Creates a parser that matches a single argument that isn't an option. The parser converts the matched argument to the given type.
+ *
+ * @param name Used for diagnostics and usage messages.
+ */
 fun <OUT> positional(name: String, type: StringType<OUT>, summary: String? = null): ScalarPositional<OUT> {
     return DefaultPositional(name, type as StringTypeInternal<OUT>, summary)
 }

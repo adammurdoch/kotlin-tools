@@ -2,12 +2,13 @@ package net.rubygrapefruit.cli.parser
 
 import net.rubygrapefruit.cli.terminal.Output
 
-internal class RequiredStringOption(
+internal class DefaultRequiredOption<OUT>(
     private val flags: List<String>,
     private val names: List<String>,
+    private val type: StringTypeInternal<OUT>,
     private val summary: String?,
     private val valueName: String
-) : AbstractParser<String>(), Option<String> {
+) : AbstractParser<OUT>(), Option<OUT> {
     private val expecting = "option " + flags.maxBy { it.length }
 
     override fun usage(): UsageInternal {
@@ -15,7 +16,7 @@ internal class RequiredStringOption(
     }
 
     override fun edges(consumer: (ParseEdge) -> Unit) {
-        consumer(StringOptionEdge(flags, names, expecting))
+        consumer(OptionEdgeWithValue(flags, names, expecting, type))
     }
 
     private inner class OptionUsage : UsageInternal.OptionUsage {

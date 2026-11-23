@@ -208,6 +208,11 @@ class StringOptionTest : AbstractParseTest() {
             failure(1, "No value provided for option -x")
             failure(1, "Unexpected option '-unknown'")
         }
+        parser.fails("-x", "-unknown", "value") {
+            failure(1, "No value provided for option -x")
+            failure(1, "Unexpected option '-unknown'")
+            failure(2, "Unexpected argument 'value'")
+        }
 
         parser.fails("-unknown", "-x") {
             failure(0, "Unexpected option '-unknown'")

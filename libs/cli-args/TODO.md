@@ -96,6 +96,8 @@ Parsers
     - matches `-n value` or `--name value`, null when not present
     - param `summary`
     - param `valueName`
+- `option(name, unsignedInteger()): Option<Int?>`
+    - matches `-n <int>` or `--name <int>`, null when not present
 - `option(name).required(): Option<String>`
     - matches `-n value` or `--name value`, must be present
 - `option(name).boolean(): Option<Boolean>`

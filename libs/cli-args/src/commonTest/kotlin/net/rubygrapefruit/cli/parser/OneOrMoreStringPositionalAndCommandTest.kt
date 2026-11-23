@@ -19,7 +19,7 @@ class OneOrMoreStringPositionalAndCommandTest : AbstractParseTest() {
         val parser = params(positional("a").oneOrMore(), command("end")) { a, _ -> a }
 
         parser.fails {
-            expectedParameter(0, "a")
+            expectedPositional(0, "a")
         }
         parser.fails("one") {
             expectedCommand(1, "end")

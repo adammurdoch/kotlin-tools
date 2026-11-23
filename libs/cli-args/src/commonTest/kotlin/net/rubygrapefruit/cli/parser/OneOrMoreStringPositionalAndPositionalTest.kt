@@ -35,10 +35,10 @@ class OneOrMoreStringPositionalAndPositionalTest : AbstractParseTest() {
         val parser = params(positional("a").oneOrMore(), positional("b")) { a, b -> Pair(a, b) }
 
         parser.fails {
-            expectedParameter(0, "a")
+            expectedPositional(0, "a")
         }
         parser.fails("one") {
-            expectedParameter(1, "b")
+            expectedPositional(1, "b")
         }
     }
 }

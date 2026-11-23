@@ -28,7 +28,7 @@ class OneOrMoreUnsignedIntPositionalTest : AbstractParseTest() {
         val parser = positional("a", unsignedInteger()).oneOrMore()
 
         parser.fails {
-            expectedParameter(0, "a")
+            expectedPositional(0, "a")
         }
         parser.fails("-unknown") {
             failure(0, "Unexpected option '-unknown'. Expected parameter <a> instead")

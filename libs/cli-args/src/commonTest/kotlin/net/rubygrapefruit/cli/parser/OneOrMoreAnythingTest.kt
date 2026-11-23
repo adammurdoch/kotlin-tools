@@ -5,7 +5,7 @@ import kotlin.test.Test
 class OneOrMoreAnythingTest : AbstractParseTest() {
     @Test
     fun `parses one or more arguments`() {
-        val parser = anything().oneOrMore()
+        val parser = anything("a").oneOrMore()
 
         parser.edges {
             positional {
@@ -27,26 +27,26 @@ class OneOrMoreAnythingTest : AbstractParseTest() {
                     }
                     endOfInput(listOf("value 1"))
                 }
-                expecting("an argument")
+                expectingPositional("a")
             }
         }
     }
 
     @Test
     fun `reports usage`() {
-        val parser = anything().oneOrMore()
+        val parser = anything("a").oneOrMore()
 
-        parser.usage("<argument>...")
+        parser.usage("<a>...")
         parser.noOptions()
-        parser.noPositionals()
+        parser.positional("<a>")
     }
 
     @Test
     fun `argument must be provided`() {
-        val parser = anything().oneOrMore()
+        val parser = anything("a").oneOrMore()
 
         parser.fails {
-            failure(0, "Expected an argument")
+            expectedPositional(0, "a")
         }
     }
 }

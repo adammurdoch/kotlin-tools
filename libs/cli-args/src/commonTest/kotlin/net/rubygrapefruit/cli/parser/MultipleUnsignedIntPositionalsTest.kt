@@ -34,10 +34,10 @@ class MultipleUnsignedIntPositionalsTest : AbstractParseTest() {
         ) { _, _ -> fail() }
 
         parser.fails {
-            expectedParameter(0, "a")
+            expectedPositional(0, "a")
         }
         parser.fails("100") {
-            expectedParameter(1, "b")
+            expectedPositional(1, "b")
         }
 
         parser.fails("--unknown") {

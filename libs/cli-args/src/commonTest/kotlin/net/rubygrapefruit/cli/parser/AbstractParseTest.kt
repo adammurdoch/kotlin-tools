@@ -85,7 +85,7 @@ abstract class AbstractParseTest {
             failure(index, "Expected option $flag")
         }
 
-        fun expectedParameter(index: Int, name: String) {
+        fun expectedPositional(index: Int, name: String) {
             failure(index, "Expected parameter <$name>")
         }
 

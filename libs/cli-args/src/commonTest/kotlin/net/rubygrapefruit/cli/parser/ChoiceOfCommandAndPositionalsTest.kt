@@ -55,7 +55,7 @@ class ChoiceOfCommandAndPositionalsTest : AbstractParseTest() {
         )
 
         parser.fails("one") {
-            expectedParameter(1, "a")
+            expectedPositional(1, "a")
         }
     }
 }

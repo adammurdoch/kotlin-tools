@@ -59,7 +59,7 @@ class CommandAndStringPositionalTest : AbstractParseTest() {
         val parser = params(command("run"), positional("a")) { a -> a }
 
         parser.fails("run") {
-            expectedParameter(1, "a")
+            expectedPositional(1, "a")
         }
         parser.fails("run", "--unknown") {
             failure(1, "Unexpected option '--unknown'. Expected parameter <a> instead")

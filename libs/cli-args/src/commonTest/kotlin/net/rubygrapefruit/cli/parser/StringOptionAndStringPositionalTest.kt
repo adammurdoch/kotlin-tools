@@ -57,10 +57,10 @@ class StringOptionAndStringPositionalTest : AbstractParseTest() {
         val parser = params(option("x"), positional("a")) { _, _ -> fail() }
 
         parser.fails {
-            expectedParameter(0, "a")
+            expectedPositional(0, "a")
         }
         parser.fails("-x", "value") {
-            expectedParameter(2, "a")
+            expectedPositional(2, "a")
         }
     }
 
@@ -73,7 +73,7 @@ class StringOptionAndStringPositionalTest : AbstractParseTest() {
         }
         parser.fails("-x") {
             failure(1, "No value provided for option -x")
-            expectedParameter(1, "a")
+            expectedPositional(1, "a")
         }
     }
 }

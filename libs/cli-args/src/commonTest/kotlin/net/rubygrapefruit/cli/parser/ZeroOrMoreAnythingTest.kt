@@ -5,7 +5,7 @@ import kotlin.test.Test
 class ZeroOrMoreAnythingTest : AbstractParseTest() {
     @Test
     fun `parses zero or more arguments`() {
-        val parser = anything().zeroOrMore()
+        val parser = anything("a").zeroOrMore()
 
         parser.edges {
             positional {
@@ -33,10 +33,10 @@ class ZeroOrMoreAnythingTest : AbstractParseTest() {
 
     @Test
     fun `reports usage`() {
-        val parser = anything().zeroOrMore()
+        val parser = anything("a").zeroOrMore()
 
-        parser.usage("[<argument>...]")
+        parser.usage("[<a>...]")
         parser.noOptions()
-        parser.noPositionals()
+        parser.positional("<a>")
     }
 }

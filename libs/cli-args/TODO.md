@@ -115,8 +115,9 @@ Parsers
     - matches 0 or more positionals, empty list when not present
 - `command(text): Parser<Unit>`
     - matches the given text, must be present
-- `anything(): Parser<String>`
+- `anything(name): Positional<String>`
     - matches 1 argument - positional or option
+    - param `summary`
 - `anything().zeroOrMore(): Parser<List<String>>`
     - matches 0 or more arguments, empty list when not present
 - `anything().oneOrMore(): Parser<List<String>>`
@@ -158,9 +159,9 @@ TODO
 ----
 
 - Migration
-  - positional value is choice of `T`
-  - file, directory option, positional
-  - int positional
+  - anything() is-a positional (with name, summary, etc)
+  - positional whose value is choice from `String -> T` mapping
+  - file, directory option and positional
 - `oneOf()` with overlapping options, some with values and some without
 - `oneOf()` currently does not report conflicting options or literals
     - See ChoiceOfStringOptionTest

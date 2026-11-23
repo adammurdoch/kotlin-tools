@@ -5,7 +5,7 @@ import kotlin.test.Test
 class AnythingTest : AbstractParseTest() {
     @Test
     fun `parses any argument`() {
-        val parser = anything()
+        val parser = anything("param")
 
         parser.edges {
             positional {
@@ -21,26 +21,35 @@ class AnythingTest : AbstractParseTest() {
                 matches("--long") {
                     endOfInput("--long")
                 }
-                expecting("an argument")
+                expectingPositional("param")
             }
         }
     }
 
     @Test
     fun `reports usage`() {
-        val parser = anything()
+        val parser = anything("param")
 
-        parser.usage("<argument>")
+        parser.usage("<param>")
         parser.noOptions()
-        parser.noPositionals()
+        parser.positional("<param>")
+    }
+
+    @Test
+    fun `can provide summaru`() {
+        val parser = anything("param", summary = "something useful")
+
+        parser.usage("<param>")
+        parser.noOptions()
+        parser.positional("<param>", "something useful")
     }
 
     @Test
     fun `argument must be provided`() {
-        val parser = anything()
+        val parser = anything("param")
 
         parser.fails {
-            failure(0, "Expected an argument")
+            expectedPositional(0, "param")
         }
     }
 }

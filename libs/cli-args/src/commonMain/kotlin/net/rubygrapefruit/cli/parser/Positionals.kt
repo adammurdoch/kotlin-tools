@@ -19,6 +19,13 @@ fun <OUT> positional(name: String, type: StringType<OUT>, summary: String? = nul
 }
 
 /**
+ * Creates a parser that matches any single argument, include any option. The parser produces the matched argument as its value.
+ */
+fun anything(name: String, summary: String? = null): ScalarPositional<String> {
+    return AnythingParser(name, summary)
+}
+
+/**
  * Creates a parser that matches the given command name. The parser produces `Unit` as its result.
  */
 fun command(name: String): Parser<Unit> {
@@ -32,11 +39,4 @@ fun command(name: String): Parser<Unit> {
         throw IllegalArgumentException("Command name '$name' cannot contain whitespace")
     }
     return DefaultCommand(name)
-}
-
-/**
- * Creates a parser that matches any single argument, include any option. The parser produces the matched argument as its value.
- */
-fun anything(): ScalarPositional<String> {
-    return AnythingParser()
 }

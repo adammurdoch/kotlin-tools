@@ -102,10 +102,10 @@ class MultipleStringPositionalsTest : AbstractParseTest() {
         val parser = params(positional("a"), positional("b")) { _, _ -> fail() }
 
         parser.fails {
-            expectedParameter(0, "a")
+            expectedPositional(0, "a")
         }
         parser.fails("one") {
-            expectedParameter(1, "b")
+            expectedPositional(1, "b")
         }
 
         parser.fails("--unknown") {

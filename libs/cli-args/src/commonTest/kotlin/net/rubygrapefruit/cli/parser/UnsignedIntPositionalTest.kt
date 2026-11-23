@@ -38,7 +38,7 @@ class UnsignedIntPositionalTest : AbstractParseTest() {
         val parser = positional("param", unsignedInteger())
 
         parser.fails {
-            expectedParameter(0, "param")
+            expectedPositional(0, "param")
         }
     }
 

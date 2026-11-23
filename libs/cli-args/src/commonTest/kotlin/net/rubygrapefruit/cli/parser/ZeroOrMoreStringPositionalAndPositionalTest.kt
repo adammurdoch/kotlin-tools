@@ -34,7 +34,7 @@ class ZeroOrMoreStringPositionalAndPositionalTest : AbstractParseTest() {
         val parser = params(positional("a").zeroOrMore(), positional("b")) { _, _ -> fail() }
 
         parser.fails {
-            expectedParameter(0, "b")
+            expectedPositional(0, "b")
         }
     }
 

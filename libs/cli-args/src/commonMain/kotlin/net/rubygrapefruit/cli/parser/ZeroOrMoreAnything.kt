@@ -2,18 +2,25 @@ package net.rubygrapefruit.cli.parser
 
 import net.rubygrapefruit.cli.terminal.Output
 
-internal object ZeroOrMoreAnything : AbstractParser<List<String>>(), Positional<List<String>> {
+internal class ZeroOrMoreAnything(private val name: String) : AbstractParser<List<String>>(), Positional<List<String>> {
     override fun edges(consumer: (ParseEdge) -> Unit) {
-        ZeroOrMorePositionalEdge(emptyList(), AnythingParser.AnythingEdge).edges(consumer)
+        ZeroOrMorePositionalEdge(emptyList(), AnythingParser.AnythingEdge(name)).edges(consumer)
     }
 
     override fun usage(): UsageInternal {
-        return Usage
+        return Usage()
     }
 
-    private data object Usage : UsageInternal {
+    private inner class Usage : UsageInternal.PositionalUsage {
         override fun writeTo(quoted: Boolean, output: Output) {
-            output.write("[<argument>...]")
+            output.write("[<$name>...]")
+        }
+
+        override fun writePositionalUsageTo(output: Output) {
+            output.write("<$name>")
+        }
+
+        override fun writePositionalSummaryTo(output: Output) {
         }
     }
 }

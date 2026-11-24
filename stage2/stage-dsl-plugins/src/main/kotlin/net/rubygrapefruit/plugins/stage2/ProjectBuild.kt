@@ -3,7 +3,6 @@ package net.rubygrapefruit.plugins.stage2
 import org.gradle.api.Project
 import org.gradle.api.initialization.Settings
 import org.gradle.api.provider.ListProperty
-import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.SourceSetContainer
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
@@ -34,40 +33,46 @@ abstract class ProjectBuilder(private val settings: Settings) {
 
     private fun Project.applySource(spec: DowngradedProject) {
         plugins.withId("org.jetbrains.kotlin.jvm") {
-            val sourceDirProvider = sourceDirProvider(spec, "main/kotlin")
             val kotlin = extensions.getByType(KotlinProjectExtension::class.java)
-            kotlin.sourceSets.getByName("main").kotlin.srcDir(sourceDirProvider)
+            sourceDir(spec, "main", kotlin)
         }
         plugins.withId("org.jetbrains.kotlin.multiplatform") {
             val kotlin = extensions.getByType(KotlinMultiplatformExtension::class.java)
-            val commonSourceDir = sourceDirProvider(spec, "commonMain/kotlin")
-            kotlin.sourceSets.getByName("commonMain").kotlin.srcDir(commonSourceDir)
-            afterEvaluate {
-                val jvmSourceDir = sourceDirProvider(spec, "jvmMain/kotlin")
-                kotlin.sourceSets.getByName("jvmMain").kotlin.srcDir(jvmSourceDir)
-            }
+            sourceDir(spec, "commonMain", kotlin)
+            sourceDir(spec, "jvmMain", kotlin)
         }
         plugins.withId("java-library") {
-            val sourceDirProvider = sourceDirProvider(spec, "main/java")
-            val sourceSets = extensions.getByType(SourceSetContainer::class.java)
-            sourceSets.getByName("main").java.srcDir(sourceDirProvider)
+            val sourceDir = sourceDir(spec, "main/java")
+            if (sourceDir != null) {
+                val sourceSets = extensions.getByType(SourceSetContainer::class.java)
+                sourceSets.getByName("main").java.srcDir(sourceDir)
+            }
         }
         plugins.withType(JniLibraryPlugin::class.java) {
-            val sourceDirProvider = sourceDirProvider(spec, "main/c")
-            val lib = extensions.getByType(JniLibrary::class.java)
-            lib.cSourceDirs.from(sourceDirProvider)
+            val sourceDir = sourceDir(spec, "main/c")
+            if (sourceDir != null) {
+                val lib = extensions.getByType(JniLibrary::class.java)
+                lib.cSourceDirs.from(sourceDir)
+            }
         }
         afterEvaluate {
             group = "stage3"
         }
     }
 
-    private fun Project.sourceDirProvider(spec: DowngradedProject, path: String): Provider<Any> = provider {
+    private fun Project.sourceDir(spec: DowngradedProject, sourceSetName: String, kotlin: KotlinProjectExtension) {
+        val sourceDir = sourceDir(spec, "$sourceSetName/kotlin") ?: return
+        afterEvaluate {
+            kotlin.sourceSets.getByName(sourceSetName).kotlin.srcDir(sourceDir)
+        }
+    }
+
+    private fun sourceDir(spec: DowngradedProject, path: String): File? {
         val sourceDir = spec.sourceProjectDir.resolve("src/$path")
-        if (sourceDir.exists()) {
+        return if (sourceDir.exists()) {
             sourceDir
         } else {
-            emptyList<File>()
+            null
         }
     }
 }

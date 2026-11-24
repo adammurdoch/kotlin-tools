@@ -23,17 +23,10 @@ class KmpLibraryPlugin : Plugin<Project> {
 
             val kotlin = extensions.getByType(KotlinMultiplatformExtension::class.java)
             kotlin.apply {
+                // Only build the JVM component for using in this build
                 jvm()
                 jvmToolchain {
                     it.languageVersion.set(extension.jvm.targetJvmVersion.map { JavaLanguageVersion.of(it) })
-                }
-
-                linuxX64()
-                mingwX64()
-                macosArm64()
-
-                js {
-                    browser()
                 }
             }
 

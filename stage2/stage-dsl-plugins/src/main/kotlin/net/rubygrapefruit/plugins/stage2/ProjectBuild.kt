@@ -39,9 +39,13 @@ abstract class ProjectBuilder(private val settings: Settings) {
             kotlin.sourceSets.getByName("main").kotlin.srcDir(sourceDirProvider)
         }
         plugins.withId("org.jetbrains.kotlin.multiplatform") {
-            val sourceDirProvider = sourceDirProvider(spec, "commonMain/kotlin")
             val kotlin = extensions.getByType(KotlinMultiplatformExtension::class.java)
-            kotlin.sourceSets.getByName("commonMain").kotlin.srcDir(sourceDirProvider)
+            val commonSourceDir = sourceDirProvider(spec, "commonMain/kotlin")
+            kotlin.sourceSets.getByName("commonMain").kotlin.srcDir(commonSourceDir)
+            afterEvaluate {
+                val jvmSourceDir = sourceDirProvider(spec, "jvmMain/kotlin")
+                kotlin.sourceSets.getByName("jvmMain").kotlin.srcDir(jvmSourceDir)
+            }
         }
         plugins.withId("java-library") {
             val sourceDirProvider = sourceDirProvider(spec, "main/java")

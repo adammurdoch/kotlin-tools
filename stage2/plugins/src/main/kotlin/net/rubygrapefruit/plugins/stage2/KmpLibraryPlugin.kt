@@ -21,7 +21,8 @@ class KmpLibraryPlugin : Plugin<Project> {
             val jvmLibrary = objects.newInstance(JvmLibrary::class.java)
             val extension = extensions.create("library", KmpLibrary::class.java, jvmLibrary)
 
-            extensions.getByType(KotlinMultiplatformExtension::class.java).apply {
+            val kotlin = extensions.getByType(KotlinMultiplatformExtension::class.java)
+            kotlin.apply {
                 jvm()
                 jvmToolchain {
                     it.languageVersion.set(extension.jvm.targetJvmVersion.map { JavaLanguageVersion.of(it) })
@@ -33,6 +34,14 @@ class KmpLibraryPlugin : Plugin<Project> {
 
                 js {
                     browser()
+                }
+            }
+
+            afterEvaluate {
+                kotlin.sourceSets.getByName("jvmMain").dependencies {
+                    for (notation in jvmLibrary.dependencies.implementation) {
+                        implementation(notation)
+                    }
                 }
             }
         }

@@ -1,7 +1,13 @@
 plugins {
-    id("net.rubygrapefruit.stage2.jvm.lib")
+    id("net.rubygrapefruit.stage2.kmp.lib")
 }
 
-dependencies {
-    implementation(project(":cpu-info"))
+library {
+    jvm {
+        targetJvmVersion = 11
+        dependencies {
+            implementation(project(":cpu-info"))
+        }
+    }
+    nativeDesktop()
 }

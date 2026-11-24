@@ -21,6 +21,7 @@ abstract class StageDslPlugin : Plugin<Settings> {
                                 .replace("id(\"net.rubygrapefruit.kmp.lib\")", "id(\"net.rubygrapefruit.stage2.kmp.lib\")")
                                 .replace("id(\"net.rubygrapefruit.convention.base-jvm-lib\")", "id(\"net.rubygrapefruit.stage2.jvm.lib\")")
                                 .replace("id(\"net.rubygrapefruit.convention.build-jvm-lib\")", "id(\"net.rubygrapefruit.stage2.jvm.lib\")")
+                                .replace("id(\"net.rubygrapefruit.convention.base-kmp-lib\")", "id(\"net.rubygrapefruit.stage2.kmp.lib\")")
                                 .replace("id(\"net.rubygrapefruit.bootstrap.release\")", "id(\"net.rubygrapefruit.stage2.release\")")
                                 .replace("id(\"net.rubygrapefruit.bootstrap.samples\")", "/* id(\"net.rubygrapefruit.bootstrap.samples\") */")
                             buildScript.writeText(modified)

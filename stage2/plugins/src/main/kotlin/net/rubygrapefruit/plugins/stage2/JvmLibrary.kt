@@ -4,4 +4,7 @@ import org.gradle.api.provider.Property
 
 abstract class JvmLibrary {
     abstract val targetJvmVersion: Property<Int>
+
+    fun dependencies(config: LibraryDependencies.() -> Unit) {
+    }
 }

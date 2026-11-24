@@ -4,8 +4,6 @@ plugins {
     id("net.rubygrapefruit.stage2.release")
 }
 
-group = versions.libs.group
-
 library {
     jvm {
         targetJvmVersion = 11

@@ -1,10 +1,8 @@
 plugins {
-    id("net.rubygrapefruit.kmp.lib")
+    id("net.rubygrapefruit.convention.base-kmp-lib")
     id("net.rubygrapefruit.bootstrap.samples")
     id("net.rubygrapefruit.bootstrap.release")
 }
-
-group = versions.libs.group
 
 library {
     jvm {

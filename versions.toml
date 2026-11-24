@@ -27,6 +27,9 @@ version = 25
 [libs]
 group = "net.rubygrapefruit"
 
+[libs.jvm.base]
+version = 11
+
 [libs.jvm]
 version = 17
 

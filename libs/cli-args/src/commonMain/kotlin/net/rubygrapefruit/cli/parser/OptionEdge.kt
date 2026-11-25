@@ -40,10 +40,16 @@ internal class OptionEdgeWithValue(flags: List<String>, names: List<String>, exp
                 val result = type.convert(args.second())
                 when (result) {
                     is StringTypeInternal.Success<*> -> ParseEdge.Transition.Matched(2, OptionValue(result.value, first, this))
-                    is StringTypeInternal.Failure -> ParseEdge.Transition.Matched(2, BadlyFormedOptionValue(first, this, args.index + 1, ValueIsNotAnInt(args.second())))
+                    is StringTypeInternal.Failure -> ParseEdge.Transition.Matched(
+                        2,
+                        BadlyFormedOptionValueEdge(
+                            first, this, args.index + 1,
+                            BadlyFormedOptionValue(first, args.second(), type.expecting)
+                        )
+                    )
                 }
             } else {
-                ParseEdge.Transition.Matched(1, BadlyFormedOptionValue(first, this, args.index + 1, MissingOptionValue(first)))
+                ParseEdge.Transition.Matched(1, BadlyFormedOptionValueEdge(first, this, args.index + 1, MissingOptionValue(first)))
             }
         } else {
             ParseEdge.Transition.NotMatched
@@ -74,7 +80,7 @@ private abstract class AfterOptionEdge(val matchedFlag: String, val source: Opti
     }
 }
 
-private class BadlyFormedOptionValue(matchedFlag: String, source: OptionEdge, val index: Int, val problem: Problem) : AfterOptionEdge(matchedFlag, source), ParseEdge.Failed {
+private class BadlyFormedOptionValueEdge(matchedFlag: String, source: OptionEdge, val index: Int, val problem: Problem) : AfterOptionEdge(matchedFlag, source), ParseEdge.Failed {
     override val positional: Boolean
         get() = false
 

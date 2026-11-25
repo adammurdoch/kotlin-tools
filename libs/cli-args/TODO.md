@@ -98,6 +98,8 @@ Parsers
     - param `valueName`
 - `option(name, unsignedInteger()): Option<Int?>`
     - matches `-n <int>` or `--name <int>`, null when not present
+- `option(name, oneOf(mapping)): Option<T?>`
+    - matches `-n <value>` or `--name <value>`, null when not present
 - `option(name).required(): Option<String>`
     - matches `-n value` or `--name value`, must be present
 - `option(name).boolean(): Option<Boolean>`
@@ -109,6 +111,8 @@ Parsers
     - param `summary`
 - `positional(name, unsignedInteger()): Positional<Int>`
     - matches 1 positional, must be present and an unsigned integer
+- `positional(name, oneOf(mapping)): Positional<T>`
+    - matches 1 positional, must be present and one of the given choices
 - `positional(name).oneOrMore(): Positional<List<String>>`
     - matches 1 or more positional, must be present
 - `positional(name).zeroOrMore(): Positional<List<String>>`
@@ -118,10 +122,12 @@ Parsers
 - `anything(name): Positional<String>`
     - matches 1 argument - positional or option
     - param `summary`
-- `anything().zeroOrMore(): Parser<List<String>>`
+- `anything(name).zeroOrMore(): Parser<List<String>>`
     - matches 0 or more arguments, empty list when not present
-- `anything().oneOrMore(): Parser<List<String>>`
+    - param `summary`
+- `anything(name).oneOrMore(): Parser<List<String>>`
     - matches 1 or more arguments, must be present
+    - param `summary`
 - `params(producer): Parser<T>`
 - `params(a, map): Parser<T>`
 - `params(a, b, map): Parser<T>`

@@ -40,17 +40,17 @@ class OneOrMoreUnsignedIntPositionalTest : AbstractParseTest() {
         val parser = positional("a", unsignedInteger()).oneOrMore()
 
         parser.fails("one") {
-            failure(0, "'one' is not an unsigned integer")
+            failure(0, "Unexpected argument 'one'. Expected an unsigned int instead")
         }
         parser.fails("1", "two") {
-            failure(1, "'two' is not an unsigned integer")
+            failure(1, "Unexpected argument 'two'. Expected an unsigned int instead")
         }
         parser.fails("1", "two", "3") {
-            failure(1, "'two' is not an unsigned integer")
+            failure(1, "Unexpected argument 'two'. Expected an unsigned int instead")
         }
         parser.fails("one", "2", "three") {
-            failure(0, "'one' is not an unsigned integer")
-            failure(2, "'three' is not an unsigned integer")
+            failure(0, "Unexpected argument 'one'. Expected an unsigned int instead")
+            failure(2, "Unexpected argument 'three'. Expected an unsigned int instead")
         }
     }
 }

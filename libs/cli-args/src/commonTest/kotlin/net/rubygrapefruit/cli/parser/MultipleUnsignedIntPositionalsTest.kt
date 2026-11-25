@@ -56,20 +56,20 @@ class MultipleUnsignedIntPositionalsTest : AbstractParseTest() {
         ) { _, _ -> fail() }
 
         parser.fails("one", "two") {
-            failure(0, "'one' is not an unsigned integer")
-            failure(1, "'two' is not an unsigned integer")
+            failure(0, "Unexpected argument 'one'. Expected an unsigned int instead")
+            failure(1, "Unexpected argument 'two'. Expected an unsigned int instead")
         }
         parser.fails("one", "two", "three") {
-            failure(0, "'one' is not an unsigned integer")
-            failure(1, "'two' is not an unsigned integer")
-            failure(2, "'three' is not an unsigned integer")
+            failure(0, "Unexpected argument 'one'. Expected an unsigned int instead")
+            failure(1, "Unexpected argument 'two'. Expected an unsigned int instead")
+            failure(2, "Unexpected argument 'three'. Expected an unsigned int instead")
         }
         parser.fails("one", "2") {
-            failure(0, "'one' is not an unsigned integer")
+            failure(0, "Unexpected argument 'one'. Expected an unsigned int instead")
             failure(2, "Expected parameter <b>")
         }
         parser.fails("1", "two") {
-            failure(1, "'two' is not an unsigned integer")
+            failure(1, "Unexpected argument 'two'. Expected an unsigned int instead")
         }
     }
 
@@ -84,10 +84,10 @@ class MultipleUnsignedIntPositionalsTest : AbstractParseTest() {
             failure(2, "Unexpected argument 'unknown'")
         }
         parser.fails("unknown", "1", "2") {
-            failure(0, "'unknown' is not an unsigned integer")
+            failure(0, "Unexpected argument 'unknown'. Expected an unsigned int instead")
         }
         parser.fails("1", "unknown", "2", "unknown") {
-            failure(1, "'unknown' is not an unsigned integer")
+            failure(1, "Unexpected argument 'unknown'. Expected an unsigned int instead")
             failure(3, "Unexpected argument 'unknown'")
         }
 

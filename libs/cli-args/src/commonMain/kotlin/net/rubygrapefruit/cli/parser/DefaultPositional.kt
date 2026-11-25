@@ -32,9 +32,9 @@ internal class DefaultPositional<OUT>(
             return if (args.firstIsOption()) {
                 null
             } else {
-                val problem = type.unexpectedType(args.first())
-                if (problem != null) {
-                    ParseEdge.Claimed(1, problem)
+                val expecting = type.expecting
+                if (expecting != null) {
+                    ParseEdge.Claimed(1, UnexpectedArgument(args.first(), listOf(expecting)))
                 } else {
                     null
                 }

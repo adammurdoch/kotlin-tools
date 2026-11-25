@@ -1,9 +1,9 @@
 package net.rubygrapefruit.cli.parser
 
 internal interface StringTypeInternal<out T> : StringType<T> {
-    fun convert(value: String): Result<T>
+    val expecting: String?
 
-    fun unexpectedType(value: String): Problem?
+    fun convert(value: String): Result<T>
 
     sealed interface Result<out T>
 

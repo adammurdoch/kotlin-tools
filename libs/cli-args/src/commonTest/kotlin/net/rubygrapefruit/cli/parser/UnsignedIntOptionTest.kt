@@ -23,21 +23,30 @@ class UnsignedIntOptionTest : AbstractParseTest() {
     }
 
     @Test
+    fun `reports usage of option with short name`() {
+        val parser = option("x", unsignedInteger())
+
+        parser.usage("[-x <value>]")
+        parser.option("-x <value>")
+        parser.noPositionals()
+    }
+
+    @Test
     fun `value must be an unsigned int`() {
         val parser = option("x", unsignedInteger())
 
         parser.fails("-x", "value") {
-            failure(1, "'value' is not an unsigned integer")
+            failure(1, "Unexpected value 'value' for option -x. Expected an unsigned int instead")
         }
         parser.fails("-x", "") {
-            failure(1, "'' is not an unsigned integer")
+            failure(1, "Unexpected value '' for option -x. Expected an unsigned int instead")
         }
         parser.fails("-x", "-12") {
             failure(1, "No value provided for option -x")
             failure(1, "Unexpected option '-12'")
         }
         parser.fails("-x", "0.45") {
-            failure(1, "'0.45' is not an unsigned integer")
+            failure(1, "Unexpected value '0.45' for option -x. Expected an unsigned int instead")
         }
     }
 }

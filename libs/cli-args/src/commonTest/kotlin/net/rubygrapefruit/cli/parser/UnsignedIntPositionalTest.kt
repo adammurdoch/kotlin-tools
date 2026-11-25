@@ -47,20 +47,20 @@ class UnsignedIntPositionalTest : AbstractParseTest() {
         val parser = positional("param", unsignedInteger())
 
         parser.fails("string") {
-            failure(0, "'string' is not an unsigned integer")
+            failure(0, "Unexpected argument 'string'. Expected an unsigned int instead")
         }
         parser.fails("") {
-            failure(0, "'' is not an unsigned integer")
+            failure(0, "Unexpected argument ''. Expected an unsigned int instead")
         }
         parser.fails("-12") {
             failure(0, "Unexpected option '-12'. Expected parameter <param> instead")
         }
         parser.fails("1.2") {
-            failure(0, "'1.2' is not an unsigned integer")
+            failure(0, "Unexpected argument '1.2'. Expected an unsigned int instead")
         }
         val overflow = (Int.MAX_VALUE.toLong() + 1).toString()
         parser.fails(overflow) {
-            failure(0, "'$overflow' is not an unsigned integer")
+            failure(0, "Unexpected argument '$overflow'. Expected an unsigned int instead")
         }
     }
 }

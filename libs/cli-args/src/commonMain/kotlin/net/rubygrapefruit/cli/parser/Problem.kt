@@ -18,6 +18,35 @@ internal class BadlyFormedOption(val option: String, val suggestion: String) : P
     }
 }
 
+internal class BadlyFormedOptionValue(val option: String, val value: String, val expected: String?) : Problem {
+    override fun writeTo(output: Output) {
+        output.write("Unexpected value ")
+        output.userInput(value)
+        output.write(" for option $option")
+        if (expected != null) {
+            output.write(". Expected ")
+            output.write(expected)
+            output.write(" instead")
+        }
+    }
+}
+
+internal class MissingOptionValue(val option: String) : Problem {
+    override fun writeTo(output: Output) {
+        output.write("No value provided for option $option")
+    }
+}
+
+internal class RepeatedOption(val option: String, val previousOption: String? = null) : Problem {
+    override fun writeTo(output: Output) {
+        if (previousOption == null) {
+            output.write("Option $option can only appear once")
+        } else {
+            output.write("Option $option cannot be used with $previousOption")
+        }
+    }
+}
+
 internal class UnexpectedOption(val option: String, val expected: List<String> = emptyList()) : Problem {
     override fun writeTo(output: Output) {
         output.write("Unexpected option ")
@@ -60,22 +89,6 @@ internal class UnexpectedArgument(val argument: String, val expected: List<Strin
     }
 }
 
-internal class RepeatedOption(val option: String, val previousOption: String? = null) : Problem {
-    override fun writeTo(output: Output) {
-        if (previousOption == null) {
-            output.write("Option $option can only appear once")
-        } else {
-            output.write("Option $option cannot be used with $previousOption")
-        }
-    }
-}
-
-internal class MissingOptionValue(val option: String) : Problem {
-    override fun writeTo(output: Output) {
-        output.write("No value provided for option $option")
-    }
-}
-
 internal class MissingParameters(val descriptions: List<String>) : Problem {
     override fun writeTo(output: Output) {
         output.write("Expected ")
@@ -89,12 +102,5 @@ internal class MissingParameters(val descriptions: List<String>) : Problem {
             }
             output.write(description)
         }
-    }
-}
-
-internal class ValueIsNotAnInt(val value: String) : Problem {
-    override fun writeTo(output: Output) {
-        output.userInput(value)
-        output.write(" is not an unsigned integer")
     }
 }

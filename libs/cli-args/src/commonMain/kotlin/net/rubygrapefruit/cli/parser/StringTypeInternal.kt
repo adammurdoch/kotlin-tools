@@ -1,7 +1,7 @@
 package net.rubygrapefruit.cli.parser
 
 internal interface StringTypeInternal<out T> : StringType<T> {
-    val expecting: String?
+    val expecting: List<String>
 
     fun convert(value: String): Result<T>
 

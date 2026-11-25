@@ -27,16 +27,16 @@ class ChoicePositionalTest : AbstractParseTest() {
         val parser = positional("param", oneOf("one" to 1, "two" to 2))
 
         parser.fails("string") {
-            failure(0, "Unexpected argument 'string'. Expected one of 'one', 'two' instead")
+            failure(0, "Unexpected argument 'string'. Expected 'one' or 'two' instead")
         }
         parser.fails("") {
-            failure(0, "Unexpected argument ''. Expected one of 'one', 'two' instead")
+            failure(0, "Unexpected argument ''. Expected 'one' or 'two' instead")
         }
         parser.fails("One") {
-            failure(0, "Unexpected argument 'One'. Expected one of 'one', 'two' instead")
+            failure(0, "Unexpected argument 'One'. Expected 'one' or 'two' instead")
         }
         parser.fails("TWO") {
-            failure(0, "Unexpected argument 'TWO'. Expected one of 'one', 'two' instead")
+            failure(0, "Unexpected argument 'TWO'. Expected 'one' or 'two' instead")
         }
     }
 }

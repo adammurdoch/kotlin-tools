@@ -27,10 +27,10 @@ class ChoiceOptionTest: AbstractParseTest() {
         val parser = option("x", oneOf("one" to 1, "two" to 2))
 
         parser.fails("-x", "value") {
-            failure(1, "Unexpected value 'value' for option -x. Expected one of 'one', 'two' instead")
+            failure(1, "Unexpected argument 'value' for option -x. Expected 'one' or 'two' instead")
         }
         parser.fails("-x", "") {
-            failure(1, "Unexpected value '' for option -x. Expected one of 'one', 'two' instead")
+            failure(1, "Unexpected argument '' for option -x. Expected 'one' or 'two' instead")
         }
     }
 }

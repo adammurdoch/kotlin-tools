@@ -36,17 +36,17 @@ class UnsignedIntOptionTest : AbstractParseTest() {
         val parser = option("x", unsignedInteger())
 
         parser.fails("-x", "value") {
-            failure(1, "Unexpected value 'value' for option -x. Expected an unsigned int instead")
+            failure(1, "Unexpected argument 'value' for option -x. Expected an unsigned int instead")
         }
         parser.fails("-x", "") {
-            failure(1, "Unexpected value '' for option -x. Expected an unsigned int instead")
+            failure(1, "Unexpected argument '' for option -x. Expected an unsigned int instead")
         }
         parser.fails("-x", "-12") {
             failure(1, "No value provided for option -x")
             failure(1, "Unexpected option '-12'")
         }
         parser.fails("-x", "0.45") {
-            failure(1, "Unexpected value '0.45' for option -x. Expected an unsigned int instead")
+            failure(1, "Unexpected argument '0.45' for option -x. Expected an unsigned int instead")
         }
     }
 }

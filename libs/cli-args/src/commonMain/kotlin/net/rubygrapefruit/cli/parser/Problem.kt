@@ -18,14 +18,14 @@ internal class BadlyFormedOption(val option: String, val suggestion: String) : P
     }
 }
 
-internal class BadlyFormedOptionValue(val option: String, val value: String, val expected: String?) : Problem {
+internal class BadlyFormedOptionValue(val option: String, val value: String, val expected: List<String> = emptyList()) : Problem {
     override fun writeTo(output: Output) {
-        output.write("Unexpected value ")
+        output.write("Unexpected argument ")
         output.userInput(value)
         output.write(" for option $option")
-        if (expected != null) {
+        if (expected.isNotEmpty()) {
             output.write(". Expected ")
-            output.write(expected)
+            output.list(expected)
             output.write(" instead")
         }
     }
@@ -53,16 +53,7 @@ internal class UnexpectedOption(val option: String, val expected: List<String> =
         output.userInput(option)
         if (expected.isNotEmpty()) {
             output.write(". Expected ")
-            expected.forEachIndexed { index, description ->
-                if (index > 0) {
-                    if (index == expected.lastIndex) {
-                        output.write(" or ")
-                    } else {
-                        output.write(", ")
-                    }
-                }
-                output.write(description)
-            }
+            output.list(expected)
             output.write(" instead")
         }
     }
@@ -74,16 +65,7 @@ internal class UnexpectedArgument(val argument: String, val expected: List<Strin
         output.userInput(argument)
         if (expected.isNotEmpty()) {
             output.write(". Expected ")
-            expected.forEachIndexed { index, description ->
-                if (index > 0) {
-                    if (index == expected.lastIndex) {
-                        output.write(" or ")
-                    } else {
-                        output.write(", ")
-                    }
-                }
-                output.write(description)
-            }
+            output.list(expected)
             output.write(" instead")
         }
     }
@@ -92,15 +74,19 @@ internal class UnexpectedArgument(val argument: String, val expected: List<Strin
 internal class MissingParameters(val descriptions: List<String>) : Problem {
     override fun writeTo(output: Output) {
         output.write("Expected ")
-        descriptions.forEachIndexed { index, description ->
-            if (index > 0) {
-                if (index == descriptions.lastIndex) {
-                    output.write(" or ")
-                } else {
-                    output.write(", ")
-                }
+        output.list(descriptions)
+    }
+}
+
+private fun Output.list(descriptions: List<String>) {
+    descriptions.forEachIndexed { index, description ->
+        if (index > 0) {
+            if (index == descriptions.lastIndex) {
+                write(" or ")
+            } else {
+                write(", ")
             }
-            output.write(description)
         }
+        write(description)
     }
 }

@@ -33,8 +33,8 @@ internal class DefaultPositional<OUT>(
                 null
             } else {
                 val expecting = type.expecting
-                if (expecting != null) {
-                    ParseEdge.Claimed(1, UnexpectedArgument(args.first(), listOf(expecting)))
+                if (expecting.isNotEmpty()) {
+                    ParseEdge.Claimed(1, UnexpectedArgument(args.first(), expecting))
                 } else {
                     null
                 }

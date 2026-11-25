@@ -25,21 +25,18 @@ internal class DefaultPositional<OUT>(
         override val positional: Boolean
             get() = true
 
-        override val expecting: String
+        override val expectingArgument: String
             get() = "parameter <$name>"
 
-        override fun maybeClaimUnrecognized(args: InputArgs): ParseEdge.Claimed? {
-            return if (args.firstIsOption()) {
-                null
-            } else {
-                val expecting = type.expecting
-                if (expecting.isNotEmpty()) {
-                    ParseEdge.Claimed(1, UnexpectedArgument(args.first(), expecting))
+        override val expectingValue: List<String>
+            get() {
+                val typeExpecting = type.expecting
+                return if (typeExpecting.isNotEmpty()) {
+                    typeExpecting
                 } else {
-                    null
+                    listOf(expectingArgument)
                 }
             }
-        }
 
         override fun next(args: InputArgs): ParseEdge.Transition {
             return match(args) { FixedValue(it) }

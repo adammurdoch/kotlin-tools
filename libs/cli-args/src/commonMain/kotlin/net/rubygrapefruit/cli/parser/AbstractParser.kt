@@ -64,7 +64,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
                 if (edge is ParseEdge.Failed) {
                     problems.add(edge.failure())
                 } else if (edge is ParseEdge.Matcher) {
-                    val expecting = edge.expecting
+                    val expecting = edge.expectingArgument
                     if (expecting != null) {
                         finalExpected.add(expecting)
                     }
@@ -89,7 +89,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
                 if (claimed != null) {
                     problems.add(ProblemAtIndex(index, claimed.problem))
                     if (candidate.edge is ParseEdge.Matcher) {
-                        val expecting = candidate.edge.expecting
+                        val expecting = candidate.edge.expectingArgument
                         if (expecting != null) {
                             reportedExpected.add(expecting)
                         }
@@ -107,9 +107,9 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
                 val expected = mutableSetOf<String>()
                 for (candidate in candidates) {
                     if (candidate.advance == 1 && candidate.edge is ParseEdge.Matcher) {
-                        val expecting = candidate.edge.expecting
+                        val expecting = candidate.edge.expectingArgument
                         if (expecting != null && finalExpected.contains(expecting) && reportedExpected.add(expecting)) {
-                            expected.add(expecting)
+                            expected.addAll(candidate.edge.expectingValue)
                         }
                     }
                 }

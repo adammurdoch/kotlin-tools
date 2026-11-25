@@ -1,18 +1,21 @@
 package net.rubygrapefruit.cli.parser
 
 internal interface SingleArgumentMatcher {
-    val expecting: String
+    val expectingArgument: String?
+
+    val expectingValue: List<String>
 
     fun match(args: InputArgs, next: (Any?) -> ParseNode): ParseEdge.Transition
-
-    fun maybeClaimUnrecognized(args: InputArgs): ParseEdge.Claimed?
 }
 
 internal class ZeroOrMorePositionalEdge(val value: List<Any?>, val matcher: SingleArgumentMatcher) : ParseEdge.Matcher, ParseNode {
     override val positional: Boolean
         get() = true
 
-    override val expecting: String?
+    override val expectingValue: List<String>
+        get() = matcher.expectingValue
+
+    override val expectingArgument: String?
         get() = null
 
     override fun edges(consumer: (ParseEdge) -> Unit) {
@@ -23,18 +26,17 @@ internal class ZeroOrMorePositionalEdge(val value: List<Any?>, val matcher: Sing
     override fun next(args: InputArgs): ParseEdge.Transition {
         return matcher.match(args) { ZeroOrMorePositionalEdge(value + it, matcher) }
     }
-
-    override fun maybeClaimUnrecognized(args: InputArgs): ParseEdge.Claimed? {
-        return matcher.maybeClaimUnrecognized(args)
-    }
 }
 
 internal class OneOrMorePositionalEdge(val matcher: SingleArgumentMatcher) : ParseEdge.Matcher, ParseNode {
     override val positional: Boolean
         get() = true
 
-    override val expecting: String
-        get() = matcher.expecting
+    override val expectingValue: List<String>
+        get() = matcher.expectingValue
+
+    override val expectingArgument: String?
+        get() = matcher.expectingArgument
 
     override fun edges(consumer: (ParseEdge) -> Unit) {
         consumer(this)
@@ -42,10 +44,6 @@ internal class OneOrMorePositionalEdge(val matcher: SingleArgumentMatcher) : Par
 
     override fun next(args: InputArgs): ParseEdge.Transition {
         return matcher.match(args) { ZeroOrMorePositionalEdge(listOf(it), matcher) }
-    }
-
-    override fun maybeClaimUnrecognized(args: InputArgs): ParseEdge.Claimed? {
-        return matcher.maybeClaimUnrecognized(args)
     }
 }
 

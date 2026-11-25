@@ -124,8 +124,11 @@ internal class AllOfParser<OUT>(
         override val positional: Boolean
             get() = edge.positional
 
-        override val expecting: String?
-            get() = edge.expecting
+        override val expectingValue: List<String>
+            get() = edge.expectingValue
+
+        override val expectingArgument: String?
+            get() = edge.expectingArgument
 
         override fun maybeClaimUnrecognized(args: InputArgs): ParseEdge.Claimed? {
             return edge.maybeClaimUnrecognized(args)

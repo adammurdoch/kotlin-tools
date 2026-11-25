@@ -252,7 +252,7 @@ abstract class AbstractParseTest {
             }
 
             assertTrue(edges.isNotEmpty())
-            val notEndOfInput = edges.count { it is ParseEdge.Matcher && it.expecting != null }
+            val notEndOfInput = edges.count { it is ParseEdge.Matcher && it.expectingArgument != null }
             val terminating = edges.count { it is ParseEdge.Terminating }
             assertTrue(terminating > 0 || notEndOfInput > 0) { "expected a terminating edge in $edges" }
         }
@@ -309,7 +309,7 @@ abstract class AbstractParseTest {
         fun expectingOption(name: String)
         fun expectingCommand(name: String)
         fun expectingPositional(name: String)
-        fun expecting(text: String)
+        fun expecting(text: String, vararg moreText: String)
     }
 
     private class ExpectedProblem(val index: Int, val message: String)
@@ -361,7 +361,7 @@ abstract class AbstractParseTest {
 
         fun check(config: MatcherEdge.() -> Unit) {
             config()
-            assertTrue(edge.expecting == null || checkedExpectation) { "edge has an expectation but it was not checked by the test" }
+            assertTrue(edge.expectingValue.isEmpty() || checkedExpectation) { "edge has expectations ${edge.expectingValue} but it was not checked by the test" }
         }
 
         override fun matches(firstArg: String, vararg moreArgs: String, config: (Edges.() -> Unit)?) {
@@ -440,8 +440,9 @@ abstract class AbstractParseTest {
             expecting("'$name'")
         }
 
-        override fun expecting(text: String) {
-            assertEquals(text, edge.expecting)
+        override fun expecting(text: String, vararg moreText: String) {
+            val expecting = listOf(text) + moreText
+            assertEquals(expecting, edge.expectingValue)
             checkedExpectation = true
         }
     }

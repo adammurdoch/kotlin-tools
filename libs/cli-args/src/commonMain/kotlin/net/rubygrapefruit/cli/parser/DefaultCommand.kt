@@ -22,8 +22,11 @@ internal class DefaultCommand(private val text: String) : AbstractParser<Unit>()
         override val positional: Boolean
             get() = true
 
-        override val expecting: String
+        override val expectingArgument: String
             get() = "'$text'"
+
+        override val expectingValue: List<String>
+            get() = listOf(expectingArgument)
 
         override fun next(args: InputArgs): ParseEdge.Transition {
             return if (args.first() == text) {

@@ -19,7 +19,7 @@ class UnsignedIntPositionalTest : AbstractParseTest() {
                     endOfInput(Int.MAX_VALUE)
                 }
                 doesNotMatch("-x")
-                expectingPositional("param")
+                expecting("an unsigned int")
             }
         }
     }
@@ -53,7 +53,7 @@ class UnsignedIntPositionalTest : AbstractParseTest() {
             failure(0, "Unexpected argument ''. Expected an unsigned int instead")
         }
         parser.fails("-12") {
-            failure(0, "Unexpected option '-12'. Expected parameter <param> instead")
+            failure(0, "Unexpected option '-12'. Expected an unsigned int instead")
         }
         parser.fails("1.2") {
             failure(0, "Unexpected argument '1.2'. Expected an unsigned int instead")

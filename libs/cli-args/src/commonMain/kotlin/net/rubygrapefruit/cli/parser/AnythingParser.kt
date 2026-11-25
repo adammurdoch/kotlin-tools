@@ -21,8 +21,11 @@ internal class AnythingParser(private val name: String, private val summary: Str
         override val positional: Boolean
             get() = true
 
-        override val expecting: String
+        override val expectingArgument: String
             get() = "parameter <$name>"
+
+        override val expectingValue: List<String>
+            get() = listOf(expectingArgument)
 
         override fun match(args: InputArgs, next: (Any?) -> ParseNode): ParseEdge.Transition {
             return ParseEdge.Transition.Matched(1, next(args.first()))
@@ -30,10 +33,6 @@ internal class AnythingParser(private val name: String, private val summary: Str
 
         override fun next(args: InputArgs): ParseEdge.Transition {
             return ParseEdge.Transition.Matched(1, FixedValue(args.first()))
-        }
-
-        override fun maybeClaimUnrecognized(args: InputArgs): ParseEdge.Claimed? {
-            return null
         }
     }
 }

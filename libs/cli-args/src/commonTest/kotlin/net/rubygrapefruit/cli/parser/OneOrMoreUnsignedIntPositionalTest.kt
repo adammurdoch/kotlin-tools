@@ -31,7 +31,7 @@ class OneOrMoreUnsignedIntPositionalTest : AbstractParseTest() {
             expectedPositional(0, "a")
         }
         parser.fails("-unknown") {
-            failure(0, "Unexpected option '-unknown'. Expected parameter <a> instead")
+            failure(0, "Unexpected option '-unknown'. Expected an unsigned int instead")
         }
     }
 

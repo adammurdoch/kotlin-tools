@@ -164,6 +164,7 @@ CLI app
 TODO
 ----
 
+- "expected x merging does not work when positionals have same name"
 - Migration
   - positional whose value is choice from `String -> T` mapping
   - file, directory option and positional

@@ -19,7 +19,7 @@ class UnsignedIntPositionalTest : AbstractParseTest() {
                     endOfInput(Int.MAX_VALUE)
                 }
                 doesNotMatch("-x")
-                expecting("an unsigned int")
+                expectingArgument("an unsigned int")
             }
         }
     }

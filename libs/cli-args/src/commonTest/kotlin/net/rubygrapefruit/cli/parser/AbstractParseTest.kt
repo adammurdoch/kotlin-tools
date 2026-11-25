@@ -309,7 +309,7 @@ abstract class AbstractParseTest {
         fun expectingOption(name: String)
         fun expectingCommand(name: String)
         fun expectingPositional(name: String)
-        fun expecting(text: String, vararg moreText: String)
+        fun expectingArgument(text: String)
     }
 
     private class ExpectedProblem(val index: Int, val message: String)
@@ -361,7 +361,7 @@ abstract class AbstractParseTest {
 
         fun check(config: MatcherEdge.() -> Unit) {
             config()
-            assertTrue(edge.expectingValue.isEmpty() || checkedExpectation) { "edge has expectations ${edge.expectingValue} but it was not checked by the test" }
+            assertTrue(edge.expectingArgument == null || checkedExpectation) { "edge has expectation ${edge.expectingArgument} but it was not checked by the test" }
         }
 
         override fun matches(firstArg: String, vararg moreArgs: String, config: (Edges.() -> Unit)?) {
@@ -429,20 +429,19 @@ abstract class AbstractParseTest {
         }
 
         override fun expectingOption(name: String) {
-            expecting("option $name")
+            expectingArgument("option $name")
         }
 
         override fun expectingPositional(name: String) {
-            expecting("parameter <$name>")
+            expectingArgument("parameter <$name>")
         }
 
         override fun expectingCommand(name: String) {
-            expecting("'$name'")
+            expectingArgument("'$name'")
         }
 
-        override fun expecting(text: String, vararg moreText: String) {
-            val expecting = listOf(text) + moreText
-            assertEquals(expecting, edge.expectingValue)
+        override fun expectingArgument(text: String) {
+            assertEquals(text, edge.expectingArgument)
             checkedExpectation = true
         }
     }

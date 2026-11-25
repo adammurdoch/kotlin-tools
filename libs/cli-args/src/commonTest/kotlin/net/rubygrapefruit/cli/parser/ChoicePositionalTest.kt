@@ -17,7 +17,7 @@ class ChoicePositionalTest : AbstractParseTest() {
                 }
                 doesNotMatch("-x")
                 doesNotMatch("other")
-                expecting("'one'", "'two'")
+                expectingPositional("param")
             }
         }
     }

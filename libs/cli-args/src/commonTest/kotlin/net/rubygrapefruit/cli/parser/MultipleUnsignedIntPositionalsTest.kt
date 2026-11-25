@@ -18,10 +18,10 @@ class MultipleUnsignedIntPositionalsTest : AbstractParseTest() {
                         matches("2") {
                             endOfInput(listOf(1, 2))
                         }
-                        expecting("an unsigned int")
+                        expectingPositional("b")
                     }
                 }
-                expecting("an unsigned int")
+                expectingPositional("a")
             }
         }
     }
@@ -44,7 +44,7 @@ class MultipleUnsignedIntPositionalsTest : AbstractParseTest() {
             failure(0, "Unexpected option '--unknown'. Expected an unsigned int instead")
         }
         parser.fails("12", "--unknown") {
-            failure(1, "Unexpected option '--unknown'. Expected parameter <b> instead")
+            failure(1, "Unexpected option '--unknown'. Expected an unsigned int instead")
         }
     }
 

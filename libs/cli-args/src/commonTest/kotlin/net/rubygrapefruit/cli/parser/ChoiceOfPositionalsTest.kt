@@ -8,7 +8,7 @@ class ChoiceOfPositionalsTest : AbstractParseTest() {
     fun `parses choice of int and choice positionals with overlapping values`() {
         val parser = oneOf(
             positional("a", oneOf("1" to 100, "two" to 200)),
-            positional("a", unsignedInteger())
+            positional("b", unsignedInteger())
         )
 
         assertEquals(100, parser.parse("1").get())
@@ -20,7 +20,7 @@ class ChoiceOfPositionalsTest : AbstractParseTest() {
     fun `argument must be well formed`() {
         val parser = oneOf(
             positional("a", oneOf("1" to 100, "two" to 200)),
-            positional("a", unsignedInteger())
+            positional("b", unsignedInteger())
         )
 
         parser.fails("three") {

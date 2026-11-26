@@ -3,6 +3,7 @@ plugins {
 }
 
 application {
+    appName = "parse-toml-cli-app"
     dependencies {
         implementation(versions.libs.coordinates("cli-app"))
         implementation(versions.libs.coordinates("file-io"))

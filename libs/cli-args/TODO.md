@@ -197,7 +197,6 @@ TODO
 - Convenience for completion command or option
     - Add 'completion' command when app uses commands
     - Complete options
-- Parser that collects unrecognized or remainder
 - Merge short options
 - `--` as end of options
 - `--option=<value>` (allows value that starts with `-`)
@@ -208,6 +207,7 @@ TODO
 - Convenience for @arg file.
 - `-Dx=y` style
 - Compose value parsers (e.g. value is one-of ip address or host name)
+- File overloads that produce JVM types
 - Deprecated, hidden options + commands
 - Terminal integration for JVM
 - Terminal integration is thread-safe

@@ -102,9 +102,12 @@ samples {
         deriveNative("parse-native-cli-app")
     }
     jvmCliApp("parse-toml-jvm-cli-app") {
-        cliArgs("--file", "../parse-toml-jvm-cli-app/test.toml")
+        launcher("parse-toml-cli-app")
+        cliArgs("../parse-toml-jvm-cli-app/test.toml")
         expectedOutput("key-1 = value 1")
-        deriveNative("parse-toml-native-cli-app")
+        deriveNative("parse-toml-native-cli-app") {
+            launcher("parse-toml-cli-app")
+        }
     }
     jvmCliApp("parse-exe-jvm-cli-app") {
         cliArgs("--help")

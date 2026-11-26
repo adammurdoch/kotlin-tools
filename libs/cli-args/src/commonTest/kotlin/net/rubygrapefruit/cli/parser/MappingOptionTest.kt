@@ -21,5 +21,4 @@ class MappingOptionTest : AbstractParseTest() {
             endOfInput(null)
         }
     }
-
 }

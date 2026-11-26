@@ -3,6 +3,7 @@ plugins {
 }
 
 application {
+    appName = "parse-toml-cli-app"
     nativeDesktop()
     common {
         implementation(versions.libs.coordinates("cli-app"))

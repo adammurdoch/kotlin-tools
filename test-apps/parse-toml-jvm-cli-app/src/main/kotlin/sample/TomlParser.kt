@@ -9,7 +9,7 @@ import net.rubygrapefruit.parse.text.*
 import net.rubygrapefruit.parse.text.file.parse
 
 class TomlParser {
-    private val parser: Parser<TextInput, FileTree>
+    private val parser: Parser<TextInput, Table>
 
     init {
         val whitespace = discard(oneOf(' ', '\t'))
@@ -92,16 +92,15 @@ class TomlParser {
         val tableHeader = suffixed(tablePath, blankLine)
         val table = prefixed(blankLines, tableHeader, pairs) { header, pairs -> TableTree(header, pairs) }
 
-        parser = sequence(pairs, zeroOrMore(table)) { a, b -> FileTree(a, b) }
+        val file = sequence(pairs, zeroOrMore(table)) { a, b -> FileTree(a, b) }
+        parser = map(file) { Table.of(it) }
     }
 
     fun parse(file: RegularFile): Table {
-        val leaves = parser.parse(file)
-        return Table.of(leaves.get())
+        return parser.parse(file).get()
     }
 
     fun parse(text: String): Table {
-        val leaves = parser.parse(text)
-        return Table.of(leaves.get())
+        return parser.parse(text).get()
     }
 }

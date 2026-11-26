@@ -4,17 +4,6 @@ import net.rubygrapefruit.parse.Position
 import sample.render.Terminal
 
 class Table private constructor(val values: List<Value>) {
-    fun renderTo(terminal: Terminal, indent: String = "") {
-        terminal.operator("{")
-        println()
-        values.forEach {
-            it.renderTo(terminal, "$indent  ")
-        }
-        terminal.whitespace(indent)
-        terminal.operator("}")
-        println()
-    }
-
     companion object {
         fun of(tree: FileTree): Table {
             val builder = TableBuilder()
@@ -91,19 +80,31 @@ class Table private constructor(val values: List<Value>) {
     }
 }
 
-class Value(val name: String, val value: Any) {
-    fun renderTo(terminal: Terminal, indent: String) {
-        terminal.whitespace(indent)
-        terminal.literal(name)
-        terminal.whitespace(" ")
-        terminal.operator("=")
-        terminal.whitespace(" ")
-        when (value) {
-            is Table -> value.renderTo(terminal, indent)
-            else -> {
-                terminal.literal(value)
-                println()
-            }
+class Value(val name: String, val value: Any)
+
+fun Table.renderTo(terminal: Terminal, indent: String = "") {
+    terminal.operator("{")
+    println()
+    values.forEach {
+        it.renderTo(terminal, "$indent  ")
+    }
+    terminal.whitespace(indent)
+    terminal.operator("}")
+    println()
+}
+
+fun Value.renderTo(terminal: Terminal, indent: String) {
+    terminal.whitespace(indent)
+    terminal.literal(name)
+    terminal.whitespace(" ")
+    terminal.operator("=")
+    terminal.whitespace(" ")
+    when (value) {
+        is Table -> value.renderTo(terminal, indent)
+        else -> {
+            terminal.literal(value)
+            println()
         }
     }
 }
+

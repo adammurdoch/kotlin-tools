@@ -7,7 +7,7 @@ application {
     dependencies {
         implementation(versions.libs.coordinates("cli-app"))
         implementation(versions.libs.coordinates("file-io"))
-        implementation(versions.libs.coordinates("parse"))
+        implementation(versions.libs.coordinates("toml"))
         implementation(versions.libs.coordinates("file-parse"))
         implementation(project(":kmp-lib-render"))
     }

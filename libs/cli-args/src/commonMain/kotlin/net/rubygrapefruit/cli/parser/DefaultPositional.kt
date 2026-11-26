@@ -29,14 +29,7 @@ internal class DefaultPositional<OUT>(
             get() = "parameter <$name>"
 
         override val expectingValue: List<String>
-            get() {
-                val typeExpecting = type.expecting
-                return if (typeExpecting.isNotEmpty()) {
-                    typeExpecting
-                } else {
-                    listOf(expectingArgument)
-                }
-            }
+            get() = type.expecting
 
         override fun next(args: InputArgs): ParseEdge.Transition {
             return match(args) { FixedValue(it) }

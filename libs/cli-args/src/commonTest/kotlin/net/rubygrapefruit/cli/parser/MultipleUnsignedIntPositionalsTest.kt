@@ -84,10 +84,10 @@ class MultipleUnsignedIntPositionalsTest : AbstractParseTest() {
             failure(2, "Unexpected argument 'unknown'")
         }
         parser.fails("unknown", "1", "2") {
-            failure(0, "Unexpected argument 'unknown'")
+            failure(0, "Unexpected argument 'unknown'. Expected an unsigned int instead")
         }
         parser.fails("1", "unknown", "2", "unknown") {
-            failure(1, "Unexpected argument 'unknown'")
+            failure(1, "Unexpected argument 'unknown'. Expected an unsigned int instead")
             failure(3, "Unexpected argument 'unknown'")
         }
 
@@ -95,7 +95,7 @@ class MultipleUnsignedIntPositionalsTest : AbstractParseTest() {
             failure(2, "Unexpected option '-unknown'")
         }
         parser.fails("-unknown", "1", "2") {
-            failure(0, "Unexpected option '-unknown'")
+            failure(0, "Unexpected option '-unknown'. Expected an unsigned int instead")
         }
     }
 }

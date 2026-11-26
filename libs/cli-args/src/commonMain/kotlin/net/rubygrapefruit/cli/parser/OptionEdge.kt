@@ -5,7 +5,7 @@ internal abstract class OptionEdge(val flags: List<String>, val names: List<Stri
         get() = false
 
     override val expectingValue: List<String>
-        get() = listOfNotNull(expectingArgument)
+        get() = emptyList()
 
     override fun maybeClaimUnrecognized(args: InputArgs): ParseEdge.Claimed? {
         val first = args.first()

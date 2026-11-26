@@ -23,16 +23,16 @@ internal sealed interface ParseEdge {
         val positional: Boolean
 
         /**
-         * Used for a mismatched value, e.g "found x, expected y"
-         */
-        val expectingValue: List<String>
-
-        /**
          * Used for a missing value, e.g. "expected y"
          *
-         * This is also used as a key to identify the argument
+         * This is also used as a key to identify the argument and is used for [expectingValue] when that property is empty.
          */
         val expectingArgument: String?
+
+        /**
+         * Used for a mismatched value, e.g "found x, expected y". Should not contain the value of [expectingArgument], which is used as a fallback
+         */
+        val expectingValue: List<String>
 
         fun next(args: InputArgs): Transition
     }

@@ -107,9 +107,15 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
                 val expected = mutableSetOf<String>()
                 for (candidate in candidates) {
                     if (candidate.advance == 1 && candidate.edge is ParseEdge.Matcher) {
-                        val expecting = candidate.edge.expectingArgument
-                        if (expecting != null && finalExpected.contains(expecting) && reportedExpected.add(expecting)) {
-                            expected.addAll(candidate.edge.expectingValue)
+                        val expectingArgument = candidate.edge.expectingArgument
+                        val expectingValue = candidate.edge.expectingValue
+                        if (expectingValue.isNotEmpty()) {
+                            expected.addAll(expectingValue)
+                            if (expectingArgument != null) {
+                                reportedExpected.add(expectingArgument)
+                            }
+                        } else if (expectingArgument != null && finalExpected.contains(expectingArgument) && reportedExpected.add(expectingArgument)) {
+                            expected.add(expectingArgument)
                         }
                     }
                 }

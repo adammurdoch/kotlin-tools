@@ -25,7 +25,7 @@ internal class AnythingParser(private val name: String, private val summary: Str
             get() = "parameter <$name>"
 
         override val expectingValue: List<String>
-            get() = listOf(expectingArgument)
+            get() = emptyList()
 
         override fun match(args: InputArgs, next: (Any?) -> ParseNode): ParseEdge.Transition {
             return ParseEdge.Transition.Matched(1, next(args.first()))

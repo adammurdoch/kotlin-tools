@@ -42,8 +42,8 @@ internal class OptionEdgeWithValue(flags: List<String>, names: List<String>, exp
             if (args.hasSecond() && !args.secondIsOption()) {
                 val result = type.convert(args.second())
                 when (result) {
-                    is StringTypeInternal.Success<*> -> ParseEdge.Transition.Matched(2, OptionValue(result.value, first, this))
-                    is StringTypeInternal.Failure -> ParseEdge.Transition.Matched(
+                    is StringType.Success<*> -> ParseEdge.Transition.Matched(2, OptionValue(result.value, first, this))
+                    is StringType.Failure -> ParseEdge.Transition.Matched(
                         2,
                         BadlyFormedOptionValueEdge(
                             first, this, args.index + 1,

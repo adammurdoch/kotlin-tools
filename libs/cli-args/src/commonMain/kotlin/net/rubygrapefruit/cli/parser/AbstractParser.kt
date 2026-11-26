@@ -51,6 +51,7 @@ internal abstract class AbstractParser<out T> : Parser<T>, ParserInternal<T> {
         val success = candidates.firstNotNullOfOrNull { it.edge as? ParseEdge.EndOfInput }
         val totalUnrecognized = unrecognized.count { it != null }
         if (success != null && totalUnrecognized == 0) {
+            @Suppress("UNCHECKED_CAST")
             return ParserInternal.Success(success.value() as T)
         }
 

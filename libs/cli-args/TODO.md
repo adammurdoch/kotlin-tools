@@ -97,9 +97,11 @@ Parsers
     - param `summary`
     - param `valueName`
 - `option(name, unsignedInteger()): Option<Int?>`
-    - matches `-n <int>` or `--name <int>`, null when not present
+    - matches `-n <int>` or `--name <int>` and converts the value to an integer >= 0, null when not present
 - `option(name, oneOf(mapping)): Option<T?>`
-    - matches `-n <value>` or `--name <value>`, null when not present
+    - matches `-n <value>` or `--name <value>`, null when not present. Value must be one of the given choices
+- `option(name, map(summary, function)): Option<T?>`
+    - matches `-n <value>` or `--name <value>` and maps the value, null when not present
 - `option(name).required(): Option<String>`
     - matches `-n value` or `--name value`, must be present
 - `option(name).boolean(): Option<Boolean>`
@@ -110,9 +112,11 @@ Parsers
     - matches 1 positional, must be present
     - param `summary`
 - `positional(name, unsignedInteger()): Positional<Int>`
-    - matches 1 positional, must be present and an unsigned integer
+    - matches 1 positional and converts the argument to an integer >= 0, must be present
 - `positional(name, oneOf(mapping)): Positional<T>`
     - matches 1 positional, must be present and one of the given choices
+- `positional(name, map(summary, function)): Positional<T>`
+    - matches 1 positional and maps the argument, must be present
 - `positional(name).oneOrMore(): Positional<List<String>>`
     - matches 1 or more positional, must be present
 - `positional(name).zeroOrMore(): Positional<List<String>>`
@@ -164,9 +168,8 @@ CLI app
 TODO
 ----
 
-- "expected x merging does not work when positionals have same name"
+- "expected x" merging does not work when positionals have same name (they have conflicting keys)
 - Migration
-  - positional whose value is choice from `String -> T` mapping
   - file, directory option and positional
 - `oneOf()` with overlapping options, some with values and some without
 - `oneOf()` currently does not report conflicting options or literals

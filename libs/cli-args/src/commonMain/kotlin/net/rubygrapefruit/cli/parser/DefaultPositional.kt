@@ -41,8 +41,8 @@ internal class DefaultPositional<OUT>(
             } else {
                 val result = type.convert(args.first())
                 when (result) {
-                    is StringTypeInternal.Success -> ParseEdge.Transition.Matched(1, next(result.value))
-                    is StringTypeInternal.Failure -> ParseEdge.Transition.NotMatched
+                    is StringType.Success -> ParseEdge.Transition.Matched(1, next(result.value))
+                    is StringType.Failure -> ParseEdge.Transition.NotMatched
                 }
             }
         }

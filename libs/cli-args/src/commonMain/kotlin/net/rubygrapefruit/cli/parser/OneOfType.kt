@@ -4,12 +4,12 @@ internal class OneOfType<out OUT>(private val values: Map<String, OUT>) : String
     override val expecting: List<String>
         get() = values.keys.map { "'$it'" }
 
-    override fun convert(value: String): StringTypeInternal.Result<OUT> {
+    override fun convert(value: String): StringType.Result<OUT> {
         val result = values[value]
         return if (result != null) {
-            StringTypeInternal.Success(result)
+            StringType.Success(result)
         } else {
-            StringTypeInternal.Failure
+            StringType.Failure
         }
     }
 }

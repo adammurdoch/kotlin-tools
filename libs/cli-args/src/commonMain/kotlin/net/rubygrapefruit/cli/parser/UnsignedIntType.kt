@@ -4,12 +4,12 @@ internal object UnsignedIntType : StringTypeInternal<Int> {
     override val expecting: List<String>
         get() = listOf("an unsigned int")
 
-    override fun convert(value: String): StringTypeInternal.Result<Int> {
+    override fun convert(value: String): StringType.Result<Int> {
         val int = value.toIntOrNull()
         return if (int == null || int < 0) {
-            StringTypeInternal.Failure
+            StringType.Failure
         } else {
-            StringTypeInternal.Success(int)
+            StringType.Success(int)
         }
     }
 }

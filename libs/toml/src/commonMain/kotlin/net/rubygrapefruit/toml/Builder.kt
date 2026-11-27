@@ -97,9 +97,3 @@ internal class ArrayBuilder : Builder {
         return TomlArray(tables.map { it.value() })
     }
 }
-
-private class ValueBuilder(val value: TomlValue) : Builder {
-    override fun value(): TomlValue {
-        return value
-    }
-}

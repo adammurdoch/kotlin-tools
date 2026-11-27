@@ -56,18 +56,18 @@ class TomlParser {
             escapes,
             match(oneOrMore(oneExcept(oneOf(escape, quote, endLine))))
         )
-        val basicStringBody = map(zeroOrMore(basicStringSpan)) { it.joinToString("") }
+        val basicStringBody = map(zeroOrMore(basicStringSpan)) { TomlString(it.joinToString("")) }
         val basicString = surrounded(quote, basicStringBody, quote)
 
         val singleQuote = literal("'")
-        val literalStringBody = match(zeroOrMore(oneExcept(oneOf(singleQuote, endLine))))
+        val literalStringBody = map(match(zeroOrMore(oneExcept(oneOf(singleQuote, endLine))))) { TomlString(it) }
         val literalString = surrounded(singleQuote, literalStringBody, singleQuote)
 
-        val number = integer()
+        val number = map(integer()) { TomlInt(it) }
 
-        val boolean = oneOf(literal("true", true), literal("false", false))
+        val boolean = oneOf(literal("true", TomlBoolean(true)), literal("false", TomlBoolean(false)))
 
-        val value = recursive<TextInput, Any>()
+        val value = recursive<TextInput, TomlValue>()
 
         val arrayWhitespace = sequence(blankLines, optionalWhitespace)
         val arrayPrefix = sequence(literal("["), arrayWhitespace)
@@ -77,7 +77,7 @@ class TomlParser {
         // allow optional trailing ','
         val arrayItems = sequence(zeroOrMore(arrayItem), optional(arrayLastItem)) { a, b -> if (b == null) a else a + b }
         val arraySuffix = literal("]")
-        val array = surrounded(arrayPrefix, arrayItems, arraySuffix)
+        val array = surrounded(arrayPrefix, arrayItems, arraySuffix) { TomlArray(it) }
 
         value.parser(oneOf(basicString, literalString, number, boolean, array))
 

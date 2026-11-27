@@ -7,9 +7,7 @@ import net.rubygrapefruit.cli.parser.app
 import net.rubygrapefruit.cli.parser.positional
 import net.rubygrapefruit.file.RegularFile
 import net.rubygrapefruit.parse.text.file.parse
-import net.rubygrapefruit.toml.Table
-import net.rubygrapefruit.toml.TomlParser
-import net.rubygrapefruit.toml.Value
+import net.rubygrapefruit.toml.*
 import sample.render.Terminal
 import sample.render.terminal
 
@@ -18,6 +16,7 @@ fun main(args: Array<String>) = appMain(args) {
         val root = TomlParser().parse(file)
         val terminal = terminal()
         root.renderTo(terminal)
+        println()
     }
 
     app("parse-toml-cli-app", action)
@@ -32,25 +31,42 @@ fun Table.renderTo(terminal: Terminal, indent: String = "") {
     println()
     values.forEach {
         it.renderTo(terminal, "$indent  ")
+        println()
     }
     terminal.whitespace(indent)
     terminal.operator("}")
-    println()
 }
 
 fun Value.renderTo(terminal: Terminal, indent: String) {
     terminal.whitespace(indent)
-    terminal.literal(name)
+    terminal.identifier(name)
     terminal.whitespace(" ")
     terminal.operator("=")
     terminal.whitespace(" ")
-    val value = value
-    when (value) {
-        is Table -> value.renderTo(terminal, indent)
-        else -> {
+    value.renderTo(terminal, indent)
+}
+
+fun TomlValue.renderTo(terminal: Terminal, indent: String) {
+    when (this) {
+        is Table -> renderTo(terminal, indent)
+        is TomlString -> {
+            terminal.operator("'")
             terminal.literal(value)
-            println()
+            terminal.operator("'")
+        }
+
+        is TomlInt -> terminal.literal(value)
+        is TomlBoolean -> terminal.literal(value)
+        is TomlArray -> {
+            terminal.operator("[")
+            value.forEachIndexed { index, element ->
+                if (index > 0) {
+                    terminal.operator(",")
+                    terminal.whitespace(" ")
+                }
+                element.renderTo(terminal, "$indent  ")
+            }
+            terminal.operator("]")
         }
     }
 }
-

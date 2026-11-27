@@ -3,6 +3,10 @@ package sample.render
 expect fun terminal(): Terminal
 
 open class Terminal {
+    open fun identifier(value: Any) {
+        print(value)
+    }
+
     open fun literal(value: Any) {
         print(value)
     }

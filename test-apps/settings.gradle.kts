@@ -104,7 +104,7 @@ samples {
     jvmCliApp("parse-toml-jvm-cli-app") {
         launcher("parse-toml-cli-app")
         cliArgs("../parse-toml-jvm-cli-app/test.toml")
-        expectedOutput("key-1 = value 1")
+        expectedOutput("key-1 = 'value 1'")
         deriveNative("parse-toml-native-cli-app") {
             launcher("parse-toml-cli-app")
         }

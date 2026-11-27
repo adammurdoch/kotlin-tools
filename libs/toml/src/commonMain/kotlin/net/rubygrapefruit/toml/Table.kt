@@ -2,9 +2,11 @@ package net.rubygrapefruit.toml
 
 import net.rubygrapefruit.parse.Position
 
-class Table private constructor(val values: List<Value>) {
+sealed interface TomlValue
+
+class Table private constructor(val values: List<Value>) : TomlValue {
     companion object {
-        fun of(tree: FileTree): Table {
+        internal fun of(tree: FileTree): Table {
             val builder = TableBuilder()
             for (pair in tree.pairs) {
                 builder.add(pair.path, pair.value)
@@ -20,7 +22,7 @@ class Table private constructor(val values: List<Value>) {
     }
 
     private sealed interface Builder {
-        fun value(): Any
+        fun value(): TomlValue
     }
 
     private class TableBuilder : Builder {
@@ -30,7 +32,7 @@ class Table private constructor(val values: List<Value>) {
             return Table(nodes())
         }
 
-        fun add(path: Path, value: Any) {
+        fun add(path: Path, value: TomlValue) {
             val name = path.parts.first()
             if (path.parts.size == 1) {
                 if (children.containsKey(name)) {
@@ -72,11 +74,19 @@ class Table private constructor(val values: List<Value>) {
         }
     }
 
-    private class ValueBuilder(val value: Any) : Builder {
-        override fun value(): Any {
+    private class ValueBuilder(val value: TomlValue) : Builder {
+        override fun value(): TomlValue {
             return value
         }
     }
 }
 
-class Value(val name: String, val value: Any)
+class TomlString(val value: String) : TomlValue
+
+class TomlInt(val value: Int) : TomlValue
+
+class TomlBoolean(val value: Boolean) : TomlValue
+
+class TomlArray(val value: List<TomlValue>) : TomlValue
+
+class Value(val name: String, val value: TomlValue)

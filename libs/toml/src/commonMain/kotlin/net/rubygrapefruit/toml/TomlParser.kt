@@ -7,7 +7,7 @@ import net.rubygrapefruit.parse.general.position
 import net.rubygrapefruit.parse.text.*
 
 class TomlParser {
-    val parser: Parser<TextInput, Table>
+    val parser: Parser<TextInput, TomlTable>
 
     init {
         val whitespace = discard(oneOf(' ', '\t'))
@@ -97,10 +97,10 @@ class TomlParser {
         val section = oneOf(table, tableArray)
 
         val file = sequence(pairs, zeroOrMore(section)) { a, b -> FileTree(a, b) }
-        parser = map(file) { Table.of(it) }
+        parser = map(file) { it.resolve() }
     }
 
-    fun parse(text: String): Table {
+    fun parse(text: String): TomlTable {
         return parser.parse(text).get()
     }
 }

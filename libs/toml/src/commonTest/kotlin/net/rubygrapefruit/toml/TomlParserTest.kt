@@ -88,7 +88,7 @@ table.key = "value"
         assertEquals(1, table.values.size)
         table.values.first().apply {
             assertEquals("table", name)
-            assertIs<Table>(value)
+            assertIs<TomlTable>(value)
             value.apply {
                 assertEquals(1, values.size)
                 values.first().isString("key", "value")
@@ -108,7 +108,7 @@ key = "value"
         assertEquals(1, table.values.size)
         table.values.first().apply {
             assertEquals("table", name)
-            assertIs<Table>(value)
+            assertIs<TomlTable>(value)
             value.apply {
                 assertEquals(1, values.size)
                 values.first().isString("key", "value")
@@ -134,8 +134,8 @@ key-2 = "value"
             assertIs<TomlArray>(value)
             value.apply {
                 assertEquals(2, value.size)
-                assertIs<Table>(value[0])
-                assertIs<Table>(value[1])
+                assertIs<TomlTable>(value[0])
+                assertIs<TomlTable>(value[1])
             }
         }
     }

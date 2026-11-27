@@ -15,4 +15,16 @@ internal class TableTree(val path: Path, val pairs: List<KeyValuePairTree>) : Se
 
 internal class TableArrayTree(val path: Path, val pairs: List<KeyValuePairTree>) : SectionTree
 
-internal class FileTree(val pairs: List<KeyValuePairTree>, val sections: List<SectionTree>)
+internal class FileTree(val pairs: List<KeyValuePairTree>, val sections: List<SectionTree>) {
+    fun resolve(): TomlTable {
+        val builder = TableBuilder()
+        builder.addAll(pairs)
+        for (section in sections) {
+            when (section) {
+                is TableTree -> builder.addTable(section.path).addAll(section.pairs)
+                is TableArrayTree -> builder.addTableToArray(section.path).addAll(section.pairs)
+            }
+        }
+        return builder.value()
+    }
+}

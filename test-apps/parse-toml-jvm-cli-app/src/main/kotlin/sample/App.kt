@@ -22,11 +22,11 @@ fun main(args: Array<String>) = appMain(args) {
     app("parse-toml-cli-app", action)
 }
 
-fun TomlParser.parse(file: RegularFile): Table {
+fun TomlParser.parse(file: RegularFile): TomlTable {
     return parser.parse(file).get()
 }
 
-fun Table.renderTo(terminal: Terminal, indent: String = "") {
+fun TomlTable.renderTo(terminal: Terminal, indent: String = "") {
     terminal.operator("{")
     println()
     values.forEach {
@@ -48,7 +48,7 @@ fun Value.renderTo(terminal: Terminal, indent: String) {
 
 fun TomlValue.renderTo(terminal: Terminal, indent: String) {
     when (this) {
-        is Table -> renderTo(terminal, indent)
+        is TomlTable -> renderTo(terminal, indent)
         is TomlString -> {
             terminal.operator("'")
             terminal.literal(value)

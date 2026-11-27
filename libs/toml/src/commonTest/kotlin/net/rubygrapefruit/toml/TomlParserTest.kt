@@ -30,11 +30,7 @@ class TomlParserTest {
         val parser = TomlParser()
         val table = parser.parse("""key="value"""")
         assertEquals(1, table.values.size)
-        table.values.first().apply {
-            assertEquals("key", name)
-            assertIs<TomlString>(value)
-            assertEquals("value", value.value)
-        }
+        table.values.first().isString("key", "value")
     }
 
     @Test
@@ -42,11 +38,7 @@ class TomlParserTest {
         val parser = TomlParser()
         val table = parser.parse("""key=12""")
         assertEquals(1, table.values.size)
-        table.values.first().apply {
-            assertEquals("key", name)
-            assertIs<TomlInt>(value)
-            assertEquals(12, value.value)
-        }
+        table.values.first().isInt("key", 12)
     }
 
     @Test
@@ -54,24 +46,20 @@ class TomlParserTest {
         val parser = TomlParser()
         val table = parser.parse("""key=true""")
         assertEquals(1, table.values.size)
-        table.values.first().apply {
-            assertEquals("key", name)
-            assertIs<TomlBoolean>(value)
-            assertEquals(true, value.value)
-        }
+        table.values.first().isBoolean("key", true)
     }
 
     @Test
     fun `parses key and array value pair`() {
         val parser = TomlParser()
-        val table = parser.parse("""key=[1, true]""")
+        val table = parser.parse("""key=[1, false]""")
         assertEquals(1, table.values.size)
         table.values.first().apply {
             assertEquals("key", name)
             assertIs<TomlArray>(value)
             assertEquals(2, value.value.size)
-            assertIs<TomlInt>(value.value[0])
-            assertIs<TomlBoolean>(value.value[1])
+            value.value[0].isInt(1)
+            value.value[1].isBoolean(false)
         }
     }
 
@@ -86,11 +74,7 @@ class TomlParserTest {
         """
         )
         assertEquals(1, table.values.size)
-        table.values.first().apply {
-            assertEquals("key", name)
-            assertIs<TomlString>(value)
-            assertEquals("value", value.value)
-        }
+        table.values.first().isString("key", "value")
     }
 
     @Test
@@ -107,11 +91,7 @@ table.key = "value"
             assertIs<Table>(value)
             value.apply {
                 assertEquals(1, values.size)
-                values.first().apply {
-                    assertEquals("key", name)
-                    assertIs<TomlString>(value)
-                    assertEquals("value", value.value)
-                }
+                values.first().isString("key", "value")
             }
         }
     }
@@ -131,12 +111,38 @@ key = "value"
             assertIs<Table>(value)
             value.apply {
                 assertEquals(1, values.size)
-                values.first().apply {
-                    assertEquals("key", name)
-                    assertIs<TomlString>(value)
-                    assertEquals("value", value.value)
-                }
+                values.first().isString("key", "value")
             }
         }
+    }
+
+    private fun Value.isString(key: String, expected: String) {
+        assertEquals(key, name)
+        value.isString(expected)
+    }
+
+    private fun Value.isInt(key: String, expected: Int) {
+        assertEquals(key, name)
+        value.isInt(expected)
+    }
+
+    private fun Value.isBoolean(key: String, expected: Boolean) {
+        assertEquals(key, name)
+        value.isBoolean(expected)
+    }
+
+    private fun TomlValue.isString(expected: String) {
+        assertIs<TomlString>(this)
+        assertEquals(expected, value)
+    }
+
+    private fun TomlValue.isInt(expected: Int) {
+        assertIs<TomlInt>(this)
+        assertEquals(expected, value)
+    }
+
+    private fun TomlValue.isBoolean(expected: Boolean) {
+        assertIs<TomlBoolean>(this)
+        assertEquals(expected, value)
     }
 }

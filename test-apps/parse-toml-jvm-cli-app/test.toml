@@ -66,4 +66,14 @@ key = "value"
 [table.nested-2]
 key = "value"
 
+# array of tables
+[[tables]]
+name = "table 1"
+
+[[tables]]
+# an empty table
+
+[[tables]]
+name = "table 3"
+
 # no trailing new line

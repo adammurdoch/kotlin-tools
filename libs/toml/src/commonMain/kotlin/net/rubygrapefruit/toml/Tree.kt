@@ -9,6 +9,10 @@ internal data class Path(val position: Position, val parts: List<String>) {
 
 internal data class KeyValuePairTree(val path: Path, val value: TomlValue)
 
-internal class TableTree(val path: Path, val pairs: List<KeyValuePairTree>)
+internal sealed interface SectionTree
 
-internal class FileTree(val pairs: List<KeyValuePairTree>, val tables: List<TableTree>)
+internal class TableTree(val path: Path, val pairs: List<KeyValuePairTree>) : SectionTree
+
+internal class TableArrayTree(val path: Path, val pairs: List<KeyValuePairTree>) : SectionTree
+
+internal class FileTree(val pairs: List<KeyValuePairTree>, val sections: List<SectionTree>)

@@ -8,13 +8,11 @@ class Table private constructor(val values: List<Value>) : TomlValue {
     companion object {
         internal fun of(tree: FileTree): Table {
             val builder = TableBuilder()
-            for (pair in tree.pairs) {
-                builder.add(pair.path, pair.value)
-            }
-            for (table in tree.tables) {
-                val tableBuilder = builder.addTable(table.path)
-                for (pair in table.pairs) {
-                    tableBuilder.add(pair.path, pair.value)
+            builder.addAll(tree.pairs)
+            for (section in tree.sections) {
+                when (section) {
+                    is TableTree -> builder.addTable(section.path).addAll(section.pairs)
+                    is TableArrayTree -> builder.addTableToArray(section.path).addAll(section.pairs)
                 }
             }
             return builder.value()
@@ -32,29 +30,46 @@ class Table private constructor(val values: List<Value>) : TomlValue {
             return Table(nodes())
         }
 
+        fun addAll(pairs: List<KeyValuePairTree>) {
+            for (pair in pairs) {
+                add(pair.path, pair.value)
+            }
+        }
+
         fun add(path: Path, value: TomlValue) {
-            val name = path.parts.first()
-            if (path.parts.size == 1) {
-                if (children.containsKey(name)) {
-                    throw IllegalArgumentException("Duplicate key '$name' at position ${path.position}")
-                }
-                children[name] = ValueBuilder(value)
-            } else {
-                val builder = table(name, path.position)
-                val tail = path.tail
-                builder.add(tail, value)
+            add(path) { name, owner ->
+                owner.add(name, path.position, value)
             }
         }
 
         fun addTable(path: Path): TableBuilder {
+            return add(path) { name, owner ->
+                owner.table(name, path.position)
+            }
+        }
+
+        fun addTableToArray(path: Path): TableBuilder {
+            return add(path) { name, owner ->
+                owner.array(name, path.position).addTable()
+            }
+        }
+
+        private fun <T> add(path: Path, action: (String, TableBuilder) -> T): T {
             val name = path.parts.first()
             return if (path.parts.size == 1) {
-                table(name, path.position)
+                action(name, this)
             } else {
                 val builder = table(name, path.position)
                 val tail = path.tail
-                builder.addTable(tail)
+                builder.add(tail, action)
             }
+        }
+
+        private fun add(name: String, position: Position, value: TomlValue) {
+            if (children.containsKey(name)) {
+                throw IllegalArgumentException("Duplicate key '$name' at position $position")
+            }
+            children[name] = ValueBuilder(value)
         }
 
         private fun table(name: String, position: Position): TableBuilder {
@@ -69,8 +84,34 @@ class Table private constructor(val values: List<Value>) : TomlValue {
             return newBuilder
         }
 
+        private fun array(name: String, position: Position): ArrayBuilder {
+            val builder = children[name]
+            if (builder is ArrayBuilder) {
+                return builder
+            } else if (builder != null) {
+                throw IllegalArgumentException("Duplicate key '$name' at position $position")
+            }
+            val newBuilder = ArrayBuilder()
+            children[name] = newBuilder
+            return newBuilder
+        }
+
         private fun nodes(): List<Value> {
             return children.map { Value(it.key, it.value.value()) }
+        }
+    }
+
+    private class ArrayBuilder : Builder {
+        private val tables = mutableListOf<TableBuilder>()
+
+        fun addTable(): TableBuilder {
+            val builder = TableBuilder()
+            tables.add(builder)
+            return builder
+        }
+
+        override fun value(): TomlValue {
+            return TomlArray(tables.map { it.value() })
         }
     }
 

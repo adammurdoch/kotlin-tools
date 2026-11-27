@@ -90,7 +90,13 @@ class TomlParser {
         val tableHeader = suffixed(tablePath, blankLine)
         val table = prefixed(blankLines, tableHeader, pairs) { header, pairs -> TableTree(header, pairs) }
 
-        val file = sequence(pairs, zeroOrMore(table)) { a, b -> FileTree(a, b) }
+        val tableArrayPath = surrounded(literal("[["), key, literal("]]"))
+        val tableArrayHeader = suffixed(tableArrayPath, blankLine)
+        val tableArray = prefixed(blankLines, tableArrayHeader, pairs) { header, pairs -> TableArrayTree(header, pairs) }
+
+        val section = oneOf(table, tableArray)
+
+        val file = sequence(pairs, zeroOrMore(section)) { a, b -> FileTree(a, b) }
         parser = map(file) { Table.of(it) }
     }
 

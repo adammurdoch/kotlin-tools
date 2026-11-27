@@ -116,6 +116,30 @@ key = "value"
         }
     }
 
+    @Test
+    fun `parses array of tables`() {
+        val parser = TomlParser()
+        val table = parser.parse(
+            """
+[[table]]
+key = "value"
+
+[[table]]
+key-2 = "value"
+        """.trimIndent()
+        )
+        assertEquals(1, table.values.size)
+        table.values.first().apply {
+            assertEquals("table", name)
+            assertIs<TomlArray>(value)
+            value.apply {
+                assertEquals(2, value.size)
+                assertIs<Table>(value[0])
+                assertIs<Table>(value[1])
+            }
+        }
+    }
+
     private fun Value.isString(key: String, expected: String) {
         assertEquals(key, name)
         value.isString(expected)

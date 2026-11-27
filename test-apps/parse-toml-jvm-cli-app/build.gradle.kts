@@ -11,7 +11,4 @@ application {
         implementation(versions.libs.coordinates("file-parse"))
         implementation(project(":kmp-lib-render"))
     }
-    test {
-        implementation(versions.test.coordinates)
-    }
 }

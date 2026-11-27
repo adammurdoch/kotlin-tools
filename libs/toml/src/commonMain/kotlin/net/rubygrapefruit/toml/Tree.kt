@@ -1,4 +1,4 @@
-package sample
+package net.rubygrapefruit.toml
 
 import net.rubygrapefruit.parse.Position
 

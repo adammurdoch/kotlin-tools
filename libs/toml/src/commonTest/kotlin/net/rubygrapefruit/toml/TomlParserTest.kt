@@ -1,4 +1,4 @@
-package sample
+package net.rubygrapefruit.toml
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

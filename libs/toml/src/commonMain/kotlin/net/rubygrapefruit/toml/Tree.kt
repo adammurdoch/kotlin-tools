@@ -7,7 +7,11 @@ internal data class Path(val position: Position, val parts: List<String>) {
         get() = Path(position, parts.drop(1))
 }
 
-internal data class KeyValuePairTree(val path: Path, val value: TomlValue)
+internal data class KeyValuePairTree(val path: Path, val value: TomlValue) : Builder {
+    override fun value(): TomlValue {
+        return value
+    }
+}
 
 internal sealed interface SectionTree
 

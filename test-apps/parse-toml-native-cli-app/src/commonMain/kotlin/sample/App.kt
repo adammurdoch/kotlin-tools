@@ -37,7 +37,7 @@ fun TomlTable.renderTo(terminal: Terminal, indent: String = "") {
     terminal.operator("}")
 }
 
-fun Value.renderTo(terminal: Terminal, indent: String) {
+fun KeyValue.renderTo(terminal: Terminal, indent: String) {
     terminal.whitespace(indent)
     terminal.identifier(name)
     terminal.whitespace(" ")

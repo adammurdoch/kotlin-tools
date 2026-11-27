@@ -140,17 +140,17 @@ key-2 = "value"
         }
     }
 
-    private fun Value.isString(key: String, expected: String) {
+    private fun KeyValue.isString(key: String, expected: String) {
         assertEquals(key, name)
         value.isString(expected)
     }
 
-    private fun Value.isInt(key: String, expected: Int) {
+    private fun KeyValue.isInt(key: String, expected: Int) {
         assertEquals(key, name)
         value.isInt(expected)
     }
 
-    private fun Value.isBoolean(key: String, expected: Boolean) {
+    private fun KeyValue.isBoolean(key: String, expected: Boolean) {
         assertEquals(key, name)
         value.isBoolean(expected)
     }

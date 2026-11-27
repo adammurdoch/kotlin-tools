@@ -2,7 +2,7 @@ package net.rubygrapefruit.toml
 
 sealed interface TomlValue
 
-class TomlTable(val values: List<Value>) : TomlValue
+class TomlTable(val values: List<KeyValue>) : TomlValue
 
 class TomlString(val value: String) : TomlValue
 
@@ -12,4 +12,4 @@ class TomlBoolean(val value: Boolean) : TomlValue
 
 class TomlArray(val value: List<TomlValue>) : TomlValue
 
-class Value(val name: String, val value: TomlValue)
+class KeyValue(val name: String, val value: TomlValue)

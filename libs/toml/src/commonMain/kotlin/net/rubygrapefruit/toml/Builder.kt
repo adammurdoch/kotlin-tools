@@ -15,13 +15,13 @@ internal class TableBuilder : Builder {
 
     fun addAll(pairs: List<KeyValuePairTree>) {
         for (pair in pairs) {
-            add(pair.path, pair.value)
+            add(pair.path, pair)
         }
     }
 
-    fun add(path: Path, value: TomlValue) {
+    fun add(path: Path, builder: Builder) {
         add(path) { name, owner ->
-            owner.add(name, path.position, value)
+            owner.add(name, path.position, builder)
         }
     }
 
@@ -48,11 +48,11 @@ internal class TableBuilder : Builder {
         }
     }
 
-    private fun add(name: String, position: Position, value: TomlValue) {
+    private fun add(name: String, position: Position, builder: Builder) {
         if (children.containsKey(name)) {
             throw IllegalArgumentException("Duplicate key '$name' at position $position")
         }
-        children[name] = ValueBuilder(value)
+        children[name] = builder
     }
 
     private fun table(name: String, position: Position): TableBuilder {
@@ -79,8 +79,8 @@ internal class TableBuilder : Builder {
         return newBuilder
     }
 
-    private fun nodes(): List<Value> {
-        return children.map { Value(it.key, it.value.value()) }
+    private fun nodes(): List<KeyValue> {
+        return children.map { KeyValue(it.key, it.value.value()) }
     }
 }
 
